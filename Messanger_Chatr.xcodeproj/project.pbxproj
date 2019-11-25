@@ -1,0 +1,599 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		05DB89B2238B851400D4581F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05DB89B1238B851400D4581F /* AppDelegate.swift */; };
+		05DB89B4238B851400D4581F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05DB89B3238B851400D4581F /* SceneDelegate.swift */; };
+		05DB89B6238B851400D4581F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05DB89B5238B851400D4581F /* ContentView.swift */; };
+		05DB89B8238B851800D4581F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 05DB89B7238B851800D4581F /* Assets.xcassets */; };
+		05DB89BB238B851800D4581F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 05DB89BA238B851800D4581F /* Preview Assets.xcassets */; };
+		05DB89BE238B851800D4581F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 05DB89BC238B851800D4581F /* LaunchScreen.storyboard */; };
+		05DB89C9238B851800D4581F /* Messanger_ChatrTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05DB89C8238B851800D4581F /* Messanger_ChatrTests.swift */; };
+		05DB89D4238B851900D4581F /* Messanger_ChatrUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05DB89D3238B851900D4581F /* Messanger_ChatrUITests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		05DB89C5238B851800D4581F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 05DB89A6238B851400D4581F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 05DB89AD238B851400D4581F;
+			remoteInfo = Messanger_Chatr;
+		};
+		05DB89D0238B851900D4581F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 05DB89A6238B851400D4581F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 05DB89AD238B851400D4581F;
+			remoteInfo = Messanger_Chatr;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		05DB89AE238B851400D4581F /* Messanger_Chatr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Messanger_Chatr.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		05DB89B1238B851400D4581F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		05DB89B3238B851400D4581F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		05DB89B5238B851400D4581F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		05DB89B7238B851800D4581F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		05DB89BA238B851800D4581F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		05DB89BD238B851800D4581F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		05DB89BF238B851800D4581F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		05DB89C4238B851800D4581F /* Messanger_ChatrTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Messanger_ChatrTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		05DB89C8238B851800D4581F /* Messanger_ChatrTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Messanger_ChatrTests.swift; sourceTree = "<group>"; };
+		05DB89CA238B851800D4581F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		05DB89CF238B851900D4581F /* Messanger_ChatrUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Messanger_ChatrUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		05DB89D3238B851900D4581F /* Messanger_ChatrUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Messanger_ChatrUITests.swift; sourceTree = "<group>"; };
+		05DB89D5238B851900D4581F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		05DB89AB238B851400D4581F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		05DB89C1238B851800D4581F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		05DB89CC238B851900D4581F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		05DB89A5238B851400D4581F = {
+			isa = PBXGroup;
+			children = (
+				05DB89B0238B851400D4581F /* Messanger_Chatr */,
+				05DB89C7238B851800D4581F /* Messanger_ChatrTests */,
+				05DB89D2238B851900D4581F /* Messanger_ChatrUITests */,
+				05DB89AF238B851400D4581F /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		05DB89AF238B851400D4581F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				05DB89AE238B851400D4581F /* Messanger_Chatr.app */,
+				05DB89C4238B851800D4581F /* Messanger_ChatrTests.xctest */,
+				05DB89CF238B851900D4581F /* Messanger_ChatrUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		05DB89B0238B851400D4581F /* Messanger_Chatr */ = {
+			isa = PBXGroup;
+			children = (
+				05DB89B1238B851400D4581F /* AppDelegate.swift */,
+				05DB89B3238B851400D4581F /* SceneDelegate.swift */,
+				05DB89B5238B851400D4581F /* ContentView.swift */,
+				05DB89B7238B851800D4581F /* Assets.xcassets */,
+				05DB89BC238B851800D4581F /* LaunchScreen.storyboard */,
+				05DB89BF238B851800D4581F /* Info.plist */,
+				05DB89B9238B851800D4581F /* Preview Content */,
+			);
+			path = Messanger_Chatr;
+			sourceTree = "<group>";
+		};
+		05DB89B9238B851800D4581F /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				05DB89BA238B851800D4581F /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		05DB89C7238B851800D4581F /* Messanger_ChatrTests */ = {
+			isa = PBXGroup;
+			children = (
+				05DB89C8238B851800D4581F /* Messanger_ChatrTests.swift */,
+				05DB89CA238B851800D4581F /* Info.plist */,
+			);
+			path = Messanger_ChatrTests;
+			sourceTree = "<group>";
+		};
+		05DB89D2238B851900D4581F /* Messanger_ChatrUITests */ = {
+			isa = PBXGroup;
+			children = (
+				05DB89D3238B851900D4581F /* Messanger_ChatrUITests.swift */,
+				05DB89D5238B851900D4581F /* Info.plist */,
+			);
+			path = Messanger_ChatrUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		05DB89AD238B851400D4581F /* Messanger_Chatr */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 05DB89D8238B851900D4581F /* Build configuration list for PBXNativeTarget "Messanger_Chatr" */;
+			buildPhases = (
+				05DB89AA238B851400D4581F /* Sources */,
+				05DB89AB238B851400D4581F /* Frameworks */,
+				05DB89AC238B851400D4581F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Messanger_Chatr;
+			productName = Messanger_Chatr;
+			productReference = 05DB89AE238B851400D4581F /* Messanger_Chatr.app */;
+			productType = "com.apple.product-type.application";
+		};
+		05DB89C3238B851800D4581F /* Messanger_ChatrTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 05DB89DB238B851900D4581F /* Build configuration list for PBXNativeTarget "Messanger_ChatrTests" */;
+			buildPhases = (
+				05DB89C0238B851800D4581F /* Sources */,
+				05DB89C1238B851800D4581F /* Frameworks */,
+				05DB89C2238B851800D4581F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				05DB89C6238B851800D4581F /* PBXTargetDependency */,
+			);
+			name = Messanger_ChatrTests;
+			productName = Messanger_ChatrTests;
+			productReference = 05DB89C4238B851800D4581F /* Messanger_ChatrTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		05DB89CE238B851900D4581F /* Messanger_ChatrUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 05DB89DE238B851900D4581F /* Build configuration list for PBXNativeTarget "Messanger_ChatrUITests" */;
+			buildPhases = (
+				05DB89CB238B851900D4581F /* Sources */,
+				05DB89CC238B851900D4581F /* Frameworks */,
+				05DB89CD238B851900D4581F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				05DB89D1238B851900D4581F /* PBXTargetDependency */,
+			);
+			name = Messanger_ChatrUITests;
+			productName = Messanger_ChatrUITests;
+			productReference = 05DB89CF238B851900D4581F /* Messanger_ChatrUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		05DB89A6238B851400D4581F /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1120;
+				LastUpgradeCheck = 1120;
+				ORGANIZATIONNAME = "Brandon Shaw";
+				TargetAttributes = {
+					05DB89AD238B851400D4581F = {
+						CreatedOnToolsVersion = 11.2.1;
+					};
+					05DB89C3238B851800D4581F = {
+						CreatedOnToolsVersion = 11.2.1;
+						TestTargetID = 05DB89AD238B851400D4581F;
+					};
+					05DB89CE238B851900D4581F = {
+						CreatedOnToolsVersion = 11.2.1;
+						TestTargetID = 05DB89AD238B851400D4581F;
+					};
+				};
+			};
+			buildConfigurationList = 05DB89A9238B851400D4581F /* Build configuration list for PBXProject "Messanger_Chatr" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 05DB89A5238B851400D4581F;
+			productRefGroup = 05DB89AF238B851400D4581F /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				05DB89AD238B851400D4581F /* Messanger_Chatr */,
+				05DB89C3238B851800D4581F /* Messanger_ChatrTests */,
+				05DB89CE238B851900D4581F /* Messanger_ChatrUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		05DB89AC238B851400D4581F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				05DB89BE238B851800D4581F /* LaunchScreen.storyboard in Resources */,
+				05DB89BB238B851800D4581F /* Preview Assets.xcassets in Resources */,
+				05DB89B8238B851800D4581F /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		05DB89C2238B851800D4581F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		05DB89CD238B851900D4581F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		05DB89AA238B851400D4581F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				05DB89B2238B851400D4581F /* AppDelegate.swift in Sources */,
+				05DB89B4238B851400D4581F /* SceneDelegate.swift in Sources */,
+				05DB89B6238B851400D4581F /* ContentView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		05DB89C0238B851800D4581F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				05DB89C9238B851800D4581F /* Messanger_ChatrTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		05DB89CB238B851900D4581F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				05DB89D4238B851900D4581F /* Messanger_ChatrUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		05DB89C6238B851800D4581F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 05DB89AD238B851400D4581F /* Messanger_Chatr */;
+			targetProxy = 05DB89C5238B851800D4581F /* PBXContainerItemProxy */;
+		};
+		05DB89D1238B851900D4581F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 05DB89AD238B851400D4581F /* Messanger_Chatr */;
+			targetProxy = 05DB89D0238B851900D4581F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		05DB89BC238B851800D4581F /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				05DB89BD238B851800D4581F /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		05DB89D6238B851900D4581F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		05DB89D7238B851900D4581F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		05DB89D9238B851900D4581F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"Messanger_Chatr/Preview Content\"";
+				DEVELOPMENT_TEAM = TEV97DGLYR;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = Messanger_Chatr/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.brandonshaw.Messanger-Chatr";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		05DB89DA238B851900D4581F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"Messanger_Chatr/Preview Content\"";
+				DEVELOPMENT_TEAM = TEV97DGLYR;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = Messanger_Chatr/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.brandonshaw.Messanger-Chatr";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		05DB89DC238B851900D4581F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = TEV97DGLYR;
+				INFOPLIST_FILE = Messanger_ChatrTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.brandonshaw.Messanger-ChatrTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Messanger_Chatr.app/Messanger_Chatr";
+			};
+			name = Debug;
+		};
+		05DB89DD238B851900D4581F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = TEV97DGLYR;
+				INFOPLIST_FILE = Messanger_ChatrTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.brandonshaw.Messanger-ChatrTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Messanger_Chatr.app/Messanger_Chatr";
+			};
+			name = Release;
+		};
+		05DB89DF238B851900D4581F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = TEV97DGLYR;
+				INFOPLIST_FILE = Messanger_ChatrUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.brandonshaw.Messanger-ChatrUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Messanger_Chatr;
+			};
+			name = Debug;
+		};
+		05DB89E0238B851900D4581F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = TEV97DGLYR;
+				INFOPLIST_FILE = Messanger_ChatrUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.brandonshaw.Messanger-ChatrUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Messanger_Chatr;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		05DB89A9238B851400D4581F /* Build configuration list for PBXProject "Messanger_Chatr" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				05DB89D6238B851900D4581F /* Debug */,
+				05DB89D7238B851900D4581F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		05DB89D8238B851900D4581F /* Build configuration list for PBXNativeTarget "Messanger_Chatr" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				05DB89D9238B851900D4581F /* Debug */,
+				05DB89DA238B851900D4581F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		05DB89DB238B851900D4581F /* Build configuration list for PBXNativeTarget "Messanger_ChatrTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				05DB89DC238B851900D4581F /* Debug */,
+				05DB89DD238B851900D4581F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		05DB89DE238B851900D4581F /* Build configuration list for PBXNativeTarget "Messanger_ChatrUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				05DB89DF238B851900D4581F /* Debug */,
+				05DB89E0238B851900D4581F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 05DB89A6238B851400D4581F /* Project object */;
+}
