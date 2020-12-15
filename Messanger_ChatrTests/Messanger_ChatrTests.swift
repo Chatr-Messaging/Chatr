@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import Messanger_Chatr
+//@testable import Messanger_Chatr
 
 class Messanger_ChatrTests: XCTestCase {
 
