@@ -254,7 +254,7 @@ struct DialogCell: View {
                             UserDefaults.standard.set(false, forKey: "localOpen")
                             changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
                             self.openActionSheet = false
-                            
+
                             if self.dialogModel.dialogType == "private" || self.dialogModel.dialogType == "group" {
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.50) {
                                     changeDialogRealmData().deletePrivateConnectyDialog(dialogID: self.dialogModel.id, isOwner: self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? true : false)

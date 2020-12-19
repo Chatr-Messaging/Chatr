@@ -11,6 +11,7 @@ import MobileCoreServices
 import SDWebImageSwiftUI
 import ConnectyCube
 import RealmSwift
+import WKView
 
 struct TextBubble: View {
     @EnvironmentObject var auth: AuthModel
@@ -47,11 +48,67 @@ struct TextBubble: View {
                 //} else {
                 ZStack {
                     if self.message.messageState != .isTyping || self.message.messageState == .deleted {
-                        Text(self.message.messageState == .deleted ? "deleted" : self.message.text)
-                            .multilineTextAlignment(.leading)
-                            .foregroundColor(self.message.messageState != .deleted ? messagePosition == .right ? .white : .primary : .secondary)
-                            .padding(.vertical, 8)
-                            .lineLimit(nil)
+                        Menu {
+                            VStack {
+                                if messagePosition == .right {
+                                    if self.message.messageState != .deleted {
+                                        Button(action: {
+                                            print("Delete Message")
+                                            self.auth.selectedConnectyDialog?.removeMessage(withID: self.message.id) { (error) in
+                                                if error != nil {
+                                                    UINotificationFeedbackGenerator().notificationOccurred(.error)
+                                                } else {
+                                                    changeMessageRealmData().updateMessageState(messageID: self.message.id, messageState: .deleted)
+                                                }
+                                            }
+                                        }) { HStack {
+                                            Image(systemName: "trash")
+                                            Text("Delete")
+                                                .foregroundColor(.red) }
+                                        }
+                                    }
+                                    Button(action: {
+                                        print("Edit Message")
+                                    }) { HStack {
+                                        Image(systemName: "pencil")
+                                        Text("Edit") }
+                                    }
+                                }
+                                Button(action: {
+                                    print("Share Message")
+                                }) { HStack {
+                                    Image(systemName: "arrowshape.turn.up.left")
+                                    Text("Share") }
+                                }
+                                Button(action: {
+                                    print("Copy Message")
+                                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                    UIPasteboard.general.setValue(self.message.text,
+                                                forPasteboardType: kUTTypePlainText as String)
+                                    auth.notificationtext = "Successfully copied message"
+                                    NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+                                }) { HStack {
+                                    Image(systemName: "doc.on.doc")
+                                    Text("Copy Text") }
+                                }
+                                
+                                ForEach(self.URLStrings, id: \.self) { link in
+                                    Button(action: {
+                                        UIApplication.shared.open(link as URL)
+                                        print("Open \(link) && \(link.absoluteString ?? "")")
+                                    }) { HStack {
+                                        Image(systemName: "safari")
+                                        Text("Open \(link)") }
+                                    }
+                                }
+                            }
+                        } label: {
+                            Text(self.message.messageState == .deleted ? "deleted" : self.message.text)
+                                .multilineTextAlignment(.leading)
+                                .foregroundColor(self.message.messageState != .deleted ? messagePosition == .right ? .white : .primary : .secondary)
+                                .padding(.vertical, 8)
+                                .lineLimit(nil)
+                        }
                     } else if self.message.messageState == .isTyping {
                         HStack(spacing: 6) {
                             ForEach(0..<3) { type in
@@ -81,62 +138,6 @@ struct TextBubble: View {
                 .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
                 .contentShape(RoundedRectangle(cornerRadius: 20, style: .circular))
                 .shadow(color: self.messagePosition == .right && self.message.messageState != .deleted ? Color.blue.opacity(0.25) : Color.black.opacity(0.15), radius: 6, x: 0, y: 6)
-                .contextMenu {
-                    if self.message.messageState != .isTyping {
-                        VStack {
-                            if messagePosition == .right {
-                                if self.message.messageState != .deleted {
-                                    Button(action: {
-                                        print("Delete Message")
-                                        self.auth.selectedConnectyDialog?.removeMessage(withID: self.message.id) { (error) in
-                                            if error != nil {
-                                                UINotificationFeedbackGenerator().notificationOccurred(.error)
-                                            } else {
-                                                changeMessageRealmData().updateMessageState(messageID: self.message.id, messageState: .deleted)
-                                            }
-                                        }
-                                    }) { HStack {
-                                        Image(systemName: "trash")
-                                        Text("Delete")
-                                            .foregroundColor(.red) }
-                                    }
-                                }
-                                Button(action: {
-                                    print("Edit Message")
-                                }) { HStack {
-                                    Image(systemName: "pencil")
-                                    Text("Edit") }
-                                }
-                            }
-                            Button(action: {
-                                print("Share Message")
-                            }) { HStack {
-                                Image(systemName: "arrowshape.turn.up.left")
-                                Text("Share") }
-                            }
-                            Button(action: {
-                                print("Copy Message")
-                                UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                UIPasteboard.general.setValue(self.message.text,
-                                            forPasteboardType: kUTTypePlainText as String)
-                            }) { HStack {
-                                Image(systemName: "doc.on.doc")
-                                Text("Copy Text") }
-                            }
-                            
-                            ForEach(self.URLStrings, id: \.self) { link in
-                                Button(action: {
-                                    print("Open \(link)")
-                                    UIApplication.shared.open(link as URL)
-                                }) { HStack {
-                                    Image(systemName: "safari")
-                                    Text("Open \(link)") }
-                                }
-                            }
-                        }
-                    }
-                }
-                //}
             HStack {
                 if messagePosition == .right { Spacer() }
                 

@@ -11,6 +11,7 @@ import SDWebImageSwiftUI
 import MessageUI
 import ConnectyCube
 import RealmSwift
+import WKView
 
 struct VisitContactView: View {
     @EnvironmentObject var auth: AuthModel
@@ -24,6 +25,7 @@ struct VisitContactView: View {
     @State var connectyContact: User = User()
     @State var isProfileImgOpen: Bool = false
     @State var isProfileBioOpen: Bool = false
+    @State var isUrlOpen: Bool = false
     @State private var showingMoreSheet = false
     @State var profileViewSize = CGSize.zero
     @State var quickSnapViewState: QuickSnapViewingState = .closed
@@ -422,35 +424,82 @@ struct VisitContactView: View {
                                         
                                     Spacer()
                                 }.padding(.horizontal)
-                                .padding(.vertical, 12.5)
+                                .padding(.vertical, self.contact.emailAddress != "empty email address" && self.contact.website != "empty website" && !self.contact.isInfoPrivate ? 12.5 : 15)
                                 
-                                Divider()
-                                    .frame(width: Constants.screenWidth - 80)
+                                if self.contact.emailAddress != "empty email address" && self.contact.website != "empty website" && !self.contact.isInfoPrivate {
+                                    Divider()
+                                        .frame(width: Constants.screenWidth - 80)
+                                }
                             }
                         
                             //MARK: Email Address Section
-                            Button(action: {
-                                if MFMailComposeViewController.canSendMail() && self.contact.emailAddress != "empty email address" && !self.contact.isInfoPrivate {
-                                    self.isShowingMailView.toggle()
-                                } else {
-                                    UINotificationFeedbackGenerator().notificationOccurred(.error)
+                            if self.contact.emailAddress != "empty email address" && !self.contact.isInfoPrivate {
+                                Button(action: {
+                                    if MFMailComposeViewController.canSendMail() && self.contact.emailAddress != "empty email address" && !self.contact.isInfoPrivate {
+                                        self.isShowingMailView.toggle()
+                                    } else {
+                                        UINotificationFeedbackGenerator().notificationOccurred(.error)
+                                    }
+                                }) {
+                                    VStack(alignment: .trailing, spacing: 0) {
+                                        HStack(alignment: .center) {
+                                            Image(systemName: "envelope")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .foregroundColor(self.contact.emailAddress == "empty email address" ? .gray : .primary)
+                                                .frame(width: 20, height: 20, alignment: .center)
+                                                .padding(.trailing, 5)
+                                            
+                                            Text(self.contact.emailAddress)
+                                                .font(.none)
+                                                .fontWeight(.none)
+                                                .background(self.contact.isInfoPrivate ? Color.secondary : Color.clear)
+                                                .foregroundColor(self.contact.isInfoPrivate ? .clear : self.contact.emailAddress == "empty email address" ? .gray : .primary)
+                                            
+                                            Spacer()
+                                            Image(systemName: "chevron.right")
+                                                .resizable()
+                                                .font(Font.title.weight(.bold))
+                                                .scaledToFit()
+                                                .frame(width: 7, height: 15, alignment: .center)
+                                                .foregroundColor(.secondary)
+                                        }.padding(.horizontal)
+                                        .padding(.vertical, 12.5)
+                                        
+                                        Divider()
+                                            .frame(width: Constants.screenWidth - 80)
+                                    }
+                                }.buttonStyle(changeBGButtonStyle())
+                                .sheet(isPresented: $isShowingMailView) {
+                                    MailView(isShowing: self.$isShowingMailView, result: self.$mailResult, emailAddress: self.contact.emailAddress)
                                 }
-                            }) {
-                                VStack(alignment: .trailing, spacing: 0) {
+                            }
+
+                            //MARK: Website Section
+                            if self.contact.website != "empty website" && !self.contact.isInfoPrivate {
+                                Button(action: {
+                                    if self.contact.website != "empty website" && !self.contact.isInfoPrivate {
+                                        //UIApplication.shared.open(URL(string:self.contact.website)!)
+                                        self.isUrlOpen.toggle()
+                                    } else {
+                                        print("website is empty")
+                                        UINotificationFeedbackGenerator().notificationOccurred(.error)
+                                    }
+                                }) {
                                     HStack(alignment: .center) {
-                                        Image(systemName: "envelope")
+                                        Image(systemName: "safari")
                                             .resizable()
                                             .scaledToFit()
-                                            .foregroundColor(self.contact.emailAddress == "empty email address" ? .gray : .primary)
+                                            .foregroundColor(self.contact.website == "empty website" ? .gray : .primary)
                                             .frame(width: 20, height: 20, alignment: .center)
                                             .padding(.trailing, 5)
                                         
-                                        Text(self.contact.emailAddress)
+                                        Text(self.contact.website)
                                             .font(.none)
                                             .fontWeight(.none)
                                             .background(self.contact.isInfoPrivate ? Color.secondary : Color.clear)
-                                            .foregroundColor(self.contact.isInfoPrivate ? .clear : self.contact.emailAddress == "empty email address" ? .gray : .primary)
-                                        
+                                            .foregroundColor(self.contact.isInfoPrivate ? .clear : self.contact.website == "empty website" ? .gray : .primary)
+                                    
                                         Spacer()
                                         Image(systemName: "chevron.right")
                                             .resizable()
@@ -460,48 +509,21 @@ struct VisitContactView: View {
                                             .foregroundColor(.secondary)
                                     }.padding(.horizontal)
                                     .padding(.vertical, 12.5)
-                                    
-                                    Divider()
-                                        .frame(width: Constants.screenWidth - 80)
-                                }
-                            }.buttonStyle(changeBGButtonStyle())
-                            .sheet(isPresented: $isShowingMailView) {
-                                MailView(isShowing: self.$isShowingMailView, result: self.$mailResult, emailAddress: self.contact.emailAddress)
+                                }.buttonStyle(changeBGButtonStyle())
+                                .sheet(isPresented: self.$isUrlOpen, content: {
+                                    NavigationView {
+                                        WebView(url: self.contact.website,
+                                            tintColor: Color("buttonColor_darker"),
+                                            titleColor: Color("bgColor_opposite"),
+                                            backText: Text("Done").foregroundColor(.blue),
+                                            reloadImage: Image(systemName: "arrow.counterclockwise"),
+                                            goForwardImage: Image(systemName: "arrow.forward"),
+                                            goBackImage: Image(systemName: "arrow.backward"),
+                                            allowedHosts: Constants.allowedHosts,
+                                            forbiddenHosts: [])
+                                    }
+                                })
                             }
-
-                            //MARK: Website Section
-                            Button(action: {
-                                if self.contact.website != "empty website" && !self.contact.isInfoPrivate {
-                                    UIApplication.shared.open(URL(string:self.contact.website)!)
-                                } else {
-                                    print("website is empty")
-                                    UINotificationFeedbackGenerator().notificationOccurred(.error)
-                                }
-                            }) {
-                                HStack(alignment: .center) {
-                                    Image(systemName: "safari")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .foregroundColor(self.contact.website == "empty website" ? .gray : .primary)
-                                        .frame(width: 20, height: 20, alignment: .center)
-                                        .padding(.trailing, 5)
-                                    
-                                    Text(self.contact.website)
-                                        .font(.none)
-                                        .fontWeight(.none)
-                                        .background(self.contact.isInfoPrivate ? Color.secondary : Color.clear)
-                                        .foregroundColor(self.contact.isInfoPrivate ? .clear : self.contact.website == "empty website" ? .gray : .primary)
-                                
-                                    Spacer()
-                                    Image(systemName: "chevron.right")
-                                        .resizable()
-                                        .font(Font.title.weight(.bold))
-                                        .scaledToFit()
-                                        .frame(width: 7, height: 15, alignment: .center)
-                                        .foregroundColor(.secondary)
-                                }.padding(.horizontal)
-                                .padding(.vertical, 12.5)
-                            }.buttonStyle(changeBGButtonStyle())
                         }
                     }.background(Color("buttonColor"))
                     .clipShape(RoundedRectangle(cornerRadius: 15, style: .circular))
@@ -594,10 +616,8 @@ struct VisitContactView: View {
                                         }.padding(.horizontal)
                                         .padding(.vertical, 12.5)
                                         
-                                        if self.contact.isMyContact {
-                                            Divider()
-                                                .frame(width: Constants.screenWidth - 80)
-                                        }
+                                        Divider()
+                                            .frame(width: Constants.screenWidth - 80)
                                     }
                                 }.buttonStyle(changeBGButtonStyle())
                             }

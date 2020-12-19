@@ -27,6 +27,7 @@ struct Constants {
     static let projectVersion = "0.9989"
     static let appStoreLink = "https://bit.ly/35fMzUg"
     static let firebaseCurrentUser = Auth.auth().currentUser
+    static let allowedHosts = [".com", ".me", ".org", ".io", ".edu", ".net", ".app", ".web", ".co", ".uk", ".us", ".gov", ".biz", ".info", ",jobs", ".ly", ".name", ".xyz"]
     let connectyCurrentUserID = UserDefaults.standard.integer(forKey: "currentUserID")
     static var userHasiOS14 : Bool {
         get { if #available(iOS 14.0, *) { return true } else { return false } }

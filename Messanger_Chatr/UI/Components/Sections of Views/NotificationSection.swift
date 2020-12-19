@@ -13,9 +13,8 @@ struct NotificationSection: View {
 
     var body: some View {
         ZStack(alignment: .top) {
-            BlurView(style: .regular)
-                .frame(width: Constants.screenWidth - 40, height: 75, alignment: .center)
-                //.frame(minHeight: 65, maxHeight: 125)
+            BlurView(style: .systemMaterial)
+                .frame(width: Constants.screenWidth - 40, height: 65, alignment: .center)
                 .cornerRadius(20)
                 .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 10)
                 
@@ -36,7 +35,7 @@ struct NotificationSection: View {
                     .lineLimit(4)
                 
                 Spacer()
-            }.padding(.vertical)            
+            }.padding(.vertical)
         }
     }
 }

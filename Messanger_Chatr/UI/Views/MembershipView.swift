@@ -55,350 +55,357 @@ struct MembershipView: View {
             Spacer()
             
             //MARK: List Section
-            //ScrollView(.vertical, showsIndicators: false) {
-            VStack(alignment: .leading, spacing: 20) {
-                    //Seal the Deal
-                    HStack(alignment: .top) {
-                        Image(systemName: "checkmark.seal")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 40, height: 40, alignment: .center)
-                            .foregroundColor(.white)
-                            .padding(.trailing, 10)
+            ScrollView(.vertical, showsIndicators: false) {
+                VStack(spacing: 20) {
+                    VStack(alignment: .leading, spacing: 20) {
+                        Spacer()
                         
-                        VStack(alignment: .leading) {
-                            Text("Seal the Deal")
-                                .font(.headline)
-                                .fontWeight(.bold)
+                        //Seal the Deal
+                        HStack(alignment: .top) {
+                            Image(systemName: "checkmark.seal")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 40, height: 40, alignment: .center)
                                 .foregroundColor(.white)
-                                .shadow(color: Color.black.opacity(0.4), radius: 3, x: 0, y: 0)
-                                .padding(.bottom, 0)
+                                .padding(.trailing, 10)
                             
-                            Text("Receive a badge next to your name to help combat fake accounts.")
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                                .shadow(color: Color.black.opacity(0.25), radius: 3, x: 0, y: 0)
-                                .foregroundColor(.white)
-                                .opacity(0.8)
-                        }
-                    }
-                                    
-                    //Customize Theme
-                    HStack(alignment: .top) {
-                        Image(systemName: "paintbrush")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 40, height: 40, alignment: .center)
-                            .foregroundColor(.white)
-                            .padding(.trailing, 10)
-                        
-                        VStack(alignment: .leading) {
-                            Text("Customize Theme")
-                                .font(.headline)
-                                .fontWeight(.bold)
-                                .foregroundColor(.white)
-                                .shadow(color: Color.black.opacity(0.4), radius: 3, x: 0, y: 0)
-                                .padding(.bottom, 0)
-                            
-                            Text("Make it feel more at home by changing the background, icon, & more.")
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                                .shadow(color: Color.black.opacity(0.25), radius: 3, x: 0, y: 0)
-                                .foregroundColor(.white)
-                                .opacity(0.8)
-                        }
-                    }
-                    
-                    //Unlimited Storage
-                    HStack(alignment: .top) {
-                        Image(systemName: "lock.shield")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 40, height: 40, alignment: .center)
-                            .foregroundColor(.white)
-                            .padding(.trailing, 10)
-                        
-                        VStack(alignment: .leading) {
-                            Text("Ultimate Security")
-                                .font(.headline)
-                                .fontWeight(.bold)
-                                .foregroundColor(.white)
-                                .shadow(color: Color.black.opacity(0.4), radius: 3, x: 0, y: 0)
-                                .padding(.bottom, 0)
-                            
-                            Text("Enhance your security with an extra layer of verification.")
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                                .shadow(color: Color.black.opacity(0.25), radius: 3, x: 0, y: 0)
-                                .foregroundColor(.white)
-                                .opacity(0.8)
-                        }
-                    }
-                    
-                    //Discovered Storage
-                    HStack(alignment: .top) {
-                        Image(systemName: "person.2")
-                            .resizable()
-                            .scaledToFit()
-                            .font(Font.title.weight(.bold))
-                            .frame(width: 40, height: 40, alignment: .center)
-                            .foregroundColor(.white)
-                            .padding(.trailing, 15)
-                        
-                        VStack(alignment: .leading) {
-                            Text("Public Channels")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.white)
-                                .shadow(color: Color.black.opacity(0.4), radius: 3, x: 0, y: 0)
-                                .padding(.bottom, 0)
-                            
-                            Text("Create public channels and watch your community grow.")
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                                .shadow(color: Color.black.opacity(0.25), radius: 3, x: 0, y: 0)
-                                .foregroundColor(.white)
-                                .opacity(0.8)
-                        }
-                    }
-                }
-            //}.frame(maxHeight: Constants.screenHeight / 3 + 25, alignment: .center)
-            
-            Spacer()
-            HStack(spacing: 10) {
-                Button(action: {
-                    print("monthly!")
-                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                    self.selectedOption = 1
-                }, label: {
-                    ZStack(alignment: .bottom) {
-                        ZStack(alignment: .center) {
-                            RoundedRectangle(cornerRadius: 25)
-                                .stroke(Constants.quickSnapGradient, lineWidth: self.selectedOption == 1 ? 8 : 0)
-                                .frame(width: (Constants.screenWidth / 3) - 29, height: (Constants.screenWidth / 3.5) - 5, alignment: .center)
-                            
-                            Rectangle()
-                                .frame(width: (Constants.screenWidth / 3) - 25, height: (Constants.screenWidth / 3.5), alignment: .center)
-                                .foregroundColor(Color("bgColor").opacity(0.35))
-                            
-                            VStack {
-                                if let mon = monthly {
-                                    Text("\(self.formattedPrice(for: mon))")
-                                        .font(.title)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(.white)
-                                        .shadow(color: Color.black.opacity(0.25), radius: 3, x: 0, y: 0)
-                                }
-                                
-                                Text("per month")
-                                    .font(.footnote)
-                                    .fontWeight(.regular)
-                                    .shadow(color: Color.black.opacity(0.25), radius: 5, x: 0, y: 0)
+                            VStack(alignment: .leading) {
+                                Text("Seal the Deal")
+                                    .font(.headline)
+                                    .fontWeight(.bold)
                                     .foregroundColor(.white)
-                                    .opacity(0.8)
-                            }
-                        }.clipShape(RoundedRectangle(cornerRadius: 25, style: .circular))
-                        .shadow(color: Color("buttonShadow"), radius: 20, x: 0, y: 20)
-                        
-                        ZStack(alignment: .center) {
-                            Rectangle()
-                                .frame(width: (Constants.screenWidth / 3) - 40, height: 45, alignment: .bottom)
-                                .shadow(color: Color.black.opacity(0.4), radius: 8, x: 0, y: 8)
-                                .foregroundColor(.clear)
-                                .background(Constants.purpleGradient)
-                                .cornerRadius(30)
-                            
-                            Text("FREE \nTRIAL!")
-                                .font(.system(size: 16))
-                                .fontWeight(.bold)
-                                .foregroundColor(.white)
-                                .multilineTextAlignment(.center)
-                        }.offset(y: 20)
-                    }
-                }).scaleEffect(self.selectedOption == 1 ? 1.1 : 1.0)
-                .animation(.spring(response: 0.25, dampingFraction: 0.6, blendDuration: 0))
-                .buttonStyle(ClickButtonStyle())
-                
-                Button(action: {
-                    print("buy 3 months")
-                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                    self.selectedOption = 2
-                }, label: {
-                    ZStack(alignment: .bottom) {
-                        ZStack(alignment: .center) {
-                            RoundedRectangle(cornerRadius: 25)
-                                .stroke(Constants.quickSnapGradient, lineWidth: self.selectedOption == 2 ? 8 : 0)
-                                .frame(width: (Constants.screenWidth / 3) - 29, height: (Constants.screenWidth / 3.5) - 5, alignment: .center)
-                            
-                            Rectangle()
-                                .frame(width: (Constants.screenWidth / 3) - 25, height: (Constants.screenWidth / 3.5), alignment: .center)
-                                .foregroundColor(Color("bgColor").opacity(0.35))
-
-                            VStack {
-                                if let threeMon = threeMonthly {
-                                    Text("\(self.formattedPrice(for: threeMon))")
-                                        .font(.title)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(.white)
-                                        .shadow(color: Color.black.opacity(0.25), radius: 3, x: 0, y: 0)
-                                }
+                                    .shadow(color: Color.black.opacity(0.4), radius: 3, x: 0, y: 0)
+                                    .padding(.bottom, 0)
                                 
-                                Text("per 3 months")
-                                    .font(.footnote)
-                                    .fontWeight(.regular)
-                                    .shadow(color: Color.black.opacity(0.25), radius: 5, x: 0, y: 0)
-                                    .foregroundColor(.white)
-                                    .opacity(0.8)
-                            }
-                        }.clipShape(RoundedRectangle(cornerRadius: 25, style: .circular))
-                        .shadow(color: Color("buttonShadow"), radius: 20, x: 0, y: 20)
-                        
-                        ZStack(alignment: .center) {
-                            Rectangle()
-                                .frame(width: (Constants.screenWidth / 3) - 40, height: 40, alignment: .bottom)
-                                .shadow(color: Color.black.opacity(0.4), radius: 8, x: 0, y: 8)
-                                .foregroundColor(.clear)
-                                .background(Constants.purpleGradient)
-                                .cornerRadius(30)
-                            
-                            Text("12% OFF!")
-                                .font(.system(size: 16))
-                                .fontWeight(.bold)
-                                .foregroundColor(.white)
-                        }.offset(y: 20)
-                    }
-                }).scaleEffect(self.selectedOption == 2 ? 1.1 : 1.0)
-                .animation(.spring(response: 0.25, dampingFraction: 0.6, blendDuration: 0))
-                .buttonStyle(ClickButtonStyle())
-                
-                Button(action: {
-                    print("buy yearly")
-                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                    self.selectedOption = 3
-                }, label: {
-                    ZStack(alignment: .bottom) {
-                        ZStack(alignment: .center) {
-                            RoundedRectangle(cornerRadius: 25)
-                                .stroke(Constants.quickSnapGradient, lineWidth: self.selectedOption == 3 ? 8 : 0)
-                                .frame(width: (Constants.screenWidth / 3) - 29, height: (Constants.screenWidth / 3.5) - 5, alignment: .center)
-                            
-                            Rectangle()
-                                .frame(width: (Constants.screenWidth / 3) - 25, height: (Constants.screenWidth / 3.5), alignment: .center)
-                                .foregroundColor(Color("bgColor").opacity(0.35))
-
-                            VStack {
-                                if let yearz = self.yearly {
-                                    Text("\(self.formattedPrice(for: yearz))")
-                                        .font(.title)
-                                        .fontWeight(.medium)
-                                        .foregroundColor(.white)
-                                        .shadow(color: Color.black.opacity(0.25), radius: 5, x: 0, y: 0)
-                                }
-                                
-                                Text("per year")
-                                    .font(.footnote)
-                                    .fontWeight(.regular)
+                                Text("Receive a badge next to your name to help combat fake accounts.")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
                                     .shadow(color: Color.black.opacity(0.25), radius: 3, x: 0, y: 0)
                                     .foregroundColor(.white)
                                     .opacity(0.8)
                             }
-                        }.clipShape(RoundedRectangle(cornerRadius: 25, style: .circular))
-                        .shadow(color: Color("buttonShadow"), radius: 20, x: 0, y: 20)
-                        
-                        ZStack(alignment: .center) {
-                            Rectangle()
-                                .frame(width: (Constants.screenWidth / 3) - 40, height: 40, alignment: .bottom)
-                                .shadow(color: Color.black.opacity(0.4), radius: 8, x: 0, y: 8)
-                                .foregroundColor(.clear)
-                                .background(Constants.purpleGradient)
-                                .cornerRadius(30)
-                            
-                            Text("20% OFF!")
-                                .font(.system(size: 16))
-                                .fontWeight(.bold)
+                        }
+                                            
+                        //Customize Theme
+                        HStack(alignment: .top) {
+                            Image(systemName: "paintbrush")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 40, height: 40, alignment: .center)
                                 .foregroundColor(.white)
-                        }.offset(y: 20)
+                                .padding(.trailing, 10)
+                            
+                            VStack(alignment: .leading) {
+                                Text("Customize Theme")
+                                    .font(.headline)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.white)
+                                    .shadow(color: Color.black.opacity(0.4), radius: 3, x: 0, y: 0)
+                                    .padding(.bottom, 0)
+                                
+                                Text("Make it feel more at home by changing the background, icon, & more.")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .shadow(color: Color.black.opacity(0.25), radius: 3, x: 0, y: 0)
+                                    .foregroundColor(.white)
+                                    .opacity(0.8)
+                            }
+                        }
+                        
+                        //Unlimited Storage
+                        HStack(alignment: .top) {
+                            Image(systemName: "lock.shield")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 40, height: 40, alignment: .center)
+                                .foregroundColor(.white)
+                                .padding(.trailing, 10)
+                            
+                            VStack(alignment: .leading) {
+                                Text("Ultimate Security")
+                                    .font(.headline)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.white)
+                                    .shadow(color: Color.black.opacity(0.4), radius: 3, x: 0, y: 0)
+                                    .padding(.bottom, 0)
+                                
+                                Text("Enhance your security with an extra layer of verification.")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .shadow(color: Color.black.opacity(0.25), radius: 3, x: 0, y: 0)
+                                    .foregroundColor(.white)
+                                    .opacity(0.8)
+                            }
+                        }
+                        
+                        //Discovered Storage
+                        HStack(alignment: .top) {
+                            Image(systemName: "person.2")
+                                .resizable()
+                                .scaledToFit()
+                                .font(Font.title.weight(.bold))
+                                .frame(width: 40, height: 40, alignment: .center)
+                                .foregroundColor(.white)
+                                .padding(.trailing, 15)
+                            
+                            VStack(alignment: .leading) {
+                                Text("Public Channels")
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.white)
+                                    .shadow(color: Color.black.opacity(0.4), radius: 3, x: 0, y: 0)
+                                    .padding(.bottom, 0)
+                                
+                                Text("Create public channels and watch your community grow.")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .shadow(color: Color.black.opacity(0.25), radius: 3, x: 0, y: 0)
+                                    .foregroundColor(.white)
+                                    .opacity(0.8)
+                            }
+                        }
                     }
-                }).scaleEffect(self.selectedOption == 3 ? 1.1 : 1.0)
-                .animation(.spring(response: 0.25, dampingFraction: 0.6, blendDuration: 0))
-                .buttonStyle(ClickButtonStyle())
-
-            }.offset(y: -15)
-            
-            Spacer()
-            
-            Button(action: {
-                print("join premium")
-                if self.selectedOption == 1 {
-                    if let mont = self.monthly {
-                        self.auth.purchase(source: "profile_settings", product: mont)
-                    } else {
-                        print("monthy no there")
-                    }
-                } else if self.selectedOption == 2 {
-                    if let threemont = self.threeMonthly {
-                        self.auth.purchase(source: "profile_settings", product: threemont)
-                    } else {
-                        print("3 monthy no there")
-                    }
-                } else if self.selectedOption == 3 {
-                    if let yearlyy = self.yearly {
-                        self.auth.purchase(source: "profile_settings", product: yearlyy)
-                    } else {
-                        print("yearly no there")
-                    }
-                }
-            }) {
-                HStack(alignment: .center) {
-                    Image(systemName: "checkmark.seal")
-                        .resizable()
-                        .frame(width: 25, height: 25, alignment: .center)
-                        .foregroundColor(.white)
-                        .padding(.trailing, 5)
+                    //}.frame(maxHeight: Constants.screenHeight / 3 + 25, alignment: .center)
                     
-                    Text("JOIN PREMIUM")
-                        .font(.headline)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.white)
+                    Spacer()
+                    HStack(spacing: 10) {
+                        Button(action: {
+                            print("monthly!")
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            self.selectedOption = 1
+                        }, label: {
+                            ZStack(alignment: .bottom) {
+                                ZStack(alignment: .center) {
+                                    RoundedRectangle(cornerRadius: 25)
+                                        .stroke(Constants.blueGradient, lineWidth: self.selectedOption == 1 ? 8 : 0)
+                                        .frame(width: (Constants.screenWidth / 3) - 29, height: (Constants.screenWidth / 3.5) - 5, alignment: .center)
+                                    
+                                    Rectangle()
+                                        .frame(width: (Constants.screenWidth / 3) - 25, height: (Constants.screenWidth / 3.5), alignment: .center)
+                                        .foregroundColor(Color("bgColor").opacity(0.35))
+                                    
+                                    VStack {
+                                        if let mon = monthly {
+                                            Text("\(self.formattedPrice(for: mon))")
+                                                .font(.title)
+                                                .fontWeight(.semibold)
+                                                .foregroundColor(.white)
+                                                .shadow(color: Color.black.opacity(0.25), radius: 3, x: 0, y: 0)
+                                        }
+                                        
+                                        Text("per month")
+                                            .font(.footnote)
+                                            .fontWeight(.regular)
+                                            .shadow(color: Color.black.opacity(0.25), radius: 5, x: 0, y: 0)
+                                            .foregroundColor(.white)
+                                            .opacity(0.8)
+                                    }
+                                }.clipShape(RoundedRectangle(cornerRadius: 25, style: .circular))
+                                .shadow(color: Color("buttonShadow"), radius: 20, x: 0, y: 20)
+                                
+                                ZStack(alignment: .center) {
+                                    Rectangle()
+                                        .frame(width: (Constants.screenWidth / 3) - 40, height: 45, alignment: .bottom)
+                                        .shadow(color: Color.black.opacity(0.4), radius: 8, x: 0, y: 8)
+                                        .foregroundColor(.clear)
+                                        .background(Constants.purpleGradient)
+                                        .cornerRadius(30)
+                                    
+                                    Text("FREE \nTRIAL!")
+                                        .font(.system(size: 16))
+                                        .fontWeight(.bold)
+                                        .foregroundColor(.white)
+                                        .multilineTextAlignment(.center)
+                                }.offset(y: 20)
+                                .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
+                            }
+                        }).scaleEffect(self.selectedOption == 1 ? 1.1 : 1.0)
+                        .animation(.spring(response: 0.25, dampingFraction: 0.6, blendDuration: 0))
+                        .buttonStyle(ClickButtonStyle())
+                        
+                        Button(action: {
+                            print("buy 3 months")
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            self.selectedOption = 2
+                        }, label: {
+                            ZStack(alignment: .bottom) {
+                                ZStack(alignment: .center) {
+                                    RoundedRectangle(cornerRadius: 25)
+                                        .stroke(Constants.blueGradient, lineWidth: self.selectedOption == 2 ? 8 : 0)
+                                        .frame(width: (Constants.screenWidth / 3) - 29, height: (Constants.screenWidth / 3.5) - 5, alignment: .center)
+                                    
+                                    Rectangle()
+                                        .frame(width: (Constants.screenWidth / 3) - 25, height: (Constants.screenWidth / 3.5), alignment: .center)
+                                        .foregroundColor(Color("bgColor").opacity(0.35))
+
+                                    VStack {
+                                        if let threeMon = threeMonthly {
+                                            Text("\(self.formattedPrice(for: threeMon))")
+                                                .font(.title)
+                                                .fontWeight(.semibold)
+                                                .foregroundColor(.white)
+                                                .shadow(color: Color.black.opacity(0.25), radius: 3, x: 0, y: 0)
+                                        }
+                                        
+                                        Text("per 3 months")
+                                            .font(.footnote)
+                                            .fontWeight(.regular)
+                                            .shadow(color: Color.black.opacity(0.25), radius: 5, x: 0, y: 0)
+                                            .foregroundColor(.white)
+                                            .opacity(0.8)
+                                    }
+                                }.clipShape(RoundedRectangle(cornerRadius: 25, style: .circular))
+                                .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
+                                
+                                ZStack(alignment: .center) {
+                                    Rectangle()
+                                        .frame(width: (Constants.screenWidth / 3) - 40, height: 40, alignment: .bottom)
+                                        .shadow(color: Color.black.opacity(0.4), radius: 8, x: 0, y: 8)
+                                        .foregroundColor(.clear)
+                                        .background(Constants.purpleGradient)
+                                        .cornerRadius(30)
+                                    
+                                    Text("12% OFF!")
+                                        .font(.system(size: 16))
+                                        .fontWeight(.bold)
+                                        .foregroundColor(.white)
+                                }.offset(y: 20)
+                                .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
+                            }
+                        }).scaleEffect(self.selectedOption == 2 ? 1.1 : 1.0)
+                        .animation(.spring(response: 0.25, dampingFraction: 0.6, blendDuration: 0))
+                        .buttonStyle(ClickButtonStyle())
+                        
+                        Button(action: {
+                            print("buy yearly")
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            self.selectedOption = 3
+                        }, label: {
+                            ZStack(alignment: .bottom) {
+                                ZStack(alignment: .center) {
+                                    RoundedRectangle(cornerRadius: 25)
+                                        .stroke(Constants.blueGradient, lineWidth: self.selectedOption == 3 ? 8 : 0)
+                                        .frame(width: (Constants.screenWidth / 3) - 29, height: (Constants.screenWidth / 3.5) - 5, alignment: .center)
+                                    
+                                    Rectangle()
+                                        .frame(width: (Constants.screenWidth / 3) - 25, height: (Constants.screenWidth / 3.5), alignment: .center)
+                                        .foregroundColor(Color("bgColor").opacity(0.35))
+
+                                    VStack {
+                                        if let yearz = self.yearly {
+                                            Text("\(self.formattedPrice(for: yearz))")
+                                                .font(.title)
+                                                .fontWeight(.medium)
+                                                .foregroundColor(.white)
+                                                .shadow(color: Color.black.opacity(0.25), radius: 5, x: 0, y: 0)
+                                        }
+                                        
+                                        Text("per year")
+                                            .font(.footnote)
+                                            .fontWeight(.regular)
+                                            .shadow(color: Color.black.opacity(0.25), radius: 3, x: 0, y: 0)
+                                            .foregroundColor(.white)
+                                            .opacity(0.8)
+                                    }
+                                }.clipShape(RoundedRectangle(cornerRadius: 25, style: .circular))
+                                .shadow(color: Color("buttonShadow"), radius: 20, x: 0, y: 20)
+                                
+                                ZStack(alignment: .center) {
+                                    Rectangle()
+                                        .frame(width: (Constants.screenWidth / 3) - 40, height: 40, alignment: .bottom)
+                                        .shadow(color: Color.black.opacity(0.4), radius: 8, x: 0, y: 8)
+                                        .foregroundColor(.clear)
+                                        .background(Constants.purpleGradient)
+                                        .cornerRadius(30)
+                                    
+                                    Text("20% OFF!")
+                                        .font(.system(size: 16))
+                                        .fontWeight(.bold)
+                                        .foregroundColor(.white)
+                                }.offset(y: 20)
+                                .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
+                            }
+                        }).scaleEffect(self.selectedOption == 3 ? 1.1 : 1.0)
+                        .animation(.spring(response: 0.25, dampingFraction: 0.6, blendDuration: 0))
+                        .buttonStyle(ClickButtonStyle())
+                    }
+                    
+                    Spacer()
+                    Button(action: {
+                        print("join premium")
+                        if self.selectedOption == 1 {
+                            if let mont = self.monthly {
+                                self.auth.purchase(source: "profile_settings", product: mont)
+                            } else {
+                                print("monthy no there")
+                            }
+                        } else if self.selectedOption == 2 {
+                            if let threemont = self.threeMonthly {
+                                self.auth.purchase(source: "profile_settings", product: threemont)
+                            } else {
+                                print("3 monthy no there")
+                            }
+                        } else if self.selectedOption == 3 {
+                            if let yearlyy = self.yearly {
+                                self.auth.purchase(source: "profile_settings", product: yearlyy)
+                            } else {
+                                print("yearly no there")
+                            }
+                        }
+                    }) {
+                        HStack(alignment: .center) {
+                            Image(systemName: "checkmark.seal")
+                                .resizable()
+                                .frame(width: 25, height: 25, alignment: .center)
+                                .foregroundColor(.white)
+                                .padding(.trailing, 5)
+                            
+                            Text("JOIN PREMIUM")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.white)
+                        }
+                    }.buttonStyle(MainButtonStyle())
+                    .frame(height: 50)
+                    .frame(minWidth: 220, maxWidth: 280)
+                    .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
+
+                    Button(action: {
+                        print("restore IAP")
+                        self.auth.restorePurchase()
+                    }) {
+                        Text("restore subscription")
+                            .font(.caption)
+                            .fontWeight(.none)
+                            .foregroundColor(.secondary)
+                    }.frame(minWidth: 100, maxWidth: 180)
+                    .padding(.vertical, 5)
+
+                    Button(action: {
+                        self.openTerms.toggle()
+                    }) {
+                        Text("by joining Chatr Premium you agree \nto the Terms of Service & Privacy Policy")
+                            .font(.caption)
+                            .underline()
+                            .fontWeight(.none)
+                            .multilineTextAlignment(.center)
+                            .lineLimit(2)
+                            .foregroundColor(.secondary)
+                    }.frame(minWidth: 200, maxWidth: 280)
+                    .padding(.bottom)
+                    .buttonStyle(PlainButtonStyle())
+                    .sheet(isPresented: self.$openTerms, content: {
+                        NavigationView {
+                            TermsView(mainText: Constants.termsOfService)
+                                .navigationBarTitle("Terms of Service")
+                                .modifier(GroupedListModifier())
+                                .environmentObject(self.auth)
+                        }
+                    })
+                    
+                    //Spacer()
                 }
-            }.buttonStyle(MainButtonStyle())
-            .frame(height: 50)
-            .frame(minWidth: 220, maxWidth: 280)
-            .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
-            
-            Button(action: {
-                print("restore IAP")
-                self.auth.restorePurchase()
-            }) {
-                Text("restore subscription")
-                    .font(.caption)
-                    .fontWeight(.none)
-                    .foregroundColor(.secondary)
-            }.frame(minWidth: 100, maxWidth: 180)
-            .padding(.vertical, 5)
-            
-            Button(action: {
-                self.openTerms.toggle()
-            }) {
-                Text("by joining Chatr Premium you agree \nto the Terms of Service & Privacy Policy")
-                    .font(.caption)
-                    .underline()
-                    .fontWeight(.none)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2)
-                    .foregroundColor(.secondary)
-            }.frame(minWidth: 200, maxWidth: 280)
-            .padding(.bottom)
-            .buttonStyle(PlainButtonStyle())
-            .sheet(isPresented: self.$openTerms, content: {
-                NavigationView {
-                    TermsView(mainText: Constants.termsOfService)
-                        .navigationBarTitle("Terms of Service")
-                        .modifier(GroupedListModifier())
-                        .environmentObject(self.auth)
-                }
-            })
-            
+            }
         }.background(AnimatedGradientGradientBG().opacity(0.85))
         .padding(.horizontal)
         .onAppear() {

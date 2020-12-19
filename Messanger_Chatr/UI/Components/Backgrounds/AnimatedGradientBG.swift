@@ -11,14 +11,15 @@ import SwiftUI
 struct AnimatedGradientGradientBG: View {
     @State var gradient = [Color("main_blue"), Color("main_pink")]
     @State var startPoint = UnitPoint(x: 0, y: 0)
-    @State var endPoint = UnitPoint(x: 0, y: 2)
+    @State var endPoint = UnitPoint(x: 0, y: 1.5)
     
     var body: some View {
         Rectangle()
             .fill(LinearGradient(gradient: Gradient(colors: self.gradient), startPoint: self.startPoint, endPoint: self.endPoint))
             .frame(width: Constants.screenHeight, height: Constants.screenHeight)
+            .blur(radius: 50)
             .onAppear() {
-                withAnimation (Animation.easeInOut(duration: 10).repeatForever(autoreverses: true)){
+                withAnimation (Animation.easeInOut(duration: 8).repeatForever(autoreverses: true)){
                     self.startPoint = UnitPoint(x: 1, y: -1)
                     self.endPoint = UnitPoint(x: 0, y: 1)
                 }
