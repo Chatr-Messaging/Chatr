@@ -105,7 +105,6 @@ struct HighlightedContactCell: View {
                 
                 HStack(alignment: .center, spacing: 20) {
                     Button(action: {
-                        print("chat...")
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                         self.newMessage = self.contact.id
                         self.dismissView.toggle()

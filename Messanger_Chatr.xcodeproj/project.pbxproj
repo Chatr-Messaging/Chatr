@@ -59,7 +59,9 @@
 		0583073E240E2F120013B93B /* ChatrApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0583073D240E2F120013B93B /* ChatrApp.swift */; };
 		0583A82D23A72A8700F9220B /* Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0583A82C23A72A8700F9220B /* Auth.swift */; };
 		0583A84F251AFB750005B7E1 /* ContactBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0583A84E251AFB740005B7E1 /* ContactBubble.swift */; };
-		059038CF258D977100D70A13 /* WKView in Frameworks */ = {isa = PBXBuildFile; productRef = 059038CE258D977100D70A13 /* WKView */; };
+		058AC52F2599064F0027FD11 /* DiscoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058AC52E2599064F0027FD11 /* DiscoverView.swift */; };
+		058AC5342599158D0027FD11 /* DiscoverCarouselSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058AC5332599158C0027FD11 /* DiscoverCarouselSection.swift */; };
+		05903A3F25925C3400D70A13 /* WKView in Frameworks */ = {isa = PBXBuildFile; productRef = 05903A3E25925C3400D70A13 /* WKView */; };
 		0593C0A223CB2AFE00460AAA /* VerifyCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0593C0A123CB2AFE00460AAA /* VerifyCodeView.swift */; };
 		0599798824D53C9500969318 /* AlertIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0599798724D53C9500969318 /* AlertIndicator.swift */; };
 		0599798A24D5468E00969318 /* TextBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0599798924D5468E00969318 /* TextBubble.swift */; };
@@ -190,6 +192,9 @@
 		0583073D240E2F120013B93B /* ChatrApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatrApp.swift; sourceTree = "<group>"; };
 		0583A82C23A72A8700F9220B /* Auth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Auth.swift; sourceTree = "<group>"; };
 		0583A84E251AFB740005B7E1 /* ContactBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactBubble.swift; sourceTree = "<group>"; };
+		058AC52E2599064F0027FD11 /* DiscoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverView.swift; sourceTree = "<group>"; };
+		058AC5332599158C0027FD11 /* DiscoverCarouselSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverCarouselSection.swift; sourceTree = "<group>"; };
+		0590397A2591C6B300D70A13 /* WKView-main */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "WKView-main"; path = "../../../../../Downloads/WKView-main"; sourceTree = "<group>"; };
 		0593C0A123CB2AFE00460AAA /* VerifyCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifyCodeView.swift; sourceTree = "<group>"; };
 		0599798724D53C9500969318 /* AlertIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertIndicator.swift; sourceTree = "<group>"; };
 		0599798924D5468E00969318 /* TextBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextBubble.swift; sourceTree = "<group>"; };
@@ -261,7 +266,7 @@
 				05C36C17252D62B90031CB3F /* PopupView in Frameworks */,
 				05FF35C92536C03400886576 /* StoreKit.framework in Frameworks */,
 				059B18102522C32000988201 /* RealmSwift in Frameworks */,
-				059038CF258D977100D70A13 /* WKView in Frameworks */,
+				05903A3F25925C3400D70A13 /* WKView in Frameworks */,
 				05670318256A3C43004123EB /* CarBode in Frameworks */,
 				E407B42A643A91913C97FAE8 /* Pods_Messanger_Chatr.framework in Frameworks */,
 				059B18122522C32000988201 /* Realm in Frameworks */,
@@ -318,6 +323,7 @@
 				056B989424C8F76B003F7FBA /* HomeUserInfoHeader.swift */,
 				05A7BD5E24FEF3870001BFC9 /* QucickSnapsSection.swift */,
 				057F2B4D250B025E005DFB21 /* ContactCarouselSection.swift */,
+				058AC5332599158C0027FD11 /* DiscoverCarouselSection.swift */,
 				05CE07EC2529930300F09754 /* NotificationSection.swift */,
 			);
 			path = "Sections of Views";
@@ -400,6 +406,7 @@
 				05DB89B5238B851400D4581F /* ContentView.swift */,
 				059EF95124C9153A004BA17C /* ChatMessagesView.swift */,
 				05F8E11423F0DDFF0066954C /* ContactsView.swift */,
+				058AC52E2599064F0027FD11 /* DiscoverView.swift */,
 				0521234B24C8E338008123CF /* ProfileSettingsView.swift */,
 				05A7BD5024FA0F800001BFC9 /* VisitContactView.swift */,
 				05C93BDA25145EF10059D1AA /* VisitGroupChannelView.swift */,
@@ -487,6 +494,7 @@
 		0583A83623BD44EB00F9220B /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				0590397A2591C6B300D70A13 /* WKView-main */,
 				0583A83123BD34B400F9220B /* AppIcons */,
 			);
 			path = Resources;
@@ -623,7 +631,7 @@
 				059B18112522C32000988201 /* Realm */,
 				05C36C16252D62B90031CB3F /* PopupView */,
 				05670317256A3C43004123EB /* CarBode */,
-				059038CE258D977100D70A13 /* WKView */,
+				05903A3E25925C3400D70A13 /* WKView */,
 			);
 			productName = Messanger_Chatr;
 			productReference = 05DB89AE238B851400D4581F /* Messanger_Chatr.app */;
@@ -701,7 +709,6 @@
 				059B180E2522C32000988201 /* XCRemoteSwiftPackageReference "realm-cocoa" */,
 				05C36C15252D62B90031CB3F /* XCRemoteSwiftPackageReference "PopupView" */,
 				05670316256A3C43004123EB /* XCRemoteSwiftPackageReference "CarBode-Barcode-Scanner-For-SwiftUI" */,
-				059038CD258D977000D70A13 /* XCRemoteSwiftPackageReference "WKView" */,
 			);
 			productRefGroup = 05DB89AF238B851400D4581F /* Products */;
 			projectDirPath = "";
@@ -885,6 +892,7 @@
 				0583073A240E2B840013B93B /* Constants.swift in Sources */,
 				0583A82D23A72A8700F9220B /* Auth.swift in Sources */,
 				05F8E11523F0DDFF0066954C /* ContactsView.swift in Sources */,
+				058AC5342599158D0027FD11 /* DiscoverCarouselSection.swift in Sources */,
 				052364C32439A37200AF825F /* DialogCell.swift in Sources */,
 				05A7BD5424FAED250001BFC9 /* CameraController.swift in Sources */,
 				05A7BD4D24F851760001BFC9 /* TermsView.swift in Sources */,
@@ -893,6 +901,7 @@
 				055C2A6024CE8C2700F7AE16 /* DialogList.swift in Sources */,
 				0572BAB72398998800AE9061 /* PhoneNumberView.swift in Sources */,
 				05578C2C242989A10016B1E5 /* Messanger_Chatr.xcdatamodeld in Sources */,
+				058AC52F2599064F0027FD11 /* DiscoverView.swift in Sources */,
 				05C93BDD251578100059D1AA /* DialogContactCell.swift in Sources */,
 				05A1223124AEE6D300EEDD72 /* KeyboardCard.swift in Sources */,
 				05FD085B2394784600575727 /* ProgressBar.swift in Sources */,
@@ -1389,14 +1398,6 @@
 				minimumVersion = 2.1.2;
 			};
 		};
-		059038CD258D977000D70A13 /* XCRemoteSwiftPackageReference "WKView" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/rebeloper/WKView.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.1.2;
-			};
-		};
 		059B180E2522C32000988201 /* XCRemoteSwiftPackageReference "realm-cocoa" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/realm/realm-cocoa.git";
@@ -1421,9 +1422,8 @@
 			package = 05670316256A3C43004123EB /* XCRemoteSwiftPackageReference "CarBode-Barcode-Scanner-For-SwiftUI" */;
 			productName = CarBode;
 		};
-		059038CE258D977100D70A13 /* WKView */ = {
+		05903A3E25925C3400D70A13 /* WKView */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 059038CD258D977000D70A13 /* XCRemoteSwiftPackageReference "WKView" */;
 			productName = WKView;
 		};
 		059B180F2522C32000988201 /* RealmSwift */ = {

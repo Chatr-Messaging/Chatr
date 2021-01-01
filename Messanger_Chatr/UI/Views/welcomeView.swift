@@ -95,13 +95,13 @@ struct MainBody: View {
                                     Text("Welcome to")
                                         .fontWeight(.regular)
                                         .foregroundColor(Color("SoftTextColor"))
-                                        .shadow(color: Color("buttonShadow"), radius: 2, x: 0, y: 2)
+                                        //.shadow(color: Color("buttonShadow"), radius: 2, x: 0, y: 2)
                                     
                                     Text("Chatr")
                                         .font(.system(size: 55))
                                         .fontWeight(.bold)
                                         .foregroundColor(Color("SoftTextColor"))
-                                        .shadow(color: Color("buttonShadow"), radius: 5, x: 0, y: 5)
+                                        //.shadow(color: Color("buttonShadow"), radius: 5, x: 0, y: 5)
                                 }
                                 
                                 Spacer()

@@ -22,6 +22,7 @@ struct ContactsView: View {
     @State var showUserProfile: Bool = false
     @State var showAddChat: Bool = false
     @State var showAddNewContact: Bool = false
+    @State var openDiscoverContent: Bool = false
     @State var profileImgSize = CGFloat(45)
     @State var alertNum: Int = 0
     @State var fullName: String = ""
@@ -90,7 +91,8 @@ struct ContactsView: View {
                                                 .foregroundColor(.primary)
                                                 .multilineTextAlignment(.leading)
                                                 .onAppear() {
-                                                    self.fullName = ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.fullName ?? "Chatr User"
+                                                    self.fullName = self.auth.profile.results.first?.fullName ?? "Chatr User"
+                                                        //ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.fullName ?? "Chatr User"
                                                 }
                                         }.offset(y: self.auth.subscriptionStatus == .subscribed ? 3 : 0)
                                         
@@ -133,7 +135,7 @@ struct ContactsView: View {
                         
                         //MARK: BANNER Section
                         VStack {
-                            //Show Banner only if 1.) User N  ot Premium, User has not uploaded address book, or
+                            //Show Banner only if 1.) User Not Premium, User has not uploaded address book, or
                             //ContactsRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ContactStruct.self))
                             ZStack(alignment: .bottom) {
                                 if self.contactBannerDataArray.count > 0 {
@@ -374,7 +376,6 @@ struct ContactsView: View {
                                     HStack {
                                         Image(systemName: "magnifyingglass")
                                             .padding(.leading, 5)
-                                            .foregroundColor(.primary)
                                         
                                         TextField("Search", text: $searchContact)
                                             .foregroundColor(.primary)

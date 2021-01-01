@@ -179,7 +179,7 @@ struct VisitContactView: View {
                                             RoundedRectangle(cornerRadius: 10)
                                                 .frame(width: 46, height: 46, alignment: .center)
                                                 .foregroundColor(.clear)
-                                                .background(Color("main_blue"))
+                                                .background(Constants.purpleGradient)
                                                 .cornerRadius(10)
                                                 .shadow(color: Color(.sRGB, red: 44 / 255, green: 0 / 255, blue: 255 / 255, opacity: 0.35), radius: 8, x: 0, y: 5)
                                             

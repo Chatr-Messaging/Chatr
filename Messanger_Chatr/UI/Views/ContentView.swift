@@ -487,7 +487,7 @@ struct mainHomeList: View {
                         .onDisappear {
                             self.auth.leaveDialog()
                         }
-                        .onAppear {
+                        //.onAppear {
                             //self.chatMessageViewHeight = Constants.screenHeight - 248 - (self.textFieldHeight < 120 ? self.textFieldHeight : 120) - self.keyboardHeight + self.keyboardDragState.height - (self.hasAttachments ? 95 : 0)
                             //print("the geo for chat messag view is: \((self.textFieldHeight < 120 ? self.textFieldHeight : 120) + self.keyboardHeight + self.keyboardDragState.height + (self.hasAttachments ? 95 : 0)) & now: \(self.chatMessageViewHeight)")
                             //Perfect message view height below **DO NOT DELETE**
@@ -497,9 +497,8 @@ struct mainHomeList: View {
 //                                        ChatrApp.messages.getMessageUpdates(dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "", completion: { newMessages in
 //                                            print("Message view successfully pulled new messages!")
 //                                        })
-                        }
+                        //}
                     }
-                
 
                 //keyboard View
                 KeyboardCardView(height: self.$textFieldHeight, mainText: self.$keyboardText, hasAttachments: self.$hasAttachments)
