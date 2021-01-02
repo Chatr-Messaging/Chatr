@@ -36,6 +36,15 @@
           "revision": "4e5326b20e6d4aae6af581402372a42971fa732b",
           "version": "6.1.1"
         }
+      },
+      {
+        "package": "WKView",
+        "repositoryURL": "https://github.com/rebeloper/WKView.git",
+        "state": {
+          "branch": null,
+          "revision": "b9314678cf946e8c02ae1dcaf4e07d6c9dd7712c",
+          "version": "0.1.6"
+        }
       }
     ]
   },
