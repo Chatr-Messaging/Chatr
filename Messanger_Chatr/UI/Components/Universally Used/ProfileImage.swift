@@ -21,7 +21,7 @@ struct ProfileImage: View {
             if let avatarURL = self.profile.results.first?.avatar {
                 WebImage(url: URL(string: avatarURL))
                     .resizable()
-                    .placeholder{ Image(systemName: "person.fill") }
+                    .placeholder{ Image("empty-profile").resizable().frame(width: size, height: size, alignment: .center).scaledToFill() }
                     .indicator(.activity)
                     .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                     .scaledToFill()

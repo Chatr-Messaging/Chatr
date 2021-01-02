@@ -31,7 +31,7 @@ struct QuickSnapsPostView: View {
                         ZStack {
                             WebImage(url: URL(string: self.selectedQuickSnapContact.avatar))
                                 .resizable()
-                                .placeholder{ Image(systemName: "person.fill") }
+                                .placeholder{ Image("empty-profile").resizable().frame(width: Constants.smallBtnSize, height: Constants.smallBtnSize, alignment: .center).scaledToFill() }
                                 .indicator(.activity)
                                 .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                                 .scaledToFill()
@@ -161,7 +161,7 @@ struct QuickSnapsPostView: View {
                             
                             WebImage(url: URL(string: self.selectedQuickSnapContact.avatar))
                                 .resizable()
-                                .placeholder{ Image(systemName: "person.fill") }
+                                .placeholder{ Image("empty-profile").resizable().frame(width: 80, height: 80, alignment: .center).scaledToFill() }
                                 .indicator(.activity)
                                 .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                                 .scaledToFill()

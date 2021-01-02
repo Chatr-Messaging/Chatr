@@ -155,7 +155,7 @@ struct TextBubble: View {
             
             WebImage(url: URL(string: self.avatar))
                 .resizable()
-                .placeholder{ Image(systemName: "person.fill") }
+                .placeholder{ Image("empty-profile").resizable().frame(width: self.hasPrior ? 1 : Constants.smallAvitarSize, height: self.hasPrior ? 1 : Constants.smallAvitarSize, alignment: .bottom).scaledToFill() }
                 .indicator(.activity)
                 .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                 .scaledToFill()

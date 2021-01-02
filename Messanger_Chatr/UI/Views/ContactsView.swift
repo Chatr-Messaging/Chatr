@@ -53,7 +53,7 @@ struct ContactsView: View {
                                             if let avitarURL = ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.avatar {
                                                 WebImage(url: URL(string: avitarURL))
                                                     .resizable()
-                                                    .placeholder{ Image(systemName: "person.fill") }
+                                                    .placeholder{ Image("empty-profile").resizable().frame(width: 80, height: 80, alignment: .center).scaledToFill() }
                                                     .indicator(.activity)
                                                     .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                                                     .scaledToFill()
@@ -458,7 +458,7 @@ struct ContactsView: View {
                                                         if let avitarURL = contact.avatar {
                                                             WebImage(url: URL(string: avitarURL))
                                                                 .resizable()
-                                                                .placeholder{ Image(systemName: "person.fill") }
+                                                                .placeholder{ Image("empty-profile").resizable().frame(width: 40, height: 40, alignment: .center).scaledToFill() }
                                                                 .indicator(.activity)
                                                                 .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                                                                 .scaledToFill()

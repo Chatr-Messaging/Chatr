@@ -49,7 +49,7 @@ struct DialogContactCell: View {
                             if let avitarURL = contact.avatar {
                                 WebImage(url: URL(string: avitarURL))
                                     .resizable()
-                                    .placeholder{ Image(systemName: "person.fill") }
+                                    .placeholder{ Image("empty-profile").resizable().frame(width: 40, height: 40, alignment: .center).scaledToFill() }
                                     .indicator(.activity)
                                     .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                                     .scaledToFill()

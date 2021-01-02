@@ -181,7 +181,7 @@ struct AttachmentBubble: View {
             
             WebImage(url: URL(string: self.avatar))
                 .resizable()
-                .placeholder{ Image(systemName: "person.fill") }
+                .placeholder{ Image("empty-profile").resizable().frame(width: self.hasPrior ? 0 : Constants.smallAvitarSize, height: self.hasPrior ? 0 : Constants.smallAvitarSize, alignment: .bottom).scaledToFill() }
                 .indicator(.activity)
                 .transition(.fade(duration: 0.05))
                 .scaledToFill()

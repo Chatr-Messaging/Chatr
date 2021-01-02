@@ -55,7 +55,7 @@ struct VisitContactView: View {
                                         ZStack {
                                             WebImage(url: URL(string: contact.avatar))
                                                 .resizable()
-                                                .placeholder{ Image(systemName: "person.fill") }
+                                                .placeholder{ Image("empty-profile").resizable().frame(width: 80, height: 80, alignment: .center).scaledToFill() }
                                                 .indicator(.activity)
                                                 .transition(.fade(duration: 0.25))
                                                 .scaledToFill()

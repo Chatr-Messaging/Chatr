@@ -40,7 +40,7 @@ struct QuickSnapCell: View {
                     if let avitarURL = quickSnap.avatar {
                         WebImage(url: URL(string: avitarURL))
                             .resizable()
-                            .placeholder{ Image(systemName: "person.fill") }
+                            .placeholder{ Image("empty-profile").resizable().frame(width: Constants.quickSnapBtnSize, height: Constants.quickSnapBtnSize, alignment: .center).scaledToFill() }
                             .indicator(.activity)
                             .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.01)), removal: AnyTransition.identity))
                             .scaledToFill()
