@@ -20,12 +20,7 @@ struct advancedView: View {
     @State var diabaleRestoreSub: Bool = false
     @State var deleteAccount: Bool = false
     @State var showDeleteAccountSheet: Bool = false
-    @State var contactsToggle: Bool = false
-    @State var locationToggle: Bool = false
-    @State var notificationsToggle: Bool = false
-    @State var photosToggle: Bool = false
-
-    @ObservedObject var profile = ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self))
+    @State var contactsEnabled: Bool = false
     
     var body: some View {
         VStack {
@@ -64,20 +59,24 @@ struct advancedView: View {
                                     Spacer()
 
                                     Button(action: {
-                                        self.auth.requestContacts()
+                                        ChatrApp.requestContacts(completion: { result in
+                                            self.contactsEnabled = result
+                                        })
                                     }) {
-                                     Text(self.auth.contactsPermission ? "Allowed" : "Allow")
+                                     Text(self.contactsEnabled ? "Allowed" : "Allow")
                                            .padding([.top, .bottom], 10)
                                            .padding([.leading, .trailing], 20)
                                            .transition(.identity)
-                                     }.disabled(self.auth.contactsPermission ? true : false)
+                                     }.disabled(self.contactsEnabled ? true : false)
                                      .frame(height: 35)
-                                    .background(LinearGradient(gradient: Gradient(colors: !self.auth.contactsPermission ? [Color(red: 71 / 255, green: 171 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)] : [Color(red: 195 / 255, green: 195 / 255, blue: 195 / 255, opacity: 1.0), Color(.sRGB, red: 145 / 255, green: 145 / 255, blue: 145 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom))
+                                    .background(LinearGradient(gradient: Gradient(colors: !self.contactsEnabled ? [Color(red: 71 / 255, green: 171 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)] : [Color(red: 195 / 255, green: 195 / 255, blue: 195 / 255, opacity: 1.0), Color(.sRGB, red: 145 / 255, green: 145 / 255, blue: 145 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom))
                                     .foregroundColor(.white)
                                     .cornerRadius(20)
                                 }.padding(.horizontal)
                                 .onAppear {
-                                    self.auth.checkContactsPermission()
+                                    ChatrApp.checkContactsPermission(completion: { result in
+                                        self.contactsEnabled = result
+                                    })
                                 }
                                 
                                 Divider()
@@ -121,7 +120,7 @@ struct advancedView: View {
                                     .cornerRadius(20)
                                 }.padding(.horizontal)
                                 .onAppear {
-                                    self.auth.checkLocationPermission()
+                                    //self.auth.checkLocationPermission()
                                 }
                                 
                                 Divider()
@@ -183,7 +182,7 @@ struct advancedView: View {
                                     .cornerRadius(20)
                                 }.padding(.horizontal)
                                 .onAppear {
-                                    self.auth.checkNotiPermission()
+                                    //self.auth.checkNotiPermission()
                                 }
                                 
                                 Divider()
@@ -233,7 +232,7 @@ struct advancedView: View {
                                    .cornerRadius(20)
                                 }.padding(.horizontal)
                                 .onAppear {
-                                    self.auth.checkPhotoPermission()
+                                    //self.auth.checkPhotoPermission()
                                 }
                                 
                                 Divider()
@@ -275,13 +274,13 @@ struct advancedView: View {
                                             .transition(.identity)
                                     }.disabled(self.auth.cameraPermission ? true : false)
                                      .frame(height: 35)
-                                     .background(LinearGradient(gradient: Gradient(colors: !self.auth.photoPermission ? [Color(red: 71 / 255, green: 171 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)] : [Color(red: 195 / 255, green: 195 / 255, blue: 195 / 255, opacity: 1.0), Color(.sRGB, red: 145 / 255, green: 145 / 255, blue: 145 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom))
+                                     .background(LinearGradient(gradient: Gradient(colors: !self.auth.cameraPermission ? [Color(red: 71 / 255, green: 171 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)] : [Color(red: 195 / 255, green: 195 / 255, blue: 195 / 255, opacity: 1.0), Color(.sRGB, red: 145 / 255, green: 145 / 255, blue: 145 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom))
                                     .foregroundColor(.white)
                                     .cornerRadius(20)
                                     }
                                 }.padding(.horizontal)
                                 .onAppear {
-                                    self.auth.checkCameraPermission()
+                                    //self.auth.checkCameraPermission()
                                 }
                         }.padding(.vertical, 15)
                     }.background(Color("buttonColor"))
@@ -322,7 +321,7 @@ struct advancedView: View {
                                         
                                         //load the address book realm func
                                         ZStack {
-                                            Text("last sync: \(self.profile.results.first?.lastAddressBookUpdate ?? "n/a")")
+                                            Text("last sync: \(self.auth.profile.results.first?.lastAddressBookUpdate ?? "n/a")")
                                                 .font(.caption)
                                                 .foregroundColor(.secondary)
                                                 .opacity(self.loadingSyncAddressBook ? 0 : 1)

@@ -100,5 +100,12 @@ struct DiscoverView: View {
                 self.bannerCount = self.bannerDataArray.count
             }
         }.resignKeyboardOnDragGesture()
+        .navigationBarItems(leading:
+            Button(action: {
+                self.presentationMode.wrappedValue.dismiss()
+            }) {
+                Text("Done")
+                    .foregroundColor(.primary)
+            })
     }
 }

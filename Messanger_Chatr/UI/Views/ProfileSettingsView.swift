@@ -11,6 +11,7 @@ import RealmSwift
 import ConnectyCube
 import SDWebImageSwiftUI
 import FirebaseDatabase
+import WKView
 
 // MARK: Profile View
 struct ProfileView: View {
@@ -30,6 +31,7 @@ struct ProfileView: View {
     @State var isInfoPrivate: Bool = false
     @State var isMessagingPrivate: Bool = false
     @State var openPremium: Bool = false
+    @State var helpsupport: Bool = false
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: true) {
@@ -394,6 +396,116 @@ struct ProfileView: View {
                 VStack(alignment: .center) {
                     VStack(spacing: 0) {
                         
+                        //Help & Support
+                        Button(action: {
+                            self.helpsupport.toggle()
+                        }) {
+                            VStack(alignment: .trailing, spacing: 0) {
+                                HStack {
+                                    Image(systemName: "flag")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .foregroundColor(Color.primary)
+                                        .frame(width: 20, height: 20, alignment: .center)
+                                        .padding(.trailing, 5)
+                                    
+                                    Text("Help & Support")
+                                        .font(.none)
+                                        .fontWeight(.none)
+                                        .foregroundColor(.primary)
+
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .resizable()
+                                        .font(Font.title.weight(.bold))
+                                        .scaledToFit()
+                                        .frame(width: 7, height: 15, alignment: .center)
+                                        .foregroundColor(.secondary)
+                                }.padding(.horizontal)
+                                .padding(.vertical, 12.5)
+                                
+                                Divider()
+                                    .frame(width: Constants.screenWidth - 80)
+                            }
+                        }.buttonStyle(changeBGButtonStyle())
+                        .sheet(isPresented: self.$helpsupport, content: {
+                            NavigationView {
+                                WebView(url: "www.chatr-messaging.com",
+                                    tintColor: Color("buttonColor_darker"),
+                                    titleColor: Color("bgColor_opposite"),
+                                    backText: Text("Done").foregroundColor(.blue),
+                                    reloadImage: Image(systemName: "arrow.counterclockwise"),
+                                    goForwardImage: Image(systemName: "arrow.forward"),
+                                    goBackImage: Image(systemName: "arrow.backward"),
+                                    allowedHosts: Constants.allowedHosts,
+                                    forbiddenHosts: [])
+                            }
+                        })
+                        
+                        //Rate Chatr
+                        Button(action: {
+                            print("rate chatr")
+                        }) {
+                            VStack(alignment: .trailing, spacing: 0) {
+                                HStack {
+                                    Image(systemName: "star")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .foregroundColor(Color.primary)
+                                        .frame(width: 20, height: 20, alignment: .center)
+                                        .padding(.trailing, 5)
+                                    
+                                    Text("Rate Chatr")
+                                        .font(.none)
+                                        .fontWeight(.none)
+                                        .foregroundColor(.primary)
+
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .resizable()
+                                        .font(Font.title.weight(.bold))
+                                        .scaledToFit()
+                                        .frame(width: 7, height: 15, alignment: .center)
+                                        .foregroundColor(.secondary)
+                                }.padding(.horizontal)
+                                .padding(.vertical, 12.5)
+                                
+                                Divider()
+                                    .frame(width: Constants.screenWidth - 80)
+                            }
+                        }.buttonStyle(changeBGButtonStyle())
+                        
+                        //More About Chatr
+                        NavigationLink(destination: AboutChatrView()) {
+                            VStack(alignment: .trailing, spacing: 0) {
+                                HStack {
+                                    Image(systemName: "iphone.homebutton")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .foregroundColor(Color.primary)
+                                        .frame(width: 20, height: 20, alignment: .center)
+                                        .padding(.trailing, 5)
+                                    
+                                    Text("About Chatr")
+                                        .font(.none)
+                                        .fontWeight(.none)
+                                        .foregroundColor(.primary)
+
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .resizable()
+                                        .font(Font.title.weight(.bold))
+                                        .scaledToFit()
+                                        .frame(width: 7, height: 15, alignment: .center)
+                                        .foregroundColor(.secondary)
+                                }.padding(.horizontal)
+                                .padding(.vertical, 12.5)
+                            
+                                Divider()
+                                    .frame(width: Constants.screenWidth - 80)
+                            }
+                        }.buttonStyle(changeBGButtonStyle())
+                        
                         //Advanced Profile
                         NavigationLink(destination: advancedView(dimissView: self.$dimissView).environmentObject(self.auth)) {
                             VStack(alignment: .trailing, spacing: 0) {
@@ -424,39 +536,8 @@ struct ProfileView: View {
                                     .frame(width: Constants.screenWidth - 80)
                             }
                         }.buttonStyle(changeBGButtonStyle())
-                        
-                    
-                        //More About Chatr
-                        NavigationLink(destination: AboutChatrView()) {
-                            VStack(alignment: .trailing, spacing: 0) {
-                                HStack {
-                                    Image(systemName: "ellipsis.circle")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .foregroundColor(Color.primary)
-                                        .frame(width: 20, height: 20, alignment: .center)
-                                        .padding(.trailing, 5)
-                                    
-                                    Text("About Chatr")
-                                        .font(.none)
-                                        .fontWeight(.none)
-                                        .foregroundColor(.primary)
 
-                                    Spacer()
-                                    Image(systemName: "chevron.right")
-                                        .resizable()
-                                        .font(Font.title.weight(.bold))
-                                        .scaledToFit()
-                                        .frame(width: 7, height: 15, alignment: .center)
-                                        .foregroundColor(.secondary)
-                                }.padding(.horizontal)
-                                .padding(.vertical, 12.5)
-                            
-                                Divider()
-                                    .frame(width: Constants.screenWidth - 80)
-                            }
-                        }.buttonStyle(changeBGButtonStyle())
-                            
+                        /*
                         //Terms of Service
                         NavigationLink(destination: TermsView(mainText: Constants.termsOfService).navigationBarTitle("Terms of Service").modifier(GroupedListModifier())) {
                             VStack(alignment: .trailing, spacing: 0) {
@@ -518,7 +599,8 @@ struct ProfileView: View {
                                     .frame(width: Constants.screenWidth - 80)
                             }
                         }.buttonStyle(changeBGButtonStyle())
-                            
+                        */
+ 
                         //Log out view
                         Button(action: {
                             self.auth.preventDismissal = true

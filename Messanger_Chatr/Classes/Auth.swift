@@ -671,8 +671,10 @@ class AuthModel: NSObject, ObservableObject {
     }
     
     func checkLocationPermission() {
+        let manager = CLLocationManager()
+        
         if CLLocationManager.locationServicesEnabled() {
-            switch CLLocationManager.authorizationStatus() {
+            switch manager.authorizationStatus {
                 case .notDetermined, .restricted, .denied:
                     print("No access to location")
                     self.locationPermission = false
@@ -682,9 +684,9 @@ class AuthModel: NSObject, ObservableObject {
                 @unknown default:
                 break
             }
-            } else {
-                print("Location services are not enabled")
-                self.locationPermission = false
+        } else {
+            print("Location services are not enabled")
+            self.locationPermission = false
         }
     }
     
