@@ -34,60 +34,60 @@ struct NewConversationView: View {
             ScrollView(.vertical, showsIndicators: true) {
                 VStack {
                     //MARK: Search Bar
-                        VStack {
-                            if self.allowOnlineSearch {
-                                HStack {
-                                    Text("SEARCH NAME OR PHONE NUMBER:")
-                                        .font(.caption)
-                                        .fontWeight(.regular)
-                                        .foregroundColor(.secondary)
-                                        .padding(.horizontal)
-                                    Spacer()
-                                }.padding(.top, 10)
-                                .padding(.bottom, 2)
+                    VStack {
+                        if self.allowOnlineSearch {
+                            HStack {
+                                Text("SEARCH NAME OR PHONE NUMBER:")
+                                    .font(.caption)
+                                    .fontWeight(.regular)
+                                    .foregroundColor(.secondary)
+                                    .padding(.horizontal)
+                                Spacer()
+                            }.padding(.top, 10)
+                            .padding(.bottom, 2)
+                            
+                            HStack {
+                                Image(systemName: "magnifyingglass")
+                                    .padding(.leading, 15)
+                                    .foregroundColor(.secondary)
                                 
-                                HStack {
-                                    Image(systemName: "magnifyingglass")
-                                        .padding(.leading, 15)
-                                        .foregroundColor(.secondary)
-                                    
-                                    TextField("Search", text: $searchText, onCommit: {
-                                        self.outputSearchText = self.searchText
-                                        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                                        if allowOnlineSearch {
-                                            self.grandSeach(searchText: self.outputSearchText)
-                                        }
-                                    })
-                                    .padding(EdgeInsets(top: 16, leading: 5, bottom: 16, trailing: 10))
-                                    .foregroundColor(.primary)
-                                    .font(.system(size: 18))
-                                    .lineLimit(1)
-                                    .keyboardType(.webSearch)
-                                    .onChange(of: self.searchText) { value in
-                                        print("the value is: \(value)")
-                                        if self.searchText.count >= 3 && self.allowOnlineSearch {
-                                            self.grandSeach(searchText: self.searchText)
-                                        } else {
-                                            self.grandUsers.removeAll()
-                                        }
+                                TextField("Search", text: $searchText, onCommit: {
+                                    self.outputSearchText = self.searchText
+                                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                                    if allowOnlineSearch {
+                                        self.grandSeach(searchText: self.outputSearchText)
                                     }
-                                    
-                                    if !searchText.isEmpty {
-                                        Button(action: {
-                                            self.searchText = ""
-                                            self.outputSearchText = ""
-                                            self.grandUsers.removeAll()
-                                        }) {
-                                            Image(systemName: "xmark.circle.fill")
-                                                .foregroundColor(.secondary)
-                                        }.padding(.horizontal, 15)
+                                })
+                                .padding(EdgeInsets(top: 16, leading: 5, bottom: 16, trailing: 10))
+                                .foregroundColor(.primary)
+                                .font(.system(size: 18))
+                                .lineLimit(1)
+                                .keyboardType(.webSearch)
+                                .onChange(of: self.searchText) { value in
+                                    print("the value is: \(value)")
+                                    if self.searchText.count >= 3 && self.allowOnlineSearch {
+                                        self.grandSeach(searchText: self.searchText)
+                                    } else {
+                                        self.grandUsers.removeAll()
                                     }
-                                    
-                                }.background(Color("buttonColor"))
-                                .clipShape(RoundedRectangle(cornerRadius: 14, style: .circular))
-                                .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
-                            }
-                        }.padding(.top, self.allowOnlineSearch ? 20 : 0)
+                                }
+                                
+                                if !searchText.isEmpty {
+                                    Button(action: {
+                                        self.searchText = ""
+                                        self.outputSearchText = ""
+                                        self.grandUsers.removeAll()
+                                    }) {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .foregroundColor(.secondary)
+                                    }.padding(.horizontal, 15)
+                                }
+                                
+                            }.background(Color("buttonColor"))
+                            .clipShape(RoundedRectangle(cornerRadius: 14, style: .circular))
+                            .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
+                        }
+                    }.padding(.top, self.allowOnlineSearch ? 20 : 0)
                     .padding(.horizontal)
                     
                     //MARK: Public Section

@@ -38,7 +38,7 @@ struct DialogCell: View {
                 ZStack {
                     WebImage(url: URL(string: (self.privateDialogContact.id != 0 ? self.privateDialogContact.avatar : PersistenceManager().getCubeProfileImage(usersID: self.connectyContact)) ?? ""))
                         .resizable()
-                        .placeholder{ Image(systemName: "person.fill") }
+                        .placeholder{ Image("empty-profile").resizable().frame(width: 55, height: 55, alignment: .center).scaledToFill() }
                         .indicator(.activity)
                         .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.05)), removal: AnyTransition.identity))
                         .scaledToFill()
@@ -96,7 +96,7 @@ struct DialogCell: View {
                                 
                                 WebImage(url: URL(string: self.groupOccUserAvatar[id]))
                                     .resizable()
-                                    .placeholder{ Image(systemName: "person.fill") }
+                                    .placeholder{ Image("empty-profile").resizable().frame(width: self.groupOccUserAvatar.count >= 3 ? 25 : self.groupOccUserAvatar.count == 2 ? 27 : 55, height: self.groupOccUserAvatar.count >= 3 ? 25 : self.groupOccUserAvatar.count == 2 ? 27 : 55, alignment: .center).scaledToFill() }
                                     .indicator(.activity)
                                     .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                                     .scaledToFill()

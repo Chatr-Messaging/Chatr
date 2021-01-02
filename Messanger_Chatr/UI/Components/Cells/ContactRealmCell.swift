@@ -23,7 +23,7 @@ struct ContactRealmCell: View {
                 
                 WebImage(url: URL(string: self.contact.avatar))
                     .resizable()
-                    .placeholder{ Image(systemName: "person.fill") }
+                    .placeholder{ Image("empty-profile").resizable().frame(width: 45, height: 45, alignment: .center).scaledToFill() }
                     .indicator(.activity)
                     .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                     .scaledToFill()

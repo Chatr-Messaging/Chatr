@@ -61,7 +61,7 @@ struct ContactBubble: View {
                                     
                                     WebImage(url: URL(string: self.contact.avatar))
                                         .resizable()
-                                        .placeholder{ Image(systemName: "person.fill") }
+                                        .placeholder{ Image("empty-profile").resizable().frame(width: 45, height: 45, alignment: .bottom).scaledToFill() }
                                         .indicator(.activity)
                                         .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                                         .scaledToFill()
@@ -297,7 +297,7 @@ struct ContactBubble: View {
 
             WebImage(url: URL(string: self.avatar))
                 .resizable()
-                .placeholder{ Image(systemName: "person.fill") }
+                .placeholder{ Image("empty-profile").resizable().frame(width: self.hasPrior ? 0 : Constants.smallAvitarSize, height: self.hasPrior ? 0 : Constants.smallAvitarSize, alignment: .bottom).scaledToFill() }
                 .indicator(.activity)
                 .transition(.fade(duration: 0.05))
                 .scaledToFill()

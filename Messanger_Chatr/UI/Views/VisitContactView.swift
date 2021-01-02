@@ -55,7 +55,7 @@ struct VisitContactView: View {
                                         ZStack {
                                             WebImage(url: URL(string: contact.avatar))
                                                 .resizable()
-                                                .placeholder{ Image(systemName: "person.fill") }
+                                                .placeholder{ Image("empty-profile").resizable().frame(width: 80, height: 80, alignment: .center).scaledToFill() }
                                                 .indicator(.activity)
                                                 .transition(.fade(duration: 0.25))
                                                 .scaledToFill()
@@ -179,7 +179,7 @@ struct VisitContactView: View {
                                             RoundedRectangle(cornerRadius: 10)
                                                 .frame(width: 46, height: 46, alignment: .center)
                                                 .foregroundColor(.clear)
-                                                .background(Color("main_blue"))
+                                                .background(Constants.purpleGradient)
                                                 .cornerRadius(10)
                                                 .shadow(color: Color(.sRGB, red: 44 / 255, green: 0 / 255, blue: 255 / 255, opacity: 0.35), radius: 8, x: 0, y: 5)
                                             
@@ -299,6 +299,34 @@ struct VisitContactView: View {
                                     HStack {
                                         Button(action: {
                                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                            Chat.instance.rejectAddContactRequest(UInt(self.contact.id)) { (error) in
+                                                if error != nil {
+                                                    print("error rejecting contact: \(String(describing: error?.localizedDescription))")
+                                                } else {
+                                                    print("rejected contact")
+                                                    self.contactRelationship = .unknown
+                                                    self.auth.profile.removeContactRequest(userID: UInt(self.contact.id))
+
+                                                }
+                                            }
+                                        }) {
+                                            Image(systemName: "person.crop.circle.badge.xmark")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 28, height: 24, alignment: .center)
+                                                .foregroundColor(Color("alertRed"))
+                                                .padding(.vertical, 10)
+                                                .padding(.horizontal, 9)
+                                                .background(Color("alertRed").opacity(0.1))
+                                                .cornerRadius(10)
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 10)
+                                                        .stroke(Color("alertRed"), lineWidth: 1)
+                                                )
+                                        }
+
+                                        Button(action: {
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                             Chat.instance.confirmAddContactRequest(UInt(self.contact.id)) { (error) in
                                                 print("accepted new contact:")
                                                 self.contactRelationship = .contact
@@ -348,34 +376,6 @@ struct VisitContactView: View {
                                                 RoundedRectangle(cornerRadius: 10)
                                                     .stroke(Color.blue, lineWidth: 1)
                                             )
-                                        }
-                                        
-                                        Button(action: {
-                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                            Chat.instance.rejectAddContactRequest(UInt(self.contact.id)) { (error) in
-                                                if error != nil {
-                                                    print("error rejecting contact: \(String(describing: error?.localizedDescription))")
-                                                } else {
-                                                    print("rejected contact")
-                                                    self.contactRelationship = .unknown
-                                                    self.auth.profile.removeContactRequest(userID: UInt(self.contact.id))
-
-                                                }
-                                            }
-                                        }) {
-                                            Image(systemName: "person.crop.circle.badge.xmark")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 28, height: 24, alignment: .center)
-                                                .foregroundColor(Color("alertRed"))
-                                                .padding(.vertical, 10)
-                                                .padding(.horizontal, 9)
-                                                .background(Color("alertRed").opacity(0.1))
-                                                .cornerRadius(10)
-                                                .overlay(
-                                                    RoundedRectangle(cornerRadius: 10)
-                                                        .stroke(Color("alertRed"), lineWidth: 1)
-                                                )
                                         }
                                     }
                                 }

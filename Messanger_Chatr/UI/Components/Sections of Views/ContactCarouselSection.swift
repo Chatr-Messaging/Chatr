@@ -99,9 +99,13 @@ struct ContactListView : View {
                 .onTapGesture {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     self.openDiscoverContent.toggle()
-                    print("the page is: \(self.page)")
                 }.sheet(isPresented: self.$openDiscoverContent, content: {
-                    Text("Coming Soon...")
+                    NavigationView {
+                        DiscoverView()
+                            .environmentObject(self.auth)
+                            .navigationBarTitle("Discover", displayMode: .large)
+                            .background(Color("bgColor").edgesIgnoringSafeArea(.all))
+                    }
                 })
             
             //premium
@@ -111,7 +115,6 @@ struct ContactListView : View {
                     .onTapGesture {
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                         self.openPremiumContent.toggle()
-                        print("the page is: \(self.page)")
                     }.sheet(isPresented: self.$openPremiumContent, content: {
                         MembershipView()
                             .environmentObject(self.auth)
@@ -142,50 +145,6 @@ struct ContactListView : View {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     self.quickSnapViewState = .camera
                 }
-            
-            /*
-            ForEach(dataArray) { i in
-                ContactBannerCell(titleBold: i.titleBold, title: i.title, subtitleImage: i.subtitleImage, subtitle: i.subtitle, imageMain: i.imageMain, gradientBG: i.gradientBG)
-                    .frame(width: Constants.screenWidth)
-                    .onTapGesture {
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        self.openContent.toggle()
-                        print("the page is: \(self.page)")
-                    }
-                    .sheet(isPresented: self.$openContent, content: {
-                        if self.page == 0 {
-                            if self.auth.subscriptionStatus == .notSubscribed {
-                                MembershipView()
-                                    .environmentObject(self.auth)
-                                    .edgesIgnoringSafeArea(.all)
-                                    .navigationBarTitle("")
-                            } else if self.addressBook.results.count == 0 {
-                                NavigationView {
-                                    SyncAddressBook()
-                                        .background(Color("bgColor"))
-                                        .navigationBarTitle("Sync Address Book", displayMode: .inline)
-                                        .frame(height: Constants.screenHeight)
-                                }
-                            } else {
-                                Text("discover")
-                            }
-                        } else if self.page == 1 {
-                            if self.auth.subscriptionStatus == .notSubscribed && self.addressBook.results.count == 0 && self.dataArray.count == 3 {
-                                NavigationView {
-                                    SyncAddressBook()
-                                        .background(Color("bgColor"))
-                                        .navigationBarTitle("Sync Address Book", displayMode: .inline)
-                                        .frame(height: Constants.screenHeight)
-                                }
-                            } else {
-                                Text("discover")
-                            }
-                        } else if self.page == 2 {
-                            Text("discover22")
-                        }
-                    })
-            }
-             */
         }.padding(.vertical)
     }
 }

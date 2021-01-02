@@ -25,7 +25,7 @@ struct HighlightedContactCell: View {
                         ZStack {
                             WebImage(url: URL(string: avitarURL))
                                 .resizable()
-                                .placeholder{ Image(systemName: "person.fill") }
+                                .placeholder{ Image("empty-profile").resizable().frame(width: 35, height: 35, alignment: .center).scaledToFill() }
                                 .indicator(.activity)
                                 .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                                 .scaledToFill()
@@ -105,7 +105,6 @@ struct HighlightedContactCell: View {
                 
                 HStack(alignment: .center, spacing: 20) {
                     Button(action: {
-                        print("chat...")
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                         self.newMessage = self.contact.id
                         self.dismissView.toggle()

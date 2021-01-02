@@ -118,7 +118,7 @@ struct AboutChatrView: View {
                             .font(.caption)
                             .fontWeight(.none)
                             .foregroundColor(.secondary)
-                            .multilineTextAlignment(.leading)
+                            .multilineTextAlignment(.center)
                     }.padding(.horizontal, 20)
                     .padding(.bottom, 20)
                     

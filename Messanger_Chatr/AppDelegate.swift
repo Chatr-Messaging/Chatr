@@ -81,13 +81,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, PKPushRegistryDelegate, U
     }
     
     func sceneDidEnterBackground(_ scene: UIScene) {
-        print("scene did enter background")
+        print("scene did enter background from AppDelegate")
         //PersistenceManager.shared.save()
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
         print("app will enter forground")
-        ChatrApp.connect()
     }
     
     func application( _ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data ) {

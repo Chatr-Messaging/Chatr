@@ -1,0 +1,6 @@
+framework module Pods_Messanger_Chatr {
+  umbrella header "Pods-Messanger_Chatr-umbrella.h"
+
+  export *
+  module * { export * }
+}
