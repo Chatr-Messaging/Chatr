@@ -24,33 +24,20 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
 
         // Create the SwiftUI view that provides the window contents.
-        if #available(iOS 14.0, *) {
-            let contentView = HomeView().environmentObject(environment)
-                //.environment(\.managedObjectContext, PersistenceManager.shared.context)
-            
-            // Use a UIHostingController as window root view controller.
-            if let windowScene = scene as? UIWindowScene {
-                let window = UIWindow(windowScene: windowScene)
-                window.rootViewController = UIHostingController(rootView: contentView)
-                window.tintColor = UIColor(named: "bgColor_opposite")
-                self.window = window
-                window.makeKeyAndVisible()
-            }
-        } else {
-            // Fallback on earlier versions
-            let oldContentView = OldHomeView().environmentObject(environment)
-            
-            // Use a UIHostingController as window root view controller.
-            if let windowScene = scene as? UIWindowScene {
-                let window = UIWindow(windowScene: windowScene)
-                window.rootViewController = UIHostingController(rootView: oldContentView)
-                self.window = window
-                window.makeKeyAndVisible()
-            }
+        let contentView = HomeView().environmentObject(environment)
+            //.environment(\.managedObjectContext, PersistenceManager.shared.context)
+        
+        // Use a UIHostingController as window root view controller.
+        if let windowScene = scene as? UIWindowScene {
+            let window = UIWindow(windowScene: windowScene)
+            window.rootViewController = UIHostingController(rootView: contentView)
+            window.tintColor = UIColor(named: "bgColor_opposite")
+            self.window = window
+            window.makeKeyAndVisible()
         }
         
         guard let userActivity = connectionOptions.userActivities.first(where: { $0.webpageURL != nil }) else { return }
-                print("dynamic link url topppp: \(userActivity.webpageURL!)")
+        print("dynamic link url topppp: \(userActivity.webpageURL!)")
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -78,11 +65,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     func sceneDidBecomeActive(_ scene: UIScene) {
         print("scene did become active")
-//        if self.environment.isUserAuthenticated == .signedIn {
-//            changeContactsRealmData().updateContacts(contactList: Chat.instance.contactList?.contacts ?? [], completion: { _ in })
+        //if self.environment.isUserAuthenticated == .signedIn {
+            //changeContactsRealmData().updateContacts(contactList: Chat.instance.contactList?.contacts ?? [], completion: { _ in })
 //            changeContactsRealmData().observeQuickSnaps()
 //            changeProfileRealmDate().observeFirebaseUser()
-//        }
+            //ChatrApp.connect()
+//            changeDialogRealmData().fetchDialogs(completion: { _ in
+//                changeContactsRealmData().observeQuickSnaps()
+//                changeProfileRealmDate().observeFirebaseUser()
+//                self.environment.initIAPurchase()
+//            })
+        //}
         // Called when the scene has moved from an inactive state to an active state.
         // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
     }
@@ -90,7 +83,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneWillResignActive(_ scene: UIScene) {
         print("scene will resign active")
         if self.environment.isUserAuthenticated == .signedIn {
-            if ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.isLocalAuthOn ?? false {
+            if self.environment.profile.results.first?.isLocalAuthOn ?? false {
                 self.environment.isLoacalAuth = true
             }
             if let dialog = self.environment.selectedConnectyDialog {
@@ -136,7 +129,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     private func sendLocalAuth() {
         print("Scene AppDelegate Used")
-        if ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.isLocalAuthOn ?? false {
+        if self.environment.profile.results.first?.isLocalAuthOn ?? false {
             print("Scene AppDelegate - Realm True")
             self.environment.isLoacalAuth = true
             let context = LAContext()

@@ -190,7 +190,7 @@ struct mainHomeList: View {
     @State var selectedQuickSnapContact: ContactStruct = ContactStruct()
     @Namespace var dialogNamespace
     @ObservedObject var dialogs = DialogRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(DialogStruct.self))
-    @State var wallpaperNames = ["", "SoftChatBubbles_DarkWallpaper", "SoftPaperAirplane-Wallpaper", "oldHouseWallpaper", "nycWallpaper", "michaelAngelWallpaper"]
+    let wallpaperNames = ["", "SoftChatBubbles_DarkWallpaper", "SoftPaperAirplane-Wallpaper", "oldHouseWallpaper", "nycWallpaper", "michaelAngelWallpaper"]
     
     var body: some View {
         ZStack {
