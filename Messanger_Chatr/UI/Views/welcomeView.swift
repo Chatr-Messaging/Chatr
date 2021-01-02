@@ -573,8 +573,8 @@ struct PermissionsView: View {
 
 // MARK: Phone Number View
 struct PhoneNumberView: View {
-    @Binding var continuePt1: Bool
     @EnvironmentObject var auth: AuthModel
+    @Binding var continuePt1: Bool
     @Binding var text: String
     @Binding var textArea: String
     @State var doneSucess = false
