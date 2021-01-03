@@ -337,7 +337,7 @@ struct VisitGroupChannelView: View {
                                             updateParameters.occupantsIDsToAdd = occu
                                             
                                             Request.updateDialog(withID: self.dialogModel.id, update: updateParameters, successBlock: { (updatedDialog) in
-                                                changeDialogRealmData().insertDialogs([updatedDialog]) { }
+                                                changeDialogRealmData.insertDialogs([updatedDialog]) { }
                                                 occu.removeAll()
                                                 self.addNewMemberID = ""
                                                 self.selectedNewMembers.removeAll()

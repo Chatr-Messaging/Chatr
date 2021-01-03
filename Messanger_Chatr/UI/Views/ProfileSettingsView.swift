@@ -12,6 +12,7 @@ import ConnectyCube
 import SDWebImageSwiftUI
 import FirebaseDatabase
 import WKView
+import StoreKit
 
 // MARK: Profile View
 struct ProfileView: View {
@@ -315,7 +316,7 @@ struct ProfileView: View {
                     VStack(spacing: 0) {
                         
                         //Private Profile
-                        NavigationLink(destination: securityView(isLocalAuthOn: self.$localAuth, isPremium: self.$isPremium, isInfoPrivate: self.$isInfoPrivate, isMessaging: self.$isMessagingPrivate).environmentObject(self.auth).navigationBarTitle("Privacy").modifier(GroupedListModifier())) {
+                        NavigationLink(destination: securityView(isLocalAuthOn: self.$localAuth, isPremium: self.$isPremium, isInfoPrivate: self.$isInfoPrivate, isMessaging: self.$isMessagingPrivate).environmentObject(self.auth).navigationBarTitle("Privacy").modifier(GroupedListModifier()).onAppear {UIImpactFeedbackGenerator(style: .medium).impactOccurred()}) {
                             VStack(alignment: .trailing, spacing: 0) {
                                 HStack {
                                     Image(systemName: "lock.shield")
@@ -399,6 +400,7 @@ struct ProfileView: View {
                         //Help & Support
                         Button(action: {
                             self.helpsupport.toggle()
+                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                         }) {
                             VStack(alignment: .trailing, spacing: 0) {
                                 HStack {
@@ -444,7 +446,8 @@ struct ProfileView: View {
                         
                         //Rate Chatr
                         Button(action: {
-                            print("rate chatr")
+                            StoreReviewHelper.requestReview()
+                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                         }) {
                             VStack(alignment: .trailing, spacing: 0) {
                                 HStack {

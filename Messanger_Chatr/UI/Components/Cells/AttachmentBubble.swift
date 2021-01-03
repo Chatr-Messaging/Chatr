@@ -56,7 +56,7 @@ struct AttachmentBubble: View {
                                             if error != nil {
                                                 UINotificationFeedbackGenerator().notificationOccurred(.error)
                                             } else {
-                                                changeMessageRealmData().updateMessageState(messageID: self.message.id, messageState: .deleted)
+                                                changeMessageRealmData.updateMessageState(messageID: self.message.id, messageState: .deleted)
                                             }
                                         }
                                     }) { HStack {
@@ -122,7 +122,7 @@ struct AttachmentBubble: View {
                                             if error != nil {
                                                 UINotificationFeedbackGenerator().notificationOccurred(.error)
                                             } else {
-                                                changeMessageRealmData().updateMessageState(messageID: self.message.id, messageState: .deleted)
+                                                changeMessageRealmData.updateMessageState(messageID: self.message.id, messageState: .deleted)
                                             }
                                         }
                                     }) { HStack {

@@ -86,7 +86,7 @@ struct KeyboardCardView: View {
                             }
                             if self.gifData.count > 0 {
                                 //have gifs
-                                changeMessageRealmData().sendGIFAttachment(dialog: selectedDialog, attachmentStrings: self.gifData.reversed(), occupentID: self.occupents)
+                                changeMessageRealmData.sendGIFAttachment(dialog: selectedDialog, attachmentStrings: self.gifData.reversed(), occupentID: self.occupents)
                             
                                 self.gifData.removeAll()
                                 self.hasAttachments = false
@@ -94,20 +94,20 @@ struct KeyboardCardView: View {
                             
                             if self.photoData.count > 0 {
                                 //have gifs
-                                changeMessageRealmData().sendPhotoAttachment(dialog: selectedDialog, attachmentImages: self.photoData, occupentID: self.occupents)
+                                changeMessageRealmData.sendPhotoAttachment(dialog: selectedDialog, attachmentImages: self.photoData, occupentID: self.occupents)
                             
                                 self.photoData.removeAll()
                                 self.hasAttachments = false
                             }
                             
                             if self.enableLocation {
-                                changeMessageRealmData().sendLocationMessage(dialog: selectedDialog, longitude: self.region.center.longitude, latitude: self.region.center.latitude, occupentID: self.occupents)
+                                changeMessageRealmData.sendLocationMessage(dialog: selectedDialog, longitude: self.region.center.longitude, latitude: self.region.center.latitude, occupentID: self.occupents)
                                 self.enableLocation = false
                                 self.hasAttachments = false
                             }
                             
                             if self.mainText.count > 0 {
-                                changeMessageRealmData().sendMessage(dialog: selectedDialog, text: self.mainText, occupentID: self.occupents)
+                                changeMessageRealmData.sendMessage(dialog: selectedDialog, text: self.mainText, occupentID: self.occupents)
                             }
                             self.occupents.removeAll()
                         }
@@ -335,7 +335,7 @@ struct KeyboardCardView: View {
                                         self.occupents.append(NSNumber(value: i))
                                     }
                                     
-                                    changeMessageRealmData().sendContactMessage(dialog: self.dialogs.selectedDia(dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").first!, contactID: self.selectedContacts, occupentID: self.occupents)
+                                    changeMessageRealmData.sendContactMessage(dialog: self.dialogs.selectedDia(dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").first!, contactID: self.selectedContacts, occupentID: self.occupents)
                                     self.occupents.removeAll()
                                 }
                             }

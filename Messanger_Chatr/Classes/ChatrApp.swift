@@ -51,7 +51,13 @@ extension ChatrApp {
             } else {
                 print("Success joining session! the current user: \(String(describing: Session.current.currentUser)) && expirationSate: \(String(describing: Session.current.sessionDetails?.token))")
 
-                changeDialogRealmData().fetchDialogs(completion: { _ in
+                Request.registeredUsersFromAddressBook(withUdid: nil, isCompact: false, successBlock: { (users) in
+                    print("received users from address book: \(users)")
+                }) { (error) in
+                    print("error in getting users from AddressBook... \(error.localizedDescription)")
+                }
+
+                changeDialogRealmData.fetchDialogs(completion: { _ in
                     changeContactsRealmData().observeQuickSnaps()
                     self.auth.initIAPurchase()
                 })

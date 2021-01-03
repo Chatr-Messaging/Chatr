@@ -10,6 +10,7 @@
 		050582FD24D8FCDF00CBD4AC /* DialogRealmModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 050582FC24D8FCDF00CBD4AC /* DialogRealmModel.swift */; };
 		050582FF24DA5F9600CBD4AC /* MessagesRealmModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 050582FE24DA5F9500CBD4AC /* MessagesRealmModel.swift */; };
 		050BF7CB23939777002B91BC /* welcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 050BF7CA23939777002B91BC /* welcomeView.swift */; };
+		0511CB7125A1911000E5F905 /* StoreReviewHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0511CB7025A1911000E5F905 /* StoreReviewHelper.swift */; };
 		05196DCA24E9EA4C0026B9A7 /* AnimatedGradientBG.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05196DC924E9EA4C0026B9A7 /* AnimatedGradientBG.swift */; };
 		05196DD424EB208C0026B9A7 /* ProfileRealmModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05196DD324EB208C0026B9A7 /* ProfileRealmModel.swift */; };
 		05196DD624ED90510026B9A7 /* NewConversationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05196DD524ED90500026B9A7 /* NewConversationView.swift */; };
@@ -42,14 +43,10 @@
 		056B98A924C8FD1D003F7FBA /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056B98A824C8FD1D003F7FBA /* SearchBar.swift */; };
 		056B98AB24C900D7003F7FBA /* PullToRefreshIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056B98AA24C900D7003F7FBA /* PullToRefreshIndicator.swift */; };
 		056B98AD24C90250003F7FBA /* HomeMessagesTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056B98AC24C90250003F7FBA /* HomeMessagesTitle.swift */; };
-		056EAB402516BB2800DC72FA /* AppIcon-Original.png in Resources */ = {isa = PBXBuildFile; fileRef = 056EAB3F2516BB2800DC72FA /* AppIcon-Original.png */; };
-		056EAB5A2516D8C900DC72FA /* AppIcon-Original-Dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 056EAB592516D8C900DC72FA /* AppIcon-Original-Dark.png */; };
 		056EAB602516D8E600DC72FA /* AppIcon-Flat.png in Resources */ = {isa = PBXBuildFile; fileRef = 056EAB5E2516D8E500DC72FA /* AppIcon-Flat.png */; };
 		056EAB612516D8E600DC72FA /* AppIcon-Flat-Dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 056EAB5F2516D8E600DC72FA /* AppIcon-Flat-Dark.png */; };
 		056EAB662516D8F300DC72FA /* AppIcon-PaperAirplane.png in Resources */ = {isa = PBXBuildFile; fileRef = 056EAB652516D8F300DC72FA /* AppIcon-PaperAirplane.png */; };
 		056EAB6B2516D8FD00DC72FA /* AppIcon-PaperAirplane-Dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 056EAB6A2516D8FD00DC72FA /* AppIcon-PaperAirplane-Dark.png */; };
-		056EAB742516DC0D00DC72FA /* AppIcon-Colorful-Dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 056EAB722516DC0C00DC72FA /* AppIcon-Colorful-Dark.png */; };
-		056EAB752516DC0D00DC72FA /* AppIcon-Colorful.png in Resources */ = {isa = PBXBuildFile; fileRef = 056EAB732516DC0D00DC72FA /* AppIcon-Colorful.png */; };
 		0572BAB72398998800AE9061 /* PhoneNumberView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0572BAB62398998700AE9061 /* PhoneNumberView.swift */; };
 		0572BAB923989A5100AE9061 /* VerifyNumberView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0572BAB823989A5100AE9061 /* VerifyNumberView.swift */; };
 		0572BABB239B348800AE9061 /* CustomStyles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0572BABA239B348700AE9061 /* CustomStyles.swift */; };
@@ -97,6 +94,10 @@
 		05C93BDB25145EF10059D1AA /* VisitGroupChannelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C93BDA25145EF10059D1AA /* VisitGroupChannelView.swift */; };
 		05C93BDD251578100059D1AA /* DialogContactCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C93BDC251578100059D1AA /* DialogContactCell.swift */; };
 		05CE07ED2529930300F09754 /* NotificationSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05CE07EC2529930300F09754 /* NotificationSection.swift */; };
+		05D77A4425A18BCE00776B93 /* AppIcon-Original-Dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 05D77A4225A18BCE00776B93 /* AppIcon-Original-Dark.png */; };
+		05D77A4525A18BCE00776B93 /* AppIcon-Original.png in Resources */ = {isa = PBXBuildFile; fileRef = 05D77A4325A18BCE00776B93 /* AppIcon-Original.png */; };
+		05D77A4B25A18BDD00776B93 /* AppIcon-Colorful.png in Resources */ = {isa = PBXBuildFile; fileRef = 05D77A4925A18BDC00776B93 /* AppIcon-Colorful.png */; };
+		05D77A4C25A18BDD00776B93 /* AppIcon-Colorful-Dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 05D77A4A25A18BDD00776B93 /* AppIcon-Colorful-Dark.png */; };
 		05D8A8DC2502CB3A00D53BE2 /* MailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05D8A8DB2502CB3A00D53BE2 /* MailView.swift */; };
 		05D8A8DE250318FA00D53BE2 /* AddressBookRealmModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05D8A8DD250318FA00D53BE2 /* AddressBookRealmModel.swift */; };
 		05DB89B2238B851400D4581F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05DB89B1238B851400D4581F /* AppDelegate.swift */; };
@@ -141,6 +142,7 @@
 		050582FE24DA5F9500CBD4AC /* MessagesRealmModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesRealmModel.swift; sourceTree = "<group>"; };
 		050BF7CA23939777002B91BC /* welcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = welcomeView.swift; sourceTree = "<group>"; };
 		050C00B3254A7C620059CBC5 /* libswiftWebKit.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libswiftWebKit.tbd; path = usr/lib/swift/libswiftWebKit.tbd; sourceTree = SDKROOT; };
+		0511CB7025A1911000E5F905 /* StoreReviewHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreReviewHelper.swift; sourceTree = "<group>"; };
 		05196DC924E9EA4C0026B9A7 /* AnimatedGradientBG.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedGradientBG.swift; sourceTree = "<group>"; };
 		05196DD324EB208C0026B9A7 /* ProfileRealmModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileRealmModel.swift; sourceTree = "<group>"; };
 		05196DD524ED90500026B9A7 /* NewConversationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewConversationView.swift; sourceTree = "<group>"; };
@@ -174,14 +176,10 @@
 		056B98A824C8FD1D003F7FBA /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
 		056B98AA24C900D7003F7FBA /* PullToRefreshIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PullToRefreshIndicator.swift; sourceTree = "<group>"; };
 		056B98AC24C90250003F7FBA /* HomeMessagesTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeMessagesTitle.swift; sourceTree = "<group>"; };
-		056EAB3F2516BB2800DC72FA /* AppIcon-Original.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon-Original.png"; path = "../../../../../Chatr Icons/Icon 9.19.20/AppIcon-Original.png"; sourceTree = "<group>"; };
-		056EAB592516D8C900DC72FA /* AppIcon-Original-Dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon-Original-Dark.png"; path = "../../../../../Chatr Icons/Icon 9.19.20/AppIcon-Original-Dark.png"; sourceTree = "<group>"; };
 		056EAB5E2516D8E500DC72FA /* AppIcon-Flat.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-Flat.png"; sourceTree = "<group>"; };
 		056EAB5F2516D8E600DC72FA /* AppIcon-Flat-Dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-Flat-Dark.png"; sourceTree = "<group>"; };
 		056EAB652516D8F300DC72FA /* AppIcon-PaperAirplane.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-PaperAirplane.png"; sourceTree = "<group>"; };
 		056EAB6A2516D8FD00DC72FA /* AppIcon-PaperAirplane-Dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-PaperAirplane-Dark.png"; sourceTree = "<group>"; };
-		056EAB722516DC0C00DC72FA /* AppIcon-Colorful-Dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon-Colorful-Dark.png"; path = "../../../../../Chatr Icons/Icon 9.19.20/AppIcon-Colorful-Dark.png"; sourceTree = "<group>"; };
-		056EAB732516DC0D00DC72FA /* AppIcon-Colorful.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon-Colorful.png"; path = "../../../../../Chatr Icons/Icon 9.19.20/AppIcon-Colorful.png"; sourceTree = "<group>"; };
 		0571F8EC254B7F3B00FA5695 /* libswiftSystem_Foundation.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libswiftSystem_Foundation.tbd; path = usr/lib/swift/libswiftSystem_Foundation.tbd; sourceTree = SDKROOT; };
 		0572BAB62398998700AE9061 /* PhoneNumberView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneNumberView.swift; sourceTree = "<group>"; };
 		0572BAB823989A5100AE9061 /* VerifyNumberView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifyNumberView.swift; sourceTree = "<group>"; };
@@ -228,6 +226,10 @@
 		05C93BDA25145EF10059D1AA /* VisitGroupChannelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitGroupChannelView.swift; sourceTree = "<group>"; };
 		05C93BDC251578100059D1AA /* DialogContactCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogContactCell.swift; sourceTree = "<group>"; };
 		05CE07EC2529930300F09754 /* NotificationSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSection.swift; sourceTree = "<group>"; };
+		05D77A4225A18BCE00776B93 /* AppIcon-Original-Dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon-Original-Dark.png"; path = "../../../../../Chatr Designs/Chatr Icons/Icon 9.19.20/AppIcon-Original-Dark.png"; sourceTree = "<group>"; };
+		05D77A4325A18BCE00776B93 /* AppIcon-Original.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon-Original.png"; path = "../../../../../Chatr Designs/Chatr Icons/Icon 9.19.20/AppIcon-Original.png"; sourceTree = "<group>"; };
+		05D77A4925A18BDC00776B93 /* AppIcon-Colorful.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon-Colorful.png"; path = "../../../../../Chatr Designs/Chatr Icons/Icon 9.19.20/AppIcon-Colorful.png"; sourceTree = "<group>"; };
+		05D77A4A25A18BDD00776B93 /* AppIcon-Colorful-Dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon-Colorful-Dark.png"; path = "../../../../../Chatr Designs/Chatr Icons/Icon 9.19.20/AppIcon-Colorful-Dark.png"; sourceTree = "<group>"; };
 		05D8A8DB2502CB3A00D53BE2 /* MailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailView.swift; sourceTree = "<group>"; };
 		05D8A8DD250318FA00D53BE2 /* AddressBookRealmModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBookRealmModel.swift; sourceTree = "<group>"; };
 		05DB89AE238B851400D4581F /* Messanger_Chatr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Messanger_Chatr.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -454,6 +456,7 @@
 				05578C352429CE030016B1E5 /* PersistenceManager.swift */,
 				0583A82C23A72A8700F9220B /* Auth.swift */,
 				0583A83023A73AEF00F9220B /* Model */,
+				05D77A5025A190BA00776B93 /* Helpers */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -479,14 +482,14 @@
 		0583A83123BD34B400F9220B /* AppIcons */ = {
 			isa = PBXGroup;
 			children = (
-				056EAB3F2516BB2800DC72FA /* AppIcon-Original.png */,
-				056EAB592516D8C900DC72FA /* AppIcon-Original-Dark.png */,
+				05D77A4225A18BCE00776B93 /* AppIcon-Original-Dark.png */,
+				05D77A4325A18BCE00776B93 /* AppIcon-Original.png */,
 				056EAB5E2516D8E500DC72FA /* AppIcon-Flat.png */,
 				056EAB5F2516D8E600DC72FA /* AppIcon-Flat-Dark.png */,
 				056EAB652516D8F300DC72FA /* AppIcon-PaperAirplane.png */,
 				056EAB6A2516D8FD00DC72FA /* AppIcon-PaperAirplane-Dark.png */,
-				056EAB732516DC0D00DC72FA /* AppIcon-Colorful.png */,
-				056EAB722516DC0C00DC72FA /* AppIcon-Colorful-Dark.png */,
+				05D77A4A25A18BDD00776B93 /* AppIcon-Colorful-Dark.png */,
+				05D77A4925A18BDC00776B93 /* AppIcon-Colorful.png */,
 			);
 			path = AppIcons;
 			sourceTree = "<group>";
@@ -498,6 +501,14 @@
 				0583A83123BD34B400F9220B /* AppIcons */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		05D77A5025A190BA00776B93 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				0511CB7025A1911000E5F905 /* StoreReviewHelper.swift */,
+			);
+			path = Helpers;
 			sourceTree = "<group>";
 		};
 		05DB89A5238B851400D4581F = {
@@ -727,16 +738,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				05DB89BE238B851800D4581F /* LaunchScreen.storyboard in Resources */,
-				056EAB402516BB2800DC72FA /* AppIcon-Original.png in Resources */,
-				056EAB742516DC0D00DC72FA /* AppIcon-Colorful-Dark.png in Resources */,
 				05DB89BB238B851800D4581F /* Preview Assets.xcassets in Resources */,
 				05DB89B8238B851800D4581F /* Assets.xcassets in Resources */,
 				05DB89E2238B854400D4581F /* GoogleService-Info.plist in Resources */,
+				05D77A4425A18BCE00776B93 /* AppIcon-Original-Dark.png in Resources */,
 				056EAB6B2516D8FD00DC72FA /* AppIcon-PaperAirplane-Dark.png in Resources */,
 				056EAB602516D8E600DC72FA /* AppIcon-Flat.png in Resources */,
-				056EAB752516DC0D00DC72FA /* AppIcon-Colorful.png in Resources */,
+				05D77A4B25A18BDD00776B93 /* AppIcon-Colorful.png in Resources */,
+				05D77A4525A18BCE00776B93 /* AppIcon-Original.png in Resources */,
+				05D77A4C25A18BDD00776B93 /* AppIcon-Colorful-Dark.png in Resources */,
 				056EAB662516D8F300DC72FA /* AppIcon-PaperAirplane.png in Resources */,
-				056EAB5A2516D8C900DC72FA /* AppIcon-Original-Dark.png in Resources */,
 				056EAB612516D8E600DC72FA /* AppIcon-Flat-Dark.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -898,6 +909,7 @@
 				05A7BD4D24F851760001BFC9 /* TermsView.swift in Sources */,
 				05A7633A25060EB2002712FA /* AddNewContactView.swift in Sources */,
 				05A7BD6124FEF5180001BFC9 /* LockedOutView.swift in Sources */,
+				0511CB7125A1911000E5F905 /* StoreReviewHelper.swift in Sources */,
 				055C2A6024CE8C2700F7AE16 /* DialogList.swift in Sources */,
 				0572BAB72398998800AE9061 /* PhoneNumberView.swift in Sources */,
 				05578C2C242989A10016B1E5 /* Messanger_Chatr.xcdatamodeld in Sources */,

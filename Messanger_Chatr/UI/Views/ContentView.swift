@@ -23,7 +23,6 @@ struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ZStack {
             if #available(iOS 14.0, *) {
-                
                 mainHomeList(showNewChat: .constant(false), showContacts: .constant(false), showUserProfile: .constant(false))
                     .background(Color("bgColor"))
             } else {
@@ -49,7 +48,6 @@ struct OldHomeView: View {
 @available(iOS 14.0, *)
 struct HomeView: View {
     @EnvironmentObject var auth: AuthModel
-    @ObservedObject var profile = ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self))
     @State var loginIsPresented: Bool = true
     @State var showNewChat: Bool = false
     @State var showContacts: Bool = false
@@ -66,10 +64,11 @@ struct HomeView: View {
                 if !self.auth.preventDismissal {
                     Text("")
                         .onAppear(perform: {
-                            print("View did appear.is the sesh avalible: \(Session.current.tokenHasExpired) Session Details: \(String(describing: Session.current.sessionDetails)) && the facID: \(String(describing: self.profile.results.first?.isLocalAuthOn))")
+                            print("View did appear. the sesh avalible: \(Session.current.tokenHasExpired) Session Details: \(String(describing: Session.current.sessionDetails)) && the facID: \(String(describing: self.auth.profile.results.first?.isLocalAuthOn))")
                             ChatrApp.connect()
+                            StoreReviewHelper.checkAndAskForReview()
                             
-                            if self.profile.results.first?.isLocalAuthOn ?? false {
+                            if self.auth.profile.results.first?.isLocalAuthOn ?? false {
                                 self.auth.isLoacalAuth = true
                                 let context = LAContext()
                                 var error: NSError?
@@ -346,7 +345,7 @@ struct mainHomeList: View {
                                     .frame(minWidth: Constants.screenWidth - 20, maxWidth: Constants.screenWidth)
                                     .frame(height: 250)
                                     .onAppear() {
-                                        changeDialogRealmData().fetchDialogs(completion: { _ in })
+                                        changeDialogRealmData.fetchDialogs(completion: { _ in })
                                     }
                                 
                                 Text("No Messages Found")
@@ -404,7 +403,7 @@ struct mainHomeList: View {
                                             } else {
                                                 UserDefaults.standard.set(false, forKey: "localOpen")
                                                 changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: i.id)
-                                                changeDialogRealmData().fetchDialogs(completion: { _ in })
+                                                changeDialogRealmData.fetchDialogs(completion: { _ in })
                                                 if i.dialogType == "group" || i.dialogType == "public" {
                                                     self.auth.leaveDialog()
                                                 }
@@ -424,7 +423,7 @@ struct mainHomeList: View {
                                                 UserDefaults.standard.set(false, forKey: "localOpen")
                                                 changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: i.id)
                                                 //changeDialogRealmData().updateDialogTypedText(text: self.keyboardText, dialogID: i.id)
-                                                changeDialogRealmData().fetchDialogs(completion: { _ in })
+                                                changeDialogRealmData.fetchDialogs(completion: { _ in })
 
                                                 self.isLocalOpen = false
                                                 self.isLoading = false
@@ -622,7 +621,7 @@ struct mainHomeList: View {
                 dialog.occupantIDs = [NSNumber(value: self.newDialogFromContact)]  // an ID of opponent
 
                 Request.createDialog(dialog, successBlock: { (dialog) in
-                    changeDialogRealmData().fetchDialogs(completion: { _ in
+                    changeDialogRealmData.fetchDialogs(completion: { _ in
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                             print("opening new dialog: \(self.newDialogID) & \(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id ?? "")")
                             self.isLocalOpen = true

@@ -102,7 +102,6 @@ extension Date {
 }
 
 extension String {
-
     var containsEmoji: Bool {
         for scalar in unicodeScalars {
             switch scalar.value {

@@ -40,6 +40,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, PKPushRegistryDelegate, U
         UIApplication.shared.registerForRemoteNotifications()
         self.voipRegistration()
         
+        StoreReviewHelper.incrementAppOpenedCount()
+        
         Messaging.messaging().delegate = self
         Messaging.messaging().token { token, error in
           if let error = error {

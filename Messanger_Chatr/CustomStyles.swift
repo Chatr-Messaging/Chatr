@@ -134,6 +134,11 @@ extension UIApplication {
             .first?
             .endEditing(force)
     }
+    
+    var currentScene: UIWindowScene? {
+        connectedScenes
+            .first { $0.activationState == .foregroundActive } as? UIWindowScene
+    }
 }
 
 struct ResignKeyboardOnDragGesture: ViewModifier {

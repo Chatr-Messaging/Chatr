@@ -68,7 +68,7 @@ struct ChatMessagesView: View {
                                     Button(action: {
                                         self.firstScroll = false
                                         self.auth.acceptScrolls = false
-                                        changeMessageRealmData().loadMoreMessages(dialogID: currentMessages[message].dialogID, currentCount: currentMessages.count, completion: { _ in
+                                        changeMessageRealmData.loadMoreMessages(dialogID: currentMessages[message].dialogID, currentCount: currentMessages.count, completion: { _ in
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                                                 withAnimation {
                                                     reader.scrollTo(currentMessages[message + 20].id, anchor: .top)
@@ -154,7 +154,7 @@ struct ChatMessagesView: View {
         }.contentShape(Rectangle())//.frame(width: Constants.screenWidth, height: Constants.screenHeight - 50 - (self.textFieldHeight <= 120 ? self.textFieldHeight : 120) - self.keyboardChange + self.keyboardDragState.height - (self.hasAttachment ? 95 : 0), alignment: .bottom)
         .onAppear() {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                changeMessageRealmData().getMessageUpdates(dialogID: self.selectedID, completion: { _ in
+                changeMessageRealmData.getMessageUpdates(dialogID: self.selectedID, completion: { _ in
                     self.auth.acceptScrolls = true
                     self.firstScroll = true
                 })
@@ -170,7 +170,7 @@ struct ChatMessagesView: View {
                                 //print("this dude is typing!!: \(userID)")
                                 if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
                                     withAnimation { () -> () in
-                                        changeMessageRealmData().addTypingMessage(userID: String(userID), dialogID: self.selectedID)
+                                        changeMessageRealmData.addTypingMessage(userID: String(userID), dialogID: self.selectedID)
                                     }
                                 }
                             }
@@ -179,7 +179,7 @@ struct ChatMessagesView: View {
                                 //print("this dude STOPPED typing!!: \(userID)")
                                 if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
                                     withAnimation { () -> () in
-                                        changeMessageRealmData().removeTypingMessage(userID: String(userID), dialogID: self.selectedID)
+                                        changeMessageRealmData.removeTypingMessage(userID: String(userID), dialogID: self.selectedID)
                                     }
                                 }
                             }

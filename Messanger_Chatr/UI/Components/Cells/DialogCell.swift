@@ -277,7 +277,7 @@ struct DialogCell: View {
                     changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                        changeDialogRealmData().fetchDialogs(completion: { _ in })
+                        changeDialogRealmData.fetchDialogs(completion: { _ in })
                     }
                 }, label: {
                     Image(systemName: "chevron.down.circle")

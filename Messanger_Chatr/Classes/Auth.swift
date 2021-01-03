@@ -476,7 +476,7 @@ class AuthModel: NSObject, ObservableObject {
             print("success logging out of connecty cube")
             self.verifyPhoneNumberStatus = .undefined
             changeProfileRealmDate().removeAllProfile()
-            changeMessageRealmData().removeAllMessages(completion: { _ in })
+            changeMessageRealmData.removeAllMessages(completion: { _ in })
             changeDialogRealmData().removeAllDialogs()
             changeContactsRealmData().removeAllContacts()
             changeQuickSnapsRealmData().removeAllQuickSnaps()
@@ -834,7 +834,7 @@ extension AuthModel: ChatDelegate {
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         if UserDefaults.standard.bool(forKey: "localOpen") {
             if (!message.removed) {
-                changeMessageRealmData().insertMessage(message, completion: { })
+                changeMessageRealmData.insertMessage(message, completion: { })
                 
                 if message.senderID != UserDefaults.standard.integer(forKey: "currentUserID") {
                     Chat.instance.read(message) { (error) in
@@ -843,14 +843,14 @@ extension AuthModel: ChatDelegate {
                 }
             }
         } else {
-            changeDialogRealmData().fetchDialogs(completion: { _ in })
+            changeDialogRealmData.fetchDialogs(completion: { _ in })
         }
         if (message.removed) {
-            changeMessageRealmData().updateMessageState(messageID: message.id ?? "", messageState: .deleted)
+            changeMessageRealmData.updateMessageState(messageID: message.id ?? "", messageState: .deleted)
         } else if (message.edited) {
-            changeMessageRealmData().updateMessageState(messageID: message.id ?? "", messageState: .editied)
+            changeMessageRealmData.updateMessageState(messageID: message.id ?? "", messageState: .editied)
         } else if (message.delayed) {
-            changeMessageRealmData().updateMessageDelayState(messageID: message.id ?? "", messageDelayed: true)
+            changeMessageRealmData.updateMessageDelayState(messageID: message.id ?? "", messageDelayed: true)
         }
         self.acceptScrolls = false
     }
@@ -859,23 +859,23 @@ extension AuthModel: ChatDelegate {
         print("receved new GROUP message: \(String(describing: message.text)) for dialogID: \(dialogID)")
         //self.acceptScrolls = true
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-        changeMessageRealmData().updateMessageState(messageID: message.id ?? "", messageState: .delivered)
+        changeMessageRealmData.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
         if UserDefaults.standard.bool(forKey: "localOpen") {
             if (!message.removed) {
                 Chat.instance.read(message) { (error) in
-                    changeMessageRealmData().insertMessage(message, completion: { })
+                    changeMessageRealmData.insertMessage(message, completion: { })
                 }
             }
             self.setOnlineCount()
         } else {
-            changeDialogRealmData().fetchDialogs(completion: { _ in })
+            changeDialogRealmData.fetchDialogs(completion: { _ in })
         }
         if (message.removed) {
-            changeMessageRealmData().updateMessageState(messageID: message.id ?? "", messageState: .deleted)
+            changeMessageRealmData.updateMessageState(messageID: message.id ?? "", messageState: .deleted)
         } else if (message.edited) {
-            changeMessageRealmData().updateMessageState(messageID: message.id ?? "", messageState: .editied)
+            changeMessageRealmData.updateMessageState(messageID: message.id ?? "", messageState: .editied)
         } else if (message.delayed) {
-            changeMessageRealmData().updateMessageDelayState(messageID: message.id ?? "", messageDelayed: true)
+            changeMessageRealmData.updateMessageDelayState(messageID: message.id ?? "", messageDelayed: true)
         }
         //self.acceptScrolls = false
     }

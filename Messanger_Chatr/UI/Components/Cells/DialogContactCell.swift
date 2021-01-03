@@ -139,7 +139,7 @@ struct DialogContactCell: View {
                     .default(Text(self.isAdmin ? "Remove Admin" : "Add Admin")) {
                         if !self.isAdmin {
                             Request.addAdminsToDialog(withID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "", adminsUserIDs: [NSNumber(value: self.contact.id)], successBlock: { (updatedDialog) in
-                                changeDialogRealmData().insertDialogs([updatedDialog]) { }
+                                changeDialogRealmData.insertDialogs([updatedDialog]) { }
                                 self.isAdmin = true
                                 self.isOwner = false
                                 print("Success adding contact as admin!")
@@ -157,7 +157,7 @@ struct DialogContactCell: View {
                             }
                         } else {
                             Request.removeAdminsFromDialog(withID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "", adminsUserIDs: [NSNumber(value: self.contact.id)], successBlock: { (updatedDialog) in
-                                changeDialogRealmData().insertDialogs([updatedDialog]) { }
+                                changeDialogRealmData.insertDialogs([updatedDialog]) { }
                                 self.isAdmin = false
                                 self.isOwner = false
                                 print("Success removing contact as admin!")
@@ -180,7 +180,7 @@ struct DialogContactCell: View {
                         let updateParameters = UpdateChatDialogParameters()
                         updateParameters.occupantsIDsToRemove = [NSNumber(value: self.contact.id)]
                         Request.updateDialog(withID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "", update: updateParameters, successBlock: { (updatedDialog) in
-                            changeDialogRealmData().insertDialogs([updatedDialog]) { }
+                            changeDialogRealmData.insertDialogs([updatedDialog]) { }
                             print("Success removing contact from dialog")
                             UINotificationFeedbackGenerator().notificationOccurred(.success)
                             self.notiType = "success"
