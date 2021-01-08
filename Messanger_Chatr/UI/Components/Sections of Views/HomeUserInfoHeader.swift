@@ -12,55 +12,59 @@ import RealmSwift
 // MARK: Home Header Section
 struct HomeHeaderSection: View {
     @EnvironmentObject var auth: AuthModel
-    @Environment(\.presentationMode) var presentationMode
     @Binding var showUserProfile: Bool
+    @State private var highlighted: Bool = false
     @State var alertNum: Int = 0
     @State var profileImgSize = CGFloat(50)
-    @ObservedObject var profile = ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self))
 
     var body: some View {
-        //header section
-        GeometryReader { geo in
-             HStack {
-                VStack(alignment: .leading) {
-                    Text("Welcome Back,")
-                        .font(.system(size: 16))
-                        .foregroundColor(Color.secondary)
-                        //.padding(.bottom, 1)
-                        .offset(y: UserDefaults.standard.bool(forKey: "premiumSubscriptionStatus") ? 3 : 0)
-                    
-                    HStack(alignment: .center, spacing: 5) {
-                        if UserDefaults.standard.bool(forKey: "premiumSubscriptionStatus") {
-                            Image(systemName: "checkmark.seal")
-                                .resizable()
-                                .scaledToFit()
-                                .font(Font.title.weight(.semibold))
-                                .frame(width: 24, height: 24, alignment: .center)
-                                .foregroundColor(Color("main_blue"))
-                        }
-                        
-                        Text(self.profile.results.first?.fullName ?? "Chatr Name")
-                            .font(.system(size: 24))
-                            .fontWeight(.medium)
-                            .foregroundColor(Color.primary)
-                    }.offset(y: UserDefaults.standard.bool(forKey: "premiumSubscriptionStatus") ? -3 : 0)
-
-                }.offset(y: geo.frame(in: .global).minY > 0 ? -geo.frame(in: .global).minY + 60 : (geo.frame(in: .global).minY < 60 ? 60 : -geo.frame(in: .global).minY + 60))
-                .onTapGesture {
-                    self.showUserProfile.toggle()
-                }
-
-                Spacer()
+         HStack {
+            VStack(alignment: .leading) {
+                Text("Welcome Back,")
+                    .font(.system(size: 16))
+                    .foregroundColor(Color.secondary)
+                    .offset(y: UserDefaults.standard.bool(forKey: "premiumSubscriptionStatus") ? 3 : 0)
                 
-                ProfileImage(size: self.$profileImgSize, alertCount: self.$alertNum)
-                    .environmentObject(self.auth)
-                    .offset(x: -8.25, y: -4)
-                    .offset(y: geo.frame(in: .global).minY > 0 ? -geo.frame(in: .global).minY + 60 : (geo.frame(in: .global).minY < 60 ? 60 : -geo.frame(in: .global).minY + 60))
-                    .onTapGesture { self.showUserProfile.toggle() }
-                    .onAppear(){
-                        self.alertNum = (self.auth.profile.results.first?.contactRequests.count ?? 0)
+                HStack(alignment: .center, spacing: 5) {
+                    if UserDefaults.standard.bool(forKey: "premiumSubscriptionStatus") {
+                        Image(systemName: "checkmark.seal")
+                            .resizable()
+                            .scaledToFit()
+                            .font(Font.title.weight(.semibold))
+                            .frame(width: 24, height: 24, alignment: .center)
+                            .foregroundColor(Color("main_blue"))
                     }
+                    
+                    Text(self.auth.profile.results.first?.fullName ?? "Chatr Name")
+                        .font(.system(size: 24))
+                        .fontWeight(.medium)
+                        .foregroundColor(Color.primary)
+                }.offset(y: UserDefaults.standard.bool(forKey: "premiumSubscriptionStatus") ? -3 : 0)
             }
-        }
+
+            Spacer()
+            ProfileImage(size: self.$profileImgSize, alertCount: self.$alertNum)
+                .environmentObject(self.auth)
+                .onAppear(){
+                    self.alertNum = (self.auth.profile.results.first?.contactRequests.count ?? 0)
+                }
+         }.contentShape(Rectangle())
+         .padding(.horizontal, 5)
+         .padding(.vertical, 10)
+         .animation(.spring(response: 0.45, dampingFraction: 0.75, blendDuration: 0))
+         .scaleEffect(self.highlighted ? 0.975 : 1.0)
+         .background(RoundedRectangle(cornerRadius: 20).fill(self.highlighted ? Color("bgColor_light") : Color.clear).animation(.none))
+         .gesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged({ _ in
+                    self.highlighted = true
+                })
+                .onEnded({ value in
+                    self.highlighted = false
+                    if value.translation.width < 20 && value.translation.height < 20 {
+                        self.showUserProfile.toggle()
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                    }
+                }))
     }
 }

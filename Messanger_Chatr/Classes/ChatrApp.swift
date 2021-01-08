@@ -57,7 +57,7 @@ extension ChatrApp {
                     print("error in getting users from AddressBook... \(error.localizedDescription)")
                 }
 
-                changeDialogRealmData.fetchDialogs(completion: { _ in
+                changeDialogRealmData().fetchDialogs(completion: { _ in
                     changeContactsRealmData().observeQuickSnaps()
                     self.auth.initIAPurchase()
                 })

@@ -74,8 +74,8 @@ class DialogRealmModel<Element>: ObservableObject where Element: RealmSwift.Real
     }
 }
 
-struct changeDialogRealmData {
-    static func fetchDialogs(completion: @escaping (Bool) -> ()) {
+class changeDialogRealmData {
+    func fetchDialogs(completion: @escaping (Bool) -> ()) {
         let extRequest : [String: String] = ["sort_desc" : "lastMessageDate"]
         Request.dialogs(with: Paginator.limit(100, skip: 0), extendedRequest: extRequest, successBlock: { (dialogs, usersIDs, paginator) in
             if dialogs.count > 0 {
@@ -106,7 +106,7 @@ struct changeDialogRealmData {
        }
     }
     
-    static func insertDialogs<T>(_ objects: [T], completion: @escaping () -> Void) where T: ChatDialog {
+    func insertDialogs<T>(_ objects: [T], completion: @escaping () -> Void) where T: ChatDialog {
         objects.forEach({ (object) in
             //var onlineUsers = 0
 //            if !object.isJoined() {

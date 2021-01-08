@@ -25,7 +25,7 @@ struct MainButtonStyle: ButtonStyle {
 }
 
 struct ClickButtonStyle: ButtonStyle {
-    public func makeBody(configuration: MainButtonStyle.Configuration) -> some View {
+    public func makeBody(configuration: ClickButtonStyle.Configuration) -> some View {
         configuration.label
             .opacity(configuration.isPressed ? 0.95 : 1)
             .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
@@ -33,37 +33,9 @@ struct ClickButtonStyle: ButtonStyle {
 }
 
 struct ClickMiniButtonStyle: ButtonStyle {
-    public func makeBody(configuration: MainButtonStyle.Configuration) -> some View {
+    public func makeBody(configuration: ClickMiniButtonStyle.Configuration) -> some View {
         configuration.label
             .scaleEffect(configuration.isPressed ? 0.975 : 1.0)
-    }
-}
-
-struct GroupedListModifier: ViewModifier {
-    func body(content: Content) -> some View {
-        Group {
-            if #available(iOS 14, *) {
-                AnyView(
-                    content
-                        .listStyle(InsetGroupedListStyle())
-                )
-            } else {
-                content
-                    .listStyle(GroupedListStyle())
-                    .environment(\.horizontalSizeClass, .regular)
-            }
-        }
-    }
-}
-
-struct plainButtonStyle: ButtonStyle {
-    public func makeBody(configuration: plainButtonStyle.Configuration) -> some View {
-        configuration.label
-            .frame(minWidth: 40, maxWidth: .infinity, minHeight: 45, maxHeight: 60)
-            .foregroundColor(configuration.isPressed ? .gray : .blue)
-            .cornerRadius(18)
-            .opacity(configuration.isPressed ? 0.95 : 1)
-            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
     }
 }
 
@@ -71,6 +43,33 @@ struct changeBGButtonStyle: ButtonStyle {
     public func makeBody(configuration: changeBGButtonStyle.Configuration) -> some View {
         configuration.label
             .background(configuration.isPressed ? Color("bgColor_light") : Color("buttonColor"))
+    }
+}
+
+struct navigationScaleHelpticButtonStyle: PrimitiveButtonStyle {
+    func makeBody(configuration: PrimitiveButtonStyle.Configuration) -> some View {
+        MyButton(configuration: configuration)
+    }
+    
+    private struct MyButton: View {
+        @State var pressed = false
+        let configuration: PrimitiveButtonStyle.Configuration
+        
+        var body: some View {
+            let gesture = DragGesture(minimumDistance: 0)
+                .onChanged { _ in self.pressed = true }
+                .onEnded { value in
+                    self.pressed = false
+                    if value.translation.width < 10 && value.translation.height < 10 {
+                        self.configuration.trigger()
+                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                    }
+                }
+            
+            return configuration.label
+                .scaleEffect(self.pressed ? 0.975 : 1.0)
+                .highPriorityGesture(gesture)
+        }
     }
 }
 
@@ -95,10 +94,38 @@ struct NeumorphismBtnStyle: ButtonStyle {
     }
 }
 
+struct plainButtonStyle: ButtonStyle {
+    public func makeBody(configuration: plainButtonStyle.Configuration) -> some View {
+        configuration.label
+            .frame(minWidth: 40, maxWidth: .infinity, minHeight: 45, maxHeight: 60)
+            .foregroundColor(configuration.isPressed ? .gray : .blue)
+            .cornerRadius(18)
+            .opacity(configuration.isPressed ? 0.95 : 1)
+            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
+    }
+}
+
 struct EmptyButtonStyle: ButtonStyle {
     public func makeBody(configuration: EmptyButtonStyle.Configuration) -> some View {
         configuration.label
             .foregroundColor(.clear)
+    }
+}
+
+struct GroupedListModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        Group {
+            if #available(iOS 14, *) {
+                AnyView(
+                    content
+                        .listStyle(InsetGroupedListStyle())
+                )
+            } else {
+                content
+                    .listStyle(GroupedListStyle())
+                    .environment(\.horizontalSizeClass, .regular)
+            }
+        }
     }
 }
 

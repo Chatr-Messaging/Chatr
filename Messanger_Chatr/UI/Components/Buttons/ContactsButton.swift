@@ -10,32 +10,25 @@ import SwiftUI
 
 // MARK: Contacts Button
 struct ContactsBtn: View {
-    @EnvironmentObject var auth: AuthModel
-    @State var size : CGFloat = Constants.btnSize
     @Binding var showContacts : Bool
     @State var alertNum = 0
-    var icon : String
     
     var body: some View {
         Button(action: {
-            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
             self.showContacts.toggle()
         }) {
             ZStack {
                 ZStack {
-                    //BlurView(style: .systemMaterial)
-                    RoundedRectangle(cornerRadius: size / 4)
+                    RoundedRectangle(cornerRadius: Constants.menuBtnSize / 4)
                         .foregroundColor(Color("buttonColor"))
 
-                    Image(systemName: icon)
+                    Image(systemName: "rectangle.stack.person.crop")
                         .resizable()
                         .scaledToFit()
-                        .padding(size * 0.25)
+                        .padding(Constants.menuBtnSize * 0.25)
                         .foregroundColor(.primary)
-                }
-                .frame(width: size, height: size)
-                //.background(Color.white)
-                //.clipShape(RoundedRectangle(cornerRadius: size / 4, style: .continuous))
+                }.frame(width: Constants.menuBtnSize, height: Constants.menuBtnSize)
                 .shadow(color: Color("buttonShadow_Deeper"), radius: 10, x: 0, y: 8)
 
                 ZStack(alignment: .center) {
@@ -46,9 +39,8 @@ struct ContactsBtn: View {
                             .font(.footnote)
                             .padding(.horizontal, 5)
                     }.background(Capsule().frame(height: 22).frame(minWidth: 22).foregroundColor(Color("alertRed")).shadow(color: Color("alertRed").opacity(0.75), radius: 5, x: 0, y: 5))
-                }.offset(x: size * 0.45, y: -(size * 0.5))
+                }.offset(x: Constants.menuBtnSize * 0.45, y: -(Constants.menuBtnSize * 0.5))
                 .opacity(self.alertNum > 0 ? 1 : 0)
-                //.animation(.default)
             }
         }.buttonStyle(ClickButtonStyle())
 

@@ -21,7 +21,7 @@ struct CapturePhotoButton: View {
                 .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 0)
                 .overlay(
                     Circle()
-                        .strokeBorder(Constants.quickSnapGradient, lineWidth: 2.5)
+                        .strokeBorder(Constants.snapPurpleGradient, lineWidth: 2.5)
                         .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 0)
                         .scaleEffect(x: 1.5, y: 1.5, anchor: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
                 )

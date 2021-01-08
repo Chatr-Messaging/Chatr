@@ -196,39 +196,36 @@ struct mainHomeList: View {
             if !self.auth.isLoacalAuth && self.auth.isUserAuthenticated != .signedOut {
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack {
-                        
                         //MARK: Header Section
-                        HomeHeaderSection(showUserProfile: self.$showUserProfile)
-                            .environmentObject(self.auth)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: Constants.btnSize + 75)
-                            .padding(.horizontal)
-                            .padding(.top)
-                            .sheet(isPresented: self.$showUserProfile, onDismiss: {
-                                if self.auth.isUserAuthenticated != .signedOut {
-                                    self.loadSelectedDialog()
-                                    print("loading selected dialog \(self.newDialogFromContact)")
-                                } else {
-                                    self.auth.logOutFirebase()
-                                    self.auth.logOutConnectyCube()
+                        GeometryReader { geo in
+                            HomeHeaderSection(showUserProfile: self.$showUserProfile)
+                                .environmentObject(self.auth)
+                                .offset(y: geo.frame(in: .global).minY > 0 ? -geo.frame(in: .global).minY + 40 : (geo.frame(in: .global).minY < 40 ? 40 : -geo.frame(in: .global).minY + 40))
+                                .frame(maxWidth: .infinity)
+                                .padding(.horizontal, 10)
+                                .padding(.top)
+                                .sheet(isPresented: self.$showUserProfile, onDismiss: {
+                                    if self.auth.isUserAuthenticated != .signedOut {
+                                        self.loadSelectedDialog()
+                                    } else {
+                                        self.auth.logOutFirebase()
+                                        self.auth.logOutConnectyCube()
+                                    }
+                                }) {
+                                    if self.auth.isUserAuthenticated == .signedIn {
+                                        NavigationView {
+                                            ProfileView(dimissView: self.$showUserProfile, selectedNewDialog: self.$newDialogFromContact)
+                                                .environmentObject(self.auth)
+                                                .background(Color("bgColor"))
+                                        }
+                                    }
+                                }.onAppear {
+                                    NotificationCenter.default.addObserver(forName: NSNotification.Name("NotificationAlert"), object: nil, queue: .main) { (_) in
+                                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                                        self.receivedNotification.toggle()
+                                    }
                                 }
-                            }) {
-                                if self.auth.isUserAuthenticated == .signedIn {
-                                    NavigationView {
-                                        ProfileView(dimissView: self.$showUserProfile, selectedNewDialog: self.$newDialogFromContact)
-                                            .environmentObject(self.auth)
-                                            .background(Color("bgColor"))
-                                    }.buttonStyle(ClickButtonStyle())
-                                }
-                            }.onAppear {
-                                //UserDefaults.standard.set(false, forKey: "localOpen")
-                                //self.isLocalOpen = false
-                                NotificationCenter.default.addObserver(forName: NSNotification.Name("NotificationAlert"), object: nil, queue: .main) { (_) in
-                                    print("received notification!! ;D \(self.auth.notificationtext)")
-                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                    self.receivedNotification.toggle()
-                                }
-                            }
+                            }.frame(height: Constants.btnSize + 90)
                             
                         // MARK: "Message" Title
                         HomeMessagesTitle(isLocalOpen: self.$isLocalOpen, contacts: self.$showContacts, newChat: self.$showNewChat, showUserProfile: self.$showUserProfile, selectedContacts: self.$selectedContacts)
@@ -237,7 +234,6 @@ struct mainHomeList: View {
                             .padding(.bottom, 25)
                             .sheet(isPresented: self.$showContacts, onDismiss: {
                                 self.loadSelectedDialog()
-                                print("loading selected dialog")
                             }) {
                                 ContactsView(newDialogID: self.$newDialogFromContact, dismissView: self.$showContacts)
                                     .environmentObject(self.auth)
@@ -345,7 +341,7 @@ struct mainHomeList: View {
                                     .frame(minWidth: Constants.screenWidth - 20, maxWidth: Constants.screenWidth)
                                     .frame(height: 250)
                                     .onAppear() {
-                                        changeDialogRealmData.fetchDialogs(completion: { _ in })
+                                        changeDialogRealmData().fetchDialogs(completion: { _ in })
                                     }
                                 
                                 Text("No Messages Found")
@@ -403,7 +399,7 @@ struct mainHomeList: View {
                                             } else {
                                                 UserDefaults.standard.set(false, forKey: "localOpen")
                                                 changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: i.id)
-                                                changeDialogRealmData.fetchDialogs(completion: { _ in })
+                                                changeDialogRealmData().fetchDialogs(completion: { _ in })
                                                 if i.dialogType == "group" || i.dialogType == "public" {
                                                     self.auth.leaveDialog()
                                                 }
@@ -423,7 +419,7 @@ struct mainHomeList: View {
                                                 UserDefaults.standard.set(false, forKey: "localOpen")
                                                 changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: i.id)
                                                 //changeDialogRealmData().updateDialogTypedText(text: self.keyboardText, dialogID: i.id)
-                                                changeDialogRealmData.fetchDialogs(completion: { _ in })
+                                                changeDialogRealmData().fetchDialogs(completion: { _ in })
 
                                                 self.isLocalOpen = false
                                                 self.isLoading = false
@@ -621,7 +617,7 @@ struct mainHomeList: View {
                 dialog.occupantIDs = [NSNumber(value: self.newDialogFromContact)]  // an ID of opponent
 
                 Request.createDialog(dialog, successBlock: { (dialog) in
-                    changeDialogRealmData.fetchDialogs(completion: { _ in
+                    changeDialogRealmData().fetchDialogs(completion: { _ in
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                             print("opening new dialog: \(self.newDialogID) & \(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id ?? "")")
                             self.isLocalOpen = true

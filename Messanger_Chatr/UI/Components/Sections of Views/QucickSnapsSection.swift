@@ -26,19 +26,18 @@ struct QuickSnapsSection: View {
                         //New Button
                         VStack(alignment: .center) {
                             Button(action: {
-                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                                 self.viewState = .camera
                                 self.selectedQuickSnapContact = ContactStruct()
-                                print("add new snap")
                             }) {
                                 VStack {
                                     ZStack {
                                         RoundedRectangle(cornerRadius: Constants.btnSize / 4)
                                             .frame(width: Constants.quickSnapBtnSize, height: Constants.quickSnapBtnSize, alignment: .center)
                                             .foregroundColor(.clear)
-                                            .background(Constants.quickSnapGradient)
+                                            .background(Constants.snapPurpleGradient)
                                             .cornerRadius(Constants.quickSnapBtnSize / 4)
-                                            .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 6)
+                                            .shadow(color: Color(.sRGB, red: 148 / 255, green: 109 / 255, blue: 245 / 255, opacity: 0.35), radius: 5, x: 0, y: 5)
                                         
                                         Image(systemName: "camera.fill")
                                             .resizable()
@@ -46,7 +45,6 @@ struct QuickSnapsSection: View {
                                             .frame(width: 28, height: 24, alignment: .center)
                                             .padding(22)
                                             .foregroundColor(.white)
-                                            .shadow(color: Color.black.opacity(0.25), radius: 4, x: 0, y: 2)
                                     }
                                 }
                             }.buttonStyle(ClickButtonStyle())
@@ -62,7 +60,7 @@ struct QuickSnapsSection: View {
                         .offset(y: UserDefaults.standard.bool(forKey: "localOpen") ? (UIDevice.current.hasNotch ? 5 : 0) : 0)
                         
                         Divider()
-                            .padding(.bottom, 20)
+                            .padding(.bottom, 30)
                             .scaleEffect(UserDefaults.standard.bool(forKey: "localOpen") ? 0.85 : 1)
                             .offset(y: UserDefaults.standard.bool(forKey: "localOpen") ? (UIDevice.current.hasNotch ? 5 : 0) : 0)
                         

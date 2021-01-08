@@ -40,22 +40,40 @@ struct securityView: View {
                     
                     VStack(alignment: .center) {
                         VStack(alignment: .trailing, spacing: 0) {
-                            Toggle("Private Info", isOn: self.$isInfoPrivate)
-                                .onReceive([self.isInfoPrivate].publisher.first()) { (value) in
-                                    print("New value is: \(value)")
-                                    Database.database().reference().child("Users").child("\(Session.current.currentUserID)").updateChildValues(["isInfoPrivate" : value])
-                                }.padding(.horizontal)
-                                .padding(.vertical, 12.5)
+                            HStack {
+                                Image(systemName: "lock.shield")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 20, height: 22, alignment: .center)
+                                    .foregroundColor(.primary)
+
+                                Toggle("Private Info", isOn: self.$isInfoPrivate)
+                                    .padding(.leading, 5)
+                                    .onReceive([self.isInfoPrivate].publisher.first()) { (value) in
+                                        Database.database().reference().child("Users").child("\(Session.current.currentUserID)").updateChildValues(["isInfoPrivate" : value])
+                                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                                    }
+                            }.padding(.horizontal)
+                            .padding(.vertical, 10)
                             
                             Divider()
                                 .frame(width: Constants.screenWidth - 80)
                             
-                            Toggle("Private Messaging", isOn: self.$isMessaging)
-                                .padding(.horizontal)
-                                .padding(.vertical, 12.5)
-                                .onReceive([self.isMessaging].publisher.first()) { (value) in
-                                    Database.database().reference().child("Users").child("\(Session.current.currentUserID)").updateChildValues(["isMessagingPrivate" : value])
-                                }
+                            HStack {
+                                Image(systemName: "lock.shield")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 20, height: 22, alignment: .center)
+                                    .foregroundColor(.primary)
+
+                                Toggle("Private Messaging", isOn: self.$isMessaging)
+                                    .padding(.leading, 5)
+                                    .onReceive([self.isMessaging].publisher.first()) { (value) in
+                                        Database.database().reference().child("Users").child("\(Session.current.currentUserID)").updateChildValues(["isMessagingPrivate" : value])
+                                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                                    }
+                            }.padding(.horizontal)
+                            .padding(.vertical, 10)
                         }
                     }.background(Color("buttonColor"))
                     .clipShape(RoundedRectangle(cornerRadius: 15, style: .circular))
@@ -64,7 +82,7 @@ struct securityView: View {
                     .padding(.bottom, 5)
                     
                     HStack(alignment: .center) {
-                        Text("-private info: rejects public users from viewing your phone, email, & website\n-private messaging: denies public users messaging")
+                        Text("• Private Info: hides your phone, email, & website from public users \n• Private Messaging: denies public users messaging you")
                             .font(.caption)
                             .fontWeight(.none)
                             .foregroundColor(.secondary)
@@ -90,20 +108,30 @@ struct securityView: View {
                                 Toggle("\(self.lockedOutText)", isOn: self.$isLocalAuthOn)
                                     .padding(.horizontal)
                                     .onReceive([self.isLocalAuthOn].publisher.first()) { (value) in
-                                        print("New value is: \(value)")
                                         Database.database().reference().child("Users").child("\(Session.current.currentUserID)").updateChildValues(["faceID" : value])
+                                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                                     }
                             } else {
                                 HStack {
+                                    Image(systemName: self.lockedOutText == "Face ID" ? "faceid" : "touchid")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 24, height: 24, alignment: .center)
+                                        .foregroundColor(.primary)
+                                        .padding(.trailing, 5)
+
                                     Text("Enable \(self.lockedOutText)")
+
                                     Spacer()
                                     Image(systemName: "lock.fill")
                                         .resizable()
                                         .scaledToFit()
                                         .frame(width: 15, height: 20, alignment: .center)
                                         .foregroundColor(.secondary)
+                                        .padding(.leading)
                                 }.contentShape(Rectangle())
                                 .padding(.horizontal)
+                                .padding(.vertical, 4)
                                 .onTapGesture {
                                     if self.auth.subscriptionStatus == .notSubscribed {
                                         UINotificationFeedbackGenerator().notificationOccurred(.error)
@@ -111,7 +139,7 @@ struct securityView: View {
                                     }
                                 }
                             }
-                        }.padding(.vertical, 12.5)
+                        }.padding(.vertical, 10)
                         .sheet(isPresented: self.$openMenbership, content: {
                             MembershipView()
                                 .environmentObject(self.auth)

@@ -121,12 +121,18 @@ class AuthModel: NSObject, ObservableObject {
     
     // MARK: - Auth
     func configureFirebaseStateDidChange() {
-        if self.profile.results.count > 0 {
+        if Auth.auth().currentUser != nil {
             self.isUserAuthenticated = .signedIn
         } else {
             self.preventDismissal = true
             self.isUserAuthenticated = .signedOut
         }
+//        if self.profile.results.count > 0 {
+//            self.isUserAuthenticated = .signedIn
+//        } else {
+//            self.preventDismissal = true
+//            self.isUserAuthenticated = .signedOut
+//        }
     }
 
     func sendVerificationNumber(numberText: String) {
@@ -843,7 +849,7 @@ extension AuthModel: ChatDelegate {
                 }
             }
         } else {
-            changeDialogRealmData.fetchDialogs(completion: { _ in })
+            changeDialogRealmData().fetchDialogs(completion: { _ in })
         }
         if (message.removed) {
             changeMessageRealmData.updateMessageState(messageID: message.id ?? "", messageState: .deleted)
@@ -868,7 +874,7 @@ extension AuthModel: ChatDelegate {
             }
             self.setOnlineCount()
         } else {
-            changeDialogRealmData.fetchDialogs(completion: { _ in })
+            changeDialogRealmData().fetchDialogs(completion: { _ in })
         }
         if (message.removed) {
             changeMessageRealmData.updateMessageState(messageID: message.id ?? "", messageState: .deleted)

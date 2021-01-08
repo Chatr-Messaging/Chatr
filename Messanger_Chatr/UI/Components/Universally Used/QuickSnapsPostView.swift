@@ -42,7 +42,7 @@ struct QuickSnapsPostView: View {
                             if self.quickSnapsRealm.results.filter("id == %@", selectedQuickSnapContact.quickSnaps.first ?? "").count > 0 {
                                 Circle()
                                     .trim(from: 0, to: CGFloat(Double(self.timeRemaining) * 0.1))
-                                    .stroke(Constants.quickSnapGradient, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                                    .stroke(Constants.snapPurpleGradient, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                                     .frame(width: Constants.smallBtnSize + 6, height: Constants.smallBtnSize + 6)
                                     .animation(Animation.linear(duration: 1.0).repeatForever(autoreverses: true))
                                     .rotationEffect(.degrees(90))

@@ -35,7 +35,7 @@ struct storageView: View {
                                     
                                     Circle()
                                         .trim(from: CGFloat(1 - self.checkRealmFileMBSize()), to: 1)
-                                        .stroke(Constants.quickSnapGradient, style: StrokeStyle(lineWidth: 8, lineCap: .round, lineJoin: .round))
+                                        .stroke(Constants.snapPurpleGradient, style: StrokeStyle(lineWidth: 8, lineCap: .round, lineJoin: .round))
                                         .frame(width: 70, height: 70, alignment: .center)
                                         .rotationEffect(.degrees(90))
                                         .rotation3DEffect(Angle(degrees: 180), axis: (x: 1, y: 0, z: 0))

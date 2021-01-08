@@ -53,7 +53,7 @@ struct VisitGroupChannelView: View {
                                 HStack(alignment: .top) {
                                     if self.dialogModel.dialogType == "private" || self.dialogModel.dialogType == "public" {
                                         Button(action: {
-                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                             self.isProfileImgOpen.toggle()
                                         }) {
                                             WebImage(url: URL(string: self.dialogModel.avatar))
@@ -160,7 +160,7 @@ struct VisitGroupChannelView: View {
                         Spacer()
                         if self.dialogRelationship == .notSubscribed && self.dialogModel.dialogType == "public" {
                             Button(action: {
-                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                             }) {
                                 ZStack {
                                     RoundedRectangle(cornerRadius: 10)
@@ -337,7 +337,7 @@ struct VisitGroupChannelView: View {
                                             updateParameters.occupantsIDsToAdd = occu
                                             
                                             Request.updateDialog(withID: self.dialogModel.id, update: updateParameters, successBlock: { (updatedDialog) in
-                                                changeDialogRealmData.insertDialogs([updatedDialog]) { }
+                                                changeDialogRealmData().insertDialogs([updatedDialog]) { }
                                                 occu.removeAll()
                                                 self.addNewMemberID = ""
                                                 self.selectedNewMembers.removeAll()
@@ -571,7 +571,7 @@ struct VisitGroupChannelView: View {
                     HStack {
                         Spacer()
                         Button(action: {
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                             self.isProfileImgOpen = false
                         }) {
                             ZStack {
@@ -616,16 +616,16 @@ struct VisitGroupChannelView: View {
                             }
                         }.onEnded { value in
                             if self.profileViewSize.height > 100 {
-                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 self.isProfileImgOpen = false
                             } else if self.profileViewSize.height < -100 {
-                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 self.isProfileImgOpen = false
                             }
 
                         }.sequenced(before: TapGesture().onEnded({
                             if self.profileViewSize.height == 0 {
-                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 self.isProfileImgOpen = false
                             } else {
                                 self.profileViewSize = .zero

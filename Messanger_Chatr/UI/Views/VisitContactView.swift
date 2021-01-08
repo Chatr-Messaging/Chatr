@@ -43,10 +43,8 @@ struct VisitContactView: View {
                             HStack(alignment: .top) {
                                 HStack(alignment: self.contact.bio == "" ? .center : .top) {
                                     Button(action: {
-                                        print("profile image")
-                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                         if self.contact.quickSnaps.count > 0 {
-                                            print("quickSnaps avalible")
                                             self.quickSnapViewState = .viewing
                                         } else {
                                             self.isProfileImgOpen.toggle()
@@ -65,7 +63,7 @@ struct VisitContactView: View {
                                             
                                             if self.contact.quickSnaps.count > 0 {
                                                 Circle()
-                                                    .stroke(Constants.quickSnapGradient, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                                                    .stroke(Constants.snapPurpleGradient, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                                                     .frame(width: 88, height: 88)
                                                     .foregroundColor(.clear)
                                             }
@@ -147,7 +145,7 @@ struct VisitContactView: View {
                                 if self.contact.isMyContact {
                                     Button(action: {
                                         print("Favourite tap")
-                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                         if self.contact.isFavourite {
                                             changeContactsRealmData().updateContactFavouriteStatus(userID: UInt(self.contact.id), favourite: false)
                                         } else {
@@ -170,25 +168,23 @@ struct VisitContactView: View {
                                 
                                 if self.contact.isMessagingPrivate == false && self.contactRelationship != .unknown && self.contact.id != UserDefaults.standard.integer(forKey: "currentUserID") {
                                     Button(action: {
-                                        print("chat... \(self.contact.id)")
-                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                                         self.newMessage = self.contact.id
                                         self.dismissView.toggle()
                                     }) {
                                         ZStack {
                                             RoundedRectangle(cornerRadius: 10)
-                                                .frame(width: 46, height: 46, alignment: .center)
+                                                .frame(width: 48, height: 48, alignment: .center)
                                                 .foregroundColor(.clear)
-                                                .background(Constants.purpleGradient)
-                                                .cornerRadius(10)
-                                                .shadow(color: Color(.sRGB, red: 44 / 255, green: 0 / 255, blue: 255 / 255, opacity: 0.35), radius: 8, x: 0, y: 5)
+                                                .background(Constants.messageBlueGradient)
+                                                .cornerRadius(12)
+                                                .shadow(color: Color(.sRGB, red: 43 / 255, green: 145 / 255, blue: 250 / 255, opacity: 0.35), radius: 8, x: 0, y: 5)
                                             
                                             Image("ChatBubble")
                                                 .resizable()
                                                 .scaledToFit()
                                                 .frame(width: 34, height: 23, alignment: .center)
                                                 .foregroundColor(.primary)
-                                                .shadow(color: Color.black.opacity(0.15), radius: 2, x: 0, y: 2)
                                                 .padding(3)
                                         }
                                     }.buttonStyle(ClickButtonStyle())
@@ -196,30 +192,28 @@ struct VisitContactView: View {
 
                                 if self.contactRelationship == .contact && self.contact.id != UserDefaults.standard.integer(forKey: "currentUserID") {
                                     Button(action: {
-                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                         self.quickSnapViewState = .camera
-                                        print("camera...")
                                     }) {
                                         ZStack {
                                             RoundedRectangle(cornerRadius: 10)
-                                                .frame(width: 45, height: 45, alignment: .center)
+                                                .frame(width: 48, height: 48, alignment: .center)
                                                 .foregroundColor(.clear)
-                                                .background(Constants.quickSnapGradient)
-                                                .cornerRadius(10)
-                                                .shadow(color: Color(.sRGB, red: 255 / 255, green: 34 / 255, blue: 169 / 255, opacity: 0.35), radius: 8, x: 0, y: 5)
+                                                .background(Constants.snapPurpleGradient)
+                                                .cornerRadius(12)
+                                                .shadow(color: Color(.sRGB, red: 130 / 255, green: 82 / 255, blue: 255 / 255, opacity: 0.35), radius: 8, x: 0, y: 5)
 
                                             Image(systemName: "camera.fill")
                                                 .resizable()
                                                 .scaledToFit()
                                                 .frame(width: 26, height: 23, alignment: .center)
                                                 .foregroundColor(.white)
-                                                .shadow(color: Color.black.opacity(0.15), radius: 2, x: 0, y: 2)
                                                 .padding(3)
                                         }
                                     }.buttonStyle(ClickButtonStyle())
                                 } else if self.contactRelationship == .notContact && self.contact.id != UserDefaults.standard.integer(forKey: "currentUserID") {
                                     Button(action: {
-                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                         Chat.instance.addUser(toContactListRequest: UInt(self.contact.id)) { (error) in
                                             if error != nil {
                                                 print("error adding user: \(String(describing: error?.localizedDescription))")
@@ -298,7 +292,7 @@ struct VisitContactView: View {
                                 } else if self.contactRelationship == .pendingRequestForYou && self.contact.id != UserDefaults.standard.integer(forKey: "currentUserID") {
                                     HStack {
                                         Button(action: {
-                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                             Chat.instance.rejectAddContactRequest(UInt(self.contact.id)) { (error) in
                                                 if error != nil {
                                                     print("error rejecting contact: \(String(describing: error?.localizedDescription))")
@@ -310,13 +304,12 @@ struct VisitContactView: View {
                                                 }
                                             }
                                         }) {
-                                            Image(systemName: "person.crop.circle.badge.xmark")
+                                            Image(systemName: "trash.fill")
                                                 .resizable()
                                                 .scaledToFit()
-                                                .frame(width: 28, height: 24, alignment: .center)
+                                                .frame(width: 24, height: 24, alignment: .center)
                                                 .foregroundColor(Color("alertRed"))
-                                                .padding(.vertical, 10)
-                                                .padding(.horizontal, 9)
+                                                .padding(.all, 10)
                                                 .background(Color("alertRed").opacity(0.1))
                                                 .cornerRadius(10)
                                                 .overlay(
@@ -326,7 +319,7 @@ struct VisitContactView: View {
                                         }
 
                                         Button(action: {
-                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                             Chat.instance.confirmAddContactRequest(UInt(self.contact.id)) { (error) in
                                                 print("accepted new contact:")
                                                 self.contactRelationship = .contact
@@ -585,7 +578,7 @@ struct VisitContactView: View {
                             if self.contact.isMyContact {
                                 Button(action: {
                                     //add to fav button
-                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                     if self.contact.isFavourite {
                                         changeContactsRealmData().updateContactFavouriteStatus(userID: UInt(self.contact.id), favourite: false)
                                     } else {
@@ -775,7 +768,7 @@ struct VisitContactView: View {
                             .frame(minWidth: 100, maxWidth: .infinity)
                             .actionSheet(isPresented: $showingMoreSheet) {
                                 ActionSheet(title: Text("More..."), message: nil, buttons: [.default(Text(self.contactRelationship == .contact ? "Remove from Contacts" : self.contactRelationship == .pendingRequest ? "Pending..." : self.contactRelationship == .pendingRequestForYou ? "waiting for you..." : "Add Contact"), action: {
-                                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                                 if self.contactRelationship == .contact {
                                                     Chat.instance.removeUser(fromContactList: UInt(self.contact.id)) { (error) in
                                                         changeContactsRealmData().deleteContact(contactID: self.contact.id, isMyContact: false, completion: { _ in
@@ -868,7 +861,7 @@ struct VisitContactView: View {
                     HStack {
                         Spacer()
                         Button(action: {
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                             self.isProfileImgOpen = false
                         }) {
                             ZStack {
@@ -892,7 +885,7 @@ struct VisitContactView: View {
                                         
                     WebImage(url: URL(string: contact.avatar))
                         .resizable()
-                        .placeholder{ Image(systemName: "person.fill") }
+                        .placeholder{ Image("empty-profile").resizable().frame(width: Constants.screenWidth - 40, height: Constants.screenWidth - 40, alignment: .center).scaledToFill() }
                         .indicator(.activity)
                         .aspectRatio(contentMode: .fill)
                         .transition(.fade(duration: 0.25))
@@ -913,16 +906,16 @@ struct VisitContactView: View {
                             }
                         }.onEnded { value in
                             if self.profileViewSize.height > 100 {
-                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 self.isProfileImgOpen = false
                             } else if self.profileViewSize.height < -100 {
-                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 self.isProfileImgOpen = false
                             }
 
                         }.sequenced(before: TapGesture().onEnded({
                             if self.profileViewSize.height == 0 {
-                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 self.isProfileImgOpen = false
                             } else {
                                 self.profileViewSize = .zero
@@ -1065,7 +1058,6 @@ struct VisitContactView: View {
     }
     
     func pullNonContact() {
-        print("not in realm visit")
         self.contactRelationship = .notContact
         
         for i in Chat.instance.contactList?.pendingApproval ?? [] {

@@ -19,7 +19,7 @@ struct QuickSnapCell: View {
     var body: some View {
         VStack {
             Button(action: {
-                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                 self.selectedQuickSnapContact = self.quickSnap
                 if self.selectedQuickSnapContact.quickSnaps.count > 0 {
                     self.viewState = .viewing
@@ -30,7 +30,7 @@ struct QuickSnapCell: View {
                 ZStack(alignment: .center) {
                     if self.quickSnap.quickSnaps.count > 0 {
                         Circle()
-                            .stroke(Constants.quickSnapGradient, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                            .stroke(Constants.snapPurpleGradient, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                             .frame(width: Constants.quickSnapBtnSize + 8, height: Constants.quickSnapBtnSize + 8)
                             .frame(maxWidth: .infinity, alignment: .center)
                             .foregroundColor(.clear)
@@ -62,7 +62,7 @@ struct QuickSnapCell: View {
                         Circle()
                             .frame(width: Constants.quickSnapBtnSize, height: Constants.quickSnapBtnSize, alignment: .center)
                             .foregroundColor(.black)
-                            .opacity(0.5)
+                            .opacity(0.35)
                         
                         Image(systemName: "camera.fill")
                             .resizable()

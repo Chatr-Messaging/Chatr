@@ -177,7 +177,7 @@ struct MembershipView: View {
                             ZStack(alignment: .bottom) {
                                 ZStack(alignment: .center) {
                                     RoundedRectangle(cornerRadius: 25)
-                                        .stroke(Constants.blueGradient, lineWidth: self.selectedOption == 1 ? 8 : 0)
+                                        .stroke(Constants.snapPurpleGradient, lineWidth: self.selectedOption == 1 ? 8 : 0)
                                         .frame(width: (Constants.screenWidth / 3) - 29, height: (Constants.screenWidth / 3.5) - 5, alignment: .center)
                                     
                                     Rectangle()
@@ -206,9 +206,9 @@ struct MembershipView: View {
                                 ZStack(alignment: .center) {
                                     Rectangle()
                                         .frame(width: (Constants.screenWidth / 3) - 40, height: 45, alignment: .bottom)
-                                        .shadow(color: Color.black.opacity(0.4), radius: 8, x: 0, y: 8)
+                                        .shadow(color: Color.black.opacity(0.4), radius: 8, x: 0, y: 0)
                                         .foregroundColor(.clear)
-                                        .background(Constants.purpleGradient)
+                                        .background(Constants.messageBlueGradient)
                                         .cornerRadius(30)
                                     
                                     Text("FREE \nTRIAL!")
@@ -231,7 +231,7 @@ struct MembershipView: View {
                             ZStack(alignment: .bottom) {
                                 ZStack(alignment: .center) {
                                     RoundedRectangle(cornerRadius: 25)
-                                        .stroke(Constants.blueGradient, lineWidth: self.selectedOption == 2 ? 8 : 0)
+                                        .stroke(Constants.snapPurpleGradient, lineWidth: self.selectedOption == 2 ? 8 : 0)
                                         .frame(width: (Constants.screenWidth / 3) - 29, height: (Constants.screenWidth / 3.5) - 5, alignment: .center)
                                     
                                     Rectangle()
@@ -260,9 +260,9 @@ struct MembershipView: View {
                                 ZStack(alignment: .center) {
                                     Rectangle()
                                         .frame(width: (Constants.screenWidth / 3) - 40, height: 40, alignment: .bottom)
-                                        .shadow(color: Color.black.opacity(0.4), radius: 8, x: 0, y: 8)
+                                        .shadow(color: Color.black.opacity(0.4), radius: 8, x: 0, y: 0)
                                         .foregroundColor(.clear)
-                                        .background(Constants.purpleGradient)
+                                        .background(Constants.messageBlueGradient)
                                         .cornerRadius(30)
                                     
                                     Text("12% OFF!")
@@ -284,7 +284,7 @@ struct MembershipView: View {
                             ZStack(alignment: .bottom) {
                                 ZStack(alignment: .center) {
                                     RoundedRectangle(cornerRadius: 25)
-                                        .stroke(Constants.blueGradient, lineWidth: self.selectedOption == 3 ? 8 : 0)
+                                        .stroke(Constants.snapPurpleGradient, lineWidth: self.selectedOption == 3 ? 8 : 0)
                                         .frame(width: (Constants.screenWidth / 3) - 29, height: (Constants.screenWidth / 3.5) - 5, alignment: .center)
                                     
                                     Rectangle()
@@ -313,9 +313,9 @@ struct MembershipView: View {
                                 ZStack(alignment: .center) {
                                     Rectangle()
                                         .frame(width: (Constants.screenWidth / 3) - 40, height: 40, alignment: .bottom)
-                                        .shadow(color: Color.black.opacity(0.4), radius: 8, x: 0, y: 8)
+                                        .shadow(color: Color.black.opacity(0.4), radius: 8, x: 0, y: 0)
                                         .foregroundColor(.clear)
-                                        .background(Constants.purpleGradient)
+                                        .background(Constants.messageBlueGradient)
                                         .cornerRadius(30)
                                     
                                     Text("20% OFF!")
@@ -332,7 +332,6 @@ struct MembershipView: View {
                     
                     Spacer()
                     Button(action: {
-                        print("join premium")
                         if self.selectedOption == 1 {
                             if let mont = self.monthly {
                                 self.auth.purchase(source: "profile_settings", product: mont)
@@ -352,6 +351,7 @@ struct MembershipView: View {
                                 print("yearly no there")
                             }
                         }
+                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                     }) {
                         HStack(alignment: .center) {
                             Image(systemName: "checkmark.seal")

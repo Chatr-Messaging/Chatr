@@ -123,11 +123,11 @@ struct ProfileView: View {
                         NavigationLink(destination: ShareProfileView(dimissView: self.$dimissView, contactID: self.profile.results.first?.id ?? 0, contactFullName: self.profile.results.first?.fullName ?? "Chatr Contact", contactAvatar: self.profile.results.first?.avatar ?? "").environmentObject(self.auth)) {
                             VStack(alignment: .trailing, spacing: 0) {
                                 HStack {
-                                    Image(systemName: "qrcode")
+                                    Image("QRIcon")
                                         .resizable()
                                         .scaledToFit()
                                         .foregroundColor(Color.primary)
-                                        .frame(width: 20, height: 20, alignment: .center)
+                                        .frame(width: 32, height: 32, alignment: .center)
                                         .padding(.trailing, 5)
                                     
                                     Text("Share Profile")
@@ -143,28 +143,32 @@ struct ProfileView: View {
                                         .frame(width: 7, height: 15, alignment: .center)
                                         .foregroundColor(.secondary)
                                 }.padding(.horizontal)
-                                .padding(.vertical, 12.5)
+                                .padding(.vertical, 8)
                                     
                                 Divider()
-                                    .frame(width: Constants.screenWidth - 70)
+                                    .frame(width: Constants.screenWidth - 95)
                             }
                         }.buttonStyle(changeBGButtonStyle())
+                        .simultaneousGesture(TapGesture()
+                            .onEnded { _ in
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                            })
                         
                         //Chatr Premium
                         VStack(alignment: .trailing, spacing: 0) {
                             Button(action: {
-                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 if !UserDefaults.standard.bool(forKey: "premiumSubscriptionStatus") {
                                     self.openPremium.toggle()
                                 }
                             }) {
                                 VStack(alignment: .trailing, spacing: 0) {
                                     HStack(alignment: .center) {
-                                        Image(systemName: "checkmark.seal")
+                                        Image("VerifiedIcon")
                                             .resizable()
                                             .scaledToFit()
                                             .foregroundColor(Color.primary)
-                                            .frame(width: 20, height: 20, alignment: .center)
+                                            .frame(width: 32, height: 32, alignment: .center)
                                             .padding(.trailing, 5)
                                         
                                         Text("Chatr Premium")
@@ -180,10 +184,10 @@ struct ProfileView: View {
                                             .frame(width: 7, height: 15, alignment: .center)
                                             .foregroundColor(.secondary)
                                     }.padding(.horizontal)
-                                    .padding(.vertical, 12.5)
+                                    .padding(.vertical, 8)
                                     
                                     Divider()
-                                        .frame(width: Constants.screenWidth - 80)
+                                        .frame(width: Constants.screenWidth - 95)
                                 }
                             }.buttonStyle(changeBGButtonStyle())
                         }.sheet(isPresented: self.$openPremium, content: {
@@ -196,22 +200,21 @@ struct ProfileView: View {
                         //Contcat Requests
                         NavigationLink(destination: contactRequestView(dismissView: self.$dimissView, selectedNewDialog: self.$selectedNewDialog).environmentObject(self.auth)) {
                             VStack(alignment: .trailing, spacing: 0) {
-                                HStack {
-                                    ZStack {
-                                        Image(systemName: "rectangle.stack.person.crop")
+                                HStack(alignment: .center) {
+                                    ZStack(alignment: .center) {
+                                        Image("ContactRequestIcon")
                                             .resizable()
-                                            .frame(width: 20, height: 20, alignment: .center)
+                                            .frame(width: 32, height: 32, alignment: .center)
                                             .foregroundColor(.primary)
                                         
-                                        ZStack(alignment: .center) {
-                                            HStack {
-                                                Text("\((self.auth.profile.results.first?.contactRequests.count ?? 0) + (Chat.instance.contactList?.pendingApproval.count ?? 0))")
-                                                    .foregroundColor(.white)
-                                                    .fontWeight(.medium)
-                                                    .font(.caption)
-                                                    .padding(.horizontal, 5)
-                                            }.background(Capsule().frame(height: 18).frame(minWidth: 18).foregroundColor(Color("alertRed")).shadow(color: Color("alertRed").opacity(0.75), radius: 5, x: 0, y: 5))
-                                        }.offset(x: -10, y: -10)
+                                        HStack {
+                                            Text("\((self.auth.profile.results.first?.contactRequests.count ?? 0) + (Chat.instance.contactList?.pendingApproval.count ?? 0))")
+                                                .foregroundColor(.white)
+                                                .fontWeight(.medium)
+                                                .font(.caption)
+                                                .padding(.horizontal, 5)
+                                        }.background(Capsule().frame(height: 18).frame(minWidth: 18).foregroundColor(Color("alertRed")).shadow(color: Color("alertRed").opacity(0.75), radius: 2.5, x: 0, y: 2.5))
+                                        .offset(x: -15, y: -15)
                                         .opacity((self.auth.profile.results.first?.contactRequests.count ?? 0) + (Chat.instance.contactList?.pendingApproval.count ?? 0) > 0 ? 1 : 0)
                                     }
                                     
@@ -219,6 +222,7 @@ struct ProfileView: View {
                                         .font(.none)
                                         .fontWeight(.none)
                                         .foregroundColor(.primary)
+                                        .offset(x: 5)
 
                                     Spacer()
                                     Image(systemName: "chevron.right")
@@ -228,22 +232,26 @@ struct ProfileView: View {
                                         .frame(width: 7, height: 15, alignment: .center)
                                         .foregroundColor(.secondary)
                                 }.padding(.horizontal)
-                                .padding(.vertical, 12.5)
+                                .padding(.vertical, 8)
                                 
                                 Divider()
-                                    .frame(width: Constants.screenWidth - 80)
+                                    .frame(width: Constants.screenWidth - 95)
                             }
                         }.buttonStyle(changeBGButtonStyle())
+                        .simultaneousGesture(TapGesture()
+                            .onEnded { _ in
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                            })
                         
                         //Data & Storage Requests
                         NavigationLink(destination: storageView().environmentObject(self.auth)) {
                             VStack(alignment: .trailing, spacing: 0) {
                                 HStack {
-                                    Image(systemName: "tray.full")
+                                    Image("DataStorageIcon")
                                         .resizable()
                                         .scaledToFit()
                                         .foregroundColor(Color.primary)
-                                        .frame(width: 20, height: 20, alignment: .center)
+                                        .frame(width: 32, height: 32, alignment: .center)
                                         .padding(.trailing, 5)
                                     
                                     Text("Data & Storage")
@@ -259,21 +267,25 @@ struct ProfileView: View {
                                         .frame(width: 7, height: 15, alignment: .center)
                                         .foregroundColor(.secondary)
                                 }.padding(.horizontal)
-                                .padding(.vertical, 12.5)
+                                .padding(.vertical, 8)
                                 
                                 Divider()
-                                    .frame(width: Constants.screenWidth - 80)
+                                    .frame(width: Constants.screenWidth - 95)
                             }
                         }.buttonStyle(changeBGButtonStyle())
+                        .simultaneousGesture(TapGesture()
+                            .onEnded { _ in
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                            })
                         
                         //Appearance Requests
                         NavigationLink(destination: appearanceView().environmentObject(self.auth)) {
                             HStack {
-                                Image(systemName: "paintbrush")
+                                Image("AppearanceIcon")
                                     .resizable()
                                     .scaledToFit()
                                     .foregroundColor(Color.primary)
-                                    .frame(width: 20, alignment: .center)
+                                    .frame(width: 32, height: 32, alignment: .center)
                                     .padding(.trailing, 5)
                                 
                                 Text("Appearance")
@@ -289,10 +301,13 @@ struct ProfileView: View {
                                     .frame(width: 7, height: 15, alignment: .center)
                                     .foregroundColor(.secondary)
                             }.padding(.horizontal)
-                            .padding(.vertical, 12.5)
+                            .padding(.vertical, 8)
                             
                         }.buttonStyle(changeBGButtonStyle())
-                        
+                        .simultaneousGesture(TapGesture()
+                            .onEnded { _ in
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                            })
                     }
                 }.background(Color("buttonColor"))
                 .clipShape(RoundedRectangle(cornerRadius: 15, style: .circular))
@@ -316,14 +331,14 @@ struct ProfileView: View {
                     VStack(spacing: 0) {
                         
                         //Private Profile
-                        NavigationLink(destination: securityView(isLocalAuthOn: self.$localAuth, isPremium: self.$isPremium, isInfoPrivate: self.$isInfoPrivate, isMessaging: self.$isMessagingPrivate).environmentObject(self.auth).navigationBarTitle("Privacy").modifier(GroupedListModifier()).onAppear {UIImpactFeedbackGenerator(style: .medium).impactOccurred()}) {
+                        NavigationLink(destination: securityView(isLocalAuthOn: self.$localAuth, isPremium: self.$isPremium, isInfoPrivate: self.$isInfoPrivate, isMessaging: self.$isMessagingPrivate).environmentObject(self.auth).navigationBarTitle("Privacy").modifier(GroupedListModifier())) {
                             VStack(alignment: .trailing, spacing: 0) {
                                 HStack {
-                                    Image(systemName: "lock.shield")
+                                    Image("PrivacyIcon")
                                         .resizable()
                                         .scaledToFit()
                                         .foregroundColor(Color.primary)
-                                        .frame(width: 20, height: 20, alignment: .center)
+                                        .frame(width: 32, height: 32, alignment: .center)
                                         .padding(.trailing, 5)
                                     
                                     Text("Privacy")
@@ -339,12 +354,16 @@ struct ProfileView: View {
                                         .frame(width: 7, height: 15, alignment: .center)
                                         .foregroundColor(.secondary)
                                 }.padding(.horizontal)
-                                .padding(.vertical, 12.5)
+                                .padding(.vertical, 8)
                                 
                                 Divider()
-                                    .frame(width: Constants.screenWidth - 80)
+                                    .frame(width: Constants.screenWidth - 95)
                             }
                         }.buttonStyle(changeBGButtonStyle())
+                        .simultaneousGesture(TapGesture()
+                            .onEnded { _ in
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                            })
                         .onAppear() {
                             self.isInfoPrivate = self.profile.results.first?.isInfoPrivate ?? false
                             self.isMessagingPrivate = self.profile.results.first?.isMessagingPrivate ?? false
@@ -353,11 +372,11 @@ struct ProfileView: View {
                         //Blocked Contacts Profile
                         NavigationLink(destination: ringtoneView().navigationBarTitle("Blocked Contacts").modifier(GroupedListModifier())) {
                             HStack {
-                                Image(systemName: "person.crop.circle.badge.xmark")
+                                Image("BlockedIcon")
                                     .resizable()
                                     .scaledToFit()
                                     .foregroundColor(Color.primary)
-                                    .frame(width: 20, height: 20, alignment: .center)
+                                    .frame(width: 32, height: 32, alignment: .center)
                                     .padding(.trailing, 5)
                                 
                                 Text("Blocked Contacts")
@@ -373,8 +392,12 @@ struct ProfileView: View {
                                     .frame(width: 7, height: 15, alignment: .center)
                                     .foregroundColor(.secondary)
                             }.padding(.horizontal)
-                            .padding(.vertical, 12.5)
+                            .padding(.vertical, 8)
                         }.buttonStyle(changeBGButtonStyle())
+                        .simultaneousGesture(TapGesture()
+                            .onEnded { _ in
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                            })
                     }
                 }.background(Color("buttonColor"))
                 .clipShape(RoundedRectangle(cornerRadius: 15, style: .circular))
@@ -400,18 +423,18 @@ struct ProfileView: View {
                         //Help & Support
                         Button(action: {
                             self.helpsupport.toggle()
-                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                         }) {
                             VStack(alignment: .trailing, spacing: 0) {
                                 HStack {
-                                    Image(systemName: "flag")
+                                    Image("HelpSupportIcon")
                                         .resizable()
                                         .scaledToFit()
                                         .foregroundColor(Color.primary)
-                                        .frame(width: 20, height: 20, alignment: .center)
+                                        .frame(width: 32, height: 32, alignment: .center)
                                         .padding(.trailing, 5)
                                     
-                                    Text("Help & Support")
+                                    Text("FAQ & Support")
                                         .font(.none)
                                         .fontWeight(.none)
                                         .foregroundColor(.primary)
@@ -424,10 +447,10 @@ struct ProfileView: View {
                                         .frame(width: 7, height: 15, alignment: .center)
                                         .foregroundColor(.secondary)
                                 }.padding(.horizontal)
-                                .padding(.vertical, 12.5)
+                                .padding(.vertical, 8)
                                 
                                 Divider()
-                                    .frame(width: Constants.screenWidth - 80)
+                                    .frame(width: Constants.screenWidth - 95)
                             }
                         }.buttonStyle(changeBGButtonStyle())
                         .sheet(isPresented: self.$helpsupport, content: {
@@ -447,15 +470,15 @@ struct ProfileView: View {
                         //Rate Chatr
                         Button(action: {
                             StoreReviewHelper.requestReview()
-                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                         }) {
                             VStack(alignment: .trailing, spacing: 0) {
                                 HStack {
-                                    Image(systemName: "star")
+                                    Image("RateIcon")
                                         .resizable()
                                         .scaledToFit()
                                         .foregroundColor(Color.primary)
-                                        .frame(width: 20, height: 20, alignment: .center)
+                                        .frame(width: 32, height: 32, alignment: .center)
                                         .padding(.trailing, 5)
                                     
                                     Text("Rate Chatr")
@@ -471,10 +494,10 @@ struct ProfileView: View {
                                         .frame(width: 7, height: 15, alignment: .center)
                                         .foregroundColor(.secondary)
                                 }.padding(.horizontal)
-                                .padding(.vertical, 12.5)
+                                .padding(.vertical, 8)
                                 
                                 Divider()
-                                    .frame(width: Constants.screenWidth - 80)
+                                    .frame(width: Constants.screenWidth - 95)
                             }
                         }.buttonStyle(changeBGButtonStyle())
                         
@@ -482,11 +505,11 @@ struct ProfileView: View {
                         NavigationLink(destination: AboutChatrView()) {
                             VStack(alignment: .trailing, spacing: 0) {
                                 HStack {
-                                    Image(systemName: "iphone.homebutton")
+                                    Image("AboutIcon")
                                         .resizable()
                                         .scaledToFit()
                                         .foregroundColor(Color.primary)
-                                        .frame(width: 20, height: 20, alignment: .center)
+                                        .frame(width: 32, height: 32, alignment: .center)
                                         .padding(.trailing, 5)
                                     
                                     Text("About Chatr")
@@ -502,22 +525,26 @@ struct ProfileView: View {
                                         .frame(width: 7, height: 15, alignment: .center)
                                         .foregroundColor(.secondary)
                                 }.padding(.horizontal)
-                                .padding(.vertical, 12.5)
+                                .padding(.vertical, 8)
                             
                                 Divider()
-                                    .frame(width: Constants.screenWidth - 80)
+                                    .frame(width: Constants.screenWidth - 95)
                             }
                         }.buttonStyle(changeBGButtonStyle())
+                        .simultaneousGesture(TapGesture()
+                            .onEnded { _ in
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                            })
                         
                         //Advanced Profile
                         NavigationLink(destination: advancedView(dimissView: self.$dimissView).environmentObject(self.auth)) {
                             VStack(alignment: .trailing, spacing: 0) {
                                 HStack {
-                                    Image(systemName: "gear")
+                                    Image("AdvancedIcon")
                                         .resizable()
                                         .scaledToFit()
                                         .foregroundColor(Color.primary)
-                                        .frame(width: 20, height: 20, alignment: .center)
+                                        .frame(width: 32, height: 32, alignment: .center)
                                         .padding(.trailing, 5)
                                     
                                     Text("Advanced")
@@ -533,79 +560,20 @@ struct ProfileView: View {
                                         .frame(width: 7, height: 15, alignment: .center)
                                         .foregroundColor(.secondary)
                                 }.padding(.horizontal)
-                                .padding(.vertical, 12.5)
+                                .padding(.vertical, 8)
                                 
                                 Divider()
-                                    .frame(width: Constants.screenWidth - 80)
+                                    .frame(width: Constants.screenWidth - 95)
                             }
                         }.buttonStyle(changeBGButtonStyle())
-
-                        /*
-                        //Terms of Service
-                        NavigationLink(destination: TermsView(mainText: Constants.termsOfService).navigationBarTitle("Terms of Service").modifier(GroupedListModifier())) {
-                            VStack(alignment: .trailing, spacing: 0) {
-                                HStack {
-                                    Image(systemName: "books.vertical")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .foregroundColor(Color.primary)
-                                        .frame(width: 20, height: 20, alignment: .center)
-                                        .padding(.trailing, 5)
-                                    
-                                    Text("Terms of Service")
-                                        .font(.none)
-                                        .fontWeight(.none)
-                                        .foregroundColor(.primary)
-
-                                    Spacer()
-                                    Image(systemName: "chevron.right")
-                                        .resizable()
-                                        .font(Font.title.weight(.bold))
-                                        .scaledToFit()
-                                        .frame(width: 7, height: 15, alignment: .center)
-                                        .foregroundColor(.secondary)
-                                }.padding(.horizontal)
-                                .padding(.vertical, 12.5)
-                            
-                                Divider()
-                                    .frame(width: Constants.screenWidth - 80)
-                            }
-                        }.buttonStyle(changeBGButtonStyle())
-
-                        //Terms of Service
-                        NavigationLink(destination: TermsView(mainText: Constants.EULAagreement).navigationBarTitle("EULA").modifier(GroupedListModifier())) {
-                            VStack(alignment: .trailing, spacing: 0) {
-                                HStack {
-                                    Image(systemName: "books.vertical")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .foregroundColor(Color.primary)
-                                        .frame(width: 20, height: 20, alignment: .center)
-                                        .padding(.trailing, 5)
-                                    
-                                    Text("End-User License Agreement")
-                                        .font(.none)
-                                        .fontWeight(.none)
-                                        .foregroundColor(.primary)
-
-                                    Spacer()
-                                    Image(systemName: "chevron.right")
-                                        .resizable()
-                                        .font(Font.title.weight(.bold))
-                                        .scaledToFit()
-                                        .frame(width: 7, height: 15, alignment: .center)
-                                        .foregroundColor(.secondary)
-                                }.padding(.horizontal)
-                                .padding(.vertical, 12.5)
-                                
-                                Divider()
-                                    .frame(width: Constants.screenWidth - 80)
-                            }
-                        }.buttonStyle(changeBGButtonStyle())
-                        */
+                        .simultaneousGesture(TapGesture()
+                            .onEnded { _ in
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                            })
  
                         //Log out view
                         Button(action: {
+                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                             self.auth.preventDismissal = true
                             self.auth.isUserAuthenticated = .signedOut
                             withAnimation {
@@ -613,11 +581,11 @@ struct ProfileView: View {
                             }
                         }) {
                             HStack {
-                                Image(systemName: "arrow.left.to.line")
+                                Image("LogOutIcon")
                                     .resizable()
                                     .scaledToFit()
                                     .foregroundColor(Color.red)
-                                    .frame(width: 20, height: 20, alignment: .center)
+                                    .frame(width: 32, height: 32, alignment: .center)
                                     .padding(.trailing, 5)
                                 
                                 Text("Log Out")
@@ -633,7 +601,7 @@ struct ProfileView: View {
                                     .frame(width: 7, height: 15, alignment: .center)
                                     .foregroundColor(.secondary)
                             }.padding(.horizontal)
-                            .padding(.vertical, 12.5)
+                            .padding(.vertical, 8)
                         }.buttonStyle(changeBGButtonStyle())
                     }
                 }.background(Color("buttonColor"))

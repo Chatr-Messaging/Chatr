@@ -17,7 +17,8 @@ struct Constants {
     static let btnSize = CGFloat(46)
     static let smallBtnSize = CGFloat(34)
     static let microBtnSize = CGFloat(18)
-    static let quickSnapBtnSize = CGFloat(55)
+    static let menuBtnSize = CGFloat(48)
+    static let quickSnapBtnSize = CGFloat(52)
     static let avitarSize = CGFloat(55)
     static let smallAvitarSize = CGFloat(25)
     static let screenWidth = UIScreen.main.bounds.width
@@ -40,9 +41,11 @@ struct Constants {
     // MARK: - Colors
     static let blueGradient = LinearGradient(gradient: Gradient(colors: [Color(red: 71 / 255, green: 171 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom)
     
+    static let messageBlueGradient = LinearGradient(gradient: Gradient(colors: [Color(red: 97 / 255, green: 195 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 49 / 255, green: 143 / 255, blue: 255 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom)
+    
     static let purpleGradient = LinearGradient(gradient: Gradient(colors: [Color(red: 88 / 255, green: 218 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 148 / 255, green: 109 / 255, blue: 245 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom)
     
-    static let quickSnapGradient = LinearGradient(gradient: Gradient(colors: [Color(red: 255 / 255, green: 184 / 255, blue: 143 / 255, opacity: 1.0), Color(.sRGB, red: 255 / 255, green: 48 / 255, blue: 136 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom)
+    static let snapPurpleGradient = LinearGradient(gradient: Gradient(colors: [Color(red: 224 / 255, green: 155 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 175 / 255, green: 82 / 255, blue: 254 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom)
     
     static let grayGradient = LinearGradient(gradient: Gradient(colors: [Color(red: 218 / 255, green: 218 / 255, blue: 218 / 255, opacity: 1.0), Color(.sRGB, red: 166 / 255, green: 166 / 255, blue: 166 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom)
 }

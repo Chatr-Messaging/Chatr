@@ -123,15 +123,11 @@ struct ContactsView: View {
                                 }
                                 
                             }
-                        }.buttonStyle(ClickMiniButtonStyle())
+                        }.buttonStyle(navigationScaleHelpticButtonStyle())
                         .frame(height: 60, alignment: .center)
                         .background(Color.clear)
                         .padding(.top)
                         .padding(.horizontal)
-                        .onTapGesture {
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                            self.navLinkAction = 1
-                        }
                         
                         //MARK: BANNER Section
                         VStack {
@@ -223,6 +219,10 @@ struct ContactsView: View {
                                                             .disabled(self.quickSnapViewState == .closed ? false : true)
                                                             
                                                     }.buttonStyle(ClickMiniButtonStyle())
+                                                    .simultaneousGesture(TapGesture()
+                                                        .onEnded { _ in
+                                                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                                        })
                                                 }.frame(height: 150)
                                             }.padding(.trailing, 10)
                                         }
@@ -285,6 +285,7 @@ struct ContactsView: View {
                                 
                                 Button(action: {
                                     self.showAddChat.toggle()
+                                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                                 }) {
                                     HStack {
                                         Image(systemName: "person.fill.badge.plus")
@@ -404,7 +405,8 @@ struct ContactsView: View {
                                 
                                 //Add new user button
                                 Button(action: {
-                                        self.showAddNewContact.toggle()
+                                    self.showAddNewContact.toggle()
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 }) {
                                     ZStack {
                                         Rectangle()
@@ -486,7 +488,7 @@ struct ContactsView: View {
                                                         
                                                         if contact.quickSnaps.count > 0 {
                                                             Circle()
-                                                                .stroke(Constants.quickSnapGradient, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                                                                .stroke(Constants.snapPurpleGradient, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                                                                 .frame(width: 48, height: 48)
                                                                 .foregroundColor(.clear)
                                                         }
@@ -535,6 +537,10 @@ struct ContactsView: View {
                                                 }
                                             }
                                         }.buttonStyle(changeBGButtonStyle())
+                                        .simultaneousGesture(TapGesture()
+                                            .onEnded { _ in
+                                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                            })
                                         .resignKeyboardOnDragGesture()
                                         .animation(.spring(response: 0.45, dampingFraction: 0.70, blendDuration: 0))
                                     }

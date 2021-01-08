@@ -60,13 +60,12 @@ struct ContactRequestCell: View {
                                 }
                             }
                         }) {
-                            Image(systemName: "person.crop.circle.badge.xmark")
+                            Image(systemName: "trash.fill")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 22, height: 18, alignment: .center)
+                                .frame(width: 18, height: 18, alignment: .center)
                                 .foregroundColor(Color("alertRed"))
-                                .padding(.vertical, 8)
-                                .padding(.horizontal, 6)
+                                .padding(.all, 8)
                                 .background(Color("alertRed").opacity(0.1))
                                 .cornerRadius(10)
                                 .overlay(

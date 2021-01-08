@@ -67,7 +67,7 @@ struct DialogCell: View {
                     
                     if self.privateDialogContact.quickSnaps.count > 0 {
                         Circle()
-                            .stroke(Constants.quickSnapGradient, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                            .stroke(Constants.snapPurpleGradient, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                             .frame(width: 63, height: 63)
                             .offset(x: -5)
                             .foregroundColor(.clear)
@@ -277,7 +277,7 @@ struct DialogCell: View {
                     changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                        changeDialogRealmData.fetchDialogs(completion: { _ in })
+                        changeDialogRealmData().fetchDialogs(completion: { _ in })
                     }
                 }, label: {
                     Image(systemName: "chevron.down.circle")

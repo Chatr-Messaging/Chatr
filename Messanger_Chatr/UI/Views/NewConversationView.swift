@@ -384,7 +384,7 @@ struct NewConversationView: View {
                                 dialog.name = "\(self.auth.profile.results.first?.fullName ?? "Chatr User")'s Group Chat"
                             }
                             Request.createDialog(dialog, successBlock: { (dialog) in
-                                changeDialogRealmData.fetchDialogs(completion: { _ in
+                                changeDialogRealmData().fetchDialogs(completion: { _ in
                                     self.auth.sendPushNoti(userIDs: occu, message: "\(self.auth.profile.results.first?.fullName ?? "Chatr User") created a new group chat with you 🥳")
                                     self.selectedContact.removeAll()
                                     self.newDialogID = "\(String(describing: dialog.id))"

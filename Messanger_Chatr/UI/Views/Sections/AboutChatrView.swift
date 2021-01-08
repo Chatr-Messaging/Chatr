@@ -34,16 +34,18 @@ struct AboutChatrView: View {
                             let appURL = NSURL(string: "twitter://user?screen_name=\(screenName)")!
                             let webURL = NSURL(string: "https://twitter.com/\(screenName)")!
                             let application = UIApplication.shared
-
-                            if application.canOpenURL(appURL as URL) {
-                                 application.open(appURL as URL)
-                            } else {
-                                 application.open(webURL as URL)
+                            
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                if application.canOpenURL(appURL as URL) {
+                                     application.open(appURL as URL)
+                                } else {
+                                     application.open(webURL as URL)
+                                }
                             }
                         }) {
                             VStack(alignment: .trailing, spacing: 0) {
                                 HStack {
-                                    Image("twitterIcon")
+                                    Image("twitterIconAbout")
                                         .resizable()
                                         .scaledToFit()
                                         .foregroundColor(Color.primary)
@@ -148,6 +150,10 @@ struct AboutChatrView: View {
                                     .frame(width: Constants.screenWidth - 80)
                             }
                         }.buttonStyle(changeBGButtonStyle())
+                        .simultaneousGesture(TapGesture()
+                            .onEnded { _ in
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                            })
                         
                         NavigationLink(destination: TermsView(mainText: Constants.EULAagreement)) {
                             VStack(alignment: .trailing, spacing: 0) {
@@ -175,6 +181,10 @@ struct AboutChatrView: View {
                                 .padding(.vertical, 15)
                             }
                         }.buttonStyle(changeBGButtonStyle())
+                        .simultaneousGesture(TapGesture()
+                            .onEnded { _ in
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                            })
                     }.background(Color("buttonColor"))
                     .clipShape(RoundedRectangle(cornerRadius: 15, style: .circular))
                     .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
