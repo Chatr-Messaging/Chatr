@@ -59,7 +59,7 @@ struct VisitContactView: View {
                                                 .scaledToFill()
                                                 .clipShape(Circle())
                                                 .frame(width: 80, height: 80, alignment: .center)
-                                                .shadow(color: Color.black.opacity(0.25), radius: 8, x: 0, y: 8)
+                                                .shadow(color: Color.black.opacity(0.25), radius: 10, x: 0, y: 10)
                                             
                                             if self.contact.quickSnaps.count > 0 {
                                                 Circle()
@@ -144,7 +144,6 @@ struct VisitContactView: View {
                                 }
                                 if self.contact.isMyContact {
                                     Button(action: {
-                                        print("Favourite tap")
                                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                         if self.contact.isFavourite {
                                             changeContactsRealmData().updateContactFavouriteStatus(userID: UInt(self.contact.id), favourite: false)
@@ -156,7 +155,7 @@ struct VisitContactView: View {
                                             .resizable()
                                             .scaledToFit()
                                             .frame(width: 20, height: 20, alignment: .center)
-                                            .foregroundColor( self.contact.isFavourite ? .yellow : .secondary)
+                                            .foregroundColor( self.contact.isFavourite ? .yellow : .gray)
                                             .shadow(color: Color.black.opacity(self.contact.isFavourite ? 0.15 : 0.0), radius: 2, x: 0, y: 2)
                                     }.buttonStyle(ClickButtonStyle())
                                 }
@@ -172,21 +171,12 @@ struct VisitContactView: View {
                                         self.newMessage = self.contact.id
                                         self.dismissView.toggle()
                                     }) {
-                                        ZStack {
-                                            RoundedRectangle(cornerRadius: 10)
-                                                .frame(width: 48, height: 48, alignment: .center)
-                                                .foregroundColor(.clear)
-                                                .background(Constants.messageBlueGradient)
-                                                .cornerRadius(12)
-                                                .shadow(color: Color(.sRGB, red: 43 / 255, green: 145 / 255, blue: 250 / 255, opacity: 0.35), radius: 8, x: 0, y: 5)
-                                            
-                                            Image("ChatBubble")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 34, height: 23, alignment: .center)
-                                                .foregroundColor(.primary)
-                                                .padding(3)
-                                        }
+                                        Image("MessagingIcon")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 48, height: 48, alignment: .center)
+                                            .foregroundColor(.primary)
+                                            .padding(3)
                                     }.buttonStyle(ClickButtonStyle())
                                 }
 
@@ -195,21 +185,12 @@ struct VisitContactView: View {
                                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                         self.quickSnapViewState = .camera
                                     }) {
-                                        ZStack {
-                                            RoundedRectangle(cornerRadius: 10)
-                                                .frame(width: 48, height: 48, alignment: .center)
-                                                .foregroundColor(.clear)
-                                                .background(Constants.snapPurpleGradient)
-                                                .cornerRadius(12)
-                                                .shadow(color: Color(.sRGB, red: 130 / 255, green: 82 / 255, blue: 255 / 255, opacity: 0.35), radius: 8, x: 0, y: 5)
-
-                                            Image(systemName: "camera.fill")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 26, height: 23, alignment: .center)
-                                                .foregroundColor(.white)
-                                                .padding(3)
-                                        }
+                                        Image("SnapIcon")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 48, height: 48, alignment: .center)
+                                            .foregroundColor(.white)
+                                            .padding(3)
                                     }.buttonStyle(ClickButtonStyle())
                                 } else if self.contactRelationship == .notContact && self.contact.id != UserDefaults.standard.integer(forKey: "currentUserID") {
                                     Button(action: {

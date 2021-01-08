@@ -109,21 +109,12 @@ struct HighlightedContactCell: View {
                         self.newMessage = self.contact.id
                         self.dismissView.toggle()
                     }) {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 10)
-                                .frame(width: 40, height: 40, alignment: .center)
-                                .foregroundColor(.clear)
-                                .background(Constants.messageBlueGradient)
-                                .cornerRadius(10)
-                                .shadow(color: Color(.sRGB, red: 49 / 255, green: 143 / 255, blue: 255 / 255, opacity: 0.35), radius: 8, x: 0, y: 5)
-                            
-                            Image("ChatBubble")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 29, height: 18, alignment: .center)
-                                .foregroundColor(.primary)
-                                .padding(3)
-                        }
+                        Image("MessagingIcon")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 40, height: 40, alignment: .center)
+                            .foregroundColor(.primary)
+                            .padding(3)
                     }.buttonStyle(ClickButtonStyle())
                     
                     Button(action: {
@@ -132,21 +123,12 @@ struct HighlightedContactCell: View {
                         self.selectedQuickSnapContact = self.contact
                         print("camera...")
                     }) {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 10)
-                                .frame(width: 40, height: 40, alignment: .center)
-                                .foregroundColor(.clear)
-                                .background(Constants.snapPurpleGradient)
-                                .cornerRadius(10)
-                                .shadow(color: Color(.sRGB, red: 148 / 255, green: 109 / 255, blue: 245 / 255, opacity: 0.35), radius: 8, x: 0, y: 5)
-
-                            Image(systemName: "camera.fill")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 21, height: 18, alignment: .center)
-                                .foregroundColor(.white)
-                                .padding(3)
-                        }
+                        Image("SnapIcon")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 40, height: 40, alignment: .center)
+                            .foregroundColor(.white)
+                            .padding(3)
                     }.buttonStyle(ClickButtonStyle())
                 }.frame(width: 160)
             }.padding(.all)

@@ -11,7 +11,7 @@ import SwiftUI
 struct MainButtonStyle: ButtonStyle {
     public func makeBody(configuration: MainButtonStyle.Configuration) -> some View {
         configuration.label
-            .frame(minWidth: 40, maxWidth: .infinity, minHeight: 45, maxHeight: 60)
+            .frame(minWidth: 40, maxWidth: .infinity, minHeight: 45, maxHeight: 65)
             .foregroundColor(.white)
             .background(LinearGradient(
                 gradient: Gradient(colors: [Color(red: 71 / 255, green: 171 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)]),
@@ -21,6 +21,14 @@ struct MainButtonStyle: ButtonStyle {
             .cornerRadius(18)
             .opacity(configuration.isPressed ? 0.95 : 1)
             .scaleEffect(configuration.isPressed ? 0.975 : 1.0)
+    }
+}
+
+struct HomeButtonStyle: ButtonStyle {
+    public func makeBody(configuration: ClickButtonStyle.Configuration) -> some View {
+        configuration.label
+            .foregroundColor(configuration.isPressed ? Color("bgColor_light") : Color("buttonColor"))
+            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
     }
 }
 

@@ -187,52 +187,39 @@ class AuthModel: NSObject, ObservableObject {
                             //Save ConnectyCube tokenID & loginto ConnectyCube then save & notify
                             UserDefaults.standard.set(idToken, forKey: "tokenID")
                             Request.logIn(withFirebaseProjectID: Constants.FirebaseProjectID, accessToken: idToken ?? "", successBlock: { (user) in
-                                print("You are now loged in with ConnectyCube: \(String(describing: user.password)) created at: \(String(describing: user.createdAt)) & last sesh at: \(String(describing: user.lastRequestAt?.getElapsedInterval(lastMsg: "now"))) with the name of: \(String(describing: user.fullName?.description))")
                                 UserDefaults.standard.set(user.id, forKey: "currentUserID")
                                 if (userz?.additionalUserInfo?.isNewUser ?? true) == false {
+                                    Analytics.logEvent(AnalyticsEventLogin, parameters: [AnalyticsParameterMethod: "Phone Number Security Code - from LogIn"])
+                                    if user.fullName != nil {
+                                        self.haveUserFullName = true
+                                    }
+                                    if self.persistenceManager.getCubeProfileImage(usersID: user) != nil {
+                                        self.haveUserProfileImg = true
+                                    }
                                     if Chat.instance.isConnected {
                                         Chat.instance.disconnect { (error) in
                                             print("chat did disconnect. error?: \(String(describing: error?.localizedDescription))")
                                         }
                                     }
                                 } else {
-                                    changeAddressBookRealmData().removeAllAddressBook(completion: { _ in })
+                                    changeAddressBookRealmData().removeAllAddressBook(completion: { _ in
+                                        Analytics.logEvent(AnalyticsEventSignUp, parameters: [AnalyticsParameterMethod: "Phone Number Security Code - from Sign Up"])
+                                    })
                                 }
                                 changeProfileRealmDate().updateProfile(user, completion: {
                                     //Update Firebase Analitics log events by checking Firebase new user
                                     Chat.instance.connect(withUserID: UInt(user.id), password: Session.current.sessionDetails?.token ?? "") { (error) in
                                         if error != nil {
                                             print("there is a error connecting to session! \(String(describing: error))")
+                                            self.verifyCodeStatus = .error
                                         } else {
                                             print("Success joining session from Login! the current user: \(String(describing: Session.current.currentUserID))")
+                                            self.verifyCodeStatus = .success
                                         }
                                     }
-                                    Purchases.shared.identify(userz!.user.uid, { (info, error) in
-                                        if let e = error {
-                                            print("Sign in error: \(e.localizedDescription)")
-                                        } else {
-                                            print("User \(userz!.user.uid) signed in")
-                                        }
-                                    })
-                                    if (userz?.additionalUserInfo?.isNewUser ?? true) {
-                                        Analytics.logEvent(AnalyticsEventSignUp, parameters: [AnalyticsParameterMethod: "Phone Number Security Code - from Sign Up"])
-                                    } else {
-                                        Analytics.logEvent(AnalyticsEventLogin, parameters: [AnalyticsParameterMethod: "Phone Number Security Code - from LogIn"])
-                                        if user.fullName != nil {
-                                            self.haveUserFullName = true
-                                            //print("user has full name... name: \(String(describing: user.fullName))")
-                                        }
-                                        if self.persistenceManager.getCubeProfileImage(usersID: user) != nil {
-                                            self.haveUserProfileImg = true
-                                            //print("user has profile image too... link: \(String(describing: self.persistenceManager.getCubeProfileImage(usersID: user)))")
-                                        }
-                                    }
-                                   self.verifyCodeStatus = .success
                                 })
-
-                               completion(true)
+                                completion(true)
                             }) { (error) in
-                                //print("Error in the connectycube login... error: \(error.localizedDescription)")
                                self.verifyCodeStatus = .error
                                completion(false)
                                return

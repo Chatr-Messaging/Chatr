@@ -15,7 +15,7 @@ struct ContactsBtn: View {
     
     var body: some View {
         Button(action: {
-            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
             self.showContacts.toggle()
         }) {
             ZStack {
@@ -42,7 +42,7 @@ struct ContactsBtn: View {
                 }.offset(x: Constants.menuBtnSize * 0.45, y: -(Constants.menuBtnSize * 0.5))
                 .opacity(self.alertNum > 0 ? 1 : 0)
             }
-        }.buttonStyle(ClickButtonStyle())
+        }.buttonStyle(HomeButtonStyle())
 
     }
 }

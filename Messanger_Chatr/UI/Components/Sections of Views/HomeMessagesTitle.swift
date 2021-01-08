@@ -7,7 +7,6 @@
 //
 
 import SwiftUI
-import SDWebImageSwiftUI
 
 // MARK: Home Header Section
 struct HomeMessagesTitle: View {
@@ -15,24 +14,21 @@ struct HomeMessagesTitle: View {
     @Binding var isLocalOpen: Bool
     @Binding var contacts: Bool
     @Binding var newChat: Bool
-    @Binding var showUserProfile: Bool
     @Binding var selectedContacts: [Int]
 
     var body: some View {
-            HStack {
-                Text("Messages")
-                    .font(.system(size: 38))
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
+        HStack(alignment: .bottom) {
+            Text("Messages")
+                .font(.system(size: 38))
+                .fontWeight(.semibold)
+                .foregroundColor(.primary)
+                .offset(y: 8)
 
-                Spacer()
-                
-                ContactsBtn(showContacts: self.$contacts)
-                    .offset(x: -5, y: -5)
+            Spacer()
+            ContactsBtn(showContacts: self.$contacts)
+                .offset(x: -5)
 
-                MenuBtn(showNewChat: self.$newChat, selectedContacts: self.$selectedContacts)
-                    .offset(y: -5)
-                    
+            MenuBtn(showNewChat: self.$newChat, selectedContacts: self.$selectedContacts)
         }.zIndex(self.isLocalOpen ? 0 : 2)
         .padding(.horizontal)
     }

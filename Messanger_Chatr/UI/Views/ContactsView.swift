@@ -305,7 +305,6 @@ struct ContactsView: View {
                                 .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
                                 .padding(.bottom, 20)
                                 .sheet(isPresented: self.$showAddChat, onDismiss: {
-                                    print("loading selected dialog")
                                     if self.newDialogID != 0 {
                                         self.dismissView.toggle()
                                     }
@@ -423,7 +422,6 @@ struct ContactsView: View {
                                 }.padding(.horizontal)
                                 .buttonStyle(ClickButtonStyle())
                                 .sheet(isPresented: self.$showAddNewContact, onDismiss: {
-                                    print("loading selected dialog")
                                     if self.newDialogID != 0 {
                                         self.dismissView.toggle()
                                     }
@@ -466,7 +464,7 @@ struct ContactsView: View {
                                                                 .scaledToFill()
                                                                 .clipShape(Circle())
                                                                 .frame(width: 40, height: 40, alignment: .center)
-                                                                .shadow(color: Color.black.opacity(0.25), radius: 5, x: 0, y: 5)
+                                                                .shadow(color: Color.black.opacity(0.20), radius: 6, x: 0, y: 4)
                                                         } else {
                                                             ZStack(alignment: .center) {
                                                                 Circle()

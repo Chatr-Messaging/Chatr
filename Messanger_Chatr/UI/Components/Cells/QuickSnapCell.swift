@@ -19,7 +19,7 @@ struct QuickSnapCell: View {
     var body: some View {
         VStack {
             Button(action: {
-                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                 self.selectedQuickSnapContact = self.quickSnap
                 if self.selectedQuickSnapContact.quickSnaps.count > 0 {
                     self.viewState = .viewing

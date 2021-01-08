@@ -64,7 +64,6 @@ struct HomeView: View {
                 if !self.auth.preventDismissal {
                     Text("")
                         .onAppear(perform: {
-                            print("View did appear. the sesh avalible: \(Session.current.tokenHasExpired) Session Details: \(String(describing: Session.current.sessionDetails)) && the facID: \(String(describing: self.auth.profile.results.first?.isLocalAuthOn))")
                             ChatrApp.connect()
                             StoreReviewHelper.checkAndAskForReview()
                             
@@ -225,13 +224,13 @@ struct mainHomeList: View {
                                         self.receivedNotification.toggle()
                                     }
                                 }
-                            }.frame(height: Constants.btnSize + 90)
+                            }.frame(height: Constants.btnSize + 100)
                             
                         // MARK: "Message" Title
-                        HomeMessagesTitle(isLocalOpen: self.$isLocalOpen, contacts: self.$showContacts, newChat: self.$showNewChat, showUserProfile: self.$showUserProfile, selectedContacts: self.$selectedContacts)
+                        HomeMessagesTitle(isLocalOpen: self.$isLocalOpen, contacts: self.$showContacts, newChat: self.$showNewChat, selectedContacts: self.$selectedContacts)
                             .frame(height: 50)
                             .environmentObject(self.auth)
-                            .padding(.bottom, 25)
+                            .padding(.bottom, 45)
                             .sheet(isPresented: self.$showContacts, onDismiss: {
                                 self.loadSelectedDialog()
                             }) {
@@ -241,7 +240,6 @@ struct mainHomeList: View {
                                     .edgesIgnoringSafeArea(.all)
                             }
                             .onChange(of: self.newDialogFromSharedContact) { newValue in
-                                print("the new value dialog from contact is: \(newValue)")
                                 if newValue != 0 {
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
                                         self.loadSelectedDialog()
@@ -259,7 +257,6 @@ struct mainHomeList: View {
                                     .simultaneousGesture(DragGesture(minimumDistance: self.isLocalOpen ? 0 : 500).onChanged({ (_) in }))
                                     .sheet(isPresented: self.$showSharedContact, onDismiss: {
                                         self.loadSelectedDialog()
-                                        print("loading selected dialog \(self.newDialogFromContact)")
                                     }) {
                                         NavigationView {
                                             VisitContactView(fromDialogCell: true, newMessage: self.$newDialogFromContact, dismissView: self.$showSharedContact, viewState: .fromDynamicLink)
@@ -312,7 +309,7 @@ struct mainHomeList: View {
                             .opacity(self.isLoading ? 0 : 1)
                             .opacity(self.dialogs.results.count != 0 ? 1 : 0)
                             .offset(y: self.isLocalOpen ? -75 + (self.activeView.height / 3) : 0)
-                            .offset(y: self.emptyQuickSnaps ? -60 : 35)
+                            .offset(y: self.emptyQuickSnaps ? -50 : 45)
                             .blur(radius: self.isLocalOpen ? ((950 - (self.activeView.height * 3)) / 600) * 2 : 0)
                             .animation(.spring(response: 0.4, dampingFraction: 0.8, blendDuration: 0))
                             .resignKeyboardOnDragGesture()
@@ -434,7 +431,7 @@ struct mainHomeList: View {
                                             }
                                         })
                                     }
-                                }.offset(y: 50)
+                                }.offset(y: 60)
                                 .frame(height: 75, alignment: .center)
                                 .simultaneousGesture(DragGesture(minimumDistance: UserDefaults.standard.bool(forKey: "localOpen") ? 0 : 500).onChanged({ (_) in }))
                                 .padding(.horizontal, self.isLocalOpen ? 0 : 20)

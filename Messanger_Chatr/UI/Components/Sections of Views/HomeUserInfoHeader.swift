@@ -51,9 +51,9 @@ struct HomeHeaderSection: View {
          }.contentShape(Rectangle())
          .padding(.horizontal, 5)
          .padding(.vertical, 10)
-         .animation(.spring(response: 0.45, dampingFraction: 0.75, blendDuration: 0))
          .scaleEffect(self.highlighted ? 0.975 : 1.0)
          .background(RoundedRectangle(cornerRadius: 20).fill(self.highlighted ? Color("bgColor_light") : Color.clear).animation(.none))
+         .animation(.spring(response: 0.1, dampingFraction: 0.75, blendDuration: 0))
          .gesture(
             DragGesture(minimumDistance: 0)
                 .onChanged({ _ in

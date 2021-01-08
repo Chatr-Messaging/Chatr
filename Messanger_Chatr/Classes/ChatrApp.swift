@@ -48,14 +48,9 @@ extension ChatrApp {
         Chat.instance.connect(withUserID: id, password: Session.current.sessionDetails?.token ?? "") { (error) in
             if error != nil {
                 print("there is a error connecting to session! \(String(describing: error?.localizedDescription)) user id: \(id)")
+                changeContactsRealmData().observeQuickSnaps()
             } else {
                 print("Success joining session! the current user: \(String(describing: Session.current.currentUser)) && expirationSate: \(String(describing: Session.current.sessionDetails?.token))")
-
-                Request.registeredUsersFromAddressBook(withUdid: nil, isCompact: false, successBlock: { (users) in
-                    print("received users from address book: \(users)")
-                }) { (error) in
-                    print("error in getting users from AddressBook... \(error.localizedDescription)")
-                }
 
                 changeDialogRealmData().fetchDialogs(completion: { _ in
                     changeContactsRealmData().observeQuickSnaps()

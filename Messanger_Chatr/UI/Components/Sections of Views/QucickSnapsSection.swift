@@ -20,7 +20,7 @@ struct QuickSnapsSection: View {
     
     var body: some View {
         ZStack() {
-            if self.quickSnapContacts.results.filter({ $0.hasQuickSnaped != false }).count > 0 {
+            if self.auth.contacts.results.filter({ $0.hasQuickSnaped != false }).count > 0 {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack {
                         //New Button
@@ -61,15 +61,16 @@ struct QuickSnapsSection: View {
                         
                         Divider()
                             .padding(.bottom, 30)
+                            .padding(.top, 15)
                             .scaleEffect(UserDefaults.standard.bool(forKey: "localOpen") ? 0.85 : 1)
                             .offset(y: UserDefaults.standard.bool(forKey: "localOpen") ? (UIDevice.current.hasNotch ? 5 : 0) : 0)
                         
                         //Received List
                         HStack(spacing: 0) {
-                            ForEach(self.quickSnapContacts.results.sorted(by: {$0.quickSnaps.count > $1.quickSnaps.count}).filter({ $0.hasQuickSnaped != false }), id:\.self) { snap in
+                            ForEach(self.auth.contacts.results.sorted(by: {$0.quickSnaps.count > $1.quickSnaps.count}).filter({ $0.hasQuickSnaped != false }), id:\.self) { snap in
                                 if snap.hasQuickSnaped {
                                     QuickSnapCell(viewState: self.$viewState, quickSnap: snap, selectedQuickSnapContact: self.$selectedQuickSnapContact)
-                                        .offset(x: (self.quickSnapContacts.results.sorted(by: {$0.quickSnaps.count > $1.quickSnaps.count}).filter({ $0.hasQuickSnaped != false }).first != nil) ? -4 : 0)
+                                        .offset(x: (self.auth.contacts.results.sorted(by: {$0.quickSnaps.count > $1.quickSnaps.count}).filter({ $0.hasQuickSnaped != false }).first != nil) ? -4 : 0)
                                 }
                             }
                         }.padding(.leading, 5)
