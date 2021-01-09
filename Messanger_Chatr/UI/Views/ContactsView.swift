@@ -189,11 +189,12 @@ struct ContactsView: View {
                                                         HighlightedContactCell(contact: savedContact, newMessage: self.$newDialogID, dismissView: self.$dismissView, selectedQuickSnapContact: self.$selectedQuickSnapContact, quickSnapViewState: self.$quickSnapViewState)
                                                             .frame(width: 150, height: 150)
                                                             .animation(.spring(response: 0.45, dampingFraction: 0.70, blendDuration: 0))
-                                                            .background(Color("buttonColor"))
-                                                            .cornerRadius(20)
                                                             .disabled(self.quickSnapViewState == .closed ? false : true)
-                                                            
-                                                    }.buttonStyle(ClickMiniButtonStyle())
+                                                    }.buttonStyle(highlightedButtonStyle())
+                                                    .simultaneousGesture(TapGesture()
+                                                        .onEnded { _ in
+                                                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                                        })
                                                 }.frame(height: 150)
                                             }.padding(.trailing, 10)
                                         }
@@ -214,11 +215,8 @@ struct ContactsView: View {
                                                         HighlightedContactCell(contact: savedContact, newMessage: self.$newDialogID, dismissView: self.$dismissView, selectedQuickSnapContact: self.$selectedQuickSnapContact, quickSnapViewState: self.$quickSnapViewState)
                                                             .frame(width: 150, height: 150)
                                                             .animation(.spring(response: 0.45, dampingFraction: 0.70, blendDuration: 0))
-                                                            .background(Color("buttonColor"))
-                                                            .cornerRadius(20)
-                                                            .disabled(self.quickSnapViewState == .closed ? false : true)
-                                                            
-                                                    }.buttonStyle(ClickMiniButtonStyle())
+                                                            .disabled(self.quickSnapViewState == .closed ? false : true)  
+                                                    }.buttonStyle(highlightedButtonStyle())
                                                     .simultaneousGesture(TapGesture()
                                                         .onEnded { _ in
                                                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
@@ -243,12 +241,13 @@ struct ContactsView: View {
                                                         HighlightedContactCell(contact: savedContact, newMessage: self.$newDialogID, dismissView: self.$dismissView, selectedQuickSnapContact: self.$selectedQuickSnapContact, quickSnapViewState: self.$quickSnapViewState)
                                                             .frame(width: 150, height: 150)
                                                             .animation(.spring(response: 0.45, dampingFraction: 0.70, blendDuration: 0))
-                                                            .background(Color("buttonColor"))
-                                                            .cornerRadius(20)
-                                                            .animation(.spring(response: 0.45, dampingFraction: 0.70, blendDuration: 0))
                                                             .disabled(self.quickSnapViewState == .closed ? false : true)
                                                             
-                                                    }.buttonStyle(ClickMiniButtonStyle())
+                                                    }.buttonStyle(highlightedButtonStyle())
+                                                    .simultaneousGesture(TapGesture()
+                                                        .onEnded { _ in
+                                                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                                        })
                                                 }.frame(height: 150)
                                             }
                                         }

@@ -54,6 +54,16 @@ struct changeBGButtonStyle: ButtonStyle {
     }
 }
 
+struct highlightedButtonStyle: ButtonStyle {
+    public func makeBody(configuration: highlightedButtonStyle.Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
+            .opacity(configuration.isPressed ? 0.95 : 1)
+            .background(configuration.isPressed ? Color("bgColor_light") : Color("buttonColor"))
+            .cornerRadius(20)
+    }
+}
+
 struct navigationScaleHelpticButtonStyle: PrimitiveButtonStyle {
     func makeBody(configuration: PrimitiveButtonStyle.Configuration) -> some View {
         MyButton(configuration: configuration)

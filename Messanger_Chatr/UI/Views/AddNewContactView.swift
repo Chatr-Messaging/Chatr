@@ -22,6 +22,7 @@ struct addNewContactView: View {
     @State var grandUsers: [User] = []
     @State var regristeredAddressBook: [User] = []
     @ObservedObject var addressBook = AddressBookRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(AddressBookStruct.self))
+    let persistenceManager = PersistenceManager()
     
     var body: some View {
         NavigationView {
@@ -105,7 +106,7 @@ struct addNewContactView: View {
                                     NavigationLink(destination: VisitContactView(newMessage: self.$newDialogID, dismissView: self.$dismissView, viewState: .fromSearch, connectyContact: contact).environmentObject(self.auth).edgesIgnoringSafeArea(.all)) {
                                         VStack(alignment: .trailing, spacing: 0) {
                                             HStack {
-                                                WebImage(url: URL(string: PersistenceManager().getCubeProfileImage(usersID: contact) ?? ""))
+                                                WebImage(url: URL(string: persistenceManager.getCubeProfileImage(usersID: contact) ?? ""))
                                                     .resizable()
                                                     .placeholder{ Image(systemName: "person.fill") }
                                                     .indicator(.activity)
@@ -128,6 +129,46 @@ struct addNewContactView: View {
                                                 }
                                                 Spacer()
                                                 
+                                                if self.isUserNotContact(id: contact.id) {
+                                                    Button(action: {
+                                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                                        Chat.instance.confirmAddContactRequest(UInt(contact.id)) { (error) in
+                                                            let event = Event()
+                                                            event.notificationType = .push
+                                                            event.usersIDs = [NSNumber(value: contact.id)]
+                                                            event.type = .oneShot
+
+                                                            var pushParameters = [String : String]()
+                                                            pushParameters["message"] = "\(ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.fullName ?? "A user")) sent you a contact request."
+                                                            pushParameters["ios_sound"] = "app_sound.wav"
+
+                                                            if let jsonData = try? JSONSerialization.data(withJSONObject: pushParameters,
+                                                                                                        options: .prettyPrinted) {
+                                                              let jsonString = String(bytes: jsonData,
+                                                                                      encoding: String.Encoding.utf8)
+
+                                                              event.message = jsonString
+
+                                                              Request.createEvent(event, successBlock: {(events) in
+                                                                print("sent push notification to user")
+                                                              }, errorBlock: {(error) in
+                                                                print("error in sending push noti: \(error.localizedDescription)")
+                                                              })
+                                                            }
+                                                        }
+                                                    }) {
+                                                        Text("Add")
+                                                            .fontWeight(.medium)
+                                                            .font(.subheadline)
+                                                            .foregroundColor(.white)
+                                                            .padding(.vertical, 8)
+                                                            .padding(.horizontal, 15)
+                                                            .background(Color.blue)
+                                                            .cornerRadius(10)
+                                                            .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 3)
+                                                    }
+                                                }
+
                                                 Image(systemName: "chevron.right")
                                                     .resizable()
                                                     .font(Font.title.weight(.bold))
@@ -145,7 +186,10 @@ struct addNewContactView: View {
                                         }
                                     }.buttonStyle(changeBGButtonStyle())
                                     .background(Color.clear)
-                                    .animation(.spring(response: 0.45, dampingFraction: 0.70, blendDuration: 0))
+                                    .simultaneousGesture(TapGesture()
+                                        .onEnded { _ in
+                                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                        })
                                 }
                             } else {
                                 if self.outputSearchText.count > 0 || self.searchText.count > 3 {
@@ -169,7 +213,8 @@ struct addNewContactView: View {
                                 Spacer()
                             }
                         }
-                    }.background(Color("buttonColor"))
+                    }.animation(.spring(response: 0.25, dampingFraction: 0.70, blendDuration: 0))
+                    .background(Color("buttonColor"))
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
                     .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
                     .padding(.horizontal)
@@ -192,7 +237,7 @@ struct addNewContactView: View {
                                     .multilineTextAlignment(.leading)
                             }
                             Spacer()
-                        }.animation(.spring(response: 0.45, dampingFraction: 0.70, blendDuration: 0))
+                        }.animation(.spring(response: 0.25, dampingFraction: 0.70, blendDuration: 0))
                         .padding(.horizontal)
                         .padding(.horizontal)
                         
@@ -207,7 +252,7 @@ struct addNewContactView: View {
                                                         .frame(width: 35, height: 35, alignment: .center)
                                                         .foregroundColor(Color("bgColor"))
                                                     
-                                                    WebImage(url: URL(string: PersistenceManager().getCubeProfileImage(usersID: contact) ?? ""))
+                                                    WebImage(url: URL(string: persistenceManager.getCubeProfileImage(usersID: contact) ?? ""))
                                                         .resizable()
                                                         .placeholder{ Image(systemName: "person.fill") }
                                                         .indicator(.activity)
@@ -231,6 +276,44 @@ struct addNewContactView: View {
                                                 }
                                                 Spacer()
                                                 
+                                                Button(action: {
+                                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                                    Chat.instance.confirmAddContactRequest(UInt(contact.id)) { (error) in
+                                                        let event = Event()
+                                                        event.notificationType = .push
+                                                        event.usersIDs = [NSNumber(value: contact.id)]
+                                                        event.type = .oneShot
+
+                                                        var pushParameters = [String : String]()
+                                                        pushParameters["message"] = "\(ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.fullName ?? "A user")) sent you a contact request."
+                                                        pushParameters["ios_sound"] = "app_sound.wav"
+
+                                                        if let jsonData = try? JSONSerialization.data(withJSONObject: pushParameters,
+                                                                                                    options: .prettyPrinted) {
+                                                          let jsonString = String(bytes: jsonData,
+                                                                                  encoding: String.Encoding.utf8)
+
+                                                          event.message = jsonString
+
+                                                          Request.createEvent(event, successBlock: {(events) in
+                                                            print("sent push notification to user")
+                                                          }, errorBlock: {(error) in
+                                                            print("error in sending push noti: \(error.localizedDescription)")
+                                                          })
+                                                        }
+                                                    }
+                                                }) {
+                                                    Text("Add")
+                                                        .fontWeight(.medium)
+                                                        .font(.subheadline)
+                                                        .foregroundColor(.white)
+                                                        .padding(.vertical, 8)
+                                                        .padding(.horizontal, 15)
+                                                        .background(Color.blue)
+                                                        .cornerRadius(10)
+                                                        .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 3)
+                                                }
+                                                
                                                 Image(systemName: "chevron.right")
                                                     .resizable()
                                                     .font(Font.title.weight(.bold))
@@ -248,9 +331,14 @@ struct addNewContactView: View {
                                         }
                                     }.buttonStyle(changeBGButtonStyle())
                                     .background(Color.clear)
+                                    .simultaneousGesture(TapGesture()
+                                        .onEnded { _ in
+                                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                        })
                                 }
-                            }.animation(.spring(response: 0.45, dampingFraction: 0.70, blendDuration: 0))
-                        }.background(Color("buttonColor"))
+                            }
+                        }.animation(.spring(response: 0.25, dampingFraction: 0.70, blendDuration: 0))
+                        .background(Color("buttonColor"))
                         .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
                         .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
                         .padding(.horizontal)
@@ -300,12 +388,12 @@ struct addNewContactView: View {
                                                 .offset(x: 35)
                                         }
                                     }
-                                }.animation(.spring(response: 0.45, dampingFraction: 0.70, blendDuration: 0))
-                                .padding(.vertical, 10)
+                                }.padding(.vertical, 10)
                             } else {
                                 // Fallback on earlier versions
                             }
-                        }.background(Color("buttonColor"))
+                        }.animation(.spring(response: 0.25, dampingFraction: 0.70, blendDuration: 0))
+                        .background(Color("buttonColor"))
                         .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
                         .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
                         .padding(.horizontal)
@@ -322,14 +410,8 @@ struct addNewContactView: View {
                     Request.registeredUsersFromAddressBook(withUdid: UIDevice.current.identifierForVendor?.uuidString, isCompact: false, successBlock: { (users) in
                         self.regristeredAddressBook.removeAll()
                         for i in users {
-                            let config = Realm.Configuration(schemaVersion: 1)
-                            do {
-                                let realm = try Realm(configuration: config)
-                                if (realm.object(ofType: ContactStruct.self, forPrimaryKey: i.id) == nil) && i.id != Session.current.currentUserID {
-                                    self.regristeredAddressBook.append(i)
-                                }
-                            } catch {
-                                print(error.localizedDescription)
+                            if self.isUserNotContact(id: i.id) {
+                                self.regristeredAddressBook.append(i)
                             }
                         }
                     })
@@ -372,6 +454,20 @@ struct addNewContactView: View {
             self.isLoading = false
         }) { (error) in
             print("error searching for phone number user \(error.localizedDescription)")
+        }
+    }
+    
+    func isUserNotContact(id: UInt) -> Bool {
+        let config = Realm.Configuration(schemaVersion: 1)
+        do {
+            let realm = try Realm(configuration: config)
+            if (realm.object(ofType: ContactStruct.self, forPrimaryKey: id) == nil) && id != Session.current.currentUserID {
+                return true
+            } else {
+                return false
+            }
+        } catch {
+            return false
         }
     }
 }

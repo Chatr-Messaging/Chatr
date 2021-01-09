@@ -183,7 +183,7 @@ struct NewConversationView: View {
                                if searchedContact.id != Session.current.currentUserID {
                                     VStack(alignment: .trailing, spacing: 0) {
                                         ContactCell(user: searchedContact, selectedContact: self.$selectedContact)
-                                            .animation(.spring(response: 0.45, dampingFraction: 0.70, blendDuration: 0))
+                                            .animation(.spring(response: 0.15, dampingFraction: 0.60, blendDuration: 0))
                                             .padding(.horizontal)
                                             .padding(.vertical, 10)
                                             .contentShape(Rectangle())
@@ -219,7 +219,7 @@ struct NewConversationView: View {
                                     .foregroundColor(.primary)
                                     .multilineTextAlignment(.leading)
 
-                                Text(Chat.instance.contactList?.contacts.count == 1 ? "\(Chat.instance.contactList?.contacts.count ?? 0) CONTACT" : "\(Chat.instance.contactList?.contacts.count ?? 0) CONTACTS")
+                                Text(Chat.instance.contactList?.contacts.count == 1 ? "\(Chat.instance.contactList?.contacts.count ?? 0) CONTACT" : "\(self.contacts.filterContact(text: self.searchText).filter({ $0.id != UserDefaults.standard.integer(forKey: "currentUserID") && $0.fullName != "No Name" }).count) CONTACTS")
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                                     .multilineTextAlignment(.leading)
@@ -233,7 +233,7 @@ struct NewConversationView: View {
                             ForEach(self.contacts.filterContact(text: self.searchText).sorted { $0.fullName < $1.fullName }.filter({ $0.id != UserDefaults.standard.integer(forKey: "currentUserID") && $0.fullName != "No Name" }), id: \.self) { contact in
                                 VStack(alignment: .trailing, spacing: 0) {
                                     ContactRealmCell(selectedContact: self.$selectedContact, contact: contact)
-                                        .animation(.spring(response: 0.45, dampingFraction: 0.70, blendDuration: 0))
+                                        .animation(.spring(response: 0.15, dampingFraction: 0.60, blendDuration: 0))
                                         .padding(.horizontal)
                                         .padding(.vertical, 10)
                                         .contentShape(Rectangle())
@@ -282,7 +282,7 @@ struct NewConversationView: View {
                             ForEach(self.regristeredAddressBook, id: \.self) { result in
                                 VStack(alignment: .trailing, spacing: 0) {
                                     ContactCell(user: result, selectedContact: self.$selectedContact)
-                                        .animation(.spring(response: 0.45, dampingFraction: 0.70, blendDuration: 0))
+                                        .animation(.spring(response: 0.15, dampingFraction: 0.60, blendDuration: 0))
                                         .padding(.horizontal)
                                         .padding(.vertical, 10)
                                         .contentShape(Rectangle())
@@ -304,7 +304,6 @@ struct NewConversationView: View {
                         }.background(Color("buttonColor"))
                         .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
                         .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 8)
-                        .cornerRadius(20)
                         .padding(.horizontal)
                     }
 
@@ -317,7 +316,7 @@ struct NewConversationView: View {
                                 .foregroundColor(.primary)
                                 .multilineTextAlignment(.leading)
 
-                            Text("\(self.addressBook.results.count) CONTACTS")
+                            Text("\(self.addressBook.filterAddressBook(text: self.searchText).sorted { $0.name < $1.name }.count) CONTACTS")
                                 .font(.footnote)
                                 .foregroundColor(.secondary)
                                 .multilineTextAlignment(.leading)
@@ -325,14 +324,14 @@ struct NewConversationView: View {
                         Spacer()
                     }.padding(.horizontal)
                     .padding(.horizontal)
-                    .opacity(self.addressBook.results.count != 0 ? 1 : 0)
+                    .opacity(self.addressBook.filterAddressBook(text: self.searchText).sorted { $0.name < $1.name }.count != 0 ? 1 : 0)
                     .padding(.top, 25)
                     
                     LazyVStack(spacing: 0) {
                         ForEach(self.addressBook.filterAddressBook(text: self.searchText).sorted { $0.name < $1.name }, id: \.self) { result in
                             VStack(alignment: .trailing, spacing: 0) {
                                 SelectableAddressBookContact(addressBook: result)
-                                    .animation(.spring(response: 0.45, dampingFraction: 0.70, blendDuration: 0))
+                                    .animation(.spring(response: 0.15, dampingFraction: 0.60, blendDuration: 0))
                                     .padding(.horizontal)
                                     .padding(.vertical, 10)
 
@@ -343,10 +342,10 @@ struct NewConversationView: View {
                             }
                         }
                     }.background(Color("buttonColor"))
-                    .cornerRadius(20)
+                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
+                    .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 8)
                     .padding(.horizontal)
-                    .opacity(self.addressBook.results.count != 0 ? 1 : 0)
-                    
+
                     SyncAddressBook()
                         .opacity(self.addressBook.results.count == 0 ? 1 : 0)
                         .offset(y: -60)
@@ -370,7 +369,6 @@ struct NewConversationView: View {
                         .foregroundColor(.primary)
                 }, trailing:
                 Button(action: {
-                    print("Create or add New users! \(self.selectedContact.count)")
                     if self.usedAsNew {
                         if self.selectedContact.count > 0 {
                             let dialog = ChatDialog(dialogID: nil, type: self.selectedContact.count > 1 ? .group : .private)
@@ -393,9 +391,7 @@ struct NewConversationView: View {
                                     }
                                 })
                             }) { (error) in
-                                //occu.removeAll()
                                 UINotificationFeedbackGenerator().notificationOccurred(.error)
-                                print("error making dialog: \(error.localizedDescription)")
                             }
                         }
                     } else {

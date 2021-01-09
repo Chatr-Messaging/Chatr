@@ -41,7 +41,7 @@ struct ContactCell: View {
                 Text(self.user.phone?.format(phoneNumber: String(user.phone?.dropFirst() ?? "")) ?? "")
                     .font(.subheadline)
                     .fontWeight(.regular)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.secondary)                
             }
             Spacer()
             
@@ -59,7 +59,6 @@ struct ContactCell: View {
                     .frame(width: 20, height: 20, alignment: .center)
                     .foregroundColor(.secondary)
             }
-
-        }
+        }.redacted(reason: user.phone == "" ? .placeholder : [])
     }
 }

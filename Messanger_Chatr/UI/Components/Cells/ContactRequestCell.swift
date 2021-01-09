@@ -20,114 +20,120 @@ struct ContactRequestCell: View {
     @State var contactRelationship: visitContactRelationship = .unknown
 
     var body: some View {
-        HStack {
-            NavigationLink(destination: VisitContactView(newMessage: self.$selectedNewDialog, dismissView: self.$dismissView, viewState: .fromRequests, contactRelationship: self.contactRelationship, contact: self.contact).edgesIgnoringSafeArea(.all).environmentObject(self.auth)) {
-                HStack {
-                    WebImage(url: URL(string: self.contact.avatar))
-                        .resizable()
-                        .placeholder{ Image("empty-profile").resizable().frame(width: 45, height: 45, alignment: .center).scaledToFill() }
-                        .indicator(.activity)
-                        .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
-                        .scaledToFill()
-                        .clipShape(Circle())
-                        .frame(width: 45, height: 45, alignment: .center)
-                        .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 8)
+        NavigationLink(destination: VisitContactView(newMessage: self.$selectedNewDialog, dismissView: self.$dismissView, viewState: .fromRequests, contactRelationship: self.contactRelationship, contact: self.contact).edgesIgnoringSafeArea(.all).environmentObject(self.auth)) {
+            HStack {
+                WebImage(url: URL(string: self.contact.avatar))
+                    .resizable()
+                    .placeholder{ Image("empty-profile").resizable().frame(width: 45, height: 45, alignment: .center).scaledToFill() }
+                    .indicator(.activity)
+                    .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
+                    .scaledToFill()
+                    .clipShape(Circle())
+                    .frame(width: 45, height: 45, alignment: .center)
+                    .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 8)
+                
+                VStack(alignment: .leading) {
+                    Text(self.contact.fullName)
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(Color.primary)
+                        .lineLimit(1)
+                        .animation(nil)
                     
-                    VStack(alignment: .leading) {
-                        Text(self.contact.fullName)
-                            .font(.headline)
-                            .fontWeight(.semibold)
-                            .foregroundColor(Color.primary)
-                            .lineLimit(1)
-                            .animation(nil)
-                        
-                        Text(self.contact.phoneNumber.format(phoneNumber: String(self.contact.phoneNumber.dropFirst())))
-                            .font(.subheadline)
-                            .fontWeight(.regular)
-                            .foregroundColor(.secondary)
-                            .lineLimit(1)
-                            .animation(nil)
-                    }
-                    Spacer()
-                    
-                    if self.contactRelationship == .pendingRequestForYou {
-                        Button(action: {
-                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                            Chat.instance.rejectAddContactRequest(UInt(self.contact.id)) { (error) in
-                                if error == nil {
-                                    self.contactRelationship = .unknown
-                                    self.auth.profile.removeContactRequest(userID: UInt(self.contact.id))
-                                }
-                            }
-                        }) {
-                            Image(systemName: "trash.fill")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 18, height: 18, alignment: .center)
-                                .foregroundColor(Color("alertRed"))
-                                .padding(.all, 8)
-                                .background(Color("alertRed").opacity(0.1))
-                                .cornerRadius(10)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .stroke(Color("alertRed"), lineWidth: 1)
-                                )
-                        }
-
-                        Button(action: {
-                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                            Chat.instance.confirmAddContactRequest(UInt(self.contact.id)) { (error) in
-                                print("accepted new contact:")
-                                self.contactRelationship = .contact
-                                self.auth.profile.removeContactRequest(userID: UInt(self.contact.id))
-
-                                let event = Event()
-                                event.notificationType = .push
-                                event.usersIDs = [NSNumber(value: self.contact.id)]
-                                event.type = .oneShot
-
-                                var pushParameters = [String : String]()
-                                pushParameters["message"] = "\(ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.fullName ?? "A user")) accepted your contact request."
-                                pushParameters["ios_sound"] = "app_sound.wav"
-
-                                if let jsonData = try? JSONSerialization.data(withJSONObject: pushParameters,
-                                                                            options: .prettyPrinted) {
-                                  let jsonString = String(bytes: jsonData,
-                                                          encoding: String.Encoding.utf8)
-
-                                  event.message = jsonString
-
-                                  Request.createEvent(event, successBlock: {(events) in
-                                    print("sent push notification to user")
-                                  }, errorBlock: {(error) in
-                                    print("error in sending push noti: \(error.localizedDescription)")
-                                  })
-                                }
-                            }
-                        }) {
-                            Text("Accept")
-                                .fontWeight(.medium)
-                                .font(.subheadline)
-                                .foregroundColor(.blue)
-                                .padding(.vertical, 8)
-                                .padding(.horizontal, 10)
-                                .background(Color.blue.opacity(0.1))
-                                .cornerRadius(10)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .stroke(Color.blue, lineWidth: 1)
-                                )
-                        }
-                    }
-
-                    Image(systemName: "chevron.right")
-                        .resizable()
-                        .font(Font.title.weight(.bold))
+                    Text(self.contact.phoneNumber.format(phoneNumber: String(self.contact.phoneNumber.dropFirst())))
+                        .font(.subheadline)
+                        .fontWeight(.regular)
                         .foregroundColor(.secondary)
-                        .frame(width: 7, height: 10, alignment: .center)
-                }.contentShape(Rectangle())
-            }.buttonStyle(PlainButtonStyle())
-        }.onAppear() {
+                        .lineLimit(1)
+                        .animation(nil)
+                }
+                Spacer()
+                
+                if self.contactRelationship == .pendingRequestForYou {
+                    Button(action: {
+                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                        Chat.instance.rejectAddContactRequest(UInt(self.contact.id)) { (error) in
+                            if error == nil {
+                                self.contactRelationship = .unknown
+                                self.auth.profile.removeContactRequest(userID: UInt(self.contact.id))
+                            }
+                        }
+                    }) {
+                        Image(systemName: "trash.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 18, height: 18, alignment: .center)
+                            .foregroundColor(Color("alertRed"))
+                            .padding(.all, 8)
+                            .background(Color("alertRed").opacity(0.1))
+                            .cornerRadius(10)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(Color("alertRed"), lineWidth: 1)
+                            )
+                    }
+
+                    Button(action: {
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                        Chat.instance.confirmAddContactRequest(UInt(self.contact.id)) { (error) in
+                            print("accepted new contact:")
+                            self.contactRelationship = .contact
+                            self.auth.profile.removeContactRequest(userID: UInt(self.contact.id))
+
+                            let event = Event()
+                            event.notificationType = .push
+                            event.usersIDs = [NSNumber(value: self.contact.id)]
+                            event.type = .oneShot
+
+                            var pushParameters = [String : String]()
+                            pushParameters["message"] = "\(ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.fullName ?? "A user")) accepted your contact request."
+                            pushParameters["ios_sound"] = "app_sound.wav"
+
+                            if let jsonData = try? JSONSerialization.data(withJSONObject: pushParameters,
+                                                                        options: .prettyPrinted) {
+                              let jsonString = String(bytes: jsonData,
+                                                      encoding: String.Encoding.utf8)
+
+                              event.message = jsonString
+
+                              Request.createEvent(event, successBlock: {(events) in
+                                print("sent push notification to user")
+                              }, errorBlock: {(error) in
+                                print("error in sending push noti: \(error.localizedDescription)")
+                              })
+                            }
+                        }
+                    }) {
+                        Text("Accept")
+                            .fontWeight(.medium)
+                            .font(.subheadline)
+                            .foregroundColor(.blue)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 10)
+                            .background(Color.blue.opacity(0.1))
+                            .cornerRadius(10)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(Color.blue, lineWidth: 1)
+                            )
+                    }
+                }
+
+                Image(systemName: "chevron.right")
+                    .resizable()
+                    .font(Font.title.weight(.bold))
+                    .foregroundColor(.secondary)
+                    .frame(width: 7, height: 10, alignment: .center)
+            }.contentShape(Rectangle())
+            .padding(.vertical, 10)
+            .padding(.horizontal)
+        }.redacted(reason: contact.phoneNumber == "" ? .placeholder : [])
+        .buttonStyle(changeBGButtonStyle())
+        .simultaneousGesture(TapGesture()
+            .onEnded { _ in
+                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+            })
+        .onAppear() {
             let config = Realm.Configuration(schemaVersion: 1)
             do {
                 let realm = try Realm(configuration: config)
