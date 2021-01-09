@@ -30,6 +30,18 @@ struct EditProfileView: View {
     @State var showImagePicker: Bool = false
     @State private var image: Image? = nil
     @State private var inputImage: UIImage? = nil
+    
+    @State var presentAuth = false
+    
+    @State var testUserData = InstagramTestUser(access_token: "", user_id: 0)
+    
+    @State var instagramApi = InstagramApi.shared
+    
+    @State var signedIn = false
+    
+    @State var instagramUser: InstagramUser? = nil
+    
+    @State var instagramImage = UIImage(imageLiteralResourceName: "proPic")
 
     var body: some View {
         ZStack {
@@ -366,6 +378,66 @@ struct EditProfileView: View {
                         .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
                         .padding(.horizontal)
                         .padding(.bottom, 5)
+                        
+//                        VStack(spacing: 10) {
+//                            Image(uiImage: instagramImage)
+//                                .resizable()
+//                                .scaledToFill()
+//                                .frame(width: 50, height: 50)
+//                            
+//                            Button(action: {
+//                                if self.testUserData.user_id == 0 {
+//                                    self.presentAuth.toggle()
+//                                } else {
+//                                    self.instagramApi.getInstagramUser(testUserData: self.testUserData) { (user) in
+//                                        self.instagramUser = user
+//                                        self.signedIn.toggle()
+//                                    }
+//                                }
+//                            }) {
+//                                Text(self.testUserData.user_id == 0 ? "Sign Into Instagram" : "Show Instagram User")
+//                                    .renderingMode(.original)
+//                                    .resizable()
+//                                    .scaledToFill()
+//                                    .frame(width: 100, height: 100)
+//                            }
+//                            
+//                            Button(action: {
+//                                if self.instagramUser != nil {
+//                                    self.instagramApi.getMedia(testUserData: self.testUserData) { (media) in
+//                                        if media.media_type != MediaType.VIDEO {
+//                                            let media_url = media.media_url
+//                                            self.instagramApi.fetchImage(urlString: media_url, completion: { (fetchedImage) in
+//                                                if let imageData = fetchedImage {
+//                                                    self.instagramImage = UIImage(data: imageData)!
+//                                                } else {
+//                                                    print("Didn't fetched the data")
+//                                                }
+//
+//                                            })
+//                                            print(media_url)
+//                                        } else {
+//                                            print("Fetched media is a video")
+//                                        }
+//                                    }
+//                                } else {
+//                                    print("Not signed in")
+//                                }
+//                            }){
+//                                Text("Fetch IG Photo")
+//                                    .font(.headline)
+//                                    .padding()
+//                            }
+//                        }.sheet(isPresented: self.$presentAuth) {
+//                            WebView(presentAuth: self.$presentAuth, testUserData: self.$testUserData, instagramApi: self.$instagramApi)
+//                        }
+//                        .actionSheet(isPresented: self.$signedIn) {
+//                            
+//                            let actionSheet = ActionSheet(title: Text("Signed in:"), message: Text("with account: @\(self.instagramUser!.username)"),buttons: [.default(Text("OK"))])
+//                            
+//                            return actionSheet
+//                            
+//                        }
                                             
                         //MARK: Footer Section
                         FooterInformation()

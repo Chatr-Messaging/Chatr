@@ -24,6 +24,9 @@
 		053AC4B7251982560036946E /* AttachmentBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053AC4B6251982550036946E /* AttachmentBubble.swift */; };
 		053D33F22393C97B00CEE03E /* DismissGuardian.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053D33F12393C97B00CEE03E /* DismissGuardian.swift */; };
 		053D33F42394511400CEE03E /* BlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053D33F32394511300CEE03E /* BlurView.swift */; };
+		054CAB7425AA6DF700DD3F7C /* InstagramApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054CAB7325AA6DF700DD3F7C /* InstagramApi.swift */; };
+		054CAB7925AA6E1F00DD3F7C /* InstagramTestUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054CAB7825AA6E1F00DD3F7C /* InstagramTestUser.swift */; };
+		054CAB7E25AA6E3700DD3F7C /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054CAB7D25AA6E3700DD3F7C /* WebView.swift */; };
 		054DA6C2250FF9DF00F28F74 /* AboutChatrView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054DA6C1250FF9DF00F28F74 /* AboutChatrView.swift */; };
 		05578C2C242989A10016B1E5 /* Messanger_Chatr.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 05578C2A242989A10016B1E5 /* Messanger_Chatr.xcdatamodeld */; };
 		05578C362429CE030016B1E5 /* PersistenceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05578C352429CE030016B1E5 /* PersistenceManager.swift */; };
@@ -158,6 +161,9 @@
 		053AC4B6251982550036946E /* AttachmentBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentBubble.swift; sourceTree = "<group>"; };
 		053D33F12393C97B00CEE03E /* DismissGuardian.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DismissGuardian.swift; sourceTree = "<group>"; };
 		053D33F32394511300CEE03E /* BlurView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlurView.swift; sourceTree = "<group>"; };
+		054CAB7325AA6DF700DD3F7C /* InstagramApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramApi.swift; sourceTree = "<group>"; };
+		054CAB7825AA6E1F00DD3F7C /* InstagramTestUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramTestUser.swift; sourceTree = "<group>"; };
+		054CAB7D25AA6E3700DD3F7C /* WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
 		054DA6C1250FF9DF00F28F74 /* AboutChatrView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutChatrView.swift; sourceTree = "<group>"; };
 		05578C2B242989A10016B1E5 /* Messanger_Chatr.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Messanger_Chatr.xcdatamodel; sourceTree = "<group>"; };
 		05578C352429CE030016B1E5 /* PersistenceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceManager.swift; sourceTree = "<group>"; };
@@ -306,6 +312,16 @@
 				0583A83623BD44EB00F9220B /* Resources */,
 			);
 			path = Extras;
+			sourceTree = "<group>";
+		};
+		054CAB7225AA6DDF00DD3F7C /* Instagram */ = {
+			isa = PBXGroup;
+			children = (
+				054CAB7D25AA6E3700DD3F7C /* WebView.swift */,
+				054CAB7825AA6E1F00DD3F7C /* InstagramTestUser.swift */,
+				054CAB7325AA6DF700DD3F7C /* InstagramApi.swift */,
+			);
+			path = Instagram;
 			sourceTree = "<group>";
 		};
 		056B989624C8F7D1003F7FBA /* Buttons */ = {
@@ -475,6 +491,7 @@
 				05D8A8DD250318FA00D53BE2 /* AddressBookRealmModel.swift */,
 				05EA572624148BA100372F1A /* Profile.swift */,
 				05E5B3282430747E00354C01 /* UserDialogs+Extensions.swift */,
+				054CAB7225AA6DDF00DD3F7C /* Instagram */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -835,6 +852,7 @@
 				057F2B4E250B026F005DFB21 /* ContactCarouselSection.swift in Sources */,
 				05A7633C2506FD42002712FA /* ContactRequestCell.swift in Sources */,
 				056B98A924C8FD1D003F7FBA /* SearchBar.swift in Sources */,
+				054CAB7E25AA6E3700DD3F7C /* WebView.swift in Sources */,
 				05DB89B2238B851400D4581F /* AppDelegate.swift in Sources */,
 				05DB89B4238B851400D4581F /* SceneDelegate.swift in Sources */,
 				05A7BD4F24F9E8D20001BFC9 /* ContactRealmCell.swift in Sources */,
@@ -891,6 +909,8 @@
 				056B98A524C8FAA8003F7FBA /* AdvancedView.swift in Sources */,
 				05C6951624F5A29F00EEF819 /* ContactCell.swift in Sources */,
 				053D33F42394511400CEE03E /* BlurView.swift in Sources */,
+				054CAB7925AA6E1F00DD3F7C /* InstagramTestUser.swift in Sources */,
+				054CAB7425AA6DF700DD3F7C /* InstagramApi.swift in Sources */,
 				05A7BD5524FAED250001BFC9 /* CameraViewController.swift in Sources */,
 				05AACE5F23A60AB6006307EB /* ImagePicker.swift in Sources */,
 				05BCE40F250C55E100E29F39 /* ShareProfileView.swift in Sources */,

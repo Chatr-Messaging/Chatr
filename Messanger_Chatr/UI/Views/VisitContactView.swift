@@ -487,7 +487,6 @@ struct VisitContactView: View {
                 .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
                 .padding(.horizontal)
                 .padding(.bottom, 10)
-                */
                 
                 //MARK: Social Section
                 if self.contact.facebook != "" || self.contact.twitter != "" {
@@ -563,6 +562,7 @@ struct VisitContactView: View {
                     .padding(.horizontal)
                     .padding(.bottom, 10)
                 }
+                */
                 
                 //MARK: More Section
                 HStack {
