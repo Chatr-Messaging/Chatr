@@ -178,7 +178,7 @@ struct NewConversationView: View {
                         .padding(.horizontal)
                         .padding(.top, 25)
 
-                        VStack(spacing: 0) {
+                        LazyVStack(spacing: 0) {
                             ForEach(self.grandUsers, id: \.self) { searchedContact in
                                if searchedContact.id != Session.current.currentUserID {
                                     VStack(alignment: .trailing, spacing: 0) {
@@ -229,7 +229,7 @@ struct NewConversationView: View {
                         .padding(.horizontal)
                         .padding(.top, 25)
 
-                        VStack(spacing: 0) {
+                        LazyVStack(spacing: 0) {
                             ForEach(self.contacts.filterContact(text: self.searchText).sorted { $0.fullName < $1.fullName }.filter({ $0.id != UserDefaults.standard.integer(forKey: "currentUserID") && $0.fullName != "No Name" }), id: \.self) { contact in
                                 VStack(alignment: .trailing, spacing: 0) {
                                     ContactRealmCell(selectedContact: self.$selectedContact, contact: contact)
@@ -278,7 +278,7 @@ struct NewConversationView: View {
                         .padding(.horizontal)
                         .padding(.top, 25)
                         
-                        VStack(spacing: 0) {
+                        LazyVStack(spacing: 0) {
                             ForEach(self.regristeredAddressBook, id: \.self) { result in
                                 VStack(alignment: .trailing, spacing: 0) {
                                     ContactCell(user: result, selectedContact: self.$selectedContact)
@@ -361,6 +361,7 @@ struct NewConversationView: View {
             .frame(width: Constants.screenWidth, alignment: .center)
             .padding(.horizontal)
             .edgesIgnoringSafeArea(.bottom)
+            .resignKeyboardOnDragGesture()
             .navigationBarItems(leading:
                 Button(action: {
                     self.presentationMode.wrappedValue.dismiss()
@@ -420,7 +421,7 @@ struct NewConversationView: View {
                     }
                 })
             }
-        }.resignKeyboardOnDragGesture()
+        }
     }
     
     func grandSeach(searchText: String) {

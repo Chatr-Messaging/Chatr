@@ -255,7 +255,8 @@ struct ContactsView: View {
                                 }.padding(.horizontal)
                             }.frame(width: Constants.screenWidth, height: self.auth.contacts.results.filter({ $0.isMyContact == true && ($0.isOnline == true || $0.isFavourite == true || $0.hasQuickSnaped == true) }).count > 0 ? 150 : 0)
                             .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
-                        }.padding(.bottom, self.auth.contacts.results.filter({ $0.isMyContact == true && ($0.isOnline == true || $0.isFavourite == true || $0.hasQuickSnaped == true) }).count > 0 ? 25 : 0)
+                        }.padding(.bottom, self.auth.contacts.results.filter({ $0.isMyContact == true && ($0.isOnline == true || $0.isFavourite == true || $0.hasQuickSnaped == true) }).count > 0 ? 40 : 0)
+                        .padding(.top, 10)
                         .resignKeyboardOnDragGesture()
                         
                         //MARK: CONTACTS Section
@@ -407,19 +408,14 @@ struct ContactsView: View {
                                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 }) {
                                     ZStack {
-                                        Rectangle()
-                                            .frame(width: Constants.btnSize, height: Constants.btnSize, alignment: .center)
-                                            .foregroundColor(Color("buttonColor"))
-                                            .clipShape(RoundedRectangle(cornerRadius: Constants.btnSize / 3.5, style: .circular))
-                                            .shadow(color: Color.black.opacity(0.20), radius: 10, x: 0, y: 8)
-                                        
                                         Image(systemName: "person.badge.plus")
                                             .resizable()
-                                            .frame(width: 22, height: 20, alignment: .center)
+                                            .scaledToFit()
+                                            .padding(8)
+                                            .frame(width: 32, height: 32)
                                             .foregroundColor(.primary)
                                     }
-                                }.padding(.horizontal)
-                                .buttonStyle(ClickButtonStyle())
+                                }.buttonStyle(HomeButtonStyle())
                                 .sheet(isPresented: self.$showAddNewContact, onDismiss: {
                                     if self.newDialogID != 0 {
                                         self.dismissView.toggle()

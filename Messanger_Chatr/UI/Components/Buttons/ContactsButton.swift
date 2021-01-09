@@ -19,17 +19,11 @@ struct ContactsBtn: View {
             self.showContacts.toggle()
         }) {
             ZStack {
-                ZStack {
-                    RoundedRectangle(cornerRadius: Constants.menuBtnSize / 4)
-                        .foregroundColor(Color("buttonColor"))
-
-                    Image(systemName: "rectangle.stack.person.crop")
-                        .resizable()
-                        .scaledToFit()
-                        .padding(Constants.menuBtnSize * 0.25)
-                        .foregroundColor(.primary)
-                }.frame(width: Constants.menuBtnSize, height: Constants.menuBtnSize)
-                .shadow(color: Color("buttonShadow_Deeper"), radius: 10, x: 0, y: 8)
+                Image(systemName: "rectangle.stack.person.crop")
+                    .resizable()
+                    .scaledToFit()
+                    .padding(Constants.menuBtnSize * 0.25)
+                    .foregroundColor(.primary)
 
                 ZStack(alignment: .center) {
                     HStack {
@@ -43,6 +37,5 @@ struct ContactsBtn: View {
                 .opacity(self.alertNum > 0 ? 1 : 0)
             }
         }.buttonStyle(HomeButtonStyle())
-
     }
 }

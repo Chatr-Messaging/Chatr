@@ -25,10 +25,13 @@ struct MainButtonStyle: ButtonStyle {
 }
 
 struct HomeButtonStyle: ButtonStyle {
-    public func makeBody(configuration: ClickButtonStyle.Configuration) -> some View {
+    public func makeBody(configuration: HomeButtonStyle.Configuration) -> some View {
         configuration.label
-            .foregroundColor(configuration.isPressed ? Color("bgColor_light") : Color("buttonColor"))
+            .background(configuration.isPressed ? Color("bgColor_light") : Color("buttonColor"))
+            .cornerRadius(Constants.menuBtnSize / 4)
             .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
+            .shadow(color: Color("buttonShadow_Deeper"), radius: 10, x: 0, y: 8)
+            .frame(width: Constants.menuBtnSize, height: Constants.menuBtnSize)
     }
 }
 

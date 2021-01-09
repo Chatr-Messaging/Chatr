@@ -63,14 +63,10 @@ struct ContactRequestCell: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: 18, height: 18, alignment: .center)
-                            .foregroundColor(Color("alertRed"))
+                            .foregroundColor(Color.white)
                             .padding(.all, 8)
-                            .background(Color("alertRed").opacity(0.1))
+                            .background(Color("alertRed"))
                             .cornerRadius(10)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(Color("alertRed"), lineWidth: 1)
-                            )
                     }
 
                     Button(action: {
@@ -107,15 +103,11 @@ struct ContactRequestCell: View {
                         Text("Accept")
                             .fontWeight(.medium)
                             .font(.subheadline)
-                            .foregroundColor(.blue)
+                            .foregroundColor(.white)
                             .padding(.vertical, 8)
                             .padding(.horizontal, 10)
-                            .background(Color.blue.opacity(0.1))
+                            .background(Color.blue)
                             .cornerRadius(10)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(Color.blue, lineWidth: 1)
-                            )
                     }
                 }
 

@@ -15,7 +15,7 @@ struct ringtoneView: View {
             VStack(alignment: .center) {
                 VStack {
                     HStack(alignment: .center) {
-                        Text("no contact requests...")
+                        Text("no blocked contacts...")
                             .font(.headline)
                             .foregroundColor(.secondary)
                             .fontWeight(.regular)
@@ -28,7 +28,7 @@ struct ringtoneView: View {
             .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
             .padding(.horizontal)
             .padding(.bottom, 25)
-            .padding(.top, 120)
+            .padding(.top, 40)
             
             Spacer()
         }

@@ -22,30 +22,22 @@ struct MenuBtn: View {
             self.showNewChat.toggle()
         }) {
             ZStack {
-                ZStack {
-                    RoundedRectangle(cornerRadius: Constants.menuBtnSize / 4)
-                        .foregroundColor(Color("buttonColor"))
-                    
-                    Image("ComposeIcon")
-                        .resizable()
-                        .scaledToFit()
-                        .padding(.bottom, 2)
-                        .padding(.leading, 2)
-                        .padding(Constants.menuBtnSize * 0.22)
-                        .foregroundColor(.primary)
-                }.frame(width: Constants.menuBtnSize, height: Constants.menuBtnSize)
-                .shadow(color: Color("buttonShadow_Deeper"), radius: 10, x: 0, y: 8)
+                Image("ComposeIcon")
+                    .resizable()
+                    .scaledToFit()
+                    .padding(.bottom, 2)
+                    .padding(.leading, 2)
+                    .padding(Constants.menuBtnSize * 0.22)
+                    .foregroundColor(.primary)
                 
                 ZStack(alignment: .center) {
-                 Circle()
-                    .frame(width: Constants.menuBtnSize * 0.5, height: Constants.menuBtnSize * 0.5)
-                    .foregroundColor(Color("alertRed"))
-                    .shadow(color: Color("alertRed"), radius: 5, x: 0, y: 3)
-                    
-                    Text(String(alertNum))
-                        .foregroundColor(.white)
-                        .fontWeight(.medium)
-                        .font(.system(size: 12))
+                    HStack {
+                        Text(String(self.alertNum))
+                            .foregroundColor(.white)
+                            .fontWeight(.medium)
+                            .font(.footnote)
+                            .padding(.horizontal, 5)
+                    }.background(Capsule().frame(height: 22).frame(minWidth: 22).foregroundColor(Color("alertRed")).shadow(color: Color("alertRed").opacity(0.75), radius: 5, x: 0, y: 5))
                 }.offset(x: Constants.menuBtnSize * 0.45, y: -(Constants.menuBtnSize * 0.5))
                 .opacity(self.alertNum > 0 ? 1 : 0)
             }
