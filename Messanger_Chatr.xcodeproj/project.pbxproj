@@ -28,6 +28,7 @@
 		054CAB7925AA6E1F00DD3F7C /* InstagramTestUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054CAB7825AA6E1F00DD3F7C /* InstagramTestUser.swift */; };
 		054CAB7E25AA6E3700DD3F7C /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054CAB7D25AA6E3700DD3F7C /* WebView.swift */; };
 		054DA6C2250FF9DF00F28F74 /* AboutChatrView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054DA6C1250FF9DF00F28F74 /* AboutChatrView.swift */; };
+		054DBABD25AAE5430053B5C1 /* ImageViewerRemote in Frameworks */ = {isa = PBXBuildFile; productRef = 054DBABC25AAE5430053B5C1 /* ImageViewerRemote */; };
 		05578C2C242989A10016B1E5 /* Messanger_Chatr.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 05578C2A242989A10016B1E5 /* Messanger_Chatr.xcdatamodeld */; };
 		05578C362429CE030016B1E5 /* PersistenceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05578C352429CE030016B1E5 /* PersistenceManager.swift */; };
 		055AEE382512EC9500F35B8F /* EditProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 055AEE372512EC9500F35B8F /* EditProfileView.swift */; };
@@ -273,6 +274,7 @@
 			files = (
 				05C36C17252D62B90031CB3F /* PopupView in Frameworks */,
 				05FF35C92536C03400886576 /* StoreKit.framework in Frameworks */,
+				054DBABD25AAE5430053B5C1 /* ImageViewerRemote in Frameworks */,
 				059B18102522C32000988201 /* RealmSwift in Frameworks */,
 				05903A3F25925C3400D70A13 /* WKView in Frameworks */,
 				05670318256A3C43004123EB /* CarBode in Frameworks */,
@@ -660,6 +662,7 @@
 				05C36C16252D62B90031CB3F /* PopupView */,
 				05670317256A3C43004123EB /* CarBode */,
 				05903A3E25925C3400D70A13 /* WKView */,
+				054DBABC25AAE5430053B5C1 /* ImageViewerRemote */,
 			);
 			productName = Messanger_Chatr;
 			productReference = 05DB89AE238B851400D4581F /* Messanger_Chatr.app */;
@@ -737,6 +740,7 @@
 				059B180E2522C32000988201 /* XCRemoteSwiftPackageReference "realm-cocoa" */,
 				05C36C15252D62B90031CB3F /* XCRemoteSwiftPackageReference "PopupView" */,
 				05670316256A3C43004123EB /* XCRemoteSwiftPackageReference "CarBode-Barcode-Scanner-For-SwiftUI" */,
+				054CAB8B25AADD7500DD3F7C /* XCRemoteSwiftPackageReference "swiftui-image-viewer" */,
 			);
 			productRefGroup = 05DB89AF238B851400D4581F /* Products */;
 			projectDirPath = "";
@@ -1422,6 +1426,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		054CAB8B25AADD7500DD3F7C /* XCRemoteSwiftPackageReference "swiftui-image-viewer" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Jake-Short/swiftui-image-viewer.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.1.0;
+			};
+		};
 		05670316256A3C43004123EB /* XCRemoteSwiftPackageReference "CarBode-Barcode-Scanner-For-SwiftUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/heart/CarBode-Barcode-Scanner-For-SwiftUI";
@@ -1449,6 +1461,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		054DBABC25AAE5430053B5C1 /* ImageViewerRemote */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 054CAB8B25AADD7500DD3F7C /* XCRemoteSwiftPackageReference "swiftui-image-viewer" */;
+			productName = ImageViewerRemote;
+		};
 		05670317256A3C43004123EB /* CarBode */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 05670316256A3C43004123EB /* XCRemoteSwiftPackageReference "CarBode-Barcode-Scanner-For-SwiftUI" */;

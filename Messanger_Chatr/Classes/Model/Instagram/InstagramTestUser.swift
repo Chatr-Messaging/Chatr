@@ -14,6 +14,12 @@ struct InstagramTestUser: Codable {
     var user_id: Int
 }
 
+struct InstagramLongLiveUser: Codable {
+    var access_token: String
+    var token_type: String
+    var expires_in: Int
+}
+
 struct InstagramUser: Codable {
     var id: String
     var username: String

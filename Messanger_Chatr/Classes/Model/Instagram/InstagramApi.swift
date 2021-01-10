@@ -15,9 +15,9 @@ class InstagramApi {
     
     private let instagramAppID = "900820717342988"
     
-    private let redirectURIURLEncoded = "https%3A%2F%2Fhttps://www.google.com/%2F"
+    private let redirectURIURLEncoded = "https%3A%2F%2Fhttps://www.chatr-messaging.com/%2F"
     
-    private let redirectURI = "https://www.google.com/"
+    private let redirectURI = "https://www.chatr-messaging.com/"
     
     private let app_secret = "e328fdafcbfd333cc628a31d83c04dd8"
     
@@ -77,7 +77,7 @@ class InstagramApi {
         return nil
     }
     
-    private func getMediaData(testUserData: InstagramTestUser, completion: @escaping (Feed) -> Void) {
+    func getMediaData(testUserData: InstagramTestUser, completion: @escaping (Feed) -> Void) {
         let urlString = "\(BaseURL.graphApi.rawValue)me/media?fields=id,caption&access_token=\(testUserData.access_token)"
         
         let request = URLRequest(url: URL(string: urlString)!)
@@ -98,10 +98,51 @@ class InstagramApi {
         task.resume()
     }
     
+    func getLongLivedToken(shortLivedToken: String, completion: @escaping (String) -> Void) {
+        let urlString = "https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=\(app_secret)&access_token=\(shortLivedToken)"
+        
+        let request = URLRequest(url: URL(string: urlString)!)
+        
+        let session = URLSession.shared
+        let task = session.dataTask(with: request, completionHandler: { data, response, error in
+            if let response = response {
+                print(response)
+            }
+            do { let jsonData = try JSONDecoder().decode(InstagramLongLiveUser.self, from: data!)
+                print(jsonData)
+                completion(jsonData.access_token)
+            }
+            catch let error as NSError {
+                print(error)
+            }
+        })
+        task.resume()
+    }
+    
+    func refreshLongToken(token: String) {
+        let urlString = "https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=\(token)"
+        
+        let request = URLRequest(url: URL(string: urlString)!)
+        
+        let session = URLSession.shared
+        let task = session.dataTask(with: request, completionHandler: { data, response, error in
+            if let response = response {
+                print(response)
+            }
+            do { let jsonData = try JSONDecoder().decode(InstagramLongLiveUser.self, from: data!)
+                UserDefaults.standard.set(jsonData.access_token, forKey: "instagramAuthKey")
+            }
+            catch let error as NSError {
+                print(error)
+            }
+        })
+        task.resume()
+    }
+    
     //MARK:- Public Methods
 
     func authorizeApp(completion: @escaping (_ url: URL?) -> Void ) {
-        let urlString = "\(BaseURL.displayApi.rawValue)\(Method.authorize.rawValue)?app_id=\(instagramAppID)&redirect_uri=\(redirectURIURLEncoded)&scope=user_profile,user_media&response_type=code"
+        let urlString = "\(BaseURL.displayApi.rawValue)\(Method.authorize.rawValue)?client_id=\(instagramAppID)&redirect_uri=\(redirectURI)&scope=user_profile,user_media&response_type=code"
         
         let request = URLRequest(url: URL(string: urlString)!)
         
@@ -161,7 +202,9 @@ class InstagramApi {
             } else {
                 do { let jsonData = try JSONDecoder().decode(InstagramTestUser.self, from: data!)
                     print(jsonData)
-                    completion(jsonData)
+                    self.getLongLivedToken(shortLivedToken: jsonData.access_token, completion: { token in
+                        completion(InstagramTestUser(access_token: token, user_id: jsonData.user_id))
+                    })
                 }
                 catch let error as NSError {
                     print(error)
@@ -194,27 +237,26 @@ class InstagramApi {
         dataTask.resume()
     }
     
-    func getMedia(testUserData: InstagramTestUser, completion: @escaping (InstagramMedia) -> Void) {
-        
+    func getMedia(testUserData: InstagramTestUser, completion: @escaping ([InstagramMedia]) -> Void) {
+        var igMedia: [InstagramMedia] = []
         getMediaData(testUserData: testUserData) { (mediaFeed) in
-            let urlString = "\(BaseURL.graphApi.rawValue + mediaFeed.data[1].id)?fields=id,media_type,media_url,username,timestamp&access_token=\(testUserData.access_token)"
-            let request = URLRequest(url: URL(string: urlString)!)
-            
-            let session = URLSession.shared
-            let task = session.dataTask(with: request, completionHandler: { data, response, error in
-                if let response = response {
-                    print(response)
-                }
-                do { let jsonData = try JSONDecoder().decode(InstagramMedia.self, from: data!)
-                    print(jsonData)
-                    completion(jsonData)
-                }
-                catch let error as NSError {
-                    print(error)
-                }
-            })
-            task.resume()
+            for igFeed in 0...9 {
+                let urlString = "\(BaseURL.graphApi.rawValue + mediaFeed.data[igFeed].id)?fields=id,media_type,media_url,username,timestamp&access_token=\(testUserData.access_token)"
+                let request = URLRequest(url: URL(string: urlString)!)
+                
+                let session = URLSession.shared
+                let task = session.dataTask(with: request, completionHandler: { data, _, error in
+                    do { let jsonData = try JSONDecoder().decode(InstagramMedia.self, from: data!)
+                        igMedia.append(jsonData)
+                    }
+                    catch let error as NSError {
+                        print(error)
+                    }
+                })
+                task.resume()
+            }
         }
+        completion(igMedia)
     }
     
     func fetchImage(urlString: String, completion: @escaping (Data?) -> Void) {

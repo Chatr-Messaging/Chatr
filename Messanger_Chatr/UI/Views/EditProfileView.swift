@@ -11,6 +11,7 @@ import RealmSwift
 import SDWebImageSwiftUI
 import ConnectyCube
 import FirebaseDatabase
+import ImageViewerRemote
 
 struct EditProfileView: View {
     @EnvironmentObject var auth: AuthModel
@@ -32,16 +33,19 @@ struct EditProfileView: View {
     @State private var inputImage: UIImage? = nil
     
     @State var presentAuth = false
-    
-    @State var testUserData = InstagramTestUser(access_token: "", user_id: 0)
-    
+    @State var testUserData = InstagramTestUser(access_token: UserDefaults.standard.string(forKey: "instagramAuthKey") ?? "", user_id: UserDefaults.standard.integer(forKey: "instagramID"))
     @State var instagramApi = InstagramApi.shared
-    
     @State var signedIn = false
-    
     @State var instagramUser: InstagramUser? = nil
-    
-    @State var instagramImage = UIImage(imageLiteralResourceName: "proPic")
+    @State var igMedia: [InstagramMedia] = []
+    @State var igUrls: [String] = []
+    @State var selectedUrl = ""
+    @State var showImageViewer: Bool = false
+    private var columns: [GridItem] = [
+        GridItem(.flexible(), spacing: 5),
+        GridItem(.flexible(), spacing: 5),
+        GridItem(.flexible(), spacing: 5)
+    ]
 
     var body: some View {
         ZStack {
@@ -379,65 +383,114 @@ struct EditProfileView: View {
                         .padding(.horizontal)
                         .padding(.bottom, 5)
                         
-//                        VStack(spacing: 10) {
-//                            Image(uiImage: instagramImage)
-//                                .resizable()
-//                                .scaledToFill()
-//                                .frame(width: 50, height: 50)
-//                            
-//                            Button(action: {
-//                                if self.testUserData.user_id == 0 {
-//                                    self.presentAuth.toggle()
-//                                } else {
-//                                    self.instagramApi.getInstagramUser(testUserData: self.testUserData) { (user) in
-//                                        self.instagramUser = user
-//                                        self.signedIn.toggle()
-//                                    }
-//                                }
-//                            }) {
-//                                Text(self.testUserData.user_id == 0 ? "Sign Into Instagram" : "Show Instagram User")
-//                                    .renderingMode(.original)
-//                                    .resizable()
-//                                    .scaledToFill()
-//                                    .frame(width: 100, height: 100)
-//                            }
-//                            
-//                            Button(action: {
-//                                if self.instagramUser != nil {
-//                                    self.instagramApi.getMedia(testUserData: self.testUserData) { (media) in
-//                                        if media.media_type != MediaType.VIDEO {
-//                                            let media_url = media.media_url
-//                                            self.instagramApi.fetchImage(urlString: media_url, completion: { (fetchedImage) in
-//                                                if let imageData = fetchedImage {
-//                                                    self.instagramImage = UIImage(data: imageData)!
-//                                                } else {
-//                                                    print("Didn't fetched the data")
-//                                                }
-//
-//                                            })
-//                                            print(media_url)
-//                                        } else {
-//                                            print("Fetched media is a video")
-//                                        }
-//                                    }
-//                                } else {
-//                                    print("Not signed in")
-//                                }
-//                            }){
-//                                Text("Fetch IG Photo")
-//                                    .font(.headline)
-//                                    .padding()
-//                            }
-//                        }.sheet(isPresented: self.$presentAuth) {
-//                            WebView(presentAuth: self.$presentAuth, testUserData: self.$testUserData, instagramApi: self.$instagramApi)
-//                        }
-//                        .actionSheet(isPresented: self.$signedIn) {
-//                            
-//                            let actionSheet = ActionSheet(title: Text("Signed in:"), message: Text("with account: @\(self.instagramUser!.username)"),buttons: [.default(Text("OK"))])
-//                            
-//                            return actionSheet
-//                            
-//                        }
+                        VStack(spacing: 10) {
+                            LazyVGrid(columns: columns, alignment: .center, spacing: 10) {
+                                ForEach(self.igUrls, id: \.self) { media in
+                                    WebImage(url: URL(string: media))
+                                        .resizable()
+                                        .placeholder{ Image("empty-profile").resizable().frame(width: 65, height: 65, alignment: .center).scaledToFill() }
+                                        .indicator(.activity)
+                                        .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
+                                        .scaledToFill()
+                                        .frame(minWidth: 0, maxWidth: Constants.screenWidth / 3, minHeight: Constants.screenWidth / 3 - 20)
+                                        .clipShape(RoundedRectangle(cornerRadius: 5, style: .circular))
+                                        .onTapGesture {
+                                            self.selectedUrl = media
+                                            self.showImageViewer.toggle()
+                                        }
+                                }
+                            }
+                            
+                            Button(action: {
+                                if self.testUserData.user_id == 0 {
+                                    self.presentAuth.toggle()
+                                } else {
+                                    self.instagramApi.getInstagramUser(testUserData: self.testUserData) { (user) in
+                                        self.instagramUser = user
+                                        self.signedIn.toggle()
+                                    }
+                                }
+                            }) {
+                                Text(self.testUserData.user_id == 0 ? "Sign Into Instagram" : "Show Instagram User")
+                                    .font(.headline)
+                                    .padding()
+                            }
+                            
+                            Button(action: {
+                                if self.instagramUser != nil {
+                                    self.instagramApi.getMediaData(testUserData: self.testUserData) { (mediaFeed) in
+                                        self.igMedia.removeAll()
+                                        self.igUrls.removeAll()
+                                        for igFeed in 0...8 {
+                                            guard mediaFeed.data.count > igFeed else { return }
+                                            let urlString = "https://graph.instagram.com/\(mediaFeed.data[igFeed].id)?fields=id,media_type,media_url,username,timestamp&access_token=\(testUserData.access_token)"
+                                            let request = URLRequest(url: URL(string: urlString)!)
+                                            
+                                            let session = URLSession.shared
+                                            let task = session.dataTask(with: request, completionHandler: { data, _, error in
+                                                do { let jsonData = try JSONDecoder().decode(InstagramMedia.self, from: data!)
+                                                    self.igMedia.append(jsonData)
+                                                    self.igUrls.append(jsonData.media_url.description)
+                                                }
+                                                catch let error as NSError {
+                                                    print(error)
+                                                }
+                                            })
+                                            task.resume()
+                                        }
+                                    }
+                                } else {
+                                    print("Not signed in")
+                                    self.presentAuth.toggle()
+                                }
+                            }){
+                                Text("Fetch IG Photo")
+                                    .font(.headline)
+                                    .padding()
+                            }
+                        }.onAppear {
+                            if self.testUserData.user_id != 0 {
+                                self.instagramApi.getInstagramUser(testUserData: self.testUserData) { (user) in
+                                    self.instagramUser = user
+                                    
+                                    self.instagramApi.getMediaData(testUserData: self.testUserData) { (mediaFeed) in
+                                        self.igMedia.removeAll()
+                                        self.igUrls.removeAll()
+                                        for igFeed in 0...8 {
+                                            guard mediaFeed.data.count >= igFeed else { return }
+                                            let urlString = "https://graph.instagram.com/\(mediaFeed.data[igFeed].id)?fields=id,media_type,media_url,username,timestamp&access_token=\(testUserData.access_token)"
+                                            let request = URLRequest(url: URL(string: urlString)!)
+                                            
+                                            let session = URLSession.shared
+                                            let task = session.dataTask(with: request, completionHandler: { data, _, error in
+                                                do { let jsonData = try JSONDecoder().decode(InstagramMedia.self, from: data!)
+                                                    self.igMedia.append(jsonData)
+                                                    self.igUrls.append(jsonData.media_url.description)
+                                                }
+                                                catch let error as NSError {
+                                                    print(error)
+                                                }
+                                            })
+                                            task.resume()
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .sheet(isPresented: self.$presentAuth, onDismiss: {
+                            self.instagramApi.getInstagramUser(testUserData: self.testUserData) { (user) in
+                                if user.id != "" {
+                                    self.instagramUser = user
+                                }
+                            }
+                        }) {
+                            WebView(presentAuth: self.$presentAuth, testUserData: self.$testUserData, instagramApi: self.$instagramApi)
+                        }
+                        .actionSheet(isPresented: self.$signedIn) {
+                            let actionSheet = ActionSheet(title: Text("Signed in:"), message: Text("with account: @\(self.instagramUser!.username)"),buttons: [.default(Text("OK"))])
+
+                            return actionSheet
+                        }
                                             
                         //MARK: Footer Section
                         FooterInformation()
@@ -482,22 +535,19 @@ struct EditProfileView: View {
                             .foregroundColor((220 - self.bioText.count) > 220 && loadingSave ? .secondary : self.didSave ? .secondary : .blue)
                             .fontWeight((220 - self.bioText.count) > 220 && loadingSave ? .none : self.didSave ? .none : .medium)
                     }.disabled((220 - self.bioText.count) > 220 && loadingSave ? true : self.didSave ? true : false)
-                )
-                .background(Color("bgColor"))
+                ).background(Color("bgColor"))
                 .edgesIgnoringSafeArea(.all)
+                .overlay(ImageViewerRemote(imageURL: self.$selectedUrl, viewerShown: self.$showImageViewer))
                 .onAppear {
                     NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { (data) in
                         DispatchQueue.main.async {
                             let height1 = data.userInfo![UIResponder.keyboardFrameEndUserInfoKey] as! NSValue
                             self.keyboardHeight = height1.cgRectValue.height + 10
-                            print("keyboad height is: \(self.keyboardHeight)")
                         }
                     }
                     
                     NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { (_) in
                         self.keyboardHeight = 0
-                        print("keyboad height is: \(self.keyboardHeight)")
-
                     }
                 }
             }

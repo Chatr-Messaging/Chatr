@@ -225,6 +225,7 @@ struct VisitContactView: View {
                     Spacer()
                 }.padding(.vertical, 10)
 
+                /*
                 //MARK: Phone Number Section
                 HStack {
                     Text("INFO:")
@@ -363,7 +364,6 @@ struct VisitContactView: View {
                 .padding(.horizontal)
                 .padding(.bottom, 10)
                 
-                /*
                 //MARK: Action Section
                 HStack {
                     Text("ACTIONS:")

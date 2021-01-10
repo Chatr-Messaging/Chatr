@@ -36,6 +36,24 @@
           "revision": "4e5326b20e6d4aae6af581402372a42971fa732b",
           "version": "6.1.1"
         }
+      },
+      {
+        "package": "SwiftUIImageViewer",
+        "repositoryURL": "https://github.com/Jake-Short/swiftui-image-viewer.git",
+        "state": {
+          "branch": null,
+          "revision": "dacc75d4f1a0fd567ce0f91c789d6131ba5f57f1",
+          "version": "2.1.0"
+        }
+      },
+      {
+        "package": "URLImage",
+        "repositoryURL": "https://github.com/dmytro-anokhin/url-image.git",
+        "state": {
+          "branch": null,
+          "revision": "2f499e1b568b04ec0ad0a92179e3d7b44bd20676",
+          "version": "2.2.0"
+        }
       }
     ]
   },
