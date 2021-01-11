@@ -35,6 +35,7 @@
 		055AEE3A2512F63F00F35B8F /* MultilineTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 055AEE392512F63F00F35B8F /* MultilineTextView.swift */; };
 		055C2A6024CE8C2700F7AE16 /* DialogList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 055C2A5F24CE8C2700F7AE16 /* DialogList.swift */; };
 		055C2A6224D3FDD200F7AE16 /* MembershipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 055C2A6124D3FDD200F7AE16 /* MembershipView.swift */; };
+		055E516625ACDC0B003BE668 /* WKView in Frameworks */ = {isa = PBXBuildFile; productRef = 055E516525ACDC0B003BE668 /* WKView */; };
 		05670318256A3C43004123EB /* CarBode in Frameworks */ = {isa = PBXBuildFile; productRef = 05670317256A3C43004123EB /* CarBode */; };
 		05693490252312F7001BDFF0 /* LocationBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0569348F252312F7001BDFF0 /* LocationBubble.swift */; };
 		056B989524C8F76B003F7FBA /* HomeUserInfoHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056B989424C8F76B003F7FBA /* HomeUserInfoHeader.swift */; };
@@ -201,7 +202,6 @@
 		0583A84E251AFB740005B7E1 /* ContactBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactBubble.swift; sourceTree = "<group>"; };
 		058AC52E2599064F0027FD11 /* DiscoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverView.swift; sourceTree = "<group>"; };
 		058AC5332599158C0027FD11 /* DiscoverCarouselSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverCarouselSection.swift; sourceTree = "<group>"; };
-		0590397A2591C6B300D70A13 /* WKView-main */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "WKView-main"; path = "../../../../../Downloads/WKView-main"; sourceTree = "<group>"; };
 		0593C0A123CB2AFE00460AAA /* VerifyCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifyCodeView.swift; sourceTree = "<group>"; };
 		0596844D25ABED4D0051B707 /* EditProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileViewModel.swift; sourceTree = "<group>"; };
 		0596845525AC16E80051B707 /* VisitContactViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitContactViewModel.swift; sourceTree = "<group>"; };
@@ -278,6 +278,7 @@
 			files = (
 				05C36C17252D62B90031CB3F /* PopupView in Frameworks */,
 				05FF35C92536C03400886576 /* StoreKit.framework in Frameworks */,
+				055E516625ACDC0B003BE668 /* WKView in Frameworks */,
 				054DBABD25AAE5430053B5C1 /* ImageViewerRemote in Frameworks */,
 				059B18102522C32000988201 /* RealmSwift in Frameworks */,
 				05903A3F25925C3400D70A13 /* WKView in Frameworks */,
@@ -521,7 +522,6 @@
 		0583A83623BD44EB00F9220B /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				0590397A2591C6B300D70A13 /* WKView-main */,
 				0583A83123BD34B400F9220B /* AppIcons */,
 			);
 			path = Resources;
@@ -677,6 +677,7 @@
 				05670317256A3C43004123EB /* CarBode */,
 				05903A3E25925C3400D70A13 /* WKView */,
 				054DBABC25AAE5430053B5C1 /* ImageViewerRemote */,
+				055E516525ACDC0B003BE668 /* WKView */,
 			);
 			productName = Messanger_Chatr;
 			productReference = 05DB89AE238B851400D4581F /* Messanger_Chatr.app */;
@@ -755,6 +756,7 @@
 				05C36C15252D62B90031CB3F /* XCRemoteSwiftPackageReference "PopupView" */,
 				05670316256A3C43004123EB /* XCRemoteSwiftPackageReference "CarBode-Barcode-Scanner-For-SwiftUI" */,
 				054CAB8B25AADD7500DD3F7C /* XCRemoteSwiftPackageReference "swiftui-image-viewer" */,
+				055E516425ACDC0B003BE668 /* XCRemoteSwiftPackageReference "WKView" */,
 			);
 			productRefGroup = 05DB89AF238B851400D4581F /* Products */;
 			projectDirPath = "";
@@ -1450,6 +1452,14 @@
 				minimumVersion = 2.1.0;
 			};
 		};
+		055E516425ACDC0B003BE668 /* XCRemoteSwiftPackageReference "WKView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/rebeloper/WKView.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.6;
+			};
+		};
 		05670316256A3C43004123EB /* XCRemoteSwiftPackageReference "CarBode-Barcode-Scanner-For-SwiftUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/heart/CarBode-Barcode-Scanner-For-SwiftUI";
@@ -1481,6 +1491,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 054CAB8B25AADD7500DD3F7C /* XCRemoteSwiftPackageReference "swiftui-image-viewer" */;
 			productName = ImageViewerRemote;
+		};
+		055E516525ACDC0B003BE668 /* WKView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 055E516425ACDC0B003BE668 /* XCRemoteSwiftPackageReference "WKView" */;
+			productName = WKView;
 		};
 		05670317256A3C43004123EB /* CarBode */ = {
 			isa = XCSwiftPackageProductDependency;
