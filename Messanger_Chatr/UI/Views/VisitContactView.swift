@@ -12,11 +12,13 @@ import MessageUI
 import ConnectyCube
 import RealmSwift
 import WKView
+import ImageViewerRemote
 
 struct VisitContactView: View {
     @EnvironmentObject var auth: AuthModel
     @Environment(\.presentationMode) var presentationMode
     var fromDialogCell: Bool = false
+    @ObservedObject var viewModel = VisitContactViewModel()
     @Binding var newMessage: Int
     @Binding var dismissView: Bool
     @State var viewState: visitUserState = .unknown
@@ -29,9 +31,14 @@ struct VisitContactView: View {
     @State private var showingMoreSheet = false
     @State var profileViewSize = CGSize.zero
     @State var quickSnapViewState: QuickSnapViewingState = .closed
-
     @State var mailResult: Result<MFMailComposeResult, Error>? = nil
     @State var isShowingMailView = false
+    
+    var columns: [GridItem] = [
+        GridItem(.flexible(), spacing: 5),
+        GridItem(.flexible(), spacing: 5),
+        GridItem(.flexible(), spacing: 5)
+    ]
 
     var body: some View {
         ZStack {
@@ -363,6 +370,7 @@ struct VisitContactView: View {
                 .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
                 .padding(.horizontal)
                 .padding(.bottom, 10)
+                 */
                 
                 //MARK: Action Section
                 HStack {
@@ -487,9 +495,9 @@ struct VisitContactView: View {
                 .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
                 .padding(.horizontal)
                 .padding(.bottom, 10)
-                
+                                 
                 //MARK: Social Section
-                if self.contact.facebook != "" || self.contact.twitter != "" {
+                if self.contact.facebook != "" || self.contact.twitter != "" || self.contact.instagramAccessToken != "" {
                     HStack {
                         Text("SOCIAL:")
                             .font(.caption)
@@ -503,6 +511,54 @@ struct VisitContactView: View {
                     
                     VStack(alignment: .center) {
                         VStack {
+                            if self.contact.instagramAccessToken != "" {
+                                HStack {
+                                    Image("instagramIcon")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .foregroundColor(Color.secondary)
+                                        .frame(width: 20, height: 20, alignment: .center)
+                                        .padding(.trailing, 5)
+                                    
+                                    Text("@\(self.viewModel.username)")
+                                        .font(.none)
+                                        .fontWeight(.none)
+                                        .foregroundColor(.secondary)
+                                        .multilineTextAlignment(.leading)
+                                    
+                                    Spacer()
+                                    Button(action: {
+                                        let instagramHooks = "instagram://user?username=\(self.viewModel.username)"
+                                        let instagramUrl = NSURL(string: instagramHooks)
+                                        if UIApplication.shared.canOpenURL(instagramUrl! as URL) {
+                                            UIApplication.shared.open(instagramUrl! as URL)
+                                        } else {
+                                            UIApplication.shared.open(NSURL(string: "http://instagram.com/\(self.viewModel.username)")! as URL)
+                                        }
+                                    }) {
+                                        Text("view profile >")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }
+                                }.padding(.horizontal)
+                                .contentShape(Rectangle())
+                                LazyVGrid(columns: self.columns, alignment: .center, spacing: 5) {
+                                    ForEach(self.viewModel.igStrings, id: \.self) { media in
+                                        WebImage(url: URL(string: media))
+                                            .resizable()
+                                            .placeholder{ Image("empty-profile").resizable().scaledToFill() }
+                                            .indicator(.activity)
+                                            .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
+                                            .scaledToFill()
+                                            .frame(minWidth: 0, maxWidth: Constants.screenWidth / 3 - 20, maxHeight: Constants.screenWidth / 3 - 20)
+                                            .clipShape(RoundedRectangle(cornerRadius: 5, style: .circular))
+                                            //.onTapGesture {
+                                                //self.selectedUrl = media
+                                                //self.showImageViewer.toggle()
+                                            //}
+                                    }
+                                }.padding(.horizontal)
+                            }
                             HStack(alignment: .center, spacing: 40) {
                                 Spacer()
                                 
@@ -562,7 +618,6 @@ struct VisitContactView: View {
                     .padding(.horizontal)
                     .padding(.bottom, 10)
                 }
-                */
                 
                 //MARK: More Section
                 HStack {
@@ -777,6 +832,9 @@ struct VisitContactView: View {
                     if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: self.connectyContact.id != 0 ? Int(self.connectyContact.id) : self.contact.id) {
                         if foundContact.isMyContact {
                             self.contact = foundContact
+                            if foundContact.instagramAccessToken != "" && foundContact.instagramId != 0 {
+                                self.viewModel.loadInstagramImages(testUser: InstagramTestUser(access_token: foundContact.instagramAccessToken, user_id: foundContact.instagramId))
+                            }
                             if self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") {
                                 self.contactRelationship = .unknown
                             } else if self.contact.id != 0 {
@@ -810,7 +868,9 @@ struct VisitContactView: View {
             } else if self.viewState == .fromContacts {
                 self.contactRelationship = .contact
                 changeContactsRealmData().observeFirebaseContact(contactID: self.contact.id)
-                
+                if self.contact.instagramAccessToken != "" && self.contact.instagramId != 0 {
+                    self.viewModel.loadInstagramImages(testUser: InstagramTestUser(access_token: self.contact.instagramAccessToken, user_id: self.contact.instagramId))
+                }
             } else if self.viewState == .fromRequests {
                 print("shuld have everything already...")
             } else if self.viewState == .fromDynamicLink {
@@ -824,6 +884,9 @@ struct VisitContactView: View {
                         if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: self.auth.dynamicLinkContactID) {
                             if foundContact.isMyContact {
                                 self.contact = foundContact
+                                if foundContact.instagramAccessToken != "" && foundContact.instagramId != 0 {
+                                    self.viewModel.loadInstagramImages(testUser: InstagramTestUser(access_token: foundContact.instagramAccessToken, user_id: foundContact.instagramId))
+                                }
                                 
                                 if self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") {
                                     self.contactRelationship = .unknown
@@ -871,6 +934,8 @@ struct VisitContactView: View {
                                             newContact.bio = firebaseContact.bio
                                             newContact.facebook = firebaseContact.facebook
                                             newContact.twitter = firebaseContact.twitter
+                                            newContact.instagramAccessToken = firebaseContact.instagramAccessToken
+                                            newContact.instagramId = firebaseContact.instagramId
                                             newContact.isPremium = firebaseContact.isPremium
                                             newContact.emailAddress = self.connectyContact.email ?? "empty email address"
                                             newContact.website = self.connectyContact.website ?? "empty website"
@@ -878,6 +943,9 @@ struct VisitContactView: View {
                                             newContact.isMessagingPrivate = firebaseContact.isMessagingPrivate
 
                                             self.contact = newContact
+                                            if newContact.instagramAccessToken != "" && newContact.instagramId != 0 {
+                                                self.viewModel.loadInstagramImages(testUser: InstagramTestUser(access_token: newContact.instagramAccessToken, user_id: newContact.instagramId))
+                                            }
                                             
                                             print("the contact is now: \(self.contact)")
                                             self.auth.dynamicLinkContactID = 0
@@ -926,6 +994,8 @@ struct VisitContactView: View {
             newContact.bio = firebaseContact.bio
             newContact.facebook = firebaseContact.facebook
             newContact.twitter = firebaseContact.twitter
+            newContact.instagramAccessToken = firebaseContact.instagramAccessToken
+            newContact.instagramId = firebaseContact.instagramId
             newContact.isPremium = firebaseContact.isPremium
             newContact.emailAddress = self.connectyContact.email ?? "empty email address"
             newContact.website = self.connectyContact.website ?? "empty website"
@@ -937,6 +1007,9 @@ struct VisitContactView: View {
             }
             
             self.contact = newContact
+            if newContact.instagramAccessToken != "" && newContact.instagramId != 0 {
+                self.viewModel.loadInstagramImages(testUser: InstagramTestUser(access_token: newContact.instagramAccessToken, user_id: newContact.instagramId))
+            }
             
             print("done loading contact: \(self.contact.id) name: \(self.contact.fullName) relationship: \(self.contactRelationship) vieState: \(self.viewState)")
         })

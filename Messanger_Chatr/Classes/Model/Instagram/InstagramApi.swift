@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import FirebaseDatabase
+import ConnectyCube
 
 class InstagramApi {
     
@@ -22,6 +24,9 @@ class InstagramApi {
     private let app_secret = "e328fdafcbfd333cc628a31d83c04dd8"
     
     private let boundary = "boundary=\(NSUUID().uuidString)"
+    
+    @Published var igStrings: [String] = []
+    @Published var username: String = ""
     
     //MARK:- Enums
     private enum BaseURL: String {
@@ -131,6 +136,7 @@ class InstagramApi {
             }
             do { let jsonData = try JSONDecoder().decode(InstagramLongLiveUser.self, from: data!)
                 UserDefaults.standard.set(jsonData.access_token, forKey: "instagramAuthKey")
+                Database.database().reference().child("Users").child("\(Session.current.currentUserID)").updateChildValues(["instagramAccessToken" : jsonData.access_token])
             }
             catch let error as NSError {
                 print(error)
@@ -149,7 +155,7 @@ class InstagramApi {
         let session = URLSession.shared
         let task = session.dataTask(with: request, completionHandler: { data, response, error in
             if let response = response {
-                print(response)
+                print("the auth app responce is: \(response)")
                 completion(response.url)
             }
         })
@@ -270,6 +276,37 @@ class InstagramApi {
             completion(data)
         })
         task.resume()
+    }
+    
+    func pullInstagramImages(testUser: InstagramTestUser) {
+        self.getInstagramUser(testUserData: testUser) { (user) in
+            DispatchQueue.main.async {
+                self.username = user.username
+            }
+            self.getMediaData(testUserData: testUser) { (mediaFeed) in
+                DispatchQueue.main.async {
+                    self.igStrings.removeAll()
+                }
+                for igFeed in 0...8 {
+                    guard mediaFeed.data.count > igFeed else { return }
+                    let urlString = "https://graph.instagram.com/\(mediaFeed.data[igFeed].id)?fields=id,media_type,media_url,username,timestamp&access_token=\(testUser.access_token)"
+                    let request = URLRequest(url: URL(string: urlString)!)
+                    
+                    let session = URLSession.shared
+                    let task = session.dataTask(with: request, completionHandler: { data, _, error in
+                        do { let jsonData = try JSONDecoder().decode(InstagramMedia.self, from: data!)
+                            DispatchQueue.main.async {
+                                self.igStrings.append(jsonData.media_url.description)
+                            }
+                        }
+                        catch let error as NSError {
+                            print(error)
+                        }
+                    })
+                    task.resume()
+                }
+            }
+        }
     }
    
 }

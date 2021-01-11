@@ -121,18 +121,12 @@ class AuthModel: NSObject, ObservableObject {
     
     // MARK: - Auth
     func configureFirebaseStateDidChange() {
-        if Auth.auth().currentUser != nil {
+        if Auth.auth().currentUser != nil && self.profile.results.count > 0 {
             self.isUserAuthenticated = .signedIn
         } else {
             self.preventDismissal = true
             self.isUserAuthenticated = .signedOut
         }
-//        if self.profile.results.count > 0 {
-//            self.isUserAuthenticated = .signedIn
-//        } else {
-//            self.preventDismissal = true
-//            self.isUserAuthenticated = .signedOut
-//        }
     }
 
     func sendVerificationNumber(numberText: String) {

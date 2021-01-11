@@ -16,6 +16,7 @@ import ImageViewerRemote
 struct EditProfileView: View {
     @EnvironmentObject var auth: AuthModel
     @ObservedObject var profile = ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self))
+    @ObservedObject var viewModel = EditProfileViewModel()
     @State var fullNameText: String = ""
     @State var bioText: String = "Bio"
     @State var bioHeight: CGFloat = 0
@@ -31,22 +32,10 @@ struct EditProfileView: View {
     @State var showImagePicker: Bool = false
     @State private var image: Image? = nil
     @State private var inputImage: UIImage? = nil
-    
+    @State var username: String = ""
     @State var presentAuth = false
-    @State var testUserData = InstagramTestUser(access_token: UserDefaults.standard.string(forKey: "instagramAuthKey") ?? "", user_id: UserDefaults.standard.integer(forKey: "instagramID"))
     @State var instagramApi = InstagramApi.shared
-    @State var signedIn = false
-    @State var instagramUser: InstagramUser? = nil
-    @State var igMedia: [InstagramMedia] = []
-    @State var igUrls: [String] = []
-    @State var selectedUrl = ""
-    @State var showImageViewer: Bool = false
-    private var columns: [GridItem] = [
-        GridItem(.flexible(), spacing: 5),
-        GridItem(.flexible(), spacing: 5),
-        GridItem(.flexible(), spacing: 5)
-    ]
-
+    
     var body: some View {
         ZStack {
             GeometryReader { geometry in
@@ -122,89 +111,83 @@ struct EditProfileView: View {
                             Spacer()
                         }.padding(.top, 10)
                         
-                        VStack(alignment: .center) {
+                        self.viewModel.styleBuilder(content: {
+                            //FullName Section
                             VStack {
-                                //FullName Section
-                                VStack {
-                                    HStack {
-                                        Image(systemName: "person.fill")
+                                HStack {
+                                    Image(systemName: "person.fill")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .foregroundColor(Color.secondary)
+                                        .frame(width: 20, height: 20, alignment: .center)
+                                        .padding(.trailing, 5)
+                                    
+                                    TextField("Full Name", text: $fullNameText)
+                                        .font(.system(size: 24, weight: .bold, design: .default))
+                                        .foregroundColor(.primary)
+                                        .onChange(of: self.fullNameText) { _ in
+                                            self.didSave = false
+                                        }
+
+                                    Spacer()
+                                }.padding(.horizontal)
+                                .contentShape(Rectangle())
+
+                                Divider()
+                                    .frame(width: Constants.screenWidth - 70)
+                                    .offset(x: 30)
+                            }.padding(.bottom, 5)
+                            .onAppear() {
+                                self.fullNameText = self.profile.results.first?.fullName ?? ""
+                            }
+                            
+                            //Bio Section
+                            VStack() {
+                                ZStack(alignment: .topTrailing) {
+                                    HStack(alignment: .top) {
+                                        Image(systemName: "note.text")
                                             .resizable()
                                             .scaledToFit()
                                             .foregroundColor(Color.secondary)
                                             .frame(width: 20, height: 20, alignment: .center)
                                             .padding(.trailing, 5)
                                         
-                                        TextField("Full Name", text: $fullNameText)
-                                            .font(.system(size: 24, weight: .bold, design: .default))
-                                            .foregroundColor(.primary)
-                                            .onChange(of: self.fullNameText) { _ in
-                                                self.didSave = false
-                                            }
-
+                                        ZStack(alignment: .topLeading) {
+                                            ResizableTextField(height: self.$bioHeight, text: self.$bioText, emptyPlaceholder: true)
+                                                .padding(.horizontal, 2.5)
+                                                .padding(.trailing, 5)
+                                                .font(.none)
+                                                .foregroundColor(self.bioText != "Bio" ? .primary : .secondary)
+                                                .multilineTextAlignment(.leading)
+                                                .lineLimit(5)
+                                                .offset(x: -5, y: -10)
+                                                .onChange(of: self.bioText) { _ in
+                                                    self.didSave = false
+                                                }
+                                            
+                                            Text("Bio")
+                                                .font(.none)
+                                                .fontWeight(.none)
+                                                .foregroundColor(.secondary)
+                                                .opacity(self.bioText != "" ? 0 : 1)
+                                                .padding(.leading, 5)
+                                        }
+                                        
                                         Spacer()
                                     }.padding(.horizontal)
-                                    .contentShape(Rectangle())
-
-                                    Divider()
-                                        .frame(width: Constants.screenWidth - 70)
-                                        .offset(x: 30)
-                                }.padding(.bottom, 5)
-                                .onAppear() {
-                                    self.fullNameText = self.profile.results.first?.fullName ?? ""
+                                    .frame(height: 100)
+                                    
+                                    Text("\(220 - self.bioText.count)")
+                                        .font(.subheadline)
+                                        .fontWeight(self.bioText.count > 220 ? .bold : .none)
+                                        .foregroundColor(self.bioText.count > 220 ? .red : .secondary)
+                                        .padding(.trailing, 15)
                                 }
-                                
-                                //Bio Section
-                                VStack() {
-                                    ZStack(alignment: .topTrailing) {
-                                        HStack(alignment: .top) {
-                                            Image(systemName: "note.text")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .foregroundColor(Color.secondary)
-                                                .frame(width: 20, height: 20, alignment: .center)
-                                                .padding(.trailing, 5)
-                                            
-                                            ZStack(alignment: .topLeading) {
-                                                ResizableTextField(height: self.$bioHeight, text: self.$bioText, emptyPlaceholder: true)
-                                                    .padding(.horizontal, 2.5)
-                                                    .padding(.trailing, 5)
-                                                    .font(.none)
-                                                    .foregroundColor(self.bioText != "Bio" ? .primary : .secondary)
-                                                    .multilineTextAlignment(.leading)
-                                                    .lineLimit(5)
-                                                    .offset(x: -5, y: -10)
-                                                    .onChange(of: self.bioText) { _ in
-                                                        self.didSave = false
-                                                    }
-                                                
-                                                Text("Bio")
-                                                    .font(.none)
-                                                    .fontWeight(.none)
-                                                    .foregroundColor(.secondary)
-                                                    .opacity(self.bioText != "" ? 0 : 1)
-                                                    .padding(.leading, 5)
-                                            }
-                                            
-                                            Spacer()
-                                        }.padding(.horizontal)
-                                        .frame(height: 100)
-                                        
-                                        Text("\(220 - self.bioText.count)")
-                                            .font(.subheadline)
-                                            .fontWeight(self.bioText.count > 220 ? .bold : .none)
-                                            .foregroundColor(self.bioText.count > 220 ? .red : .secondary)
-                                            .padding(.trailing, 15)
-                                    }
-                                }.onAppear() {
-                                    self.bioText = self.profile.results.first?.bio ?? "Bio"
-                                    print("bio height is: \(self.bioHeight) && \(self.bioText)")
-                                }
-                            }.padding(.vertical, 15)
-                        }.background(Color("buttonColor"))
-                        .clipShape(RoundedRectangle(cornerRadius: 15, style: .circular))
-                        .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
-                        .padding(.horizontal)
-                        .padding(.bottom, 5)
+                            }.onAppear() {
+                                self.bioText = self.profile.results.first?.bio ?? "Bio"
+                                print("bio height is: \(self.bioHeight) && \(self.bioText)")
+                            }
+                        })
                         
                         //MARK: Details Section
                         HStack {
@@ -218,96 +201,89 @@ struct EditProfileView: View {
                             Spacer()
                         }.padding(.top, 10)
                         
-                        VStack(alignment: .center) {
+                        self.viewModel.styleBuilder(content: {
+                            //Phone Number Section
                             VStack {
-                                //Phone Number Section
-                                VStack {
-                                    HStack {
-                                        Image(systemName: "phone.fill")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .foregroundColor(Color.secondary)
-                                            .frame(width: 20, height: 20, alignment: .center)
-                                            .padding(.trailing, 5)
+                                HStack {
+                                    Image(systemName: "phone.fill")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .foregroundColor(Color.secondary)
+                                        .frame(width: 20, height: 20, alignment: .center)
+                                        .padding(.trailing, 5)
+                                    
+                                    Text("\(self.phoneText.format(phoneNumber: String(self.phoneText.dropFirst().dropFirst())))")
+                                        .font(.none)
+                                        .foregroundColor(.secondary)
                                         
-                                        Text("\(self.phoneText.format(phoneNumber: String(self.phoneText.dropFirst().dropFirst())))")
-                                            .font(.none)
-                                            .foregroundColor(.secondary)
-                                            
-                                        Spacer()
-                                    }.padding(.horizontal)
-                                    .contentShape(Rectangle())
+                                    Spacer()
+                                }.padding(.horizontal)
+                                .contentShape(Rectangle())
 
-                                    Divider()
-                                        .frame(width: Constants.screenWidth - 70)
-                                        .offset(x: 30)
-                                }.padding(.bottom, 5)
-                                .onAppear {
-                                    self.phoneText = UserDefaults.standard.string(forKey: "phoneNumber") ?? ""
-                                }
-                                
-                                //Email Address Section
-                                VStack {
-                                    HStack {
-                                        Image(systemName: "envelope.fill")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .foregroundColor(Color.secondary)
-                                            .frame(width: 20, height: 20, alignment: .center)
-                                            .padding(.trailing, 5)
-                                        
-                                        TextField("Email Address", text: $emailText)
-                                            .font(.none)
-                                            .foregroundColor(self.errorEmail ? .red : .primary)
-                                            .textCase(.lowercase)
-                                            .keyboardType(.emailAddress)
-                                            .onChange(of: self.emailText) { _ in
-                                                self.didSave = false
-                                            }
-                                        
-                                        Spacer()
-                                    }.padding(.horizontal)
-                                    .contentShape(Rectangle())
+                                Divider()
+                                    .frame(width: Constants.screenWidth - 70)
+                                    .offset(x: 30)
+                            }.padding(.bottom, 5)
+                            .onAppear {
+                                self.phoneText = UserDefaults.standard.string(forKey: "phoneNumber") ?? ""
+                            }
+                            
+                            //Email Address Section
+                            VStack {
+                                HStack {
+                                    Image(systemName: "envelope.fill")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .foregroundColor(Color.secondary)
+                                        .frame(width: 20, height: 20, alignment: .center)
+                                        .padding(.trailing, 5)
+                                    
+                                    TextField("Email Address", text: $emailText)
+                                        .font(.none)
+                                        .foregroundColor(self.errorEmail ? .red : .primary)
+                                        .textCase(.lowercase)
+                                        .keyboardType(.emailAddress)
+                                        .onChange(of: self.emailText) { _ in
+                                            self.didSave = false
+                                        }
+                                    
+                                    Spacer()
+                                }.padding(.horizontal)
+                                .contentShape(Rectangle())
 
-                                    Divider()
-                                        .frame(width: Constants.screenWidth - 70)
-                                        .offset(x: 30)
-                                }.padding(.bottom, 5)
-                                .onAppear() {
-                                    self.emailText = self.profile.results.first?.emailAddress ?? ""
-                                }
-                                
-                                //Website Section
-                                VStack {
-                                    HStack {
-                                        Image(systemName: "safari")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .foregroundColor(Color.secondary)
-                                            .frame(width: 20, height: 20, alignment: .center)
-                                            .padding(.trailing, 5)
-                                        
-                                        TextField("Website", text: $websiteText)
-                                            .font(.none)
-                                            .foregroundColor(.primary)
-                                            .textCase(.lowercase)
-                                            .onChange(of: self.websiteText) { _ in
-                                                self.didSave = false
-                                            }
-                                        
-                                        Spacer()
-                                    }.padding(.horizontal)
-                                    .contentShape(Rectangle())
-                                }.onAppear() {
-                                    self.websiteText = self.profile.results.first?.website ?? ""
-                                }
-                                
-                            }.padding(.vertical, 15)
-                        }.background(Color("buttonColor"))
-                        .clipShape(RoundedRectangle(cornerRadius: 15, style: .circular))
-                        .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
-                        .padding(.horizontal)
-                        .padding(.bottom, 5)
+                                Divider()
+                                    .frame(width: Constants.screenWidth - 70)
+                                    .offset(x: 30)
+                            }.padding(.bottom, 5)
+                            .onAppear() {
+                                self.emailText = self.profile.results.first?.emailAddress ?? ""
+                            }
+                            
+                            //Website Section
+                            VStack {
+                                HStack {
+                                    Image(systemName: "safari")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .foregroundColor(Color.secondary)
+                                        .frame(width: 20, height: 20, alignment: .center)
+                                        .padding(.trailing, 5)
+                                    
+                                    TextField("Website", text: $websiteText)
+                                        .font(.none)
+                                        .foregroundColor(.primary)
+                                        .textCase(.lowercase)
+                                        .onChange(of: self.websiteText) { _ in
+                                            self.didSave = false
+                                        }
+                                    
+                                    Spacer()
+                                }.padding(.horizontal)
+                                .contentShape(Rectangle())
+                            }.onAppear() {
+                                self.websiteText = self.profile.results.first?.website ?? ""
+                            }
+                        })
                         
                         //MARK: Details Section
                         HStack {
@@ -321,184 +297,169 @@ struct EditProfileView: View {
                             Spacer()
                         }.padding(.top, 10)
                         
-                        VStack(alignment: .center) {
+                        self.viewModel.styleBuilder(content: {
+                            //Instagram Section
                             VStack {
-                                //Twitter Section
-                                VStack {
-                                    HStack {
-                                        Image("twitterIcon")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .foregroundColor(Color.secondary)
-                                            .frame(width: 20, height: 20, alignment: .center)
-                                            .padding(.trailing, 5)
-                                        
-                                        TextField("Twitter", text: $twitterText)
-                                            .font(.none)
-                                            .foregroundColor(.primary)
-                                            .textCase(.lowercase)
-                                            .onChange(of: self.twitterText) { _ in
-                                                self.didSave = false
-                                            }
-                                        
-                                        Spacer()
-                                    }.padding(.horizontal)
-                                    .contentShape(Rectangle())
-
-                                    Divider()
-                                        .frame(width: Constants.screenWidth - 70)
-                                        .offset(x: 30)
-                                }.onAppear() {
-                                    self.twitterText = self.profile.results.first?.twitter ?? ""
-                                }
-                                
-                                //Phone Number Section
-                                VStack {
-                                    HStack {
-                                        Image("facebookIcon")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .foregroundColor(Color.secondary)
-                                            .frame(width: 20, height: 20, alignment: .center)
-                                            .padding(.trailing, 5)
-                                        
-                                        TextField("Facebook", text: $facebookText)
-                                            .font(.none)
-                                            .foregroundColor(.primary)
-                                            .textCase(.lowercase)
-                                            .onChange(of: self.facebookText) { _ in
-                                                self.didSave = false
-                                            }
-                                            
-                                        Spacer()
-                                    }.padding(.horizontal)
-                                    .contentShape(Rectangle())
-                                }.onAppear() {
-                                    self.facebookText = self.profile.results.first?.facebook ?? ""
-                                }
-                            }.padding(.vertical, 15)
-                        }.background(Color("buttonColor"))
-                        .clipShape(RoundedRectangle(cornerRadius: 15, style: .circular))
-                        .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
-                        .padding(.horizontal)
-                        .padding(.bottom, 5)
-                        
-                        VStack(spacing: 10) {
-                            LazyVGrid(columns: columns, alignment: .center, spacing: 10) {
-                                ForEach(self.igUrls, id: \.self) { media in
-                                    WebImage(url: URL(string: media))
+                                HStack {
+                                    Image("instagramIcon")
                                         .resizable()
-                                        .placeholder{ Image("empty-profile").resizable().frame(width: 65, height: 65, alignment: .center).scaledToFill() }
-                                        .indicator(.activity)
-                                        .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
-                                        .scaledToFill()
-                                        .frame(minWidth: 0, maxWidth: Constants.screenWidth / 3, minHeight: Constants.screenWidth / 3 - 20)
-                                        .clipShape(RoundedRectangle(cornerRadius: 5, style: .circular))
-                                        .onTapGesture {
-                                            self.selectedUrl = media
-                                            self.showImageViewer.toggle()
-                                        }
-                                }
-                            }
-                            
-                            Button(action: {
-                                if self.testUserData.user_id == 0 {
-                                    self.presentAuth.toggle()
-                                } else {
-                                    self.instagramApi.getInstagramUser(testUserData: self.testUserData) { (user) in
-                                        self.instagramUser = user
-                                        self.signedIn.toggle()
-                                    }
-                                }
-                            }) {
-                                Text(self.testUserData.user_id == 0 ? "Sign Into Instagram" : "Show Instagram User")
-                                    .font(.headline)
-                                    .padding()
-                            }
-                            
-                            Button(action: {
-                                if self.instagramUser != nil {
-                                    self.instagramApi.getMediaData(testUserData: self.testUserData) { (mediaFeed) in
-                                        self.igMedia.removeAll()
-                                        self.igUrls.removeAll()
-                                        for igFeed in 0...8 {
-                                            guard mediaFeed.data.count > igFeed else { return }
-                                            let urlString = "https://graph.instagram.com/\(mediaFeed.data[igFeed].id)?fields=id,media_type,media_url,username,timestamp&access_token=\(testUserData.access_token)"
-                                            let request = URLRequest(url: URL(string: urlString)!)
-                                            
-                                            let session = URLSession.shared
-                                            let task = session.dataTask(with: request, completionHandler: { data, _, error in
-                                                do { let jsonData = try JSONDecoder().decode(InstagramMedia.self, from: data!)
-                                                    self.igMedia.append(jsonData)
-                                                    self.igUrls.append(jsonData.media_url.description)
-                                                }
-                                                catch let error as NSError {
-                                                    print(error)
-                                                }
-                                            })
-                                            task.resume()
-                                        }
-                                    }
-                                } else {
-                                    print("Not signed in")
-                                    self.presentAuth.toggle()
-                                }
-                            }){
-                                Text("Fetch IG Photo")
-                                    .font(.headline)
-                                    .padding()
-                            }
-                        }.onAppear {
-                            if self.testUserData.user_id != 0 {
-                                self.instagramApi.getInstagramUser(testUserData: self.testUserData) { (user) in
-                                    self.instagramUser = user
+                                        .scaledToFit()
+                                        .foregroundColor(Color.secondary)
+                                        .frame(width: 20, height: 20, alignment: .center)
+                                        .padding(.trailing, 5)
                                     
-                                    self.instagramApi.getMediaData(testUserData: self.testUserData) { (mediaFeed) in
-                                        self.igMedia.removeAll()
-                                        self.igUrls.removeAll()
-                                        for igFeed in 0...8 {
-                                            guard mediaFeed.data.count >= igFeed else { return }
-                                            let urlString = "https://graph.instagram.com/\(mediaFeed.data[igFeed].id)?fields=id,media_type,media_url,username,timestamp&access_token=\(testUserData.access_token)"
-                                            let request = URLRequest(url: URL(string: urlString)!)
-                                            
-                                            let session = URLSession.shared
-                                            let task = session.dataTask(with: request, completionHandler: { data, _, error in
-                                                do { let jsonData = try JSONDecoder().decode(InstagramMedia.self, from: data!)
-                                                    self.igMedia.append(jsonData)
-                                                    self.igUrls.append(jsonData.media_url.description)
-                                                }
-                                                catch let error as NSError {
-                                                    print(error)
-                                                }
-                                            })
-                                            task.resume()
+                                    Button(action: {
+                                        if self.viewModel.testUserData.user_id == 0 {
+                                            self.presentAuth.toggle()
                                         }
+                                    }) {
+                                        Text(self.viewModel.testUserData.user_id == 0 ? "Link Instagram Account" : " @\(self.username)")
+                                            .font(.none)
+                                            .foregroundColor(.primary)
                                     }
-                                }
-                            }
-                        }
-                        .sheet(isPresented: self.$presentAuth, onDismiss: {
-                            self.instagramApi.getInstagramUser(testUserData: self.testUserData) { (user) in
-                                if user.id != "" {
-                                    self.instagramUser = user
-                                }
-                            }
-                        }) {
-                            WebView(presentAuth: self.$presentAuth, testUserData: self.$testUserData, instagramApi: self.$instagramApi)
-                        }
-                        .actionSheet(isPresented: self.$signedIn) {
-                            let actionSheet = ActionSheet(title: Text("Signed in:"), message: Text("with account: @\(self.instagramUser!.username)"),buttons: [.default(Text("OK"))])
+                                    
+                                    Spacer()
+                                }.padding(.horizontal)
+                                .contentShape(Rectangle())
 
-                            return actionSheet
-                        }
+                                Divider()
+                                    .frame(width: Constants.screenWidth - 70)
+                                    .offset(x: 30)
+                            }.onAppear() {
+                                //self.viewModel.testUserData.access_token = self.profile.results.first?.instagramAccessToken ?? UserDefaults.standard.string(forKey: "instagramAuthKey") ?? ""
+                               // self.viewModel.testUserData.user_id = self.profile.results.first?.instagramId ?? UserDefaults.standard.integer(forKey: "instagramID")
+                                self.viewModel.pullInstagramUser(completion: { username in
+                                    self.username = username
+                                })
+                            }
+                            
+                            //Twitter Section
+                            VStack {
+                                HStack {
+                                    Image("twitterIcon")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .foregroundColor(Color.secondary)
+                                        .frame(width: 20, height: 20, alignment: .center)
+                                        .padding(.trailing, 5)
+                                    
+                                    TextField("Twitter", text: $twitterText)
+                                        .font(.none)
+                                        .foregroundColor(.primary)
+                                        .textCase(.lowercase)
+                                        .onChange(of: self.twitterText) { _ in
+                                            self.didSave = false
+                                        }
+                                    
+                                    Spacer()
+                                }.padding(.horizontal)
+                                .contentShape(Rectangle())
+
+                                Divider()
+                                    .frame(width: Constants.screenWidth - 70)
+                                    .offset(x: 30)
+                            }.onAppear() {
+                                self.twitterText = self.profile.results.first?.twitter ?? ""
+                            }
+                            
+                            //Phone Number Section
+                            VStack {
+                                HStack {
+                                    Image("facebookIcon")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .foregroundColor(Color.secondary)
+                                        .frame(width: 20, height: 20, alignment: .center)
+                                        .padding(.trailing, 5)
+                                    
+                                    TextField("Facebook", text: $facebookText)
+                                        .font(.none)
+                                        .foregroundColor(.primary)
+                                        .textCase(.lowercase)
+                                        .onChange(of: self.facebookText) { _ in
+                                            self.didSave = false
+                                        }
+                                        
+                                    Spacer()
+                                }.padding(.horizontal)
+                                .contentShape(Rectangle())
+                            }.onAppear() {
+                                self.facebookText = self.profile.results.first?.facebook ?? ""
+                            }
+                        })
+                        
+                        //MARK: InstagramAPI Section
+                        //VStack(spacing: 10) {
+//                            LazyVGrid(columns: columns, alignment: .center, spacing: 10) {
+//                                ForEach(self.igUrls, id: \.self) { media in
+//                                    WebImage(url: URL(string: media))
+//                                        .resizable()
+//                                        .placeholder{ Image("empty-profile").resizable().frame(width: 65, height: 65, alignment: .center).scaledToFill() }
+//                                        .indicator(.activity)
+//                                        .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
+//                                        .scaledToFill()
+//                                        .frame(minWidth: 0, maxWidth: Constants.screenWidth / 3, minHeight: Constants.screenWidth / 3 - 20)
+//                                        .clipShape(RoundedRectangle(cornerRadius: 5, style: .circular))
+//                                        .onTapGesture {
+//                                            self.selectedUrl = media
+//                                            self.showImageViewer.toggle()
+//                                        }
+//                                }
+//                            }
+                            
+
+                            
+//                            Button(action: {
+//                                if self.instagramUser != nil {
+//                                    self.instagramApi.getMediaData(testUserData: self.testUserData) { (mediaFeed) in
+//                                        self.igMedia.removeAll()
+//                                        self.igUrls.removeAll()
+//                                        for igFeed in 0...8 {
+//                                            guard mediaFeed.data.count > igFeed else { return }
+//                                            let urlString = "https://graph.instagram.com/\(mediaFeed.data[igFeed].id)?fields=id,media_type,media_url,username,timestamp&access_token=\(testUserData.access_token)"
+//                                            let request = URLRequest(url: URL(string: urlString)!)
+//
+//                                            let session = URLSession.shared
+//                                            let task = session.dataTask(with: request, completionHandler: { data, _, error in
+//                                                do { let jsonData = try JSONDecoder().decode(InstagramMedia.self, from: data!)
+//                                                    self.igMedia.append(jsonData)
+//                                                    self.igUrls.append(jsonData.media_url.description)
+//                                                }
+//                                                catch let error as NSError {
+//                                                    print(error)
+//                                                }
+//                                            })
+//                                            task.resume()
+//                                        }
+//                                    }
+//                                } else {
+//                                    print("Not signed in")
+//                                    self.presentAuth.toggle()
+//                                }
+//                            }){
+//                                Text("Reload IG Photo")
+//                                    .font(.headline)
+//                                    .padding()
+//                            }
+                        //}
+
                                             
                         //MARK: Footer Section
                         FooterInformation()
                             .padding(.vertical, 40)
                         
                     }.padding(.top, 70)
-                    //.KeyboardAwarePaddingFull()
                     .resignKeyboardOnDragGesture()
+                    .onAppear {
+                        changeProfileRealmDate().observeFirebaseUser()
+                    }
+                    .sheet(isPresented: self.$presentAuth, onDismiss: {
+                        self.viewModel.pullInstagramUser(completion: { username in
+                            self.username = username
+                        })
+                    }) {
+                        WebView(presentAuth: self.$presentAuth, instagramApi: self.$instagramApi)
+                    }
                 }.frame(height: Constants.screenHeight - 50 - self.keyboardHeight)
                 .navigationBarTitle("Edit Profile", displayMode: .inline)
                 .navigationBarItems(trailing:
@@ -537,7 +498,7 @@ struct EditProfileView: View {
                     }.disabled((220 - self.bioText.count) > 220 && loadingSave ? true : self.didSave ? true : false)
                 ).background(Color("bgColor"))
                 .edgesIgnoringSafeArea(.all)
-                .overlay(ImageViewerRemote(imageURL: self.$selectedUrl, viewerShown: self.$showImageViewer))
+                //.overlay(ImageViewerRemote(imageURL: self.viewModel.$selectedUrl, viewerShown: self.$showImageViewer))
                 .onAppear {
                     NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { (data) in
                         DispatchQueue.main.async {

@@ -145,6 +145,8 @@ struct ContactRequestCell: View {
                                 newContact.bio = contact.bio
                                 newContact.facebook = contact.facebook
                                 newContact.twitter = contact.twitter
+                                newContact.instagramAccessToken = contact.instagramAccessToken
+                                newContact.instagramId = contact.instagramId
                                 newContact.isPremium = contact.isPremium
                                 newContact.emailAddress = firstUser.email ?? "empty email address"
                                 newContact.website = firstUser.website ?? "empty website"

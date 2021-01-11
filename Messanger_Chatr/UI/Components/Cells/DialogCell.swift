@@ -408,6 +408,8 @@ struct DialogCell: View {
                         newContact.bio = firebaseContact.bio
                         newContact.facebook = firebaseContact.facebook
                         newContact.twitter = firebaseContact.twitter
+                        newContact.instagramAccessToken = firebaseContact.instagramAccessToken
+                        newContact.instagramId = firebaseContact.instagramId
                         newContact.isPremium = firebaseContact.isPremium
                         newContact.emailAddress = self.connectyContact.email ?? "empty email address"
                         newContact.website = self.connectyContact.website ?? "empty website"

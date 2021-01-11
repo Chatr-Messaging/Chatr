@@ -8,15 +8,17 @@
 
 import SwiftUI
 import WebKit
+import FirebaseDatabase
+import ConnectyCube
 
 struct WebView: UIViewRepresentable {
         
     //MARK:- Member variables
     @Binding var presentAuth: Bool
-    
-    @Binding var testUserData: InstagramTestUser
-    
+        
     @Binding var instagramApi: InstagramApi
+    
+    //@Binding var testUserData: InstagramTestUser
     
     //MARK:- UIViewRepresentable Delegate Methods
     func makeCoordinator() -> WebView.Coordinator {
@@ -51,7 +53,9 @@ struct WebView: UIViewRepresentable {
             self.parent.instagramApi.getTestUserIDAndToken(request: request) { (instagramTestUser) in
                 UserDefaults.standard.set(Int(instagramTestUser.user_id), forKey: "instagramID")
                 UserDefaults.standard.set(instagramTestUser.access_token, forKey: "instagramAuthKey")
-                self.parent.testUserData = instagramTestUser
+                Database.database().reference().child("Users").child("\(Session.current.currentUserID)").updateChildValues(["instagramAccessToken" : instagramTestUser.access_token])
+                Database.database().reference().child("Users").child("\(Session.current.currentUserID)").updateChildValues(["instagramId" : instagramTestUser.user_id])
+                //self.parent.testUserData = instagramTestUser
                 self.parent.presentAuth = false
             }
             decisionHandler(WKNavigationActionPolicy.allow)

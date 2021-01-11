@@ -429,7 +429,6 @@ struct NewConversationView: View {
             Request.users(withFullName: searchText, paginator: Paginator.limit(20, skip: 0), successBlock: { (paginator, users) in
                 for i in users {
                     changeContactsRealmData().observeFirebaseContactReturn(contactID: Int(i.id), completion: { firebaseContact in
-                        print("got emmm \(firebaseContact.isMessagingPrivate)")
                         if !firebaseContact.isMessagingPrivate {
                             self.grandUsers.append(i)
                             self.grandUsers.removeDuplicates()

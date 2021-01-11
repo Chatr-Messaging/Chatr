@@ -64,6 +64,8 @@
 		058AC5342599158D0027FD11 /* DiscoverCarouselSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058AC5332599158C0027FD11 /* DiscoverCarouselSection.swift */; };
 		05903A3F25925C3400D70A13 /* WKView in Frameworks */ = {isa = PBXBuildFile; productRef = 05903A3E25925C3400D70A13 /* WKView */; };
 		0593C0A223CB2AFE00460AAA /* VerifyCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0593C0A123CB2AFE00460AAA /* VerifyCodeView.swift */; };
+		0596844E25ABED4D0051B707 /* EditProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0596844D25ABED4D0051B707 /* EditProfileViewModel.swift */; };
+		0596845625AC16E80051B707 /* VisitContactViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0596845525AC16E80051B707 /* VisitContactViewModel.swift */; };
 		0599798824D53C9500969318 /* AlertIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0599798724D53C9500969318 /* AlertIndicator.swift */; };
 		0599798A24D5468E00969318 /* TextBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0599798924D5468E00969318 /* TextBubble.swift */; };
 		059B18102522C32000988201 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 059B180F2522C32000988201 /* RealmSwift */; };
@@ -201,6 +203,8 @@
 		058AC5332599158C0027FD11 /* DiscoverCarouselSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverCarouselSection.swift; sourceTree = "<group>"; };
 		0590397A2591C6B300D70A13 /* WKView-main */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "WKView-main"; path = "../../../../../Downloads/WKView-main"; sourceTree = "<group>"; };
 		0593C0A123CB2AFE00460AAA /* VerifyCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifyCodeView.swift; sourceTree = "<group>"; };
+		0596844D25ABED4D0051B707 /* EditProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileViewModel.swift; sourceTree = "<group>"; };
+		0596845525AC16E80051B707 /* VisitContactViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitContactViewModel.swift; sourceTree = "<group>"; };
 		0599798724D53C9500969318 /* AlertIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertIndicator.swift; sourceTree = "<group>"; };
 		0599798924D5468E00969318 /* TextBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextBubble.swift; sourceTree = "<group>"; };
 		059EF95124C9153A004BA17C /* ChatMessagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagesView.swift; sourceTree = "<group>"; };
@@ -415,6 +419,7 @@
 			children = (
 				05830738240E2B080013B93B /* Components */,
 				05830737240E2AEC0013B93B /* Views */,
+				0596844C25ABED160051B707 /* ViewModel */,
 				0583073B240E2E1A0013B93B /* Others */,
 			);
 			path = UI;
@@ -520,6 +525,15 @@
 				0583A83123BD34B400F9220B /* AppIcons */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		0596844C25ABED160051B707 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				0596844D25ABED4D0051B707 /* EditProfileViewModel.swift */,
+				0596845525AC16E80051B707 /* VisitContactViewModel.swift */,
+			);
+			path = ViewModel;
 			sourceTree = "<group>";
 		};
 		05D77A5025A190BA00776B93 /* Helpers */ = {
@@ -877,6 +891,8 @@
 				0572BAB923989A5100AE9061 /* VerifyNumberView.swift in Sources */,
 				053D33F22393C97B00CEE03E /* DismissGuardian.swift in Sources */,
 				0583073E240E2F120013B93B /* ChatrApp.swift in Sources */,
+				0596845625AC16E80051B707 /* VisitContactViewModel.swift in Sources */,
+				0596844E25ABED4D0051B707 /* EditProfileViewModel.swift in Sources */,
 				05C93BDB25145EF10059D1AA /* VisitGroupChannelView.swift in Sources */,
 				05BCE40D250B4EA400E29F39 /* HighlightedContactCell.swift in Sources */,
 				05D8A8DC2502CB3A00D53BE2 /* MailView.swift in Sources */,
