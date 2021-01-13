@@ -11,6 +11,7 @@ import ConnectyCube
 import RealmSwift
 import Contacts
 import Photos
+import Firebase
 
 struct advancedView: View {
     @EnvironmentObject var auth: AuthModel
@@ -21,6 +22,7 @@ struct advancedView: View {
     @State var deleteAccount: Bool = false
     @State var showDeleteAccountSheet: Bool = false
     @State var contactsEnabled: Bool = false
+    @State var instagramReset: Bool = false
     
     var body: some View {
         VStack {
@@ -303,6 +305,8 @@ struct advancedView: View {
                     
                     VStack(alignment: .center) {
                         VStack(spacing: 0) {
+                            //Disconnect Instagram
+                            
                             //Sync Address
                             Button(action: {
                                 self.diabaleSyncAddressBook = true
@@ -347,6 +351,35 @@ struct advancedView: View {
                                 }
                             }.buttonStyle(changeBGButtonStyle())
                             .disabled(self.diabaleSyncAddressBook ? true : false)
+                            
+                            Button(action: {
+                                Database.database().reference().child("Users").child("\(Session.current.currentUserID)").updateChildValues(["instagramAccessToken" : ""])
+                                Database.database().reference().child("Users").child("\(Session.current.currentUserID)").updateChildValues(["instagramId" : ""])
+                                self.instagramReset = false
+                            }) {
+                                HStack(alignment: .center) {
+                                    Text(self.instagramReset ? "Unauthorize Instagram" : "Instagram Disabled")
+                                        .foregroundColor(!self.instagramReset ? .secondary : .primary)
+                                    
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .resizable()
+                                        .font(Font.title.weight(.bold))
+                                        .scaledToFit()
+                                        .frame(width: 7, height: 15, alignment: .center)
+                                        .foregroundColor(.secondary)
+                                }.padding(.horizontal)
+                                .padding(.vertical, 12.5)
+                                
+                                Divider()
+                                    .frame(width: Constants.screenWidth - 80)
+                            }.buttonStyle(changeBGButtonStyle())
+                            .disabled(!self.instagramReset ? true : false)
+                            .onAppear {
+                                if self.auth.profile.results.first?.instagramAccessToken != "" && self.auth.profile.results.first?.instagramId != 0 {
+                                    self.instagramReset = true
+                                }
+                            }
 
                             //Restore Purchase
                             Button(action: {

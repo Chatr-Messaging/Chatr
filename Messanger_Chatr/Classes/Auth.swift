@@ -386,6 +386,23 @@ class AuthModel: NSObject, ObservableObject {
         }
     }
     
+    func removeContactRequest(userID: UInt) {
+        let config = Realm.Configuration(schemaVersion: 1)
+        do {
+            let realm = try Realm(configuration: config)
+            if let oldData = realm.object(ofType: ProfileStruct.self, forPrimaryKey: UserDefaults.standard.integer(forKey: "currentUserID")) {
+                try realm.safeWrite ({
+                    if let index = oldData.contactRequests.firstIndex(of: Int(userID)) {
+                        oldData.contactRequests.remove(at: index)
+                    }
+                    realm.add(oldData, update: .all)    
+                })
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
     // MARK: - Save User Image
     
     func store(image: UIImage, compression: Double, forKey key: String, withStorageType storageType: StorageType) {

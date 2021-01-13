@@ -57,8 +57,9 @@ struct DialogCell: View {
                                 if let connDia = self.auth.selectedConnectyDialog {
                                     connDia.sendUserStoppedTyping()
                                 }
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                             } else {
-                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 self.isOpen = true
                                 UserDefaults.standard.set(true, forKey: "localOpen")
                                 changeDialogRealmData().updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
@@ -76,13 +77,6 @@ struct DialogCell: View {
                     AlertIndicator(dialogModel: self.dialogModel)
                         .offset(x: -36, y: -27.5)
                         .opacity(self.isOpen ? 0 : 1)
-                        //.zIndex(self.isOpen ? 0 : -1)
-                    
-//                        RoundedRectangle(cornerRadius: 5)
-//                            .frame(width: 10, height: 10)
-//                            .foregroundColor(.green)
-//                            .opacity(profile.isOnline ? 1 : 0)
-//                            .offset(x: 15, y: 20)
                 }
             } else if self.dialogModel.dialogType == "group" {
                 ZStack {
@@ -126,7 +120,7 @@ struct DialogCell: View {
                                         connDia.sendUserStoppedTyping()
                                     }
                                 } else {
-                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                     self.isOpen = true
                                     UserDefaults.standard.set(true, forKey: "localOpen")
                                     changeDialogRealmData().updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
@@ -213,8 +207,9 @@ struct DialogCell: View {
                     if let connDia = self.auth.selectedConnectyDialog {
                         connDia.sendUserStoppedTyping()
                     }
+                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                 } else {
-                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                     self.isOpen = true
                     UserDefaults.standard.set(true, forKey: "localOpen")
                     changeDialogRealmData().updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
@@ -303,7 +298,6 @@ struct DialogCell: View {
                 for occ in self.dialogModel.occupentsID {
                     if occ != UserDefaults.standard.integer(forKey: "currentUserID") {
                         self.privateUserID = occ
-                        print("set selected user id to: \(occ)")
                         break
                     }
                 }
@@ -315,7 +309,6 @@ struct DialogCell: View {
                         //changeContactsRealmData().observeFirebaseContact(contactID: foundContact.id)
                         self.privateDialogContact = foundContact
                         self.connectyContact.id = UInt(foundContact.id)
-                        print("contact IN Realm... view did load \(self.privateDialogContact.avatar)")
                         if self.privateDialogContact.avatar == "" || self.privateDialogContact.id == 0 && !Session.current.tokenHasExpired {
                             self.pullPrivateAvatatr()
                         } else if Session.current.tokenHasExpired {

@@ -46,25 +46,12 @@ struct CursorData: Codable {
     var after: String
 }
 
-struct InstagramMedia: Codable {
+struct InstagramMedia: Codable, Hashable {
       var id: String
       var media_type: MediaType
       var media_url: String
       var username: String
       var timestamp: String //"2017-08-31T18:10:00+0000"
-    
-    class igMedia {
-        let id: UUID
-        @Published var name: String = ""
-        @Published var media_type: String = ""
-        @Published var media_url: String = ""
-        @Published var username: String = ""
-        @Published var timestamp: String = ""
-        
-        init() {
-            id = UUID()
-        }
-    }
 }
 
 enum MediaType: String,Codable {

@@ -25,7 +25,7 @@ class InstagramApi {
     
     private let boundary = "boundary=\(NSUUID().uuidString)"
     
-    @Published var igStrings: [String] = []
+    @Published var igMedia: [InstagramMedia] = []
     @Published var username: String = ""
     
     //MARK:- Enums
@@ -119,6 +119,8 @@ class InstagramApi {
             }
             catch let error as NSError {
                 print(error)
+                Database.database().reference().child("Users").child("\(Session.current.currentUserID)").updateChildValues(["instagramAccessToken" : ""])
+                Database.database().reference().child("Users").child("\(Session.current.currentUserID)").updateChildValues(["instagramId" : ""])
             }
         })
         task.resume()
@@ -140,13 +142,14 @@ class InstagramApi {
             }
             catch let error as NSError {
                 print(error)
+                Database.database().reference().child("Users").child("\(Session.current.currentUserID)").updateChildValues(["instagramAccessToken" : ""])
+                Database.database().reference().child("Users").child("\(Session.current.currentUserID)").updateChildValues(["instagramId" : ""])
             }
         })
         task.resume()
     }
     
     //MARK:- Public Methods
-
     func authorizeApp(completion: @escaping (_ url: URL?) -> Void ) {
         let urlString = "\(BaseURL.displayApi.rawValue)\(Method.authorize.rawValue)?client_id=\(instagramAppID)&redirect_uri=\(redirectURI)&scope=user_profile,user_media&response_type=code"
         
@@ -163,7 +166,6 @@ class InstagramApi {
     }
     
     func getTestUserIDAndToken(request: URLRequest, completion: @escaping (InstagramTestUser) -> Void){
-        
         guard let authToken = getTokenFromCallbackURL(request: request) else {
             return
         }
@@ -214,6 +216,8 @@ class InstagramApi {
                 }
                 catch let error as NSError {
                     print(error)
+                    Database.database().reference().child("Users").child("\(Session.current.currentUserID)").updateChildValues(["instagramAccessToken" : ""])
+                    Database.database().reference().child("Users").child("\(Session.current.currentUserID)").updateChildValues(["instagramId" : ""])
                 }
                 
             }
@@ -285,7 +289,7 @@ class InstagramApi {
             }
             self.getMediaData(testUserData: testUser) { (mediaFeed) in
                 DispatchQueue.main.async {
-                    self.igStrings.removeAll()
+                    self.igMedia.removeAll()
                 }
                 for igFeed in 0...8 {
                     guard mediaFeed.data.count > igFeed else { return }
@@ -294,9 +298,10 @@ class InstagramApi {
                     
                     let session = URLSession.shared
                     let task = session.dataTask(with: request, completionHandler: { data, _, error in
-                        do { let jsonData = try JSONDecoder().decode(InstagramMedia.self, from: data!)
+                        do { let jsonData = try JSONDecoder().decode(InstagramMedia.self, from: data!)                            
                             DispatchQueue.main.async {
-                                self.igStrings.append(jsonData.media_url.description)
+                                print("the timeline ig is: \(jsonData.timestamp)")
+                                self.igMedia.append(jsonData)
                             }
                         }
                         catch let error as NSError {

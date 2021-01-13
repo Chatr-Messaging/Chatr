@@ -57,36 +57,41 @@ struct EditProfileView: View {
                         VStack(alignment: .center) {
                             Button(action: {
                                 self.showImagePicker.toggle()
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                             }, label: {
                                 VStack {
-                                    VStack {
-                                        HStack {
+                                    HStack(alignment: .center) {
+                                        Spacer()
+                                        VStack(alignment: .center) {
                                             if let avitarURL = self.profile.results.first?.avatar {
                                                 WebImage(url: URL(string: avitarURL))
                                                     .resizable()
-                                                    .placeholder{ Image("empty-profile").resizable().frame(width: 65, height: 65, alignment: .center).scaledToFill() }
+                                                    .placeholder{ Image("empty-profile").resizable().frame(width: 80, height: 80, alignment: .center).scaledToFill() }
                                                     .indicator(.activity)
                                                     .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                                                     .scaledToFill()
                                                     .clipShape(Circle())
-                                                    .frame(width: 65, height: 65, alignment: .center)
-                                                    .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 8)
+                                                    .frame(width: 80, height: 80, alignment: .center)
+                                                    .shadow(color: Color.black.opacity(0.25), radius: 10, x: 0, y: 8)
                                             }
                                             
                                             Text("Change Profile Picture")
                                                 .font(.none)
                                                 .fontWeight(.none)
                                                 .foregroundColor(.blue)
-
-                                            Spacer()
-                                            Image(systemName: "chevron.right")
-                                                .resizable()
-                                                .font(Font.title.weight(.bold))
-                                                .scaledToFit()
-                                                .frame(width: 7, height: 15, alignment: .center)
-                                                .foregroundColor(.secondary)
+                                                .padding(.top, 10)
                                         }.padding(.horizontal)
+                                        .offset(x: 20)
                                         .contentShape(Rectangle())
+                                        Spacer()
+                                        
+                                        Image(systemName: "chevron.right")
+                                            .resizable()
+                                            .font(Font.title.weight(.bold))
+                                            .scaledToFit()
+                                            .frame(width: 7, height: 15, alignment: .center)
+                                            .foregroundColor(.secondary)
+                                            .padding()
                                     }
                                 }.padding(.vertical, 10)
                             }).buttonStyle(changeBGButtonStyle())
@@ -123,7 +128,7 @@ struct EditProfileView: View {
                                         .padding(.trailing, 5)
                                     
                                     TextField("Full Name", text: $fullNameText)
-                                        .font(.system(size: 24, weight: .bold, design: .default))
+                                        //.font(.system(size: 24, weight: .bold, design: .default))
                                         .foregroundColor(.primary)
                                         .onChange(of: self.fullNameText) { _ in
                                             self.didSave = false
@@ -131,20 +136,21 @@ struct EditProfileView: View {
 
                                     Spacer()
                                 }.padding(.horizontal)
+                                .padding(.vertical, 6)
+                                .padding(.top, 2)
                                 .contentShape(Rectangle())
 
                                 Divider()
                                     .frame(width: Constants.screenWidth - 70)
                                     .offset(x: 30)
-                            }.padding(.bottom, 5)
-                            .onAppear() {
+                            }.onAppear() {
                                 self.fullNameText = self.profile.results.first?.fullName ?? ""
                             }
                             
                             //Bio Section
                             VStack() {
-                                ZStack(alignment: .topTrailing) {
-                                    HStack(alignment: .top) {
+                                HStack(alignment: .top) {
+                                    VStack() {
                                         Image(systemName: "note.text")
                                             .resizable()
                                             .scaledToFit()
@@ -152,40 +158,39 @@ struct EditProfileView: View {
                                             .frame(width: 20, height: 20, alignment: .center)
                                             .padding(.trailing, 5)
                                         
-                                        ZStack(alignment: .topLeading) {
-                                            ResizableTextField(height: self.$bioHeight, text: self.$bioText, emptyPlaceholder: true)
-                                                .padding(.horizontal, 2.5)
-                                                .padding(.trailing, 5)
-                                                .font(.none)
-                                                .foregroundColor(self.bioText != "Bio" ? .primary : .secondary)
-                                                .multilineTextAlignment(.leading)
-                                                .lineLimit(5)
-                                                .offset(x: -5, y: -10)
-                                                .onChange(of: self.bioText) { _ in
-                                                    self.didSave = false
-                                                }
-                                            
-                                            Text("Bio")
-                                                .font(.none)
-                                                .fontWeight(.none)
-                                                .foregroundColor(.secondary)
-                                                .opacity(self.bioText != "" ? 0 : 1)
-                                                .padding(.leading, 5)
-                                        }
-                                        
-                                        Spacer()
-                                    }.padding(.horizontal)
-                                    .frame(height: 100)
+                                        Text("\(220 - self.bioText.count)")
+                                            .font(.subheadline)
+                                            .fontWeight(self.bioText.count > 220 ? .bold : .none)
+                                            .foregroundColor(self.bioText.count > 220 ? .red : .secondary)
+                                            .padding(.trailing, 5)
+                                    }
                                     
-                                    Text("\(220 - self.bioText.count)")
-                                        .font(.subheadline)
-                                        .fontWeight(self.bioText.count > 220 ? .bold : .none)
-                                        .foregroundColor(self.bioText.count > 220 ? .red : .secondary)
-                                        .padding(.trailing, 15)
+                                    ZStack(alignment: .topLeading) {
+                                        ResizableTextField(height: self.$bioHeight, text: self.$bioText, emptyPlaceholder: true)
+                                            .padding(.horizontal, 2.5)
+                                            .padding(.trailing, 5)
+                                            .font(.none)
+                                            .foregroundColor(self.bioText != "Bio" ? .primary : .secondary)
+                                            .multilineTextAlignment(.leading)
+                                            .lineLimit(5)
+                                            .offset(x: -7, y: -10)
+                                            .onChange(of: self.bioText) { _ in
+                                                self.didSave = false
+                                            }
+                                        
+                                        Text("Bio")
+                                            .font(.none)
+                                            .fontWeight(.none)
+                                            .foregroundColor(.secondary)
+                                            .opacity(self.bioText != "" ? 0 : 1)
+                                            .padding(.leading, 5)
+                                    }
                                 }
-                            }.onAppear() {
+                            }.padding(.horizontal)
+                            .padding(.vertical, 8)
+                            .frame(height: 100)
+                            .onAppear() {
                                 self.bioText = self.profile.results.first?.bio ?? "Bio"
-                                print("bio height is: \(self.bioHeight) && \(self.bioText)")
                             }
                         })
                         
@@ -218,13 +223,13 @@ struct EditProfileView: View {
                                         
                                     Spacer()
                                 }.padding(.horizontal)
+                                .padding(.vertical, 6)
                                 .contentShape(Rectangle())
 
                                 Divider()
                                     .frame(width: Constants.screenWidth - 70)
                                     .offset(x: 30)
-                            }.padding(.bottom, 5)
-                            .onAppear {
+                            }.onAppear {
                                 self.phoneText = UserDefaults.standard.string(forKey: "phoneNumber") ?? ""
                             }
                             
@@ -249,13 +254,14 @@ struct EditProfileView: View {
                                     
                                     Spacer()
                                 }.padding(.horizontal)
+                                .padding(.vertical, 6)
+                                .padding(.top, 2)
                                 .contentShape(Rectangle())
 
                                 Divider()
                                     .frame(width: Constants.screenWidth - 70)
                                     .offset(x: 30)
-                            }.padding(.bottom, 5)
-                            .onAppear() {
+                            }.onAppear() {
                                 self.emailText = self.profile.results.first?.emailAddress ?? ""
                             }
                             
@@ -279,6 +285,8 @@ struct EditProfileView: View {
                                     
                                     Spacer()
                                 }.padding(.horizontal)
+                                .padding(.vertical, 6)
+                                .padding(.top, 2)
                                 .contentShape(Rectangle())
                             }.onAppear() {
                                 self.websiteText = self.profile.results.first?.website ?? ""
@@ -315,19 +323,18 @@ struct EditProfileView: View {
                                     }) {
                                         Text(self.viewModel.testUserData.user_id == 0 ? "Link Instagram Account" : " @\(self.username)")
                                             .font(.none)
-                                            .foregroundColor(.primary)
+                                            .foregroundColor(self.viewModel.testUserData.user_id == 0 ? .blue : .primary)
                                     }
                                     
                                     Spacer()
                                 }.padding(.horizontal)
+                                .padding(.vertical, 6)
                                 .contentShape(Rectangle())
 
                                 Divider()
                                     .frame(width: Constants.screenWidth - 70)
                                     .offset(x: 30)
                             }.onAppear() {
-                                //self.viewModel.testUserData.access_token = self.profile.results.first?.instagramAccessToken ?? UserDefaults.standard.string(forKey: "instagramAuthKey") ?? ""
-                               // self.viewModel.testUserData.user_id = self.profile.results.first?.instagramId ?? UserDefaults.standard.integer(forKey: "instagramID")
                                 self.viewModel.pullInstagramUser(completion: { username in
                                     self.username = username
                                 })
@@ -353,6 +360,8 @@ struct EditProfileView: View {
                                     
                                     Spacer()
                                 }.padding(.horizontal)
+                                .padding(.vertical, 6)
+                                .padding(.top, 2)
                                 .contentShape(Rectangle())
 
                                 Divider()
@@ -382,68 +391,14 @@ struct EditProfileView: View {
                                         
                                     Spacer()
                                 }.padding(.horizontal)
+                                .padding(.vertical, 6)
+                                .padding(.top, 2)
                                 .contentShape(Rectangle())
                             }.onAppear() {
                                 self.facebookText = self.profile.results.first?.facebook ?? ""
                             }
                         })
                         
-                        //MARK: InstagramAPI Section
-                        //VStack(spacing: 10) {
-//                            LazyVGrid(columns: columns, alignment: .center, spacing: 10) {
-//                                ForEach(self.igUrls, id: \.self) { media in
-//                                    WebImage(url: URL(string: media))
-//                                        .resizable()
-//                                        .placeholder{ Image("empty-profile").resizable().frame(width: 65, height: 65, alignment: .center).scaledToFill() }
-//                                        .indicator(.activity)
-//                                        .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
-//                                        .scaledToFill()
-//                                        .frame(minWidth: 0, maxWidth: Constants.screenWidth / 3, minHeight: Constants.screenWidth / 3 - 20)
-//                                        .clipShape(RoundedRectangle(cornerRadius: 5, style: .circular))
-//                                        .onTapGesture {
-//                                            self.selectedUrl = media
-//                                            self.showImageViewer.toggle()
-//                                        }
-//                                }
-//                            }
-                            
-
-                            
-//                            Button(action: {
-//                                if self.instagramUser != nil {
-//                                    self.instagramApi.getMediaData(testUserData: self.testUserData) { (mediaFeed) in
-//                                        self.igMedia.removeAll()
-//                                        self.igUrls.removeAll()
-//                                        for igFeed in 0...8 {
-//                                            guard mediaFeed.data.count > igFeed else { return }
-//                                            let urlString = "https://graph.instagram.com/\(mediaFeed.data[igFeed].id)?fields=id,media_type,media_url,username,timestamp&access_token=\(testUserData.access_token)"
-//                                            let request = URLRequest(url: URL(string: urlString)!)
-//
-//                                            let session = URLSession.shared
-//                                            let task = session.dataTask(with: request, completionHandler: { data, _, error in
-//                                                do { let jsonData = try JSONDecoder().decode(InstagramMedia.self, from: data!)
-//                                                    self.igMedia.append(jsonData)
-//                                                    self.igUrls.append(jsonData.media_url.description)
-//                                                }
-//                                                catch let error as NSError {
-//                                                    print(error)
-//                                                }
-//                                            })
-//                                            task.resume()
-//                                        }
-//                                    }
-//                                } else {
-//                                    print("Not signed in")
-//                                    self.presentAuth.toggle()
-//                                }
-//                            }){
-//                                Text("Reload IG Photo")
-//                                    .font(.headline)
-//                                    .padding()
-//                            }
-                        //}
-
-                                            
                         //MARK: Footer Section
                         FooterInformation()
                             .padding(.vertical, 40)
@@ -458,7 +413,7 @@ struct EditProfileView: View {
                             self.username = username
                         })
                     }) {
-                        WebView(presentAuth: self.$presentAuth, instagramApi: self.$instagramApi)
+                        InstagramWebView(presentAuth: self.$presentAuth, instagramApi: self.$instagramApi)
                     }
                 }.frame(height: Constants.screenHeight - 50 - self.keyboardHeight)
                 .navigationBarTitle("Edit Profile", displayMode: .inline)

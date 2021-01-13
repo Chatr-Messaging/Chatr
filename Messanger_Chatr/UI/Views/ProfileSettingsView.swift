@@ -316,7 +316,6 @@ struct ProfileView: View {
                 .padding(.bottom, 5)
                 
                 //MARK: Security Section
-                /*
                 HStack {
                     Text("SECURITY:")
                         .font(.caption)
@@ -610,9 +609,6 @@ struct ProfileView: View {
                 .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
                 .padding(.horizontal)
                 .padding(.bottom, 5)
- 
- */
-                
             
                 Spacer()
                 //MARK: FOOTER

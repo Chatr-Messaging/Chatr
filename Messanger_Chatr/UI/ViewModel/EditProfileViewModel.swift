@@ -25,8 +25,6 @@ class EditProfileViewModel: ObservableObject {
         }
         return InstagramTestUser(access_token: "", user_id: 0)
     }
-        
-        //= InstagramTestUser(access_token: UserDefaults.standard.string(forKey: "instagramAuthKey") ?? "", user_id: UserDefaults.standard.integer(forKey: "instagramID"))
     
     func pullInstagramUser(completion: @escaping (String) -> ()) {
         self.instagramApi.getInstagramUser(testUserData: self.testUserData) { (user) in
@@ -34,15 +32,20 @@ class EditProfileViewModel: ObservableObject {
         }
     }
     
+    func pullInstagramUserFromDefaults(completion: @escaping (String) -> ()) {
+        self.instagramApi.getInstagramUser(testUserData: InstagramTestUser(access_token: UserDefaults.standard.string(forKey: "instagramAuthKey") ?? "", user_id: UserDefaults.standard.integer(forKey: "instagramID"))) { (user) in
+            completion(user.username)
+        }
+    }
+    
     func styleBuilder<Content: View>(@ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .center) {
-            VStack {
+            VStack(spacing: 0) {
                 content()
-            }.padding(.vertical, 15)
+            }.padding(.vertical, 10)
         }.background(Color("buttonColor"))
         .clipShape(RoundedRectangle(cornerRadius: 15, style: .circular))
         .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
         .padding(.horizontal)
-        .padding(.bottom, 5)
     }
 }

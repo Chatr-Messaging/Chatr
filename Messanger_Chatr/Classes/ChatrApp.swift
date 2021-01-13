@@ -39,8 +39,6 @@ extension ChatrApp {
             } else {
                 self.chatInstanceConnect(id: UInt(user.id))
             }
-        } else {
-            print("user current profile is not there...")
         }
     }
     
@@ -54,6 +52,7 @@ extension ChatrApp {
 
                 changeDialogRealmData().fetchDialogs(completion: { _ in
                     changeContactsRealmData().observeQuickSnaps()
+                    changeProfileRealmDate().observeFirebaseUser()
                     self.auth.initIAPurchase()
                 })
             }

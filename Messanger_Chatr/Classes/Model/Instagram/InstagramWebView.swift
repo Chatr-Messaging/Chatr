@@ -11,7 +11,7 @@ import WebKit
 import FirebaseDatabase
 import ConnectyCube
 
-struct WebView: UIViewRepresentable {
+struct InstagramWebView: UIViewRepresentable {
         
     //MARK:- Member variables
     @Binding var presentAuth: Bool
@@ -21,17 +21,17 @@ struct WebView: UIViewRepresentable {
     //@Binding var testUserData: InstagramTestUser
     
     //MARK:- UIViewRepresentable Delegate Methods
-    func makeCoordinator() -> WebView.Coordinator {
+    func makeCoordinator() -> InstagramWebView.Coordinator {
         return Coordinator(parent: self)
     }
     
-    func makeUIView(context: UIViewRepresentableContext<WebView>) -> WKWebView {
+    func makeUIView(context: UIViewRepresentableContext<InstagramWebView>) -> WKWebView {
         let webView = WKWebView()
         webView.navigationDelegate = context.coordinator
         return webView
     }
     
-    func updateUIView(_ webView: WKWebView, context: UIViewRepresentableContext<WebView>) {
+    func updateUIView(_ webView: WKWebView, context: UIViewRepresentableContext<InstagramWebView>) {
         instagramApi.authorizeApp { (url) in
             DispatchQueue.main.async {
                 webView.load(URLRequest(url: url!))
@@ -42,9 +42,9 @@ struct WebView: UIViewRepresentable {
     //MARK:- Coordinator class
     class Coordinator: NSObject, WKNavigationDelegate {
         
-        var parent: WebView
+        var parent: InstagramWebView
         
-        init(parent: WebView) {
+        init(parent: InstagramWebView) {
             self.parent = parent
         }
         
