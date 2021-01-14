@@ -106,7 +106,7 @@ struct ContactRequestCell: View {
                             .foregroundColor(.white)
                             .padding(.vertical, 8)
                             .padding(.horizontal, 10)
-                            .background(Color.blue)
+                            .background(Constants.baseBlue)
                             .cornerRadius(10)
                     }
                 }
@@ -145,6 +145,8 @@ struct ContactRequestCell: View {
                                 newContact.bio = contact.bio
                                 newContact.facebook = contact.facebook
                                 newContact.twitter = contact.twitter
+                                newContact.instagramAccessToken = contact.instagramAccessToken
+                                newContact.instagramId = contact.instagramId
                                 newContact.isPremium = contact.isPremium
                                 newContact.emailAddress = firstUser.email ?? "empty email address"
                                 newContact.website = firstUser.website ?? "empty website"

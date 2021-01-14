@@ -384,7 +384,7 @@ struct NewConversationView: View {
                             }
                             Request.createDialog(dialog, successBlock: { (dialog) in
                                 changeDialogRealmData().fetchDialogs(completion: { _ in
-                                    self.auth.sendPushNoti(userIDs: occu, message: "\(self.auth.profile.results.first?.fullName ?? "Chatr User") created a new group chat with you 🥳")
+                                    self.auth.sendPushNoti(userIDs: occu, message: "\(self.auth.profile.results.first?.fullName ?? "Chatr User") created a new group chat with you!")
                                     self.selectedContact.removeAll()
                                     self.newDialogID = "\(String(describing: dialog.id))"
                                     withAnimation {
@@ -429,7 +429,6 @@ struct NewConversationView: View {
             Request.users(withFullName: searchText, paginator: Paginator.limit(20, skip: 0), successBlock: { (paginator, users) in
                 for i in users {
                     changeContactsRealmData().observeFirebaseContactReturn(contactID: Int(i.id), completion: { firebaseContact in
-                        print("got emmm \(firebaseContact.isMessagingPrivate)")
                         if !firebaseContact.isMessagingPrivate {
                             self.grandUsers.append(i)
                             self.grandUsers.removeDuplicates()

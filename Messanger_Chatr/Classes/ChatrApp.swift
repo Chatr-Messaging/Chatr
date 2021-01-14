@@ -11,7 +11,6 @@ import ConnectyCube
 import UserNotifications
 import RealmSwift
 import Purchases
-import Contacts
 
 struct ChatrApp {
     ///Users Service
@@ -39,8 +38,6 @@ extension ChatrApp {
             } else {
                 self.chatInstanceConnect(id: UInt(user.id))
             }
-        } else {
-            print("user current profile is not there...")
         }
     }
     
@@ -54,44 +51,10 @@ extension ChatrApp {
 
                 changeDialogRealmData().fetchDialogs(completion: { _ in
                     changeContactsRealmData().observeQuickSnaps()
+                    changeProfileRealmDate().observeFirebaseUser()
                     self.auth.initIAPurchase()
                 })
             }
-        }
-    }
-}
-
-//Permissions
-extension ChatrApp {
-    static func checkContactsPermission(completion: @escaping (Bool) -> ()) {
-       if CNContactStore.authorizationStatus(for: .contacts) == .notDetermined {
-            print("Contacts are notDetermined")
-            completion(false)
-       } else if CNContactStore.authorizationStatus(for: .contacts) == .authorized {
-            print("Contacts are authorized")
-            completion(true)
-       }
-    }
-    
-    static func requestContacts(completion: @escaping (Bool) -> ()) {
-        let store = CNContactStore()
-        if CNContactStore.authorizationStatus(for: .contacts) == .notDetermined {
-            store.requestAccess(for: .contacts){succeeded, err in
-                guard err == nil && succeeded else {
-                    completion(false)
-                    return
-                }
-                if succeeded {
-                    completion(true)
-                }
-            }
-        } else if CNContactStore.authorizationStatus(for: .contacts) == .authorized {
-            print("Contacts are authorized")
-            completion(true)
-
-        } else if CNContactStore.authorizationStatus(for: .contacts) == .denied {
-            UINotificationFeedbackGenerator().notificationOccurred(.error)
-            completion(false)
         }
     }
 }

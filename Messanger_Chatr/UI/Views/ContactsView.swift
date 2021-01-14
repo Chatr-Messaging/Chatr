@@ -281,28 +281,27 @@ struct ContactsView: View {
                                 Image("NoContacts")
                                     .resizable()
                                     .scaledToFit()
+                                    .padding(.horizontal, 10)
                                     .padding(.bottom, 20)
+                                
                                 
                                 Button(action: {
                                     self.showAddChat.toggle()
-                                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 }) {
-                                    HStack {
+                                    HStack(alignment: .center, spacing: 15) {
                                         Image(systemName: "person.fill.badge.plus")
                                             .resizable()
                                             .scaledToFit()
-                                            .frame(width: 26, height: 22, alignment: .center)
-                                            .foregroundColor(.white)
-                                            .padding(.trailing, 5)
+                                            .frame(width: 24, height: 22, alignment: .center)
                                         
                                         Text("Add Contacts")
                                             .font(.headline)
                                             .foregroundColor(.white)
-                                    }
+                                    }.padding(15)
                                 }.buttonStyle(MainButtonStyle())
-                                .frame(height: 45)
-                                .frame(minWidth: 200, maxWidth: 240)
-                                .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
+                                .frame(maxWidth: 230)
+                                .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 8)
                                 .padding(.bottom, 20)
                                 .sheet(isPresented: self.$showAddChat, onDismiss: {
                                     if self.newDialogID != 0 {
@@ -323,54 +322,6 @@ struct ContactsView: View {
                             
                             //MARK: Search, Filter, & Add Section
                             HStack {
-                                
-                                /*
-                                //Filter Btn
-                                Button(action: {
-                                    print("tap filter btn")
-                                    
-                                    let event = Event()
-                                    event.notificationType = .push
-                                    event.usersIDs = [NSNumber(value: 654260)]
-                                    event.type = .oneShot
-
-                                    var pushParameters = [String : String]()
-                                    pushParameters["title"] = "Marissa Frankford"
-                                    pushParameters["message"] = "Hello Brandon Shaw!! Test Push Noti"
-                                    pushParameters["ios_badge"] = "1"
-                                    pushParameters["ios_sound"] = "app_sound.wav"
-
-                                    if let jsonData = try? JSONSerialization.data(withJSONObject: pushParameters,
-                                                                                options: .prettyPrinted) {
-                                      let jsonString = String(bytes: jsonData,
-                                                              encoding: String.Encoding.utf8)
-
-                                      event.message = jsonString
-
-                                      Request.createEvent(event, successBlock: {(events) in
-                                        print("sent push notification!! \(events)")
-                                      }, errorBlock: {(error) in
-                                        print("error sending noti: \(error.localizedDescription)")
-                                      })
-                                    }
-                                    
-                                }) {
-                                    ZStack {
-                                        Rectangle()
-                                            .frame(width: Constants.btnSize, height: Constants.btnSize, alignment: .center)
-                                            .foregroundColor(Color("buttonColor"))
-                                            .clipShape(RoundedRectangle(cornerRadius: Constants.btnSize / 3.5, style: .circular))
-                                            .shadow(color: Color.black.opacity(0.20), radius: 10, x: 0, y: 8)
-                                        
-                                        Image(systemName: "slider.horizontal.3")
-                                            .resizable()
-                                            .frame(width: 20, height: 18, alignment: .center)
-                                            .foregroundColor(.primary)
-                                    }
-                                }.padding(.horizontal)
-                                .buttonStyle(ClickButtonStyle())
-                                */
-                                
                                 //Seach Bar
                                 ZStack {
                                     HStack {
@@ -411,11 +362,12 @@ struct ContactsView: View {
                                         Image(systemName: "person.badge.plus")
                                             .resizable()
                                             .scaledToFit()
-                                            .padding(8)
-                                            .frame(width: 32, height: 32)
+                                            .padding(Constants.menuBtnSize * 0.25)
                                             .foregroundColor(.primary)
                                     }
                                 }.buttonStyle(HomeButtonStyle())
+                                .padding(.horizontal)
+                                .offset(y: -2)
                                 .sheet(isPresented: self.$showAddNewContact, onDismiss: {
                                     if self.newDialogID != 0 {
                                         self.dismissView.toggle()
@@ -551,7 +503,7 @@ struct ContactsView: View {
                         FooterInformation()
                             .padding(.vertical, 30)
                     }.padding(.top, 110)
-                }.navigationBarTitle("Contacts", displayMode: .large)
+                }.navigationBarTitle("Contacts", displayMode: .automatic)
                 .background(Color("bgColor"))
                 .edgesIgnoringSafeArea(.all)
                 .navigationBarItems(leading:

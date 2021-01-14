@@ -57,8 +57,9 @@ struct DialogCell: View {
                                 if let connDia = self.auth.selectedConnectyDialog {
                                     connDia.sendUserStoppedTyping()
                                 }
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                             } else {
-                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 self.isOpen = true
                                 UserDefaults.standard.set(true, forKey: "localOpen")
                                 changeDialogRealmData().updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
@@ -76,13 +77,6 @@ struct DialogCell: View {
                     AlertIndicator(dialogModel: self.dialogModel)
                         .offset(x: -36, y: -27.5)
                         .opacity(self.isOpen ? 0 : 1)
-                        //.zIndex(self.isOpen ? 0 : -1)
-                    
-//                        RoundedRectangle(cornerRadius: 5)
-//                            .frame(width: 10, height: 10)
-//                            .foregroundColor(.green)
-//                            .opacity(profile.isOnline ? 1 : 0)
-//                            .offset(x: 15, y: 20)
                 }
             } else if self.dialogModel.dialogType == "group" {
                 ZStack {
@@ -90,22 +84,22 @@ struct DialogCell: View {
                         if id < 3 {
                             ZStack {
                                 Circle()
-                                    .frame(width: self.groupOccUserAvatar.count > 2 ? 28 : self.groupOccUserAvatar.count > 1 ? 30 : 55, height: self.groupOccUserAvatar.count > 2 ? 28 : self.groupOccUserAvatar.count > 1 ? 30 : 55, alignment: .center)
+                                    .frame(width: self.groupOccUserAvatar.count > 2 ? 31 : self.groupOccUserAvatar.count > 1 ? 34 : 55, height: self.groupOccUserAvatar.count > 2 ? 31 : self.groupOccUserAvatar.count > 1 ? 34 : 55, alignment: .center)
                                     .foregroundColor(Color("buttonColor"))
                                     .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 5)
                                 
                                 WebImage(url: URL(string: self.groupOccUserAvatar[id]))
                                     .resizable()
-                                    .placeholder{ Image("empty-profile").resizable().frame(width: self.groupOccUserAvatar.count >= 3 ? 25 : self.groupOccUserAvatar.count == 2 ? 27 : 55, height: self.groupOccUserAvatar.count >= 3 ? 25 : self.groupOccUserAvatar.count == 2 ? 27 : 55, alignment: .center).scaledToFill() }
+                                    .placeholder{ Image("empty-profile").resizable().frame(width: self.groupOccUserAvatar.count >= 3 ? 28 : self.groupOccUserAvatar.count == 2 ? 31 : 55, height: self.groupOccUserAvatar.count >= 3 ? 28 : self.groupOccUserAvatar.count == 2 ? 31 : 55, alignment: .center).scaledToFill() }
                                     .indicator(.activity)
-                                    .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
+                                    .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.05)), removal: AnyTransition.identity))
                                     .scaledToFill()
                                     .clipShape(Circle())
-                                    .frame(width: self.groupOccUserAvatar.count >= 3 ? 25 : self.groupOccUserAvatar.count == 2 ? 27 : 55, height: self.groupOccUserAvatar.count >= 3 ? 25 : self.groupOccUserAvatar.count == 2 ? 27 : 55, alignment: .center)
+                                    .frame(width: self.groupOccUserAvatar.count >= 3 ? 28 : self.groupOccUserAvatar.count == 2 ? 31 : 55, height: self.groupOccUserAvatar.count >= 3 ? 28 : self.groupOccUserAvatar.count == 2 ? 31 : 55, alignment: .center)
                                 
                                 if id == 2 && self.dialogModel.occupentsID.count >= 5 {
                                     Circle()
-                                        .frame(width: 25, height: 25)
+                                        .frame(width: 28, height: 28)
                                         .foregroundColor(.black)
                                         .opacity(0.6)
                                     
@@ -114,7 +108,7 @@ struct DialogCell: View {
                                         .fontWeight(.medium)
                                         .foregroundColor(.white)
                                 }
-                            }.offset(x: self.groupOccUserAvatar.count >= 3 ? (id == 0 ? 0 : (id == 1 ? -10 : (id == 2 ? 10 : 0))) : self.groupOccUserAvatar.count == 1 ? 0 : (id == 0 ? -10 : 10), y: self.groupOccUserAvatar.count >= 3 ? (id == 0 ? -10 : (id == 1 ? 10 : (id == 2 ? 10 : 0))) : 0)
+                            }.offset(x: self.groupOccUserAvatar.count >= 3 ? (id == 0 ? -0 : (id == 1 ? -12 : (id == 2 ? 12 : 0))) : self.groupOccUserAvatar.count == 1 ? 0 : (id == 0 ? -12 : 10), y: self.groupOccUserAvatar.count >= 3 ? (id == 0 ? -12 : (id == 1 ? 12 : (id == 2 ? 12 : 0))) : self.groupOccUserAvatar.count == 2 ? (id == 0 ? -8 : 8) : 0)
                             .offset(x: self.groupOccUserAvatar.count == 1 ? -5 : 0)
                             .padding(.trailing, self.groupOccUserAvatar.count == 1 ? 0 : 15)
                             .padding(.leading, self.groupOccUserAvatar.count == 1 ? 0 : 10)
@@ -126,7 +120,7 @@ struct DialogCell: View {
                                         connDia.sendUserStoppedTyping()
                                     }
                                 } else {
-                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                     self.isOpen = true
                                     UserDefaults.standard.set(true, forKey: "localOpen")
                                     changeDialogRealmData().updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
@@ -144,7 +138,7 @@ struct DialogCell: View {
                     AlertIndicator(dialogModel: self.dialogModel)
                         .offset(x: -34, y: -25)
                         .opacity(self.isOpen ? 0 : 1)
-                }
+                }.padding(.vertical, self.groupOccUserAvatar.count == 2 ? 11 : 11.5)
             }
             
             VStack(alignment: .leading) {
@@ -183,6 +177,7 @@ struct DialogCell: View {
                         .opacity(dialogModel.isOpen ? 0 : 1)
                  
                 }.frame(height: 25)
+                .offset(x: self.groupOccUserAvatar.count == 2 ? -4 : -2)
                 
                 HStack(spacing: 5) {
                     Text((self.dialogModel.isOpen ? self.dialogModel.dialogType == "private" ? (self.privateDialogContact.isOnline ? "online now" : "last online \(self.privateDialogContact.lastOnline.getElapsedInterval(lastMsg: "moments")) ago") : "\(self.dialogModel.occupentsID.count) members \(self.auth.onlineCount != 0 ? "•" : "")" : dialogModel.lastMessage))
@@ -213,8 +208,9 @@ struct DialogCell: View {
                     if let connDia = self.auth.selectedConnectyDialog {
                         connDia.sendUserStoppedTyping()
                     }
+                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                 } else {
-                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                     self.isOpen = true
                     UserDefaults.standard.set(true, forKey: "localOpen")
                     changeDialogRealmData().updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
@@ -303,7 +299,6 @@ struct DialogCell: View {
                 for occ in self.dialogModel.occupentsID {
                     if occ != UserDefaults.standard.integer(forKey: "currentUserID") {
                         self.privateUserID = occ
-                        print("set selected user id to: \(occ)")
                         break
                     }
                 }
@@ -315,7 +310,6 @@ struct DialogCell: View {
                         //changeContactsRealmData().observeFirebaseContact(contactID: foundContact.id)
                         self.privateDialogContact = foundContact
                         self.connectyContact.id = UInt(foundContact.id)
-                        print("contact IN Realm... view did load \(self.privateDialogContact.avatar)")
                         if self.privateDialogContact.avatar == "" || self.privateDialogContact.id == 0 && !Session.current.tokenHasExpired {
                             self.pullPrivateAvatatr()
                         } else if Session.current.tokenHasExpired {
@@ -408,6 +402,8 @@ struct DialogCell: View {
                         newContact.bio = firebaseContact.bio
                         newContact.facebook = firebaseContact.facebook
                         newContact.twitter = firebaseContact.twitter
+                        newContact.instagramAccessToken = firebaseContact.instagramAccessToken
+                        newContact.instagramId = firebaseContact.instagramId
                         newContact.isPremium = firebaseContact.isPremium
                         newContact.emailAddress = self.connectyContact.email ?? "empty email address"
                         newContact.website = self.connectyContact.website ?? "empty website"

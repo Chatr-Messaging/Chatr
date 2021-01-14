@@ -6,11 +6,10 @@
 //  Copyright © 2019 Brandon Shaw. All rights reserved.
 //
 
-import Foundation
+import UIKit
 import SwiftUI
 
 struct ImagePicker: UIViewControllerRepresentable {
-
     @Environment(\.presentationMode)
     var presentationMode
 

@@ -610,6 +610,58 @@ struct ProfileView: View {
                 .padding(.horizontal)
                 .padding(.bottom, 5)
                 
+                if self.profile.results.first?.id == 654260 {
+                    //MARK: Stats Section
+                    HStack {
+                        Text("CHATR STATISTICS:")
+                            .font(.caption)
+                            .fontWeight(.regular)
+                            .foregroundColor(.secondary)
+                            .padding(.horizontal)
+                            .padding(.horizontal)
+                            .offset(y: 2)
+                        Spacer()
+                    }.padding(.top, 10)
+                    
+                    VStack(alignment: .center) {
+                        VStack(spacing: 0) {
+                            NavigationLink(destination: ChatrStats().environmentObject(self.auth).navigationBarTitle("Stats").modifier(GroupedListModifier())) {
+                                VStack(alignment: .trailing, spacing: 0) {
+                                    HStack {
+                                        Image(systemName: "arrow.up.right.square")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .foregroundColor(Color.primary)
+                                            .frame(width: 24, height: 24, alignment: .center)
+                                            .padding(.trailing, 5)
+
+                                        Text("Chatr Stats")
+                                            .font(.none)
+                                            .fontWeight(.none)
+                                            .foregroundColor(.primary)
+
+                                        Spacer()
+                                        Image(systemName: "chevron.right")
+                                            .resizable()
+                                            .font(Font.title.weight(.bold))
+                                            .scaledToFit()
+                                            .frame(width: 7, height: 15, alignment: .center)
+                                            .foregroundColor(.secondary)
+                                    }.padding(.horizontal)
+                                    .padding(.vertical, 12.5)
+                                }
+                            }.buttonStyle(changeBGButtonStyle())
+                            .simultaneousGesture(TapGesture()
+                                .onEnded { _ in
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                            })
+                        }
+                    }.background(Color("buttonColor"))
+                    .clipShape(RoundedRectangle(cornerRadius: 15, style: .circular))
+                    .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
+                    .padding(.horizontal)
+                    .padding(.bottom, 5)
+                }
             
                 Spacer()
                 //MARK: FOOTER

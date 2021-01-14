@@ -309,7 +309,7 @@ struct addNewContactView: View {
                                                         .foregroundColor(.white)
                                                         .padding(.vertical, 8)
                                                         .padding(.horizontal, 15)
-                                                        .background(Color.blue)
+                                                        .background(Constants.baseBlue)
                                                         .cornerRadius(10)
                                                         .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 3)
                                                 }

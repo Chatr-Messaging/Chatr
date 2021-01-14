@@ -22,6 +22,8 @@ class ProfileStruct : Object {
     @objc dynamic var website: String = ""
     @objc dynamic var facebook: String = ""
     @objc dynamic var twitter: String = ""
+    @objc dynamic var instagramAccessToken: String = ""
+    @objc dynamic var instagramId: Int = 0
     @objc dynamic var isLocalAuthOn: Bool = false
     @objc dynamic var isPremium: Bool = false
     @objc dynamic var isInfoPrivate: Bool = false
@@ -96,7 +98,6 @@ class ProfileRealmModel<Element>: ObservableObject where Element: RealmSwift.Rea
 class changeProfileRealmDate {
     
     func observeFirebaseUser() {
-        print("starting observe firebase")
         let user = Database.database().reference().child("Users").child("\(Session.current.currentUserID)")
         user.observe(.value, with: { (snapshot: DataSnapshot) in
             if let dict = snapshot.value as? [String: Any] {
@@ -109,6 +110,8 @@ class changeProfileRealmDate {
                             foundContact.bio = dict["bio"] as? String ?? ""
                             foundContact.facebook = dict["facebook"] as? String ?? ""
                             foundContact.twitter = dict["twitter"] as? String ?? ""
+                            foundContact.instagramAccessToken = dict["instagramAccessToken"] as? String ?? ""
+                            foundContact.instagramId = dict["instagramId"] as? Int ?? 0
                             foundContact.lastAddressBookUpdate = dict["lastAddressBookUpload"] as? String ?? ""
                             foundContact.isLocalAuthOn = dict["faceID"] as? Bool ?? false
                             foundContact.isPremium = dict["isPremium"] as? Bool ?? false
@@ -124,6 +127,8 @@ class changeProfileRealmDate {
                         newData.bio = dict["bio"] as? String ?? ""
                         newData.facebook = dict["facebook"] as? String ?? ""
                         newData.twitter = dict["twitter"] as? String ?? ""
+                        newData.instagramAccessToken = dict["instagramAccessToken"] as? String ?? ""
+                        newData.instagramId = dict["instagramId"] as? Int ?? 0
                         newData.lastAddressBookUpdate = dict["lastAddressBookUpload"] as? String ?? ""
                         newData.isLocalAuthOn = dict["faceID"] as? Bool ?? false
                         newData.isPremium = dict["isPremium"] as? Bool ?? false

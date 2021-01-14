@@ -48,6 +48,8 @@ struct Constants {
     static let snapPurpleGradient = LinearGradient(gradient: Gradient(colors: [Color(red: 224 / 255, green: 155 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 175 / 255, green: 82 / 255, blue: 254 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom)
     
     static let grayGradient = LinearGradient(gradient: Gradient(colors: [Color(red: 218 / 255, green: 218 / 255, blue: 218 / 255, opacity: 1.0), Color(.sRGB, red: 166 / 255, green: 166 / 255, blue: 166 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom)
+    
+    static let baseBlue = Color(red: 69/255, green: 155/255, blue: 255/255, opacity: 1.0)
 }
 
 extension Date {
@@ -105,6 +107,24 @@ extension Date {
 }
 
 extension String {
+    func toDate(withFormat format: String = "HH:mm") -> Date? {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = format
+        guard let dateObjectWithTime = dateFormatter.date(from: self) else { return nil }
+        
+        let gregorian = Calendar(identifier: .gregorian)
+        let now = Date()
+        let components: Set<Calendar.Component> = [.year, .month, .day, .hour, .minute, .second]
+        var dateComponents = gregorian.dateComponents(components, from: now)
+
+        let calendar = Calendar.current
+        dateComponents.hour = calendar.component(.hour, from: dateObjectWithTime)
+        dateComponents.minute = calendar.component(.minute, from: dateObjectWithTime)
+        dateComponents.second = 0
+
+        return gregorian.date(from: dateComponents)
+    }
+    
     var containsEmoji: Bool {
         for scalar in unicodeScalars {
             switch scalar.value {

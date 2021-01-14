@@ -24,13 +24,19 @@
 		053AC4B7251982560036946E /* AttachmentBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053AC4B6251982550036946E /* AttachmentBubble.swift */; };
 		053D33F22393C97B00CEE03E /* DismissGuardian.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053D33F12393C97B00CEE03E /* DismissGuardian.swift */; };
 		053D33F42394511400CEE03E /* BlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053D33F32394511300CEE03E /* BlurView.swift */; };
+		054CAB7425AA6DF700DD3F7C /* InstagramApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054CAB7325AA6DF700DD3F7C /* InstagramApi.swift */; };
+		054CAB7925AA6E1F00DD3F7C /* InstagramTestUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054CAB7825AA6E1F00DD3F7C /* InstagramTestUser.swift */; };
+		054CAB7E25AA6E3700DD3F7C /* InstagramWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054CAB7D25AA6E3700DD3F7C /* InstagramWebView.swift */; };
 		054DA6C2250FF9DF00F28F74 /* AboutChatrView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054DA6C1250FF9DF00F28F74 /* AboutChatrView.swift */; };
+		054DBABD25AAE5430053B5C1 /* ImageViewerRemote in Frameworks */ = {isa = PBXBuildFile; productRef = 054DBABC25AAE5430053B5C1 /* ImageViewerRemote */; };
+		0554281725AFE7AD00B6D106 /* ChatrStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0554281625AFE7AD00B6D106 /* ChatrStats.swift */; };
 		05578C2C242989A10016B1E5 /* Messanger_Chatr.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 05578C2A242989A10016B1E5 /* Messanger_Chatr.xcdatamodeld */; };
 		05578C362429CE030016B1E5 /* PersistenceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05578C352429CE030016B1E5 /* PersistenceManager.swift */; };
 		055AEE382512EC9500F35B8F /* EditProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 055AEE372512EC9500F35B8F /* EditProfileView.swift */; };
 		055AEE3A2512F63F00F35B8F /* MultilineTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 055AEE392512F63F00F35B8F /* MultilineTextView.swift */; };
 		055C2A6024CE8C2700F7AE16 /* DialogList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 055C2A5F24CE8C2700F7AE16 /* DialogList.swift */; };
 		055C2A6224D3FDD200F7AE16 /* MembershipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 055C2A6124D3FDD200F7AE16 /* MembershipView.swift */; };
+		055E516625ACDC0B003BE668 /* WKView in Frameworks */ = {isa = PBXBuildFile; productRef = 055E516525ACDC0B003BE668 /* WKView */; };
 		05670318256A3C43004123EB /* CarBode in Frameworks */ = {isa = PBXBuildFile; productRef = 05670317256A3C43004123EB /* CarBode */; };
 		05693490252312F7001BDFF0 /* LocationBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0569348F252312F7001BDFF0 /* LocationBubble.swift */; };
 		056B989524C8F76B003F7FBA /* HomeUserInfoHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056B989424C8F76B003F7FBA /* HomeUserInfoHeader.swift */; };
@@ -60,12 +66,15 @@
 		058AC5342599158D0027FD11 /* DiscoverCarouselSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058AC5332599158C0027FD11 /* DiscoverCarouselSection.swift */; };
 		05903A3F25925C3400D70A13 /* WKView in Frameworks */ = {isa = PBXBuildFile; productRef = 05903A3E25925C3400D70A13 /* WKView */; };
 		0593C0A223CB2AFE00460AAA /* VerifyCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0593C0A123CB2AFE00460AAA /* VerifyCodeView.swift */; };
+		0596844E25ABED4D0051B707 /* EditProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0596844D25ABED4D0051B707 /* EditProfileViewModel.swift */; };
+		0596845625AC16E80051B707 /* VisitContactViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0596845525AC16E80051B707 /* VisitContactViewModel.swift */; };
 		0599798824D53C9500969318 /* AlertIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0599798724D53C9500969318 /* AlertIndicator.swift */; };
 		0599798A24D5468E00969318 /* TextBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0599798924D5468E00969318 /* TextBubble.swift */; };
 		059B18102522C32000988201 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 059B180F2522C32000988201 /* RealmSwift */; };
 		059B18122522C32000988201 /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = 059B18112522C32000988201 /* Realm */; };
 		059EF95224C9153A004BA17C /* ChatMessagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 059EF95124C9153A004BA17C /* ChatMessagesView.swift */; };
 		05A1223124AEE6D300EEDD72 /* KeyboardCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A1223024AEE6D300EEDD72 /* KeyboardCard.swift */; };
+		05A6D54725B021E400AD66DD /* AdvancedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A6D54625B021E400AD66DD /* AdvancedViewModel.swift */; };
 		05A7633A25060EB2002712FA /* AddNewContactView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A7633925060EB2002712FA /* AddNewContactView.swift */; };
 		05A7633C2506FD42002712FA /* ContactRequestCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A7633B2506FD42002712FA /* ContactRequestCell.swift */; };
 		05A7BD4D24F851760001BFC9 /* TermsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A7BD4C24F851760001BFC9 /* TermsView.swift */; };
@@ -91,6 +100,7 @@
 		05C6951424F1EC5400EEF819 /* StorageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C6951324F1EC5400EEF819 /* StorageView.swift */; };
 		05C6951624F5A29F00EEF819 /* ContactCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C6951524F5A29F00EEF819 /* ContactCell.swift */; };
 		05C6951824F73C5000EEF819 /* ContactRequestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C6951724F73C5000EEF819 /* ContactRequestView.swift */; };
+		05C7885F25ADFD81004DCCD6 /* Pods_Messanger_Chatr.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E43470782E29946CCC0BFCD6 /* Pods_Messanger_Chatr.framework */; };
 		05C93BDB25145EF10059D1AA /* VisitGroupChannelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C93BDA25145EF10059D1AA /* VisitGroupChannelView.swift */; };
 		05C93BDD251578100059D1AA /* DialogContactCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C93BDC251578100059D1AA /* DialogContactCell.swift */; };
 		05CE07ED2529930300F09754 /* NotificationSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05CE07EC2529930300F09754 /* NotificationSection.swift */; };
@@ -117,7 +127,6 @@
 		05F8E11823F122490066954C /* userModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F8E11723F122490066954C /* userModel.swift */; };
 		05FD085B2394784600575727 /* ProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FD085A2394784600575727 /* ProgressBar.swift */; };
 		05FF35C92536C03400886576 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 05FF35C82536C03400886576 /* StoreKit.framework */; };
-		E407B42A643A91913C97FAE8 /* Pods_Messanger_Chatr.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E43470782E29946CCC0BFCD6 /* Pods_Messanger_Chatr.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -158,7 +167,11 @@
 		053AC4B6251982550036946E /* AttachmentBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentBubble.swift; sourceTree = "<group>"; };
 		053D33F12393C97B00CEE03E /* DismissGuardian.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DismissGuardian.swift; sourceTree = "<group>"; };
 		053D33F32394511300CEE03E /* BlurView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlurView.swift; sourceTree = "<group>"; };
+		054CAB7325AA6DF700DD3F7C /* InstagramApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramApi.swift; sourceTree = "<group>"; };
+		054CAB7825AA6E1F00DD3F7C /* InstagramTestUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramTestUser.swift; sourceTree = "<group>"; };
+		054CAB7D25AA6E3700DD3F7C /* InstagramWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramWebView.swift; sourceTree = "<group>"; };
 		054DA6C1250FF9DF00F28F74 /* AboutChatrView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutChatrView.swift; sourceTree = "<group>"; };
+		0554281625AFE7AD00B6D106 /* ChatrStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatrStats.swift; sourceTree = "<group>"; };
 		05578C2B242989A10016B1E5 /* Messanger_Chatr.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Messanger_Chatr.xcdatamodel; sourceTree = "<group>"; };
 		05578C352429CE030016B1E5 /* PersistenceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceManager.swift; sourceTree = "<group>"; };
 		055AEE372512EC9500F35B8F /* EditProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileView.swift; sourceTree = "<group>"; };
@@ -192,12 +205,14 @@
 		0583A84E251AFB740005B7E1 /* ContactBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactBubble.swift; sourceTree = "<group>"; };
 		058AC52E2599064F0027FD11 /* DiscoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverView.swift; sourceTree = "<group>"; };
 		058AC5332599158C0027FD11 /* DiscoverCarouselSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverCarouselSection.swift; sourceTree = "<group>"; };
-		0590397A2591C6B300D70A13 /* WKView-main */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "WKView-main"; path = "../../../../../Downloads/WKView-main"; sourceTree = "<group>"; };
 		0593C0A123CB2AFE00460AAA /* VerifyCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifyCodeView.swift; sourceTree = "<group>"; };
+		0596844D25ABED4D0051B707 /* EditProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileViewModel.swift; sourceTree = "<group>"; };
+		0596845525AC16E80051B707 /* VisitContactViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitContactViewModel.swift; sourceTree = "<group>"; };
 		0599798724D53C9500969318 /* AlertIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertIndicator.swift; sourceTree = "<group>"; };
 		0599798924D5468E00969318 /* TextBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextBubble.swift; sourceTree = "<group>"; };
 		059EF95124C9153A004BA17C /* ChatMessagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagesView.swift; sourceTree = "<group>"; };
 		05A1223024AEE6D300EEDD72 /* KeyboardCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardCard.swift; sourceTree = "<group>"; };
+		05A6D54625B021E400AD66DD /* AdvancedViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedViewModel.swift; sourceTree = "<group>"; };
 		05A7633925060EB2002712FA /* AddNewContactView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddNewContactView.swift; sourceTree = "<group>"; };
 		05A7633B2506FD42002712FA /* ContactRequestCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactRequestCell.swift; sourceTree = "<group>"; };
 		05A7BD4C24F851760001BFC9 /* TermsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermsView.swift; sourceTree = "<group>"; };
@@ -267,10 +282,12 @@
 			files = (
 				05C36C17252D62B90031CB3F /* PopupView in Frameworks */,
 				05FF35C92536C03400886576 /* StoreKit.framework in Frameworks */,
+				055E516625ACDC0B003BE668 /* WKView in Frameworks */,
+				054DBABD25AAE5430053B5C1 /* ImageViewerRemote in Frameworks */,
+				05C7885F25ADFD81004DCCD6 /* Pods_Messanger_Chatr.framework in Frameworks */,
 				059B18102522C32000988201 /* RealmSwift in Frameworks */,
 				05903A3F25925C3400D70A13 /* WKView in Frameworks */,
 				05670318256A3C43004123EB /* CarBode in Frameworks */,
-				E407B42A643A91913C97FAE8 /* Pods_Messanger_Chatr.framework in Frameworks */,
 				059B18122522C32000988201 /* Realm in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -306,6 +323,25 @@
 				0583A83623BD44EB00F9220B /* Resources */,
 			);
 			path = Extras;
+			sourceTree = "<group>";
+		};
+		0549FA5B25AE8AF700EC1339 /* CoreData */ = {
+			isa = PBXGroup;
+			children = (
+				05EA572624148BA100372F1A /* Profile.swift */,
+				05E5B3282430747E00354C01 /* UserDialogs+Extensions.swift */,
+			);
+			path = CoreData;
+			sourceTree = "<group>";
+		};
+		054CAB7225AA6DDF00DD3F7C /* Instagram */ = {
+			isa = PBXGroup;
+			children = (
+				054CAB7D25AA6E3700DD3F7C /* InstagramWebView.swift */,
+				054CAB7825AA6E1F00DD3F7C /* InstagramTestUser.swift */,
+				054CAB7325AA6DF700DD3F7C /* InstagramApi.swift */,
+			);
+			path = Instagram;
 			sourceTree = "<group>";
 		};
 		056B989624C8F7D1003F7FBA /* Buttons */ = {
@@ -388,6 +424,7 @@
 				056B98A424C8FAA8003F7FBA /* AdvancedView.swift */,
 				054DA6C1250FF9DF00F28F74 /* AboutChatrView.swift */,
 				056B98A624C8FAC9003F7FBA /* SecurityView.swift */,
+				0554281625AFE7AD00B6D106 /* ChatrStats.swift */,
 			);
 			path = Sections;
 			sourceTree = "<group>";
@@ -397,6 +434,7 @@
 			children = (
 				05830738240E2B080013B93B /* Components */,
 				05830737240E2AEC0013B93B /* Views */,
+				0596844C25ABED160051B707 /* ViewModel */,
 				0583073B240E2E1A0013B93B /* Others */,
 			);
 			path = UI;
@@ -473,8 +511,8 @@
 				05196DDA24EE3BD20026B9A7 /* ContactsRealmModel.swift */,
 				05A7BD5A24FD6A4F0001BFC9 /* QuickSnapsRealmModel.swift */,
 				05D8A8DD250318FA00D53BE2 /* AddressBookRealmModel.swift */,
-				05EA572624148BA100372F1A /* Profile.swift */,
-				05E5B3282430747E00354C01 /* UserDialogs+Extensions.swift */,
+				0549FA5B25AE8AF700EC1339 /* CoreData */,
+				054CAB7225AA6DDF00DD3F7C /* Instagram */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -497,10 +535,19 @@
 		0583A83623BD44EB00F9220B /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				0590397A2591C6B300D70A13 /* WKView-main */,
 				0583A83123BD34B400F9220B /* AppIcons */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		0596844C25ABED160051B707 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				0596844D25ABED4D0051B707 /* EditProfileViewModel.swift */,
+				0596845525AC16E80051B707 /* VisitContactViewModel.swift */,
+				05A6D54625B021E400AD66DD /* AdvancedViewModel.swift */,
+			);
+			path = ViewModel;
 			sourceTree = "<group>";
 		};
 		05D77A5025A190BA00776B93 /* Helpers */ = {
@@ -643,6 +690,8 @@
 				05C36C16252D62B90031CB3F /* PopupView */,
 				05670317256A3C43004123EB /* CarBode */,
 				05903A3E25925C3400D70A13 /* WKView */,
+				054DBABC25AAE5430053B5C1 /* ImageViewerRemote */,
+				055E516525ACDC0B003BE668 /* WKView */,
 			);
 			productName = Messanger_Chatr;
 			productReference = 05DB89AE238B851400D4581F /* Messanger_Chatr.app */;
@@ -720,6 +769,8 @@
 				059B180E2522C32000988201 /* XCRemoteSwiftPackageReference "realm-cocoa" */,
 				05C36C15252D62B90031CB3F /* XCRemoteSwiftPackageReference "PopupView" */,
 				05670316256A3C43004123EB /* XCRemoteSwiftPackageReference "CarBode-Barcode-Scanner-For-SwiftUI" */,
+				054CAB8B25AADD7500DD3F7C /* XCRemoteSwiftPackageReference "swiftui-image-viewer" */,
+				055E516425ACDC0B003BE668 /* XCRemoteSwiftPackageReference "WKView" */,
 			);
 			productRefGroup = 05DB89AF238B851400D4581F /* Products */;
 			projectDirPath = "";
@@ -835,6 +886,7 @@
 				057F2B4E250B026F005DFB21 /* ContactCarouselSection.swift in Sources */,
 				05A7633C2506FD42002712FA /* ContactRequestCell.swift in Sources */,
 				056B98A924C8FD1D003F7FBA /* SearchBar.swift in Sources */,
+				054CAB7E25AA6E3700DD3F7C /* InstagramWebView.swift in Sources */,
 				05DB89B2238B851400D4581F /* AppDelegate.swift in Sources */,
 				05DB89B4238B851400D4581F /* SceneDelegate.swift in Sources */,
 				05A7BD4F24F9E8D20001BFC9 /* ContactRealmCell.swift in Sources */,
@@ -843,6 +895,7 @@
 				054DA6C2250FF9DF00F28F74 /* AboutChatrView.swift in Sources */,
 				059EF95224C9153A004BA17C /* ChatMessagesView.swift in Sources */,
 				053AC4B225194C080036946E /* GIFController.swift in Sources */,
+				0554281725AFE7AD00B6D106 /* ChatrStats.swift in Sources */,
 				05A7BD5924FB36B30001BFC9 /* CameraView.swift in Sources */,
 				0572BABB239B348800AE9061 /* CustomStyles.swift in Sources */,
 				056B98A224C8FA75003F7FBA /* RingtoneView.swift in Sources */,
@@ -854,7 +907,10 @@
 				05C6951824F73C5000EEF819 /* ContactRequestView.swift in Sources */,
 				0572BAB923989A5100AE9061 /* VerifyNumberView.swift in Sources */,
 				053D33F22393C97B00CEE03E /* DismissGuardian.swift in Sources */,
+				05A6D54725B021E400AD66DD /* AdvancedViewModel.swift in Sources */,
 				0583073E240E2F120013B93B /* ChatrApp.swift in Sources */,
+				0596845625AC16E80051B707 /* VisitContactViewModel.swift in Sources */,
+				0596844E25ABED4D0051B707 /* EditProfileViewModel.swift in Sources */,
 				05C93BDB25145EF10059D1AA /* VisitGroupChannelView.swift in Sources */,
 				05BCE40D250B4EA400E29F39 /* HighlightedContactCell.swift in Sources */,
 				05D8A8DC2502CB3A00D53BE2 /* MailView.swift in Sources */,
@@ -891,6 +947,8 @@
 				056B98A524C8FAA8003F7FBA /* AdvancedView.swift in Sources */,
 				05C6951624F5A29F00EEF819 /* ContactCell.swift in Sources */,
 				053D33F42394511400CEE03E /* BlurView.swift in Sources */,
+				054CAB7925AA6E1F00DD3F7C /* InstagramTestUser.swift in Sources */,
+				054CAB7425AA6DF700DD3F7C /* InstagramApi.swift in Sources */,
 				05A7BD5524FAED250001BFC9 /* CameraViewController.swift in Sources */,
 				05AACE5F23A60AB6006307EB /* ImagePicker.swift in Sources */,
 				05BCE40F250C55E100E29F39 /* ShareProfileView.swift in Sources */,
@@ -1178,6 +1236,7 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
+				VALIDATE_WORKSPACE = YES;
 			};
 			name = Debug;
 		};
@@ -1273,6 +1332,7 @@
 				SWIFT_INCLUDE_PATHS = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
+				VALIDATE_WORKSPACE = YES;
 			};
 			name = Release;
 		};
@@ -1402,6 +1462,22 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		054CAB8B25AADD7500DD3F7C /* XCRemoteSwiftPackageReference "swiftui-image-viewer" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Jake-Short/swiftui-image-viewer.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.1.0;
+			};
+		};
+		055E516425ACDC0B003BE668 /* XCRemoteSwiftPackageReference "WKView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/rebeloper/WKView.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.6;
+			};
+		};
 		05670316256A3C43004123EB /* XCRemoteSwiftPackageReference "CarBode-Barcode-Scanner-For-SwiftUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/heart/CarBode-Barcode-Scanner-For-SwiftUI";
@@ -1429,6 +1505,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		054DBABC25AAE5430053B5C1 /* ImageViewerRemote */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 054CAB8B25AADD7500DD3F7C /* XCRemoteSwiftPackageReference "swiftui-image-viewer" */;
+			productName = ImageViewerRemote;
+		};
+		055E516525ACDC0B003BE668 /* WKView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 055E516425ACDC0B003BE668 /* XCRemoteSwiftPackageReference "WKView" */;
+			productName = WKView;
+		};
 		05670317256A3C43004123EB /* CarBode */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 05670316256A3C43004123EB /* XCRemoteSwiftPackageReference "CarBode-Barcode-Scanner-For-SwiftUI" */;

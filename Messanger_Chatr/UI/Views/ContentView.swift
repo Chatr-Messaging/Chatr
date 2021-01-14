@@ -304,29 +304,31 @@ struct mainHomeList: View {
 //                            }
                         
                         //MARK: Search Bar
-                        CustomSearchBar(searchText: self.$searchText, localOpen: self.$isLocalOpen, loading: self.$isLoading)
-                            .opacity(self.isLocalOpen ? Double(self.activeView.height / 150) : 1)
-                            .opacity(self.isLoading ? 0 : 1)
-                            .opacity(self.dialogs.results.count != 0 ? 1 : 0)
-                            .offset(y: self.isLocalOpen ? -75 + (self.activeView.height / 3) : 0)
-                            .offset(y: self.emptyQuickSnaps ? -50 : 45)
-                            .blur(radius: self.isLocalOpen ? ((950 - (self.activeView.height * 3)) / 600) * 2 : 0)
-                            .animation(.spring(response: 0.4, dampingFraction: 0.8, blendDuration: 0))
-                            .resignKeyboardOnDragGesture()
-                            .sheet(isPresented: self.$showNewChat, onDismiss: {
-                                if self.newDialogID.count > 0 {
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
-                                        self.isLocalOpen = true
-                                        UserDefaults.standard.set(self.isLocalOpen, forKey: "localOpen")
-                                        changeDialogRealmData().updateDialogOpen(isOpen: self.isLocalOpen, dialogID: self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id ?? "")
-                                        UserDefaults.standard.set(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id, forKey: "selectedDialogID")
-                                        self.newDialogID = ""
+                        if self.dialogs.results.filter { $0.isDeleted != true }.count != 0 {
+                            CustomSearchBar(searchText: self.$searchText, localOpen: self.$isLocalOpen, loading: self.$isLoading)
+                                .opacity(self.isLocalOpen ? Double(self.activeView.height / 150) : 1)
+                                .opacity(self.isLoading ? 0 : 1)
+                                .opacity(self.dialogs.results.count != 0 ? 1 : 0)
+                                .offset(y: self.isLocalOpen ? -75 + (self.activeView.height / 3) : 0)
+                                .offset(y: self.emptyQuickSnaps ? -50 : 45)
+                                .blur(radius: self.isLocalOpen ? ((950 - (self.activeView.height * 3)) / 600) * 2 : 0)
+                                .animation(.spring(response: 0.4, dampingFraction: 0.8, blendDuration: 0))
+                                .resignKeyboardOnDragGesture()
+                                .sheet(isPresented: self.$showNewChat, onDismiss: {
+                                    if self.newDialogID.count > 0 {
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
+                                            self.isLocalOpen = true
+                                            UserDefaults.standard.set(self.isLocalOpen, forKey: "localOpen")
+                                            changeDialogRealmData().updateDialogOpen(isOpen: self.isLocalOpen, dialogID: self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id ?? "")
+                                            UserDefaults.standard.set(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id, forKey: "selectedDialogID")
+                                            self.newDialogID = ""
+                                        }
                                     }
+                                }) {
+                                    NewConversationView(usedAsNew: true, selectedContact: self.$selectedContacts, newDialogID: self.$newDialogID)
+                                        .environmentObject(self.auth)
                                 }
-                            }) {
-                                NewConversationView(usedAsNew: true, selectedContact: self.$selectedContacts, newDialogID: self.$newDialogID)
-                                    .environmentObject(self.auth)
-                            }
+                        }
                         
                         //MARK: Dialogs Section
                         if self.dialogs.results.filter { $0.isDeleted != true }.count == 0 {
@@ -336,7 +338,8 @@ struct mainHomeList: View {
                                     .resizable()
                                     .scaledToFit()
                                     .frame(minWidth: Constants.screenWidth - 20, maxWidth: Constants.screenWidth)
-                                    .frame(height: 250)
+                                    .frame(height: Constants.screenWidth < 375 ? 250 : 200)
+                                    .padding(.horizontal, 10)
                                     .onAppear() {
                                         changeDialogRealmData().fetchDialogs(completion: { _ in })
                                     }
@@ -355,17 +358,25 @@ struct mainHomeList: View {
                                 
                                 Button(action: {
                                     self.showNewChat.toggle()
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 }) {
-                                    Text("Start Conversation")
-                                        .font(.headline)
-                                        .foregroundColor(.white)
+                                    HStack(alignment: .center, spacing: 15) {
+                                        Text("Start Conversation")
+                                            .font(.headline)
+                                            .foregroundColor(.white)
+                                        
+                                        Image("ComposeIcon_white")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 22, height: 22, alignment: .center)
+                                            .offset(x: -2, y: -2)
+                                    }.padding(15)
                                 }.buttonStyle(MainButtonStyle())
-                                .frame(height: 45)
-                                .frame(minWidth: 220, maxWidth: 260)
-                                .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
+                                .frame(maxWidth: 230)
+                                .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 8)
                                 
                                 Spacer()
-                            }.offset(y: 30)
+                            }.offset(y: Constants.screenWidth < 375 ? 30 : -30)
                         } else {
                             //Main Dialog Cells
                             VStack {
@@ -436,11 +447,11 @@ struct mainHomeList: View {
                                 .simultaneousGesture(DragGesture(minimumDistance: UserDefaults.standard.bool(forKey: "localOpen") ? 0 : 500).onChanged({ (_) in }))
                                 .padding(.horizontal, self.isLocalOpen ? 0 : 20)
                                 .background(Color.clear)
-                                .onAppear {
+                                //.onAppear {
                                     //UserDefaults.standard.set(false, forKey: "localOpen")
                                     //ChatrApp.dialogs.getDialogUpdates() { result in }
                                     //self.dialogActions.fetchDialogs(completion: { result in })
-                                }
+                                //}
                             }.disabled(self.disableDialog)
                             .onChange(of: UserDefaults.standard.bool(forKey: "localOpen")) { newValue in
                                 print("did change dialog state - new value of: \(newValue)")
@@ -454,8 +465,8 @@ struct mainHomeList: View {
                     
                     if self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.count >= 4 || self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.count == 0 {
                         FooterInformation()
-                            .padding(.top, 120)
-                            .padding(.bottom, 20)
+                            .padding(.top, 140)
+                            .padding(.bottom, 25)
                             .opacity(self.isLocalOpen ? 0 : 1)
                     }
                 }

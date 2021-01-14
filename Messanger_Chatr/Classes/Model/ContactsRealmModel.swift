@@ -25,6 +25,8 @@ class ContactStruct : Object {
     @objc dynamic var website: String = ""
     @objc dynamic var facebook: String = ""
     @objc dynamic var twitter: String = ""
+    @objc dynamic var instagramAccessToken: String = ""
+    @objc dynamic var instagramId: Int = 0
     @objc dynamic var likeCount: Int = 0
     @objc dynamic var isOnline: Bool = false
     @objc dynamic var isFavourite: Bool = false
@@ -150,16 +152,7 @@ class changeContactsRealmData {
     
     func observeFirebaseContact(contactID: Int) {
         print("starting observe firebase CONTACT!")
-        //Database.database().isPersistenceEnabled = true
         let user = Database.database().reference().child("Users").child("\(contactID)")
-        let connectedRef = Database.database().reference(withPath: ".info/connected")
-        connectedRef.observe(.value, with: { snapshot in
-          if snapshot.value as? Bool ?? false {
-            print("Connected to firebase")
-          } else {
-            print("Not connected to firebase")
-          }
-        })
         user.observeSingleEvent(of: .value, with: { (snapshot: DataSnapshot) in
             print("Metadata: Data fetched from \(snapshot.ref.database.isPersistenceEnabled)")
             if let dict = snapshot.value as? [String: Any] {
@@ -172,6 +165,8 @@ class changeContactsRealmData {
                             foundContact.bio = dict["bio"] as? String ?? ""
                             foundContact.facebook = dict["facebook"] as? String ?? ""
                             foundContact.twitter = dict["twitter"] as? String ?? ""
+                            foundContact.instagramAccessToken = dict["instagramAccessToken"] as? String ?? ""
+                            foundContact.instagramId = dict["instagramId"] as? Int ?? 0
                             foundContact.isPremium = dict["isPremium"] as? Bool ?? false
                             
                             realm.add(foundContact, update: .all)
@@ -183,6 +178,8 @@ class changeContactsRealmData {
                         newData.bio = dict["bio"] as? String ?? ""
                         newData.facebook = dict["facebook"] as? String ?? ""
                         newData.twitter = dict["twitter"] as? String ?? ""
+                        newData.instagramAccessToken = dict["instagramAccessToken"] as? String ?? ""
+                        newData.instagramId = dict["instagramId"] as? Int ?? 0
                         newData.isPremium = dict["isPremium"] as? Bool ?? false
                         newData.isMyContact = false
                         
@@ -207,6 +204,8 @@ class changeContactsRealmData {
                 newData.bio = dict["bio"] as? String ?? ""
                 newData.facebook = dict["facebook"] as? String ?? ""
                 newData.twitter = dict["twitter"] as? String ?? ""
+                newData.instagramAccessToken = dict["instagramAccessToken"] as? String ?? ""
+                newData.instagramId = dict["instagramId"] as? Int ?? 0
                 newData.isPremium = dict["isPremium"] as? Bool ?? false
                 newData.isInfoPrivate = dict["isInfoPrivate"] as? Bool ?? false
                 newData.isMessagingPrivate = dict["isMessagingPrivate"] as? Bool ?? false
@@ -244,6 +243,7 @@ class changeContactsRealmData {
                                 foundContact.isMessagingPrivate = false
                                 
                                 realm.add(foundContact, update: .all)
+                                self.observeFirebaseContact(contactID: foundContact.id)
                             })
                         } else {
                             print("Contact NOT in Realm: \(user.id)")
@@ -263,8 +263,8 @@ class changeContactsRealmData {
                                 
                             try realm.safeWrite ({
                                 realm.add(newData, update: .all)
+                                self.observeFirebaseContact(contactID: newData.id)
                                 print("Succsessfuly added new contact to realm! \(newData.fullName)")
-                                
                             })
                         }
                     } catch {
@@ -383,7 +383,6 @@ class changeContactsRealmData {
                 try realm.safeWrite ({
                     realmContact.isFavourite = favourite
                     realm.add(realmContact, update: .all)
-                    print("Succsessfuly updated favourite status in realm! \(favourite)")
                 })
             }
         } catch {

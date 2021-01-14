@@ -108,7 +108,10 @@ struct TextBubble: View {
                                 .foregroundColor(self.message.messageState != .deleted ? messagePosition == .right ? .white : .primary : .secondary)
                                 .padding(.vertical, 8)
                                 .lineLimit(nil)
-                        }
+                        }.simultaneousGesture(TapGesture()
+                            .onEnded { _ in
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                            })
                     } else if self.message.messageState == .isTyping {
                         HStack(spacing: 6) {
                             ForEach(0..<3) { type in

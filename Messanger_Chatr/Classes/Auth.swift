@@ -121,18 +121,12 @@ class AuthModel: NSObject, ObservableObject {
     
     // MARK: - Auth
     func configureFirebaseStateDidChange() {
-        if Auth.auth().currentUser != nil {
+        if Auth.auth().currentUser != nil && self.profile.results.count > 0 {
             self.isUserAuthenticated = .signedIn
         } else {
             self.preventDismissal = true
             self.isUserAuthenticated = .signedOut
         }
-//        if self.profile.results.count > 0 {
-//            self.isUserAuthenticated = .signedIn
-//        } else {
-//            self.preventDismissal = true
-//            self.isUserAuthenticated = .signedOut
-//        }
     }
 
     func sendVerificationNumber(numberText: String) {
@@ -392,6 +386,23 @@ class AuthModel: NSObject, ObservableObject {
         }
     }
     
+    func removeContactRequest(userID: UInt) {
+        let config = Realm.Configuration(schemaVersion: 1)
+        do {
+            let realm = try Realm(configuration: config)
+            if let oldData = realm.object(ofType: ProfileStruct.self, forPrimaryKey: UserDefaults.standard.integer(forKey: "currentUserID")) {
+                try realm.safeWrite ({
+                    if let index = oldData.contactRequests.firstIndex(of: Int(userID)) {
+                        oldData.contactRequests.remove(at: index)
+                    }
+                    realm.add(oldData, update: .all)    
+                })
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
     // MARK: - Save User Image
     
     func store(image: UIImage, compression: Double, forKey key: String, withStorageType storageType: StorageType) {
@@ -455,6 +466,22 @@ class AuthModel: NSObject, ObservableObject {
                                                 in: FileManager.SearchPathDomainMask.userDomainMask).first else { return nil }
         
         return documentURL.appendingPathComponent(key + ".png")
+    }
+    
+    func fetchTotalUserCount(completion: @escaping (Int) -> Void) {
+        Database.database().reference().child("Users").observe(.value, with: {
+            snapshot in
+            let count = Int(snapshot.childrenCount)
+            completion(count)
+        })
+    }
+    
+    func fetchTotalQuickSnapCount(completion: @escaping (Int) -> Void) {
+        Database.database().reference().child("Quick Snaps").observe(.value, with: {
+            snapshot in
+            let count = Int(snapshot.childrenCount)
+            completion(count)
+        })
     }
 
     // MARK: - Logout Firebase & Connectycube
