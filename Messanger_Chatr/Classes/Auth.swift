@@ -467,6 +467,22 @@ class AuthModel: NSObject, ObservableObject {
         
         return documentURL.appendingPathComponent(key + ".png")
     }
+    
+    func fetchTotalUserCount(completion: @escaping (Int) -> Void) {
+        Database.database().reference().child("Users").observe(.value, with: {
+            snapshot in
+            let count = Int(snapshot.childrenCount)
+            completion(count)
+        })
+    }
+    
+    func fetchTotalQuickSnapCount(completion: @escaping (Int) -> Void) {
+        Database.database().reference().child("Quick Snaps").observe(.value, with: {
+            snapshot in
+            let count = Int(snapshot.childrenCount)
+            completion(count)
+        })
+    }
 
     // MARK: - Logout Firebase & Connectycube
     func logOutConnectyCube() {

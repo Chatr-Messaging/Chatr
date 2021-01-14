@@ -281,28 +281,27 @@ struct ContactsView: View {
                                 Image("NoContacts")
                                     .resizable()
                                     .scaledToFit()
+                                    .padding(.horizontal, 10)
                                     .padding(.bottom, 20)
+                                
                                 
                                 Button(action: {
                                     self.showAddChat.toggle()
-                                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 }) {
-                                    HStack {
+                                    HStack(alignment: .center, spacing: 15) {
                                         Image(systemName: "person.fill.badge.plus")
                                             .resizable()
                                             .scaledToFit()
-                                            .frame(width: 26, height: 22, alignment: .center)
-                                            .foregroundColor(.white)
-                                            .padding(.trailing, 5)
+                                            .frame(width: 24, height: 22, alignment: .center)
                                         
                                         Text("Add Contacts")
                                             .font(.headline)
                                             .foregroundColor(.white)
-                                    }
+                                    }.padding(15)
                                 }.buttonStyle(MainButtonStyle())
-                                .frame(height: 45)
-                                .frame(minWidth: 200, maxWidth: 240)
-                                .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
+                                .frame(maxWidth: 230)
+                                .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 8)
                                 .padding(.bottom, 20)
                                 .sheet(isPresented: self.$showAddChat, onDismiss: {
                                     if self.newDialogID != 0 {
@@ -368,6 +367,7 @@ struct ContactsView: View {
                                     }
                                 }.buttonStyle(HomeButtonStyle())
                                 .padding(.horizontal)
+                                .offset(y: -2)
                                 .sheet(isPresented: self.$showAddNewContact, onDismiss: {
                                     if self.newDialogID != 0 {
                                         self.dismissView.toggle()

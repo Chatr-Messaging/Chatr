@@ -81,6 +81,7 @@ struct contactRequestView: View {
                             .foregroundColor(.secondary)
                             .padding(.horizontal)
                             .padding(.horizontal)
+                            .padding(.top, (self.auth.profile.results.first?.contactRequests.count ?? 0) > 0 ? 0 : 120)
                             .offset(y: 2)
                         Spacer()
                     }
@@ -100,7 +101,6 @@ struct contactRequestView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 15, style: .circular))
                     .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 8)
                     .padding(.horizontal)
-                    .padding(.top, (self.auth.profile.results.first?.contactRequests.count ?? 0) > 0 ? 0 : 120)
                     .padding(.bottom, 70)
                     .animation(.spring(response: 0.15, dampingFraction: 0.70, blendDuration: 0))
                 }

@@ -48,6 +48,8 @@ struct Constants {
     static let snapPurpleGradient = LinearGradient(gradient: Gradient(colors: [Color(red: 224 / 255, green: 155 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 175 / 255, green: 82 / 255, blue: 254 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom)
     
     static let grayGradient = LinearGradient(gradient: Gradient(colors: [Color(red: 218 / 255, green: 218 / 255, blue: 218 / 255, opacity: 1.0), Color(.sRGB, red: 166 / 255, green: 166 / 255, blue: 166 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom)
+    
+    static let baseBlue = Color(red: 69/255, green: 155/255, blue: 255/255, opacity: 1.0)
 }
 
 extension Date {

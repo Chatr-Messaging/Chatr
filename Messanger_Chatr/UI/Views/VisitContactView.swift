@@ -306,6 +306,7 @@ struct VisitContactView: View {
                             Button(action: {
                                 self.viewModel.openInstagramApp()
                             }) {
+                                VStack(spacing: 0) {
                                 HStack(alignment: .center) {
                                     Image("instagramIcon_black")
                                         .resizable()
@@ -335,6 +336,12 @@ struct VisitContactView: View {
                                         .foregroundColor(.secondary)
                                 }.padding(.horizontal)
                                 .padding(.vertical, 12.5)
+                                    if self.contact.twitter != "" || self.contact.facebook != ""{
+                                        Divider()
+                                            .frame(width: Constants.screenWidth - 80)
+                                            .offset(x: 30)
+                                    }
+                                }
                             }.buttonStyle(changeBGButtonStyle())
                             .simultaneousGesture(TapGesture()
                                 .onEnded { _ in
@@ -362,6 +369,7 @@ struct VisitContactView: View {
                                 .padding(.bottom, 10)
                             }
                         }
+
                         VStack(alignment: .center, spacing: 0) {
                             if self.contact.facebook != "" {
                                 Button(action: {
@@ -390,7 +398,7 @@ struct VisitContactView: View {
                                     }.padding(.horizontal)
                                     .padding(.vertical, 12.5)
                                     
-                                    if self.contact.twitter != "" && self.contact.instagramAccessToken != "" {
+                                    if self.contact.twitter != "" {
                                         Divider()
                                             .frame(width: Constants.screenWidth - 80)
                                             .offset(x: 30)
@@ -407,7 +415,7 @@ struct VisitContactView: View {
                                     self.viewModel.openTwitterApp(screenName: self.contact.twitter)
                                 }) {
                                     HStack(alignment: .center) {
-                                        Image("twitterIcon_black")
+                                        Image("twitterIcon_light")
                                             .resizable()
                                             .scaledToFit()
                                             .frame(width: 20, height: 20, alignment: .center)
@@ -637,11 +645,12 @@ struct VisitContactView: View {
                 }
             } else if self.viewState == .fromRequests {
                 print("shuld have everything already...")
+                if self.contact.instagramAccessToken != "" && self.contact.instagramId != 0 {
+                    self.viewModel.loadInstagramImages(testUser: InstagramTestUser(access_token: self.contact.instagramAccessToken, user_id: self.contact.instagramId))
+                }
             } else if self.viewState == .fromDynamicLink {
                 print("from Dynamic link: \(self.auth.dynamicLinkContactID)")
                 if self.auth.dynamicLinkContactID != 0 {
-                    print("ayy dynamic profile")
-                    
                     let config = Realm.Configuration(schemaVersion: 1)
                     do {
                         let realm = try Realm(configuration: config)
@@ -679,14 +688,14 @@ struct VisitContactView: View {
                                                 break
                                             }
                                         }
-                                        
+
                                         for request in ChatrApp.dialogs.contactRequestIDs {
                                             if request == self.connectyContact.id {
                                                 self.contactRelationship = .pendingRequestForYou
                                                 break
                                             }
                                         }
-                                        
+
                                         changeContactsRealmData().observeFirebaseContactReturn(contactID: Int(self.connectyContact.id), completion: { firebaseContact in
                                             let newContact = ContactStruct()
                                             newContact.id = Int(self.connectyContact.id)
@@ -964,38 +973,9 @@ struct actionButtonView: View {
                 }.buttonStyle(ClickButtonStyle())
             } else if self.contactRelationship == .notContact && self.contact.id != UserDefaults.standard.integer(forKey: "currentUserID") {
                 Button(action: {
-                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                    Chat.instance.addUser(toContactListRequest: UInt(self.contact.id)) { (error) in
-                        if error != nil {
-                            print("error adding user: \(String(describing: error?.localizedDescription))")
-                        } else {
-                            self.contactRelationship = .pendingRequest
-
-                            let event = Event()
-                            event.notificationType = .push
-                            event.usersIDs = [NSNumber(value: self.contact.id)]
-                            event.type = .oneShot
-
-                            var pushParameters = [String : String]()
-                            pushParameters["message"] = "\(ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.fullName ?? "A user") sent you a contact request."
-                            pushParameters["ios_sound"] = "app_sound.wav"
-
-
-                            if let jsonData = try? JSONSerialization.data(withJSONObject: pushParameters,
-                                                                        options: .prettyPrinted) {
-                              let jsonString = String(bytes: jsonData,
-                                                      encoding: String.Encoding.utf8)
-
-                              event.message = jsonString
-
-                              Request.createEvent(event, successBlock: {(events) in
-                                print("sent push notification to user \(self.contact.id)")
-                              }, errorBlock: {(error) in
-                                print("error in sending push noti: \(error.localizedDescription)")
-                              })
-                            }
-                        }
-                    }
+                    self.viewModel.addContact(contactRelationship: self.contactRelationship, contactId: self.contact.id, completion: { contactState in
+                        self.contactRelationship = contactState
+                    })
                 }) {
                     HStack(alignment: .center) {
                         Image(systemName: "person.crop.circle.badge.plus")
@@ -1011,7 +991,7 @@ struct actionButtonView: View {
                             .foregroundColor(.white)
                     }.padding(.all, 10)
                     .padding(.horizontal, 5)
-                    .background(Color.blue)
+                    .background(Constants.baseBlue)
                     .cornerRadius(12.5)
                     .shadow(color: Color.blue.opacity(0.30), radius: 8, x: 0, y: 8)
                 }.buttonStyle(ClickButtonStyle())
@@ -1021,7 +1001,7 @@ struct actionButtonView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 22, height: 24, alignment: .center)
-                        .foregroundColor(.white)
+                        .foregroundColor(.secondary)
                         .padding(3)
                     
                     Text("Pending...")
@@ -1032,6 +1012,7 @@ struct actionButtonView: View {
                 .padding(.horizontal, 12)
                 .background(Color("buttonColor"))
                 .cornerRadius(12.5)
+                .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 8)
             }
             else if self.contactRelationship == .pendingRequestForYou && self.contact.id != UserDefaults.standard.integer(forKey: "currentUserID") {
                 HStack {
@@ -1055,7 +1036,7 @@ struct actionButtonView: View {
                                 .padding(3)
                         }.padding(.all, 12)
                         .padding(.horizontal, 4)
-                        .background(Color.blue)
+                        .background(Constants.baseBlue)
                         .cornerRadius(12.5)
                         .shadow(color: Color.blue.opacity(0.30), radius: 8, x: 0, y: 8)
                     }

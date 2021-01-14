@@ -243,6 +243,7 @@ class changeContactsRealmData {
                                 foundContact.isMessagingPrivate = false
                                 
                                 realm.add(foundContact, update: .all)
+                                self.observeFirebaseContact(contactID: foundContact.id)
                             })
                         } else {
                             print("Contact NOT in Realm: \(user.id)")
@@ -262,8 +263,8 @@ class changeContactsRealmData {
                                 
                             try realm.safeWrite ({
                                 realm.add(newData, update: .all)
+                                self.observeFirebaseContact(contactID: newData.id)
                                 print("Succsessfuly added new contact to realm! \(newData.fullName)")
-                                
                             })
                         }
                     } catch {

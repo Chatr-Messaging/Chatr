@@ -33,9 +33,39 @@ class VisitContactViewModel: ObservableObject {
         }
     }
     
-    func pullInstagramUser(testUser: InstagramTestUser, completion: @escaping (String) -> ()) {
+    func pullInstagramUser(testUser: InstagramTestUser, completion: @escaping (String) -> Void) {
         self.instagramApi.getInstagramUser(testUserData: testUser) { (user) in
             completion(user.username)
+        }
+    }
+    
+    func addContact(contactRelationship: visitContactRelationship, contactId: Int, completion: @escaping (visitContactRelationship) -> Void) {
+        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+        Chat.instance.addUser(toContactListRequest: UInt(contactId)) { (error) in
+            if error != nil {
+                print("error adding user: \(String(describing: error?.localizedDescription))")
+            } else {
+                let event = Event()
+                event.notificationType = .push
+                event.usersIDs = [NSNumber(value: contactId)]
+                event.type = .oneShot
+
+                var pushParameters = [String : String]()
+                pushParameters["message"] = "\(ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.fullName ?? "A user") sent you a contact request."
+                pushParameters["ios_sound"] = "app_sound.wav"
+
+                if let jsonData = try? JSONSerialization.data(withJSONObject: pushParameters, options: .prettyPrinted) {
+                    let jsonString = String(bytes: jsonData, encoding: String.Encoding.utf8)
+
+                    event.message = jsonString
+
+                    Request.createEvent(event, successBlock: { _ in
+                        completion(.pendingRequest)
+                    }, errorBlock: { (error) in
+                    print("error in sending push noti: \(error.localizedDescription)")
+                    })
+                }
+            }
         }
     }
     
@@ -92,7 +122,7 @@ class VisitContactViewModel: ObservableObject {
         }
     }
     
-    func trashContactRequest(visitContactRelationship: visitContactRelationship, userId: Int, completion: @escaping (visitContactRelationship) -> ()) {
+    func trashContactRequest(visitContactRelationship: visitContactRelationship, userId: Int, completion: @escaping (visitContactRelationship) -> Void) {
         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
         Chat.instance.rejectAddContactRequest(UInt(userId)) { (error) in
             if error != nil {
@@ -105,7 +135,7 @@ class VisitContactViewModel: ObservableObject {
         }
     }
     
-    func removeContactRequest(userID: UInt, completion: @escaping () -> ()) {
+    func removeContactRequest(userID: UInt, completion: @escaping () -> Void) {
         let config = Realm.Configuration(schemaVersion: 1)
         do {
             let realm = try Realm(configuration: config)
@@ -113,18 +143,17 @@ class VisitContactViewModel: ObservableObject {
                 try realm.safeWrite ({
                     if let index = oldData.contactRequests.firstIndex(of: Int(userID)) {
                         oldData.contactRequests.remove(at: index)
-                        realm.add(oldData, update: .all)
-                        
-                        completion()
                     }
                 })
+                realm.add(oldData, update: .all)
+                completion()
             }
         } catch {
             print(error.localizedDescription)
         }
     }
     
-    func acceptContactRequest(contactRelationship: visitContactRelationship, contactId: Int, completion: @escaping (visitContactRelationship) -> ()) {
+    func acceptContactRequest(contactRelationship: visitContactRelationship, contactId: Int, completion: @escaping (visitContactRelationship) -> Void) {
         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
         Chat.instance.confirmAddContactRequest(UInt(contactId)) { (error) in
             self.removeContactRequest(userID: UInt(contactId), completion: {
@@ -145,6 +174,7 @@ class VisitContactViewModel: ObservableObject {
                         completion(.contact)
                     }, errorBlock: {(error) in
                         UINotificationFeedbackGenerator().notificationOccurred(.error)
+                        completion(.pendingRequestForYou)
                         print("error in sending push noti: \(error.localizedDescription)")
                     })
                 }
@@ -152,7 +182,7 @@ class VisitContactViewModel: ObservableObject {
         }
     }
     
-    func actionSheetMoreBtn(contactRelationship: visitContactRelationship, contactId: Int, completion: @escaping (visitContactRelationship) -> ()) {
+    func actionSheetMoreBtn(contactRelationship: visitContactRelationship, contactId: Int, completion: @escaping (visitContactRelationship) -> Void) {
         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
         if contactRelationship == .contact {
             Chat.instance.removeUser(fromContactList: UInt(contactId)) { (error) in

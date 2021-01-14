@@ -29,6 +29,7 @@
 		054CAB7E25AA6E3700DD3F7C /* InstagramWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054CAB7D25AA6E3700DD3F7C /* InstagramWebView.swift */; };
 		054DA6C2250FF9DF00F28F74 /* AboutChatrView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054DA6C1250FF9DF00F28F74 /* AboutChatrView.swift */; };
 		054DBABD25AAE5430053B5C1 /* ImageViewerRemote in Frameworks */ = {isa = PBXBuildFile; productRef = 054DBABC25AAE5430053B5C1 /* ImageViewerRemote */; };
+		0554281725AFE7AD00B6D106 /* ChatrStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0554281625AFE7AD00B6D106 /* ChatrStats.swift */; };
 		05578C2C242989A10016B1E5 /* Messanger_Chatr.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 05578C2A242989A10016B1E5 /* Messanger_Chatr.xcdatamodeld */; };
 		05578C362429CE030016B1E5 /* PersistenceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05578C352429CE030016B1E5 /* PersistenceManager.swift */; };
 		055AEE382512EC9500F35B8F /* EditProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 055AEE372512EC9500F35B8F /* EditProfileView.swift */; };
@@ -73,6 +74,7 @@
 		059B18122522C32000988201 /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = 059B18112522C32000988201 /* Realm */; };
 		059EF95224C9153A004BA17C /* ChatMessagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 059EF95124C9153A004BA17C /* ChatMessagesView.swift */; };
 		05A1223124AEE6D300EEDD72 /* KeyboardCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A1223024AEE6D300EEDD72 /* KeyboardCard.swift */; };
+		05A6D54725B021E400AD66DD /* AdvancedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A6D54625B021E400AD66DD /* AdvancedViewModel.swift */; };
 		05A7633A25060EB2002712FA /* AddNewContactView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A7633925060EB2002712FA /* AddNewContactView.swift */; };
 		05A7633C2506FD42002712FA /* ContactRequestCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A7633B2506FD42002712FA /* ContactRequestCell.swift */; };
 		05A7BD4D24F851760001BFC9 /* TermsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A7BD4C24F851760001BFC9 /* TermsView.swift */; };
@@ -169,6 +171,7 @@
 		054CAB7825AA6E1F00DD3F7C /* InstagramTestUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramTestUser.swift; sourceTree = "<group>"; };
 		054CAB7D25AA6E3700DD3F7C /* InstagramWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramWebView.swift; sourceTree = "<group>"; };
 		054DA6C1250FF9DF00F28F74 /* AboutChatrView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutChatrView.swift; sourceTree = "<group>"; };
+		0554281625AFE7AD00B6D106 /* ChatrStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatrStats.swift; sourceTree = "<group>"; };
 		05578C2B242989A10016B1E5 /* Messanger_Chatr.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Messanger_Chatr.xcdatamodel; sourceTree = "<group>"; };
 		05578C352429CE030016B1E5 /* PersistenceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceManager.swift; sourceTree = "<group>"; };
 		055AEE372512EC9500F35B8F /* EditProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileView.swift; sourceTree = "<group>"; };
@@ -209,6 +212,7 @@
 		0599798924D5468E00969318 /* TextBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextBubble.swift; sourceTree = "<group>"; };
 		059EF95124C9153A004BA17C /* ChatMessagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagesView.swift; sourceTree = "<group>"; };
 		05A1223024AEE6D300EEDD72 /* KeyboardCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardCard.swift; sourceTree = "<group>"; };
+		05A6D54625B021E400AD66DD /* AdvancedViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedViewModel.swift; sourceTree = "<group>"; };
 		05A7633925060EB2002712FA /* AddNewContactView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddNewContactView.swift; sourceTree = "<group>"; };
 		05A7633B2506FD42002712FA /* ContactRequestCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactRequestCell.swift; sourceTree = "<group>"; };
 		05A7BD4C24F851760001BFC9 /* TermsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermsView.swift; sourceTree = "<group>"; };
@@ -420,6 +424,7 @@
 				056B98A424C8FAA8003F7FBA /* AdvancedView.swift */,
 				054DA6C1250FF9DF00F28F74 /* AboutChatrView.swift */,
 				056B98A624C8FAC9003F7FBA /* SecurityView.swift */,
+				0554281625AFE7AD00B6D106 /* ChatrStats.swift */,
 			);
 			path = Sections;
 			sourceTree = "<group>";
@@ -540,6 +545,7 @@
 			children = (
 				0596844D25ABED4D0051B707 /* EditProfileViewModel.swift */,
 				0596845525AC16E80051B707 /* VisitContactViewModel.swift */,
+				05A6D54625B021E400AD66DD /* AdvancedViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -889,6 +895,7 @@
 				054DA6C2250FF9DF00F28F74 /* AboutChatrView.swift in Sources */,
 				059EF95224C9153A004BA17C /* ChatMessagesView.swift in Sources */,
 				053AC4B225194C080036946E /* GIFController.swift in Sources */,
+				0554281725AFE7AD00B6D106 /* ChatrStats.swift in Sources */,
 				05A7BD5924FB36B30001BFC9 /* CameraView.swift in Sources */,
 				0572BABB239B348800AE9061 /* CustomStyles.swift in Sources */,
 				056B98A224C8FA75003F7FBA /* RingtoneView.swift in Sources */,
@@ -900,6 +907,7 @@
 				05C6951824F73C5000EEF819 /* ContactRequestView.swift in Sources */,
 				0572BAB923989A5100AE9061 /* VerifyNumberView.swift in Sources */,
 				053D33F22393C97B00CEE03E /* DismissGuardian.swift in Sources */,
+				05A6D54725B021E400AD66DD /* AdvancedViewModel.swift in Sources */,
 				0583073E240E2F120013B93B /* ChatrApp.swift in Sources */,
 				0596845625AC16E80051B707 /* VisitContactViewModel.swift in Sources */,
 				0596844E25ABED4D0051B707 /* EditProfileViewModel.swift in Sources */,

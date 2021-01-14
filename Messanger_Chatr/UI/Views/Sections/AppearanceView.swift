@@ -137,7 +137,7 @@ struct appearanceView: View {
                                 })
                                 .onTapGesture {
                                     if self.auth.subscriptionStatus == .subscribed || self.AppIconDataArray[results].title == self.AppIconDataArray.first?.title {
-                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                         self.selectedIcon = self.AppIconDataArray[results]
                                         UserDefaults.standard.set(results, forKey: "selectedAppIcon")
                                         self.auth.changeHomeIconTo(name: self.selectedIcon?.image == "AppIcon-Original" ? nil : self.selectedIcon?.image)

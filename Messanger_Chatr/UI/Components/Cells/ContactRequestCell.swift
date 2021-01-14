@@ -106,7 +106,7 @@ struct ContactRequestCell: View {
                             .foregroundColor(.white)
                             .padding(.vertical, 8)
                             .padding(.horizontal, 10)
-                            .background(Color.blue)
+                            .background(Constants.baseBlue)
                             .cornerRadius(10)
                     }
                 }

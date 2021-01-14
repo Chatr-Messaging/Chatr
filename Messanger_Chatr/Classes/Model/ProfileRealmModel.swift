@@ -98,7 +98,6 @@ class ProfileRealmModel<Element>: ObservableObject where Element: RealmSwift.Rea
 class changeProfileRealmDate {
     
     func observeFirebaseUser() {
-        print("starting observe firebase")
         let user = Database.database().reference().child("Users").child("\(Session.current.currentUserID)")
         user.observe(.value, with: { (snapshot: DataSnapshot) in
             if let dict = snapshot.value as? [String: Any] {
