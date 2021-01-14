@@ -16,6 +16,7 @@ import SDWebImageSwiftUI
 struct KeyboardCardView: View {
     @EnvironmentObject var auth: AuthModel
     @ObservedObject var dialogs = DialogRealmModel(results: try! Realm().objects(DialogStruct.self))
+    @ObservedObject var viewModel = AdvancedViewModel()
     @Binding var height: CGFloat
     @State var open: Bool = UserDefaults.standard.bool(forKey: "localOpen")
     @Binding var mainText: String
@@ -349,12 +350,12 @@ struct KeyboardCardView: View {
                         self.hasAttachments.toggle()
                         self.enableLocation.toggle()
                         
-                        self.auth.checkLocationPermission()
-                        if self.auth.locationPermission {
-                            self.region.center.longitude = self.auth.locationManager.location?.coordinate.longitude ?? 0
-                            self.region.center.latitude = self.auth.locationManager.location?.coordinate.latitude ?? 0
+                        self.viewModel.checkLocationPermission()
+                        if self.viewModel.locationPermission {
+                            self.region.center.longitude = self.viewModel.locationManager.location?.coordinate.longitude ?? 0
+                            self.region.center.latitude = self.viewModel.locationManager.location?.coordinate.latitude ?? 0
                         } else {
-                            self.auth.requestLocationPermission()
+                            self.viewModel.requestLocationPermission()
                         }
                     }, label: {
                         ZStack {

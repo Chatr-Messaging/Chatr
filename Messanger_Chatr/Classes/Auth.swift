@@ -75,11 +75,6 @@ class AuthModel: NSObject, ObservableObject {
     @Published var verifyCodeStatusKeyboard = false
     @Published var verifyPhoneStatusKeyboard = false
     
-    @Published var notificationPermission = false
-    @Published var photoPermission = false
-    @Published var locationPermission = false
-    @Published var contactsPermission = false
-    @Published var cameraPermission = false
     @Published var isLoacalAuth = false
     @Published var visitContactProfile: Bool = false
     @Published var dynamicLinkContactID: Int = 0
@@ -102,15 +97,12 @@ class AuthModel: NSObject, ObservableObject {
     
     var anyCancellable: AnyCancellable? = nil
     var anyCancellable1: AnyCancellable? = nil
-    var locationManager: CLLocationManager = CLLocationManager()
     var authStateDidChangeListenerHandle: AuthStateDidChangeListenerHandle?
     
-    var persistenceManager: PersistenceManager = PersistenceManager()
+    let persistenceManager = PersistenceManager()
 
     override init() {
         super.init()
-        self.locationManager.delegate = self
-        
         anyCancellable = profile.objectWillChange.sink { (_) in
             self.objectWillChange.send()
         }
@@ -631,132 +623,7 @@ class AuthModel: NSObject, ObservableObject {
             }
         }
     }
-        
-    // MARK: - Noti Permission
-    func checkNotiPermission() {
-        UNUserNotificationCenter.current().getNotificationSettings(completionHandler: { (settings) in
-            if settings.authorizationStatus == .notDetermined {
-                print("Noti permission is .notDermined")
-                self.notificationPermission = false
-            } else if settings.authorizationStatus == .denied {
-                print("Noti permission is .denied")
-                self.notificationPermission = false
-            } else if settings.authorizationStatus == .authorized {
-                print("Noti permission is .auth")
-                self.notificationPermission = true
-            }
-        })
-    }
-    
-    // MARK: - Photo Permission
-    func checkPhotoPermission() {
-        // Get the current authorization state.
-        let status = PHPhotoLibrary.authorizationStatus()
-        if (status == PHAuthorizationStatus.authorized) {
-            // Access has been granted.
-            self.photoPermission = true
-        } else if (status == PHAuthorizationStatus.denied) {
-            // Access has been denied.
-            self.photoPermission = false
-        }
-    }
-    
-    // MARK: - Camera Permission
-    func checkCameraPermission() {
-        if AVCaptureDevice.authorizationStatus(for: .video) ==  .authorized {
-            //already authorized
-            self.cameraPermission = true
-        } else {
-            self.cameraPermission = false
-        }
-    }
-    
-    func requestCameraPermission() {
-        AVCaptureDevice.requestAccess(for: AVMediaType.video, completionHandler: { (granted: Bool) -> Void in
-           if granted == true {
-            self.cameraPermission = true
-           } else {
-            self.cameraPermission = false
-           }
-        })
-    }
-    
-    // MARK: - Location Permission
-    
-    func requestLocationPermission() {
-        self.locationManager = CLLocationManager()
-        self.locationManager.delegate = self
-        self.locationManager.requestAlwaysAuthorization()
-        self.locationPermission = true
-    }
-    
-    func checkLocationPermission() {
-        let manager = CLLocationManager()
-        
-        if CLLocationManager.locationServicesEnabled() {
-            switch manager.authorizationStatus {
-                case .notDetermined, .restricted, .denied:
-                    print("No access to location")
-                    self.locationPermission = false
-                case .authorizedAlways, .authorizedWhenInUse:
-                    print("Access location true")
-                    self.locationPermission = true
-                @unknown default:
-                break
-            }
-        } else {
-            print("Location services are not enabled")
-            self.locationPermission = false
-        }
-    }
-    
-    // MARK: - Contacts Permission
-
-    func requestContacts() {
-        let store = CNContactStore()
-        if CNContactStore.authorizationStatus(for: .contacts) == .notDetermined {
-            store.requestAccess(for: .contacts){succeeded, err in
-                guard err == nil && succeeded else {
-                    self.contactsPermission = false
-                    return
-                }
-                if succeeded {
-                    self.contactsPermission = true
-                }
-            }
-        } else if CNContactStore.authorizationStatus(for: .contacts) == .authorized {
-            print("Contacts are authorized")
-            self.contactsPermission = true
-
-        } else if CNContactStore.authorizationStatus(for: .contacts) == .denied {
-            UINotificationFeedbackGenerator().notificationOccurred(.error)
-            self.contactsPermission = false
-        }
-    }
-    
-    func checkContactsPermission() {
-       if CNContactStore.authorizationStatus(for: .contacts) == .notDetermined {
-            print("Contacts are notDetermined")
-            self.contactsPermission = false
-       } else if CNContactStore.authorizationStatus(for: .contacts) == .authorized {
-           print("Contacts are authorized")
-           self.contactsPermission = true
-       }
-    }
 }
-
-extension AuthModel: CLLocationManagerDelegate {
-    private func locationManager(manager: CLLocationManager, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
-        if (status == CLAuthorizationStatus.denied) {
-            self.locationPermission = false
-            print("Location deniedddddddd")
-        } else if (status == CLAuthorizationStatus.authorizedAlways) {
-            self.locationPermission = true
-            print("Location is AUTHHHHHHHHH")
-        }
-    }
-}
-
 
 //MARK: ChatDelegate
 extension AuthModel: ChatDelegate {

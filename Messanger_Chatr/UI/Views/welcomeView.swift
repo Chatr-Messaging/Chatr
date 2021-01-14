@@ -57,6 +57,8 @@ var WalkthroughDataArray = [
 
 // MARK: Main Home Body
 struct MainBody: View {
+    @EnvironmentObject var auth: AuthModel
+    @ObservedObject var viewModel = AdvancedViewModel()
     @State private var continuePermissions = false
     @State private var continuePt1: Bool = false
     @State private var continuePt2: Bool = false
@@ -67,8 +69,6 @@ struct MainBody: View {
     @State var text: String = ""
     @State var textArea: String = "+1"
     @Binding var presentView: Bool
-
-    @EnvironmentObject var auth: AuthModel
              
     var body: some View {
         ZStack {
@@ -126,23 +126,30 @@ struct MainBody: View {
                 HStack(alignment: .center) {
                     PageControl(page: self.$pageIndex, color: "black")
                         .disabled(self.continuePermissions || self.continuePt1 ? true : false)
+                        .padding(.leading)
                         .frame(minWidth: 35, idealWidth: 50, maxWidth: 75)
  
                      Spacer()
                      Button(action: {
-                        if self.auth.contactsPermission == true && self.auth.locationPermission == true && self.auth.photoPermission == true && self.auth.notificationPermission == true {
+                        if self.viewModel.contactsPermission == true && self.viewModel.locationPermission == true && self.viewModel.photoPermission == true && self.viewModel.notificationPermission == true {
                             self.continuePt1.toggle()
                         } else {
                             self.continuePermissions.toggle()
                         }
                         }) {
+                        HStack(alignment: .center, spacing: 15) {
                             Text("Start Chatting")
                                 .fontWeight(.semibold)
-                                //.padding(5)
-                                .foregroundColor(Color.white)
+                                .foregroundColor(.white)
+                            
+                            Image(systemName: "arrow.right")
+                                .resizable()
+                                .scaledToFit()
+                                .font(Font.title.weight(.semibold))
+                                .frame(width: 20, height: 18, alignment: .center)
+                        }.padding(.horizontal, 15)
                      }.buttonStyle(MainButtonStyle())
-                    .frame(height: 40)
-                    .frame(maxWidth: 200)
+                    .frame(maxWidth: 190)
                     .disabled(self.continuePermissions || self.continuePt1 ? true : false)
                     .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
                 }.animation(.spring(response: 0.45, dampingFraction: 0.45, blendDuration: 0))
@@ -151,7 +158,6 @@ struct MainBody: View {
             }
             
             PermissionsView(continuePt1: $continuePt1, permisContinue: $continuePermissions)
-                .environmentObject(self.auth)
                 .frame(minHeight: 240, idealHeight: 390, maxHeight: 470, alignment: .center)
                 .frame(maxWidth: 400)
                 .background(BlurView(style: .systemThinMaterial))
@@ -284,13 +290,12 @@ struct WalkthroughCell: View, Identifiable {
 
 // MARK: Permissions View
 struct PermissionsView: View {
-    @EnvironmentObject var auth: AuthModel
+    @ObservedObject var viewModel = AdvancedViewModel()
     @Binding var continuePt1: Bool
     @Binding var permisContinue: Bool
     var locationManager: CLLocationManager = CLLocationManager()
 
     var body: some View {
-    
         VStack {
             Text("Permissions")
                 .font(.system(size: 28))
@@ -305,8 +310,8 @@ struct PermissionsView: View {
                 .lineLimit(2)
                 .foregroundColor(Color.secondary)
                 .multilineTextAlignment(.center)
-                .padding(.top, 10)
-                .padding([.trailing, .leading], 5)
+                .padding(.top, 5)
+                .padding(.horizontal, 5)
             
             Spacer()
 
@@ -330,18 +335,18 @@ struct PermissionsView: View {
                     Spacer()
 
                     Button(action: {
-                        self.auth.requestContacts()
+                        self.viewModel.requestContacts()
                     }) {
-                     Text(self.auth.contactsPermission ? "Allowed" : "Allow")
+                     Text(self.viewModel.contactsPermission ? "Allowed" : "Allow")
                            .padding([.top, .bottom], 10)
                            .padding([.leading, .trailing], 20)
                            .transition(.identity)
                      }.onAppear {
-                       self.auth.checkContactsPermission()
+                       self.viewModel.checkContactsPermission()
                      }
-                     .disabled(self.auth.contactsPermission ? true : false)
+                     .disabled(self.viewModel.contactsPermission ? true : false)
                      .frame(height: 35)
-                    .background(LinearGradient(gradient: Gradient(colors: self.auth.contactsPermission ? [Color(red: 71 / 255, green: 171 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)] : [Color(red: 195 / 255, green: 195 / 255, blue: 195 / 255, opacity: 1.0), Color(.sRGB, red: 145 / 255, green: 145 / 255, blue: 145 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom))
+                    .background(LinearGradient(gradient: Gradient(colors: !self.viewModel.contactsPermission ? [Color(red: 71 / 255, green: 171 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)] : [Color(red: 195 / 255, green: 195 / 255, blue: 195 / 255, opacity: 1.0), Color(.sRGB, red: 145 / 255, green: 145 / 255, blue: 145 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom))
                     .foregroundColor(.white)
                     .cornerRadius(20)
                 }
@@ -367,24 +372,23 @@ struct PermissionsView: View {
                                     
                     Button(action: {
                         print("allow access ")
-                        if self.auth.locationPermission == false {
-                            self.auth.requestLocationPermission()
+                        if self.viewModel.locationPermission == false {
+                            self.viewModel.requestLocationPermission()
                         }
                     }) {
-                     Text(self.auth.locationPermission ? "Allowed" : "Allow")
+                     Text(self.viewModel.locationPermission ? "Allowed" : "Allow")
                             .padding([.top, .bottom], 10)
                             .padding([.leading, .trailing], 20)
                             .transition(.identity)
                       }
-                      .disabled(self.auth.locationPermission ? true : false)
+                      .disabled(self.viewModel.locationPermission ? true : false)
                       .frame(height: 35)
-                      .background(LinearGradient(gradient: Gradient(colors: self.auth.locationPermission ? [Color(red: 71 / 255, green: 171 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)] : [Color(red: 195 / 255, green: 195 / 255, blue: 195 / 255, opacity: 1.0), Color(.sRGB, red: 145 / 255, green: 145 / 255, blue: 145 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom))
+                      .background(LinearGradient(gradient: Gradient(colors: !self.viewModel.locationPermission ? [Color(red: 71 / 255, green: 171 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)] : [Color(red: 195 / 255, green: 195 / 255, blue: 195 / 255, opacity: 1.0), Color(.sRGB, red: 145 / 255, green: 145 / 255, blue: 145 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom))
                     .foregroundColor(.white)
                     .cornerRadius(20)
-                    .onAppear(perform: ({
-                        self.auth.checkLocationPermission()
-                        print("the location enabled: \(self.auth.locationPermission)")
-                    }))
+                    .onAppear(perform: {
+                        self.viewModel.checkLocationPermission()
+                    })
                 }
                 
                 Divider()
@@ -407,17 +411,16 @@ struct PermissionsView: View {
                     Spacer()
                     
                     Button(action: {
-                        if self.auth.notificationPermission == false {
+                        if self.viewModel.notificationPermission == false {
                             print("allow access to noit")
                             if #available(iOS 10, *) {                                
                                 UNUserNotificationCenter.current().requestAuthorization(options: [.badge, .alert, .sound, .carPlay], completionHandler: { (granted, error) in
-                                    if error != nil {
+                                    if error == nil {
                                         print("error with notification permissions")
-                                    } else {
                                         DispatchQueue.main.async(execute: {
                                             UIApplication.shared.registerForRemoteNotifications()
                                         })
-                                        self.auth.checkNotiPermission()
+                                        self.viewModel.checkNotiPermission()
                                     }
                                 })
                             } else {
@@ -426,20 +429,20 @@ struct PermissionsView: View {
                                     UIApplication.shared.registerUserNotificationSettings(notificationSettings)
                                     UIApplication.shared.registerForRemoteNotifications()
                                 })
-                                self.auth.checkNotiPermission()
+                                self.viewModel.checkNotiPermission()
                             }
                         }
                       }) {
-                        Text(self.auth.notificationPermission ? "Allowed" : "Allow")
+                        Text(self.viewModel.notificationPermission ? "Allowed" : "Allow")
                             .padding([.top, .bottom], 10)
                             .padding([.leading, .trailing], 20)
                             .transition(.identity)
                       }.onAppear {
-                        self.auth.checkNotiPermission()
+                        self.viewModel.checkNotiPermission()
                       }
-                      .disabled(self.auth.notificationPermission ? true : false)
+                      .disabled(self.viewModel.notificationPermission ? true : false)
                       .frame(height: 35)
-                      .background(LinearGradient(gradient: Gradient(colors: self.auth.notificationPermission ? [Color(red: 71 / 255, green: 171 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)] : [Color(red: 195 / 255, green: 195 / 255, blue: 195 / 255, opacity: 1.0), Color(.sRGB, red: 145 / 255, green: 145 / 255, blue: 145 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom))
+                      .background(LinearGradient(gradient: Gradient(colors: !self.viewModel.notificationPermission ? [Color(red: 71 / 255, green: 171 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)] : [Color(red: 195 / 255, green: 195 / 255, blue: 195 / 255, opacity: 1.0), Color(.sRGB, red: 145 / 255, green: 145 / 255, blue: 145 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom))
                     .foregroundColor(.white)
                     .cornerRadius(20)
                 }
@@ -464,29 +467,29 @@ struct PermissionsView: View {
                     Spacer()
 
                     Button(action: {
-                        if self.auth.photoPermission == false {
+                        if self.viewModel.photoPermission == false {
                           let photos = PHPhotoLibrary.authorizationStatus()
                           if photos == .notDetermined {
                               PHPhotoLibrary.requestAuthorization({ status in
                                   if status == .authorized{
                                     DispatchQueue.main.async(execute: {
-                                        self.auth.photoPermission = true
+                                        self.viewModel.photoPermission = true
                                     })
                                   }
                               })
                           }
                         }
                     }) {
-                     Text(self.auth.photoPermission ? "Allowed" : "Allow")
+                     Text(self.viewModel.photoPermission ? "Allowed" : "Allow")
                            .padding([.top, .bottom], 10)
                            .padding([.leading, .trailing], 20)
                            .transition(.identity)
                      }.onAppear {
-                       self.auth.checkPhotoPermission()
+                       self.viewModel.checkPhotoPermission()
                      }
-                     .disabled(self.auth.photoPermission ? true : false)
+                     .disabled(self.viewModel.photoPermission ? true : false)
                      .frame(height: 35)
-                    .background(LinearGradient(gradient: Gradient(colors: self.auth.photoPermission ? [Color(red: 71 / 255, green: 171 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)] : [Color(red: 195 / 255, green: 195 / 255, blue: 195 / 255, opacity: 1.0), Color(.sRGB, red: 145 / 255, green: 145 / 255, blue: 145 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom))
+                    .background(LinearGradient(gradient: Gradient(colors: !self.viewModel.photoPermission ? [Color(red: 71 / 255, green: 171 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)] : [Color(red: 195 / 255, green: 195 / 255, blue: 195 / 255, opacity: 1.0), Color(.sRGB, red: 145 / 255, green: 145 / 255, blue: 145 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom))
                    .foregroundColor(.white)
                    .cornerRadius(20)
                 }
@@ -512,42 +515,50 @@ struct PermissionsView: View {
                     Spacer()
 
                     Button(action: {
-                        if self.auth.cameraPermission == false {
-                            self.auth.requestCameraPermission()
+                        if self.viewModel.cameraPermission == false {
+                            AVCaptureDevice.requestAccess(for: .video, completionHandler: { (granted: Bool) in
+                                if granted {
+                                    self.viewModel.cameraPermission = true
+                                } else {
+                                    self.viewModel.cameraPermission = false
+                                }
+                            })
                         }
                     }) {
-                     Text(self.auth.cameraPermission ? "Allowed" : "Allow")
+                     Text(self.viewModel.cameraPermission ? "Allowed" : "Allow")
                            .padding([.top, .bottom], 10)
                            .padding([.leading, .trailing], 20)
                            .transition(.identity)
                      }.onAppear {
-                       self.auth.checkCameraPermission()
+                       self.viewModel.checkCameraPermission()
                      }
-                     .disabled(self.auth.cameraPermission ? true : false)
+                     .disabled(self.viewModel.cameraPermission ? true : false)
                      .frame(height: 35)
-                    .background(LinearGradient(gradient: Gradient(colors: self.auth.cameraPermission ? [Color(red: 71 / 255, green: 171 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)] : [Color(red: 195 / 255, green: 195 / 255, blue: 195 / 255, opacity: 1.0), Color(.sRGB, red: 145 / 255, green: 145 / 255, blue: 145 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom))
+                    .background(LinearGradient(gradient: Gradient(colors: !self.viewModel.cameraPermission ? [Color(red: 71 / 255, green: 171 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)] : [Color(red: 195 / 255, green: 195 / 255, blue: 195 / 255, opacity: 1.0), Color(.sRGB, red: 145 / 255, green: 145 / 255, blue: 145 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom))
                    .foregroundColor(.white)
                    .cornerRadius(20)
                 }
-                
-                
-            }.offset(y: 10)
+            }
             
             Spacer()
-            
-            if self.auth.notificationPermission == true && self.auth.photoPermission == true && self.auth.locationPermission == true && self.auth.contactsPermission == true && self.auth.cameraPermission == true {
+            if self.viewModel.notificationPermission == true && self.viewModel.photoPermission == true && self.viewModel.locationPermission == true && self.viewModel.contactsPermission == true && self.viewModel.cameraPermission == true {
                 Button(action: {
                    self.continuePt1.toggle()
                     self.permisContinue.toggle()
                 }) {
-                    Text("Continue")
-                        .fontWeight(.medium)
-                        .padding(20)
-                        .foregroundColor(Color.white)
+                    HStack(alignment: .center, spacing: 15) {
+                        Text("Continue")
+                            .fontWeight(.semibold)
+                            .foregroundColor(.white)
+                        
+                        Image(systemName: "arrow.right")
+                            .resizable()
+                            .scaledToFit()
+                            .font(Font.title.weight(.semibold))
+                            .frame(width: 20, height: 18, alignment: .center)
+                    }.padding(.horizontal, 15)
                 }.buttonStyle(MainButtonStyle())
-                .frame(height: 35)
-                .padding(.horizontal, 45)
-                .padding(.top, 5)
+                .frame(width: 180)
                 .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
             } else {
                 Button(action: {
@@ -595,8 +606,8 @@ struct PhoneNumberView: View {
                 .font(.footnote)
                 .foregroundColor(Color.secondary)
                 .multilineTextAlignment(.center)
-                .padding(.top, 10)
-                .padding([.trailing, .leading], 10)
+                .padding(.top, 5)
+                .padding(.horizontal, 30)
             Spacer()
             
             HStack {
@@ -655,9 +666,9 @@ struct PhoneNumberView: View {
                         self.auth.sendVerificationNumber(numberText: self.textArea + self.text)
                     }) {
                         Text("Submit")
-                        .fontWeight(.medium)
-                        .padding(20)
-                        .foregroundColor(Color.white)
+                            .fontWeight(.semibold)
+                            .padding(20)
+                            .foregroundColor(Color.white)
                     }.buttonStyle(MainButtonStyle())
                     .frame(height: 40)
                     .padding(.horizontal, 45)
@@ -668,13 +679,19 @@ struct PhoneNumberView: View {
                     Button(action: {
                        self.auth.sendVerificationNumber(numberText: self.textArea + self.text)
                    }) {
-                       Text("Verify")
-                       .fontWeight(.medium)
-                       .padding(20)
-                       .foregroundColor(Color.white)
+                        HStack(alignment: .center, spacing: 10) {
+                            Text("Verify")
+                                .fontWeight(.semibold)
+                                .foregroundColor(.white)
+                            
+                            Image(systemName: "arrow.right")
+                                .resizable()
+                                .scaledToFit()
+                                .font(Font.title.weight(.semibold))
+                                .frame(width: 20, height: 18, alignment: .center)
+                        }.padding(.horizontal, 15)
                     }.buttonStyle(MainButtonStyle())
-                    .frame(height: 40)
-                    .padding(.horizontal, 45)
+                    .frame(width: 175)
                     .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
                 } else {
                     Text("Verify")
@@ -728,8 +745,8 @@ struct VerifyNumberView: View {
                     .foregroundColor(Color.secondary)
                     .lineLimit(2)
                     .multilineTextAlignment(.center)
-                    .padding(.top, 10)
-                    .padding([.trailing, .leading], 30)
+                    .padding(.top, 5)
+                    .padding(.horizontal, 30)
                                 
 //                    VerifyNumberViewController()
 //                        .environmentObject(self.auth)

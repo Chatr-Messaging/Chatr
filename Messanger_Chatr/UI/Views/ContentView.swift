@@ -23,7 +23,7 @@ struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ZStack {
             if #available(iOS 14.0, *) {
-                mainHomeList(showNewChat: .constant(false), showContacts: .constant(false), showUserProfile: .constant(false))
+                mainHomeList()
                     .background(Color("bgColor"))
             } else {
                 // Fallback on earlier versions
@@ -49,9 +49,6 @@ struct OldHomeView: View {
 struct HomeView: View {
     @EnvironmentObject var auth: AuthModel
     @State var loginIsPresented: Bool = true
-    @State var showNewChat: Bool = false
-    @State var showContacts: Bool = false
-    @State var showUserProfile: Bool = false
 
     var body: some View {
         ZStack {
@@ -133,9 +130,7 @@ struct HomeView: View {
                     .edgesIgnoringSafeArea(.all)
             }
             
-            mainHomeList(showNewChat: self.$showNewChat,
-                         showContacts: self.$showContacts,
-                         showUserProfile: self.$showUserProfile)
+            mainHomeList()
                 .background(Color("bgColor"))
                 .environmentObject(self.auth)
                 .edgesIgnoringSafeArea(.all)
@@ -159,9 +154,9 @@ struct mainHomeList: View {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @EnvironmentObject var auth: AuthModel
     @Environment(\.colorScheme) var colorScheme
-    @Binding var showNewChat: Bool
-    @Binding var showContacts: Bool
-    @Binding var showUserProfile: Bool
+    @State var showContacts: Bool = false
+    @State var showUserProfile: Bool = false
+    @State var showNewChat: Bool = false
     @State var searchText: String = String()
     @State var keyboardText: String = String()
     @State var selectedDialogID: String = String()
@@ -349,12 +344,13 @@ struct mainHomeList: View {
                                     .font(.system(size: 28))
                                     .fontWeight(.semibold)
                                     .frame(maxWidth: .infinity, alignment: .center)
-                                    .padding(.vertical, 10)
+                                    .padding(.top, 15)
+                                    .padding(.bottom, 5)
                                 
                                 Text("Start a new conversation!")
                                     .font(.system(size: 18))
                                     .foregroundColor(Color.secondary)
-                                    .padding(.bottom, 30)
+                                    .padding(.bottom, 25)
                                 
                                 Button(action: {
                                     self.showNewChat.toggle()
@@ -370,13 +366,13 @@ struct mainHomeList: View {
                                             .scaledToFit()
                                             .frame(width: 22, height: 22, alignment: .center)
                                             .offset(x: -2, y: -2)
-                                    }.padding(15)
+                                    }.padding(.horizontal, 15)
                                 }.buttonStyle(MainButtonStyle())
                                 .frame(maxWidth: 230)
                                 .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 8)
                                 
                                 Spacer()
-                            }.offset(y: Constants.screenWidth < 375 ? 30 : -30)
+                            }.offset(y: Constants.screenWidth < 375 ? 60 : -30)
                         } else {
                             //Main Dialog Cells
                             VStack {
@@ -463,7 +459,7 @@ struct mainHomeList: View {
                         }
                     }
                     
-                    if self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.count >= 4 || self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.count == 0 {
+                    if self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.count >= 4 || self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.count >= 1 {
                         FooterInformation()
                             .padding(.top, 140)
                             .padding(.bottom, 25)

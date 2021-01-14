@@ -14,13 +14,7 @@ struct MainButtonStyle: ButtonStyle {
             .frame(minWidth: 40, maxWidth: .infinity, minHeight: 55, maxHeight: 55)
             .foregroundColor(.white)
             .background(configuration.isPressed ? Color(.sRGB, red: 78/255, green: 153/255, blue: 255/255, opacity: 1.0) : Color(.sRGB, red: 31/255, green: 127/255, blue: 255/255, opacity: 1.0))
-//                LinearGradient(
-//                gradient: Gradient(colors: [Color(red: 71 / 255, green: 171 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)]),
-//                startPoint: .top,
-//                endPoint: .bottom
-//            ))
             .cornerRadius(15)
-            .opacity(configuration.isPressed ? 0.95 : 1)
             .scaleEffect(configuration.isPressed ? 0.975 : 1.0)
     }
 }

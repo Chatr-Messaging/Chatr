@@ -50,18 +50,19 @@ class AddressBookRealmModel<Element>: ObservableObject where Element: RealmSwift
 }
 
 class changeAddressBookRealmData {
+    let advancedViewModel = AdvancedViewModel()
     
     func uploadAddressBook(completion: @escaping (Bool) -> ()) {
         let status = CNContactStore.authorizationStatus(for: .contacts)
         if status == .denied || status == .restricted {
-            AuthModel().requestContacts()
+            advancedViewModel.requestContacts()
             completion(false)
         }
         let store = CNContactStore()
         store.requestAccess(for: .contacts) { granted, error in
             guard granted else {
                 DispatchQueue.main.async {
-                    AuthModel().requestContacts()
+                    self.advancedViewModel.requestContacts()
                 }
                 return
             }
