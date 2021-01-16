@@ -53,7 +53,7 @@ struct ContactsView: View {
                                             if let avitarURL = ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.avatar {
                                                 WebImage(url: URL(string: avitarURL))
                                                     .resizable()
-                                                    .placeholder{ Image("empty-profile").resizable().frame(width: 80, height: 80, alignment: .center).scaledToFill() }
+                                                    .placeholder{ Image("empty-profile").resizable().frame(width: 55, height: 55, alignment: .center).scaledToFill() }
                                                     .indicator(.activity)
                                                     .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                                                     .scaledToFill()
@@ -321,7 +321,7 @@ struct ContactsView: View {
                         } else {
                             
                             //MARK: Search, Filter, & Add Section
-                            HStack {
+                            HStack(alignment: .bottom) {
                                 //Seach Bar
                                 ZStack {
                                     HStack {
@@ -367,7 +367,6 @@ struct ContactsView: View {
                                     }
                                 }.buttonStyle(HomeButtonStyle())
                                 .padding(.horizontal)
-                                .offset(y: -2)
                                 .sheet(isPresented: self.$showAddNewContact, onDismiss: {
                                     if self.newDialogID != 0 {
                                         self.dismissView.toggle()

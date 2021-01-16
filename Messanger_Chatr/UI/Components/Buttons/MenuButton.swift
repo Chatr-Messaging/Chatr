@@ -18,8 +18,8 @@ struct MenuBtn: View {
 
     var body: some View {
         Button(action: {
-            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
             self.showNewChat.toggle()
+            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
         }) {
             ZStack {
                 Image("ComposeIcon")

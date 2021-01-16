@@ -49,7 +49,7 @@ struct ProfileView: View {
                                 if let avitarURL = self.profile.results.first?.avatar {
                                     WebImage(url: URL(string: avitarURL))
                                         .resizable()
-                                        .placeholder{ Image(systemName: "person.fill") }
+                                        .placeholder{ Image("empty-profile").resizable().frame(width: 55, height: 55, alignment: .center).scaledToFill() }
                                         .indicator(.activity)
                                         .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                                         .scaledToFill()

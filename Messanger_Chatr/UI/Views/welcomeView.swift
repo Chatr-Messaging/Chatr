@@ -83,9 +83,9 @@ struct MainBody: View {
                             .offset(x: continuePermissions ? -50 : 0)
                             .offset(x: continuePt1 ? -50 : 0)
                             .offset(x: self.auth.verifyPhoneNumberStatus == .success ? -50 : 0)
-                            .offset(x: self.auth.haveUserFullName == true && self.auth.haveUserProfileImg == true ? -50 : 0)
+                            .offset(x: self.auth.haveUserFullName == true && self.auth.haveUserProfileImg == true && self.auth.isFirstTimeUser == false && self.auth.verifyCodeStatus == .success ? -50 : 0)
                             .offset(x: self.continuePt4 || (self.auth.haveUserProfileImg == false && self.auth.verifyCodeStatus == .success) ? -50 : 0)
-                            .frame(width: Constants.screenWidth * 4, height: Constants.screenHeight, alignment: .leading)
+                            .frame(width: Constants.screenWidth * 3.5, height: Constants.screenHeight, alignment: .leading)
                             .animation(.spring(response: 0.6, dampingFraction: 0.45, blendDuration: 0.4))
                             .zIndex(-1)
                         
@@ -95,18 +95,17 @@ struct MainBody: View {
                                     Text("Welcome to")
                                         .fontWeight(.regular)
                                         .foregroundColor(Color("SoftTextColor"))
-                                        //.shadow(color: Color("buttonShadow"), radius: 2, x: 0, y: 2)
                                     
                                     Text("Chatr")
                                         .font(.system(size: 55))
                                         .fontWeight(.bold)
                                         .foregroundColor(Color("SoftTextColor"))
-                                        //.shadow(color: Color("buttonShadow"), radius: 5, x: 0, y: 5)
                                 }
                                 
                                 Spacer()
                                 Image("iconCoin")
                                     .resizable()
+                                    .scaledToFit()
                                     .frame(width: 60, height: 60, alignment: .center)
                                     .shadow(color: Color("buttonShadow"), radius: 20, x: 0, y: 10)
                             }.padding(.all)
@@ -128,9 +127,11 @@ struct MainBody: View {
                         .disabled(self.continuePermissions || self.continuePt1 ? true : false)
                         .padding(.leading)
                         .frame(minWidth: 35, idealWidth: 50, maxWidth: 75)
+                        .animation(.spring(response: 0.45, dampingFraction: 0.45, blendDuration: 0))
  
                      Spacer()
                      Button(action: {
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                         if self.viewModel.contactsPermission == true && self.viewModel.locationPermission == true && self.viewModel.photoPermission == true && self.viewModel.notificationPermission == true {
                             self.continuePt1.toggle()
                         } else {
@@ -152,12 +153,11 @@ struct MainBody: View {
                     .frame(maxWidth: 190)
                     .disabled(self.continuePermissions || self.continuePt1 ? true : false)
                     .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
-                }.animation(.spring(response: 0.45, dampingFraction: 0.45, blendDuration: 0))
-                .padding(.horizontal, 25)
+                }.padding(.horizontal, 25)
                 .offset(y: self.continuePermissions || self.continuePt1 ? 150 : -44)
             }
             
-            PermissionsView(continuePt1: $continuePt1, permisContinue: $continuePermissions)
+            PermissionsView(viewModel: self.viewModel, continuePt1: $continuePt1, permisContinue: $continuePermissions)
                 .frame(minHeight: 240, idealHeight: 390, maxHeight: 470, alignment: .center)
                 .frame(maxWidth: 400)
                 .background(BlurView(style: .systemThinMaterial))
@@ -167,8 +167,7 @@ struct MainBody: View {
                 .shadow(color: Color("buttonShadow_Deeper"), radius: 15, x: 0, y: 15)
                 .offset(x: continuePermissions ? 0 : Constants.screenWidth, y: 0)
                 .animation(.spring(response: 0.45, dampingFraction: 0.45, blendDuration: 0))
-            
-        
+
             PhoneNumberView(continuePt1: $continuePt1, text: self.$text, textArea: self.$textArea)
                 .environmentObject(self.auth)
                 .frame(minHeight: 240, idealHeight: 260, maxHeight: 270, alignment: .center)
@@ -179,7 +178,7 @@ struct MainBody: View {
                 .shadow(color: Color("buttonShadow_Deeper"), radius: 15, x: 0, y: 15)
                 .offset(x: continuePt1 ? 0 : Constants.screenWidth, y: 60)
                 .offset(x:self.auth.verifyPhoneNumberStatus == .success ? -(Constants.screenWidth) : 0)
-                .animation(.spring(response: 0.45, dampingFraction: 0.45, blendDuration: 0))
+                .animation(.spring(response: 0.48, dampingFraction: 0.45, blendDuration: 0))
                 .KeyboardAwarePadding()
                 .resignKeyboardOnDragGesture()
 
@@ -194,7 +193,7 @@ struct MainBody: View {
                 .shadow(color: Color("buttonShadow_Deeper"), radius: 15, x: 0, y: 15)
                 .offset(x: self.auth.verifyPhoneNumberStatus == .success ? 0 : Constants.screenWidth, y: 75)
                 .offset(x: self.auth.verifyCodeStatus == .success ? -(Constants.screenWidth) : 0)
-                .animation(.spring(response: 0.45, dampingFraction: 0.45, blendDuration: 0))
+                .animation(.spring(response: 0.48, dampingFraction: 0.45, blendDuration: 0))
                 .KeyboardAwarePadding()
                 .resignKeyboardOnDragGesture()
             
@@ -205,13 +204,11 @@ struct MainBody: View {
                 .frame(maxWidth: 400)
                 .background(BlurView(style: .systemThinMaterial))
                 .cornerRadius(30)
-                .padding(.top, 20)
-                .padding(.bottom, 50)
                 .padding(.horizontal, 25)
                 .shadow(color: Color("buttonShadow_Deeper"), radius: 15, x: 10, y: 15)
                 .offset(x: self.auth.verifyCodeStatus == .success && self.auth.haveUserFullName == false ? 0 : self.continuePt4 ? 0 : Constants.screenWidth, y: 60)
                 .offset(x: self.continuePt4 ? -(Constants.screenWidth) : 0, y: 0)
-                .animation(.spring(response: 0.45, dampingFraction: 0.45, blendDuration: 0))
+                .animation(.spring(response: 0.48, dampingFraction: 0.45, blendDuration: 0))
                 .KeyboardAwarePadding()
                 .resignKeyboardOnDragGesture()
            
@@ -226,7 +223,7 @@ struct MainBody: View {
                 .padding(.horizontal, 25)
                 .shadow(color: Color("buttonShadow_Deeper"), radius: 15, x: 0, y: 15)
                 .offset(x: self.continuePt4 || (self.auth.haveUserProfileImg == false && self.auth.verifyCodeStatus == .success && self.auth.haveUserFullName == true) ? 0 : Constants.screenWidth, y: 10)
-                .animation(.spring(response: 0.45, dampingFraction: 0.45, blendDuration: 0))
+                .animation(.spring(response: 0.48, dampingFraction: 0.45, blendDuration: 0))
                 .resignKeyboardOnDragGesture()
             
             welcomeBackView(presentView: self.$presentView)
@@ -238,8 +235,8 @@ struct MainBody: View {
                 .padding(.bottom, 50)
                 .padding(.horizontal, 25)
                 .shadow(color: Color("buttonShadow_Deeper"), radius: 15, x: 0, y: 15)
-                .offset(x: self.auth.haveUserFullName == true && self.auth.haveUserProfileImg == true ? 0 : Constants.screenWidth, y: 50)
-                .animation(.spring(response: 0.45, dampingFraction: 0.45, blendDuration: 0))
+                .offset(x: self.auth.haveUserFullName == true && self.auth.haveUserProfileImg == true && self.auth.isFirstTimeUser == false && self.auth.verifyCodeStatus == .success ? 0 : Constants.screenWidth, y: 50)
+                .animation(.spring(response: 0.48, dampingFraction: 0.45, blendDuration: 0))
                 .resignKeyboardOnDragGesture()
         }
     }
@@ -290,7 +287,7 @@ struct WalkthroughCell: View, Identifiable {
 
 // MARK: Permissions View
 struct PermissionsView: View {
-    @ObservedObject var viewModel = AdvancedViewModel()
+    @ObservedObject var viewModel: AdvancedViewModel
     @Binding var continuePt1: Bool
     @Binding var permisContinue: Bool
     var locationManager: CLLocationManager = CLLocationManager()
@@ -471,12 +468,14 @@ struct PermissionsView: View {
                           let photos = PHPhotoLibrary.authorizationStatus()
                           if photos == .notDetermined {
                               PHPhotoLibrary.requestAuthorization({ status in
-                                  if status == .authorized{
+                                  if status == .authorized {
                                     DispatchQueue.main.async(execute: {
                                         self.viewModel.photoPermission = true
                                     })
                                   }
                               })
+                          } else if photos == .authorized {
+                            self.viewModel.photoPermission = true
                           }
                         }
                     }) {
@@ -542,41 +541,49 @@ struct PermissionsView: View {
             
             Spacer()
             if self.viewModel.notificationPermission == true && self.viewModel.photoPermission == true && self.viewModel.locationPermission == true && self.viewModel.contactsPermission == true && self.viewModel.cameraPermission == true {
-                Button(action: {
-                   self.continuePt1.toggle()
-                    self.permisContinue.toggle()
-                }) {
-                    HStack(alignment: .center, spacing: 15) {
-                        Text("Continue")
-                            .fontWeight(.semibold)
-                            .foregroundColor(.white)
-                        
-                        Image(systemName: "arrow.right")
-                            .resizable()
-                            .scaledToFit()
-                            .font(Font.title.weight(.semibold))
-                            .frame(width: 20, height: 18, alignment: .center)
-                    }.padding(.horizontal, 15)
-                }.buttonStyle(MainButtonStyle())
-                .frame(width: 180)
-                .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                        self.continuePt1.toggle()
+                        self.permisContinue.toggle()
+                    }) {
+                        HStack(alignment: .center, spacing: 15) {
+                            Text("Continue")
+                                .fontWeight(.semibold)
+                                .foregroundColor(.white)
+                            
+                            Image(systemName: "arrow.right")
+                                .resizable()
+                                .scaledToFit()
+                                .font(Font.title.weight(.semibold))
+                                .frame(width: 20, height: 18, alignment: .center)
+                        }.padding(.horizontal, 15)
+                    }.buttonStyle(MainButtonStyle())
+                    .frame(width: 170)
+                    .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
+                }
             } else {
-                Button(action: {
-                    self.continuePt1.toggle()
-                    self.permisContinue.toggle()
-                 }) {
-                    ZStack {
-                        Text("Skip")
-                            .italic()
-                            .font(.system(size: 16))
-                            .font(.footnote)
-                            .foregroundColor(Color.secondary)
-                            .multilineTextAlignment(.center)
-                            .padding(.all)
-                    }
-                }.offset(y: 10)
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                        self.continuePt1.toggle()
+                        self.permisContinue.toggle()
+                     }) {
+                        ZStack {
+                            Text("Skip")
+                                .italic()
+                                .font(.system(size: 16))
+                                .fontWeight(.medium)
+                                .foregroundColor(Color("disabledButton"))
+                                .multilineTextAlignment(.center)
+                                .padding(.all, 15)
+                                .padding(.horizontal, 10)
+                        }
+                    }.buttonStyle(changeBGButtonStyleDisabled())
+                }
             }
-                        
             Spacer()
         }.padding([.trailing, .leading], 20)
     }
@@ -607,7 +614,7 @@ struct PhoneNumberView: View {
                 .foregroundColor(Color.secondary)
                 .multilineTextAlignment(.center)
                 .padding(.top, 5)
-                .padding(.horizontal, 30)
+                .padding(.horizontal)
             Spacer()
             
             HStack {
@@ -659,6 +666,7 @@ struct PhoneNumberView: View {
                     .padding(.horizontal, 25)
                     .foregroundColor(Color.secondary)
                     .onAppear {
+                        UINotificationFeedbackGenerator().notificationOccurred(.error)
                         self.continuePt1 = true
                     }
                 if !self.text.isEmpty {
@@ -676,28 +684,52 @@ struct PhoneNumberView: View {
                 }
             } else if auth.verifyPhoneNumberStatus == .undefined {
                 if !self.text.isEmpty {
-                    Button(action: {
-                       self.auth.sendVerificationNumber(numberText: self.textArea + self.text)
-                   }) {
-                        HStack(alignment: .center, spacing: 10) {
-                            Text("Verify")
-                                .fontWeight(.semibold)
-                                .foregroundColor(.white)
-                            
-                            Image(systemName: "arrow.right")
-                                .resizable()
-                                .scaledToFit()
-                                .font(Font.title.weight(.semibold))
-                                .frame(width: 20, height: 18, alignment: .center)
-                        }.padding(.horizontal, 15)
-                    }.buttonStyle(MainButtonStyle())
-                    .frame(width: 175)
-                    .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
-                } else {
-                    Text("Verify")
-                        .fontWeight(.regular)
-                        .padding(5)
-                        .foregroundColor(.secondary)
+                    HStack() {
+                        Spacer()
+                        Button(action: {
+                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                           self.auth.sendVerificationNumber(numberText: self.textArea + self.text)
+                       }) {
+                            HStack(alignment: .center, spacing: 10) {
+                                Text("Verify")
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.white)
+                                
+                                Image(systemName: "arrow.right")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .font(Font.title.weight(.semibold))
+                                    .frame(width: 20, height: 18, alignment: .center)
+                            }.padding(.horizontal, 15)
+                        }.buttonStyle(MainButtonStyle())
+                        .frame(width: 160)
+                        .offset(x: -10)
+                        .padding(.trailing)
+                        .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
+                    }
+                } else {                    
+                    HStack() {
+                        Spacer()
+                        Button(action: {
+                            UINotificationFeedbackGenerator().notificationOccurred(.error)
+                       }) {
+                            HStack(alignment: .center, spacing: 10) {
+                                Text("Verify")
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(Color("disabledButton"))
+                                
+                                Image(systemName: "arrow.right")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .font(Font.title.weight(.medium))
+                                    .frame(width: 20, height: 18, alignment: .center)
+                            }.padding(.horizontal, 15)
+                        }.buttonStyle(MainButtonStyleDeselected())
+                        .frame(width: 160)
+                        .offset(x: -10)
+                        .padding(.trailing)
+                        .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
+                    }
                 }
             } else {
               Text("Verify")
@@ -727,7 +759,7 @@ struct VerifyNumberView: View {
     @Binding var textArea: String
         
     var body: some View {
-        ZStack {
+        ZStack(alignment: .center) {
             VStack(alignment: .center) {
                 Text("Verify Phone Number")
                     .font(.system(size: 28))
@@ -736,10 +768,8 @@ struct VerifyNumberView: View {
                     .foregroundColor(Color.primary)
                     .padding(.top, 30)
                     .padding([.trailing, .leading], 20)
-                
 
                 Text("Enter the 6 digit code sent to \n\(self.textArea) \(text.format(phoneNumber: String(text.dropFirst())))")
-                    //.format(phoneNumber: phonenum3) ?? "+1 (123) 456 7890")")
                     .font(.system(size: 12))
                     .font(.footnote)
                     .foregroundColor(Color.secondary)
@@ -747,40 +777,14 @@ struct VerifyNumberView: View {
                     .multilineTextAlignment(.center)
                     .padding(.top, 5)
                     .padding(.horizontal, 30)
-                                
-//                    VerifyNumberViewController()
-//                        .environmentObject(self.auth)
-//                        .frame(height: 70)
-//                        .font(.system(size: 24))
-//                        .padding([.leading, .trailing], 30)
-//                        //.opacity(self.auth.verifyPhoneNumberStatus == .success ? 1 : 0)
+
                 Spacer()
-                
-//                VerifyCodeTextFieldView(text: $auth.text, isFirstResponder: $continuePt3)
-//                    .environmentObject(self.auth)
-//                    .cornerRadius(18)
-//                    .frame(height: 50)
-//                    .lineLimit(1)
-//                    .disabled(auth.text.count >= 6 ? true : false)
-//                    .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 5)
-//                    .padding([.leading, .trailing], 30)
                 if auth.verifyCodeStatus == .success {
                     Text("Success")
                         .font(.footnote)
                         .padding([.trailing, .leading], 20)
                         .foregroundColor(Color.secondary)
-                } else if auth.verifyCodeStatus == .loading {
-                    Circle()
-                        .trim(from: 0, to: 0.8)
-                        .stroke(Color.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
-                        .frame(width: 25, height: 25)
-                        .rotationEffect(.init(degrees: loadAni ? 360 : 0))
-                        .animation(Animation.linear(duration: 0.55).repeatForever(autoreverses: false))
-                        .onAppear(perform: ({
-                            self.loadAni.toggle()
-                        }))
                 } else if auth.verifyCodeStatus == .error {
-                    
                     VerifyCodeTextFieldView(text: $textCode, isFirstResponder: $auth.verifyPhoneStatusKeyboard)
                         .environmentObject(self.auth)
                         .cornerRadius(18)
@@ -789,23 +793,17 @@ struct VerifyNumberView: View {
                         .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 5)
                         .padding([.leading, .trailing], 30)
                     
-                    /*
-                    TextField("enter 6 diget code", text: $auth.text)
-                        .keyboardType(.numberPad)
-                        .font(.system(size: 20))
-                        .foregroundColor(.primary)
-                        .frame(height: 50)
-                        .lineLimit(1)
-                        .multilineTextAlignment(.center)
-                        .background(Color("bgColor"))
-                        .cornerRadius(18)
-                        .disabled(auth.text.count >= 6 ? true : false)
-                        .padding([.leading, .trailing], 30)
-                        .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 5)
-                    */
                     Text("error, please try again")
                         .font(.footnote)
-                        .padding([.trailing, .leading], 20)
+                        .padding(.horizontal, 20)
+                        .foregroundColor(Color.secondary)
+                        .onAppear() {
+                            UINotificationFeedbackGenerator().notificationOccurred(.error)
+                        }
+                } else if auth.verifyCodeStatus == .loading {
+                    Text("verifying...")
+                        .font(.footnote)
+                        .padding(.horizontal, 20)
                         .foregroundColor(Color.secondary)
                 } else {
                     VerifyCodeTextFieldView(text: $textCode, isFirstResponder: $auth.verifyPhoneStatusKeyboard)
@@ -814,23 +812,17 @@ struct VerifyNumberView: View {
                         .frame(height: 50)
                         .lineLimit(1)
                         .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 5)
-                        .padding([.leading, .trailing], 30)
-                    /*
-                    TextField("enter 6 diget code", text: $auth.text)
-                        .keyboardType(.numberPad)
-                        .font(.system(size: 20))
-                        .foregroundColor(.primary)
-                        .frame(height: 50)
-                        .lineLimit(1)
-                        .multilineTextAlignment(.center)
-                        .background(Color("bgColor"))
-                        .cornerRadius(18)
-                        .disabled(auth.text.count >= 6 ? true : false)
-                        .padding([.leading, .trailing], 30)
-                        .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 5)
-                    */
+                        .padding(.horizontal, 30)
                 }
                 
+//                Circle()
+//                    .trim(from: 0, to: 0.8)
+//                    .stroke(Color.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+//                    .frame(width: auth.verifyCodeStatus == .loading ? 25 : 0, height: auth.verifyCodeStatus == .loading ? 25 : 0)
+//                    .rotationEffect(.init(degrees: auth.verifyCodeStatus == .loading ? 360 : 0))
+//                    .opacity(auth.verifyCodeStatus == .loading ? 1 : 0)
+//                    .animation(Animation.linear(duration: 0.55).repeatForever(autoreverses: false))
+
                 Button(action: {
                     self.auth.verifyPhoneNumberStatus = .undefined
                     self.auth.verifyCodeStatus = .undefined
@@ -852,10 +844,11 @@ struct VerifyNumberView: View {
 
 // MARK: Add Info / Name View
 struct AddInfoView: View {
+    @EnvironmentObject var auth: AuthModel
     @Binding var continuePt4: Bool
     @State var firstNameFilled: Bool = false
+    @State var loadingSetName: Bool = false
     @State var text = ""
-    @EnvironmentObject var auth: AuthModel
 
     var body: some View {
         ZStack {
@@ -884,27 +877,56 @@ struct AddInfoView: View {
                     
                     if !self.text.isEmpty {
                         Button(action: {
+                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                            self.loadingSetName = true
                             self.auth.updateFullName(phoneNumber: UserDefaults.standard.string(forKey: "phoneNumber")  ?? "", fullName: self.text.trimmingCharacters(in: .whitespacesAndNewlines), completion: { result in
                                 if result != true {
-                                    //error
+                                    self.auth.haveUserFullName = false
+                                    self.loadingSetName = false
                                 }
                                 //success
-                                self.auth.haveUserFullName = true
-                                self.continuePt4 = true
                                 UIApplication.shared.endEditing(true)
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                    self.loadingSetName = false
+                                    self.auth.haveUserFullName = true
+                                    self.continuePt4 = true
+                                }
                             })
                         }) {
-                            Text("Save Name")
-                                .fontWeight(.medium)
-                                .foregroundColor(Color.white)
-                        }
-                        .buttonStyle(MainButtonStyle())
-                        //.disabled(self.fullName.isEmpty)
-                        //.opacity(self.fullName.isEmpty ? 0.0 : 1.0)
-                        .padding(.horizontal, 45)
-                        .frame(height: 40)
-                        .frame(maxWidth: 350)
+                            HStack(alignment: .center, spacing: 10) {
+                                Text("Set Name")
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.white)
+                                
+                                Image(systemName: "arrow.right")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .font(Font.title.weight(.semibold))
+                                    .frame(width: 20, height: 18, alignment: .center)
+                            }.padding(.horizontal, 15)
+                        }.buttonStyle(MainButtonStyle())
+                        .frame(width: 170)
+                        .disabled(loadingSetName ? true : false)
+                        .padding(.horizontal)
                         .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
+                    } else {
+                        Button(action: {
+                            //UINotificationFeedbackGenerator().notificationOccurred(.error)
+                       }) {
+                            HStack(alignment: .center, spacing: 10) {
+                                Text("Set Name")
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(Color("disabledButton"))
+                                
+                                Image(systemName: "arrow.right")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .font(Font.title.weight(.medium))
+                                    .frame(width: 20, height: 18, alignment: .center)
+                            }.padding(.horizontal, 15)
+                        }.buttonStyle(MainButtonStyleDeselected())
+                        .frame(width: 170)
+                        .padding(.horizontal)
                     }
                     Spacer()
                 }
@@ -942,6 +964,7 @@ struct AddProfileImageView: View {
                 
                 ZStack {
                     Button(action: {
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                         withAnimation {
                             self.showImagePicker = true
                         }
@@ -994,6 +1017,7 @@ struct AddProfileImageView: View {
                 Button(action: {
                     //UIApplication.shared.endEditing(true)
                     //self.auth.isUserAuthenticated = .signedIn
+                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                     self.presentView = false
                     //self.presentationMode.wrappedValue.dismiss()
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
@@ -1025,10 +1049,13 @@ struct AddProfileImageView: View {
         guard let inputImage = inputImage else { return }
         image = Image(uiImage: inputImage)
         self.auth.setUserAvatar(image: inputImage, completion: { result in
-            self.presentationMode.wrappedValue.dismiss()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                self.auth.preventDismissal = false
-                self.auth.isUserAuthenticated = .signedIn
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                self.presentationMode.wrappedValue.dismiss()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                    self.auth.preventDismissal = false
+                    self.auth.isUserAuthenticated = .signedIn
+                }
             }
         })
     }
@@ -1105,6 +1132,9 @@ struct welcomeBackView: View {
                                     .onAppear(perform: ({
                                         self.loadAni.toggle()
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 3.5) {
+                                            if self.auth.isFirstTimeUser == false {
+                                                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                            }
                                             self.dismissView = true
                                         }
                                     }))
@@ -1125,7 +1155,6 @@ struct welcomeBackView: View {
                     Text("")
                         .onAppear() {
                             if self.auth.profile.results.first?.id != 0 {
-                                //self.presentationMode.wrappedValue.dismiss()
                                 self.presentView = false
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                                     self.auth.preventDismissal = false

@@ -15,8 +15,8 @@ struct ContactsBtn: View {
     
     var body: some View {
         Button(action: {
-            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
             self.showContacts.toggle()
+            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
         }) {
             ZStack {
                 Image(systemName: "rectangle.stack.person.crop")

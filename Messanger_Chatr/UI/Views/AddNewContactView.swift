@@ -122,10 +122,11 @@ struct addNewContactView: View {
                                                         .fontWeight(.semibold)
                                                         .foregroundColor(Color.primary)
                                                     
-                                                    Text(contact.phone?.format(phoneNumber: String(contact.phone?.dropFirst() ?? "")) ?? "")
-                                                        .font(.subheadline)
+                                                    Text("last online \(contact.lastRequestAt?.getElapsedInterval(lastMsg: "moments") ?? "recently") ago")
+                                                        .font(.caption)
                                                         .fontWeight(.regular)
                                                         .foregroundColor(.secondary)
+                                                        .multilineTextAlignment(.leading)
                                                 }
                                                 Spacer()
                                                 
@@ -245,6 +246,7 @@ struct addNewContactView: View {
                             ForEach(self.regristeredAddressBook, id: \.self) { contact in
                                 if contact.id != Session.current.currentUserID {
                                     NavigationLink(destination: VisitContactView(newMessage: self.$newDialogID, dismissView: self.$dismissView, viewState: .fromSearch, connectyContact: contact).environmentObject(self.auth).edgesIgnoringSafeArea(.all)) {
+                                        var isAdded: Bool = false
                                         VStack(alignment: .trailing, spacing: 0) {
                                             HStack(alignment: .center) {
                                                 ZStack(alignment: .center) {
@@ -269,47 +271,53 @@ struct addNewContactView: View {
                                                         .fontWeight(.semibold)
                                                         .foregroundColor(Color.primary)
                                                     
-                                                    Text(contact.phone?.format(phoneNumber: String(contact.phone?.dropFirst() ?? "")) ?? "")
-                                                        .font(.subheadline)
+                                                    Text("last online \(contact.lastRequestAt?.getElapsedInterval(lastMsg: "moments") ?? "recently") ago")
+                                                        .font(.caption)
                                                         .fontWeight(.regular)
                                                         .foregroundColor(.secondary)
+                                                        .multilineTextAlignment(.leading)
                                                 }
                                                 Spacer()
                                                 
                                                 Button(action: {
-                                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                                    Chat.instance.confirmAddContactRequest(UInt(contact.id)) { (error) in
-                                                        let event = Event()
-                                                        event.notificationType = .push
-                                                        event.usersIDs = [NSNumber(value: contact.id)]
-                                                        event.type = .oneShot
+                                                    if isAdded {
+                                                        UINotificationFeedbackGenerator().notificationOccurred(.error)
+                                                    } else {
+                                                        Chat.instance.confirmAddContactRequest(UInt(contact.id)) { (error) in
+                                                            UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                                            isAdded = true
+                                                            let event = Event()
+                                                            event.notificationType = .push
+                                                            event.usersIDs = [NSNumber(value: contact.id)]
+                                                            event.type = .oneShot
 
-                                                        var pushParameters = [String : String]()
-                                                        pushParameters["message"] = "\(ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.fullName ?? "A user")) sent you a contact request."
-                                                        pushParameters["ios_sound"] = "app_sound.wav"
+                                                            var pushParameters = [String : String]()
+                                                            pushParameters["message"] = "\(ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.fullName ?? "A user")) sent you a contact request."
+                                                            pushParameters["ios_sound"] = "app_sound.wav"
 
-                                                        if let jsonData = try? JSONSerialization.data(withJSONObject: pushParameters,
-                                                                                                    options: .prettyPrinted) {
-                                                          let jsonString = String(bytes: jsonData,
-                                                                                  encoding: String.Encoding.utf8)
+                                                            if let jsonData = try? JSONSerialization.data(withJSONObject: pushParameters,
+                                                                                                        options: .prettyPrinted) {
+                                                              let jsonString = String(bytes: jsonData,
+                                                                                      encoding: String.Encoding.utf8)
 
-                                                          event.message = jsonString
+                                                              event.message = jsonString
 
-                                                          Request.createEvent(event, successBlock: {(events) in
-                                                            print("sent push notification to user")
-                                                          }, errorBlock: {(error) in
-                                                            print("error in sending push noti: \(error.localizedDescription)")
-                                                          })
+                                                              Request.createEvent(event, successBlock: {(events) in
+                                                                print("sent push notification to user")
+                                                              }, errorBlock: {(error) in
+                                                                print("error in sending push noti: \(error.localizedDescription)")
+                                                              })
+                                                            }
                                                         }
                                                     }
                                                 }) {
-                                                    Text("Add")
+                                                    Text(isAdded ? "Added" : "Add")
                                                         .fontWeight(.medium)
                                                         .font(.subheadline)
-                                                        .foregroundColor(.white)
+                                                        .foregroundColor(isAdded ? Color("disabledButton") : .white)
                                                         .padding(.vertical, 8)
                                                         .padding(.horizontal, 15)
-                                                        .background(Constants.baseBlue)
+                                                        .background(isAdded ? Color("bgColor_light") : Constants.baseBlue)
                                                         .cornerRadius(10)
                                                         .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 3)
                                                 }

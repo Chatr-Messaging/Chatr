@@ -60,10 +60,12 @@ struct ContactRealmCell: View {
                     .fontWeight(.semibold)
                     .foregroundColor(Color.primary)
                 
-                Text(self.contact.phoneNumber.format(phoneNumber: String(self.contact.phoneNumber.dropFirst())))
-                    .font(.subheadline)
+                Text(contact.isOnline ? "online now" : "last online \(contact.lastOnline.getElapsedInterval(lastMsg: "moments")) ago")
+                    .font(.caption)
                     .fontWeight(.regular)
                     .foregroundColor(.secondary)
+                    .multilineTextAlignment(.leading)
+                    .offset(y: contact.isPremium ? -3 : 0)
             }
             Spacer()
             

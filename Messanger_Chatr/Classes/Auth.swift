@@ -72,6 +72,7 @@ class AuthModel: NSObject, ObservableObject {
     @Published var verifyCodeStatus: PhoneNumberStatus = .undefined
     @Published var haveUserFullName = false
     @Published var haveUserProfileImg = false
+    @Published var isFirstTimeUser = false
     @Published var verifyCodeStatusKeyboard = false
     @Published var verifyPhoneStatusKeyboard = false
     
@@ -129,9 +130,8 @@ class AuthModel: NSObject, ObservableObject {
                 self.verifyPhoneNumberStatus = .error
             } else {
                 self.verifyPhoneNumberStatus = .success
-                print("success sending!! es")
                 UserDefaults.standard.set(verificationID, forKey: "authID")
-                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
                     self.verifyPhoneStatusKeyboard = true
                 }
             }
@@ -175,6 +175,7 @@ class AuthModel: NSObject, ObservableObject {
                             Request.logIn(withFirebaseProjectID: Constants.FirebaseProjectID, accessToken: idToken ?? "", successBlock: { (user) in
                                 UserDefaults.standard.set(user.id, forKey: "currentUserID")
                                 if (userz?.additionalUserInfo?.isNewUser ?? true) == false {
+                                    self.isFirstTimeUser = false
                                     Analytics.logEvent(AnalyticsEventLogin, parameters: [AnalyticsParameterMethod: "Phone Number Security Code - from LogIn"])
                                     if user.fullName != nil {
                                         self.haveUserFullName = true
@@ -188,6 +189,7 @@ class AuthModel: NSObject, ObservableObject {
                                         }
                                     }
                                 } else {
+                                    self.isFirstTimeUser = true
                                     changeAddressBookRealmData().removeAllAddressBook(completion: { _ in
                                         Analytics.logEvent(AnalyticsEventSignUp, parameters: [AnalyticsParameterMethod: "Phone Number Security Code - from Sign Up"])
                                     })
@@ -200,7 +202,14 @@ class AuthModel: NSObject, ObservableObject {
                                             self.verifyCodeStatus = .error
                                         } else {
                                             print("Success joining session from Login! the current user: \(String(describing: Session.current.currentUserID))")
-                                            self.verifyCodeStatus = .success
+                                            self.verifyPhoneStatusKeyboard = false
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                                self.verifyCodeStatus = .success
+                                                if user.fullName == nil {
+                                                    self.verifyCodeStatusKeyboard = true
+                                                }
+                                            }
                                         }
                                     }
                                 })
@@ -317,29 +326,21 @@ class AuthModel: NSObject, ObservableObject {
     func updateFullName(phoneNumber: String, fullName: String, completion: @escaping (Bool) -> Void) {
         let updateParameters = UpdateUserParameters()
         updateParameters.fullName = fullName
-
         Request.updateCurrentUser(updateParameters, successBlock: { (user) in
-            //success updating name..now save to core data
             //self.persistenceManager.setCubeProfile(user)
             changeProfileRealmDate().updateProfile(user, completion: {
-                
+                //upload that data to firebase firestore
+                if let phoneNum = user.phone {
+                    let reference = Firestore.firestore().collection("Profiles").document(phoneNum)
+                    reference.updateData(["fullName" : user.fullName ?? "New Chatr User"], completion: { (error) in
+                        if error == nil {
+                            completion(true)
+                        } else {
+                            completion(false)
+                        }
+                    })
+                }
             })
-            self.haveUserFullName = true
-            //upload that data to firebase firestore
-            if let phoneNum = user.phone {
-                let reference = Firestore.firestore().collection("Profiles").document(phoneNum)
-                reference.updateData(["fullName" : user.fullName ?? "New Chatr User"], completion: { (error) in
-                    if error == nil {
-                        print("success adding name to firebase")
-                        self.haveUserFullName = true
-                    } else {
-                        print("error adding name to firebase")
-                        self.haveUserFullName = false
-                    }
-                })
-            }
-            print("success upllading full name \(String(describing: user.fullName))")
-            completion(true)
         }) { (error) in
             print("the error in full name is: \(error.localizedDescription)")
             completion(false)
@@ -351,10 +352,8 @@ class AuthModel: NSObject, ObservableObject {
         let data = image.jpegData(compressionQuality: 0.2)
         
         Request.uploadFile(with: data!, fileName: "user's_profileImg", contentType: "image/jpeg", isPublic: false, progressBlock: { (progress) in
-            //set progress here
             print("the upload progress is: \(progress)")
             self.avitarProgress = CGFloat(progress)
-            
         }, successBlock: { (blob) in
             let parameters = UpdateUserParameters()
             let customData = ["avatar_uid" : blob.uid]
@@ -362,13 +361,10 @@ class AuthModel: NSObject, ObservableObject {
                 parameters.customData = String(data: theJSONData, encoding: .utf8)
             }
             Request.updateCurrentUser(parameters, successBlock: { (user) in
-                //self.persistenceManager.setCubeProfile(user)
                 changeProfileRealmDate().updateProfile(user, completion: {
-                    
-                })
-                self.haveUserProfileImg = true
-                //self.store(image: image, compression: 1.0, forKey: "userImage", withStorageType: .fileSystem)
-                completion(true)
+                    self.haveUserProfileImg = true
+                    completion(true)
+                })        
             }, errorBlock: { (error) in
                 completion(false)
             })

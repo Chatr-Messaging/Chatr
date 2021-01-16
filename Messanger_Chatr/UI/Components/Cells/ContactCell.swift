@@ -37,11 +37,12 @@ struct ContactCell: View {
                     .font(.headline)
                     .fontWeight(.semibold)
                     .foregroundColor(Color.primary)
-                
-                Text(self.user.phone?.format(phoneNumber: String(user.phone?.dropFirst() ?? "")) ?? "")
-                    .font(.subheadline)
+
+                Text("last online \(self.user.lastRequestAt?.getElapsedInterval(lastMsg: "moments") ?? "recently") ago")
+                    .font(.caption)
                     .fontWeight(.regular)
-                    .foregroundColor(.secondary)                
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.leading)
             }
             Spacer()
             

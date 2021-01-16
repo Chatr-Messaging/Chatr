@@ -287,6 +287,19 @@ struct mainHomeList: View {
                                     .padding(.vertical, self.emptyQuickSnaps ? 0 : 20)
                                 
                             }.zIndex(5)
+                        }.sheet(isPresented: self.$showNewChat, onDismiss: {
+                            if self.newDialogID.count > 0 {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
+                                    self.isLocalOpen = true
+                                    UserDefaults.standard.set(self.isLocalOpen, forKey: "localOpen")
+                                    changeDialogRealmData().updateDialogOpen(isOpen: self.isLocalOpen, dialogID: self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id ?? "")
+                                    UserDefaults.standard.set(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id, forKey: "selectedDialogID")
+                                    self.newDialogID = ""
+                                }
+                            }
+                        }) {
+                            NewConversationView(usedAsNew: true, selectedContact: self.$selectedContacts, newDialogID: self.$newDialogID)
+                                .environmentObject(self.auth)
                         }
                         
 //                        //MARK: Pull to refresh - loading dialogs
@@ -309,20 +322,6 @@ struct mainHomeList: View {
                                 .blur(radius: self.isLocalOpen ? ((950 - (self.activeView.height * 3)) / 600) * 2 : 0)
                                 .animation(.spring(response: 0.4, dampingFraction: 0.8, blendDuration: 0))
                                 .resignKeyboardOnDragGesture()
-                                .sheet(isPresented: self.$showNewChat, onDismiss: {
-                                    if self.newDialogID.count > 0 {
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
-                                            self.isLocalOpen = true
-                                            UserDefaults.standard.set(self.isLocalOpen, forKey: "localOpen")
-                                            changeDialogRealmData().updateDialogOpen(isOpen: self.isLocalOpen, dialogID: self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id ?? "")
-                                            UserDefaults.standard.set(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id, forKey: "selectedDialogID")
-                                            self.newDialogID = ""
-                                        }
-                                    }
-                                }) {
-                                    NewConversationView(usedAsNew: true, selectedContact: self.$selectedContacts, newDialogID: self.$newDialogID)
-                                        .environmentObject(self.auth)
-                                }
                         }
                         
                         //MARK: Dialogs Section

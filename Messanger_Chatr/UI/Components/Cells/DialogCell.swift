@@ -45,7 +45,7 @@ struct DialogCell: View {
                         .clipShape(Circle())
                         .frame(width: 55, height: 55, alignment: .center)
                         .offset(x: -5)
-                        .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 5)
+                        .shadow(color: Color.black.opacity(0.23), radius: 7, x: 0, y: 5)
                         .onTapGesture {
                             UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")
                             if isOpen {
@@ -136,7 +136,7 @@ struct DialogCell: View {
                     }
                     
                     AlertIndicator(dialogModel: self.dialogModel)
-                        .offset(x: -34, y: -25)
+                        .offset(x: self.groupOccUserAvatar.count == 2 ? -37 : -34, y: -25)
                         .opacity(self.isOpen ? 0 : 1)
                 }.padding(.vertical, self.groupOccUserAvatar.count == 2 ? 11 : 11.5)
             }
@@ -157,24 +157,27 @@ struct DialogCell: View {
                             .font(.headline)
                             .fontWeight(.semibold)
                             .foregroundColor(Color.primary)
+                            .frame(width: .infinity)
                     }.offset(y: 2)
                     
                     
                     Spacer()
                     
-                    Text(self.dialogModel.isOpen ? "" : "\(self.dialogModel.lastMessageDate.getElapsedInterval(lastMsg: "now"))")
-                            .font(.subheadline)
-                            .fontWeight(.regular)
+                    HStack {
+                        Text(self.dialogModel.isOpen ? "" : "\(self.dialogModel.lastMessageDate.getElapsedInterval(lastMsg: "now"))")
+                                .font(.subheadline)
+                                .fontWeight(.regular)
+                                .foregroundColor(.secondary)
+                                .opacity(dialogModel.isOpen ? 0 : 1)
+                            
+                        Image(systemName: "chevron.right")
+                            .resizable()
+                            .font(Font.title.weight(.bold))
                             .foregroundColor(.secondary)
+                            .frame(width: self.dialogModel.isOpen ? 0 : 7, height: 10, alignment: .center)
+                            .rotationEffect(.degrees(dialogModel.isOpen ? 90 : 0))
                             .opacity(dialogModel.isOpen ? 0 : 1)
-                        
-                    Image(systemName: "chevron.right")
-                        .resizable()
-                        .font(Font.title.weight(.bold))
-                        .foregroundColor(.secondary)
-                        .frame(width: self.dialogModel.isOpen ? 0 : 7, height: 10, alignment: .center)
-                        .rotationEffect(.degrees(dialogModel.isOpen ? 90 : 0))
-                        .opacity(dialogModel.isOpen ? 0 : 1)
+                    }.offset(x: 10)
                  
                 }.frame(height: 25)
                 .offset(x: self.groupOccUserAvatar.count == 2 ? -4 : -2)
@@ -185,17 +188,19 @@ struct DialogCell: View {
                         .fontWeight(.regular)
                         .lineLimit(2)
                         .multilineTextAlignment(.leading)
-                        .offset(y: -6)
+                        .offset(x: -4, y: -6)
+                        .frame(width: .infinity)
                         .foregroundColor(Color.gray)
                         .fixedSize(horizontal: false, vertical: true)
                     
                     Text(self.auth.onlineCount != 0 && self.isOpen && (self.dialogModel.dialogType == "group" || self.dialogModel.dialogType == "public") ? "\(self.auth.onlineCount) online" : "")
-                            .font(.footnote)
-                            .fontWeight(.regular)
-                            .lineLimit(1)
-                            .multilineTextAlignment(.leading)
-                            .offset(y: -6)
-                            .foregroundColor(Color.green)
+                        .font(.footnote)
+                        .fontWeight(.regular)
+                        .lineLimit(1)
+                        .frame(width: .infinity)
+                        .multilineTextAlignment(.leading)
+                        .offset(x: -4, y: -6)
+                        .foregroundColor(Color.green)
                 }
             }.onTapGesture {
                 UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")

@@ -42,6 +42,8 @@ struct VerifyCodeTextFieldView: UIViewRepresentable {
         if uiView.window != nil, isFirstResponder && !context.coordinator.didBecomeFirstResponder  {
             uiView.becomeFirstResponder()
             context.coordinator.didBecomeFirstResponder = true
+        } else {
+            context.coordinator.didBecomeFirstResponder = false
         }
     }
     

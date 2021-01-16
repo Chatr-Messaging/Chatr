@@ -19,6 +19,20 @@ struct MainButtonStyle: ButtonStyle {
     }
 }
 
+struct MainButtonStyleDeselected: ButtonStyle {
+    public func makeBody(configuration: MainButtonStyleDeselected.Configuration) -> some View {
+        configuration.label
+            .frame(minWidth: 40, maxWidth: .infinity, minHeight: 55, maxHeight: 55)
+            .foregroundColor(Color("disabledButton"))
+            .background(configuration.isPressed ? Color.secondary : Color(.clear))
+            .cornerRadius(15)
+            .overlay(
+                 RoundedRectangle(cornerRadius: 15)
+                     .stroke(Color("disabledButton"), lineWidth: 1)
+             )
+    }
+}
+
 struct HomeButtonStyle: ButtonStyle {
     public func makeBody(configuration: HomeButtonStyle.Configuration) -> some View {
         configuration.label
@@ -52,6 +66,14 @@ struct changeBGButtonStyle: ButtonStyle {
     }
 }
 
+struct changeBGButtonStyleDisabled: ButtonStyle {
+    public func makeBody(configuration: changeBGButtonStyleDisabled.Configuration) -> some View {
+        configuration.label
+            .background(configuration.isPressed ? Color("disabledButton") : Color.clear)
+            .cornerRadius(10)
+    }
+}
+
 struct highlightedButtonStyle: ButtonStyle {
     public func makeBody(configuration: highlightedButtonStyle.Configuration) -> some View {
         configuration.label
@@ -78,7 +100,7 @@ struct navigationScaleHelpticButtonStyle: PrimitiveButtonStyle {
                     self.pressed = false
                     if value.translation.width < 10 && value.translation.height < 10 {
                         self.configuration.trigger()
-                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                     }
                 }
             

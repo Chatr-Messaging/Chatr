@@ -13,7 +13,7 @@ import CoreLocation
 import NotificationCenter
 import Photos
 
-class AdvancedViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
+class AdvancedViewModel: ObservableObject {
     var locationManager: CLLocationManager = CLLocationManager()
     @Published var contactsPermission: Bool = false
     @Published var locationPermission: Bool = false
@@ -21,11 +21,6 @@ class AdvancedViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var photoPermission: Bool = false
     @Published var cameraPermission: Bool = false
     
-    override init() {
-        super.init()
-        self.locationManager.delegate = self
-    }
-
     func checkContactsPermission() {
         if CNContactStore.authorizationStatus(for: .contacts) == .notDetermined {
             self.contactsPermission = false
@@ -58,7 +53,6 @@ class AdvancedViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     
     func requestLocationPermission() {
         self.locationManager = CLLocationManager()
-        self.locationManager.delegate = self
         self.locationManager.requestAlwaysAuthorization()
         self.locationPermission = true
     }
