@@ -56,8 +56,10 @@ struct EditProfileView: View {
                         //Profile Image
                         VStack(alignment: .center) {
                             Button(action: {
-                                self.showImagePicker.toggle()
                                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                withAnimation {
+                                    self.showImagePicker.toggle()
+                                }
                             }, label: {
                                 VStack {
                                     HStack(alignment: .center) {
@@ -100,7 +102,7 @@ struct EditProfileView: View {
                         .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
                         .padding(.horizontal)
                         .padding(.bottom, 5)
-                        .sheet(isPresented: $showImagePicker, onDismiss: loadImage) {
+                        .sheet(isPresented: self.$showImagePicker, onDismiss: self.loadImage) {
                             ImagePicker(image: self.$inputImage)
                         }
                         
@@ -473,8 +475,6 @@ struct EditProfileView: View {
     func loadImage() {
         guard let inputImage = inputImage else { return }
         image = Image(uiImage: inputImage)
-        self.auth.setUserAvatar(image: inputImage, completion: { result in
-            
-        })
+        self.auth.setUserAvatar(image: inputImage, completion: { _ in })
     }
 }

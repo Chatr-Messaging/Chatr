@@ -95,7 +95,7 @@ struct ProfileView: View {
                                 .foregroundColor(.secondary)
                         }.padding(.horizontal)
                     }.onTapGesture {
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                         self.editProfileAction = 1
                     }
                 }.buttonStyle(ClickMiniButtonStyle())
