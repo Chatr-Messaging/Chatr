@@ -117,6 +117,13 @@ struct EditProfileView: View {
                                 .offset(y: 2)
                             Spacer()
                         }.padding(.top, 10)
+                        .sheet(isPresented: self.$presentAuth, onDismiss: {
+                            self.viewModel.pullInstagramUser(completion: { username in
+                                self.username = username
+                            })
+                        }) {
+                            InstagramWebView(presentAuth: self.$presentAuth, instagramApi: self.$instagramApi)
+                        }
                         
                         self.viewModel.styleBuilder(content: {
                             //FullName Section
@@ -410,19 +417,11 @@ struct EditProfileView: View {
                     .onAppear {
                         changeProfileRealmDate().observeFirebaseUser()
                     }
-                    .sheet(isPresented: self.$presentAuth, onDismiss: {
-                        self.viewModel.pullInstagramUser(completion: { username in
-                            self.username = username
-                        })
-                    }) {
-                        InstagramWebView(presentAuth: self.$presentAuth, instagramApi: self.$instagramApi)
-                    }
                 }.frame(height: Constants.screenHeight - 50 - self.keyboardHeight)
                 .navigationBarTitle("Edit Profile", displayMode: .inline)
                 .navigationBarItems(trailing:
                     Button(action: {
-                        print("Save btn")
-                        UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
+                        UIApplication.shared.endEditing(true)
                         if self.loadingSave == false {
                             self.loadingSave = true
                             let updateParameters = UpdateUserParameters()
@@ -437,7 +436,7 @@ struct EditProfileView: View {
                             Request.updateCurrentUser(updateParameters, successBlock: { (user) in
                                 changeProfileRealmDate().updateProfile(user, completion: {
                                     Database.database().reference().child("Users").child("\(UserDefaults.standard.integer(forKey: "currentUserID"))").updateChildValues(["bio" : self.bioText, "facebook" : self.facebookText, "twitter" : self.twitterText])
-                                    print("done updating profile")
+                                    UINotificationFeedbackGenerator().notificationOccurred(.success)
                                     self.loadingSave = false
                                     self.didSave = true
                                 })

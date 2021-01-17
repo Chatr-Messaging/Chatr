@@ -104,11 +104,12 @@ struct addNewContactView: View {
                             if self.grandUsers.count > 0 {
                                 ForEach(self.grandUsers, id: \.self) { contact in
                                     NavigationLink(destination: VisitContactView(newMessage: self.$newDialogID, dismissView: self.$dismissView, viewState: .fromSearch, connectyContact: contact).environmentObject(self.auth).edgesIgnoringSafeArea(.all)) {
+                                        var isAdded: Bool = false
                                         VStack(alignment: .trailing, spacing: 0) {
                                             HStack {
                                                 WebImage(url: URL(string: persistenceManager.getCubeProfileImage(usersID: contact) ?? ""))
                                                     .resizable()
-                                                    .placeholder{ Image(systemName: "person.fill") }
+                                                    .placeholder{ Image("empty-profile").resizable().frame(width: 45, height: 45, alignment: .center).scaledToFill() }
                                                     .indicator(.activity)
                                                     .transition(.fade(duration: 0.25))
                                                     .scaledToFill()
@@ -132,15 +133,16 @@ struct addNewContactView: View {
                                                 
                                                 if self.isUserNotContact(id: contact.id) {
                                                     Button(action: {
-                                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                                         Chat.instance.confirmAddContactRequest(UInt(contact.id)) { (error) in
+                                                            UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                                            isAdded = true
                                                             let event = Event()
                                                             event.notificationType = .push
                                                             event.usersIDs = [NSNumber(value: contact.id)]
                                                             event.type = .oneShot
 
                                                             var pushParameters = [String : String]()
-                                                            pushParameters["message"] = "\(ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.fullName ?? "A user")) sent you a contact request."
+                                                            pushParameters["message"] = "\(ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.fullName ?? "A user") sent you a contact request."
                                                             pushParameters["ios_sound"] = "app_sound.wav"
 
                                                             if let jsonData = try? JSONSerialization.data(withJSONObject: pushParameters,
@@ -158,16 +160,16 @@ struct addNewContactView: View {
                                                             }
                                                         }
                                                     }) {
-                                                        Text("Add")
+                                                        Text(isAdded ? "Added" : "Add")
                                                             .fontWeight(.medium)
                                                             .font(.subheadline)
                                                             .foregroundColor(.white)
                                                             .padding(.vertical, 8)
                                                             .padding(.horizontal, 15)
-                                                            .background(Color.blue)
+                                                            .background(isAdded ? Color.gray : Color.blue)
                                                             .cornerRadius(10)
                                                             .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 3)
-                                                    }
+                                                    }.disabled(isAdded ? true : false)
                                                 }
 
                                                 Image(systemName: "chevron.right")
@@ -244,106 +246,105 @@ struct addNewContactView: View {
                         
                         VStack(alignment: .center, spacing: 0) {
                             ForEach(self.regristeredAddressBook, id: \.self) { contact in
-                                if contact.id != Session.current.currentUserID {
-                                    NavigationLink(destination: VisitContactView(newMessage: self.$newDialogID, dismissView: self.$dismissView, viewState: .fromSearch, connectyContact: contact).environmentObject(self.auth).edgesIgnoringSafeArea(.all)) {
-                                        var isAdded: Bool = false
-                                        VStack(alignment: .trailing, spacing: 0) {
-                                            HStack(alignment: .center) {
-                                                ZStack(alignment: .center) {
-                                                    Circle()
-                                                        .frame(width: 35, height: 35, alignment: .center)
-                                                        .foregroundColor(Color("bgColor"))
-                                                    
-                                                    WebImage(url: URL(string: persistenceManager.getCubeProfileImage(usersID: contact) ?? ""))
-                                                        .resizable()
-                                                        .placeholder{ Image(systemName: "person.fill") }
-                                                        .indicator(.activity)
-                                                        .transition(.fade(duration: 0.25))
-                                                        .scaledToFill()
-                                                        .clipShape(Circle())
-                                                        .frame(width: 45, height: 45, alignment: .center)
-                                                        .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 6)
-                                                }
+                                NavigationLink(destination: VisitContactView(newMessage: self.$newDialogID, dismissView: self.$dismissView, viewState: .fromSearch, connectyContact: contact).environmentObject(self.auth).edgesIgnoringSafeArea(.all)) {
+                                    var isAdded: Bool = false
+                                    
+                                    VStack(alignment: .trailing, spacing: 0) {
+                                        HStack(alignment: .center) {
+                                            ZStack(alignment: .center) {
+                                                Circle()
+                                                    .frame(width: 35, height: 35, alignment: .center)
+                                                    .foregroundColor(Color("bgColor"))
                                                 
-                                                VStack(alignment: .leading) {
-                                                    Text(contact.fullName ?? "No Name")
-                                                        .font(.headline)
-                                                        .fontWeight(.semibold)
-                                                        .foregroundColor(Color.primary)
-                                                    
-                                                    Text("last online \(contact.lastRequestAt?.getElapsedInterval(lastMsg: "moments") ?? "recently") ago")
-                                                        .font(.caption)
-                                                        .fontWeight(.regular)
-                                                        .foregroundColor(.secondary)
-                                                        .multilineTextAlignment(.leading)
-                                                }
-                                                Spacer()
+                                                WebImage(url: URL(string: persistenceManager.getCubeProfileImage(usersID: contact) ?? ""))
+                                                    .resizable()
+                                                    .placeholder{ Image("empty-profile").resizable().frame(width: 45, height: 45, alignment: .center).scaledToFill() }
+                                                    .indicator(.activity)
+                                                    .transition(.fade(duration: 0.25))
+                                                    .scaledToFill()
+                                                    .clipShape(Circle())
+                                                    .frame(width: 45, height: 45, alignment: .center)
+                                                    .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 6)
+                                            }
+                                            
+                                            VStack(alignment: .leading) {
+                                                Text(contact.fullName ?? "No Name")
+                                                    .font(.headline)
+                                                    .fontWeight(.semibold)
+                                                    .foregroundColor(Color.primary)
                                                 
-                                                Button(action: {
-                                                    if isAdded {
-                                                        UINotificationFeedbackGenerator().notificationOccurred(.error)
-                                                    } else {
-                                                        Chat.instance.confirmAddContactRequest(UInt(contact.id)) { (error) in
-                                                            UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                                            isAdded = true
-                                                            let event = Event()
-                                                            event.notificationType = .push
-                                                            event.usersIDs = [NSNumber(value: contact.id)]
-                                                            event.type = .oneShot
+                                                Text("last online \(contact.lastRequestAt?.getElapsedInterval(lastMsg: "moments") ?? "recently") ago")
+                                                    .font(.caption)
+                                                    .fontWeight(.regular)
+                                                    .foregroundColor(.secondary)
+                                                    .multilineTextAlignment(.leading)
+                                            }
+                                            Spacer()
+                                            
+                                            Button(action: {
+                                                if isAdded {
+                                                    UINotificationFeedbackGenerator().notificationOccurred(.error)
+                                                } else {
+                                                    Chat.instance.confirmAddContactRequest(UInt(contact.id)) { (error) in
+                                                        UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                                        isAdded = true
+                                                        let event = Event()
+                                                        event.notificationType = .push
+                                                        event.usersIDs = [NSNumber(value: contact.id)]
+                                                        event.type = .oneShot
 
-                                                            var pushParameters = [String : String]()
-                                                            pushParameters["message"] = "\(ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.fullName ?? "A user")) sent you a contact request."
-                                                            pushParameters["ios_sound"] = "app_sound.wav"
+                                                        var pushParameters = [String : String]()
+                                                        pushParameters["message"] = "\(ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.fullName ?? "A user")) sent you a contact request."
+                                                        pushParameters["ios_sound"] = "app_sound.wav"
 
-                                                            if let jsonData = try? JSONSerialization.data(withJSONObject: pushParameters,
-                                                                                                        options: .prettyPrinted) {
-                                                              let jsonString = String(bytes: jsonData,
-                                                                                      encoding: String.Encoding.utf8)
+                                                        if let jsonData = try? JSONSerialization.data(withJSONObject: pushParameters,
+                                                                                                    options: .prettyPrinted) {
+                                                          let jsonString = String(bytes: jsonData,
+                                                                                  encoding: String.Encoding.utf8)
 
-                                                              event.message = jsonString
+                                                          event.message = jsonString
 
-                                                              Request.createEvent(event, successBlock: {(events) in
-                                                                print("sent push notification to user")
-                                                              }, errorBlock: {(error) in
-                                                                print("error in sending push noti: \(error.localizedDescription)")
-                                                              })
-                                                            }
+                                                          Request.createEvent(event, successBlock: {(events) in
+                                                            print("sent push notification to user")
+                                                          }, errorBlock: {(error) in
+                                                            print("error in sending push noti: \(error.localizedDescription)")
+                                                          })
                                                         }
                                                     }
-                                                }) {
-                                                    Text(isAdded ? "Added" : "Add")
-                                                        .fontWeight(.medium)
-                                                        .font(.subheadline)
-                                                        .foregroundColor(isAdded ? Color("disabledButton") : .white)
-                                                        .padding(.vertical, 8)
-                                                        .padding(.horizontal, 15)
-                                                        .background(isAdded ? Color("bgColor_light") : Constants.baseBlue)
-                                                        .cornerRadius(10)
-                                                        .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 3)
                                                 }
-                                                
-                                                Image(systemName: "chevron.right")
-                                                    .resizable()
-                                                    .font(Font.title.weight(.bold))
-                                                    .scaledToFit()
-                                                    .frame(width: 7, height: 15, alignment: .center)
-                                                    .foregroundColor(.secondary)
-                                            }.padding(.horizontal)
-                                            .padding(.vertical, 12.5)
-                                            .contentShape(Rectangle())
-                                            
-                                            if self.regristeredAddressBook.last != contact {
-                                                Divider()
-                                                    .frame(width: Constants.screenWidth - 100)
+                                            }) {
+                                                Text(isAdded ? "Added" : "Add")
+                                                    .fontWeight(.medium)
+                                                    .font(.subheadline)
+                                                    .foregroundColor(isAdded ? Color("disabledButton") : .white)
+                                                    .padding(.vertical, 8)
+                                                    .padding(.horizontal, 15)
+                                                    .background(isAdded ? Color("bgColor_light") : Constants.baseBlue)
+                                                    .cornerRadius(10)
+                                                    .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 3)
                                             }
+                                            
+                                            Image(systemName: "chevron.right")
+                                                .resizable()
+                                                .font(Font.title.weight(.bold))
+                                                .scaledToFit()
+                                                .frame(width: 7, height: 15, alignment: .center)
+                                                .foregroundColor(.secondary)
+                                        }.padding(.horizontal)
+                                        .padding(.vertical, 12.5)
+                                        .contentShape(Rectangle())
+                                        
+                                        if self.regristeredAddressBook.last != contact {
+                                            Divider()
+                                                .frame(width: Constants.screenWidth - 100)
                                         }
-                                    }.buttonStyle(changeBGButtonStyle())
-                                    .background(Color.clear)
-                                    .simultaneousGesture(TapGesture()
-                                        .onEnded { _ in
-                                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                        })
-                                }
+                                    }
+                                }.buttonStyle(changeBGButtonStyle())
+                                .background(Color.clear)
+                                .simultaneousGesture(TapGesture()
+                                    .onEnded { _ in
+                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                    })
                             }
                         }.animation(.spring(response: 0.25, dampingFraction: 0.70, blendDuration: 0))
                         .background(Color("buttonColor"))
@@ -418,7 +419,7 @@ struct addNewContactView: View {
                     Request.registeredUsersFromAddressBook(withUdid: UIDevice.current.identifierForVendor?.uuidString, isCompact: false, successBlock: { (users) in
                         self.regristeredAddressBook.removeAll()
                         for i in users {
-                            if self.isUserNotContact(id: i.id) {
+                            if self.isUserNotContact(id: i.id) && i.id != Session.current.currentUserID {
                                 self.regristeredAddressBook.append(i)
                             }
                         }
@@ -469,10 +470,19 @@ struct addNewContactView: View {
         let config = Realm.Configuration(schemaVersion: 1)
         do {
             let realm = try Realm(configuration: config)
-            if (realm.object(ofType: ContactStruct.self, forPrimaryKey: id) == nil) && id != Session.current.currentUserID {
-                return true
+            if let contact = realm.object(ofType: ContactStruct.self, forPrimaryKey: id) {
+                if contact.id != Session.current.currentUserID && contact.isMyContact == false {
+                    for i in Chat.instance.contactList?.pendingApproval ?? [] {
+                        if i.userID == contact.id {
+                            return false
+                        }
+                    }
+                    return true
+                } else {
+                    return false
+                }
             } else {
-                return false
+                return true
             }
         } catch {
             return false

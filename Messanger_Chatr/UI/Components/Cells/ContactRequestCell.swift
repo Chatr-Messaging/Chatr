@@ -18,9 +18,17 @@ struct ContactRequestCell: View {
     @State var contactID: Int
     @State var contact: ContactStruct = ContactStruct()
     @State var contactRelationship: visitContactRelationship = .unknown
+    @State private var action: Int? = 0
 
     var body: some View {
-        NavigationLink(destination: VisitContactView(newMessage: self.$selectedNewDialog, dismissView: self.$dismissView, viewState: .fromRequests, contactRelationship: self.contactRelationship, contact: self.contact).edgesIgnoringSafeArea(.all).environmentObject(self.auth)) {
+        NavigationLink(destination: VisitContactView(newMessage: self.$selectedNewDialog, dismissView: self.$dismissView, viewState: .fromRequests, contactRelationship: self.contactRelationship, contact: self.contact).edgesIgnoringSafeArea(.all).environmentObject(self.auth), tag: 1, selection: $action) {
+         EmptyView()
+        }
+        
+        Button(action: {
+            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+            self.action = 1
+        }) {
             HStack {
                 WebImage(url: URL(string: self.contact.avatar))
                     .resizable()
@@ -51,9 +59,9 @@ struct ContactRequestCell: View {
                 
                 if self.contactRelationship == .pendingRequestForYou {
                     Button(action: {
-                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                         Chat.instance.rejectAddContactRequest(UInt(self.contact.id)) { (error) in
                             if error == nil {
+                                UINotificationFeedbackGenerator().notificationOccurred(.error)
                                 self.contactRelationship = .unknown
                                 self.auth.profile.removeContactRequest(userID: UInt(self.contact.id))
                             }
@@ -70,9 +78,8 @@ struct ContactRequestCell: View {
                     }
 
                     Button(action: {
-                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                         Chat.instance.confirmAddContactRequest(UInt(self.contact.id)) { (error) in
-                            print("accepted new contact:")
+                            UINotificationFeedbackGenerator().notificationOccurred(.success)
                             self.contactRelationship = .contact
                             self.auth.profile.removeContactRequest(userID: UInt(self.contact.id))
 
@@ -121,10 +128,6 @@ struct ContactRequestCell: View {
             .padding(.horizontal)
         }.redacted(reason: contact.phoneNumber == "" ? .placeholder : [])
         .buttonStyle(changeBGButtonStyle())
-        .simultaneousGesture(TapGesture()
-            .onEnded { _ in
-                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-            })
         .onAppear() {
             let config = Realm.Configuration(schemaVersion: 1)
             do {

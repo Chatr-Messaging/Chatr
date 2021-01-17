@@ -53,6 +53,7 @@
 		056EAB612516D8E600DC72FA /* AppIcon-Flat-Dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 056EAB5F2516D8E600DC72FA /* AppIcon-Flat-Dark.png */; };
 		056EAB662516D8F300DC72FA /* AppIcon-PaperAirplane.png in Resources */ = {isa = PBXBuildFile; fileRef = 056EAB652516D8F300DC72FA /* AppIcon-PaperAirplane.png */; };
 		056EAB6B2516D8FD00DC72FA /* AppIcon-PaperAirplane-Dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 056EAB6A2516D8FD00DC72FA /* AppIcon-PaperAirplane-Dark.png */; };
+		0572046E25B3FDB700542CCF /* ImagePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0572046D25B3FDB700542CCF /* ImagePickerView.swift */; };
 		0572BAB72398998800AE9061 /* PhoneNumberView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0572BAB62398998700AE9061 /* PhoneNumberView.swift */; };
 		0572BAB923989A5100AE9061 /* VerifyNumberView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0572BAB823989A5100AE9061 /* VerifyNumberView.swift */; };
 		0572BABB239B348800AE9061 /* CustomStyles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0572BABA239B348700AE9061 /* CustomStyles.swift */; };
@@ -194,6 +195,7 @@
 		056EAB652516D8F300DC72FA /* AppIcon-PaperAirplane.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-PaperAirplane.png"; sourceTree = "<group>"; };
 		056EAB6A2516D8FD00DC72FA /* AppIcon-PaperAirplane-Dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-PaperAirplane-Dark.png"; sourceTree = "<group>"; };
 		0571F8EC254B7F3B00FA5695 /* libswiftSystem_Foundation.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libswiftSystem_Foundation.tbd; path = usr/lib/swift/libswiftSystem_Foundation.tbd; sourceTree = SDKROOT; };
+		0572046D25B3FDB700542CCF /* ImagePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerView.swift; sourceTree = "<group>"; };
 		0572BAB62398998700AE9061 /* PhoneNumberView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneNumberView.swift; sourceTree = "<group>"; };
 		0572BAB823989A5100AE9061 /* VerifyNumberView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifyNumberView.swift; sourceTree = "<group>"; };
 		0572BABA239B348700AE9061 /* CustomStyles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomStyles.swift; sourceTree = "<group>"; };
@@ -483,6 +485,7 @@
 			children = (
 				053D33F12393C97B00CEE03E /* DismissGuardian.swift */,
 				05AACE5E23A60AB6006307EB /* ImagePicker.swift */,
+				0572046D25B3FDB700542CCF /* ImagePickerView.swift */,
 			);
 			path = Others;
 			sourceTree = "<group>";
@@ -957,6 +960,7 @@
 				05A7BD5F24FEF3870001BFC9 /* QucickSnapsSection.swift in Sources */,
 				052347B623E55C8A00EF9CEB /* FullNameView.swift in Sources */,
 				050582FD24D8FCDF00CBD4AC /* DialogRealmModel.swift in Sources */,
+				0572046E25B3FDB700542CCF /* ImagePickerView.swift in Sources */,
 				05CE07ED2529930300F09754 /* NotificationSection.swift in Sources */,
 				0583073A240E2B840013B93B /* Constants.swift in Sources */,
 				0583A82D23A72A8700F9220B /* Auth.swift in Sources */,

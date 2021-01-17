@@ -33,6 +33,7 @@ struct ProfileView: View {
     @State var isMessagingPrivate: Bool = false
     @State var openPremium: Bool = false
     @State var helpsupport: Bool = false
+    @State var logoutActionSheet: Bool = false
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: true) {
@@ -574,11 +575,7 @@ struct ProfileView: View {
                         //Log out view
                         Button(action: {
                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                            self.auth.preventDismissal = true
-                            self.auth.isUserAuthenticated = .signedOut
-                            withAnimation {
-                                self.dimissView.toggle()
-                            }
+                            self.logoutActionSheet.toggle()
                         }) {
                             HStack {
                                 Image("LogOutIcon")
@@ -603,6 +600,19 @@ struct ProfileView: View {
                             }.padding(.horizontal)
                             .padding(.vertical, 8)
                         }.buttonStyle(changeBGButtonStyle())
+                        .actionSheet(isPresented: self.$logoutActionSheet) {
+                            ActionSheet(title: Text("Are you sure you want to log out?"), message: nil, buttons: [
+                                .destructive(Text("Log Out"), action: {
+                                    self.auth.preventDismissal = true
+                                    self.auth.isUserAuthenticated = .signedOut
+                                    withAnimation {
+                                        self.dimissView.toggle()
+                                    }
+                                }),
+                                .cancel()
+                            ])
+                        }
+                        
                     }
                 }.background(Color("buttonColor"))
                 .clipShape(RoundedRectangle(cornerRadius: 15, style: .circular))

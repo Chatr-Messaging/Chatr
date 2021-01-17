@@ -60,10 +60,10 @@ class VisitContactViewModel: ObservableObject {
                     event.message = jsonString
 
                     Request.createEvent(event, successBlock: { _ in
-                        completion(.pendingRequest)
                     }, errorBlock: { (error) in
                     print("error in sending push noti: \(error.localizedDescription)")
                     })
+                    completion(.pendingRequest)
                 }
             }
         }
@@ -143,9 +143,9 @@ class VisitContactViewModel: ObservableObject {
                 try realm.safeWrite ({
                     if let index = oldData.contactRequests.firstIndex(of: Int(userID)) {
                         oldData.contactRequests.remove(at: index)
+                        realm.add(oldData, update: .all)
                     }
                 })
-                realm.add(oldData, update: .all)
                 completion()
             }
         } catch {
@@ -170,13 +170,12 @@ class VisitContactViewModel: ObservableObject {
                     let jsonString = String(bytes: jsonData, encoding: String.Encoding.utf8)
                     event.message = jsonString
 
-                    Request.createEvent(event, successBlock: { _ in
-                        completion(.contact)
-                    }, errorBlock: {(error) in
+                    Request.createEvent(event, successBlock: { _ in }, errorBlock: {(error) in
                         UINotificationFeedbackGenerator().notificationOccurred(.error)
                         completion(.pendingRequestForYou)
                         print("error in sending push noti: \(error.localizedDescription)")
                     })
+                    completion(.contact)
                 }
             })
         }
@@ -204,21 +203,19 @@ class VisitContactViewModel: ObservableObject {
                     pushParameters["message"] = "\(ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.fullName ?? "A user") sent you a contact request."
                     pushParameters["ios_sound"] = "app_sound.wav"
 
-
                     if let jsonData = try? JSONSerialization.data(withJSONObject: pushParameters, options: .prettyPrinted) {
-                      let jsonString = String(bytes: jsonData, encoding: String.Encoding.utf8)
+                        let jsonString = String(bytes: jsonData, encoding: String.Encoding.utf8)
 
-                      event.message = jsonString
+                        event.message = jsonString
 
-                      Request.createEvent(event, successBlock: {(events) in
+                        Request.createEvent(event, successBlock: {(events) in
                         print("sent push notification to user \(contactId)")
-                        completion(.pendingRequest)
-                      }, errorBlock: {(error) in
+                        }, errorBlock: {(error) in
                         UINotificationFeedbackGenerator().notificationOccurred(.error)
                         print("error in sending push noti: \(error.localizedDescription)")
-                      })
+                        })
+                        completion(.pendingRequest)
                     }
-                    
                 }
             }
         }

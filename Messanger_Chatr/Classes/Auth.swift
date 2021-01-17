@@ -192,6 +192,9 @@ class AuthModel: NSObject, ObservableObject {
                                     self.isFirstTimeUser = true
                                     changeAddressBookRealmData().removeAllAddressBook(completion: { _ in
                                         Analytics.logEvent(AnalyticsEventSignUp, parameters: [AnalyticsParameterMethod: "Phone Number Security Code - from Sign Up"])
+                                        self.fetchTotalUserCount(completion: { count in
+                                            Database.database().reference().child("Users").child("\(user.id)").updateChildValues(["userNumber" : count])
+                                        })
                                     })
                                 }
                                 changeProfileRealmDate().updateProfile(user, completion: {

@@ -20,7 +20,7 @@ struct HomeHeaderSection: View {
     var body: some View {
          HStack {
             VStack(alignment: .leading) {
-                Text("Welcome Back,")
+                Text(self.auth.isFirstTimeUser ? "Welcome" : "Welcome Back")
                     .font(.system(size: 16))
                     .foregroundColor(Color.secondary)
                     .offset(y: UserDefaults.standard.bool(forKey: "premiumSubscriptionStatus") ? 3 : 0)

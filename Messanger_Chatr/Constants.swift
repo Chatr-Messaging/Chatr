@@ -18,7 +18,7 @@ struct Constants {
     static let smallBtnSize = CGFloat(34)
     static let microBtnSize = CGFloat(18)
     static let menuBtnSize = CGFloat(48)
-    static let quickSnapBtnSize = CGFloat(52)
+    static let quickSnapBtnSize = CGFloat(54)
     static let avitarSize = CGFloat(55)
     static let smallAvitarSize = CGFloat(25)
     static let screenWidth = UIScreen.main.bounds.width

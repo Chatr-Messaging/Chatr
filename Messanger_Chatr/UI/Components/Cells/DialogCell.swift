@@ -177,8 +177,7 @@ struct DialogCell: View {
                             .frame(width: self.dialogModel.isOpen ? 0 : 7, height: 10, alignment: .center)
                             .rotationEffect(.degrees(dialogModel.isOpen ? 90 : 0))
                             .opacity(dialogModel.isOpen ? 0 : 1)
-                    }.offset(x: 10)
-                 
+                    }
                 }.frame(height: 25)
                 .offset(x: self.groupOccUserAvatar.count == 2 ? -4 : -2)
                 
@@ -188,7 +187,7 @@ struct DialogCell: View {
                         .fontWeight(.regular)
                         .lineLimit(2)
                         .multilineTextAlignment(.leading)
-                        .offset(x: -4, y: -6)
+                        .offset(x: -2, y: -6)
                         .frame(width: .infinity)
                         .foregroundColor(Color.gray)
                         .fixedSize(horizontal: false, vertical: true)
@@ -294,7 +293,8 @@ struct DialogCell: View {
             .opacity(self.isOpen ? 1 : 0)
             
         }.contentShape(Rectangle())
-        .padding(.horizontal)
+        .padding(.trailing, self.dialogModel.isOpen ? 20 : 5)
+        .padding(.leading)
         .padding(.vertical, self.privateDialogContact.quickSnaps.count > 0 ? 4 : 8)
         .background(Color("buttonColor"))
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))

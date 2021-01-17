@@ -49,7 +49,7 @@ struct contactRequestView: View {
                     .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 8)
                     .padding(.horizontal)
                     .padding(.bottom, Chat.instance.contactList?.pendingApproval.count != 0 ? 25 : 70)
-                    .animation(.spring(response: 0.15, dampingFraction: 0.70, blendDuration: 0))
+                    .animation(.spring(response: 0.45, dampingFraction: 0.70, blendDuration: 0))
                 }
                 
                 //MARK: EMPTY Requests Section
@@ -102,7 +102,7 @@ struct contactRequestView: View {
                     .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 8)
                     .padding(.horizontal)
                     .padding(.bottom, 70)
-                    .animation(.spring(response: 0.15, dampingFraction: 0.70, blendDuration: 0))
+                    .animation(.spring(response: 0.45, dampingFraction: 0.70, blendDuration: 0))
                 }
                 
                 FooterInformation()

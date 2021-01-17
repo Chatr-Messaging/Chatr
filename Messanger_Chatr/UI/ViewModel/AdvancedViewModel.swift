@@ -52,7 +52,6 @@ class AdvancedViewModel: ObservableObject {
     }
     
     func requestLocationPermission() {
-        self.locationManager = CLLocationManager()
         self.locationManager.requestAlwaysAuthorization()
         self.locationPermission = true
     }

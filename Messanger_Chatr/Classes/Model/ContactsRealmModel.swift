@@ -220,62 +220,87 @@ class changeContactsRealmData {
 
     func updateContacts(contactList: [ContactListItem], completion: @escaping (Bool) -> ()) {
         var contactUsers: [NSNumber] = []
-        for contact in contactList {
-            contactUsers.append(NSNumber(value: contact.userID))
-        }
-        if contactUsers.count != 0 {
-            Request.users(withIDs: contactUsers, paginator: Paginator.limit(300, skip: 0), successBlock: { (paginator, users) in
-                for user in users {
-                    print("users pulled from Connecty Cube: \(String(describing: user.fullName)) & \(String(describing: user.phone))")
-                    let config = Realm.Configuration(schemaVersion: 1)
-                    do {
-                        let realm = try Realm(configuration: config)
-                        if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: user.id) {
-                            try realm.safeWrite ({
-                                foundContact.fullName = user.fullName ?? "empty name"
-                                foundContact.phoneNumber = user.phone ?? "empty phone number"
-                                foundContact.emailAddress = user.email ?? "empty email address"
-                                foundContact.website = user.website ?? "empty website"
-                                foundContact.lastOnline = user.lastRequestAt ?? Date()
-                                foundContact.avatar = PersistenceManager().getCubeProfileImage(usersID: user) ?? ""
-                                foundContact.isMyContact = true
-                                foundContact.isInfoPrivate = false
-                                foundContact.isMessagingPrivate = false
-                                
-                                realm.add(foundContact, update: .all)
-                                self.observeFirebaseContact(contactID: foundContact.id)
-                            })
-                        } else {
-                            print("Contact NOT in Realm: \(user.id)")
-                            let newData = ContactStruct()
-                            newData.id = Int(user.id)
-                            newData.fullName = user.fullName ?? "empty name"
-                            newData.phoneNumber = user.phone ?? "empty phone number"
-                            newData.emailAddress = user.email ?? "empty email address"
-                            newData.website = user.website ?? "empty website"
-                            newData.isFavourite = false
-                            newData.isInfoPrivate = false
-                            newData.isMessagingPrivate = false
-                            newData.isMyContact = true
-                            newData.lastOnline = user.lastRequestAt ?? Date()
-                            newData.avatar = PersistenceManager().getCubeProfileImage(usersID: user) ?? ""
-                            newData.createdAccount = user.createdAt ?? Date()
-                                
-                            try realm.safeWrite ({
-                                realm.add(newData, update: .all)
-                                self.observeFirebaseContact(contactID: newData.id)
-                                print("Succsessfuly added new contact to realm! \(newData.fullName)")
-                            })
-                        }
-                    } catch {
-                        print(error.localizedDescription)
-                    }
-                }
-                completion(true)
-            }) { (error) in
-                print("error pulling connecty users: \(error.localizedDescription)")
-                completion(true)
+        self.removeOldContact(completion: { 
+            for contact in contactList {
+                contactUsers.append(NSNumber(value: contact.userID))
             }
+            if contactUsers.count != 0 {
+                Request.users(withIDs: contactUsers, paginator: Paginator.limit(300, skip: 0), successBlock: { (paginator, users) in
+                    for user in users {
+                        print("users pulled from Connecty Cube: \(String(describing: user.fullName)) & \(String(describing: user.phone))")
+                        let config = Realm.Configuration(schemaVersion: 1)
+                        do {
+                            let realm = try Realm(configuration: config)
+                            if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: user.id) {
+                                try realm.safeWrite ({
+                                    foundContact.fullName = user.fullName ?? "empty name"
+                                    foundContact.phoneNumber = user.phone ?? "empty phone number"
+                                    foundContact.emailAddress = user.email ?? "empty email address"
+                                    foundContact.website = user.website ?? "empty website"
+                                    foundContact.lastOnline = user.lastRequestAt ?? Date()
+                                    foundContact.avatar = PersistenceManager().getCubeProfileImage(usersID: user) ?? ""
+                                    foundContact.isMyContact = true
+                                    foundContact.isInfoPrivate = false
+                                    foundContact.isMessagingPrivate = false
+                                    
+                                    realm.add(foundContact, update: .all)
+                                    self.observeFirebaseContact(contactID: foundContact.id)
+                                })
+                            } else {
+                                print("Contact NOT in Realm: \(user.id)")
+                                let newData = ContactStruct()
+                                newData.id = Int(user.id)
+                                newData.fullName = user.fullName ?? "empty name"
+                                newData.phoneNumber = user.phone ?? "empty phone number"
+                                newData.emailAddress = user.email ?? "empty email address"
+                                newData.website = user.website ?? "empty website"
+                                newData.isFavourite = false
+                                newData.isInfoPrivate = false
+                                newData.isMessagingPrivate = false
+                                newData.isMyContact = true
+                                newData.lastOnline = user.lastRequestAt ?? Date()
+                                newData.avatar = PersistenceManager().getCubeProfileImage(usersID: user) ?? ""
+                                newData.createdAccount = user.createdAt ?? Date()
+                                    
+                                try realm.safeWrite ({
+                                    realm.add(newData, update: .all)
+                                    self.observeFirebaseContact(contactID: newData.id)
+                                    print("Succsessfuly added new contact to realm! \(newData.fullName)")
+                                })
+                            }
+                        } catch {
+                            print(error.localizedDescription)
+                        }
+                    }
+                    completion(true)
+                }) { (error) in
+                    print("error pulling connecty users: \(error.localizedDescription)")
+                    completion(true)
+                }
+            }
+        })
+    }
+    
+    func removeOldContact(completion: @escaping () -> ()) {
+        let config = Realm.Configuration(schemaVersion: 1)
+        do {
+            let realm = try Realm(configuration: config)
+            for i in realm.objects(ContactStruct.self) {
+                if let user = Chat.instance.contactList?.contacts.first(where: { $0.userID == i.id }) {
+                    print("rnning through contact: \(String(describing: user.userID))")
+                } else {
+                    print("DELETING contact: \(String(describing: i.id))")
+                    try realm.safeWrite ({
+                        i.isMyContact = false
+                        realm.add(i, update: .all)
+                    })
+                }
+            }
+
+            completion()
+        } catch {
+            completion()
+            print(error.localizedDescription)
         }
     }
     
@@ -287,8 +312,8 @@ class changeContactsRealmData {
                 try realm.safeWrite ({
                     foundContact.isMyContact = isMyContact
                     realm.add(foundContact, update: .all)
-                    completion(true)
                 })
+                completion(true)
             } else {
                 completion(true)
             }

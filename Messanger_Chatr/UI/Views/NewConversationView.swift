@@ -210,7 +210,7 @@ struct NewConversationView: View {
                     }
 
                     //MARK: Contacts Section
-                    if self.contacts.filterContact(text: self.searchText).count != 0 {
+                    if self.contacts.filterContact(text: self.searchText).filter({ $0.isMyContact == true }).count != 0 {
                         HStack {
                             VStack(alignment: .leading) {
                                 Text("Contacts:")
@@ -219,7 +219,7 @@ struct NewConversationView: View {
                                     .foregroundColor(.primary)
                                     .multilineTextAlignment(.leading)
 
-                                Text(Chat.instance.contactList?.contacts.count == 1 ? "\(Chat.instance.contactList?.contacts.count ?? 0) CONTACT" : "\(self.contacts.filterContact(text: self.searchText).filter({ $0.id != UserDefaults.standard.integer(forKey: "currentUserID") && $0.fullName != "No Name" }).count) CONTACTS")
+                                Text(Chat.instance.contactList?.contacts.count == 1 ? "\(Chat.instance.contactList?.contacts.count ?? 0) CONTACT" : "\(self.contacts.filterContact(text: self.searchText).filter({ $0.id != UserDefaults.standard.integer(forKey: "currentUserID") && $0.fullName != "No Name" && $0.isMyContact == true }).count) CONTACTS")
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                                     .multilineTextAlignment(.leading)
@@ -230,7 +230,7 @@ struct NewConversationView: View {
                         .padding(.top, 25)
 
                         LazyVStack(spacing: 0) {
-                            ForEach(self.contacts.filterContact(text: self.searchText).sorted { $0.fullName < $1.fullName }.filter({ $0.id != UserDefaults.standard.integer(forKey: "currentUserID") && $0.fullName != "No Name" }), id: \.self) { contact in
+                            ForEach(self.contacts.filterContact(text: self.searchText).filter({ $0.isMyContact == true }).sorted { $0.fullName < $1.fullName }.filter({ $0.id != UserDefaults.standard.integer(forKey: "currentUserID") && $0.fullName != "No Name" }), id: \.self) { contact in
                                 VStack(alignment: .trailing, spacing: 0) {
                                     ContactRealmCell(selectedContact: self.$selectedContact, contact: contact)
                                         .animation(.spring(response: 0.15, dampingFraction: 0.60, blendDuration: 0))

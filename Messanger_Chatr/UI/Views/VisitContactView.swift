@@ -937,6 +937,7 @@ struct actionButtonView: View {
     @Binding var contactRelationship: visitContactRelationship
     @Binding var newMessage: Int
     @Binding var dismissView: Bool
+    @State var showRemoveRequest: Bool = false
     
     var body: some View {
         HStack(spacing: self.contactRelationship == .contact ? 40 : 20) {
@@ -974,6 +975,7 @@ struct actionButtonView: View {
             } else if self.contactRelationship == .notContact && self.contact.id != UserDefaults.standard.integer(forKey: "currentUserID") {
                 Button(action: {
                     self.viewModel.addContact(contactRelationship: self.contactRelationship, contactId: self.contact.id, completion: { contactState in
+                        UINotificationFeedbackGenerator().notificationOccurred(.success)
                         self.contactRelationship = contactState
                     })
                 }) {
@@ -996,28 +998,46 @@ struct actionButtonView: View {
                     .shadow(color: Color.blue.opacity(0.30), radius: 8, x: 0, y: 8)
                 }.buttonStyle(ClickButtonStyle())
             } else if self.contactRelationship == .pendingRequest && self.contact.id != UserDefaults.standard.integer(forKey: "currentUserID") {
-                HStack(alignment: .center) {
-                    Image(systemName: "alarm")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 22, height: 24, alignment: .center)
-                        .foregroundColor(.secondary)
-                        .padding(3)
-                    
-                    Text("Pending...")
-                        .font(.none)
-                        .fontWeight(.regular)
-                        .foregroundColor(.secondary)
-                }.padding(.vertical, 8)
-                .padding(.horizontal, 12)
-                .background(Color("buttonColor"))
-                .cornerRadius(12.5)
+                Button(action: {
+                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                    self.showRemoveRequest.toggle()
+                }) {
+                    HStack(alignment: .center) {
+                        Image(systemName: "alarm")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 22, height: 24, alignment: .center)
+                            .foregroundColor(.secondary)
+                            .padding(3)
+                        
+                        Text("Pending...")
+                            .font(.none)
+                            .fontWeight(.regular)
+                            .foregroundColor(.secondary)
+                    }.padding(.vertical, 8)
+                    .padding(.horizontal, 12)
+                    .background(Color("buttonColor"))
+                }.cornerRadius(12.5)
+                .buttonStyle(ClickButtonStyle())
                 .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 8)
+                .actionSheet(isPresented: self.$showRemoveRequest) {
+                    ActionSheet(title: Text("Are you sure you want to un-send your contact request?"), message: nil, buttons: [
+                        .destructive(Text("Remove Request"), action: {
+                            Chat.instance.removeUser(fromContactList: UInt(self.contact.id)) { (error) in
+                                changeContactsRealmData().deleteContact(contactID: self.contact.id, isMyContact: false, completion: { _ in
+                                    self.contactRelationship = .notContact
+                                })
+                            }
+                        }),
+                        .cancel()
+                    ])
+                }
             }
             else if self.contactRelationship == .pendingRequestForYou && self.contact.id != UserDefaults.standard.integer(forKey: "currentUserID") {
                 HStack {
                     Button(action: {
                         self.viewModel.acceptContactRequest(contactRelationship: self.contactRelationship, contactId: self.contact.id, completion: { contactState in
+                            UINotificationFeedbackGenerator().notificationOccurred(.success)
                             self.contactRelationship = contactState
                         })
                     }) {
@@ -1043,6 +1063,7 @@ struct actionButtonView: View {
 
                     Button(action: {
                         self.viewModel.trashContactRequest(visitContactRelationship: self.contactRelationship, userId: self.contact.id, completion: { contactStatus in
+                            UINotificationFeedbackGenerator().notificationOccurred(.error)
                             self.contactRelationship = contactStatus
                         })
                     }) {

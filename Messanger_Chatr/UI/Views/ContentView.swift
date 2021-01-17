@@ -11,7 +11,6 @@ import UIKit
 import SwiftUI
 import CoreData
 import ConnectyCube
-import SDWebImageSwiftUI
 import PopupView
 import RealmSwift
 import LocalAuthentication
@@ -227,7 +226,14 @@ struct mainHomeList: View {
                             .environmentObject(self.auth)
                             .padding(.bottom, 45)
                             .sheet(isPresented: self.$showContacts, onDismiss: {
-                                self.loadSelectedDialog()
+                                if self.auth.isUserAuthenticated != .signedOut {
+                                    self.loadSelectedDialog()
+                                } else {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
+                                        self.auth.logOutFirebase()
+                                        self.auth.logOutConnectyCube()
+                                    }
+                                }
                             }) {
                                 ContactsView(newDialogID: self.$newDialogFromContact, dismissView: self.$showContacts)
                                     .environmentObject(self.auth)
@@ -458,7 +464,7 @@ struct mainHomeList: View {
                         }
                     }
                     
-                    if self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.count >= 4 || self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.count >= 1 {
+                    if self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.count >= 3 {
                         FooterInformation()
                             .padding(.top, 140)
                             .padding(.bottom, 25)
