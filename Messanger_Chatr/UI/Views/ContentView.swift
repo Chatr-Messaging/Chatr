@@ -496,7 +496,7 @@ struct mainHomeList: View {
                     //.scaleEffect(1 - self.activeView.height / 2500)
                     //.offset(y: self.activeView.height / 6)
                     .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: -5)
-                    .animation(.timingCurve(0.2, 0.8, 0.2, 1, duration: 0.75))
+                    .animation(.timingCurve(0.2, 0.8, 0.2, 1, duration: 0.5))
                     .offset(y: self.isLocalOpen ? Constants.screenHeight - (UIDevice.current.hasNotch || self.keyboardHeight != 0 ? 50 : 30) - (self.textFieldHeight <= 120 ? self.textFieldHeight : 120) - self.keyboardHeight + self.keyboardDragState.height - (self.hasAttachments ? 95 : 0) : Constants.screenHeight)
                     .gesture(
                         DragGesture().onChanged { value in

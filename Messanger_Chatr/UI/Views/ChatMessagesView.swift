@@ -24,7 +24,7 @@ struct ChatMessagesView: View {
     @State var isLoadingMore: Bool = false
     @State var isLoadingAni: Bool = false
     @State private var delayViewMessages: Bool = false
-    @State private var firstScroll: Bool = false
+    @State private var firstScroll: Bool = true
     @State private var isPrevious: Bool = true
     @State private var mesgCount: Int = -1
     
@@ -46,8 +46,6 @@ struct ChatMessagesView: View {
                                 Request.countOfMessages(forDialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "", extendedRequest: ["sort_desc" : "lastMessageDate"], successBlock: { count in
                                     print("success getting message count: \(count)")
                                     self.mesgCount = Int(count)
-                                }, errorBlock: { error in
-                                    print("error getting message count: \(error.localizedDescription)")
                                 })
                             }
                         }
@@ -94,48 +92,45 @@ struct ChatMessagesView: View {
                                         } else {
                                             TextBubble(message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
                                                 .environmentObject(self.auth)
+                                                .animation(.spring(response: 0.65, dampingFraction: 0.55, blendDuration: 0))
                                                 .contentShape(Rectangle())
                                                 .transition(AnyTransition.scale)
                                         }
                                         
                                         if messagePosition == .left { Spacer() }
-                                    }.background(Color.clear)
+                                    }.id(currentMessages[message].id)
+                                    .background(Color.clear)
                                     .padding(.horizontal, 25)
                                     .padding(.top, topMsg && currentMessages.count < 20 ? 20 : 0)
                                     .padding(.bottom, self.hasPrevious(index: message) ? -4 : 15)
                                     .padding(.bottom, notLast && self.hasPrevious(index: message) && currentMessages[message].messageState != .error ? 0 : 10)
                                     .padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 120 ? self.textFieldHeight : 120) + (self.hasAttachment ? 95 : 0) + 50)
-                                }.id(currentMessages[message].id)
-                                .onAppear() {
-                                    if !notLast {
-                                        withAnimation {
-                                            reader.scrollTo(currentMessages[message].id, anchor: .bottom)
-                                        }
-                                    }
                                 }
-//                                if !notLast && self.auth.acceptScrolls {
-//                                    Scroll(reader: reader, id: currentMessages[message].id)
-//                                }
-                            }
-                            .frame(width: Constants.screenWidth)
-                            .contentShape(Rectangle())
-                            //.opacity(self.delayViewMessages ? 1 : 0)
-//                            .onAppear() {
-//                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-//                                    reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
-//                                }
-//                            }
-//                            .onChange(of: self.keyboardChange) { value in
-//                                //self.auth.acceptScrolls = true
-//                                print("keyboard changed: \(currentMessages.last?.id ?? "") && \(value)")
-//                                if value > 0 {
-//                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-//                                        withAnimation {
-//                                            reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
+//                                .onAppear() {
+//                                    if !notLast {
+//                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) {
+//                                            //if firstScroll {
+//                                                reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
+//                                              /////
+//                                            /////self.firstScroll = false
+//                                            //}
 //                                        }
 //                                    }
-//                                }
-//                            }
+//                                }nt
+                            }.contentShape(Rectangle())
+                            //.opacity(self.delayViewMessages ? 1 : 0)
+                            .onAppear() {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) {
+                                    reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
+                                }
+                            }
+                            .onChange(of: self.keyboardChange) { value in
+                                if value > 0 {
+                                    withAnimation {
+                                        reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
+                                    }
+                                }
+                            }
                         }.resignKeyboardOnDragGesture()
                     }
                 }
@@ -146,7 +141,8 @@ struct ChatMessagesView: View {
                     }
                 }
             }.contentShape(Rectangle())
-        }.contentShape(Rectangle())//.frame(width: Constants.screenWidth, height: Constants.screenHeight - 50 - (self.textFieldHeight <= 120 ? self.textFieldHeight : 120) - self.keyboardChange + self.keyboardDragState.height - (self.hasAttachment ? 95 : 0), alignment: .bottom)
+        }.frame(width: Constants.screenWidth)
+        .contentShape(Rectangle())
         .onAppear() {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                 changeMessageRealmData.getMessageUpdates(dialogID: self.selectedID, completion: { _ in
@@ -215,21 +211,7 @@ struct ChatMessagesView: View {
                             }
                         }
                     }
-                    
-                    print("done pulling the dialog! \(dialog.id ?? "")")
                 })
-                
-//                let extRequest : [String: String] = ["sort_desc" : "lastMessageDate"]
-//                Request.dialogs(with: Paginator.limit(20, skip: 0), extendedRequest: extRequest, successBlock: { (dialogs, usersIDs, paginator) in
-//                    for dialog in dialogs {
-//                        if dialog.id == self.selectedID {
-//
-//
-//                            break
-//                        }
-//                    }
-//                })
-                
             }
         }
     }
