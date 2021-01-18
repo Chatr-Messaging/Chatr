@@ -109,9 +109,10 @@ struct AttachmentBubble: View {
                     .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                     .aspectRatio(contentMode: .fit)
                     .scaledToFit()
-                    .frame(idealWidth: CGFloat(Constants.screenWidth * 0.60), idealHeight: CGFloat(Constants.screenWidth * 0.6))
+                    .frame(idealWidth: CGFloat(Constants.screenWidth * 0.75), idealHeight: CGFloat(Constants.screenWidth * 0.75))
                     .frame(minWidth: 100)
                     .cornerRadius(20)
+                    .padding(.bottom, self.hasPrior ? 0 : 15)
                     .shadow(color: Color.black.opacity(0.15), radius: 12, x: 0, y: 14)
                     .offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
                     .contextMenu {

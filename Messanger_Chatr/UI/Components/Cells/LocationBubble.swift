@@ -49,6 +49,7 @@ struct LocationBubble: View {
                     .padding(.leading, self.messagePosition == .right ? 35 : 0)
                     .padding(.trailing, self.messagePosition == .right ? 0 : 35)
                     .cornerRadius(20)
+                    .padding(.bottom, self.hasPrior ? 0 : 15)
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
                     .contentShape(RoundedRectangle(cornerRadius: 20, style: .circular))
                     .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 10)
@@ -101,6 +102,7 @@ struct LocationBubble: View {
                         .padding(.vertical, 8)
                         .lineLimit(nil)
                 }.padding(.horizontal, 15)
+                .padding(.bottom, self.hasPrior ? 0 : 15)
                 .background(self.messagePosition == .right && self.message.messageState != .deleted ? LinearGradient(
                     gradient: Gradient(colors: [Color(red: 46 / 255, green: 168 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)]),
                     startPoint: .top, endPoint: .bottom) : LinearGradient(

@@ -172,6 +172,7 @@ struct ContactBubble: View {
                             }.contentShape(Rectangle())
                             .padding(.horizontal)
                         }).buttonStyle(PlainButtonStyle())
+                        .padding(.bottom, self.hasPrior ? 0 : 15)
                         .sheet(isPresented: self.$showContact, onDismiss: {
                             if self.chatContact != 0 && self.chatContact != self.message.senderID {
                                print("need to open Chat view!!")
