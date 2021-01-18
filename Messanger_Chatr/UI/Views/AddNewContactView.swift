@@ -104,7 +104,6 @@ struct addNewContactView: View {
                             if self.grandUsers.count > 0 {
                                 ForEach(self.grandUsers, id: \.self) { contact in
                                     NavigationLink(destination: VisitContactView(newMessage: self.$newDialogID, dismissView: self.$dismissView, viewState: .fromSearch, connectyContact: contact).environmentObject(self.auth).edgesIgnoringSafeArea(.all)) {
-                                        var isAdded: Bool = false
                                         VStack(alignment: .trailing, spacing: 0) {
                                             HStack {
                                                 WebImage(url: URL(string: persistenceManager.getCubeProfileImage(usersID: contact) ?? ""))
@@ -135,41 +134,20 @@ struct addNewContactView: View {
                                                     Button(action: {
                                                         Chat.instance.confirmAddContactRequest(UInt(contact.id)) { (error) in
                                                             UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                                            isAdded = true
-                                                            let event = Event()
-                                                            event.notificationType = .push
-                                                            event.usersIDs = [NSNumber(value: contact.id)]
-                                                            event.type = .oneShot
-
-                                                            var pushParameters = [String : String]()
-                                                            pushParameters["message"] = "\(ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.fullName ?? "A user") sent you a contact request."
-                                                            pushParameters["ios_sound"] = "app_sound.wav"
-
-                                                            if let jsonData = try? JSONSerialization.data(withJSONObject: pushParameters,
-                                                                                                        options: .prettyPrinted) {
-                                                              let jsonString = String(bytes: jsonData,
-                                                                                      encoding: String.Encoding.utf8)
-
-                                                              event.message = jsonString
-
-                                                              Request.createEvent(event, successBlock: {(events) in
-                                                                print("sent push notification to user")
-                                                              }, errorBlock: {(error) in
-                                                                print("error in sending push noti: \(error.localizedDescription)")
-                                                              })
-                                                            }
+                                                            self.grandUsers.removeAll(where: { $0.id == contact.id })
+                                                            self.auth.sendPushNoti(userIDs: [NSNumber(value: contact.id)], title: "Contact Request", message: "\(self.auth.profile.results.first?.fullName ?? "A user") sent you a contact request")
                                                         }
                                                     }) {
-                                                        Text(isAdded ? "Added" : "Add")
+                                                        Text("Add")
                                                             .fontWeight(.medium)
                                                             .font(.subheadline)
                                                             .foregroundColor(.white)
                                                             .padding(.vertical, 8)
                                                             .padding(.horizontal, 15)
-                                                            .background(isAdded ? Color.gray : Color.blue)
+                                                            .background(Color.blue)
                                                             .cornerRadius(10)
                                                             .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 3)
-                                                    }.disabled(isAdded ? true : false)
+                                                    }
                                                 }
 
                                                 Image(systemName: "chevron.right")

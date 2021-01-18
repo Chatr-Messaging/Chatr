@@ -13,7 +13,6 @@ import ConnectyCube
 
 struct ChatMessagesView: View {
     @EnvironmentObject var auth: AuthModel
-    @ObservedObject var messages = MessagesRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(MessageStruct.self))
     @Binding var activeView: CGSize
     @Binding var keyboardChange: CGFloat
     @Binding var dialogID: String
@@ -28,11 +27,9 @@ struct ChatMessagesView: View {
     @State private var firstScroll: Bool = false
     @State private var isPrevious: Bool = true
     @State private var mesgCount: Int = -1
-
-//    @ObservedObject var messages = MessagesRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(MessageStruct.self).filter(NSPredicate(format: "dialogID == %@", UserDefaults.standard.string(forKey: "selectedDialogID") ?? "")).sorted(byKeyPath: "date", ascending: true))
     
     var body: some View {
-        let currentMessages = self.messages.selectedDialog(dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "")
+        let currentMessages = self.auth.messages.selectedDialog(dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "")
         ZStack(alignment: .center) {
             ScrollView(.vertical, showsIndicators: false) {
                 LazyVStack() {
@@ -55,10 +52,9 @@ struct ChatMessagesView: View {
                             }
                         }
                     
-
                     //CUSTOM MESSAGE BUBBLE:
                     if self.delayViewMessages {
-                        ScrollViewReader { reader in
+                        ScrollViewReader { (reader: ScrollViewProxy) in
                             ForEach(currentMessages.indices, id: \.self) { message in
                                 let messagePosition: messagePosition = UInt(currentMessages[message].senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? .right : .left
                                 let notLast = currentMessages[message] != currentMessages.last
@@ -93,7 +89,7 @@ struct ChatMessagesView: View {
                                             ContactBubble(chatContact: self.$newDialogFromSharedContact, message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
                                                 .environmentObject(self.auth)
                                                 .contentShape(Rectangle())
-                                        } else if currentMessages[message].longitude != 0 && self.messages.results[message].latitude != 0 {
+                                        } else if currentMessages[message].longitude != 0 && currentMessages[message].latitude != 0 {
                                             LocationBubble(message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
                                         } else {
                                             TextBubble(message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
@@ -119,7 +115,7 @@ struct ChatMessagesView: View {
                                 }
 
                                 if !notLast && self.auth.acceptScrolls {
-                                    Scroll(reader: reader, id: self.messages.results[message].id)
+                                    Scroll(reader: reader, id: currentMessages[message].id)
                                 }
                             }
                             .frame(width: Constants.screenWidth)
@@ -257,7 +253,7 @@ struct ChatMessagesView: View {
     }
     
     func hasPrevious(index: Int) -> Bool {
-        let result = self.messages.selectedDialog(dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "")
+        let result = self.auth.messages.selectedDialog(dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "")
         return result[index] != result.last ? (result[index + 1].senderID == result[index].senderID ? true : false) : false
     }
 }

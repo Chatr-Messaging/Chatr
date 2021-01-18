@@ -114,13 +114,14 @@ struct MainBody: View {
                                     .frame(width: 60, height: 60, alignment: .center)
                                     .shadow(color: Color("buttonShadow"), radius: 20, x: 0, y: 10)
                             }.padding(.all)
-                            .offset(y: -geo.frame(in: .global).minY + 80)
+                            .offset(y: Constants.screenWidth == 375 ? -geo.frame(in: .global).minY + 50 : -geo.frame(in: .global).minY + 80)
                             
                             Spacer()
                             Carousel(width: Constants.screenWidth, page: self.$pageIndex, scrollOffset: self.$scrollOffset, height: geo.frame(in: .global).height - 120)
                                 .disabled(self.continuePermissions || self.continuePt1 ? true : false)
                                 .opacity(self.continuePermissions || self.continuePt1 ? 0.0 : 1.0)
                                 .frame(width: Constants.screenWidth)
+                                .offset(y: Constants.screenWidth == 375 ? -30 : 0)
                                 .animation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0))
                         }
                     }

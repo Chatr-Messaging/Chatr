@@ -39,6 +39,7 @@
 		055E516625ACDC0B003BE668 /* WKView in Frameworks */ = {isa = PBXBuildFile; productRef = 055E516525ACDC0B003BE668 /* WKView */; };
 		05670318256A3C43004123EB /* CarBode in Frameworks */ = {isa = PBXBuildFile; productRef = 05670317256A3C43004123EB /* CarBode */; };
 		05693490252312F7001BDFF0 /* LocationBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0569348F252312F7001BDFF0 /* LocationBubble.swift */; };
+		056935D825B50B3D000705F6 /* MessagesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056935D725B50B3D000705F6 /* MessagesViewModel.swift */; };
 		056B989524C8F76B003F7FBA /* HomeUserInfoHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056B989424C8F76B003F7FBA /* HomeUserInfoHeader.swift */; };
 		056B989C24C8F9BD003F7FBA /* MenuButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056B989B24C8F9BD003F7FBA /* MenuButton.swift */; };
 		056B989E24C8F9E7003F7FBA /* ContactsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056B989D24C8F9E7003F7FBA /* ContactsButton.swift */; };
@@ -180,6 +181,7 @@
 		055C2A5F24CE8C2700F7AE16 /* DialogList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogList.swift; sourceTree = "<group>"; };
 		055C2A6124D3FDD200F7AE16 /* MembershipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MembershipView.swift; sourceTree = "<group>"; };
 		0569348F252312F7001BDFF0 /* LocationBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationBubble.swift; sourceTree = "<group>"; };
+		056935D725B50B3D000705F6 /* MessagesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesViewModel.swift; sourceTree = "<group>"; };
 		056B989424C8F76B003F7FBA /* HomeUserInfoHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeUserInfoHeader.swift; sourceTree = "<group>"; };
 		056B989B24C8F9BD003F7FBA /* MenuButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuButton.swift; sourceTree = "<group>"; };
 		056B989D24C8F9E7003F7FBA /* ContactsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsButton.swift; sourceTree = "<group>"; };
@@ -548,6 +550,7 @@
 			children = (
 				0596844D25ABED4D0051B707 /* EditProfileViewModel.swift */,
 				0596845525AC16E80051B707 /* VisitContactViewModel.swift */,
+				056935D725B50B3D000705F6 /* MessagesViewModel.swift */,
 				05A6D54625B021E400AD66DD /* AdvancedViewModel.swift */,
 			);
 			path = ViewModel;
@@ -886,6 +889,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				056935D825B50B3D000705F6 /* MessagesViewModel.swift in Sources */,
 				057F2B4E250B026F005DFB21 /* ContactCarouselSection.swift in Sources */,
 				05A7633C2506FD42002712FA /* ContactRequestCell.swift in Sources */,
 				056B98A924C8FD1D003F7FBA /* SearchBar.swift in Sources */,

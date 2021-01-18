@@ -12,7 +12,6 @@ import ConnectyCube
 
 struct QuickSnapsSection: View {
     @EnvironmentObject var auth: AuthModel
-    @ObservedObject var quickSnapContacts = ContactsRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ContactStruct.self))
     @Binding var viewState: QuickSnapViewingState
     @Binding var selectedQuickSnapContact: ContactStruct
     @Binding var emptyQuickSnaps: Bool

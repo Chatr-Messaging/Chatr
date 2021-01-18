@@ -445,7 +445,8 @@ struct mainHomeList: View {
                                     }
                                 }.offset(y: 60)
                                 .frame(height: 75, alignment: .center)
-                                .simultaneousGesture(DragGesture(minimumDistance: UserDefaults.standard.bool(forKey: "localOpen") ? 0 : 500).onChanged({ (_) in }))
+                                .frame(minWidth: Constants.screenWidth - 40, maxWidth: Constants.screenWidth)
+                                .simultaneousGesture(DragGesture(minimumDistance: UserDefaults.standard.bool(forKey: "localOpen") ? 0 : 500))
                                 .padding(.horizontal, self.isLocalOpen ? 0 : 20)
                                 .background(Color.clear)
                                 //.onAppear {

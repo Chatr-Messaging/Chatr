@@ -253,6 +253,7 @@ struct ContactsView: View {
                                         }
                                     }
                                 }.padding(.horizontal)
+                                .animation(.spring(response: 0.45, dampingFraction: 0.70, blendDuration: 0))
                             }.frame(width: Constants.screenWidth, height: self.auth.contacts.results.filter({ $0.isMyContact == true && ($0.isOnline == true || $0.isFavourite == true || $0.hasQuickSnaped == true) }).count > 0 ? 150 : 0)
                             .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
                         }.padding(.bottom, self.auth.contacts.results.filter({ $0.isMyContact == true && ($0.isOnline == true || $0.isFavourite == true || $0.hasQuickSnaped == true) }).count > 0 ? 40 : 0)

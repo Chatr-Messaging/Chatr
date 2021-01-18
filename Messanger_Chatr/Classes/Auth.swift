@@ -557,17 +557,17 @@ class AuthModel: NSObject, ObservableObject {
         .cornerRadius(15)
     }
     
-    public func sendPushNoti(userIDs: [NSNumber], message: String) {
+    public func sendPushNoti(userIDs: [NSNumber], title: String, message: String) {
         let event = Event()
         event.notificationType = .push
         event.usersIDs = userIDs
         event.type = .oneShot
-        event.name = "Liked Quick Snap"
+        event.name = title
 
         var pushParameters = [String : String]()
+        pushParameters["title"] = title
         pushParameters["message"] = message
         pushParameters["ios_sound"] = "app_sound.wav"
-        pushParameters["title"] = "Liked Quci Snap"
 
         if let jsonData = try? JSONSerialization.data(withJSONObject: pushParameters, options: .prettyPrinted) {
             let jsonString = String(bytes: jsonData, encoding: String.Encoding.utf8)

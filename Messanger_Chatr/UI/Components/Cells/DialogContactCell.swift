@@ -147,7 +147,7 @@ struct DialogContactCell: View {
                                 self.notiType = "success"
                                 self.notiText = "Successfully added \(self.contact.fullName) as admin."
                                 self.showAlert.toggle()
-                                self.auth.sendPushNoti(userIDs: [NSNumber(value: self.contact.id)], message: "\(ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.fullName ?? "Chatr User") added you as an admin 🥳")
+                                self.auth.sendPushNoti(userIDs: [NSNumber(value: self.contact.id)], title: "Added Admin", message: "\(ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.fullName ?? "Chatr User") added you as an admin 🥳")
                             }) { (error) in
                                 print("Error adding contact as admin: \(error.localizedDescription) && \(UserDefaults.standard.string(forKey: "selectedDialogID") ?? "")")
                                 UINotificationFeedbackGenerator().notificationOccurred(.error)
@@ -165,7 +165,7 @@ struct DialogContactCell: View {
                                 self.notiType = "success"
                                 self.notiText = "Successfully removed \(self.contact.fullName) as admin."
                                 self.showAlert.toggle()
-                                self.auth.sendPushNoti(userIDs: [NSNumber(value: self.contact.id)], message: "\(ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.fullName ?? "Chatr User") removed you as an admin.")
+                                self.auth.sendPushNoti(userIDs: [NSNumber(value: self.contact.id)], title: "Removed Admin", message: "\(ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.fullName ?? "Chatr User") removed you as an admin")
                             }) { (error) in
                                 print("Error removing contact as admin: \(error.localizedDescription)")
                                 UINotificationFeedbackGenerator().notificationOccurred(.error)
@@ -186,7 +186,7 @@ struct DialogContactCell: View {
                             self.notiType = "success"
                             self.notiText = "Successfully removed \(self.contact.fullName) from group chat."
                             self.showAlert.toggle()
-                            self.auth.sendPushNoti(userIDs: [NSNumber(value: self.contact.id)], message: "\(ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.fullName ?? "Chatr User") removed you from the group chat.")
+                            self.auth.sendPushNoti(userIDs: [NSNumber(value: self.contact.id)], title: "Removed from Group", message: "\(ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.fullName ?? "Chatr User") removed you from the group chat")
                         }) { (error) in
                             print("Error removing contact from dialog: \(error.localizedDescription)")
                             UINotificationFeedbackGenerator().notificationOccurred(.error)

@@ -48,7 +48,7 @@ struct ContactRequestCell: View {
                         .lineLimit(1)
                         .animation(nil)
                     
-                    Text(self.contact.phoneNumber.format(phoneNumber: String(self.contact.phoneNumber.dropFirst())))
+                    Text("last online \(self.contact.lastOnline.getElapsedInterval(lastMsg: "moments")) ago")
                         .font(.subheadline)
                         .fontWeight(.regular)
                         .foregroundColor(.secondary)
@@ -82,29 +82,7 @@ struct ContactRequestCell: View {
                             UINotificationFeedbackGenerator().notificationOccurred(.success)
                             self.contactRelationship = .contact
                             self.auth.profile.removeContactRequest(userID: UInt(self.contact.id))
-
-                            let event = Event()
-                            event.notificationType = .push
-                            event.usersIDs = [NSNumber(value: self.contact.id)]
-                            event.type = .oneShot
-
-                            var pushParameters = [String : String]()
-                            pushParameters["message"] = "\(ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.fullName ?? "A user")) accepted your contact request."
-                            pushParameters["ios_sound"] = "app_sound.wav"
-
-                            if let jsonData = try? JSONSerialization.data(withJSONObject: pushParameters,
-                                                                        options: .prettyPrinted) {
-                              let jsonString = String(bytes: jsonData,
-                                                      encoding: String.Encoding.utf8)
-
-                              event.message = jsonString
-
-                              Request.createEvent(event, successBlock: {(events) in
-                                print("sent push notification to user")
-                              }, errorBlock: {(error) in
-                                print("error in sending push noti: \(error.localizedDescription)")
-                              })
-                            }
+                            self.auth.sendPushNoti(userIDs: [NSNumber(value: self.contact.id)], title: "Accepted Request", message: "\(self.auth.profile.results.first?.fullName ?? "A user")) accepted your contact request")
                         }
                     }) {
                         Text("Accept")
@@ -157,8 +135,8 @@ struct ContactRequestCell: View {
                                 self.contact = newContact
                             }
                         })
-                    }) { (error) in
-
+                    }) { _ in
+                        //error here
                     }
                 }
             } catch {
