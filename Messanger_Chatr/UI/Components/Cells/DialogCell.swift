@@ -231,7 +231,8 @@ struct DialogCell: View {
                         .frame(width: 20, height: 25, alignment: .center)
                         .foregroundColor(.secondary)
                         .font(Font.title.weight(.light))
-                }).disabled(self.dialogModel.isOpen ? false : true)
+                }).padding(.horizontal, self.dialogModel.isOpen ? 5 : 0)
+                .disabled(self.dialogModel.isOpen ? false : true)
                 .opacity(self.dialogModel.isOpen ? 1 : 0)
                 .sheet(isPresented: self.$openContactProfile, content: {
                     NavigationView {
@@ -274,9 +275,9 @@ struct DialogCell: View {
                 Button(action: {
                     self.isOpen = false
                     UserDefaults.standard.set(false, forKey: "localOpen")
-                    changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
                         changeDialogRealmData().fetchDialogs(completion: { _ in })
                     }
                 }, label: {

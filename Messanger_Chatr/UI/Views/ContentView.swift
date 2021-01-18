@@ -390,12 +390,12 @@ struct mainHomeList: View {
                                                        activeView: self.$activeView,
                                                        selectedDialogID: self.$selectedDialogID)
                                                 .environmentObject(self.auth)
+                                                .zIndex(i.isOpen ? 3 : -1)
                                                 .opacity(self.isLocalOpen ? (i.isOpen ? 1 : 0) : 1)
                                                 .offset(y: i.isOpen && self.isLocalOpen ? -geo.frame(in: .global).minY + (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 50 : 25) : 125) : self.emptyQuickSnaps ? -45 : 50)
                                                 .offset(y: self.isLocalOpen ? self.activeView.height : 0)
                                                 .shadow(color: Color.black.opacity(self.isLocalOpen ? (self.colorScheme == .dark ? 0.40 : 0.15) : 0.15), radius: self.isLocalOpen ? 15 : 8, x: 0, y: self.isLocalOpen ? (self.colorScheme == .dark ? 15 : 5) : 5)
                                                 .animation(.spring(response: 0.45, dampingFraction: 0.70, blendDuration: 0))
-                                                .zIndex(self.isLocalOpen ? 3 : -1)
                                                 .id(i.id)
                                         }.onTapGesture {
                                             self.onCellTapGesture(id: i.id, dialogType: i.dialogType)
@@ -428,7 +428,7 @@ struct mainHomeList: View {
                                 }.offset(y: 60)
                                 .frame(height: 75, alignment: .center)
                                 .frame(minWidth: Constants.screenWidth - 40, maxWidth: Constants.screenWidth)
-                                .simultaneousGesture(DragGesture(minimumDistance: UserDefaults.standard.bool(forKey: "localOpen") ? 0 : 500))
+                                .simultaneousGesture(DragGesture(minimumDistance: self.isLocalOpen ? 0 : 500))
                                 .padding(.horizontal, self.isLocalOpen ? 0 : 20)
                                 .background(Color.clear)
                                 //.onAppear {
@@ -456,7 +456,7 @@ struct mainHomeList: View {
                 }
 
                 //Chat View
-                if UserDefaults.standard.bool(forKey: "localOpen") {
+                //if UserDefaults.standard.bool(forKey: "localOpen") {
                     ChatMessagesView(activeView: self.$activeView, keyboardChange: self.$keyboardHeight, dialogID: self.$selectedDialogID, textFieldHeight: self.$textFieldHeight, keyboardDragState: self.$keyboardDragState, hasAttachment: self.$hasAttachments, newDialogFromSharedContact: self.$newDialogFromSharedContact)
                         .environmentObject(self.auth)
                         .frame(width: Constants.screenWidth, alignment: .bottom)
@@ -468,9 +468,9 @@ struct mainHomeList: View {
                         //height: Constants.screenHeight - 248 - (self.textFieldHeight < 120 ? self.textFieldHeight : 120) - self.keyboardHeight + self.keyboardDragState.height - (self.hasAttachments ? 95 : 0)
                         //.padding(.bottom, (self.textFieldHeight < 120 ? self.textFieldHeight : 120) + self.keyboardHeight - self.keyboardDragState.height + (self.hasAttachments ? 95 : 0) + 248)
                         .animation(.timingCurve(0.5, 0.8, 0.2, 1, duration: 0.30))
-                        .opacity(self.isLocalOpen ? Double((190 - self.activeView.height) / 150) : 0)
+                        .opacity(UserDefaults.standard.bool(forKey: "localOpen") ? Double((190 - self.activeView.height) / 150) : 0)
                         .zIndex(0)
-                        .simultaneousGesture(DragGesture(minimumDistance: 800).onChanged({ (_) in }))
+                        .simultaneousGesture(DragGesture(minimumDistance: UserDefaults.standard.bool(forKey: "localOpen") ? 800 : 0).onChanged({ (_) in }))
                         .onDisappear {
                             self.auth.leaveDialog()
                         }
@@ -485,7 +485,7 @@ struct mainHomeList: View {
 //                                            print("Message view successfully pulled new messages!")
 //                                        })
                         //}
-                    }
+                    //}
                 
                 //keyboard View
                 KeyboardCardView(height: self.$textFieldHeight, mainText: self.$keyboardText, hasAttachments: self.$hasAttachments)
