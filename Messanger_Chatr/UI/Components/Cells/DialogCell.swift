@@ -47,7 +47,6 @@ struct DialogCell: View {
                         .offset(x: -5)
                         .shadow(color: Color.black.opacity(0.23), radius: 7, x: 0, y: 5)
                         .onTapGesture {
-                            UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")
                             if isOpen {
                                 if self.dialogModel.dialogType == "private" {
                                     self.openContactProfile.toggle()
@@ -61,7 +60,9 @@ struct DialogCell: View {
                             } else {
                                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 self.isOpen = true
+                                self.selectedDialogID = self.dialogModel.id
                                 UserDefaults.standard.set(true, forKey: "localOpen")
+                                UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")
                                 changeDialogRealmData().updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
                             }
                         }
@@ -113,7 +114,6 @@ struct DialogCell: View {
                             .padding(.trailing, self.groupOccUserAvatar.count == 1 ? 0 : 15)
                             .padding(.leading, self.groupOccUserAvatar.count == 1 ? 0 : 10)
                             .onTapGesture {
-                                UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")
                                 if isOpen {
                                     self.openGroupProfile.toggle()
                                     if let connDia = self.auth.selectedConnectyDialog {
@@ -122,7 +122,9 @@ struct DialogCell: View {
                                 } else {
                                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                     self.isOpen = true
+                                    self.selectedDialogID = self.dialogModel.id
                                     UserDefaults.standard.set(true, forKey: "localOpen")
+                                    UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")
                                     changeDialogRealmData().updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
                                 }
                             }.sheet(isPresented: self.$openGroupProfile, content: {
@@ -202,8 +204,8 @@ struct DialogCell: View {
                         .foregroundColor(Color.green)
                 }
             }.onTapGesture {
-                UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")
                 if isOpen {
+                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                     if self.dialogModel.dialogType == "private" {
                         self.openContactProfile.toggle()
                     } else if self.dialogModel.dialogType == "group" || self.dialogModel.dialogType == "public" {
@@ -212,11 +214,12 @@ struct DialogCell: View {
                     if let connDia = self.auth.selectedConnectyDialog {
                         connDia.sendUserStoppedTyping()
                     }
-                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                 } else {
                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                     self.isOpen = true
+                    self.selectedDialogID = self.dialogModel.id
                     UserDefaults.standard.set(true, forKey: "localOpen")
+                    UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")
                     changeDialogRealmData().updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
                 }
             }
@@ -299,7 +302,6 @@ struct DialogCell: View {
         .padding(.vertical, self.privateDialogContact.quickSnaps.count > 0 ? 4 : 8)
         .background(Color("buttonColor"))
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
-        .frame(height: 75)
         .onAppear() {
             if self.dialogModel.dialogType == "private" {
                 for occ in self.dialogModel.occupentsID {

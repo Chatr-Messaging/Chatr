@@ -379,96 +379,94 @@ struct mainHomeList: View {
                                 
                                 Spacer()
                             }.offset(y: Constants.screenWidth < 375 ? 60 : -30)
-                        } else {
-                            //Main Dialog Cells
-                            VStack {
-                                ForEach(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }, id: \.self) { i in
-                                    GeometryReader { geo in
-                                        ZStack(alignment: .topLeading) {
-                                            DialogCell(dialogModel: i,
-                                                       isOpen: self.$isLocalOpen,
-                                                       activeView: self.$activeView,
-                                                       selectedDialogID: self.$selectedDialogID)
-                                                .environmentObject(self.auth)
-                                                .zIndex(i.isOpen ? 3 : -1)
-                                                .opacity(self.isLocalOpen ? (i.isOpen ? 1 : 0) : 1)
-                                                .offset(y: i.isOpen && self.isLocalOpen ? -geo.frame(in: .global).minY + (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 50 : 25) : 125) : self.emptyQuickSnaps ? -45 : 50)
-                                                .offset(y: self.isLocalOpen ? self.activeView.height : 0)
-                                                .shadow(color: Color.black.opacity(self.isLocalOpen ? (self.colorScheme == .dark ? 0.40 : 0.15) : 0.15), radius: self.isLocalOpen ? 15 : 8, x: 0, y: self.isLocalOpen ? (self.colorScheme == .dark ? 15 : 5) : 5)
-                                                .animation(.spring(response: 0.45, dampingFraction: 0.70, blendDuration: 0))
-                                                .id(i.id)
-                                        }.onTapGesture {
-                                            self.onCellTapGesture(id: i.id, dialogType: i.dialogType)
-                                        }.gesture(DragGesture(minimumDistance: 0).onChanged { value in
-                                            guard value.translation.height < 150 else { UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true); return }
-                                            guard value.translation.height > 0 else { return }
-                                            
-                                            self.activeView = value.translation
-                                        }.onEnded { value in
-                                            if self.activeView.height > 50 {
-                                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                                UserDefaults.standard.set(false, forKey: "localOpen")
-                                                changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: i.id)
-                                                //changeDialogRealmData().updateDialogTypedText(text: self.keyboardText, dialogID: i.id)
+                        }
+                        
+                        //MARK: Main Dialog Cells
+                        ForEach(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }, id: \.self) { i in
+                            GeometryReader { geo in
+                                DialogCell(dialogModel: i,
+                                           isOpen: self.$isLocalOpen,
+                                           activeView: self.$activeView,
+                                           selectedDialogID: self.$selectedDialogID)
+                                    .environmentObject(self.auth)
+                                    .zIndex(i.isOpen ? 3 : -1)
+                                    .opacity(self.isLocalOpen ? (i.isOpen ? 1 : 0) : 1)
+                                    .offset(y: i.isOpen && self.isLocalOpen ? -geo.frame(in: .global).minY + (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 50 : 25) : 125) : self.emptyQuickSnaps ? -45 : 50)
+                                    .offset(y: self.isLocalOpen ? self.activeView.height : 0)
+                                    .shadow(color: Color.black.opacity(self.isLocalOpen ? (self.colorScheme == .dark ? 0.40 : 0.15) : 0.15), radius: self.isLocalOpen ? 15 : 8, x: 0, y: self.isLocalOpen ? (self.colorScheme == .dark ? 15 : 5) : 5)
+                                    .animation(.spring(response: 0.45, dampingFraction: 0.70, blendDuration: 0))
+                                    .id(i.id)
+                                    .onTapGesture {
+                                        self.onCellTapGesture(id: i.id, dialogType: i.dialogType)
+                                    }.gesture(DragGesture(minimumDistance: 0).onChanged { value in
+                                        guard value.translation.height < 150 else { UIApplication.shared.endEditing(true); return }
+                                        guard value.translation.height > 0 else { return }
+                                        
+                                        self.activeView = value.translation
+                                    }.onEnded { value in
+                                        if self.activeView.height > 50 {
+                                            self.isLocalOpen = false
+                                            self.isLoading = false
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                            UserDefaults.standard.set(false, forKey: "localOpen")
+                                            UIApplication.shared.endEditing(true)
+                                            changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: i.id)
+                                            //changeDialogRealmData().updateDialogTypedText(text: self.keyboardText, dialogID: i.id)
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                                                 changeDialogRealmData().fetchDialogs(completion: { _ in })
-
-                                                self.isLocalOpen = false
-                                                self.isLoading = false
-                                                UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
                                             }
-                                            self.activeView.height = .zero
-                                            if i.dialogType == "group" || i.dialogType == "public" {
-                                                self.auth.leaveDialog()
-                                            }
-                                            if self.keyboardText.count > 0 {
-                                                self.auth.selectedConnectyDialog?.sendUserStoppedTyping()
-                                            }
-                                        })
-                                    }
-                                }.offset(y: 60)
-                                .frame(height: 75, alignment: .center)
-                                .frame(minWidth: Constants.screenWidth - 40, maxWidth: Constants.screenWidth)
-                                .simultaneousGesture(DragGesture(minimumDistance: self.isLocalOpen ? 0 : 500))
-                                .padding(.horizontal, self.isLocalOpen ? 0 : 20)
-                                .background(Color.clear)
-                                //.onAppear {
-                                    //UserDefaults.standard.set(false, forKey: "localOpen")
-                                    //ChatrApp.dialogs.getDialogUpdates() { result in }
-                                    //self.dialogActions.fetchDialogs(completion: { result in })
-                                //}
-                            }.disabled(self.disableDialog)
-                            .onChange(of: UserDefaults.standard.bool(forKey: "localOpen")) { newValue in
-                                print("did change dialog state - new value of: \(newValue)")
-                                self.disableDialog = true
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
-                                    self.disableDialog = false
-                                }
+                                        }
+                                        self.activeView.height = .zero
+                                        if i.dialogType == "group" || i.dialogType == "public" {
+                                            self.auth.leaveDialog()
+                                        }
+                                        if self.keyboardText.count > 0 {
+                                            self.auth.selectedConnectyDialog?.sendUserStoppedTyping()
+                                        }
+                                    })
+                            }.frame(height: 75, alignment: .center)
+                            .frame(minWidth: Constants.screenWidth - 40, maxWidth: Constants.screenWidth)
+                        }.offset(y: 60)
+                        .simultaneousGesture(DragGesture(minimumDistance: self.isLocalOpen ? 0 : 500))
+                        .padding(.horizontal, self.isLocalOpen ? 0 : 20)
+                        .background(Color.clear)
+                        .disabled(self.disableDialog)
+                        .onChange(of: UserDefaults.standard.bool(forKey: "localOpen")) { newValue in
+                            self.disableDialog = true
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
+                                self.disableDialog = false
                             }
                         }
-                    }
-                    
-                    if self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.count >= 3 {
-                        FooterInformation()
-                            .padding(.top, 140)
-                            .padding(.bottom, 25)
-                            .opacity(self.isLocalOpen ? 0 : 1)
+                        //.onAppear {
+                            //UserDefaults.standard.set(false, forKey: "localOpen")
+                            //ChatrApp.dialogs.getDialogUpdates() { result in }
+                            //self.dialogActions.fetchDialogs(completion: { result in })
+                        //}
+                        
+                        
+                        if self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.count >= 3 {
+                            FooterInformation()
+                                .padding(.top, 140)
+                                .padding(.bottom, 25)
+                                .opacity(self.isLocalOpen ? 0 : 1)
+                        }
                     }
                 }
 
                 //Chat View
-                //if UserDefaults.standard.bool(forKey: "localOpen") {
+                if UserDefaults.standard.bool(forKey: "localOpen") {
                     ChatMessagesView(activeView: self.$activeView, keyboardChange: self.$keyboardHeight, dialogID: self.$selectedDialogID, textFieldHeight: self.$textFieldHeight, keyboardDragState: self.$keyboardDragState, hasAttachment: self.$hasAttachments, newDialogFromSharedContact: self.$newDialogFromSharedContact)
                         .environmentObject(self.auth)
                         .frame(width: Constants.screenWidth, alignment: .bottom)
                         .frame(minHeight: 1)
                         .contentShape(Rectangle())
-                        .offset(y: self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 124 : 88) : 198)
-                        .padding(.bottom, self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 124 : 88) : 198)
+                        .offset(y: self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 123 : 87) : 197)
+                        .padding(.bottom, self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 123 : 87) : 197)
                         .offset(y: self.activeView.height)// + (self.emptyQuickSnaps ? 25 : 197))
                         //height: Constants.screenHeight - 248 - (self.textFieldHeight < 120 ? self.textFieldHeight : 120) - self.keyboardHeight + self.keyboardDragState.height - (self.hasAttachments ? 95 : 0)
                         //.padding(.bottom, (self.textFieldHeight < 120 ? self.textFieldHeight : 120) + self.keyboardHeight - self.keyboardDragState.height + (self.hasAttachments ? 95 : 0) + 248)
                         .animation(.timingCurve(0.5, 0.8, 0.2, 1, duration: 0.30))
-                        .opacity(UserDefaults.standard.bool(forKey: "localOpen") ? Double((190 - self.activeView.height) / 150) : 0)
+                        //.opacity(UserDefaults.standard.bool(forKey: "localOpen") ? Double((190 - self.activeView.height) / 150) : 0)
                         .zIndex(0)
                         .simultaneousGesture(DragGesture(minimumDistance: UserDefaults.standard.bool(forKey: "localOpen") ? 800 : 0).onChanged({ (_) in }))
                         .onDisappear {
@@ -485,7 +483,7 @@ struct mainHomeList: View {
 //                                            print("Message view successfully pulled new messages!")
 //                                        })
                         //}
-                    //}
+                    }
                 
                 //keyboard View
                 KeyboardCardView(height: self.$textFieldHeight, mainText: self.$keyboardText, hasAttachments: self.$hasAttachments)
@@ -535,6 +533,7 @@ struct mainHomeList: View {
                             }
                         }
                     ).onAppear {
+                        self.selectedDialogID = UserDefaults.standard.string(forKey: "selectedDialogID") ?? ""
                         NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { (data) in
                             let height1 = data.userInfo![UIResponder.keyboardFrameEndUserInfoKey] as! NSValue
                             self.keyboardHeight = height1.cgRectValue.height - 20
@@ -627,25 +626,28 @@ struct mainHomeList: View {
     }
     
     func onCellTapGesture(id: String, dialogType: String) {
-        self.isLocalOpen.toggle()
+        self.selectedDialogID = id
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
         UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
         UserDefaults.standard.set(id, forKey: "selectedDialogID")
         if !UserDefaults.standard.bool(forKey: "localOpen") {
+            self.isLocalOpen = true
             UserDefaults.standard.set(true, forKey: "localOpen")
             changeDialogRealmData().updateDialogOpen(isOpen: true, dialogID: id)
-            print("opening dialog")
         } else {
+            self.isLocalOpen = false
             UserDefaults.standard.set(false, forKey: "localOpen")
             changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: id)
-            changeDialogRealmData().fetchDialogs(completion: { _ in })
-            if dialogType == "group" || dialogType == "public" {
-                self.auth.leaveDialog()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                changeDialogRealmData().fetchDialogs(completion: { _ in })
+                if dialogType == "group" || dialogType == "public" {
+                    self.auth.leaveDialog()
+                }
+                if self.keyboardText.count > 0 {
+                    self.auth.selectedConnectyDialog?.sendUserStoppedTyping()
+                }
+                //changeDialogRealmData().updateDialogTypedText(text: self.keyboardText, dialogID: i.id)
             }
-            if self.keyboardText.count > 0 {
-                self.auth.selectedConnectyDialog?.sendUserStoppedTyping()
-            }
-            //changeDialogRealmData().updateDialogTypedText(text: self.keyboardText, dialogID: i.id)
         }
     }
     

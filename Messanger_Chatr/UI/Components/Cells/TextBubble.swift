@@ -106,8 +106,16 @@ struct TextBubble: View {
                             Text(self.message.messageState == .deleted ? "deleted" : self.message.text)
                                 .multilineTextAlignment(.leading)
                                 .foregroundColor(self.message.messageState != .deleted ? messagePosition == .right ? .white : .primary : .secondary)
-                                .padding(.vertical, 8)
-                                .lineLimit(nil)
+                                .padding(.horizontal, 15)
+                                .padding(.vertical, 10)
+                                .transition(AnyTransition.scale)
+                                .background(self.messagePosition == .right && self.message.messageState != .deleted ? LinearGradient(
+                                    gradient: Gradient(colors: [Color(red: 46 / 255, green: 168 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)]),
+                                    startPoint: .top, endPoint: .bottom) : LinearGradient(
+                                        gradient: Gradient(colors: [Color("buttonColor"), Color("buttonColor_darker")]), startPoint: .top, endPoint: .bottom))
+                                .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
+                                .contentShape(RoundedRectangle(cornerRadius: 20, style: .circular))
+                                .shadow(color: self.messagePosition == .right && self.message.messageState != .deleted ? Color.blue.opacity(0.15) : Color.black.opacity(0.15), radius: 6, x: 0, y: 6)
                         }.simultaneousGesture(TapGesture()
                             .onEnded { _ in
                                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
@@ -130,17 +138,11 @@ struct TextBubble: View {
                                         }
                                     }
                             }
-                        }.padding(.vertical, 12.5)
+                        }.padding(.horizontal, 15)
+                        .padding(.vertical, 7.5)
                     }
-                }.padding(.horizontal, 15)
-                .transition(AnyTransition.scale)
-                .background(self.messagePosition == .right && self.message.messageState != .deleted ? LinearGradient(
-                    gradient: Gradient(colors: [Color(red: 46 / 255, green: 168 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)]),
-                    startPoint: .top, endPoint: .bottom) : LinearGradient(
-                        gradient: Gradient(colors: [Color("buttonColor"), Color("buttonColor_darker")]), startPoint: .top, endPoint: .bottom))
-                .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
-                .contentShape(RoundedRectangle(cornerRadius: 20, style: .circular))
-                .shadow(color: self.messagePosition == .right && self.message.messageState != .deleted ? Color.blue.opacity(0.25) : Color.black.opacity(0.15), radius: 6, x: 0, y: 6)
+                }.padding(.bottom, self.hasPrior ? 0 : 15)
+                .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.45)), removal: AnyTransition.identity))
             HStack {
                 if messagePosition == .right { Spacer() }
                 
@@ -148,7 +150,6 @@ struct TextBubble: View {
                     .foregroundColor(self.message.messageState == .error ? .red : .gray)
                     .font(.caption)
                     .lineLimit(1)
-                    .offset(y: 15)
                     .padding(.horizontal)
                     .multilineTextAlignment(messagePosition == .right ? .trailing : .leading)
                     .opacity(self.hasPrior && self.message.messageState != .error ? 0 : 1)
@@ -158,18 +159,18 @@ struct TextBubble: View {
             
             WebImage(url: URL(string: self.avatar))
                 .resizable()
-                .placeholder{ Image("empty-profile").resizable().frame(width: self.hasPrior ? 1 : Constants.smallAvitarSize, height: self.hasPrior ? 1 : Constants.smallAvitarSize, alignment: .bottom).scaledToFill() }
+                .placeholder{ Image("empty-profile").resizable().frame(width: self.hasPrior ? 0 : Constants.smallAvitarSize, height: self.hasPrior ? 0 : Constants.smallAvitarSize, alignment: .bottom).scaledToFill() }
                 .indicator(.activity)
-                .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                 .scaledToFill()
                 .clipShape(Circle())
-                .frame(width: self.hasPrior ? 1 : Constants.smallAvitarSize, height: self.hasPrior ? 1 : Constants.smallAvitarSize, alignment: .bottom)
-                .offset(x: messagePosition == .right ? (Constants.smallAvitarSize / 2) : -(Constants.smallAvitarSize / 2), y: (Constants.smallAvitarSize / 2) + 5)
+                .frame(width: self.hasPrior ? 0 : Constants.smallAvitarSize, height: self.hasPrior ? 0 : Constants.smallAvitarSize, alignment: .bottom)
+                .offset(x: messagePosition == .right ? (Constants.smallAvitarSize / 2) : -(Constants.smallAvitarSize / 2))
                 .opacity(self.hasPrior ? 0 : 1)
+                .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 6)
         }.onAppear() {
             self.fetchURLText(text: self.message.text)
             if self.message.senderID == UserDefaults.standard.integer(forKey: "currentUserID") {
-                self.avatar = ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.avatar ?? ""
+                self.avatar = self.auth.profile.results.first?.avatar ?? ""
             } else {
                 let config = Realm.Configuration(schemaVersion: 1)
                 do {

@@ -118,7 +118,6 @@ struct LocationBubble: View {
                     .foregroundColor(self.message.messageState == .error ? .red : .gray)
                     .font(.caption)
                     .lineLimit(1)
-                    .offset(y: 15)
                     .padding(.horizontal)
                     .multilineTextAlignment(messagePosition == .right ? .trailing : .leading)
                     .opacity(self.hasPrior && self.message.messageState != .error ? 0 : 1)
@@ -130,13 +129,12 @@ struct LocationBubble: View {
                 .resizable()
                 .placeholder{ Image("empty-profile").resizable().frame(width: self.hasPrior ? 0 : Constants.smallAvitarSize, height: self.hasPrior ? 0 : Constants.smallAvitarSize, alignment: .bottom).scaledToFill() }
                 .indicator(.activity)
-                .transition(.fade(duration: 0.05))
                 .scaledToFill()
                 .clipShape(Circle())
                 .frame(width: self.hasPrior ? 0 : Constants.smallAvitarSize, height: self.hasPrior ? 0 : Constants.smallAvitarSize, alignment: .bottom)
-                .shadow(color: Color("buttonShadow"), radius: 5, x: 0, y: 0)
-                .offset(x: messagePosition == .right ? (Constants.smallAvitarSize / 2) : -(Constants.smallAvitarSize / 2), y: (Constants.smallAvitarSize / 2) + 5)
+                .offset(x: messagePosition == .right ? (Constants.smallAvitarSize / 2) : -(Constants.smallAvitarSize / 2))
                 .opacity(self.hasPrior ? 0 : 1)
+                .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 6)
         }.onAppear() {
             print("the image type is: \(self.message.imageType)")
             if self.message.senderID == UserDefaults.standard.integer(forKey: "currentUserID") {

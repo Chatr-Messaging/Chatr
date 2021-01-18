@@ -57,7 +57,7 @@ struct KeyboardCardView: View {
                     ResizableTextField(height: self.$height, text: self.$mainText)
                         .frame(height: self.height < 125 ? self.height : 125)
                         .padding(.leading, 2.5)
-                }.background(Color("bgColor_light").opacity(0.5))
+                } .background(Color("buttonColor"))
                 .cornerRadius(20)
                 .onChange(of: self.mainText) { newValue in
                     if self.mainText.count > 0 {
@@ -431,7 +431,7 @@ struct ResizableTextField : UIViewRepresentable {
         
         func textViewDidBeginEditing(_ textView: UITextView) {
             if self.parent.text == "" {
-                textView.text = nil
+                //textView.text = nil
                 textView.textColor = UIColor(named: "textColor")
             }
         }

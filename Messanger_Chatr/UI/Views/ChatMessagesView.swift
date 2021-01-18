@@ -20,7 +20,6 @@ struct ChatMessagesView: View {
     @Binding var keyboardDragState: CGSize
     @Binding var hasAttachment: Bool
     @Binding var newDialogFromSharedContact: Int
-    @State var selectedID = UserDefaults.standard.string(forKey: "selectedDialogID") ?? ""
     @State var isLoadingMore: Bool = false
     @State var isLoadingAni: Bool = false
     @State private var delayViewMessages: Bool = false
@@ -29,7 +28,7 @@ struct ChatMessagesView: View {
     @State private var mesgCount: Int = -1
     
     var body: some View {
-        let currentMessages = self.auth.messages.selectedDialog(dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "")
+        let currentMessages = self.auth.messages.selectedDialog(dialogID: self.dialogID)
         ZStack(alignment: .center) {
             ScrollView(.vertical, showsIndicators: false) {
                 LazyVStack() {
@@ -43,7 +42,7 @@ struct ChatMessagesView: View {
                         .opacity(self.mesgCount >= 1 && self.delayViewMessages ? 0 : 1)
                         .onAppear() {
                             if !Session.current.tokenHasExpired {
-                                Request.countOfMessages(forDialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "", extendedRequest: ["sort_desc" : "lastMessageDate"], successBlock: { count in
+                                Request.countOfMessages(forDialogID: self.dialogID, extendedRequest: ["sort_desc" : "lastMessageDate"], successBlock: { count in
                                     print("success getting message count: \(count)")
                                     self.mesgCount = Int(count)
                                 })
@@ -76,51 +75,38 @@ struct ChatMessagesView: View {
                                     }).padding(.top)
                                 }
                                 
-                                VStack {
-                                    HStack() {
-                                        if messagePosition == .right { Spacer() }
-                                        if currentMessages[message].image != "" {
-                                            AttachmentBubble(message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
-                                                .environmentObject(self.auth)
-                                                .contentShape(Rectangle())
-                                        } else if currentMessages[message].contactID != 0 {
-                                            ContactBubble(chatContact: self.$newDialogFromSharedContact, message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
-                                                .environmentObject(self.auth)
-                                                .contentShape(Rectangle())
-                                        } else if currentMessages[message].longitude != 0 && currentMessages[message].latitude != 0 {
-                                            LocationBubble(message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
-                                        } else {
-                                            TextBubble(message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
-                                                .environmentObject(self.auth)
-                                                .animation(.spring(response: 0.65, dampingFraction: 0.55, blendDuration: 0))
-                                                .contentShape(Rectangle())
-                                                .transition(AnyTransition.scale)
-                                        }
-                                        
-                                        if messagePosition == .left { Spacer() }
-                                    }.id(currentMessages[message].id)
-                                    .background(Color.clear)
-                                    .padding(.horizontal, 25)
-                                    .padding(.top, topMsg && currentMessages.count < 20 ? 20 : 0)
-                                    .padding(.bottom, self.hasPrevious(index: message) ? -4 : 15)
-                                    .padding(.bottom, notLast && self.hasPrevious(index: message) && currentMessages[message].messageState != .error ? 0 : 10)
-                                    .padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 120 ? self.textFieldHeight : 120) + (self.hasAttachment ? 95 : 0) + 50)
-                                }
-//                                .onAppear() {
-//                                    if !notLast {
-//                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) {
-//                                            //if firstScroll {
-//                                                reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
-//                                              /////
-//                                            /////self.firstScroll = false
-//                                            //}
-//                                        }
-//                                    }
-//                                }nt
+                                VStack(spacing: 0) {
+                                        HStack() {
+                                            if messagePosition == .right { Spacer() }
+                                            if currentMessages[message].image != "" {
+                                                AttachmentBubble(message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
+                                                    .environmentObject(self.auth)
+                                                    .contentShape(Rectangle())
+                                            } else if currentMessages[message].contactID != 0 {
+                                                ContactBubble(chatContact: self.$newDialogFromSharedContact, message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
+                                                    .environmentObject(self.auth)
+                                                    .contentShape(Rectangle())
+                                            } else if currentMessages[message].longitude != 0 && currentMessages[message].latitude != 0 {
+                                                LocationBubble(message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
+                                            } else {
+                                                TextBubble(message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
+                                                    .environmentObject(self.auth)
+                                                    .animation(.spring(response: 0.65, dampingFraction: 0.55, blendDuration: 0))
+                                                    .contentShape(Rectangle())
+                                                    .transition(AnyTransition.scale)
+                                            }
+                                            
+                                            if messagePosition == .left { Spacer() }
+                                        }.id(currentMessages[message].id)
+                                        .background(Color.clear)
+                                        .padding(.horizontal, 25)
+                                        .padding(.top, topMsg && currentMessages.count < 20 ? 20 : 0)
+                                        .padding(.bottom, self.hasPrevious(index: message) ? -6 : 10)
+                                        .padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 120 ? self.textFieldHeight : 120) + (self.hasAttachment ? 95 : 0) + 50)
+                                    }
                             }.contentShape(Rectangle())
-                            //.opacity(self.delayViewMessages ? 1 : 0)
                             .onAppear() {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.09) {
                                     reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
                                 }
                             }
@@ -145,35 +131,32 @@ struct ChatMessagesView: View {
         .contentShape(Rectangle())
         .onAppear() {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                changeMessageRealmData.getMessageUpdates(dialogID: self.selectedID, completion: { _ in
+                changeMessageRealmData.getMessageUpdates(dialogID: self.dialogID, completion: { _ in
                     self.auth.acceptScrolls = true
                     self.firstScroll = true
                 })
                 
-                Request.updateDialog(withID: self.selectedID, update: UpdateChatDialogParameters(), successBlock: { dialog in
+                Request.updateDialog(withID: self.dialogID, update: UpdateChatDialogParameters(), successBlock: { dialog in
                     self.auth.selectedConnectyDialog = dialog
                     dialog.sendUserStoppedTyping()
                     
                     dialog.onUserIsTyping = { (userID: UInt) in
-                        //print("this dude is typing!!: \(userID)")
                         if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
                             withAnimation { () -> () in
-                                changeMessageRealmData.addTypingMessage(userID: String(userID), dialogID: self.selectedID)
+                                changeMessageRealmData.addTypingMessage(userID: String(userID), dialogID: self.dialogID)
                             }
                         }
                     }
                     
                     dialog.onUserStoppedTyping = { (userID: UInt) in
-                        //print("this dude STOPPED typing!!: \(userID)")
                         if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
                             withAnimation { () -> () in
-                                changeMessageRealmData.removeTypingMessage(userID: String(userID), dialogID: self.selectedID)
+                                changeMessageRealmData.removeTypingMessage(userID: String(userID), dialogID: self.dialogID)
                             }
                         }
                     }
                     
                     if dialog.type == .group || dialog.type == .public {
-                        
                         dialog.requestOnlineUsers(completionBlock: { (online, error) in
                             print("The online count is!!: \(String(describing: online?.count))")
                             self.auth.onlineCount = online?.count ?? 0
@@ -216,29 +199,8 @@ struct ChatMessagesView: View {
         }
     }
     
-    func Scroll(reader: ScrollViewProxy, id: String) -> some View {
-        DispatchQueue.main.asyncAfter(deadline: .now() + (self.firstScroll ? 0.05 : 0.05)) {
-//            withAnimation {
-//                reader.scrollTo(id, anchor: .bottom)
-//            }
-//            if self.firstScroll {
-               // withAnimation {
-                    //reader.scrollTo(id, anchor: .bottom)
-//                    self.auth.acceptScrolls = false
-//                    print("scroll ani \(id)")
-                //}
-//            } else {
-                //reader.scrollTo(id, anchor: .bottom)
-                self.firstScroll = false
-                //self.auth.acceptScrolls = false
-//                print("NOOOO scroll ani \(id)")
-//            }
-        }
-        return EmptyView()
-    }
-    
     func hasPrevious(index: Int) -> Bool {
-        let result = self.auth.messages.selectedDialog(dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "")
+        let result = self.auth.messages.selectedDialog(dialogID: self.dialogID)
         return result[index] != result.last ? (result[index + 1].senderID == result[index].senderID ? true : false) : false
     }
 }
