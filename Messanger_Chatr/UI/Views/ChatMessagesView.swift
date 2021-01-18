@@ -113,10 +113,9 @@ struct ChatMessagesView: View {
                                         }
                                     }
                                 }
-
-                                if !notLast && self.auth.acceptScrolls {
-                                    Scroll(reader: reader, id: currentMessages[message].id)
-                                }
+//                                if !notLast && self.auth.acceptScrolls {
+//                                    Scroll(reader: reader, id: currentMessages[message].id)
+//                                }
                             }
                             .frame(width: Constants.screenWidth)
                             .contentShape(Rectangle())
@@ -155,77 +154,81 @@ struct ChatMessagesView: View {
                     self.firstScroll = true
                 })
                 
-                let extRequest : [String: String] = ["sort_desc" : "lastMessageDate"]
-                Request.dialogs(with: Paginator.limit(20, skip: 0), extendedRequest: extRequest, successBlock: { (dialogs, usersIDs, paginator) in
-                    for dialog in dialogs {
-                        if dialog.id == self.selectedID {
-                            self.auth.selectedConnectyDialog = dialog
-                            dialog.sendUserStoppedTyping()
-                            
-                            dialog.onUserIsTyping = { (userID: UInt) in
-                                //print("this dude is typing!!: \(userID)")
-                                if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
-                                    withAnimation { () -> () in
-                                        changeMessageRealmData.addTypingMessage(userID: String(userID), dialogID: self.selectedID)
-                                    }
-                                }
+                Request.updateDialog(withID: self.selectedID, update: UpdateChatDialogParameters(), successBlock: { dialog in
+                    self.auth.selectedConnectyDialog = dialog
+                    dialog.sendUserStoppedTyping()
+                    
+                    dialog.onUserIsTyping = { (userID: UInt) in
+                        //print("this dude is typing!!: \(userID)")
+                        if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
+                            withAnimation { () -> () in
+                                changeMessageRealmData.addTypingMessage(userID: String(userID), dialogID: self.selectedID)
                             }
-                            
-                            dialog.onUserStoppedTyping = { (userID: UInt) in
-                                //print("this dude STOPPED typing!!: \(userID)")
-                                if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
-                                    withAnimation { () -> () in
-                                        changeMessageRealmData.removeTypingMessage(userID: String(userID), dialogID: self.selectedID)
-                                    }
-                                }
-                            }
-                            
-                            if dialog.type == .group || dialog.type == .public {
-                                
-                                dialog.requestOnlineUsers(completionBlock: { (online, error) in
-                                    print("The online count is!!: \(String(describing: online?.count))")
-                                    self.auth.onlineCount = online?.count ?? 0
-                                })
-                                
-                                dialog.onUpdateOccupant = { (userID: UInt) in
-                                    print("update occupant: \(userID)")
-                                    self.auth.setOnlineCount()
-                                }
-                                
-                                dialog.onJoinOccupant = { (userID: UInt) in
-                                    print("on join occupant: \(userID)")
-                                    self.auth.setOnlineCount()
-                                }
-                                
-                                dialog.onLeaveOccupant = { (userID: UInt) in
-                                    print("on leave occupant: \(userID)")
-                                    self.auth.setOnlineCount()
-                                }
-                                
-                                if Chat.instance.isConnected || !Chat.instance.isConnecting {
-                                    if !dialog.isJoined() {
-                                        dialog.join(completionBlock: { error in
-                                            print("we have joined the dialog!! \(String(describing: error))")
-                                        })
-                                    }
-                                } else {
-                                    ChatrApp.connect()
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                                        if !dialog.isJoined() {
-                                            dialog.join(completionBlock: { error in
-                                                print("we have joined the dialog after atempt 2!! \(String(describing: error))")
-                                            })
-                                        }
-                                    }
-                                }
-                            }
-                            
-                            print("done pulling the dialog! \(dialog.id ?? "")")
-                            
-                            break
                         }
                     }
+                    
+                    dialog.onUserStoppedTyping = { (userID: UInt) in
+                        //print("this dude STOPPED typing!!: \(userID)")
+                        if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
+                            withAnimation { () -> () in
+                                changeMessageRealmData.removeTypingMessage(userID: String(userID), dialogID: self.selectedID)
+                            }
+                        }
+                    }
+                    
+                    if dialog.type == .group || dialog.type == .public {
+                        
+                        dialog.requestOnlineUsers(completionBlock: { (online, error) in
+                            print("The online count is!!: \(String(describing: online?.count))")
+                            self.auth.onlineCount = online?.count ?? 0
+                        })
+                        
+                        dialog.onUpdateOccupant = { (userID: UInt) in
+                            print("update occupant: \(userID)")
+                            self.auth.setOnlineCount()
+                        }
+                        
+                        dialog.onJoinOccupant = { (userID: UInt) in
+                            print("on join occupant: \(userID)")
+                            self.auth.setOnlineCount()
+                        }
+                        
+                        dialog.onLeaveOccupant = { (userID: UInt) in
+                            print("on leave occupant: \(userID)")
+                            self.auth.setOnlineCount()
+                        }
+                        
+                        if Chat.instance.isConnected || !Chat.instance.isConnecting {
+                            if !dialog.isJoined() {
+                                dialog.join(completionBlock: { error in
+                                    print("we have joined the dialog!! \(String(describing: error))")
+                                })
+                            }
+                        } else {
+                            ChatrApp.connect()
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                if !dialog.isJoined() {
+                                    dialog.join(completionBlock: { error in
+                                        print("we have joined the dialog after atempt 2!! \(String(describing: error))")
+                                    })
+                                }
+                            }
+                        }
+                    }
+                    
+                    print("done pulling the dialog! \(dialog.id ?? "")")
                 })
+                
+//                let extRequest : [String: String] = ["sort_desc" : "lastMessageDate"]
+//                Request.dialogs(with: Paginator.limit(20, skip: 0), extendedRequest: extRequest, successBlock: { (dialogs, usersIDs, paginator) in
+//                    for dialog in dialogs {
+//                        if dialog.id == self.selectedID {
+//
+//
+//                            break
+//                        }
+//                    }
+//                })
                 
             }
         }
@@ -233,9 +236,9 @@ struct ChatMessagesView: View {
     
     func Scroll(reader: ScrollViewProxy, id: String) -> some View {
         DispatchQueue.main.asyncAfter(deadline: .now() + (self.firstScroll ? 0.05 : 0.05)) {
-            withAnimation {
-                reader.scrollTo(id, anchor: .bottom)
-            }
+//            withAnimation {
+//                reader.scrollTo(id, anchor: .bottom)
+//            }
 //            if self.firstScroll {
                // withAnimation {
                     //reader.scrollTo(id, anchor: .bottom)

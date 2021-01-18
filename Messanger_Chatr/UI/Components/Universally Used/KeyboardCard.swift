@@ -23,7 +23,6 @@ struct KeyboardCardView: View {
     @Binding var hasAttachments: Bool
     @State var selectedContacts: [Int] = []
     @State var newDialogID: String = ""
-    @State var occupents: [NSNumber] = [NSNumber]()
     @State var gifData: [String] = []
     @State var photoData: [UIImage] = []
     @State var enableLocation: Bool = false
@@ -82,12 +81,12 @@ struct KeyboardCardView: View {
                                 connDia.sendUserStoppedTyping()
                             }
                             
-                            for i in selectedDialog.occupentsID {
-                                self.occupents.append(NSNumber(value: i))
-                            }
+//                            for i in selectedDialog.occupentsID {
+//                                self.occupents.append(NSNumber(value: i))
+//                            }
                             if self.gifData.count > 0 {
                                 //have gifs
-                                changeMessageRealmData.sendGIFAttachment(dialog: selectedDialog, attachmentStrings: self.gifData.reversed(), occupentID: self.occupents)
+                                changeMessageRealmData.sendGIFAttachment(dialog: selectedDialog, attachmentStrings: self.gifData.reversed(), occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                             
                                 self.gifData.removeAll()
                                 self.hasAttachments = false
@@ -95,22 +94,21 @@ struct KeyboardCardView: View {
                             
                             if self.photoData.count > 0 {
                                 //have gifs
-                                changeMessageRealmData.sendPhotoAttachment(dialog: selectedDialog, attachmentImages: self.photoData, occupentID: self.occupents)
+                                changeMessageRealmData.sendPhotoAttachment(dialog: selectedDialog, attachmentImages: self.photoData, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                             
                                 self.photoData.removeAll()
                                 self.hasAttachments = false
                             }
                             
                             if self.enableLocation {
-                                changeMessageRealmData.sendLocationMessage(dialog: selectedDialog, longitude: self.region.center.longitude, latitude: self.region.center.latitude, occupentID: self.occupents)
+                                changeMessageRealmData.sendLocationMessage(dialog: selectedDialog, longitude: self.region.center.longitude, latitude: self.region.center.latitude, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                                 self.enableLocation = false
                                 self.hasAttachments = false
                             }
                             
                             if self.mainText.count > 0 {
-                                changeMessageRealmData.sendMessage(dialog: selectedDialog, text: self.mainText, occupentID: self.occupents)
+                                changeMessageRealmData.sendMessage(dialog: selectedDialog, text: self.mainText, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                             }
-                            self.occupents.removeAll()
                         }
 
                         self.mainText = ""
@@ -330,14 +328,8 @@ struct KeyboardCardView: View {
                     .sheet(isPresented: self.$shareContact, onDismiss: {
                         if self.selectedContacts.count > 0 {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                                print("selected contacts: \(self.selectedContacts)")
                                 if let selectedDialog = self.dialogs.results.filter("id == %@", UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").first {
-                                    for i in selectedDialog.occupentsID {
-                                        self.occupents.append(NSNumber(value: i))
-                                    }
-                                    
-                                    changeMessageRealmData.sendContactMessage(dialog: self.dialogs.selectedDia(dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").first!, contactID: self.selectedContacts, occupentID: self.occupents)
-                                    self.occupents.removeAll()
+                                    changeMessageRealmData.sendContactMessage(dialog: selectedDialog, contactID: self.selectedContacts, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                                 }
                             }
                         }
@@ -400,7 +392,6 @@ struct ResizableTextField : UIViewRepresentable {
     @Binding var height: CGFloat
     @Binding var text: String
     @State var emptyPlaceholder: Bool = false
-    @ObservedObject var dialogs = DialogRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(DialogStruct.self))
     
     func makeCoordinator() -> Coordinator {
         return ResizableTextField.Coordinator(parent1: self)

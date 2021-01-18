@@ -153,6 +153,7 @@ struct mainHomeList: View {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @EnvironmentObject var auth: AuthModel
     @Environment(\.colorScheme) var colorScheme
+    @GestureState var isDragging = false
     @State var showContacts: Bool = false
     @State var showUserProfile: Bool = false
     @State var showNewChat: Bool = false
@@ -397,26 +398,7 @@ struct mainHomeList: View {
                                                 .zIndex(self.isLocalOpen ? 3 : -1)
                                                 .id(i.id)
                                         }.onTapGesture {
-                                            self.isLocalOpen.toggle()
-                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                            UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
-                                            UserDefaults.standard.set(i.id, forKey: "selectedDialogID")
-                                            if !UserDefaults.standard.bool(forKey: "localOpen") {
-                                                UserDefaults.standard.set(true, forKey: "localOpen")
-                                                changeDialogRealmData().updateDialogOpen(isOpen: true, dialogID: i.id)
-                                                print("opening dialog")
-                                            } else {
-                                                UserDefaults.standard.set(false, forKey: "localOpen")
-                                                changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: i.id)
-                                                changeDialogRealmData().fetchDialogs(completion: { _ in })
-                                                if i.dialogType == "group" || i.dialogType == "public" {
-                                                    self.auth.leaveDialog()
-                                                }
-                                                if self.keyboardText.count > 0 {
-                                                    self.auth.selectedConnectyDialog?.sendUserStoppedTyping()
-                                                }
-                                                //changeDialogRealmData().updateDialogTypedText(text: self.keyboardText, dialogID: i.id)
-                                            }
+                                            self.onCellTapGesture(id: i.id, dialogType: i.dialogType)
                                         }.gesture(DragGesture(minimumDistance: 0).onChanged { value in
                                             guard value.translation.height < 150 else { UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true); return }
                                             guard value.translation.height > 0 else { return }
@@ -504,7 +486,7 @@ struct mainHomeList: View {
 //                                        })
                         //}
                     }
-
+                
                 //keyboard View
                 KeyboardCardView(height: self.$textFieldHeight, mainText: self.$keyboardText, hasAttachments: self.$hasAttachments)
                     .environmentObject(self.auth)
@@ -519,7 +501,6 @@ struct mainHomeList: View {
                     .gesture(
                         DragGesture().onChanged { value in
                             self.keyboardDragState = value.translation
-                            print("the drag keyboard is: \(self.keyboardDragState.height)")
                             if self.showFullKeyboard {
                                 self.keyboardDragState.height += -100
                             }
@@ -563,7 +544,6 @@ struct mainHomeList: View {
                             self.keyboardHeight = 0
                         }
                     }
-                
                 
 //                GeometryReader { geometry in
 //                    NotificationSection()
@@ -643,6 +623,57 @@ struct mainHomeList: View {
                     print("error making dialog: \(error.localizedDescription)")
                 }
             }
+        }
+    }
+    
+    func onCellTapGesture(id: String, dialogType: String) {
+        self.isLocalOpen.toggle()
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
+        UserDefaults.standard.set(id, forKey: "selectedDialogID")
+        if !UserDefaults.standard.bool(forKey: "localOpen") {
+            UserDefaults.standard.set(true, forKey: "localOpen")
+            changeDialogRealmData().updateDialogOpen(isOpen: true, dialogID: id)
+            print("opening dialog")
+        } else {
+            UserDefaults.standard.set(false, forKey: "localOpen")
+            changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: id)
+            changeDialogRealmData().fetchDialogs(completion: { _ in })
+            if dialogType == "group" || dialogType == "public" {
+                self.auth.leaveDialog()
+            }
+            if self.keyboardText.count > 0 {
+                self.auth.selectedConnectyDialog?.sendUserStoppedTyping()
+            }
+            //changeDialogRealmData().updateDialogTypedText(text: self.keyboardText, dialogID: i.id)
+        }
+    }
+    
+    func onChanged(value: DragGesture.Value, index: Int){
+        guard value.translation.height < 150 else { UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true); return }
+        guard value.translation.height > 0 else { return }
+        
+        self.activeView = value.translation
+    }
+    
+    func onEnd(value: DragGesture.Value, index: Int, id: String, dialogType: String){
+        if self.activeView.height > 50 {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            UserDefaults.standard.set(false, forKey: "localOpen")
+            changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: id)
+            //changeDialogRealmData().updateDialogTypedText(text: self.keyboardText, dialogID: i.id)
+            changeDialogRealmData().fetchDialogs(completion: { _ in })
+
+            self.isLocalOpen = false
+            self.isLoading = false
+            UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
+        }
+        self.activeView.height = .zero
+        if dialogType == "group" || dialogType == "public" {
+            self.auth.leaveDialog()
+        }
+        if self.keyboardText.count > 0 {
+            self.auth.selectedConnectyDialog?.sendUserStoppedTyping()
         }
     }
 }
