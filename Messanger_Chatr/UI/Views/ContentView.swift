@@ -458,7 +458,7 @@ struct mainHomeList: View {
                     ChatMessagesView(activeView: self.$activeView, keyboardChange: self.$keyboardHeight, dialogID: self.$selectedDialogID, textFieldHeight: self.$textFieldHeight, keyboardDragState: self.$keyboardDragState, hasAttachment: self.$hasAttachments, newDialogFromSharedContact: self.$newDialogFromSharedContact)
                         .environmentObject(self.auth)
                         .frame(width: Constants.screenWidth, alignment: .bottom)
-                        .frame(minHeight: 1)
+                        .zIndex(0)
                         .contentShape(Rectangle())
                         .offset(y: self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 123 : 87) : 197)
                         .padding(.bottom, self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 123 : 87) : 197)
@@ -467,7 +467,6 @@ struct mainHomeList: View {
                         //.padding(.bottom, (self.textFieldHeight < 120 ? self.textFieldHeight : 120) + self.keyboardHeight - self.keyboardDragState.height + (self.hasAttachments ? 95 : 0) + 248)
                         .animation(.timingCurve(0.5, 0.8, 0.2, 1, duration: 0.30))
                         //.opacity(UserDefaults.standard.bool(forKey: "localOpen") ? Double((190 - self.activeView.height) / 150) : 0)
-                        .zIndex(0)
                         .simultaneousGesture(DragGesture(minimumDistance: UserDefaults.standard.bool(forKey: "localOpen") ? 800 : 0).onChanged({ (_) in }))
                         .onDisappear {
                             self.auth.leaveDialog()
