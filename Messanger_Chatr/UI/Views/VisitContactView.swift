@@ -940,7 +940,7 @@ struct actionButtonView: View {
     @State var showRemoveRequest: Bool = false
     
     var body: some View {
-        HStack(spacing: self.contactRelationship == .contact ? 40 : 20) {
+        HStack(spacing: self.contactRelationship == .contact ? 60 : 30) {
             Spacer()
             
             if self.contact.isMessagingPrivate == false && self.contactRelationship != .unknown && self.contact.id != UserDefaults.standard.integer(forKey: "currentUserID") {
@@ -949,14 +949,13 @@ struct actionButtonView: View {
                     self.newMessage = self.contact.id
                     self.dismissView.toggle()
                 }) {
-                    Image("MessagingIcon")
+                    Image("ChatBubble")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 48, height: 48, alignment: .center)
-                        .foregroundColor(.primary)
-                        .padding(3)
-                        .shadow(color: Color.blue.opacity(0.25), radius: 8, x: 0, y: 6)
+                        .frame(width: 38, height: 26)
+                        .background(RoundedRectangle(cornerRadius: 15, style: .circular).frame(width: 54, height: 50).foregroundColor(Constants.baseBlue).shadow(color: Color.blue.opacity(0.25), radius: 8, x: 0, y: 6))
                 }.buttonStyle(ClickButtonStyle())
+                .padding(.vertical, 8)
             }
 
             if self.contactRelationship == .contact && self.contact.id != UserDefaults.standard.integer(forKey: "currentUserID") {
@@ -964,13 +963,12 @@ struct actionButtonView: View {
                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                     self.quickSnapViewState = .camera
                 }) {
-                    Image("SnapIcon")
+                    Image(systemName: "camera.fill")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 48, height: 48, alignment: .center)
                         .foregroundColor(.white)
-                        .padding(3)
-                        .shadow(color: Color.purple.opacity(0.25), radius: 8, x: 0, y: 8)
+                        .frame(width: 36, height: 24)
+                        .background(RoundedRectangle(cornerRadius: 15, style: .circular).frame(width: 54, height: 50).foregroundColor(.purple).shadow(color: Color.purple.opacity(0.25), radius: 8, x: 0, y: 6))
                 }.buttonStyle(ClickButtonStyle())
             } else if self.contactRelationship == .notContact && self.contact.id != UserDefaults.standard.integer(forKey: "currentUserID") {
                 Button(action: {
