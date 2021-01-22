@@ -181,7 +181,6 @@ struct mainHomeList: View {
     @State var chatMessageViewHeight: CGFloat = 0
     @State var quickSnapViewState: QuickSnapViewingState = .closed
     @State var selectedQuickSnapContact: ContactStruct = ContactStruct()
-    @Namespace var dialogNamespace
     @ObservedObject var dialogs = DialogRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(DialogStruct.self))
     let wallpaperNames = ["", "SoftChatBubbles_DarkWallpaper", "SoftPaperAirplane-Wallpaper", "oldHouseWallpaper", "nycWallpaper", "michaelAngelWallpaper"]
     

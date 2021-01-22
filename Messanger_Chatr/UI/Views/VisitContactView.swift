@@ -49,10 +49,10 @@ struct VisitContactView: View {
 
                 //MARK: Action Buttons
                 actionButtonView(contact: self.$contact, quickSnapViewState: self.$quickSnapViewState, contactRelationship: self.$contactRelationship, newMessage: self.$newMessage, dismissView: self.$dismissView)
-                    .padding(.bottom, 15)
+                    .padding(.vertical, 5)
 
                 //MARK: Phone Number Section
-                //self.viewModel.drawMiniHeader(text: "INFO:")
+                self.viewModel.drawMiniHeader(text: "INFO:")
                 
                 self.viewModel.styleBuilder(content: {
                     VStack(alignment: .trailing, spacing: 0) {
@@ -497,12 +497,9 @@ struct VisitContactView: View {
                     }
                 }).padding(.bottom, 60)
                 
-                Spacer()
-                
                 //MARK: Footer Section
                 FooterInformation(middleText: "joined \(self.contact.createdAccount.getFullElapsedInterval())")
                     .padding(.bottom, 30)
-
             }.background(Color("bgColor"))
             .navigationBarHidden(self.quickSnapViewState == .camera || self.quickSnapViewState == .takenPic)
             .navigationBarItems(leading:
