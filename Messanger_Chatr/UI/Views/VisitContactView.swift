@@ -46,7 +46,7 @@ struct VisitContactView: View {
                 //MARK: Top Profile
                 topHeaderContactView(contact: self.$contact, quickSnapViewState: self.$quickSnapViewState, isProfileImgOpen: self.$isProfileImgOpen, isProfileBioOpen: self.$isProfileBioOpen, selectedImageUrl: self.$selectedImageUrl)
                     .padding(.top, 20)
-                
+
                 //MARK: Action Buttons
                 actionButtonView(contact: self.$contact, quickSnapViewState: self.$quickSnapViewState, contactRelationship: self.$contactRelationship, newMessage: self.$newMessage, dismissView: self.$dismissView)
                     .padding(.bottom, 15)
