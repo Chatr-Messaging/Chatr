@@ -385,7 +385,7 @@ struct ContactsView: View {
                             
                             //MARK: Contact Section
                             HStack {
-                                Text(self.auth.contacts.results.filter({ $0.isMyContact == true }).count == 1 ? "\(self.auth.contacts.results.filter({ $0.isMyContact == true }).count) TOTAL CONTACT:" : "\(self.auth.contacts.results.filter({ $0.isMyContact == true }).count) TOTAL CONTACTS:")
+                                Text(self.auth.contacts.filterContact(text: self.searchContact).filter({ $0.isMyContact == true }).count == 1 ? "\(self.auth.contacts.filterContact(text: self.searchContact).filter({ $0.isMyContact == true }).count) TOTAL CONTACT:" : "\(self.auth.contacts.filterContact(text: self.searchContact).filter({ $0.isMyContact == true }).count) TOTAL CONTACTS:")
                                     .font(.caption)
                                     .fontWeight(.regular)
                                     .foregroundColor(.secondary)
@@ -495,13 +495,13 @@ struct ContactsView: View {
                             .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 8)
                             .padding(.horizontal)
                             .padding(.bottom, 40)
-                            .KeyboardAwarePadding()
                         }
                         
                         Spacer()
                         //MARK: FOOTER
                         FooterInformation()
                             .padding(.vertical, 30)
+                            .KeyboardAwarePadding()
                     }.padding(.top, 110)
                 }.navigationBarTitle("Contacts", displayMode: .automatic)
                 .background(Color("bgColor"))
