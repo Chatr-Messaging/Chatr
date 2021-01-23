@@ -53,7 +53,6 @@ struct TextBubble: View {
                                 if messagePosition == .right {
                                     if self.message.messageState != .deleted {
                                         Button(action: {
-                                            print("Delete Message")
                                             self.auth.selectedConnectyDialog?.removeMessage(withID: self.message.id) { (error) in
                                                 if error != nil {
                                                     UINotificationFeedbackGenerator().notificationOccurred(.error)
@@ -74,12 +73,7 @@ struct TextBubble: View {
                                         Text("Edit") }
                                     }
                                 }
-                                Button(action: {
-                                    print("Share Message")
-                                }) { HStack {
-                                    Image(systemName: "arrowshape.turn.up.left")
-                                    Text("Share") }
-                                }
+
                                 Button(action: {
                                     print("Copy Message")
                                     UINotificationFeedbackGenerator().notificationOccurred(.success)

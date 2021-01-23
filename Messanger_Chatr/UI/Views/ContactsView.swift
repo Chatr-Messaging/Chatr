@@ -23,6 +23,7 @@ struct ContactsView: View {
     @State var showAddChat: Bool = false
     @State var showAddNewContact: Bool = false
     @State var openDiscoverContent: Bool = false
+    @State var toggleContactState: Bool = UserDefaults.standard.bool(forKey: "headerStyle")
     @State var profileImgSize = CGFloat(45)
     @State var alertNum: Int = 0
     @State var fullName: String = ""
@@ -33,6 +34,7 @@ struct ContactsView: View {
     @State var quickSnapViewState: QuickSnapViewingState = .closed
     @State var selectedQuickSnapContact: ContactStruct = ContactStruct()
     @State var contactBannerDataArray: [ContactBannerData] = []
+    @Namespace private var animation
     let alphabet = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W", "X","Y", "Z"]
 
     var body: some View {
@@ -323,7 +325,34 @@ struct ContactsView: View {
                         } else {
                             
                             //MARK: Search, Filter, & Add Section
+                            HStack {
+                                Text(self.auth.contacts.filterContact(text: self.searchContact).filter({ $0.isMyContact == true }).count == 1 ? "\(self.auth.contacts.filterContact(text: self.searchContact).filter({ $0.isMyContact == true }).count) TOTAL CONTACT:" : "\(self.auth.contacts.filterContact(text: self.searchContact).filter({ $0.isMyContact == true }).count) TOTAL CONTACTS:")
+                                    .font(.caption)
+                                    .fontWeight(.regular)
+                                    .foregroundColor(.secondary)
+                                    .padding(.horizontal)
+                                    .padding(.horizontal)
+                                    .offset(y: 2)
+                                Spacer()
+                            }
+
                             HStack(alignment: .bottom) {
+                                //Toggle contact list view state
+                                Button(action: {
+                                    withAnimation(.spring()) {
+                                        self.toggleContactState.toggle()
+                                    }
+                                    UserDefaults.standard.setValue(self.toggleContactState, forKey: "headerStyle")
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                }) {
+                                    Image(systemName: UserDefaults.standard.bool(forKey: "headerStyle") ? "text.justify" : "text.alignleft")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .padding(Constants.menuBtnSize * 0.25)
+                                        .foregroundColor(.primary)
+                                }.buttonStyle(HomeButtonStyle())
+                                .padding(.leading)
+                                
                                 //Seach Bar
                                 ZStack {
                                     HStack {
@@ -351,7 +380,7 @@ struct ContactsView: View {
                                     .clipShape(RoundedRectangle(cornerRadius: 14, style: .circular))
                                     .shadow(color: Color.black.opacity(0.20), radius: 10, x: 0, y: 8)
                                 }.frame(minWidth: 80, maxWidth: 200)
-                                .padding(.horizontal)
+                                .padding(.leading, 2.5)
                                 
                                 Spacer()
                                 
@@ -360,13 +389,11 @@ struct ContactsView: View {
                                     self.showAddNewContact.toggle()
                                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 }) {
-                                    ZStack {
-                                        Image(systemName: "person.badge.plus")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .padding(Constants.menuBtnSize * 0.25)
-                                            .foregroundColor(.primary)
-                                    }
+                                    Image(systemName: "person.badge.plus")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .padding(Constants.menuBtnSize * 0.25)
+                                        .foregroundColor(.primary)
                                 }.buttonStyle(HomeButtonStyle())
                                 .padding(.horizontal)
                                 .sheet(isPresented: self.$showAddNewContact, onDismiss: {
@@ -381,137 +408,231 @@ struct ContactsView: View {
                                             self.newDialogID = 0
                                         }
                                 }
-                            }.padding(.bottom, 10)
+                            }.padding(.bottom)
                             .resignKeyboardOnDragGesture()
                             
                             //MARK: Contact Section
-                            HStack {
-                                Text(self.auth.contacts.filterContact(text: self.searchContact).filter({ $0.isMyContact == true }).count == 1 ? "\(self.auth.contacts.filterContact(text: self.searchContact).filter({ $0.isMyContact == true }).count) TOTAL CONTACT:" : "\(self.auth.contacts.filterContact(text: self.searchContact).filter({ $0.isMyContact == true }).count) TOTAL CONTACTS:")
-                                    .font(.caption)
-                                    .fontWeight(.regular)
-                                    .foregroundColor(.secondary)
-                                    .padding(.horizontal)
-                                    .padding(.horizontal)
-                                    .offset(y: 2)
-                                Spacer()
-                            }
                             //ScrollViewReader { value in
                                 //ZStack() {
-                                    LazyVStack(alignment: .leading, spacing: 0) {
-                                        ForEach(alphabet, id: \.self) { letter in
-                                            if self.auth.contacts.filterContact(text: self.searchContact).filter({ $0.isMyContact == true && $0.fullName.hasPrefix(letter) }).count != 0 {
-                                                Text(letter)
-                                                    .font(.system(size: 18, weight: .semibold, design: .default))
-                                                    .foregroundColor(.secondary)
-                                                    .padding(.bottom, 5)
-                                                    .padding(.top, 10)
-                                                    .padding(.horizontal)
-                                            }
+                            if self.toggleContactState {
+                                LazyVStack(alignment: .leading, spacing: 0) {
+                                    ForEach(alphabet, id: \.self) { letter in
+                                        if self.auth.contacts.filterContact(text: self.searchContact).filter({ $0.isMyContact == true && $0.fullName.hasPrefix(letter) }).count != 0 {
+                                            Text(letter)
+                                                .font(.system(size: 18, weight: .semibold, design: .default))
+                                                .foregroundColor(.secondary)
+                                                .padding(.bottom, 5)
+                                                .padding(.top, 10)
+                                                .padding(.horizontal)
+                                        }
 
-                                            VStack {
-                                                ForEach(self.auth.contacts.filterContact(text: self.searchContact).filter({ $0.isMyContact == true && $0.fullName.hasPrefix(letter) }).sorted { $0.fullName < $1.fullName }, id: \.self) { contact in
-                                                    if contact.id != Session.current.currentUserID {
-                                                        NavigationLink(destination: VisitContactView(newMessage: self.$newDialogID, dismissView: self.$dismissView, viewState: .fromContacts, contact: contact).edgesIgnoringSafeArea(.all).environmentObject(self.auth)) {
-                                                            VStack(alignment: .trailing, spacing: 0) {
-                                                                HStack {
-                                                                    ZStack() {
-                                                                        if let avitarURL = contact.avatar {
-                                                                            WebImage(url: URL(string: avitarURL))
-                                                                                .resizable()
-                                                                                .placeholder{ Image("empty-profile").resizable().frame(width: 40, height: 40, alignment: .center).scaledToFill() }
-                                                                                .indicator(.activity)
-                                                                                .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
-                                                                                .scaledToFill()
-                                                                                .clipShape(Circle())
-                                                                                .frame(width: 40, height: 40, alignment: .center)
-                                                                                .shadow(color: Color.black.opacity(0.20), radius: 6, x: 0, y: 4)
-                                                                        } else {
-                                                                            ZStack(alignment: .center) {
-                                                                                Circle()
-                                                                                    .frame(width: 40, height: 40, alignment: .center)
-                                                                                    .foregroundColor(Color("bgColor"))
-                                                                                
-                                                                                Text("".firstLeters(text: contact.fullName))
-                                                                                    .font(.system(size: 14))
-                                                                                    .fontWeight(.bold)
-                                                                                    .foregroundColor(.primary)
-                                                                            }
-                                                                        }
-                                                                        
-                                                                        RoundedRectangle(cornerRadius: 5)
-                                                                            .frame(width: 10, height: 10)
-                                                                            .foregroundColor(.green)
-                                                                            .opacity(contact.isOnline ? 1 : 0)
-                                                                            .offset(x: 12, y: 15)
-                                                                        
-                                                                        if contact.quickSnaps.count > 0 {
+                                        VStack {
+                                            ForEach(self.auth.contacts.filterContact(text: self.searchContact).filter({ $0.isMyContact == true && $0.fullName.hasPrefix(letter) }).sorted { $0.fullName < $1.fullName }, id: \.self) { contact in
+                                                if contact.id != Session.current.currentUserID {
+                                                    NavigationLink(destination: VisitContactView(newMessage: self.$newDialogID, dismissView: self.$dismissView, viewState: .fromContacts, contact: contact).edgesIgnoringSafeArea(.all).environmentObject(self.auth)) {
+                                                        VStack(alignment: .trailing, spacing: 0) {
+                                                            HStack {
+                                                                ZStack() {
+                                                                    if let avitarURL = contact.avatar {
+                                                                        WebImage(url: URL(string: avitarURL))
+                                                                            .resizable()
+                                                                            .placeholder{ Image("empty-profile").resizable().frame(width: 40, height: 40, alignment: .center).scaledToFill() }
+                                                                            .indicator(.activity)
+                                                                            .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
+                                                                            .scaledToFill()
+                                                                            .clipShape(Circle())
+                                                                            .frame(width: 40, height: 40, alignment: .center)
+                                                                            .shadow(color: Color.black.opacity(0.20), radius: 6, x: 0, y: 4)
+                                                                    } else {
+                                                                        ZStack(alignment: .center) {
                                                                             Circle()
-                                                                                .stroke(Constants.snapPurpleGradient, style: StrokeStyle(lineWidth: 2, lineCap: .round))
-                                                                                .frame(width: 48, height: 48)
-                                                                                .foregroundColor(.clear)
+                                                                                .frame(width: 40, height: 40, alignment: .center)
+                                                                                .foregroundColor(Color("bgColor"))
+                                                                            
+                                                                            Text("".firstLeters(text: contact.fullName))
+                                                                                .font(.system(size: 14))
+                                                                                .fontWeight(.bold)
+                                                                                .foregroundColor(.primary)
                                                                         }
                                                                     }
                                                                     
-                                                                    VStack(alignment: .leading) {
-                                                                        HStack(spacing: 5) {
-                                                                            if contact.isPremium {
-                                                                                Image(systemName: "checkmark.seal")
-                                                                                    .resizable()
-                                                                                    .scaledToFit()
-                                                                                    .font(Font.title.weight(.medium))
-                                                                                    .frame(width: 16, height: 16, alignment: .center)
-                                                                                    .foregroundColor(Color("main_blue"))
-                                                                            }
-                                                                                                                                        
-                                                                            Text(contact.fullName)
-                                                                                .font(.headline)
-                                                                                .fontWeight(.semibold)
-                                                                                .foregroundColor(.primary)
-                                                                                .multilineTextAlignment(.leading)
-                                                                        }.offset(y: contact.isPremium ? 3 : 0)
-                                                                        
-                                                                        Text(contact.isOnline ? "online now" : "last online \(contact.lastOnline.getElapsedInterval(lastMsg: "moments")) ago")
-                                                                            .font(.caption)
-                                                                            .fontWeight(.regular)
-                                                                            .foregroundColor(.secondary)
-                                                                            .multilineTextAlignment(.leading)
-                                                                            .offset(y: contact.isPremium ? -3 : 0)
+                                                                    RoundedRectangle(cornerRadius: 5)
+                                                                        .frame(width: 10, height: 10)
+                                                                        .foregroundColor(.green)
+                                                                        .opacity(contact.isOnline ? 1 : 0)
+                                                                        .offset(x: 12, y: 15)
+                                                                    
+                                                                    if contact.quickSnaps.count > 0 {
+                                                                        Circle()
+                                                                            .stroke(Constants.snapPurpleGradient, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                                                                            .frame(width: 48, height: 48)
+                                                                            .foregroundColor(.clear)
                                                                     }
-                                                                    
-                                                                    Spacer()
-                                                                    
-                                                                    Image(systemName: "chevron.right")
-                                                                        .resizable()
-                                                                        .font(Font.title.weight(.bold))
-                                                                        .scaledToFit()
-                                                                        .frame(width: 7, height: 15, alignment: .center)
-                                                                        .foregroundColor(.secondary)
-                                                                }.padding(.horizontal)
-                                                                .padding(.vertical, 10)
+                                                                }
                                                                 
-                                                                if self.auth.contacts.results.filter({ $0.isMyContact == true && $0.fullName.hasPrefix(letter) }).sorted { $0.fullName < $1.fullName }.last != contact {
-                                                                    Divider()
-                                                                        .frame(width: Constants.screenWidth - 100)
+                                                                VStack(alignment: .leading) {
+                                                                    HStack(spacing: 5) {
+                                                                        if contact.isPremium {
+                                                                            Image(systemName: "checkmark.seal")
+                                                                                .resizable()
+                                                                                .scaledToFit()
+                                                                                .font(Font.title.weight(.medium))
+                                                                                .frame(width: 16, height: 16, alignment: .center)
+                                                                                .foregroundColor(Color("main_blue"))
+                                                                        }
+                                                                                                                                    
+                                                                        Text(contact.fullName)
+                                                                            .font(.headline)
+                                                                            .fontWeight(.semibold)
+                                                                            .foregroundColor(.primary)
+                                                                            .multilineTextAlignment(.leading)
+                                                                    }.offset(y: contact.isPremium ? 3 : 0)
+                                                                    
+                                                                    Text(contact.isOnline ? "online now" : "last online \(contact.lastOnline.getElapsedInterval(lastMsg: "moments")) ago")
+                                                                        .font(.caption)
+                                                                        .fontWeight(.regular)
+                                                                        .foregroundColor(.secondary)
+                                                                        .multilineTextAlignment(.leading)
+                                                                        .offset(y: contact.isPremium ? -3 : 0)
+                                                                }
+                                                                
+                                                                Spacer()
+                                                                
+                                                                Image(systemName: "chevron.right")
+                                                                    .resizable()
+                                                                    .font(Font.title.weight(.bold))
+                                                                    .scaledToFit()
+                                                                    .frame(width: 7, height: 15, alignment: .center)
+                                                                    .foregroundColor(.secondary)
+                                                            }.padding(.horizontal)
+                                                            .padding(.vertical, 10)
+                                                            
+                                                            if self.auth.contacts.results.filter({ $0.isMyContact == true && $0.fullName.hasPrefix(letter) }).sorted { $0.fullName < $1.fullName }.last != contact {
+                                                                Divider()
+                                                                    .frame(width: Constants.screenWidth - 100)
+                                                            }
+                                                        }
+                                                    }.buttonStyle(changeBGButtonStyle())
+                                                    .simultaneousGesture(TapGesture()
+                                                        .onEnded { _ in
+                                                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                                        })
+                                                    .matchedGeometryEffect(id: contact.id.description, in: animation)
+                                                    .animation(.spring(response: 0.45, dampingFraction: 0.70, blendDuration: 0))
+                                                }
+                                            }.resignKeyboardOnDragGesture()
+                                        }.background(Color("buttonColor"))
+                                        .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
+                                        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 8)
+                                        .id(letter)
+                                    }
+                                }.matchedGeometryEffect(id: "headerState", in: animation)
+                                .padding(.horizontal)
+                                .padding(.bottom, 40)
+                                .offset(y: -15)
+                            } else {
+                                LazyVStack(alignment: .leading, spacing: 0) {
+                                    VStack(alignment: .leading, spacing: 0) {
+                                        ForEach(self.auth.contacts.filterContact(text: self.searchContact).filter({ $0.isMyContact == true }).sorted { $0.fullName < $1.fullName }, id: \.self) { contact in
+                                            if contact.id != Session.current.currentUserID {
+                                                NavigationLink(destination: VisitContactView(newMessage: self.$newDialogID, dismissView: self.$dismissView, viewState: .fromContacts, contact: contact).edgesIgnoringSafeArea(.all).environmentObject(self.auth)) {
+                                                    VStack(alignment: .trailing, spacing: 0) {
+                                                        HStack {
+                                                            ZStack() {
+                                                                if let avitarURL = contact.avatar {
+                                                                    WebImage(url: URL(string: avitarURL))
+                                                                        .resizable()
+                                                                        .placeholder{ Image("empty-profile").resizable().frame(width: 40, height: 40, alignment: .center).scaledToFill() }
+                                                                        .indicator(.activity)
+                                                                        .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
+                                                                        .scaledToFill()
+                                                                        .clipShape(Circle())
+                                                                        .frame(width: 40, height: 40, alignment: .center)
+                                                                        .shadow(color: Color.black.opacity(0.20), radius: 6, x: 0, y: 4)
+                                                                } else {
+                                                                    ZStack(alignment: .center) {
+                                                                        Circle()
+                                                                            .frame(width: 40, height: 40, alignment: .center)
+                                                                            .foregroundColor(Color("bgColor"))
+                                                                        
+                                                                        Text("".firstLeters(text: contact.fullName))
+                                                                            .font(.system(size: 14))
+                                                                            .fontWeight(.bold)
+                                                                            .foregroundColor(.primary)
+                                                                    }
+                                                                }
+                                                                
+                                                                RoundedRectangle(cornerRadius: 5)
+                                                                    .frame(width: 10, height: 10)
+                                                                    .foregroundColor(.green)
+                                                                    .opacity(contact.isOnline ? 1 : 0)
+                                                                    .offset(x: 12, y: 15)
+                                                                
+                                                                if contact.quickSnaps.count > 0 {
+                                                                    Circle()
+                                                                        .stroke(Constants.snapPurpleGradient, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                                                                        .frame(width: 48, height: 48)
+                                                                        .foregroundColor(.clear)
                                                                 }
                                                             }
-                                                        }.buttonStyle(changeBGButtonStyle())
-                                                        .simultaneousGesture(TapGesture()
-                                                            .onEnded { _ in
-                                                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                                            })
-                                                        .resignKeyboardOnDragGesture()
-                                                        .animation(.spring(response: 0.45, dampingFraction: 0.70, blendDuration: 0))
+                                                            
+                                                            VStack(alignment: .leading) {
+                                                                HStack(spacing: 5) {
+                                                                    if contact.isPremium {
+                                                                        Image(systemName: "checkmark.seal")
+                                                                            .resizable()
+                                                                            .scaledToFit()
+                                                                            .font(Font.title.weight(.medium))
+                                                                            .frame(width: 16, height: 16, alignment: .center)
+                                                                            .foregroundColor(Color("main_blue"))
+                                                                    }
+                                                                                                                                
+                                                                    Text(contact.fullName)
+                                                                        .font(.headline)
+                                                                        .fontWeight(.semibold)
+                                                                        .foregroundColor(.primary)
+                                                                        .multilineTextAlignment(.leading)
+                                                                }.offset(y: contact.isPremium ? 3 : 0)
+                                                                
+                                                                Text(contact.isOnline ? "online now" : "last online \(contact.lastOnline.getElapsedInterval(lastMsg: "moments")) ago")
+                                                                    .font(.caption)
+                                                                    .fontWeight(.regular)
+                                                                    .foregroundColor(.secondary)
+                                                                    .multilineTextAlignment(.leading)
+                                                                    .offset(y: contact.isPremium ? -3 : 0)
+                                                            }
+                                                            
+                                                            Spacer()
+                                                            
+                                                            Image(systemName: "chevron.right")
+                                                                .resizable()
+                                                                .font(Font.title.weight(.bold))
+                                                                .scaledToFit()
+                                                                .frame(width: 7, height: 15, alignment: .center)
+                                                                .foregroundColor(.secondary)
+                                                        }.padding(.horizontal)
+                                                        .padding(.vertical, 10)
+                                                        
+                                                        if self.auth.contacts.results.filter({ $0.isMyContact == true }).sorted { $0.fullName < $1.fullName }.last != contact {
+                                                            Divider()
+                                                                .frame(width: Constants.screenWidth - 100)
+                                                        }
                                                     }
-                                                }
-                                            }.background(Color("buttonColor"))
-                                            .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
-                                            .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 8)
-                                            .id(letter)
-                                        }
-                                    }.padding(.horizontal)
-                                    .padding(.bottom, 40)
-                                    .offset(y: -15)
-
+                                                }.buttonStyle(changeBGButtonStyle())
+                                                .simultaneousGesture(TapGesture()
+                                                    .onEnded { _ in
+                                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                                    })
+                                                .matchedGeometryEffect(id: contact.id.description, in: animation)
+                                                .animation(.spring(response: 0.45, dampingFraction: 0.70, blendDuration: 0))
+                                            }
+                                        }.resignKeyboardOnDragGesture()
+                                    }.background(Color("buttonColor"))
+                                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
+                                    .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 8)
+                                }.padding(.horizontal)
+                                .padding(.bottom, 40)
+                            }
 //                                    GeometryReader { geo in
 //                                        HStack {
 //                                            Spacer()

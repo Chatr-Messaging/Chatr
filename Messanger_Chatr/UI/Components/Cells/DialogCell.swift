@@ -17,8 +17,6 @@ struct DialogCell: View {
     @State var dialogModel: DialogStruct = DialogStruct()
     @State var privateDialogContact: ContactStruct = ContactStruct()
     @State var connectyContact: User = User()
-    @State private var currentPosition: CGSize = .zero
-    @State private var newPosition: CGSize = .zero
     @State private var privateUserID: Int = 0
     @State var groupOccUserAvatar: [String] = []
     @State private var openActionSheet: Bool = false
@@ -260,12 +258,10 @@ struct DialogCell: View {
                             if self.dialogModel.dialogType == "private" || self.dialogModel.dialogType == "group" {
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.50) {
                                     changeDialogRealmData().deletePrivateConnectyDialog(dialogID: self.dialogModel.id, isOwner: self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? true : false)
-                                    print("done deleting dialog: \(self.dialogModel.id)")
                                 }
                             } else if self.dialogModel.dialogType == "public" {
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.50) {
                                     changeDialogRealmData().unsubscribePublicConnectyDialog(dialogID: self.dialogModel.id)
-                                    print("done deleting PUBLIC dialog: \(self.dialogModel.id)")
                                 }
                             }
                         }),
@@ -294,8 +290,7 @@ struct DialogCell: View {
             .padding(.trailing, self.dialogModel.isOpen ? 20 : 0)
             .opacity(self.isOpen ? 1 : 0)
             
-        }.contentShape(Rectangle())
-        .padding(.trailing, self.dialogModel.isOpen ? 20 : 5)
+        }.padding(.trailing, self.dialogModel.isOpen ? 20 : 5)
         .padding(.leading)
         .padding(.vertical, self.privateDialogContact.quickSnaps.count > 0 ? 4 : 8)
         .background(Color("buttonColor"))
@@ -319,7 +314,7 @@ struct DialogCell: View {
                         if self.privateDialogContact.avatar == "" || self.privateDialogContact.id == 0 && !Session.current.tokenHasExpired {
                             self.pullPrivateAvatatr()
                         } else if Session.current.tokenHasExpired {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.75) {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                                 self.pullPrivateAvatatr()
                             }
                         }
@@ -327,7 +322,7 @@ struct DialogCell: View {
                         if !Session.current.tokenHasExpired {
                             self.pullPrivateAvatatr()
                         } else {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.75) {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                                 self.pullPrivateAvatatr()
                             }
                         }
@@ -336,7 +331,6 @@ struct DialogCell: View {
             } else if self.dialogModel.dialogType == "group" && !Session.current.tokenHasExpired {
                 self.pullGroupAvatar()
             } else {
-                print("Chat dialog can not load bcause token has expired!")
                 if self.dialogModel.dialogType == "group" {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                         self.pullGroupAvatar()
@@ -355,7 +349,6 @@ struct DialogCell: View {
         }
         
         self.groupOccUserAvatar.removeAll()
-        print("the occ count for diaog: \(self.dialogModel.fullName) is: \(self.dialogModel.occupentsID.count)")
         for occ in self.dialogModel.occupentsID {
             if self.groupOccUserAvatar.count != 3 {
                 if occ != UserDefaults.standard.integer(forKey: "currentUserID") {
@@ -366,7 +359,6 @@ struct DialogCell: View {
                                 Request.users(withIDs: [NSNumber(value: occ)], paginator: Paginator.limit(1, skip: 0), successBlock: { (paginator, users) in
                                     for i in users {
                                         self.groupOccUserAvatar.append(PersistenceManager().getCubeProfileImage(usersID: i) ?? "")
-                                        print("found group connecty countactttt: \(String(describing: PersistenceManager().getCubeProfileImage(usersID: i) ?? ""))")
                                         if self.groupOccUserAvatar.count >= 3 { break }
                                     }
                                 })
@@ -379,7 +371,6 @@ struct DialogCell: View {
                             Request.users(withIDs: [NSNumber(value: occ)], paginator: Paginator.limit(1, skip: 0), successBlock: { (paginator, users) in
                                 for i in users {
                                     self.groupOccUserAvatar.append(PersistenceManager().getCubeProfileImage(usersID: i) ?? "")
-                                    print("found group connecty countact: \(String(describing: PersistenceManager().getCubeProfileImage(usersID: i) ?? ""))")
                                     if self.groupOccUserAvatar.count >= 3 { break }
                                 }
                             })
@@ -388,11 +379,9 @@ struct DialogCell: View {
                 }
             } else { break }
         }
-        print("group occ count: \(self.groupOccUserAvatar.count)")
     }
     
     func pullPrivateAvatatr() {
-        print("contact not in Realm... view did load")
         Request.users(withIDs: [NSNumber(value: self.privateUserID)], paginator: Paginator.limit(5, skip: 0), successBlock: { (paginator, users) in
             for user in users {
                 if user.id == self.privateUserID {

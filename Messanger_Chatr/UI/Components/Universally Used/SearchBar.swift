@@ -12,7 +12,6 @@ struct CustomSearchBar: View {
     @EnvironmentObject var auth: AuthModel
     @Binding var searchText: String
     @Binding var localOpen: Bool
-    @Binding var loading: Bool
 
     var body: some View {
         GeometryReader { geometry in

@@ -163,22 +163,18 @@ struct mainHomeList: View {
     @State var newDialogID: String = ""
     @State var newDialogFromContact: Int = 0
     @State var newDialogFromSharedContact: Int = 0
-    @State var isPreLoading = false
-    @State var isLoading = false
     @State var showFullKeyboard = false
     @State var emptyQuickSnaps: Bool = false
     @State var hasAttachments: Bool = false
     @State var showSharedContact: Bool = false
     @State var receivedNotification: Bool = false
     @State var disableDialog: Bool = false
-    @State var alertNum = 0
     @State var isLocalOpen : Bool = UserDefaults.standard.bool(forKey: "localOpen")
     @State var activeView = CGSize.zero
     @State var keyboardDragState = CGSize.zero
     @State var keyboardHeight: CGFloat = 0
     @State var textFieldHeight: CGFloat = 0
     @State var selectedContacts: [Int] = []
-    @State var chatMessageViewHeight: CGFloat = 0
     @State var quickSnapViewState: QuickSnapViewingState = .closed
     @State var selectedQuickSnapContact: ContactStruct = ContactStruct()
     @ObservedObject var dialogs = DialogRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(DialogStruct.self))
@@ -218,7 +214,7 @@ struct mainHomeList: View {
                                         self.receivedNotification.toggle()
                                     }
                                 }
-                            }.frame(height: Constants.btnSize + 100)
+                        }.frame(height: Constants.btnSize + 100)
                             
                         // MARK: "Message" Title
                         HomeMessagesTitle(isLocalOpen: self.$isLocalOpen, contacts: self.$showContacts, newChat: self.$showNewChat, selectedContacts: self.$selectedContacts)
@@ -255,7 +251,7 @@ struct mainHomeList: View {
                                     .frame(width: Constants.screenWidth, height: Constants.screenHeight, alignment: .center)
                                     .offset(y: self.isLocalOpen ? -geometry.frame(in: .global).minY : -35)
                                     .opacity(self.isLocalOpen ? Double((275 - self.activeView.height) / 150) : 0)
-                                    .simultaneousGesture(DragGesture(minimumDistance: self.isLocalOpen ? 0 : 500).onChanged({ (_) in }))
+                                    .simultaneousGesture(DragGesture(minimumDistance: self.isLocalOpen ? 0 : 500))
                                     .sheet(isPresented: self.$showSharedContact, onDismiss: {
                                         self.loadSelectedDialog()
                                     }) {
@@ -281,7 +277,7 @@ struct mainHomeList: View {
                                     .offset(y: self.isLocalOpen ? self.activeView.height : 0)
                                     .opacity(self.isLocalOpen ? Double((275 - self.activeView.height) / 150) : 0)
                                     .animation(.spring(response: 0.45, dampingFraction: self.isLocalOpen ? 0.65 : 0.75, blendDuration: 0))
-                                    .simultaneousGesture(DragGesture(minimumDistance: self.isLocalOpen ? 0 : 500).onChanged({ (_) in }))
+                                    .simultaneousGesture(DragGesture(minimumDistance: self.isLocalOpen ? 0 : 500))
                                 
                                 QuickSnapsSection(viewState: self.$quickSnapViewState, selectedQuickSnapContact: self.$selectedQuickSnapContact, emptyQuickSnaps: self.$emptyQuickSnaps)
                                     .environmentObject(self.auth)
@@ -289,10 +285,9 @@ struct mainHomeList: View {
                                     .offset(y: self.isLocalOpen ? -geometry.frame(in: .global).minY - (UIDevice.current.hasNotch ? -60 : 5) : 0)
                                     .offset(x: self.isLocalOpen ? (((self.activeView.height - 150) / 1.5) / 150) * 40 : 0, y: self.isLocalOpen ? self.activeView.height / 1.5 : 0)
                                     //.scaleEffect(self.isLocalOpen ? ((self.activeView.height / 150) * 22.5) / 150 + 0.85 : 1.0)
-                                    .animation(.spring(response: 0.45, dampingFraction: self.isLocalOpen ? 0.55 : 0.75, blendDuration: 0))
+                                    .animation(.spring(response: 0.45, dampingFraction: self.isLocalOpen ? 0.65 : 0.75, blendDuration: 0))
                                     .padding(.vertical, self.emptyQuickSnaps ? 0 : 20)
-                                
-                            }.zIndex(5)
+                            }
                         }.sheet(isPresented: self.$showNewChat, onDismiss: {
                             if self.newDialogID.count > 0 {
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
@@ -319,9 +314,8 @@ struct mainHomeList: View {
                         
                         //MARK: Search Bar
                         if self.dialogs.results.filter { $0.isDeleted != true }.count != 0 {
-                            CustomSearchBar(searchText: self.$searchText, localOpen: self.$isLocalOpen, loading: self.$isLoading)
+                            CustomSearchBar(searchText: self.$searchText, localOpen: self.$isLocalOpen)
                                 .opacity(self.isLocalOpen ? Double(self.activeView.height / 150) : 1)
-                                .opacity(self.isLoading ? 0 : 1)
                                 .opacity(self.dialogs.results.count != 0 ? 1 : 0)
                                 .offset(y: self.isLocalOpen ? -75 + (self.activeView.height / 3) : 0)
                                 .offset(y: self.emptyQuickSnaps ? -50 : 45)
@@ -385,16 +379,19 @@ struct mainHomeList: View {
                                            activeView: self.$activeView,
                                            selectedDialogID: self.$selectedDialogID)
                                     .environmentObject(self.auth)
-                                    .zIndex(i.isOpen ? 3 : -1)
+                                    .contentShape(Rectangle())
+                                    .position(x: self.isLocalOpen ? UIScreen.main.bounds.size.width / 2 : UIScreen.main.bounds.size.width / 2 - 20, y: i.isOpen ? 40 : 40)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .zIndex(i.isOpen ? 2 : 0)
                                     .opacity(self.isLocalOpen ? (i.isOpen ? 1 : 0) : 1)
                                     .offset(y: i.isOpen && self.isLocalOpen ? -geo.frame(in: .global).minY + (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 50 : 25) : 125) : self.emptyQuickSnaps ? -45 : 50)
                                     .offset(y: self.isLocalOpen ? self.activeView.height : 0)
                                     .shadow(color: Color.black.opacity(self.isLocalOpen ? (self.colorScheme == .dark ? 0.40 : 0.15) : 0.15), radius: self.isLocalOpen ? 15 : 8, x: 0, y: self.isLocalOpen ? (self.colorScheme == .dark ? 15 : 5) : 5)
-                                    .animation(.spring(response: 0.45, dampingFraction: 0.70, blendDuration: 0))
+                                    .animation(.spring(response: 0.4, dampingFraction: 0.95, blendDuration: 0))
                                     .id(i.id)
                                     .onTapGesture {
                                         self.onCellTapGesture(id: i.id, dialogType: i.dialogType)
-                                    }.gesture(DragGesture(minimumDistance: 0).onChanged { value in
+                                    }.simultaneousGesture(DragGesture(minimumDistance: i.isOpen ? 0 : 500).onChanged { value in
                                         guard value.translation.height < 150 else { UIApplication.shared.endEditing(true); return }
                                         guard value.translation.height > 0 else { return }
                                         
@@ -402,7 +399,6 @@ struct mainHomeList: View {
                                     }.onEnded { value in
                                         if self.activeView.height > 50 {
                                             self.isLocalOpen = false
-                                            self.isLoading = false
                                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                             UserDefaults.standard.set(false, forKey: "localOpen")
                                             UIApplication.shared.endEditing(true)
@@ -420,25 +416,20 @@ struct mainHomeList: View {
                                             self.auth.selectedConnectyDialog?.sendUserStoppedTyping()
                                         }
                                     })
-                            }.frame(height: 75, alignment: .center)
-                            .frame(minWidth: Constants.screenWidth - 40, maxWidth: Constants.screenWidth)
+                            }.frame(minHeight: 75, maxHeight: 100, alignment: .center)
+                            .padding(.horizontal, self.isLocalOpen ? 0 : 20)
                         }.offset(y: 60)
-                        .simultaneousGesture(DragGesture(minimumDistance: self.isLocalOpen ? 0 : 500))
-                        .padding(.horizontal, self.isLocalOpen ? 0 : 20)
-                        .background(Color.clear)
                         .disabled(self.disableDialog)
-                        .onChange(of: UserDefaults.standard.bool(forKey: "localOpen")) { newValue in
+                        .onChange(of: UserDefaults.standard.bool(forKey: "localOpen")) { _ in
                             self.disableDialog = true
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                                 self.disableDialog = false
                             }
                         }
                         //.onAppear {
                             //UserDefaults.standard.set(false, forKey: "localOpen")
                             //ChatrApp.dialogs.getDialogUpdates() { result in }
-                            //self.dialogActions.fetchDialogs(completion: { result in })
                         //}
-                        
                         
                         if self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.count >= 3 {
                             FooterInformation()
@@ -450,21 +441,20 @@ struct mainHomeList: View {
                 }
 
                 //Chat View
-                /*
                 if UserDefaults.standard.bool(forKey: "localOpen") {
                     ChatMessagesView(activeView: self.$activeView, keyboardChange: self.$keyboardHeight, dialogID: self.$selectedDialogID, textFieldHeight: self.$textFieldHeight, keyboardDragState: self.$keyboardDragState, hasAttachment: self.$hasAttachments, newDialogFromSharedContact: self.$newDialogFromSharedContact)
                         .environmentObject(self.auth)
                         .frame(width: Constants.screenWidth, alignment: .bottom)
-                        .zIndex(0)
+                        .zIndex(1)
                         .contentShape(Rectangle())
                         .offset(y: self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 123 : 87) : 197)
                         .padding(.bottom, self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 123 : 87) : 197)
                         .offset(y: self.activeView.height)// + (self.emptyQuickSnaps ? 25 : 197))
                         //height: Constants.screenHeight - 248 - (self.textFieldHeight < 120 ? self.textFieldHeight : 120) - self.keyboardHeight + self.keyboardDragState.height - (self.hasAttachments ? 95 : 0)
                         //.padding(.bottom, (self.textFieldHeight < 120 ? self.textFieldHeight : 120) + self.keyboardHeight - self.keyboardDragState.height + (self.hasAttachments ? 95 : 0) + 248)
-                        .animation(.timingCurve(0.5, 0.8, 0.2, 1, duration: 0.30))
+                        .animation(.spring(response: 0.35, dampingFraction: 0.8, blendDuration: 0))
                         //.opacity(UserDefaults.standard.bool(forKey: "localOpen") ? Double((190 - self.activeView.height) / 150) : 0)
-                        .simultaneousGesture(DragGesture(minimumDistance: UserDefaults.standard.bool(forKey: "localOpen") ? 800 : 0).onChanged({ (_) in }))
+                        .simultaneousGesture(DragGesture(minimumDistance: UserDefaults.standard.bool(forKey: "localOpen") ? 800 : 0))
                         .onDisappear {
                             self.auth.leaveDialog()
                         }
@@ -480,7 +470,7 @@ struct mainHomeList: View {
 //                                        })
                         //}
                     }
-                */
+
                 //keyboard View
                 KeyboardCardView(height: self.$textFieldHeight, mainText: self.$keyboardText, hasAttachments: self.$hasAttachments)
                     .environmentObject(self.auth)
@@ -492,6 +482,7 @@ struct mainHomeList: View {
                     .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: -5)
                     .animation(.timingCurve(0.2, 0.8, 0.2, 1, duration: 0.5))
                     .offset(y: self.isLocalOpen ? Constants.screenHeight - (UIDevice.current.hasNotch || self.keyboardHeight != 0 ? 50 : 30) - (self.textFieldHeight <= 120 ? self.textFieldHeight : 120) - self.keyboardHeight + self.keyboardDragState.height - (self.hasAttachments ? 95 : 0) : Constants.screenHeight)
+                    .zIndex(2)
                     .gesture(
                         DragGesture().onChanged { value in
                             self.keyboardDragState = value.translation
@@ -663,7 +654,6 @@ struct mainHomeList: View {
             changeDialogRealmData().fetchDialogs(completion: { _ in })
 
             self.isLocalOpen = false
-            self.isLoading = false
             UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
         }
         self.activeView.height = .zero
