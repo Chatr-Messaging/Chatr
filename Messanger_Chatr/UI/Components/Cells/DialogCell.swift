@@ -162,9 +162,7 @@ struct DialogCell: View {
                             .frame(width: .infinity)
                     }.offset(y: 2)
                     
-                    
                     Spacer()
-                    
                     HStack {
                         Text(self.dialogModel.isOpen ? "" : "\(self.dialogModel.lastMessageDate.getElapsedInterval(lastMsg: "now"))")
                                 .font(.subheadline)

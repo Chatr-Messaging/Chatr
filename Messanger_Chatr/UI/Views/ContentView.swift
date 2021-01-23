@@ -333,7 +333,6 @@ struct mainHomeList: View {
                         //MARK: Dialogs Section
                         if self.dialogs.results.filter { $0.isDeleted != true }.count == 0 {
                             VStack {
-                                Spacer()
                                 Image("NoChats")
                                     .resizable()
                                     .scaledToFit()
@@ -375,8 +374,6 @@ struct mainHomeList: View {
                                 }.buttonStyle(MainButtonStyle())
                                 .frame(maxWidth: 230)
                                 .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 8)
-                                
-                                Spacer()
                             }.offset(y: Constants.screenWidth < 375 ? 60 : -30)
                         }
                         
@@ -453,6 +450,7 @@ struct mainHomeList: View {
                 }
 
                 //Chat View
+                /*
                 if UserDefaults.standard.bool(forKey: "localOpen") {
                     ChatMessagesView(activeView: self.$activeView, keyboardChange: self.$keyboardHeight, dialogID: self.$selectedDialogID, textFieldHeight: self.$textFieldHeight, keyboardDragState: self.$keyboardDragState, hasAttachment: self.$hasAttachments, newDialogFromSharedContact: self.$newDialogFromSharedContact)
                         .environmentObject(self.auth)
@@ -482,7 +480,7 @@ struct mainHomeList: View {
 //                                        })
                         //}
                     }
-                
+                */
                 //keyboard View
                 KeyboardCardView(height: self.$textFieldHeight, mainText: self.$keyboardText, hasAttachments: self.$hasAttachments)
                     .environmentObject(self.auth)
