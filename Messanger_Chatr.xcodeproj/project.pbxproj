@@ -125,6 +125,7 @@
 		05EA572524148A1600372F1A /* Mesages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05EA572424148A1600372F1A /* Mesages.swift */; };
 		05EA572724148BA100372F1A /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05EA572624148BA100372F1A /* Profile.swift */; };
 		05F08B5E252DAD1A005222FA /* MoreContactsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F08B5D252DAD1A005222FA /* MoreContactsView.swift */; };
+		05F58CEB25BFCF5400839590 /* CameraViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F58CEA25BFCF5400839590 /* CameraViewModel.swift */; };
 		05F8E11523F0DDFF0066954C /* ContactsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F8E11423F0DDFF0066954C /* ContactsView.swift */; };
 		05F8E11823F122490066954C /* userModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F8E11723F122490066954C /* userModel.swift */; };
 		05FD085B2394784600575727 /* ProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FD085A2394784600575727 /* ProgressBar.swift */; };
@@ -270,6 +271,7 @@
 		05EA572424148A1600372F1A /* Mesages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mesages.swift; sourceTree = "<group>"; };
 		05EA572624148BA100372F1A /* Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
 		05F08B5D252DAD1A005222FA /* MoreContactsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreContactsView.swift; sourceTree = "<group>"; };
+		05F58CEA25BFCF5400839590 /* CameraViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewModel.swift; sourceTree = "<group>"; };
 		05F8E11423F0DDFF0066954C /* ContactsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsView.swift; sourceTree = "<group>"; };
 		05F8E11723F122490066954C /* userModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = userModel.swift; sourceTree = "<group>"; };
 		05FD085A2394784600575727 /* ProgressBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressBar.swift; sourceTree = "<group>"; };
@@ -552,6 +554,7 @@
 				0596845525AC16E80051B707 /* VisitContactViewModel.swift */,
 				056935D725B50B3D000705F6 /* MessagesViewModel.swift */,
 				05A6D54625B021E400AD66DD /* AdvancedViewModel.swift */,
+				05F58CEA25BFCF5400839590 /* CameraViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -962,6 +965,7 @@
 				056B989C24C8F9BD003F7FBA /* MenuButton.swift in Sources */,
 				056B98A024C8FA41003F7FBA /* AppearanceView.swift in Sources */,
 				05A7BD5F24FEF3870001BFC9 /* QucickSnapsSection.swift in Sources */,
+				05F58CEB25BFCF5400839590 /* CameraViewModel.swift in Sources */,
 				052347B623E55C8A00EF9CEB /* FullNameView.swift in Sources */,
 				050582FD24D8FCDF00CBD4AC /* DialogRealmModel.swift in Sources */,
 				0572046E25B3FDB700542CCF /* ImagePickerView.swift in Sources */,

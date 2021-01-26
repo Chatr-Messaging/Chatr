@@ -380,7 +380,6 @@ struct ContactsView: View {
                                     .clipShape(RoundedRectangle(cornerRadius: 14, style: .circular))
                                     .shadow(color: Color.black.opacity(0.20), radius: 10, x: 0, y: 8)
                                 }.frame(minWidth: 80, maxWidth: 200)
-                                .padding(.leading, 2.5)
                                 
                                 Spacer()
                                 
@@ -392,7 +391,7 @@ struct ContactsView: View {
                                     Image(systemName: "person.badge.plus")
                                         .resizable()
                                         .scaledToFit()
-                                        .padding(Constants.menuBtnSize * 0.25)
+                                        .padding(Constants.menuBtnSize * 0.275)
                                         .foregroundColor(.primary)
                                 }.buttonStyle(HomeButtonStyle())
                                 .padding(.horizontal)

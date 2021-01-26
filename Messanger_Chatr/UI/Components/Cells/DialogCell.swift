@@ -31,92 +31,38 @@ struct DialogCell: View {
     var body: some View {
         //MARK: Main Dialog Cell
         HStack {
-            //ZStack {
-            if self.dialogModel.dialogType == "private" || self.dialogModel.dialogType == "public" {
-                ZStack {
-                    WebImage(url: URL(string: (self.privateDialogContact.id != 0 ? self.privateDialogContact.avatar : PersistenceManager().getCubeProfileImage(usersID: self.connectyContact)) ?? ""))
-                        .resizable()
-                        .placeholder{ Image("empty-profile").resizable().frame(width: 55, height: 55, alignment: .center).scaledToFill() }
-                        .indicator(.activity)
-                        .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.05)), removal: AnyTransition.identity))
-                        .scaledToFill()
-                        .clipShape(Circle())
-                        .frame(width: 55, height: 55, alignment: .center)
+            ZStack {
+                if self.privateDialogContact.quickSnaps.count > 0 {
+                    Circle()
+                        .stroke(Constants.snapPurpleGradient, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                        .frame(width: 63, height: 63)
                         .offset(x: -5)
-                        .shadow(color: Color.black.opacity(0.23), radius: 7, x: 0, y: 5)
-                        .onTapGesture {
-                            if isOpen {
-                                if self.dialogModel.dialogType == "private" {
-                                    self.openContactProfile.toggle()
-                                } else if self.dialogModel.dialogType == "group" || self.dialogModel.dialogType == "public" {
-                                    self.openGroupProfile.toggle()
-                                }
-                                if let connDia = self.auth.selectedConnectyDialog {
-                                    connDia.sendUserStoppedTyping()
-                                }
-                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                            } else {
-                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                self.isOpen = true
-                                self.selectedDialogID = self.dialogModel.id
-                                UserDefaults.standard.set(true, forKey: "localOpen")
-                                UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")
-                                changeDialogRealmData().updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
-                            }
-                        }
-                    
-                    if self.privateDialogContact.quickSnaps.count > 0 {
-                        Circle()
-                            .stroke(Constants.snapPurpleGradient, style: StrokeStyle(lineWidth: 2, lineCap: .round))
-                            .frame(width: 63, height: 63)
-                            .offset(x: -5)
-                            .foregroundColor(.clear)
-                    }
-                    
-                    AlertIndicator(dialogModel: self.dialogModel)
-                        .offset(x: -36, y: -27.5)
-                        .opacity(self.isOpen ? 0 : 1)
+                        .foregroundColor(.clear)
                 }
-            } else if self.dialogModel.dialogType == "group" {
-                ZStack {
-                    ForEach(self.groupOccUserAvatar.indices, id: \.self) { id in
-                        if id < 3 {
-                            ZStack {
-                                Circle()
-                                    .frame(width: self.groupOccUserAvatar.count > 2 ? 31 : self.groupOccUserAvatar.count > 1 ? 34 : 55, height: self.groupOccUserAvatar.count > 2 ? 31 : self.groupOccUserAvatar.count > 1 ? 34 : 55, alignment: .center)
-                                    .foregroundColor(Color("buttonColor"))
-                                    .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 5)
-                                
-                                WebImage(url: URL(string: self.groupOccUserAvatar[id]))
-                                    .resizable()
-                                    .placeholder{ Image("empty-profile").resizable().frame(width: self.groupOccUserAvatar.count >= 3 ? 28 : self.groupOccUserAvatar.count == 2 ? 31 : 55, height: self.groupOccUserAvatar.count >= 3 ? 28 : self.groupOccUserAvatar.count == 2 ? 31 : 55, alignment: .center).scaledToFill() }
-                                    .indicator(.activity)
-                                    .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.05)), removal: AnyTransition.identity))
-                                    .scaledToFill()
-                                    .clipShape(Circle())
-                                    .frame(width: self.groupOccUserAvatar.count >= 3 ? 28 : self.groupOccUserAvatar.count == 2 ? 31 : 55, height: self.groupOccUserAvatar.count >= 3 ? 28 : self.groupOccUserAvatar.count == 2 ? 31 : 55, alignment: .center)
-                                
-                                if id == 2 && self.dialogModel.occupentsID.count >= 5 {
-                                    Circle()
-                                        .frame(width: 28, height: 28)
-                                        .foregroundColor(.black)
-                                        .opacity(0.6)
-                                    
-                                    Text("+\(self.dialogModel.occupentsID.count - 2)")
-                                        .font(.caption)
-                                        .fontWeight(.medium)
-                                        .foregroundColor(.white)
-                                }
-                            }.offset(x: self.groupOccUserAvatar.count >= 3 ? (id == 0 ? -0 : (id == 1 ? -12 : (id == 2 ? 12 : 0))) : self.groupOccUserAvatar.count == 1 ? 0 : (id == 0 ? -12 : 10), y: self.groupOccUserAvatar.count >= 3 ? (id == 0 ? -12 : (id == 1 ? 12 : (id == 2 ? 12 : 0))) : self.groupOccUserAvatar.count == 2 ? (id == 0 ? -8 : 8) : 0)
-                            .offset(x: self.groupOccUserAvatar.count == 1 ? -5 : 0)
-                            .padding(.trailing, self.groupOccUserAvatar.count == 1 ? 0 : 15)
-                            .padding(.leading, self.groupOccUserAvatar.count == 1 ? 0 : 10)
+
+                if self.dialogModel.dialogType == "private" || self.dialogModel.dialogType == "public" {
+                    ZStack {
+                        WebImage(url: URL(string: (self.privateDialogContact.id != 0 ? self.privateDialogContact.avatar : PersistenceManager().getCubeProfileImage(usersID: self.connectyContact)) ?? ""))
+                            .resizable()
+                            .placeholder{ Image("empty-profile").resizable().frame(width: 55, height: 55, alignment: .center).scaledToFill() }
+                            .indicator(.activity)
+                            .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.05)), removal: AnyTransition.identity))
+                            .scaledToFill()
+                            .clipShape(Circle())
+                            .frame(width: 55, height: 55, alignment: .center)
+                            .offset(x: -5)
+                            .shadow(color: Color.black.opacity(0.23), radius: 7, x: 0, y: 5)
                             .onTapGesture {
                                 if isOpen {
-                                    self.openGroupProfile.toggle()
+                                    if self.dialogModel.dialogType == "private" {
+                                        self.openContactProfile.toggle()
+                                    } else if self.dialogModel.dialogType == "group" || self.dialogModel.dialogType == "public" {
+                                        self.openGroupProfile.toggle()
+                                    }
                                     if let connDia = self.auth.selectedConnectyDialog {
                                         connDia.sendUserStoppedTyping()
                                     }
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 } else {
                                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                     self.isOpen = true
@@ -125,20 +71,75 @@ struct DialogCell: View {
                                     UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")
                                     changeDialogRealmData().updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
                                 }
-                            }.sheet(isPresented: self.$openGroupProfile, content: {
-                                NavigationView {
-                                    VisitGroupChannelView(dismissView: self.$openGroupProfile, openNewDialogID: self.$openNewDialogID, groupOccUserAvatar: self.groupOccUserAvatar, fromDialogCell: true, viewState: .fromContacts, dialogRelationship: .subscribed, dialogModel: self.dialogModel)
-                                        .environmentObject(self.auth)
-                                        .edgesIgnoringSafeArea(.all)
-                                }
-                            })
-                        }
+                            }
+                        
+                        AlertIndicator(dialogModel: self.dialogModel)
+                            .offset(x: -36, y: -27.5)
+                            .opacity(self.isOpen ? 0 : 1)
                     }
-                    
-                    AlertIndicator(dialogModel: self.dialogModel)
-                        .offset(x: self.groupOccUserAvatar.count == 2 ? -37 : -34, y: -25)
-                        .opacity(self.isOpen ? 0 : 1)
-                }.padding(.vertical, self.groupOccUserAvatar.count == 2 ? 11 : 11.5)
+                } else if self.dialogModel.dialogType == "group" {
+                    ZStack {
+                        ForEach(self.groupOccUserAvatar.indices, id: \.self) { id in
+                            if id < 3 {
+                                ZStack {
+                                    Circle()
+                                        .frame(width: self.groupOccUserAvatar.count > 2 ? 31 : self.groupOccUserAvatar.count > 1 ? 34 : 55, height: self.groupOccUserAvatar.count > 2 ? 31 : self.groupOccUserAvatar.count > 1 ? 34 : 55, alignment: .center)
+                                        .foregroundColor(Color("buttonColor"))
+                                        .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 5)
+                                    
+                                    WebImage(url: URL(string: self.groupOccUserAvatar[id]))
+                                        .resizable()
+                                        .placeholder{ Image("empty-profile").resizable().frame(width: self.groupOccUserAvatar.count >= 3 ? 28 : self.groupOccUserAvatar.count == 2 ? 31 : 55, height: self.groupOccUserAvatar.count >= 3 ? 28 : self.groupOccUserAvatar.count == 2 ? 31 : 55, alignment: .center).scaledToFill() }
+                                        .indicator(.activity)
+                                        .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.05)), removal: AnyTransition.identity))
+                                        .scaledToFill()
+                                        .clipShape(Circle())
+                                        .frame(width: self.groupOccUserAvatar.count >= 3 ? 28 : self.groupOccUserAvatar.count == 2 ? 31 : 55, height: self.groupOccUserAvatar.count >= 3 ? 28 : self.groupOccUserAvatar.count == 2 ? 31 : 55, alignment: .center)
+                                    
+                                    if id == 2 && self.dialogModel.occupentsID.count >= 5 {
+                                        Circle()
+                                            .frame(width: 28, height: 28)
+                                            .foregroundColor(.black)
+                                            .opacity(0.6)
+                                        
+                                        Text("+\(self.dialogModel.occupentsID.count - 2)")
+                                            .font(.caption)
+                                            .fontWeight(.medium)
+                                            .foregroundColor(.white)
+                                    }
+                                }.offset(x: self.groupOccUserAvatar.count >= 3 ? (id == 0 ? -0 : (id == 1 ? -12 : (id == 2 ? 12 : 0))) : self.groupOccUserAvatar.count == 1 ? 0 : (id == 0 ? -12 : 10), y: self.groupOccUserAvatar.count >= 3 ? (id == 0 ? -12 : (id == 1 ? 12 : (id == 2 ? 12 : 0))) : self.groupOccUserAvatar.count == 2 ? (id == 0 ? -8 : 8) : 0)
+                                .offset(x: self.groupOccUserAvatar.count == 1 ? -5 : 0)
+                                .padding(.trailing, self.groupOccUserAvatar.count == 1 ? 0 : 15)
+                                .padding(.leading, self.groupOccUserAvatar.count == 1 ? 0 : 10)
+                                .onTapGesture {
+                                    if isOpen {
+                                        self.openGroupProfile.toggle()
+                                        if let connDia = self.auth.selectedConnectyDialog {
+                                            connDia.sendUserStoppedTyping()
+                                        }
+                                    } else {
+                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                        self.isOpen = true
+                                        self.selectedDialogID = self.dialogModel.id
+                                        UserDefaults.standard.set(true, forKey: "localOpen")
+                                        UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")
+                                        changeDialogRealmData().updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
+                                    }
+                                }.sheet(isPresented: self.$openGroupProfile, content: {
+                                    NavigationView {
+                                        VisitGroupChannelView(dismissView: self.$openGroupProfile, openNewDialogID: self.$openNewDialogID, groupOccUserAvatar: self.groupOccUserAvatar, fromDialogCell: true, viewState: .fromContacts, dialogRelationship: .subscribed, dialogModel: self.dialogModel)
+                                            .environmentObject(self.auth)
+                                            .edgesIgnoringSafeArea(.all)
+                                    }
+                                })
+                            }
+                        }
+                        
+                        AlertIndicator(dialogModel: self.dialogModel)
+                            .offset(x: self.groupOccUserAvatar.count == 2 ? -37 : -34, y: -25)
+                            .opacity(self.isOpen ? 0 : 1)
+                    }.padding(.vertical, self.groupOccUserAvatar.count == 2 ? 11 : 11.5)
+                }
             }
             
             VStack(alignment: .leading) {
@@ -289,7 +290,6 @@ struct DialogCell: View {
             }.frame(width: self.dialogModel.isOpen ? 20 : 0)
             .padding(.trailing, self.dialogModel.isOpen ? 20 : 0)
             .opacity(self.isOpen ? 1 : 0)
-            
         }.padding(.trailing, self.dialogModel.isOpen ? 20 : 5)
         .padding(.leading)
         .padding(.vertical, self.privateDialogContact.quickSnaps.count > 0 ? 4 : 8)
