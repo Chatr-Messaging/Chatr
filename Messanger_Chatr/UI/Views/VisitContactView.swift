@@ -950,7 +950,7 @@ struct actionButtonView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 38, height: 26)
-                        .background(RoundedRectangle(cornerRadius: 15, style: .circular).frame(width: 54, height: 50).foregroundColor(Constants.baseBlue).shadow(color: Color.blue.opacity(0.25), radius: 8, x: 0, y: 6))
+                        .background(RoundedRectangle(cornerRadius: 15, style: .circular).frame(width: 54, height: 54).foregroundColor(Constants.baseBlue).shadow(color: Color.blue.opacity(0.25), radius: 8, x: 0, y: 6))
                 }.buttonStyle(ClickButtonStyle())
                 .padding(.vertical, 8)
             }
@@ -965,7 +965,7 @@ struct actionButtonView: View {
                         .scaledToFit()
                         .foregroundColor(.white)
                         .frame(width: 36, height: 24)
-                        .background(RoundedRectangle(cornerRadius: 15, style: .circular).frame(width: 54, height: 50).foregroundColor(.purple).shadow(color: Color.purple.opacity(0.25), radius: 8, x: 0, y: 6))
+                        .background(RoundedRectangle(cornerRadius: 15, style: .circular).frame(width: 54, height: 54).foregroundColor(.purple).shadow(color: Color.purple.opacity(0.25), radius: 8, x: 0, y: 6))
                 }.buttonStyle(ClickButtonStyle())
             } else if self.contactRelationship == .notContact && self.contact.id != UserDefaults.standard.integer(forKey: "currentUserID") {
                 Button(action: {
