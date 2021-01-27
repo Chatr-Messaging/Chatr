@@ -48,8 +48,8 @@ struct VisitGroupChannelView: View {
                     VStack {
                         ZStack(alignment: .top) {
                             VStack(alignment: .center) {
-                                if isOwner {
-                                    NavigationLink(destination: self.addMore()) {
+                                if isOwner || isAdmin {
+                                    NavigationLink(destination: EditGroupDialogView(dialogModel: self.$dialogModel).environmentObject(self.auth)) {
                                         HStack() {
                                             Spacer()
 
@@ -92,7 +92,7 @@ struct VisitGroupChannelView: View {
                                                 Text(self.dialogModel.bio)
                                                     .font(.subheadline)
                                                     .fontWeight(.none)
-                                                    .multilineTextAlignment(.leading)
+                                                    .multilineTextAlignment(.center)
                                                     .lineLimit(self.isProfileBioOpen ? 20 : 5)
                                                     .padding(.top, 3)
                                                     .padding(.bottom, self.dialogModel.bio.count > 220 ? 10 : 5)
@@ -114,7 +114,7 @@ struct VisitGroupChannelView: View {
                                         }
                                     }
                                 }.padding(.horizontal)
-                                .padding(.top, isOwner ? 10 : 45)
+                                .padding(.top, isOwner || isAdmin ? 10 : 45)
                                 .padding(.bottom, 5)
                             }.frame(width: Constants.screenWidth - 40)
                             .background(Color("buttonColor"))
@@ -542,7 +542,10 @@ struct VisitGroupChannelView: View {
                                                 changeDialogRealmData().deletePrivateConnectyDialog(dialogID: self.dialogModel.id, isOwner: self.isOwner)
                                                 print("done deleting dialog: \(self.dialogModel.id)")
                                             }), .cancel(Text("Done"))])
-                        }
+                        }.simultaneousGesture(TapGesture()
+                            .onEnded { _ in
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                            })
                     }.background(Color("buttonColor"))
                     .clipShape(RoundedRectangle(cornerRadius: 15, style: .circular))
                     .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
@@ -556,6 +559,7 @@ struct VisitGroupChannelView: View {
                 }.navigationBarItems(leading:
                                     Button(action: {
                                         print("Done btn tap \(self.fromDialogCell)")
+                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                         withAnimation {
                                             self.presentationMode.wrappedValue.dismiss()
                                         }

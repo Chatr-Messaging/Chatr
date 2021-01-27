@@ -75,6 +75,8 @@ class DialogRealmModel<Element>: ObservableObject where Element: RealmSwift.Real
 }
 
 class changeDialogRealmData {
+    lazy var shared = changeDialogRealmData()
+
     func fetchDialogs(completion: @escaping (Bool) -> ()) {
         let extRequest : [String: String] = ["sort_desc" : "lastMessageDate"]
         Request.dialogs(with: Paginator.limit(100, skip: 0), extendedRequest: extRequest, successBlock: { (dialogs, usersIDs, paginator) in
@@ -219,20 +221,34 @@ class changeDialogRealmData {
         }
     }
     
+    func updateDialogNameDescription(name: String, description: String, dialogID: String) {
+        let config = Realm.Configuration(schemaVersion: 1)
+        do {
+            let realm = try Realm(configuration: config)
+            let dialogResult = realm.object(ofType: DialogStruct.self, forPrimaryKey: dialogID)
+
+            try? realm.safeWrite({
+                dialogResult?.fullName = name
+                dialogResult?.bio = description
+                realm.add(dialogResult!, update: .all)
+            })
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
     func deletePrivateConnectyDialog(dialogID: String, isOwner: Bool) {
         Request.deleteDialogs(withIDs: Set<String>([dialogID]), forAllUsers: isOwner ? true : false, successBlock: { (deletedObjectsIDs, notFoundObjectsIDs, wrongPermissionsObjectsIDs) in
-            print("success deleting dialog: \(deletedObjectsIDs) and not found objects: \(notFoundObjectsIDs) wrong?: \(wrongPermissionsObjectsIDs)")
-            changeDialogRealmData().updateDialogDelete(isDelete: true, dialogID: dialogID)
+            self.shared.updateDialogDelete(isDelete: true, dialogID: dialogID)
         }) { (error) in
             print("error deleting dialog: \(error.localizedDescription) for dialog: \(dialogID)")
-            changeDialogRealmData().updateDialogDelete(isDelete: true, dialogID: dialogID)
+            self.shared.updateDialogDelete(isDelete: true, dialogID: dialogID)
         }
     }
     
     func unsubscribePublicConnectyDialog(dialogID: String) {
         Request.unsubscribeFromPublicDialog(withID: dialogID, successBlock: {
-            print("success deleting PUBLIC dialog: \(dialogID)")
-            changeDialogRealmData().updateDialogDelete(isDelete: true, dialogID: dialogID)
+            self.shared.updateDialogDelete(isDelete: true, dialogID: dialogID)
         }, errorBlock: { error in
             print("error deleting public: \(error.localizedDescription) for dialog: \(dialogID)")
         })

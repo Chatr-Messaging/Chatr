@@ -132,22 +132,23 @@ struct DialogContactCell: View {
                 }
             }.buttonStyle(changeBGButtonStyle())
             .actionSheet(isPresented: self.$openActionSheet) {
-                ActionSheet(title: Text("\(self.contact.fullName)'s Options:"), message: nil, buttons: [
+                ActionSheet(title: Text("\(self.contact.fullName)'s options:"), message: nil, buttons: [
                     .default(Text("View Profile")) {
                         self.actionState = 1
                     },
                     .default(Text(self.isAdmin ? "Remove Admin" : "Add Admin")) {
                         if !self.isAdmin {
                             Request.addAdminsToDialog(withID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "", adminsUserIDs: [NSNumber(value: self.contact.id)], successBlock: { (updatedDialog) in
-                                changeDialogRealmData().insertDialogs([updatedDialog]) { }
-                                self.isAdmin = true
-                                self.isOwner = false
-                                print("Success adding contact as admin!")
-                                UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                self.notiType = "success"
-                                self.notiText = "Successfully added \(self.contact.fullName) as admin."
-                                self.showAlert.toggle()
-                                self.auth.sendPushNoti(userIDs: [NSNumber(value: self.contact.id)], title: "Added Admin", message: "\(ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.fullName ?? "Chatr User") added you as an admin 🥳")
+                                changeDialogRealmData().insertDialogs([updatedDialog]) {
+                                    self.isAdmin = true
+                                    self.isOwner = false
+                                    print("Success adding contact as admin!")
+                                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                    self.notiType = "success"
+                                    self.notiText = "Successfully added \(self.contact.fullName) as admin."
+                                    self.showAlert.toggle()
+                                    self.auth.sendPushNoti(userIDs: [NSNumber(value: self.contact.id)], title: "Added Admin", message: "\(self.auth.profile.results.first?.fullName ?? "Chatr User") added you as an admin 🥳")
+                                }
                             }) { (error) in
                                 print("Error adding contact as admin: \(error.localizedDescription) && \(UserDefaults.standard.string(forKey: "selectedDialogID") ?? "")")
                                 UINotificationFeedbackGenerator().notificationOccurred(.error)
@@ -157,15 +158,16 @@ struct DialogContactCell: View {
                             }
                         } else {
                             Request.removeAdminsFromDialog(withID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "", adminsUserIDs: [NSNumber(value: self.contact.id)], successBlock: { (updatedDialog) in
-                                changeDialogRealmData().insertDialogs([updatedDialog]) { }
-                                self.isAdmin = false
-                                self.isOwner = false
-                                print("Success removing contact as admin!")
-                                UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                self.notiType = "success"
-                                self.notiText = "Successfully removed \(self.contact.fullName) as admin."
-                                self.showAlert.toggle()
-                                self.auth.sendPushNoti(userIDs: [NSNumber(value: self.contact.id)], title: "Removed Admin", message: "\(ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.fullName ?? "Chatr User") removed you as an admin")
+                                changeDialogRealmData().insertDialogs([updatedDialog]) {
+                                    self.isAdmin = false
+                                    self.isOwner = false
+                                    print("Success removing contact as admin!")
+                                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                    self.notiType = "success"
+                                    self.notiText = "Successfully removed \(self.contact.fullName) as admin."
+                                    self.showAlert.toggle()
+                                    self.auth.sendPushNoti(userIDs: [NSNumber(value: self.contact.id)], title: "Removed Admin", message: "\(self.auth.profile.results.first?.fullName ?? "Chatr User") removed you as an admin")
+                                }
                             }) { (error) in
                                 print("Error removing contact as admin: \(error.localizedDescription)")
                                 UINotificationFeedbackGenerator().notificationOccurred(.error)
@@ -175,18 +177,18 @@ struct DialogContactCell: View {
                             }
                         }
                     },
-                    .destructive(Text("Remove"), action: {
-                        print("remove memeber")
+                    .destructive(Text("Remove From Group"), action: {
                         let updateParameters = UpdateChatDialogParameters()
                         updateParameters.occupantsIDsToRemove = [NSNumber(value: self.contact.id)]
                         Request.updateDialog(withID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "", update: updateParameters, successBlock: { (updatedDialog) in
-                            changeDialogRealmData().insertDialogs([updatedDialog]) { }
-                            print("Success removing contact from dialog")
-                            UINotificationFeedbackGenerator().notificationOccurred(.success)
-                            self.notiType = "success"
-                            self.notiText = "Successfully removed \(self.contact.fullName) from group chat."
-                            self.showAlert.toggle()
-                            self.auth.sendPushNoti(userIDs: [NSNumber(value: self.contact.id)], title: "Removed from Group", message: "\(ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.fullName ?? "Chatr User") removed you from the group chat")
+                            changeDialogRealmData().insertDialogs([updatedDialog]) {
+                                print("Success removing contact from dialog")
+                                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                self.notiType = "success"
+                                self.notiText = "Successfully removed \(self.contact.fullName) from group chat."
+                                self.showAlert.toggle()
+                                self.auth.sendPushNoti(userIDs: [NSNumber(value: self.contact.id)], title: "Removed from Group", message: "\(self.auth.profile.results.first?.fullName ?? "Chatr User") removed you from the group chat")
+                            }
                         }) { (error) in
                             print("Error removing contact from dialog: \(error.localizedDescription)")
                             UINotificationFeedbackGenerator().notificationOccurred(.error)
@@ -199,7 +201,11 @@ struct DialogContactCell: View {
                 ])
             }
   
-        }.onAppear() {
+        }.simultaneousGesture(TapGesture()
+                                .onEnded { _ in
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                })
+        .onAppear() {
             let config = Realm.Configuration(schemaVersion: 1)
             do {
                 let realm = try Realm(configuration: config)

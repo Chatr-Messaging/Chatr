@@ -113,6 +113,7 @@ struct DialogCell: View {
                                 .padding(.leading, self.groupOccUserAvatar.count == 1 ? 0 : 10)
                                 .onTapGesture {
                                     if isOpen {
+                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                         self.openGroupProfile.toggle()
                                         if let connDia = self.auth.selectedConnectyDialog {
                                             connDia.sendUserStoppedTyping()

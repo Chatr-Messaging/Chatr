@@ -11,11 +11,9 @@ import RealmSwift
 import SDWebImageSwiftUI
 import ConnectyCube
 import FirebaseDatabase
-import ImageViewerRemote
 
 struct EditProfileView: View {
     @EnvironmentObject var auth: AuthModel
-    @ObservedObject var profile = ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self))
     @ObservedObject var viewModel = EditProfileViewModel()
     @State var fullNameText: String = ""
     @State var bioText: String = "Bio"
@@ -65,7 +63,7 @@ struct EditProfileView: View {
                                     HStack(alignment: .center) {
                                         Spacer()
                                         VStack(alignment: .center) {
-                                            if let avitarURL = self.profile.results.first?.avatar {
+                                            if let avitarURL = self.auth.profile.results.first?.avatar {
                                                 WebImage(url: URL(string: avitarURL))
                                                     .resizable()
                                                     .placeholder{ Image("empty-profile").resizable().frame(width: 80, height: 80, alignment: .center).scaledToFill() }
@@ -153,7 +151,7 @@ struct EditProfileView: View {
                                     .frame(width: Constants.screenWidth - 70)
                                     .offset(x: 30)
                             }.onAppear() {
-                                self.fullNameText = self.profile.results.first?.fullName ?? ""
+                                self.fullNameText = self.auth.profile.results.first?.fullName ?? ""
                             }
                             
                             //Bio Section
@@ -199,7 +197,7 @@ struct EditProfileView: View {
                             .padding(.vertical, 8)
                             .frame(height: 100)
                             .onAppear() {
-                                self.bioText = self.profile.results.first?.bio ?? "Bio"
+                                self.bioText = self.auth.profile.results.first?.bio ?? "Bio"
                             }
                         })
                         
@@ -271,7 +269,7 @@ struct EditProfileView: View {
                                     .frame(width: Constants.screenWidth - 70)
                                     .offset(x: 30)
                             }.onAppear() {
-                                self.emailText = self.profile.results.first?.emailAddress ?? ""
+                                self.emailText = self.auth.profile.results.first?.emailAddress ?? ""
                             }
                             
                             //Website Section
@@ -298,7 +296,7 @@ struct EditProfileView: View {
                                 .padding(.top, 2)
                                 .contentShape(Rectangle())
                             }.onAppear() {
-                                self.websiteText = self.profile.results.first?.website ?? ""
+                                self.websiteText = self.auth.profile.results.first?.website ?? ""
                             }
                         })
                         
@@ -377,7 +375,7 @@ struct EditProfileView: View {
                                     .frame(width: Constants.screenWidth - 70)
                                     .offset(x: 30)
                             }.onAppear() {
-                                self.twitterText = self.profile.results.first?.twitter ?? ""
+                                self.twitterText = self.auth.profile.results.first?.twitter ?? ""
                             }
                             
                             //Phone Number Section
@@ -404,7 +402,7 @@ struct EditProfileView: View {
                                 .padding(.top, 2)
                                 .contentShape(Rectangle())
                             }.onAppear() {
-                                self.facebookText = self.profile.results.first?.facebook ?? ""
+                                self.facebookText = self.auth.profile.results.first?.facebook ?? ""
                             }
                         })
                         
@@ -454,7 +452,6 @@ struct EditProfileView: View {
                     }.disabled((220 - self.bioText.count) > 220 && loadingSave ? true : self.didSave ? true : false)
                 ).background(Color("bgColor"))
                 .edgesIgnoringSafeArea(.all)
-                //.overlay(ImageViewerRemote(imageURL: self.viewModel.$selectedUrl, viewerShown: self.$showImageViewer))
                 .onAppear {
                     NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { (data) in
                         DispatchQueue.main.async {

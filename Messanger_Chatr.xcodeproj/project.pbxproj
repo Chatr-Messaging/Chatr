@@ -125,6 +125,7 @@
 		05EA572524148A1600372F1A /* Mesages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05EA572424148A1600372F1A /* Mesages.swift */; };
 		05EA572724148BA100372F1A /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05EA572624148BA100372F1A /* Profile.swift */; };
 		05F08B5E252DAD1A005222FA /* MoreContactsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F08B5D252DAD1A005222FA /* MoreContactsView.swift */; };
+		05F5829825C12FC30043221D /* EditGroupDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F5829725C12FC30043221D /* EditGroupDialogView.swift */; };
 		05F58CEB25BFCF5400839590 /* CameraViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F58CEA25BFCF5400839590 /* CameraViewModel.swift */; };
 		05F8E11523F0DDFF0066954C /* ContactsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F8E11423F0DDFF0066954C /* ContactsView.swift */; };
 		05F8E11823F122490066954C /* userModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F8E11723F122490066954C /* userModel.swift */; };
@@ -271,6 +272,7 @@
 		05EA572424148A1600372F1A /* Mesages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mesages.swift; sourceTree = "<group>"; };
 		05EA572624148BA100372F1A /* Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
 		05F08B5D252DAD1A005222FA /* MoreContactsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreContactsView.swift; sourceTree = "<group>"; };
+		05F5829725C12FC30043221D /* EditGroupDialogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditGroupDialogView.swift; sourceTree = "<group>"; };
 		05F58CEA25BFCF5400839590 /* CameraViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewModel.swift; sourceTree = "<group>"; };
 		05F8E11423F0DDFF0066954C /* ContactsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsView.swift; sourceTree = "<group>"; };
 		05F8E11723F122490066954C /* userModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = userModel.swift; sourceTree = "<group>"; };
@@ -462,6 +464,7 @@
 				05A7BD5824FB36B30001BFC9 /* CameraView.swift */,
 				05A7BD6224FEF6AC0001BFC9 /* QuickSnapStartView.swift */,
 				055AEE372512EC9500F35B8F /* EditProfileView.swift */,
+				05F5829725C12FC30043221D /* EditGroupDialogView.swift */,
 				05F08B5D252DAD1A005222FA /* MoreContactsView.swift */,
 				05A7BD6024FEF5180001BFC9 /* LockedOutView.swift */,
 				050BF7CA23939777002B91BC /* welcomeView.swift */,
@@ -957,6 +960,7 @@
 				056B98A524C8FAA8003F7FBA /* AdvancedView.swift in Sources */,
 				05C6951624F5A29F00EEF819 /* ContactCell.swift in Sources */,
 				053D33F42394511400CEE03E /* BlurView.swift in Sources */,
+				05F5829825C12FC30043221D /* EditGroupDialogView.swift in Sources */,
 				054CAB7925AA6E1F00DD3F7C /* InstagramTestUser.swift in Sources */,
 				054CAB7425AA6DF700DD3F7C /* InstagramApi.swift in Sources */,
 				05A7BD5524FAED250001BFC9 /* CameraViewController.swift in Sources */,
