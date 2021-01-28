@@ -141,7 +141,7 @@ struct TextBubble: View {
                 if messagePosition == .right { Spacer() }
                 
                 Text(self.subText.messageStatusText(message: self.message, positionRight: messagePosition == .right))
-                    .foregroundColor(self.message.messageState == .error ? .red : .gray)
+                    .foregroundColor(self.hasPrior && self.message.messageState == .error ? .red : .gray)
                     .font(.caption)
                     .lineLimit(1)
                     .padding(.horizontal)

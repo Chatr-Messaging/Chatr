@@ -625,7 +625,6 @@ struct VisitContactView: View {
                                     break
                                 }
                             }
-                            //self.pullNonContact()
                         }
                     } else {
                         //not in realm and not a contact - check if pending
@@ -645,8 +644,26 @@ struct VisitContactView: View {
                 if self.contact.instagramAccessToken != "" && self.contact.instagramId != 0 {
                     self.viewModel.loadInstagramImages(testUser: InstagramTestUser(access_token: self.contact.instagramAccessToken, user_id: self.contact.instagramId))
                 }
-            } else if self.viewState == .fromDynamicLink {
-                print("from Dynamic link: \(self.auth.dynamicLinkContactID)")
+            } else if self.viewState == .fromGroupDialog {
+                if self.contact.instagramAccessToken != "" && self.contact.instagramId != 0 {
+                    self.viewModel.loadInstagramImages(testUser: InstagramTestUser(access_token: self.contact.instagramAccessToken, user_id: self.contact.instagramId))
+                }
+                
+                let config = Realm.Configuration(schemaVersion: 1)
+                do {
+                    let realm = try Realm(configuration: config)
+                    if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: self.contact.id) {
+                        self.contactRelationship = foundContact.isMyContact ? .contact : .notContact
+                    }
+                    
+                    if self.contactRelationship == .notContact || self.contactRelationship == .unknown {
+                        self.pullNonContact()
+                    }
+                } catch {
+                    print("error catching realm error")
+                }
+            }
+            else if self.viewState == .fromDynamicLink {
                 if self.auth.dynamicLinkContactID != 0 {
                     let config = Realm.Configuration(schemaVersion: 1)
                     do {
@@ -663,7 +680,6 @@ struct VisitContactView: View {
                                 } else {
                                     self.contactRelationship = .contact
                                 }
-                                print("the found contactt id is: \(self.contact.id)")
                                 self.auth.dynamicLinkContactID = 0
                             }
                         } else {
@@ -671,7 +687,6 @@ struct VisitContactView: View {
                                 for use in users {
                                     if use.id == self.auth.dynamicLinkContactID {
                                         self.connectyContact = use
-                                        print("the pullled connecty id is: \(self.connectyContact)")
                                         
                                         if self.connectyContact.id == UserDefaults.standard.integer(forKey: "currentUserID") {
                                             self.contactRelationship = .unknown
@@ -679,17 +694,19 @@ struct VisitContactView: View {
                                             self.contactRelationship = .notContact
                                         }
                                         
-                                        for i in Chat.instance.contactList?.pendingApproval ?? [] {
-                                            if i.userID == self.connectyContact.id {
-                                                self.contactRelationship = .pendingRequest
-                                                break
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                            for i in Chat.instance.contactList?.pendingApproval ?? [] {
+                                                if i.userID == self.connectyContact.id {
+                                                    self.contactRelationship = .pendingRequest
+                                                    break
+                                                }
                                             }
-                                        }
 
-                                        for request in ChatrApp.dialogs.contactRequestIDs {
-                                            if request == self.connectyContact.id {
-                                                self.contactRelationship = .pendingRequestForYou
-                                                break
+                                            for request in ChatrApp.dialogs.contactRequestIDs {
+                                                if request == self.connectyContact.id {
+                                                    self.contactRelationship = .pendingRequestForYou
+                                                    break
+                                                }
                                             }
                                         }
 
@@ -755,12 +772,12 @@ struct VisitContactView: View {
         
         changeContactsRealmData().observeFirebaseContactReturn(contactID: self.connectyContact.id != 0 ? Int(self.connectyContact.id) : self.contact.id, completion: { firebaseContact in
             let newContact = ContactStruct()
-            newContact.id = Int(self.connectyContact.id)
-            newContact.fullName = self.connectyContact.fullName ?? ""
-            newContact.phoneNumber = self.connectyContact.phone ?? ""
-            newContact.lastOnline = self.connectyContact.lastRequestAt ?? Date()
-            newContact.createdAccount = self.connectyContact.createdAt ?? Date()
-            newContact.avatar = PersistenceManager.shared.getCubeProfileImage(usersID: self.connectyContact) ?? ""
+            newContact.id = self.viewState == .fromGroupDialog ? self.contact.id : Int(self.connectyContact.id)
+            newContact.fullName = self.viewState == .fromGroupDialog ? self.contact.fullName : self.connectyContact.fullName ?? ""
+            newContact.phoneNumber = self.viewState == .fromGroupDialog ? self.contact.phoneNumber : self.connectyContact.phone ?? ""
+            newContact.lastOnline = self.viewState == .fromGroupDialog ? self.contact.lastOnline : self.connectyContact.lastRequestAt ?? Date()
+            newContact.createdAccount = self.viewState == .fromGroupDialog ? self.contact.createdAccount : self.connectyContact.createdAt ?? Date()
+            newContact.avatar = self.viewState == .fromGroupDialog ? self.contact.avatar : PersistenceManager.shared.getCubeProfileImage(usersID: self.connectyContact) ?? ""
             newContact.bio = firebaseContact.bio
             newContact.facebook = firebaseContact.facebook
             newContact.twitter = firebaseContact.twitter
@@ -978,15 +995,15 @@ struct actionButtonView: View {
                         Image(systemName: "person.crop.circle.badge.plus")
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 26, height: 22, alignment: .center)
+                            .frame(width: 28, height: 24, alignment: .center)
                             .foregroundColor(.white)
                             .padding(3)
                         
                         Text("Add Contact")
                             .font(.none)
-                            .fontWeight(.medium)
+                            .fontWeight(.semibold)
                             .foregroundColor(.white)
-                    }.padding(.all, 10)
+                    }.padding(.all, 12)
                     .padding(.horizontal, 5)
                     .background(Constants.baseBlue)
                     .cornerRadius(12.5)
@@ -1001,16 +1018,16 @@ struct actionButtonView: View {
                         Image(systemName: "alarm")
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 22, height: 24, alignment: .center)
+                            .frame(width: 24, height: 26, alignment: .center)
                             .foregroundColor(.secondary)
                             .padding(3)
                         
                         Text("Pending...")
                             .font(.none)
-                            .fontWeight(.regular)
+                            .fontWeight(.semibold)
                             .foregroundColor(.secondary)
-                    }.padding(.vertical, 8)
-                    .padding(.horizontal, 12)
+                    }.padding(.all, 12)
+                    .padding(.horizontal, 5)
                     .background(Color("buttonColor"))
                 }.cornerRadius(12.5)
                 .buttonStyle(ClickButtonStyle())
@@ -1039,18 +1056,18 @@ struct actionButtonView: View {
                         HStack(alignment: .center) {
                             Text("Accept")
                                 .font(.none)
-                                .fontWeight(.medium)
+                                .fontWeight(.semibold)
                                 .foregroundColor(.white)
 
                             Image(systemName: "checkmark")
                                 .resizable()
                                 .scaledToFit()
                                 .font(Font.title.weight(.semibold))
-                                .frame(width: 20, height: 18, alignment: .center)
+                                .frame(width: 22, height: 20, alignment: .center)
                                 .foregroundColor(.white)
                                 .padding(3)
                         }.padding(.all, 12)
-                        .padding(.horizontal, 4)
+                        .padding(.horizontal, 5)
                         .background(Constants.baseBlue)
                         .cornerRadius(12.5)
                         .shadow(color: Color.blue.opacity(0.30), radius: 8, x: 0, y: 8)

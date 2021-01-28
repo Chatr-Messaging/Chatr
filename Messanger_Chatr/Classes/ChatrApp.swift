@@ -33,10 +33,14 @@ extension ChatrApp {
             if Session.current.tokenHasExpired {
                 users.login(completion: {
                     print("done re-logging in.")
-                    self.chatInstanceConnect(id: UInt(user.id))
+                    if self.auth.visitContactProfile == false {
+                        self.chatInstanceConnect(id: UInt(user.id))
+                    }
                 })
             } else {
-                self.chatInstanceConnect(id: UInt(user.id))
+                if self.auth.visitContactProfile == false {
+                    self.chatInstanceConnect(id: UInt(user.id))
+                }
             }
         }
     }

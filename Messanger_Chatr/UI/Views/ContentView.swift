@@ -248,25 +248,11 @@ struct mainHomeList: View {
                         GeometryReader { geometry in
                             ZStack(alignment: .top) {
                                 BlurView(style: .systemUltraThinMaterial)
+                                    .allowsHitTesting(UserDefaults.standard.bool(forKey: "localOpen") ? false : true)
+                                    .simultaneousGesture(DragGesture(minimumDistance: self.isLocalOpen ? 0 : 500))
                                     .frame(width: Constants.screenWidth, height: Constants.screenHeight, alignment: .center)
                                     .offset(y: self.isLocalOpen ? -geometry.frame(in: .global).minY : -35)
                                     .opacity(self.isLocalOpen ? Double((275 - self.activeView.height) / 150) : 0)
-                                    .simultaneousGesture(DragGesture(minimumDistance: self.isLocalOpen ? 0 : 500))
-                                    .sheet(isPresented: self.$showSharedContact, onDismiss: {
-                                        self.loadSelectedDialog()
-                                    }) {
-                                        NavigationView {
-                                            VisitContactView(fromDialogCell: true, newMessage: self.$newDialogFromContact, dismissView: self.$showSharedContact, viewState: .fromDynamicLink)
-                                                .environmentObject(self.auth)
-                                                .edgesIgnoringSafeArea(.all)
-                                        }
-                                    }
-                                    .onChange(of: self.auth.visitContactProfile) { newValue in
-                                        if newValue {
-                                            self.showSharedContact.toggle()
-                                            self.auth.visitContactProfile = false
-                                        }
-                                    }
                                 
                                 //Wallpaper View
                                 Image(self.wallpaperNames[UserDefaults.standard.integer(forKey: "selectedWallpaper")])
@@ -278,7 +264,7 @@ struct mainHomeList: View {
                                     .opacity(self.isLocalOpen ? Double((275 - self.activeView.height) / 150) : 0)
                                     .animation(.spring(response: 0.45, dampingFraction: self.isLocalOpen ? 0.65 : 0.75, blendDuration: 0))
                                     .simultaneousGesture(DragGesture(minimumDistance: self.isLocalOpen ? 0 : 500))
-                                
+
                                 QuickSnapsSection(viewState: self.$quickSnapViewState, selectedQuickSnapContact: self.$selectedQuickSnapContact, emptyQuickSnaps: self.$emptyQuickSnaps)
                                     .environmentObject(self.auth)
                                     .frame(width: Constants.screenWidth)
@@ -322,6 +308,25 @@ struct mainHomeList: View {
                                 .blur(radius: self.isLocalOpen ? ((950 - (self.activeView.height * 3)) / 600) * 2 : 0)
                                 .animation(.spring(response: 0.4, dampingFraction: 0.8, blendDuration: 0))
                                 .resignKeyboardOnDragGesture()
+                        }
+                        
+                        //Chat View
+                        if UserDefaults.standard.bool(forKey: "localOpen") {
+                            GeometryReader { geo in
+                                ChatMessagesView(activeView: self.$activeView, keyboardChange: self.$keyboardHeight, dialogID: self.$selectedDialogID, textFieldHeight: self.$textFieldHeight, keyboardDragState: self.$keyboardDragState, hasAttachment: self.$hasAttachments, newDialogFromSharedContact: self.$newDialogFromSharedContact)
+                                    .environmentObject(self.auth)
+                                    .frame(width: Constants.screenWidth, height: Constants.screenHeight - (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 123 : 87) : 197), alignment: .bottom)
+                                    .zIndex(1)
+                                    .contentShape(Rectangle())
+                                    .offset(y: -geo.frame(in: .global).minY + (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 123 : 87) : 197))
+                                    .padding(.bottom, self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 123 : 87) : 197)
+                                    .offset(y: self.activeView.height)// + (self.emptyQuickSnaps ? 25 : 197))
+                                    .animation(.spring(response: 0.35, dampingFraction: 0.8, blendDuration: 0))
+                                    .simultaneousGesture(DragGesture(minimumDistance: UserDefaults.standard.bool(forKey: "localOpen") ? 800 : 0))
+                                    .onDisappear {
+                                        self.auth.leaveDialog()
+                                    }
+                            }
                         }
                         
                         //MARK: Dialogs Section
@@ -440,37 +445,6 @@ struct mainHomeList: View {
                     }
                 }
 
-                //Chat View
-                if UserDefaults.standard.bool(forKey: "localOpen") {
-                    ChatMessagesView(activeView: self.$activeView, keyboardChange: self.$keyboardHeight, dialogID: self.$selectedDialogID, textFieldHeight: self.$textFieldHeight, keyboardDragState: self.$keyboardDragState, hasAttachment: self.$hasAttachments, newDialogFromSharedContact: self.$newDialogFromSharedContact)
-                        .environmentObject(self.auth)
-                        .frame(width: Constants.screenWidth, alignment: .bottom)
-                        .zIndex(1)
-                        .contentShape(Rectangle())
-                        .offset(y: self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 123 : 87) : 197)
-                        .padding(.bottom, self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 123 : 87) : 197)
-                        .offset(y: self.activeView.height)// + (self.emptyQuickSnaps ? 25 : 197))
-                        //height: Constants.screenHeight - 248 - (self.textFieldHeight < 120 ? self.textFieldHeight : 120) - self.keyboardHeight + self.keyboardDragState.height - (self.hasAttachments ? 95 : 0)
-                        //.padding(.bottom, (self.textFieldHeight < 120 ? self.textFieldHeight : 120) + self.keyboardHeight - self.keyboardDragState.height + (self.hasAttachments ? 95 : 0) + 248)
-                        .animation(.spring(response: 0.35, dampingFraction: 0.8, blendDuration: 0))
-                        //.opacity(UserDefaults.standard.bool(forKey: "localOpen") ? Double((190 - self.activeView.height) / 150) : 0)
-                        .simultaneousGesture(DragGesture(minimumDistance: UserDefaults.standard.bool(forKey: "localOpen") ? 800 : 0))
-                        .onDisappear {
-                            self.auth.leaveDialog()
-                        }
-                        //.onAppear {
-                            //self.chatMessageViewHeight = Constants.screenHeight - 248 - (self.textFieldHeight < 120 ? self.textFieldHeight : 120) - self.keyboardHeight + self.keyboardDragState.height - (self.hasAttachments ? 95 : 0)
-                            //print("the geo for chat messag view is: \((self.textFieldHeight < 120 ? self.textFieldHeight : 120) + self.keyboardHeight + self.keyboardDragState.height + (self.hasAttachments ? 95 : 0)) & now: \(self.chatMessageViewHeight)")
-                            //Perfect message view height below **DO NOT DELETE**
-                            //Constants.screenHeight - 248 - (self.textFieldHeight < 120 ? self.textFieldHeight : 120) - self.keyboardHeight + self.keyboardDragState.height - (self.hasAttachments ? 95 : 0)
-                            
-//                                        UserDefaults.standard.set(false, forKey: "localOpen")
-//                                        ChatrApp.messages.getMessageUpdates(dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "", completion: { newMessages in
-//                                            print("Message view successfully pulled new messages!")
-//                                        })
-                        //}
-                    }
-
                 //keyboard View
                 KeyboardCardView(height: self.$textFieldHeight, mainText: self.$keyboardText, hasAttachments: self.$hasAttachments)
                     .environmentObject(self.auth)
@@ -483,8 +457,7 @@ struct mainHomeList: View {
                     .animation(.timingCurve(0.2, 0.8, 0.2, 1, duration: 0.5))
                     .offset(y: self.isLocalOpen ? Constants.screenHeight - (UIDevice.current.hasNotch || self.keyboardHeight != 0 ? 50 : 30) - (self.textFieldHeight <= 120 ? self.textFieldHeight : 120) - self.keyboardHeight + self.keyboardDragState.height - (self.hasAttachments ? 95 : 0) : Constants.screenHeight)
                     .zIndex(2)
-                    .gesture(
-                        DragGesture().onChanged { value in
+                    .gesture(DragGesture().onChanged { value in
                             self.keyboardDragState = value.translation
                             if self.showFullKeyboard {
                                 self.keyboardDragState.height += -100
@@ -500,8 +473,7 @@ struct mainHomeList: View {
                                 self.keyboardHeight = 0
                                 UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
                             }
-                        }
-                        .onEnded { valueEnd in
+                        }.onEnded { valueEnd in
                             if self.keyboardDragState.height > 50 {
                                 self.showFullKeyboard = false
                                 self.keyboardDragState = .zero
@@ -519,7 +491,26 @@ struct mainHomeList: View {
                                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             }
                         }
-                    ).onAppear {
+                    ).sheet(isPresented: self.$showSharedContact, onDismiss: {
+                        if self.newDialogFromContact != 0 {
+                            self.isLocalOpen = false
+                            UserDefaults.standard.set(false, forKey: "localOpen")
+                            changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: "\(self.newDialogFromContact)")
+                        }
+                        self.loadSelectedDialog()
+                    }) {
+                        NavigationView {
+                            VisitContactView(fromDialogCell: true, newMessage: self.$newDialogFromContact, dismissView: self.$showSharedContact, viewState: .fromDynamicLink)
+                                .environmentObject(self.auth)
+                                .edgesIgnoringSafeArea(.all)
+                        }
+                    }
+                    .onChange(of: self.auth.visitContactProfile) { newValue in
+                        if newValue {
+                            self.showSharedContact.toggle()
+                            self.auth.visitContactProfile = false
+                        }
+                    }.onAppear {
                         self.selectedDialogID = UserDefaults.standard.string(forKey: "selectedDialogID") ?? ""
                         NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { (data) in
                             let height1 = data.userInfo![UIResponder.keyboardFrameEndUserInfoKey] as! NSValue
@@ -576,7 +567,7 @@ struct mainHomeList: View {
                 for occu in dia.occupentsID {
                     if occu == self.newDialogFromContact && dia.dialogType == "private" {
                         self.newDialogFromContact = 0
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
                             self.isLocalOpen = true
                             UserDefaults.standard.set(true, forKey: "localOpen")
                             changeDialogRealmData().updateDialogOpen(isOpen: self.isLocalOpen, dialogID: dia.id)
@@ -588,6 +579,7 @@ struct mainHomeList: View {
                     }
                 }
             }
+
             if self.newDialogFromContact != 0 {
                 let dialog = ChatDialog(dialogID: nil, type: .private)
                 dialog.occupantIDs = [NSNumber(value: self.newDialogFromContact)]  // an ID of opponent

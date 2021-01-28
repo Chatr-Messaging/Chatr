@@ -33,7 +33,7 @@ struct DialogContactCell: View {
     
     var body: some View {
         VStack(alignment: .center, spacing: 0) {
-            NavigationLink(destination: VisitContactView(newMessage: self.$openNewDialogID, dismissView: self.$dismissView, viewState: .fromSearch, contactRelationship: self.contactRelationship, contact: self.contact, connectyContact: self.connectyContact).edgesIgnoringSafeArea(.all).environmentObject(self.auth), tag: 1, selection: self.$actionState) {
+            NavigationLink(destination: VisitContactView(newMessage: self.$openNewDialogID, dismissView: self.$dismissView, viewState: .fromGroupDialog, contactRelationship: self.contactRelationship, contact: self.contact, connectyContact: self.connectyContact).edgesIgnoringSafeArea(.all).environmentObject(self.auth), tag: 1, selection: self.$actionState) {
                 EmptyView()
             }
             Button(action: {

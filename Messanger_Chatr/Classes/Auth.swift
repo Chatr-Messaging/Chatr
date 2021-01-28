@@ -43,7 +43,7 @@ enum messagePosition {
 }
 
 enum visitUserState {
-    case unknown, fromContacts, fromSearch, fromRequests, fromDynamicLink
+    case unknown, fromContacts, fromSearch, fromRequests, fromDynamicLink, fromGroupDialog
 }
 
 enum visitContactRelationship {

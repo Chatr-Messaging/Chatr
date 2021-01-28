@@ -166,6 +166,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, PKPushRegistryDelegate, U
                     print("found erre: \(String(describing: error?.localizedDescription))")
                     return
                 }
+
                 if let dynamicLink = dynamicLink {
                     self.handleIncomingDynamicLink(dynamicLink)
                 }
