@@ -267,6 +267,38 @@ struct VisitContactView: View {
                     
                     Button(action: {
                         print("Forward Contact")
+                        Request.dialogs(with: Paginator.limit(100, skip: 0), extendedRequest: nil, successBlock: { (dialogs, usersIDs, paginator) in
+
+                            for dialog in dialogs {
+                                if dialog.type == .private {
+                                    guard let occupents = dialog.occupantIDs else {
+                                        return
+                                    }
+                                    
+                                    for id in occupents {
+                                        print("the user ID is: \(id)")
+                                        //replace below with selected contact id:
+                                        if id == NSNumber(value: self.contact.id) || id == NSNumber(value: self.connectyContact.id){
+                                            print("found contact dialog \(String(describing: dialog.id))")
+                                            return
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            //do not have dialog for selected user:
+//                            let dialog = ChatDialog(dialogID: nil, type: .private)
+//                            dialog.occupantIDs = [34]  // an ID of opponent
+//
+//                            Request.createDialog(dialog, successBlock: { (dialog) in
+//
+//                            }) { (error) in
+//
+//                            }
+                            
+                        }) { (error) in
+                            print("error forwarding contact: \(error)")
+                        }
                     }) {
                         HStack {
                             Image(systemName: "arrowshape.turn.up.left")

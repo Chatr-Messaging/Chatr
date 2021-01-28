@@ -303,6 +303,7 @@ struct VisitGroupChannelView: View {
                     
                     VStack(alignment: .center, spacing: 0) {
                         ForEach(self.dialogModelAdmins, id: \.self) { id in
+                            
                             DialogContactCell(showAlert: self.$showAlert, notiType: self.$notiType, notiText: self.$notiText, dismissView: self.$dismissView, openNewDialogID: self.$openNewDialogID, contactID: Int(id), isAdmin: self.dialogModel.adminID.contains(Int(id)) ? true : false, isOwner: self.dialogModel.owner == id ? true : false, currentUserIsPowerful: self.$currentUserIsPowerful, isLast: self.dialogModelAdmins.last == id, isRemoving: self.$isRemoving)
                                 .environmentObject(self.auth)
 
