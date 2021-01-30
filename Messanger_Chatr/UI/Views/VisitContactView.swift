@@ -13,6 +13,7 @@ import ConnectyCube
 import RealmSwift
 import ImageViewerRemote
 import WKView
+import PopupView
 
 struct VisitContactView: View {
     @EnvironmentObject var auth: AuthModel
@@ -29,6 +30,10 @@ struct VisitContactView: View {
     @State var isProfileBioOpen: Bool = false
     @State var isUrlOpen: Bool = false
     @State private var showingMoreSheet = false
+    @State var showForwardContact = false
+    @State var receivedNotification: Bool = false
+    @State var newDialogID: String = ""
+    @State var selectedContact: [Int] = []
     @State var profileViewSize = CGSize.zero
     @State var selectedImageUrl = ""
     @State var quickSnapViewState: QuickSnapViewingState = .closed
@@ -266,39 +271,7 @@ struct VisitContactView: View {
                     }
                     
                     Button(action: {
-                        print("Forward Contact")
-                        Request.dialogs(with: Paginator.limit(100, skip: 0), extendedRequest: nil, successBlock: { (dialogs, usersIDs, paginator) in
-
-                            for dialog in dialogs {
-                                if dialog.type == .private {
-                                    guard let occupents = dialog.occupantIDs else {
-                                        return
-                                    }
-                                    
-                                    for id in occupents {
-                                        print("the user ID is: \(id)")
-                                        //replace below with selected contact id:
-                                        if id == NSNumber(value: self.contact.id) || id == NSNumber(value: self.connectyContact.id){
-                                            print("found contact dialog \(String(describing: dialog.id))")
-                                            return
-                                        }
-                                    }
-                                }
-                            }
-                            
-                            //do not have dialog for selected user:
-//                            let dialog = ChatDialog(dialogID: nil, type: .private)
-//                            dialog.occupantIDs = [34]  // an ID of opponent
-//
-//                            Request.createDialog(dialog, successBlock: { (dialog) in
-//
-//                            }) { (error) in
-//
-//                            }
-                            
-                        }) { (error) in
-                            print("error forwarding contact: \(error)")
-                        }
+                        self.showForwardContact.toggle()
                     }) {
                         HStack {
                             Image(systemName: "arrowshape.turn.up.left")
@@ -328,6 +301,16 @@ struct VisitContactView: View {
                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                         })
                 }).padding(.bottom, 10)
+                .sheet(isPresented: self.$showForwardContact, onDismiss: {
+                    if self.selectedContact.count > 0 {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
+                            self.forwardContact()
+                        }
+                    }
+                }) {
+                    NewConversationView(usedAsNew: false, selectedContact: self.$selectedContact, newDialogID: self.$newDialogID)
+                        .environmentObject(self.auth)
+                }
                 
                 //MARK: Social Section
                 if self.contact.facebook != "" || self.contact.twitter != "" || self.contact.instagramAccessToken != "" {
@@ -533,6 +516,10 @@ struct VisitContactView: View {
                 FooterInformation(middleText: "joined \(self.contact.createdAccount.getFullElapsedInterval())")
                     .padding(.bottom, 30)
             }.background(Color("bgColor"))
+            .popup(isPresented: self.$receivedNotification, type: .floater(), position: .bottom, animation: Animation.spring(), autohideIn: 4, closeOnTap: true) {
+                NotificationSection()
+                    .environmentObject(self.auth)
+            }
             .navigationBarHidden(self.quickSnapViewState == .camera || self.quickSnapViewState == .takenPic)
             .navigationBarItems(leading:
                 Button(action: {
@@ -626,6 +613,10 @@ struct VisitContactView: View {
                 .environmentObject(self.auth)
                 .disabled(self.quickSnapViewState != .closed ? false : true)
         }.onAppear() {
+            NotificationCenter.default.addObserver(forName: NSNotification.Name("NotificationAlert"), object: nil, queue: .main) { (_) in
+                self.receivedNotification.toggle()
+            }
+            
             if self.viewState == .fromSearch {
                 let config = Realm.Configuration(schemaVersion: 1)
                 do {
@@ -781,6 +772,72 @@ struct VisitContactView: View {
                         print("error catching realm error")
                     }
                 }
+            }
+        }
+    }
+    
+    func forwardContact() {
+        for dialog in self.auth.dialogs.results {
+            if dialog.dialogType == "private" {
+                for id in dialog.occupentsID {
+                    if id != self.auth.profile.results.first?.id {
+                        print("the user ID is: \(id)")
+                        //replace below with selected contact id:
+                        if self.selectedContact.contains(id) {
+                            if let selectedDialog = self.auth.dialogs.results.filter("id == %@", dialog.id).first {
+                                changeMessageRealmData.sendContactMessage(dialog: selectedDialog, contactID: [self.contact.id], occupentID: [NSNumber(value: id), NSNumber(value: Int(self.auth.profile.results.first?.id ?? 0))])
+                                
+                                if let index = self.selectedContact.firstIndex(of: id) {
+                                    self.selectedContact.remove(at: index)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        //selectedContact
+        if self.selectedContact.count == 0 {
+            self.auth.notificationtext = "Forwarded Contact"
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
+            NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+        } else {
+            // does not have a dialog for the selected user so we create one
+            for contact in self.selectedContact {
+                let dialog = ChatDialog(dialogID: nil, type: .private)
+                dialog.occupantIDs = [NSNumber(value: contact), NSNumber(value: Int(self.auth.profile.results.first?.id ?? 0))]  // an ID of opponent
+
+                Request.createDialog(dialog, successBlock: { (dialog) in
+                   let attachment = ChatAttachment()
+                   attachment["contactID"] = "\(self.contact.id)"
+                   
+                   let message = ChatMessage.markable()
+                   message.markable = true
+                   message.text = "Shared Contact"
+                   message.attachments = [attachment]
+                   
+                   dialog.send(message) { (error) in
+                       changeMessageRealmData.insertMessage(message, completion: {
+                           if error != nil {
+                               print("error sending message: \(String(describing: error?.localizedDescription))")
+                               changeMessageRealmData.updateMessageState(messageID: message.id ?? "", messageState: .error)
+                           } else {
+                               print("Success sending message to ConnectyCube server!")
+                           }
+                       })
+                   }
+                }) { (error) in
+                    print("error making dialog: \(error.localizedDescription)")
+                }
+
+                changeDialogRealmData().fetchDialogs(completion: { _ in
+                    self.selectedContact.removeAll()
+                    self.auth.notificationtext = "Forwarded Contact"
+                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                    NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+
+                })
             }
         }
     }

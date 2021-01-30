@@ -15,66 +15,66 @@ struct QuickSnapsSection: View {
     @Binding var viewState: QuickSnapViewingState
     @Binding var selectedQuickSnapContact: ContactStruct
     @Binding var emptyQuickSnaps: Bool
+    @Binding var isLocalOpen: Bool
     @State var preLoading: Bool = false
     
     var body: some View {
         ZStack() {
             if self.auth.contacts.results.filter({ $0.hasQuickSnaped != false }).count > 0 {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack {
-                        //New Button
-                        VStack(alignment: .center) {
-                            Button(action: {
-                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                                self.viewState = .camera
-                                self.selectedQuickSnapContact = ContactStruct()
-                            }) {
-                                VStack {
-                                    ZStack {
-                                        RoundedRectangle(cornerRadius: Constants.btnSize / 4)
-                                            .frame(width: Constants.quickSnapBtnSize, height: Constants.quickSnapBtnSize, alignment: .center)
-                                            .foregroundColor(.clear)
-                                            .background(Constants.snapPurpleGradient)
-                                            .cornerRadius(Constants.quickSnapBtnSize / 4)
-                                            .shadow(color: Color(.sRGB, red: 148 / 255, green: 109 / 255, blue: 245 / 255, opacity: 0.35), radius: 5, x: 0, y: 5)
-                                        
-                                        Image(systemName: "camera.fill")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 28, height: 24, alignment: .center)
-                                            .padding(22)
-                                            .foregroundColor(.white)
+                GeometryReader { geometry in
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack {
+                            //New Button
+                            VStack(alignment: .center) {
+                                Button(action: {
+                                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                                    self.viewState = .camera
+                                    self.selectedQuickSnapContact = ContactStruct()
+                                }) {
+                                    VStack {
+                                        ZStack {
+                                            RoundedRectangle(cornerRadius: Constants.btnSize / 4)
+                                                .frame(width: Constants.quickSnapBtnSize, height: Constants.quickSnapBtnSize, alignment: .center)
+                                                .foregroundColor(.clear)
+                                                .background(Constants.snapPurpleGradient)
+                                                .cornerRadius(Constants.quickSnapBtnSize / 4)
+                                                .shadow(color: Color(.sRGB, red: 148 / 255, green: 109 / 255, blue: 245 / 255, opacity: 0.35), radius: 5, x: 0, y: 5)
+                                            
+                                            Image(systemName: "camera.fill")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 28, height: 24, alignment: .center)
+                                                .padding(22)
+                                                .foregroundColor(.white)
+                                        }
+                                    }
+                                }.buttonStyle(ClickButtonStyle())
+                                
+                                Text("New")
+                                    .font(.caption)
+                                    .fontWeight(.none)
+                                    .foregroundColor(.secondary)
+                                    .offset(y: self.isLocalOpen ? -7 : -5)
+                            }.padding(.trailing, 5)
+                            .offset(y: self.isLocalOpen ? (UIDevice.current.hasNotch ? 5 : 0) : 0)
+                            
+                            Divider()
+                                .padding(.bottom, 30)
+                                .padding(.top, 15)
+                            
+                            //Received List
+                            HStack(spacing: 0) {
+                                ForEach(self.auth.contacts.results.sorted(by: {$0.quickSnaps.count > $1.quickSnaps.count}).filter({ $0.hasQuickSnaped != false }), id:\.self) { snap in
+                                    if snap.hasQuickSnaped {
+                                        QuickSnapCell(viewState: self.$viewState, quickSnap: snap, selectedQuickSnapContact: self.$selectedQuickSnapContact)
+                                            .offset(x: (self.auth.contacts.results.sorted(by: {$0.quickSnaps.count > $1.quickSnaps.count}).filter({ $0.hasQuickSnaped != false }).first != nil) ? -4 : 0)
                                     }
                                 }
-                            }.buttonStyle(ClickButtonStyle())
-                            .scaleEffect(UserDefaults.standard.bool(forKey: "localOpen") ? 0.85 : 1)
-                            
-                            Text("New")
-                                .font(.caption)
-                                .fontWeight(.none)
-                                .foregroundColor(.secondary)
-                                .offset(y: UserDefaults.standard.bool(forKey: "localOpen") ? -7 : -5)
-                        }.padding(.trailing, 5)
-                        .padding(.leading, UserDefaults.standard.bool(forKey: "localOpen") ? 20 : 0)
-                        .offset(y: UserDefaults.standard.bool(forKey: "localOpen") ? (UIDevice.current.hasNotch ? 5 : 0) : 0)
-                        
-                        Divider()
-                            .padding(.bottom, 30)
-                            .padding(.top, 15)
-                            .scaleEffect(UserDefaults.standard.bool(forKey: "localOpen") ? 0.85 : 1)
-                            .offset(y: UserDefaults.standard.bool(forKey: "localOpen") ? (UIDevice.current.hasNotch ? 5 : 0) : 0)
-                        
-                        //Received List
-                        HStack(spacing: 0) {
-                            ForEach(self.auth.contacts.results.sorted(by: {$0.quickSnaps.count > $1.quickSnaps.count}).filter({ $0.hasQuickSnaped != false }), id:\.self) { snap in
-                                if snap.hasQuickSnaped {
-                                    QuickSnapCell(viewState: self.$viewState, quickSnap: snap, selectedQuickSnapContact: self.$selectedQuickSnapContact)
-                                        .offset(x: (self.auth.contacts.results.sorted(by: {$0.quickSnaps.count > $1.quickSnaps.count}).filter({ $0.hasQuickSnaped != false }).first != nil) ? -4 : 0)
-                                }
-                            }
-                        }.padding(.leading, 5)
-                    }.padding(.horizontal)
-                }.frame(height: self.emptyQuickSnaps ? 70 : 0)
+                            }.padding(.leading, 5)
+                        }.scaleEffect(self.isLocalOpen ? 0.85 : 1)
+                        .padding(.horizontal)
+                    }.frame(height: self.emptyQuickSnaps ? geometry.size.height : 0)
+                }
                 .onAppear() {
                     self.emptyQuickSnaps = false
                     print("quick snaps is NOT empty: \(self.emptyQuickSnaps)")

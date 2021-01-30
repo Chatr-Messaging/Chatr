@@ -265,11 +265,11 @@ struct mainHomeList: View {
                                     .animation(.spring(response: 0.45, dampingFraction: self.isLocalOpen ? 0.65 : 0.75, blendDuration: 0))
                                     .simultaneousGesture(DragGesture(minimumDistance: self.isLocalOpen ? 0 : 500))
 
-                                QuickSnapsSection(viewState: self.$quickSnapViewState, selectedQuickSnapContact: self.$selectedQuickSnapContact, emptyQuickSnaps: self.$emptyQuickSnaps)
+                                QuickSnapsSection(viewState: self.$quickSnapViewState, selectedQuickSnapContact: self.$selectedQuickSnapContact, emptyQuickSnaps: self.$emptyQuickSnaps, isLocalOpen: self.$isLocalOpen)
                                     .environmentObject(self.auth)
                                     .frame(width: Constants.screenWidth)
                                     .offset(y: self.isLocalOpen ? -geometry.frame(in: .global).minY - (UIDevice.current.hasNotch ? -60 : 5) : 0)
-                                    .offset(x: self.isLocalOpen ? (((self.activeView.height - 150) / 1.5) / 150) * 40 : 0, y: self.isLocalOpen ? self.activeView.height / 1.5 : 0)
+                                    .offset(y: self.isLocalOpen ? self.activeView.height / 1.5 : 0)
                                     //.scaleEffect(self.isLocalOpen ? ((self.activeView.height / 150) * 22.5) / 150 + 0.85 : 1.0)
                                     .animation(.spring(response: 0.45, dampingFraction: self.isLocalOpen ? 0.65 : 0.75, blendDuration: 0))
                                     .padding(.vertical, self.emptyQuickSnaps ? 0 : 20)
