@@ -7,11 +7,13 @@
 //
 
 import SwiftUI
+import MobileCoreServices
 import RealmSwift
 import FirebaseDynamicLinks
 import CarBode
 import SDWebImageSwiftUI
 import AVFoundation
+import SCSDKCreativeKit
 
 struct ShareProfileView: View {
     @EnvironmentObject var auth: AuthModel
@@ -25,127 +27,31 @@ struct ShareProfileView: View {
     @State var torchIsOn = false
     @State var foundUser = false
     @State var hideQrCode = false
-    
+    @State var showShared = false
+    @State var hasCopiedUrl = false
+
     var body: some View {
-        ZStack {
-            //MARK: Camera View
-            ZStack(alignment: .center) {
-                ZStack(alignment: .bottomTrailing) {
-                    CBScanner(supportBarcode: .constant([.qr, .code128]), torchLightIsOn: self.$torchIsOn, scanInterval: .constant(0.5)) {
-                        if self.foundUser == false {
-                            UINotificationFeedbackGenerator().notificationOccurred(.success)
-                            self.foundUser = true
-                            
-                            //print("have received incoming link!: \(String(describing: URL(string: $0)))")
-                            DynamicLinks.dynamicLinks().handleUniversalLink((URL(string: String(describing: $0)) ?? URL(string: ""))!, completion: { (dynamicLink, error) in
-                                guard error == nil else {
-                                    print("found erre: \(String(describing: error?.localizedDescription))")
-                                    return
-                                }
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 2.75) {
-                                    if let dynamicLink = dynamicLink {
-                                        self.auth.handleIncomingDynamicLink(dynamicLink)
-                                    }
-                                }
-                            })
-                        }
-                    }.frame(minWidth: 0, maxWidth: .infinity)
-                    .frame(minHeight: 0, maxHeight: .infinity)
-                    .foregroundColor(Color("bgColor"))
-                    
-                    HStack {
-                        Button(action: {
-                            self.torchIsOn.toggle()
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        }) {
-                            ZStack {
-                                BlurView(style: .systemUltraThinMaterial)
-                                    .frame(width: 50, height: 50)
-                                    .cornerRadius(15)
-                                    .foregroundColor(Color("bgColor"))
-                                    .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 5)
-                                
-                                Image(systemName: self.torchIsOn ? "lightbulb.fill" : "lightbulb.slash.fill")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .foregroundColor(.primary)
-                                    .frame(width: 25, height: 25, alignment: .center)
-                            }
-                        }.buttonStyle(ClickMiniButtonStyle())
-                        
-                        Button(action: {
-                            self.hideQrCode.toggle()
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        }) {
-                            ZStack(alignment: .center) {
-                                BlurView(style: .systemUltraThinMaterial)
-                                    .frame(width: 50, height: 50)
-                                    .cornerRadius(15)
-                                    .foregroundColor(Color("bgColor"))
-                                    .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 5)
-                                
-                                Image(systemName: self.hideQrCode ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .foregroundColor(.primary)
-                                    .frame(width: 22, height: 22, alignment: .center)
-                            }
-                        }.buttonStyle(ClickMiniButtonStyle())
-                    }.padding(.vertical, 30)
-                    .padding(.horizontal, 20)
-                }
-                
-                VStack() {
-                    if self.foundUser {
-                        VStack {
-                            Image(systemName: "checkmark.circle")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 55, height: 55, alignment: .center)
-                                .foregroundColor(.white)
-                                .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 0)
-                                .padding(.bottom, 10)
-                            
-                            Text("Found Contact!")
-                                .font(.title)
-                                .fontWeight(.bold)
-                                .foregroundColor(.white)
-                                .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 0)
-                                
-                            Text("redirecting shortly...")
-                                .font(.subheadline)
-                                .fontWeight(.none)
-                                .foregroundColor(.white)
-                                .opacity(0.8)
-                                .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 0)
-                        }.offset(y: -100)
-                        .onAppear() {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                                self.foundUser = false
-                                withAnimation {
-                                    self.dimissView.toggle()
-                                }
-                            }
-                        }
+        VStack {
+            ScrollView(.vertical, showsIndicators: false) {
+                //MARK: QR Code
+                ZStack(alignment: .center) {
+                    if !foundUser {
+                        Text("Loading QR Code...")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
                     }
-                }.opacity(self.foundUser ? 1 : 0)
-                .animation(.linear)
-            }
-            
-            //MARK: QR Code
-            GeometryReader { geo in
-                ZStack(alignment: .top) {
+                    
                     ZStack(alignment: .bottom) {
                         ZStack {
                             Rectangle()
-                                .frame(width: 240, height: 240)
-                                .cornerRadius(25)
+                                .frame(width: 275, height: 275)
+                                .cornerRadius(40)
                                 .foregroundColor(Color.white)
-                                .shadow(color: Color.black.opacity(0.25), radius: 15, x: 0, y: 10)
+                                .shadow(color: Color.black.opacity(0.22), radius: 20, x: 0, y: 12)
                             
                             CBBarcodeView(data: self.$shareURL, barcodeType: self.$barcodeType, orientation: self.$rotate, onGenerated: { _ in })
                                 .frame(width: 225, height: 225)
-                                .padding(.all, 10)
+                                .padding(.all, 25)
                             
                             Circle()
                                 .foregroundColor(Color("bgColor"))
@@ -155,20 +61,17 @@ struct ShareProfileView: View {
                             Image("iconCoin")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 55, height: 55, alignment: .center)
+                                .frame(width: 58, height: 58, alignment: .center)
                         }.animation(.spring(response: 0.45, dampingFraction: 0.60, blendDuration: 0))
-                        .onTapGesture() {
-                            self.hideQrCode.toggle()
-                            print("show qr \(geo.frame(in: .global).maxY)")
-                        }
                         
                         ZStack(alignment: .center) {
                             BlurView(style: .systemUltraThinMaterial)
                                 .frame(minWidth: 175, idealWidth: 200, maxWidth: 220)
-                                .frame(height: 45)
+                                .frame(height: 54)
                                 .cornerRadius(15)
                                 .foregroundColor(Color("bgColor"))
-                                .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 10)
+                                .shadow(color: Color.white.opacity(0.1), radius: 6, x: 0, y: 2)
+                                .shadow(color: Color.black.opacity(0.2), radius: 15, x: 0, y: 10)
                             
                             HStack(alignment: .center) {
                                 if self.auth.isUserAuthenticated == .signedIn {
@@ -179,7 +82,7 @@ struct ShareProfileView: View {
                                         .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                                         .scaledToFill()
                                         .clipShape(Circle())
-                                        .frame(width: 35, height: 35, alignment: .center)
+                                        .frame(width: 38, height: 38, alignment: .center)
                                         .padding(.vertical, 10)
                                         .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 3)
                                 }
@@ -211,22 +114,167 @@ struct ShareProfileView: View {
                             }.frame(minWidth: 175, idealWidth: 200, maxWidth: 220)
                         }.offset(y: 35)
                     }.padding(.bottom, 30)
-                    .scaleEffect(self.hideQrCode ? 0.5 : 1.0)
-                    .transition(AnyTransition.opacity)
                     .opacity(self.shareURL != "" ? 1 : 0)
-                    .offset(x: self.hideQrCode ? -geo.frame(in: .global).minX - 100 : 0, y: self.hideQrCode ? geo.frame(in: .global).maxY - 275 : geo.frame(in: .global).maxY / 2.33)
+                }.padding(.top)
+                
+                //MARK: Action Buttons
+                HStack(alignment: .center, spacing: 30) {
+                    Button(action: {
+                        print("snapchat sticker")
+                        let photo = SCSDKSnapPhoto(imageUrl: URL(string: "https://homepages.cae.wisc.edu/~ece533/images/frymire.png")!)
+                        let snap = SCSDKPhotoSnapContent(snapPhoto: photo)
+                        let sticker = SCSDKSnapSticker(stickerImage: #imageLiteral(resourceName: "iconCoin"))
+                        snap.sticker = sticker
+                        snap.caption = "Add me on Chatr!"
+                        snap.attachmentUrl = self.shareURL
+                        
+                        let api = SCSDKSnapAPI()
+                        api.startSending(snap, completionHandler: { (error: Error?) in
+                            print("Shared \(self.shareURL)) on SnapChat.")
+                            if let error = error {
+                                print(error.localizedDescription)
+                                UINotificationFeedbackGenerator().notificationOccurred(.error)
+                            } else {
+                                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                            }
+                        })
+                    }) {
+                        HStack(alignment: .center) {
+                            Image("snapchatIcon")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 28, height: 26, alignment: .center)
+                                .padding(3)
+                            
+                            Text("Sticker")
+                                .font(.none)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.black)
+                                .padding(.trailing)
+
+                            Image(systemName: "chevron.right")
+                                .resizable()
+                                .font(Font.title.weight(.bold))
+                                .scaledToFit()
+                                .frame(width: 7, height: 15, alignment: .center)
+                                .foregroundColor(.black)
+                        }.padding(.vertical, 15)
+                        .padding(.horizontal, 10)
+                        .background(Color(red: 255/255, green: 252/255, blue: 0/255, opacity: 1.0))
+                        .cornerRadius(15)
+                        .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 3)
+                        .shadow(color: Color(red: 255/255, green: 252/255, blue: 0/255, opacity: 0.3), radius: 20, x: 0, y: 10)
+                    }.buttonStyle(ClickButtonStyle())
                     
-                }.frame(width: Constants.screenWidth)
-                .navigationBarTitle("Share Profile")
-                .background(Color.clear)
-                .edgesIgnoringSafeArea(.all)
-                .animation(.spring(response: 0.35, dampingFraction: 0.60, blendDuration: 0))
-                .onAppear {
-                    self.getURLLink()
+                    NavigationLink(destination: ScanQRView(dimissView: self.$dimissView, contactID: self.auth.profile.results.first?.id ?? 0, contactFullName: self.auth.profile.results.first?.fullName ?? "Chatr Contact", contactAvatar: self.auth.profile.results.first?.avatar ?? "").environmentObject(self.auth).edgesIgnoringSafeArea(.all)) {
+                        HStack(alignment: .center) {
+                            Image(systemName: "qrcode.viewfinder")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 26, height: 26, alignment: .center)
+                                .foregroundColor(.white)
+                                .padding(3)
+                            
+                            Text("Scan QR")
+                                .font(.none)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.white)
+                                .padding(.trailing)
+                            
+                            Image(systemName: "chevron.right")
+                                .resizable()
+                                .font(Font.title.weight(.bold))
+                                .scaledToFit()
+                                .frame(width: 7, height: 15, alignment: .center)
+                                .foregroundColor(.white)
+                        }.padding(.vertical, 15)
+                        .padding(.horizontal, 10)
+                        .background(Color.blue)
+                        .cornerRadius(15)
+                        .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 3)
+                        .shadow(color: Color.blue.opacity(0.3), radius: 20, x: 0, y: 10)
+                    }.buttonStyle(ClickButtonStyle())
+                    .simultaneousGesture(TapGesture()
+                        .onEnded { _ in
+                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                        })
+
+                }.padding(.top, 40)
+                .padding(.horizontal)
+                .frame(width: Constants.screenWidth)
+                
+                //MARK: Copy Link
+                HStack {
+                    Text("PROFILE LINK:")
+                        .font(.caption)
+                        .fontWeight(.regular)
+                        .foregroundColor(.secondary)
+                        .padding(.horizontal)
+                        .padding(.horizontal)
+                        .offset(y: 2)
+                    Spacer()
+                }.padding(.top, 40)
+                
+                HStack() {
+                    HStack {
+                        Image("linkIcon")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 22)
+                            .padding(.leading, 8)
+                        
+                        Text(self.shareURL)
+                            .foregroundColor(.primary)
+                            .font(.system(size: 16))
+                            .lineLimit(1)
+                            .padding(.vertical, 15)
+                    }.foregroundColor(.gray)
+                    .background(Color("buttonColor"))
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .circular))
+                    .shadow(color: Color.black.opacity(0.20), radius: 10, x: 0, y: 8)
+                    
+                    Button(action: {
+                        if self.hasCopiedUrl {
+                            UINotificationFeedbackGenerator().notificationOccurred(.success)
+                        } else {
+                            UINotificationFeedbackGenerator().notificationOccurred(.success)
+                            UIPasteboard.general.setValue(self.shareURL, forPasteboardType: kUTTypePlainText as String)
+                            self.hasCopiedUrl = true
+                        }
+                    }) {
+                        Image(systemName: hasCopiedUrl ? "checkmark" : "doc.on.doc")
+                            .resizable()
+                            .scaledToFit()
+                            .padding(Constants.menuBtnSize * 0.25)
+                            .padding(.horizontal, 2)
+                            .foregroundColor(.primary)
+                    }.buttonStyle(HomeButtonStyle())
+                }.padding(.horizontal)
+                .padding(.bottom)
+                
+                Spacer()
+            }.frame(width: Constants.screenWidth)
+        }.navigationBarTitle("Share Profile")
+        .animation(.spring(response: 0.35, dampingFraction: 0.60, blendDuration: 0))
+        .navigationBarItems(trailing:
+            Button(action: {
+                withAnimation {
+                    self.showShared.toggle()
                 }
-            }
-        }.edgesIgnoringSafeArea(.all)
-        .disabled(self.foundUser ? true : false)
+            }) {
+                Image(systemName: "square.and.arrow.up")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .padding(.trailing, 5)
+                    .font(Font.system(size: 22, weight: .regular))
+                    .foregroundColor(.primary)
+            }.disabled(self.foundUser ? false : true)
+        )
+        .onAppear {
+            self.getURLLink()
+        }.sheet(isPresented: self.$showShared) {
+            ShareSheet(activityItems: [URL(string: self.shareURL)!])
+        }
     }
 
     func getURLLink() {
@@ -267,6 +315,29 @@ struct ShareProfileView: View {
             guard let url = url else { return }
             print("I have a short URL to share: \(url.absoluteString)")
             self.shareURL = url.absoluteString
+            self.foundUser = true
         })
+    }
+}
+
+struct ShareSheet: UIViewControllerRepresentable {
+    typealias Callback = (_ activityType: UIActivity.ActivityType?, _ completed: Bool, _ returnedItems: [Any]?, _ error: Error?) -> Void
+    
+    let activityItems: [Any]
+    let applicationActivities: [UIActivity]? = nil
+    let excludedActivityTypes: [UIActivity.ActivityType]? = nil
+    let callback: Callback? = nil
+    
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        let controller = UIActivityViewController(
+            activityItems: activityItems,
+            applicationActivities: applicationActivities)
+        controller.excludedActivityTypes = excludedActivityTypes
+        controller.completionWithItemsHandler = callback
+        return controller
+    }
+    
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {
+        // nothing to do here
     }
 }

@@ -121,7 +121,7 @@ struct ProfileView: View {
                     VStack(spacing: 0) {
                         
                         //Share Profile
-                        NavigationLink(destination: ShareProfileView(dimissView: self.$dimissView, contactID: self.profile.results.first?.id ?? 0, contactFullName: self.profile.results.first?.fullName ?? "Chatr Contact", contactAvatar: self.profile.results.first?.avatar ?? "").environmentObject(self.auth)) {
+                        NavigationLink(destination: ShareProfileView(dimissView: self.$dimissView, contactID: self.profile.results.first?.id ?? 0, contactFullName: self.profile.results.first?.fullName ?? "Chatr Contact", contactAvatar: self.profile.results.first?.avatar ?? "").environmentObject(self.auth).background(Color("bgColor").edgesIgnoringSafeArea(.all))) {
                             VStack(alignment: .trailing, spacing: 0) {
                                 HStack {
                                     Image("QRIcon")

@@ -399,6 +399,7 @@ PODS:
   - SDWebImage/Core (5.9.5)
   - SDWebImageSwiftUI (1.5.0):
     - SDWebImage (~> 5.7)
+  - SnapSDK/SCSDKCreativeKit (1.4.0)
   - SROTPView (2.1.0)
 
 DEPENDENCIES:
@@ -415,6 +416,7 @@ DEPENDENCIES:
   - PhoneNumberKit
   - Purchases
   - SDWebImageSwiftUI
+  - SnapSDK/SCSDKCreativeKit (= 1.4.0)
   - SROTPView
 
 SPEC REPOS:
@@ -453,6 +455,7 @@ SPEC REPOS:
     - PurchasesCoreSwift
     - SDWebImage
     - SDWebImageSwiftUI
+    - SnapSDK
     - SROTPView
 
 EXTERNAL SOURCES:
@@ -495,8 +498,9 @@ SPEC CHECKSUMS:
   PurchasesCoreSwift: 638f04384b60f44c8728d0af7a10785bbd747cab
   SDWebImage: 0b2ba0d56479bf6a45ecddbfd5558bea93150d25
   SDWebImageSwiftUI: 43687ffe232ddd33fe0659498b7ca9884fdd6b35
+  SnapSDK: 222857226700e1373a186da658c619a79dfa40c8
   SROTPView: 81b761c6e72f0a1a0b8c77b0046e13a54d4dcaa9
 
-PODFILE CHECKSUM: 8197681011f8ac5674aa00862ac41bb265434282
+PODFILE CHECKSUM: 09630b25271c39e1e8f88470c80d30051841c777
 
 COCOAPODS: 1.10.1

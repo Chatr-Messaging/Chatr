@@ -198,9 +198,12 @@
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>twitter</string>
+		<string>snapchat</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>SCSDKClientId</key>
+	<string>a84dd344-dc21-4f34-ae38-7ac9047a65b7</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
