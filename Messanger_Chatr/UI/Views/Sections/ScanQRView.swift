@@ -6,6 +6,7 @@
 //  Copyright © 2021 Brandon Shaw. All rights reserved.
 //
 
+import AVFoundation
 import SwiftUI
 import RealmSwift
 import FirebaseDynamicLinks
@@ -15,12 +16,6 @@ import SDWebImageSwiftUI
 struct ScanQRView: View {
     @EnvironmentObject var auth: AuthModel
     @Binding var dimissView: Bool
-    @State var contactID: Int
-    @State var contactFullName: String
-    @State var contactAvatar: String
-    @State var shareURL = ""
-    @State var barcodeType = CBBarcodeView.BarcodeType.qrCode
-    @State var rotate = CBBarcodeView.Orientation.up
     @State var torchIsOn = false
     @State var foundUser = false
     
@@ -32,14 +27,15 @@ struct ScanQRView: View {
                     if self.foundUser == false {
                         UINotificationFeedbackGenerator().notificationOccurred(.success)
                         self.foundUser = true
+                        print("BarCodeType =",$0.type.rawValue, "Value =",$0.value)
                         
-                        //print("have received incoming link!: \(String(describing: URL(string: $0)))")
-                        DynamicLinks.dynamicLinks().handleUniversalLink((URL(string: String(describing: $0)) ?? URL(string: ""))!, completion: { (dynamicLink, error) in
+                        print("have received incoming link!: \(String(describing: $0.value))")
+                        DynamicLinks.dynamicLinks().handleUniversalLink((URL(string: String(describing: $0.value)) ?? URL(string: ""))!, completion: { (dynamicLink, error) in
                             guard error == nil else {
                                 print("found erre: \(String(describing: error?.localizedDescription))")
                                 return
                             }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 2.75) {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2.25) {
                                 if let dynamicLink = dynamicLink {
                                     self.auth.handleIncomingDynamicLink(dynamicLink)
                                 }
@@ -98,7 +94,7 @@ struct ScanQRView: View {
                             .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 0)
                     }.offset(y: -100)
                     .onAppear() {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                             self.foundUser = false
                             withAnimation {
                                 self.dimissView.toggle()

@@ -166,7 +166,7 @@ struct ShareProfileView: View {
                         .shadow(color: Color(red: 255/255, green: 252/255, blue: 0/255, opacity: 0.3), radius: 20, x: 0, y: 10)
                     }.buttonStyle(ClickButtonStyle())
                     
-                    NavigationLink(destination: ScanQRView(dimissView: self.$dimissView, contactID: self.auth.profile.results.first?.id ?? 0, contactFullName: self.auth.profile.results.first?.fullName ?? "Chatr Contact", contactAvatar: self.auth.profile.results.first?.avatar ?? "").environmentObject(self.auth).edgesIgnoringSafeArea(.all)) {
+                    NavigationLink(destination: ScanQRView(dimissView: self.$dimissView).environmentObject(self.auth).edgesIgnoringSafeArea(.all)) {
                         HStack(alignment: .center) {
                             Image(systemName: "qrcode.viewfinder")
                                 .resizable()
@@ -252,7 +252,10 @@ struct ShareProfileView: View {
                 }.padding(.horizontal)
                 .padding(.bottom)
                 
-                Spacer()
+                FooterInformation()
+                    .padding(.top, 50)
+                    .padding(.bottom, 35)
+                
             }.frame(width: Constants.screenWidth)
         }.navigationBarTitle("Share Profile")
         .animation(.spring(response: 0.35, dampingFraction: 0.60, blendDuration: 0))
