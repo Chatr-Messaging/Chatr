@@ -32,6 +32,7 @@ struct NewConversationView: View {
     var body: some View {
         NavigationView {
             ScrollView(.vertical, showsIndicators: true) {
+                //MARK: Private or Group Section
                 VStack {
                     //MARK: Search Bar
                     VStack {
@@ -49,7 +50,7 @@ struct NewConversationView: View {
                             HStack {
                                 Image(systemName: "magnifyingglass")
                                     .padding(.leading, 15)
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(.primary)
                                 
                                 TextField("Search", text: $searchText, onCommit: {
                                     self.outputSearchText = self.searchText
@@ -91,49 +92,50 @@ struct NewConversationView: View {
                     .padding(.horizontal)
                     
                     //MARK: Public Section
-//                    VStack {
-//                        if self.isPremium {
-//                            HStack {
-//                                Text("PUBLIC:")
-//                                    .font(.caption)
-//                                    .fontWeight(.regular)
-//                                    .foregroundColor(.secondary)
-//                                    .padding(.horizontal)
-//                                    .padding(.horizontal)
-//                                Spacer()
-//                            }.padding(.top, 10)
-//
-//                            VStack {
-//                                VStack {
-//                                    HStack {
-//                                        Text("New Channel")
-//                                            .font(.none)
-//                                            .foregroundColor(.primary)
-//
-//                                        Spacer()
-//
-//                                        Toggle("", isOn: self.$publicGroupOn)
-//                                        .onReceive([self.publicGroupOn].publisher.first()) { (value) in
-//                                            print("New value is: \(value)")
-//                                        }
-//                                    }.padding(.horizontal)
-//                                }.padding(.vertical, 8)
-//                            }.background(Color("buttonColor"))
-//                            .cornerRadius(15)
-//                            .padding(.horizontal)
-//                            .padding(.bottom, 25)
-//
-//                            if self.publicGroupOn {
-//                                HStack {
-//                                    Text("PLEASE COMPLETE THE BELOW:")
-//                                        .font(.caption)
-//                                        .fontWeight(.regular)
-//                                        .foregroundColor(.secondary)
-//                                        .padding(.horizontal)
-//                                        .padding(.horizontal)
-//                                    Spacer()
-//                                }
-//
+                    VStack {
+                        if self.usedAsNew {
+                            HStack {
+                                Text("PUBLIC:")
+                                    .font(.caption)
+                                    .fontWeight(.regular)
+                                    .foregroundColor(.secondary)
+                                    .padding(.horizontal)
+                                    .padding(.horizontal)
+                                Spacer()
+                            }.padding(.top, 10)
+
+                            VStack {
+                                VStack {
+                                    HStack {
+                                        Text("New Channel")
+                                            .font(.none)
+                                            .foregroundColor(.primary)
+
+                                        Spacer()
+
+                                        Toggle("", isOn: self.$publicGroupOn)
+                                        .onReceive([self.publicGroupOn].publisher.first()) { (value) in
+                                            print("New value is: \(value)")
+                                        }
+                                    }.padding(.horizontal)
+                                }.padding(.vertical, 8)
+                            }.background(Color("buttonColor"))
+                            .clipShape(RoundedRectangle(cornerRadius: 14, style: .circular))
+                            .shadow(color: Color.black.opacity(0.10), radius: 10, x: 0, y: 8)
+                            .padding(.horizontal)
+                            .padding(.bottom, 10)
+
+                            if self.publicGroupOn {
+                                HStack {
+                                    Text("PLEASE COMPLETE THE BELOW:")
+                                        .font(.caption)
+                                        .fontWeight(.regular)
+                                        .foregroundColor(.secondary)
+                                        .padding(.horizontal)
+                                        .padding(.horizontal)
+                                    Spacer()
+                                }
+
 //                                VStack {
 //                                    VStack {
 //                                        VStack(alignment: .center) {
@@ -157,14 +159,12 @@ struct NewConversationView: View {
 //                                .cornerRadius(15)
 //                                .padding(.horizontal)
 //                                .padding(.bottom, 25)
-//                            }
-//                        }
-//                    }.onAppear() {
-//                        self.isPremium = self.profile.results.first?.isPremium ?? false
-//                    }
+                            }
+                        }
+                    }.onAppear() {
+                        self.isPremium = self.profile.results.first?.isPremium ?? false
+                    }
 
-                    //Spacer()
-                    
                     //MARK: Search All Section
                     if self.grandUsers.count != 0 {
                         HStack {

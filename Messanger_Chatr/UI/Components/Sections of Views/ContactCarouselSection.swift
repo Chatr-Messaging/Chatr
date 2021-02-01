@@ -103,7 +103,7 @@ struct ContactListView : View {
                     NavigationView {
                         DiscoverView()
                             .environmentObject(self.auth)
-                            .navigationBarTitle("Discover", displayMode: .large)
+                            //.navigationBarTitle("Discover", displayMode: .large)
                             .background(Color("bgColor").edgesIgnoringSafeArea(.all))
                     }
                 })

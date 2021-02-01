@@ -17,11 +17,67 @@ struct DiscoverView: View {
     @State var bannerDataArray: [DiscoverBannerData] = []
     @State var bannerCount: Int = 0
     @State var pageIndex: Int = 0
+    @State var openNewPublicDialog: Bool = false
     
     var body: some View {
         ScrollView(.vertical, showsIndicators: true) {
             VStack {
+                Spacer()
+
+                Text("Under Construction")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(.primary)
+                    .padding(.top, 30)
                 
+                Text("Coming soon...")
+                    .font(.headline)
+                    .fontWeight(.regular)
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(.secondary)
+                    .padding(.top, 10)
+
+                Image("Construction")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: Constants.screenWidth)
+                
+                Button(action: {
+                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                    self.openNewPublicDialog.toggle()
+                }) {
+                    HStack(alignment: .center, spacing: 15) {
+                        Image("ComposeIcon_white")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 22, height: 22, alignment: .center)
+                            .offset(x: -2, y: -2)
+
+                        Text("Create Public Channel")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                    }.padding(.horizontal, 15)
+                }.buttonStyle(MainButtonStyle())
+                .frame(maxWidth: 260)
+                .padding(.top, 35)
+                .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 3)
+                .shadow(color: Color.blue.opacity(0.3), radius: 20, x: 0, y: 10)
+//                .sheet(isPresented: self.$openNewPublicDialog, onDismiss: {
+//                    if self.newDialogID.count > 0 {
+//                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
+//                            self.isLocalOpen = true
+//                            UserDefaults.standard.set(self.isLocalOpen, forKey: "localOpen")
+//                            changeDialogRealmData().updateDialogOpen(isOpen: self.isLocalOpen, dialogID: self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id ?? "")
+//                            UserDefaults.standard.set(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id, forKey: "selectedDialogID")
+//                            self.newDialogID = ""
+//                        }
+//                    }
+//                }) {
+//                    NewConversationView(usedAsNew: true, selectedContact: self.$selectedContacts, newDialogID: self.$newDialogID)
+//                        .environmentObject(self.auth)
+//                }
+                /*
                 //SEARCH BAR
                 VStack {
                     HStack {
@@ -90,7 +146,9 @@ struct DiscoverView: View {
                             .offset(y: -30)
                     }
                 }
-            }.onAppear {
+                 */
+            }.frame(width: Constants.screenHeight)
+            .onAppear {
                 self.bannerDataArray.append(DiscoverBannerData(groupName: "Apple Fanboy", memberCount: 18, catagory: "Technology", groupImg: "proPic", backgroundImg: "michaelAngelWallpaper", catagoryImg: "iphone.homebutton"))
                 
                 //DiscoverBannerData(titleBold: "Discover", title: "Channels", subtitleImage: "magnifyingglass", subtitle: "Join your favorite public groups", imageMain: "contactsBanner", gradientBG: "discoverBackground")
