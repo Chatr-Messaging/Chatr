@@ -40,7 +40,7 @@ struct DialogCell: View {
                         .foregroundColor(.clear)
                 }
 
-                if self.dialogModel.dialogType == "private" || self.dialogModel.dialogType == "public" {
+                if self.dialogModel.dialogType == "private" || self.dialogModel.dialogType == "public" || self.dialogModel.dialogType == "broadcast" {
                     ZStack {
                         WebImage(url: URL(string: (self.privateDialogContact.id != 0 ? self.privateDialogContact.avatar : PersistenceManager().getCubeProfileImage(usersID: self.connectyContact)) ?? ""))
                             .resizable()

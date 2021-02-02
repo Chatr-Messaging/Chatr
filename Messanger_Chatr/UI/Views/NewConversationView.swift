@@ -24,6 +24,8 @@ struct NewConversationView: View {
     @State var outputSearchText: String = ""
     @Binding var newDialogID: String
     @State var isPremium: Bool = false
+    @State var showingMaxAlert: Bool = false
+    @State var occupentsAlreadyIn: Int = 0
     @ObservedObject var contacts = ContactsRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ContactStruct.self))
     @ObservedObject var profile = ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self))
     @ObservedObject var addressBook = AddressBookRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(AddressBookStruct.self))
@@ -371,7 +373,7 @@ struct NewConversationView: View {
                 }, trailing:
                 Button(action: {
                     if self.usedAsNew {
-                        if self.selectedContact.count > 0 {
+                        if self.selectedContact.count <= Constants.maxNumberGroupOccu {
                             let dialog = ChatDialog(dialogID: nil, type: self.selectedContact.count > 1 ? .group : .private)
                             var occu: [NSNumber] = []
                             for i in self.selectedContact {
@@ -394,6 +396,9 @@ struct NewConversationView: View {
                             }) { (error) in
                                 UINotificationFeedbackGenerator().notificationOccurred(.error)
                             }
+                        } else {
+                            //too many contact selected
+                            UINotificationFeedbackGenerator().notificationOccurred(.error)
                         }
                     } else {
                         withAnimation {

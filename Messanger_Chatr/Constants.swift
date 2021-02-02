@@ -21,6 +21,7 @@ struct Constants {
     static let quickSnapBtnSize = CGFloat(54)
     static let avitarSize = CGFloat(55)
     static let smallAvitarSize = CGFloat(28)
+    static let maxNumberGroupOccu = 10
     static let screenWidth = UIScreen.main.bounds.width
     static let screenHeight = UIScreen.main.bounds.height
     static let FirebaseProjectID = "chatr-b849e"

@@ -33,7 +33,7 @@ struct ContactCarousel : UIViewRepresentable {
         return ContactCarousel.Coordinator(parent1: self)
     }
 
-    func makeUIView(context: Context) -> UIScrollView{
+    func makeUIView(context: Context) -> UIScrollView {
         // ScrollView Content Size...
         let total = width * CGFloat(dataArrayCount)
         let view = UIScrollView()
@@ -75,6 +75,11 @@ struct ContactCarousel : UIViewRepresentable {
         
         func scrollViewDidScroll(_ scrollView: UIScrollView) {
             self.parent.scrollOffset = scrollView.contentOffset.x
+        }
+        
+        func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+            let page = Int(scrollView.contentOffset.x / UIScreen.main.bounds.width)
+            self.parent.page = page
         }
     }
 }

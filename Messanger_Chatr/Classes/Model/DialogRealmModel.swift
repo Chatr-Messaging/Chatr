@@ -147,6 +147,8 @@ class changeDialogRealmData {
 //                    if object.occupantsCount == 0 {
 //                        self.deletePrivateConnectyDialog(dialogID: object.id ?? "", isOwner: false)
 //                    }
+                } else if object.type == .broadcast {
+                    newData.dialogType = "broadcast"
                 } else if object.type == .public {
                     newData.dialogType = "public"
                 }

@@ -1310,6 +1310,11 @@ struct Carousel : UIViewRepresentable {
         func scrollViewDidScroll(_ scrollView: UIScrollView) {
             self.parent.scrollOffset = scrollView.contentOffset.x
         }
+        
+        func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+            let page = Int(scrollView.contentOffset.x / UIScreen.main.bounds.width)
+            self.parent.page = page
+        }
     }
 }
 

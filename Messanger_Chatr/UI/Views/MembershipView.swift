@@ -149,14 +149,14 @@ struct MembershipView: View {
                                 .padding(.trailing, 15)
                             
                             VStack(alignment: .leading) {
-                                Text("Public Channels")
+                                Text("Support a Startup")
                                     .font(.headline)
                                     .fontWeight(.semibold)
                                     .foregroundColor(.white)
                                     .shadow(color: Color.black.opacity(0.4), radius: 3, x: 0, y: 0)
                                     .padding(.bottom, 0)
                                 
-                                Text("Create public channels and watch your community grow.")
+                                Text("Supporting ensures this project lives on and features keep coming.")
                                     .font(.subheadline)
                                     .fontWeight(.medium)
                                     .shadow(color: Color.black.opacity(0.25), radius: 3, x: 0, y: 0)
