@@ -122,6 +122,7 @@
 		05DB89C9238B851800D4581F /* Messanger_ChatrTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05DB89C8238B851800D4581F /* Messanger_ChatrTests.swift */; };
 		05DB89D4238B851900D4581F /* Messanger_ChatrUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05DB89D3238B851900D4581F /* Messanger_ChatrUITests.swift */; };
 		05DB89E2238B854400D4581F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 05DB89E1238B854400D4581F /* GoogleService-Info.plist */; };
+		05DD2D4225C9D44900B1ACB7 /* LinkedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05DD2D4125C9D44900B1ACB7 /* LinkedText.swift */; };
 		05E5B3292430747E00354C01 /* UserDialogs+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E5B3282430747E00354C01 /* UserDialogs+Extensions.swift */; };
 		05EA572524148A1600372F1A /* Mesages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05EA572424148A1600372F1A /* Mesages.swift */; };
 		05EA572724148BA100372F1A /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05EA572624148BA100372F1A /* Profile.swift */; };
@@ -270,6 +271,7 @@
 		05DB89D3238B851900D4581F /* Messanger_ChatrUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Messanger_ChatrUITests.swift; sourceTree = "<group>"; };
 		05DB89D5238B851900D4581F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		05DB89E1238B854400D4581F /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		05DD2D4125C9D44900B1ACB7 /* LinkedText.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinkedText.swift; sourceTree = "<group>"; };
 		05E5B3282430747E00354C01 /* UserDialogs+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDialogs+Extensions.swift"; sourceTree = "<group>"; };
 		05EA572424148A1600372F1A /* Mesages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mesages.swift; sourceTree = "<group>"; };
 		05EA572624148BA100372F1A /* Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
@@ -418,6 +420,7 @@
 				053AC4B6251982550036946E /* AttachmentBubble.swift */,
 				0583A84E251AFB740005B7E1 /* ContactBubble.swift */,
 				0569348F252312F7001BDFF0 /* LocationBubble.swift */,
+				05DD2D4125C9D44900B1ACB7 /* LinkedText.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -913,6 +916,7 @@
 				053AC4B225194C080036946E /* GIFController.swift in Sources */,
 				0554281725AFE7AD00B6D106 /* ChatrStats.swift in Sources */,
 				05A7BD5924FB36B30001BFC9 /* CameraView.swift in Sources */,
+				05DD2D4225C9D44900B1ACB7 /* LinkedText.swift in Sources */,
 				0572BABB239B348800AE9061 /* CustomStyles.swift in Sources */,
 				056B98A224C8FA75003F7FBA /* RingtoneView.swift in Sources */,
 				05EA572724148BA100372F1A /* Profile.swift in Sources */,

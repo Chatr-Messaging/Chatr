@@ -48,6 +48,9 @@ struct TextBubble: View {
                 //} else {
                 ZStack {
                     if self.message.messageState != .isTyping || self.message.messageState == .deleted {
+                        LinkedText(self.message.text, messageRight: self.messagePosition == .right)
+
+                        /*
                         Menu {
                             VStack {
                                 if messagePosition == .right {
@@ -114,6 +117,7 @@ struct TextBubble: View {
                             .onEnded { _ in
                                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                             })
+                        */
                     } else if self.message.messageState == .isTyping {
                         HStack(spacing: 6) {
                             ForEach(0..<3) { type in

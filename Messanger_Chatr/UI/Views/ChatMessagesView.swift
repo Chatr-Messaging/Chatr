@@ -78,6 +78,7 @@ struct ChatMessagesView: View {
                                 VStack(spacing: 0) {
                                         HStack() {
                                             if messagePosition == .right { Spacer() }
+
                                             if currentMessages[message].image != "" {
                                                 AttachmentBubble(message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
                                                     .environmentObject(self.auth)

@@ -126,7 +126,7 @@ struct ShareProfileView: View {
                         let sticker = SCSDKSnapSticker(stickerImage: #imageLiteral(resourceName: "iconCoin"))
                         snap.sticker = sticker
                         snap.caption = "Add me on Chatr!"
-                        snap.attachmentUrl = self.shareURL
+                        //snap.attachmentUrl = self.shareURL
                         
                         let api = SCSDKSnapAPI()
                         api.startSending(snap, completionHandler: { (error: Error?) in
