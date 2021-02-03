@@ -126,6 +126,8 @@
 		05E5B3292430747E00354C01 /* UserDialogs+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E5B3282430747E00354C01 /* UserDialogs+Extensions.swift */; };
 		05EA572524148A1600372F1A /* Mesages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05EA572424148A1600372F1A /* Mesages.swift */; };
 		05EA572724148BA100372F1A /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05EA572624148BA100372F1A /* Profile.swift */; };
+		05EE518B25CA5BCD0063A558 /* WebsiteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05EE518A25CA5BCD0063A558 /* WebsiteView.swift */; };
+		05EE519325CA5C160063A558 /* WebViewStateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05EE519225CA5C160063A558 /* WebViewStateModel.swift */; };
 		05F08B5E252DAD1A005222FA /* MoreContactsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F08B5D252DAD1A005222FA /* MoreContactsView.swift */; };
 		05F5829825C12FC30043221D /* EditGroupDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F5829725C12FC30043221D /* EditGroupDialogView.swift */; };
 		05F58CEB25BFCF5400839590 /* CameraViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F58CEA25BFCF5400839590 /* CameraViewModel.swift */; };
@@ -275,6 +277,8 @@
 		05E5B3282430747E00354C01 /* UserDialogs+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDialogs+Extensions.swift"; sourceTree = "<group>"; };
 		05EA572424148A1600372F1A /* Mesages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mesages.swift; sourceTree = "<group>"; };
 		05EA572624148BA100372F1A /* Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
+		05EE518A25CA5BCD0063A558 /* WebsiteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsiteView.swift; sourceTree = "<group>"; };
+		05EE519225CA5C160063A558 /* WebViewStateModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewStateModel.swift; sourceTree = "<group>"; };
 		05F08B5D252DAD1A005222FA /* MoreContactsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreContactsView.swift; sourceTree = "<group>"; };
 		05F5829725C12FC30043221D /* EditGroupDialogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditGroupDialogView.swift; sourceTree = "<group>"; };
 		05F58CEA25BFCF5400839590 /* CameraViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewModel.swift; sourceTree = "<group>"; };
@@ -475,6 +479,7 @@
 				05A7BD6024FEF5180001BFC9 /* LockedOutView.swift */,
 				050BF7CA23939777002B91BC /* welcomeView.swift */,
 				056B98A324C8FA8B003F7FBA /* Sections */,
+				05EE518925CA5BA20063A558 /* Utility */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -564,6 +569,7 @@
 				056935D725B50B3D000705F6 /* MessagesViewModel.swift */,
 				05A6D54625B021E400AD66DD /* AdvancedViewModel.swift */,
 				05F58CEA25BFCF5400839590 /* CameraViewModel.swift */,
+				05EE519225CA5C160063A558 /* WebViewStateModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -644,6 +650,14 @@
 				05DB89D5238B851900D4581F /* Info.plist */,
 			);
 			path = Messanger_ChatrUITests;
+			sourceTree = "<group>";
+		};
+		05EE518925CA5BA20063A558 /* Utility */ = {
+			isa = PBXGroup;
+			children = (
+				05EE518A25CA5BCD0063A558 /* WebsiteView.swift */,
+			);
+			path = Utility;
 			sourceTree = "<group>";
 		};
 		05F8E11623F0DE150066954C /* Representable or Pure Swift */ = {
@@ -907,6 +921,7 @@
 				056B98A924C8FD1D003F7FBA /* SearchBar.swift in Sources */,
 				054CAB7E25AA6E3700DD3F7C /* InstagramWebView.swift in Sources */,
 				05DB89B2238B851400D4581F /* AppDelegate.swift in Sources */,
+				05EE519325CA5C160063A558 /* WebViewStateModel.swift in Sources */,
 				05DB89B4238B851400D4581F /* SceneDelegate.swift in Sources */,
 				05A7BD4F24F9E8D20001BFC9 /* ContactRealmCell.swift in Sources */,
 				05196DDB24EE3BD20026B9A7 /* ContactsRealmModel.swift in Sources */,
@@ -951,6 +966,7 @@
 				0579EF6D23F898A50013C737 /* dialogModel.swift in Sources */,
 				05196DDD24EE5D000026B9A7 /* SelectableAddressBookContact.swift in Sources */,
 				055C2A6224D3FDD200F7AE16 /* MembershipView.swift in Sources */,
+				05EE518B25CA5BCD0063A558 /* WebsiteView.swift in Sources */,
 				05A7BD5724FAFC3C0001BFC9 /* CapturePhotoButton.swift in Sources */,
 				050BF7CB23939777002B91BC /* welcomeView.swift in Sources */,
 				05A7BD5124FA0F800001BFC9 /* VisitContactView.swift in Sources */,

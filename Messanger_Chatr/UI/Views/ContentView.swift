@@ -248,7 +248,7 @@ struct mainHomeList: View {
                         GeometryReader { geometry in
                             ZStack(alignment: .top) {
                                 BlurView(style: .systemUltraThinMaterial)
-                                    .allowsHitTesting(UserDefaults.standard.bool(forKey: "localOpen") ? false : true)
+                                    .allowsHitTesting(!UserDefaults.standard.bool(forKey: "localOpen") ? false : true)
                                     .simultaneousGesture(DragGesture(minimumDistance: self.isLocalOpen ? 0 : 500))
                                     .frame(width: Constants.screenWidth, height: Constants.screenHeight, alignment: .center)
                                     .offset(y: self.isLocalOpen ? -geometry.frame(in: .global).minY : -35)
@@ -263,6 +263,7 @@ struct mainHomeList: View {
                                     .offset(y: self.isLocalOpen ? self.activeView.height : 0)
                                     .opacity(self.isLocalOpen ? Double((275 - self.activeView.height) / 150) : 0)
                                     .animation(.spring(response: 0.45, dampingFraction: self.isLocalOpen ? 0.65 : 0.75, blendDuration: 0))
+                                    .allowsHitTesting(!UserDefaults.standard.bool(forKey: "localOpen") ? false : true)
                                     .simultaneousGesture(DragGesture(minimumDistance: self.isLocalOpen ? 0 : 500))
 
                                 QuickSnapsSection(viewState: self.$quickSnapViewState, selectedQuickSnapContact: self.$selectedQuickSnapContact, emptyQuickSnaps: self.$emptyQuickSnaps, isLocalOpen: self.$isLocalOpen)
@@ -320,7 +321,7 @@ struct mainHomeList: View {
                                     .contentShape(Rectangle())
                                     .offset(y: -geo.frame(in: .global).minY + (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 123 : 87) : 197))
                                     .padding(.bottom, self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 123 : 87) : 197)
-                                    .offset(y: self.activeView.height)// + (self.emptyQuickSnaps ? 25 : 197))
+                                    .offset(y: self.activeView.height) // + (self.emptyQuickSnaps ? 25 : 197))
                                     .animation(.spring(response: 0.35, dampingFraction: 0.8, blendDuration: 0))
                                     .simultaneousGesture(DragGesture(minimumDistance: UserDefaults.standard.bool(forKey: "localOpen") ? 800 : 0))
                                     .onDisappear {

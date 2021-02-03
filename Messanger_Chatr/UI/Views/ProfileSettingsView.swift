@@ -11,7 +11,6 @@ import RealmSwift
 import ConnectyCube
 import SDWebImageSwiftUI
 import FirebaseDatabase
-import WKView
 import StoreKit
 
 // MARK: Profile View
@@ -34,6 +33,7 @@ struct ProfileView: View {
     @State var openPremium: Bool = false
     @State var helpsupport: Bool = false
     @State var logoutActionSheet: Bool = false
+    @State var chatrLink: String = "https://www.chatr-messaging.com/"
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: true) {
@@ -456,15 +456,7 @@ struct ProfileView: View {
                         }.buttonStyle(changeBGButtonStyle())
                         .sheet(isPresented: self.$helpsupport, content: {
                             NavigationView {
-                                WebView(url: "www.chatr-messaging.com",
-                                    tintColor: Color("buttonColor_darker"),
-                                    titleColor: Color("bgColor_opposite"),
-                                    backText: Text("Done").foregroundColor(.blue),
-                                    reloadImage: Image(systemName: "arrow.counterclockwise"),
-                                    goForwardImage: Image(systemName: "arrow.forward"),
-                                    goBackImage: Image(systemName: "arrow.backward"),
-                                    allowedHosts: Constants.allowedHosts,
-                                    forbiddenHosts: [])
+                                WebsiteView(websiteUrl: self.$chatrLink)
                             }
                         })
                         

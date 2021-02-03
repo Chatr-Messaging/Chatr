@@ -62,11 +62,13 @@ struct LinkColoredText: View {
 
 struct LinkedText: View {
     let text: String
-    let links: [NSTextCheckingResult]
+    var links: [NSTextCheckingResult] = []
     let messageRight: Bool
 
     @State var displayOverlay = true
-    
+    @State var showWebsite: Bool = false
+    @State var websiteUrl: String = ""
+
     init (_ text: String, messageRight: Bool) {
         self.messageRight = messageRight
         self.text = text
@@ -80,11 +82,18 @@ struct LinkedText: View {
     var body: some View {
         LinkColoredText(text: text, links: links, messageRight: messageRight)
             .font(.body) // enforce here because the link tapping won't be right if it's different
-            .overlay(displayOverlay ? LinkTapOverlay(text: text, links: links) : nil)
-            .onChange(of: links, perform: { value in
+            .overlay(displayOverlay ? LinkTapOverlay(text: text, links: links, showWebsite: self.$showWebsite, websiteUrl: self.$websiteUrl) : nil)
+            .onChange(of: links, perform: { _ in
                 self.displayOverlay = false
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     self.displayOverlay = true
+                }
+            }).sheet(isPresented: self.$showWebsite, content: {
+                NavigationView {
+                    WebsiteView(websiteUrl: self.$websiteUrl)
+                        .onAppear(){
+                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                        }
                 }
             })
     }
@@ -93,7 +102,10 @@ struct LinkedText: View {
 private struct LinkTapOverlay: UIViewRepresentable {
     let text: String
     let links: [NSTextCheckingResult]
-    
+    @ObservedObject var webViewStateModel: WebViewStateModel = WebViewStateModel()
+    @Binding var showWebsite: Bool
+    @Binding var websiteUrl: String
+
     func makeUIView(context: Context) -> LinkTapOverlayView {
         let view = LinkTapOverlayView()
         view.textContainer = context.coordinator.textContainer
@@ -148,7 +160,10 @@ private struct LinkTapOverlay: UIViewRepresentable {
                 return
             }
 
-            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            //UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            self.overlay.websiteUrl = "\(url)"
+            self.overlay.webViewStateModel.websiteUrl = "\(url)"
+            self.overlay.showWebsite.toggle()
         }
         
         private func link(at point: CGPoint) -> NSTextCheckingResult? {

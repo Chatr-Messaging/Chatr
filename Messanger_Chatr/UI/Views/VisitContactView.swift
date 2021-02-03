@@ -12,7 +12,6 @@ import MessageUI
 import ConnectyCube
 import RealmSwift
 import ImageViewerRemote
-import WKView
 import PopupView
 
 struct VisitContactView: View {
@@ -36,6 +35,7 @@ struct VisitContactView: View {
     @State var selectedContact: [Int] = []
     @State var profileViewSize = CGSize.zero
     @State var selectedImageUrl = ""
+    @State var contactWebsiteUrl: String = ""
     @State var quickSnapViewState: QuickSnapViewingState = .closed
     @State var mailResult: Result<MFMailComposeResult, Error>? = nil
     @State var isShowingMailView = false
@@ -170,15 +170,7 @@ struct VisitContactView: View {
                         }.buttonStyle(changeBGButtonStyle())
                         .sheet(isPresented: self.$isUrlOpen, content: {
                             NavigationView {
-                                WebView(url: self.contact.website,
-                                    tintColor: Color("buttonColor_darker"),
-                                    titleColor: Color("bgColor_opposite"),
-                                    backText: Text("Done").foregroundColor(.blue),
-                                    reloadImage: Image(systemName: "arrow.counterclockwise"),
-                                    goForwardImage: Image(systemName: "arrow.forward"),
-                                    goBackImage: Image(systemName: "arrow.backward"),
-                                    allowedHosts: Constants.allowedHosts,
-                                    forbiddenHosts: [])
+                                WebsiteView(websiteUrl: self.$contactWebsiteUrl)
                             }
                         })
                     }
@@ -523,7 +515,6 @@ struct VisitContactView: View {
             .navigationBarHidden(self.quickSnapViewState == .camera || self.quickSnapViewState == .takenPic)
             .navigationBarItems(leading:
                 Button(action: {
-                    print("Done btn tap")
                     withAnimation {
                         self.presentationMode.wrappedValue.dismiss()
                     }
@@ -624,6 +615,7 @@ struct VisitContactView: View {
                     if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: self.connectyContact.id != 0 ? Int(self.connectyContact.id) : self.contact.id) {
                         if foundContact.isMyContact {
                             self.contact = foundContact
+                            self.contactWebsiteUrl = self.contact.website
                             if foundContact.instagramAccessToken != "" && foundContact.instagramId != 0 {
                                 self.viewModel.loadInstagramImages(testUser: InstagramTestUser(access_token: foundContact.instagramAccessToken, user_id: foundContact.instagramId))
                             }
@@ -662,11 +654,13 @@ struct VisitContactView: View {
                 if self.contact.instagramAccessToken != "" && self.contact.instagramId != 0 {
                     self.viewModel.loadInstagramImages(testUser: InstagramTestUser(access_token: self.contact.instagramAccessToken, user_id: self.contact.instagramId))
                 }
+                self.contactWebsiteUrl = self.contact.website
             } else if self.viewState == .fromRequests {
                 print("shuld have everything already...")
                 if self.contact.instagramAccessToken != "" && self.contact.instagramId != 0 {
                     self.viewModel.loadInstagramImages(testUser: InstagramTestUser(access_token: self.contact.instagramAccessToken, user_id: self.contact.instagramId))
                 }
+                self.contactWebsiteUrl = self.contact.website
             } else if self.viewState == .fromGroupDialog {
                 if self.contact.instagramAccessToken != "" && self.contact.instagramId != 0 {
                     self.viewModel.loadInstagramImages(testUser: InstagramTestUser(access_token: self.contact.instagramAccessToken, user_id: self.contact.instagramId))
@@ -677,6 +671,7 @@ struct VisitContactView: View {
                     let realm = try Realm(configuration: config)
                     if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: self.contact.id) {
                         self.contactRelationship = foundContact.isMyContact ? .contact : .notContact
+                        self.contactWebsiteUrl = foundContact.website
                     }
                     
                     if self.contactRelationship == .notContact || self.contactRelationship == .unknown {
@@ -694,6 +689,7 @@ struct VisitContactView: View {
                         if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: self.auth.dynamicLinkContactID) {
                             if foundContact.isMyContact {
                                 self.contact = foundContact
+                                self.contactWebsiteUrl = self.contact.website
                                 if foundContact.instagramAccessToken != "" && foundContact.instagramId != 0 {
                                     self.viewModel.loadInstagramImages(testUser: InstagramTestUser(access_token: foundContact.instagramAccessToken, user_id: foundContact.instagramId))
                                 }
@@ -710,7 +706,7 @@ struct VisitContactView: View {
                                 for use in users {
                                     if use.id == self.auth.dynamicLinkContactID {
                                         self.connectyContact = use
-                                        
+                                        self.contactWebsiteUrl = use.website ?? ""
                                         if self.connectyContact.id == UserDefaults.standard.integer(forKey: "currentUserID") {
                                             self.contactRelationship = .unknown
                                         } else {

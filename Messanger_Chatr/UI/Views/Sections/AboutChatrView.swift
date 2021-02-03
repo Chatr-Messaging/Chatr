@@ -9,7 +9,9 @@
 import SwiftUI
 
 struct AboutChatrView: View {
-    
+    @State var openWebsite: Bool = false
+    @State var chatrLink = "https://www.chatr-messaging.com/"
+
     var body: some View {
         VStack {
             ScrollView(.vertical, showsIndicators: false) {
@@ -74,8 +76,9 @@ struct AboutChatrView: View {
                         
                         //Website Section
                         Button(action: {
-                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                            UIApplication.shared.open(URL(string: "https://www.chatr-messaging.com/")!)
+                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                            self.openWebsite.toggle()
+                            //UIApplication.shared.open(URL(string: "https://www.chatr-messaging.com/")!)
                         }) {
                             VStack(alignment: .trailing, spacing: 0) {
                                 HStack {
@@ -107,6 +110,11 @@ struct AboutChatrView: View {
                     .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
                     .padding(.horizontal)
                     .padding(.bottom, 5)
+                    .sheet(isPresented: self.$openWebsite) {
+                        NavigationView {
+                            WebsiteView(websiteUrl: self.$chatrLink)
+                        }
+                    }
                     
                     //MARK: Legal Section
                     HStack {

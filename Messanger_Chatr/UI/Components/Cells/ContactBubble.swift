@@ -51,6 +51,7 @@ struct ContactBubble: View {
                     
                     HStack {
                         Button(action: {
+                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                             self.showContact.toggle()
                         }, label: {
                             HStack {
@@ -172,15 +173,16 @@ struct ContactBubble: View {
                             }.contentShape(Rectangle())
                             .padding(.horizontal)
                         }).buttonStyle(PlainButtonStyle())
-                        .padding(.bottom, self.hasPrior ? 0 : 15)
                         .sheet(isPresented: self.$showContact, onDismiss: {
                             if self.chatContact != 0 && self.chatContact != self.message.senderID {
                                print("need to open Chat view!!")
                             }
                         }) {
-                            VisitContactView(fromDialogCell: true, newMessage: self.$chatContact, dismissView: self.$showContact, viewState: .fromRequests, contactRelationship: self.contactRelationship, contact: self.contact)
-                                .environmentObject(self.auth)
-                                .edgesIgnoringSafeArea(.all)
+                            NavigationView {
+                                VisitContactView(fromDialogCell: true, newMessage: self.$chatContact, dismissView: self.$showContact, viewState: .fromRequests, contactRelationship: self.contactRelationship, contact: self.contact)
+                                    .environmentObject(self.auth)
+                                    .edgesIgnoringSafeArea(.all)
+                            }
                         }
                         .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
                         .contentShape(RoundedRectangle(cornerRadius: 20, style: .circular))
@@ -189,7 +191,6 @@ struct ContactBubble: View {
                                 if messagePosition == .right {
                                     if self.message.messageState != .deleted {
                                         Button(action: {
-                                            print("Delete Message")
                                             self.auth.selectedConnectyDialog?.removeMessage(withID: self.message.id) { (error) in
                                                 if error != nil {
                                                     UINotificationFeedbackGenerator().notificationOccurred(.error)
@@ -281,6 +282,7 @@ struct ContactBubble: View {
                         }
                     }
                 }.frame(width: Constants.screenWidth * 0.7, height: 70)
+                .padding(.bottom, self.hasPrior ? 0 : 15)
             }
             
             HStack {
