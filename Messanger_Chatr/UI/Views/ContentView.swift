@@ -324,6 +324,7 @@ struct mainHomeList: View {
                                     .offset(y: self.activeView.height) // + (self.emptyQuickSnaps ? 25 : 197))
                                     .animation(.spring(response: 0.35, dampingFraction: 0.8, blendDuration: 0))
                                     .simultaneousGesture(DragGesture(minimumDistance: UserDefaults.standard.bool(forKey: "localOpen") ? 800 : 0))
+                                    .layoutPriority(1)
                                     .onDisappear {
                                         self.auth.leaveDialog()
                                     }
@@ -378,58 +379,60 @@ struct mainHomeList: View {
                         }
                         
                         //MARK: Main Dialog Cells
-                        ForEach(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }, id: \.self) { i in
-                            GeometryReader { geo in
-                                DialogCell(dialogModel: i,
-                                           isOpen: self.$isLocalOpen,
-                                           activeView: self.$activeView,
-                                           selectedDialogID: self.$selectedDialogID)
-                                    .environmentObject(self.auth)
-                                    .contentShape(Rectangle())
-                                    .position(x: self.isLocalOpen ? UIScreen.main.bounds.size.width / 2 : UIScreen.main.bounds.size.width / 2 - 20, y: i.isOpen ? 40 : 40)
-                                    .fixedSize(horizontal: false, vertical: true)
-                                    .zIndex(i.isOpen ? 2 : 0)
-                                    .opacity(self.isLocalOpen ? (i.isOpen ? 1 : 0) : 1)
-                                    .offset(y: i.isOpen && self.isLocalOpen ? -geo.frame(in: .global).minY + (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 50 : 25) : 125) : self.emptyQuickSnaps ? -45 : 50)
-                                    .offset(y: self.isLocalOpen ? self.activeView.height : 0)
-                                    .shadow(color: Color.black.opacity(self.isLocalOpen ? (self.colorScheme == .dark ? 0.40 : 0.15) : 0.15), radius: self.isLocalOpen ? 15 : 8, x: 0, y: self.isLocalOpen ? (self.colorScheme == .dark ? 15 : 5) : 5)
-                                    .animation(.spring(response: 0.4, dampingFraction: 0.95, blendDuration: 0))
-                                    .id(i.id)
-                                    .onTapGesture {
-                                        self.onCellTapGesture(id: i.id, dialogType: i.dialogType)
-                                    }.simultaneousGesture(DragGesture(minimumDistance: i.isOpen ? 0 : 500).onChanged { value in
-                                        guard value.translation.height < 150 else { UIApplication.shared.endEditing(true); return }
-                                        guard value.translation.height > 0 else { return }
-                                        
-                                        self.activeView = value.translation
-                                    }.onEnded { value in
-                                        if self.activeView.height > 50 {
-                                            self.isLocalOpen = false
-                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                            UserDefaults.standard.set(false, forKey: "localOpen")
-                                            UIApplication.shared.endEditing(true)
-                                            changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: i.id)
-                                            //changeDialogRealmData().updateDialogTypedText(text: self.keyboardText, dialogID: i.id)
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                                                changeDialogRealmData().fetchDialogs(completion: { _ in })
+                        VStack {
+                            ForEach(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }, id: \.self) { i in
+                                GeometryReader { geo in
+                                    DialogCell(dialogModel: i,
+                                               isOpen: self.$isLocalOpen,
+                                               activeView: self.$activeView,
+                                               selectedDialogID: self.$selectedDialogID)
+                                        .environmentObject(self.auth)
+                                        .contentShape(Rectangle())
+                                        .position(x: self.isLocalOpen ? UIScreen.main.bounds.size.width / 2 : UIScreen.main.bounds.size.width / 2 - 20, y: i.isOpen ? 40 : 40)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                        .zIndex(i.isOpen ? 2 : 0)
+                                        .opacity(self.isLocalOpen ? (i.isOpen ? 1 : 0) : 1)
+                                        .offset(y: i.isOpen && self.isLocalOpen ? -geo.frame(in: .global).minY + (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 50 : 25) : 125) : self.emptyQuickSnaps ? -45 : 50)
+                                        .offset(y: self.isLocalOpen ? self.activeView.height : 0)
+                                        .shadow(color: Color.black.opacity(self.isLocalOpen ? (self.colorScheme == .dark ? 0.40 : 0.15) : 0.15), radius: self.isLocalOpen ? 15 : 8, x: 0, y: self.isLocalOpen ? (self.colorScheme == .dark ? 15 : 5) : 5)
+                                        .animation(.spring(response: 0.4, dampingFraction: 0.95, blendDuration: 0))
+                                        .id(i.id)
+                                        .onTapGesture {
+                                            self.onCellTapGesture(id: i.id, dialogType: i.dialogType)
+                                        }.simultaneousGesture(DragGesture(minimumDistance: i.isOpen ? 0 : 500).onChanged { value in
+                                            guard value.translation.height < 150 else { UIApplication.shared.endEditing(true); return }
+                                            guard value.translation.height > 0 else { return }
+                                            
+                                            self.activeView = value.translation
+                                        }.onEnded { value in
+                                            if self.activeView.height > 50 {
+                                                self.isLocalOpen = false
+                                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                UserDefaults.standard.set(false, forKey: "localOpen")
+                                                UIApplication.shared.endEditing(true)
+                                                changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: i.id)
+                                                //changeDialogRealmData().updateDialogTypedText(text: self.keyboardText, dialogID: i.id)
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                                                    changeDialogRealmData().fetchDialogs(completion: { _ in })
+                                                }
                                             }
-                                        }
-                                        self.activeView.height = .zero
-                                        if i.dialogType == "group" || i.dialogType == "public" {
-                                            self.auth.leaveDialog()
-                                        }
-                                        if self.keyboardText.count > 0 {
-                                            self.auth.selectedConnectyDialog?.sendUserStoppedTyping()
-                                        }
-                                    })
-                            }.frame(minHeight: 75, maxHeight: 100, alignment: .center)
-                            .padding(.horizontal, self.isLocalOpen ? 0 : 20)
-                        }.offset(y: 60)
-                        .disabled(self.disableDialog)
-                        .onChange(of: UserDefaults.standard.bool(forKey: "localOpen")) { _ in
-                            self.disableDialog = true
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                self.disableDialog = false
+                                            self.activeView.height = .zero
+                                            if i.dialogType == "group" || i.dialogType == "public" {
+                                                self.auth.leaveDialog()
+                                            }
+                                            if self.keyboardText.count > 0 {
+                                                self.auth.selectedConnectyDialog?.sendUserStoppedTyping()
+                                            }
+                                        })
+                                }.frame(minHeight: 75, maxHeight: 100, alignment: .center)
+                                .padding(.horizontal, self.isLocalOpen ? 0 : 20)
+                            }.offset(y: 60)
+                            .disabled(self.disableDialog)
+                            .onChange(of: UserDefaults.standard.bool(forKey: "localOpen")) { _ in
+                                self.disableDialog = true
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                    self.disableDialog = false
+                                }
                             }
                         }
                         //.onAppear {

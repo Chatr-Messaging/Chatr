@@ -26,6 +26,7 @@ struct ChatMessagesView: View {
     @State private var firstScroll: Bool = true
     @State private var isPrevious: Bool = true
     @State private var mesgCount: Int = -1
+    let fontSize: CGFloat = CGFloat(12)
     
     var body: some View {
         let currentMessages = self.auth.messages.selectedDialog(dialogID: self.dialogID)
@@ -77,43 +78,37 @@ struct ChatMessagesView: View {
                                     }
                                     
                                     VStack(spacing: 0) {
-                                            HStack() {
-                                                if messagePosition == .right { Spacer() }
+                                        HStack() {
+                                            if messagePosition == .right { Spacer() }
 
-                                                if currentMessages[message].image != "" {
-                                                    AttachmentBubble(message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
-                                                        .environmentObject(self.auth)
-                                                        .contentShape(Rectangle())
-                                                } else if currentMessages[message].imageType == "video" {
-                                                    Text("Video here")
-                                                } else if currentMessages[message].contactID != 0 {
-                                                    ContactBubble(chatContact: self.$newDialogFromSharedContact, message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
-                                                        .environmentObject(self.auth)
-                                                        .contentShape(Rectangle())
-                                                } else if currentMessages[message].longitude != 0 && currentMessages[message].latitude != 0 {
-                                                    LocationBubble(message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
-                                                } else {
-                                                    TextBubble(message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
-                                                        .environmentObject(self.auth)
-                                                        .animation(.spring(response: 0.65, dampingFraction: 0.55, blendDuration: 0))
-                                                        .contentShape(Rectangle())
-                                                        .transition(AnyTransition.scale)
-                                                }
-                                                
-                                                if messagePosition == .left { Spacer() }
-                                            }.id(currentMessages[message].id)
-                                            .background(Color.clear)
-                                            .padding(.horizontal, 25)
-                                            .padding(.top, topMsg && currentMessages.count < 20 ? 20 : 0)
-                                            .padding(.bottom, self.hasPrevious(index: message) ? -6 : 10)
-                                            .padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 120 ? self.textFieldHeight : 120) + (self.hasAttachment ? 95 : 0) + 50)
-                                        }.onAppear() {
-                                            if currentMessages.last?.id == currentMessages[message].id {
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.09) {
-                                                    reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
-                                                }
+                                            if currentMessages[message].image != "" {
+                                                AttachmentBubble(message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
+                                                    .environmentObject(self.auth)
+                                                    .contentShape(Rectangle())
+                                            } else if currentMessages[message].imageType == "video" {
+                                                Text("Video here")
+                                            } else if currentMessages[message].contactID != 0 {
+                                                ContactBubble(chatContact: self.$newDialogFromSharedContact, message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
+                                                    .environmentObject(self.auth)
+                                                    .contentShape(Rectangle())
+                                            } else if currentMessages[message].longitude != 0 && currentMessages[message].latitude != 0 {
+                                                LocationBubble(message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
+                                            } else {
+                                                TextBubble(message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
+                                                    .environmentObject(self.auth)
+                                                    .animation(.spring(response: 0.65, dampingFraction: 0.55, blendDuration: 0))
+                                                    .contentShape(Rectangle())
+                                                    .transition(AnyTransition.scale)
                                             }
-                                        }
+                                            
+                                            if messagePosition == .left { Spacer() }
+                                        }.id(currentMessages[message].id)
+                                        .background(Color.clear)
+                                        .padding(.horizontal, 25)
+                                        .padding(.top, topMsg && currentMessages.count < 20 ? 20 : 0)
+                                        .padding(.bottom, self.hasPrevious(index: message) ? -6 : 10)
+                                        .padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 120 ? self.textFieldHeight : 120) + (self.hasAttachment ? 95 : 0) + 50)
+                                    }
                                 }.contentShape(Rectangle())
                             }.onChange(of: self.keyboardChange) { value in
                                 if value > 0 {
