@@ -412,23 +412,9 @@ struct mainHomeList: View {
                                         self.activeView = value.translation
                                     }.onEnded { value in
                                         if self.activeView.height > 50 {
-                                            self.isLocalOpen = false
-                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                            UserDefaults.standard.set(false, forKey: "localOpen")
-                                            UIApplication.shared.endEditing(true)
-                                            changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: i.id)
-                                            //changeDialogRealmData().updateDialogTypedText(text: self.keyboardText, dialogID: i.id)
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                                                changeDialogRealmData().fetchDialogs(completion: { _ in })
-                                            }
+                                            self.onCellTapGesture(id: i.id, dialogType: i.dialogType)
                                         }
                                         self.activeView.height = .zero
-                                        if i.dialogType == "group" || i.dialogType == "public" {
-                                            self.auth.leaveDialog()
-                                        }
-                                        if self.keyboardText.count > 0 {
-                                            self.auth.selectedConnectyDialog?.sendUserStoppedTyping()
-                                        }
                                     })
                             }.frame(height: 75, alignment: .center)
                             .padding(.horizontal, self.isLocalOpen ? 0 : 20)

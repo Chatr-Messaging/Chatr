@@ -107,9 +107,13 @@ struct ChatMessagesView: View {
                                     .padding(.top, topMsg && currentMessages.count < 20 ? 20 : 0)
                                     .padding(.bottom, self.hasPrevious(index: message) ? -6 : 10)
                                     .padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 120 ? self.textFieldHeight : 120) + (self.hasAttachment ? 95 : 0) + 50)
-                                }.onAppear {
+                                }.opacity(self.firstScroll ? 0 : 1)
+                                .onAppear {
                                     if currentMessages[message].id == currentMessages.last?.id {
                                         reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                            self.firstScroll = false
+                                        }
                                     }
                                 }
                             }.contentShape(Rectangle())
@@ -125,7 +129,7 @@ struct ChatMessagesView: View {
                     }.resignKeyboardOnDragGesture()
                 }
             }.onAppear() {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                     self.delayViewMessages = true
                     self.auth.acceptScrolls = true
                 }
@@ -136,7 +140,6 @@ struct ChatMessagesView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
                 changeMessageRealmData.getMessageUpdates(dialogID: self.dialogID, completion: { _ in
                     self.auth.acceptScrolls = true
-                    self.firstScroll = true
                 })
                 
                 Request.updateDialog(withID: self.dialogID, update: UpdateChatDialogParameters(), successBlock: { dialog in
