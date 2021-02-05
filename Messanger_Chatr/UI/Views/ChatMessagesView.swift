@@ -30,107 +30,106 @@ struct ChatMessagesView: View {
     
     var body: some View {
         let currentMessages = self.auth.messages.selectedDialog(dialogID: self.dialogID)
-        ZStack(alignment: .center) {
-            ScrollView(.vertical, showsIndicators: false) {
-                LazyVStack() {
-                    //No Messages found:
-                    Text(self.mesgCount == 0 ? "no messages found" : self.mesgCount == -1 ? "loading messages..." : "")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .frame(width: Constants.screenWidth)
-                        .padding(.all, self.mesgCount >= 1 && self.delayViewMessages ? 0 : 20)
-                        .offset(y: self.mesgCount >= 1 && self.delayViewMessages ? 0 : 40)
-                        .opacity(self.mesgCount >= 1 && self.delayViewMessages ? 0 : 1)
-                        .onAppear() {
-                            if !Session.current.tokenHasExpired {
-                                Request.countOfMessages(forDialogID: self.dialogID, extendedRequest: ["sort_desc" : "lastMessageDate"], successBlock: { count in
-                                    print("success getting message count: \(count)")
-                                    self.mesgCount = Int(count)
-                                })
-                            }
+        ScrollView(.vertical, showsIndicators: false) {
+            LazyVStack() {
+                //No Messages found:
+                Text(self.mesgCount == 0 ? "no messages found" : self.mesgCount == -1 ? "loading messages..." : "")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .frame(width: Constants.screenWidth)
+                    .padding(.all, self.mesgCount >= 1 && self.delayViewMessages ? 0 : 20)
+                    .offset(y: self.mesgCount >= 1 && self.delayViewMessages ? 0 : 40)
+                    .opacity(self.mesgCount >= 1 && self.delayViewMessages ? 0 : 1)
+                    .onAppear() {
+                        if !Session.current.tokenHasExpired {
+                            Request.countOfMessages(forDialogID: self.dialogID, extendedRequest: ["sort_desc" : "lastMessageDate"], successBlock: { count in
+                                print("success getting message count: \(count)")
+                                self.mesgCount = Int(count)
+                            })
                         }
-                    
-                    //CUSTOM MESSAGE BUBBLE:
-                    if self.delayViewMessages {
-                        ScrollViewReader { reader in
-                            VStack {
-                                ForEach(currentMessages.indices, id: \.self) { message in
-                                    let messagePosition: messagePosition = UInt(currentMessages[message].senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? .right : .left
-                                    let notLast = currentMessages[message] != currentMessages.last
-                                    let topMsg = currentMessages[message] == currentMessages.first
+                    }
+                
+                //CUSTOM MESSAGE BUBBLE:
+                if self.delayViewMessages {
+                    ScrollViewReader { reader in
+                        VStack {
+                            ForEach(currentMessages.indices, id: \.self) { message in
+                                let messagePosition: messagePosition = UInt(currentMessages[message].senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? .right : .left
+                                let notLast = currentMessages[message] != currentMessages.last
+                                let topMsg = currentMessages[message] == currentMessages.first
 
-                                    if topMsg && currentMessages.count > 20 {
-                                        Button(action: {
-                                            self.firstScroll = false
-                                            self.auth.acceptScrolls = false
-                                            changeMessageRealmData.loadMoreMessages(dialogID: currentMessages[message].dialogID, currentCount: currentMessages.count, completion: { _ in
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                                                    withAnimation {
-                                                        reader.scrollTo(currentMessages[message + 20].id, anchor: .top)
-                                                    }
+                                if topMsg && currentMessages.count > 20 {
+                                    Button(action: {
+                                        self.firstScroll = false
+                                        self.auth.acceptScrolls = false
+                                        changeMessageRealmData.loadMoreMessages(dialogID: currentMessages[message].dialogID, currentCount: currentMessages.count, completion: { _ in
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                                withAnimation {
+                                                    reader.scrollTo(currentMessages[message + 20].id, anchor: .top)
                                                 }
-                                            })
-                                            
-                                        }, label: {
-                                            Text("Load More...")
-                                                .foregroundColor(.blue)
-                                        }).padding(.top)
-                                    }
-                                    
-                                    VStack(spacing: 0) {
-                                        HStack() {
-                                            if messagePosition == .right { Spacer() }
-
-                                            if currentMessages[message].image != "" {
-                                                AttachmentBubble(message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
-                                                    .environmentObject(self.auth)
-                                                    .contentShape(Rectangle())
-                                            } else if currentMessages[message].imageType == "video" {
-                                                Text("Video here")
-                                            } else if currentMessages[message].contactID != 0 {
-                                                ContactBubble(chatContact: self.$newDialogFromSharedContact, message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
-                                                    .environmentObject(self.auth)
-                                                    .contentShape(Rectangle())
-                                            } else if currentMessages[message].longitude != 0 && currentMessages[message].latitude != 0 {
-                                                LocationBubble(message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
-                                            } else {
-                                                TextBubble(message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
-                                                    .environmentObject(self.auth)
-                                                    .animation(.spring(response: 0.65, dampingFraction: 0.55, blendDuration: 0))
-                                                    .contentShape(Rectangle())
-                                                    .transition(AnyTransition.scale)
                                             }
-                                            
-                                            if messagePosition == .left { Spacer() }
-                                        }.id(currentMessages[message].id)
-                                        .background(Color.clear)
-                                        .padding(.horizontal, 25)
-                                        .padding(.top, topMsg && currentMessages.count < 20 ? 20 : 0)
-                                        .padding(.bottom, self.hasPrevious(index: message) ? -6 : 10)
-                                        .padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 120 ? self.textFieldHeight : 120) + (self.hasAttachment ? 95 : 0) + 50)
-                                    }
-                                }.contentShape(Rectangle())
-                            }.onChange(of: self.keyboardChange) { value in
-                                if value > 0 {
-                                    withAnimation {
+                                        })
+                                        
+                                    }, label: {
+                                        Text("Load More...")
+                                            .foregroundColor(.blue)
+                                    }).padding(.top)
+                                }
+                                
+                                VStack(spacing: 0) {
+                                    HStack() {
+                                        if messagePosition == .right { Spacer() }
+
+                                        if currentMessages[message].image != "" {
+                                            AttachmentBubble(message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
+                                                .environmentObject(self.auth)
+                                                .contentShape(Rectangle())
+                                        } else if currentMessages[message].imageType == "video" {
+                                            Text("Video here")
+                                        } else if currentMessages[message].contactID != 0 {
+                                            ContactBubble(chatContact: self.$newDialogFromSharedContact, message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
+                                                .environmentObject(self.auth)
+                                                .contentShape(Rectangle())
+                                        } else if currentMessages[message].longitude != 0 && currentMessages[message].latitude != 0 {
+                                            LocationBubble(message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
+                                        } else {
+                                            TextBubble(message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
+                                                .environmentObject(self.auth)
+                                                .animation(.spring(response: 0.65, dampingFraction: 0.55, blendDuration: 0))
+                                                .contentShape(Rectangle())
+                                                .transition(AnyTransition.scale)
+                                        }
+                                        
+                                        if messagePosition == .left { Spacer() }
+                                    }.id(currentMessages[message].id)
+                                    .background(Color.clear)
+                                    .padding(.horizontal, 25)
+                                    .padding(.top, topMsg && currentMessages.count < 20 ? 20 : 0)
+                                    .padding(.bottom, self.hasPrevious(index: message) ? -6 : 10)
+                                    .padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 120 ? self.textFieldHeight : 120) + (self.hasAttachment ? 95 : 0) + 50)
+                                }.onAppear {
+                                    if currentMessages[message].id == currentMessages.last?.id {
                                         reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
                                     }
                                 }
-                            }.onChange(of: currentMessages) { msg in
+                            }.contentShape(Rectangle())
+                        }.onChange(of: self.keyboardChange) { value in
+                            if value > 0 {
                                 withAnimation {
                                     reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
                                 }
                             }
-                        }.resignKeyboardOnDragGesture()
-                    }
+                        }.onChange(of: currentMessages) { msg in
+                            reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
+                        }
+                    }.resignKeyboardOnDragGesture()
                 }
-                .onAppear() {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        self.delayViewMessages = true
-                        self.auth.acceptScrolls = true
-                    }
+            }.onAppear() {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self.delayViewMessages = true
+                    self.auth.acceptScrolls = true
                 }
-            }.contentShape(Rectangle())
+            }
         }.frame(width: Constants.screenWidth)
         .contentShape(Rectangle())
         .onAppear() {

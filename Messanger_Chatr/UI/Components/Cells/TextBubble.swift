@@ -121,13 +121,9 @@ struct TextBubble: View {
                     } else if self.message.messageState == .isTyping {
                         HStack(spacing: 6) {
                             ForEach(0..<3) { type in
-                                Image("typingDot")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .scaledToFit()
+                                Circle()
                                     .frame(width: 10, height: 10, alignment: .center)
                                     .background(Color.secondary)
-                                    .clipShape(Circle())
                                     .opacity(Double(self.typingOpacity))
                                     .animation(Animation.easeInOut(duration: 0.66).repeatForever(autoreverses: true).delay(Double(type + 1) * 0.22))
                                     .onAppear() {

@@ -31,8 +31,7 @@ struct AttachmentBubble: View {
                             Text("loading GIF...")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                        }.cornerRadius(20)
-                        .background(Color("pendingBtnColor"))
+                        }
                     }
                     .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                     .aspectRatio(contentMode: .fit)
@@ -103,8 +102,7 @@ struct AttachmentBubble: View {
                             Text("loading image...")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                        }.background(Color("pendingBtnColor"))
-                        .cornerRadius(20)
+                        }
                     }.transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                     .aspectRatio(contentMode: .fit)
                     .scaledToFit()

@@ -41,59 +41,56 @@ struct LocationBubble: View {
             if self.message.messageState != .deleted {
                 Map(coordinateRegion: $region, interactionModes: MapInteractionModes.all, showsUserLocation: true, userTrackingMode: $userTrackingMode, annotationItems: [MyAnnotationItem(coordinate: CLLocationCoordinate2D(latitude: self.message.latitude, longitude: self.message.longitude))]) { marker in
                     MapPin(coordinate: marker.coordinate)
+                }.frame(height: CGFloat(Constants.screenWidth * 0.4))
+                .cornerRadius(20)
+                .padding(.leading, self.messagePosition == .right ? 35 : 0)
+                .padding(.trailing, self.messagePosition == .right ? 0 : 35)
+                .padding(.bottom, self.hasPrior ? 0 : 15)
+                //.aspectRatio(contentMode: .fill)
+                //.clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
+                //.contentShape(RoundedRectangle(cornerRadius: 20, style: .circular))
+                .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 10)
+                .animation(nil)
+                //.offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
+                .onAppear() {
+                    self.region.center.latitude = self.message.latitude
+                    self.region.center.longitude = self.message.longitude
                 }
-                    .aspectRatio(contentMode: .fit)
-                    .scaledToFit()
-                    .cornerRadius(15)
-                    .frame(idealWidth: CGFloat(Constants.screenWidth * 0.60), idealHeight: CGFloat(Constants.screenWidth * 0.6))
-                    .padding(.leading, self.messagePosition == .right ? 35 : 0)
-                    .padding(.trailing, self.messagePosition == .right ? 0 : 35)
-                    .cornerRadius(20)
-                    .padding(.bottom, self.hasPrior ? 0 : 15)
-                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
-                    .contentShape(RoundedRectangle(cornerRadius: 20, style: .circular))
-                    .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 10)
-                    .animation(nil)
-                    .offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
-                    .onAppear() {
-                        self.region.center.latitude = self.message.latitude
-                        self.region.center.longitude = self.message.longitude
-                    }
-                    .contextMenu {
-                        VStack {
-                            if messagePosition == .right {
-                                if self.message.messageState != .deleted {
-                                    Button(action: {
-                                        print("Delete Map")
-                                        self.auth.selectedConnectyDialog?.removeMessage(withID: self.message.id) { (error) in
-                                            if error != nil {
-                                                UINotificationFeedbackGenerator().notificationOccurred(.error)
-                                            } else {
-                                                changeMessageRealmData.updateMessageState(messageID: self.message.id, messageState: .deleted)
-                                            }
+                .contextMenu {
+                    VStack {
+                        if messagePosition == .right {
+                            if self.message.messageState != .deleted {
+                                Button(action: {
+                                    print("Delete Map")
+                                    self.auth.selectedConnectyDialog?.removeMessage(withID: self.message.id) { (error) in
+                                        if error != nil {
+                                            UINotificationFeedbackGenerator().notificationOccurred(.error)
+                                        } else {
+                                            changeMessageRealmData.updateMessageState(messageID: self.message.id, messageState: .deleted)
                                         }
-                                    }) { HStack {
-                                        Image(systemName: "trash")
-                                        Text("Delete")
-                                            .foregroundColor(.red) }
                                     }
+                                }) { HStack {
+                                    Image(systemName: "trash")
+                                    Text("Delete")
+                                        .foregroundColor(.red) }
                                 }
                             }
-                            Button(action: {
-                                print("Forward Map")
-                            }) { HStack {
-                                Image(systemName: "arrowshape.turn.up.left")
-                                Text("Forward Map") }
-                            }
-                            Button(action: {
-                                print("Open in maps")
-                                self.openMapForPlace()
-                            }) { HStack {
-                                Image(systemName: "arrowshape.turn.up.left")
-                                Text("Open in Maps") }
-                            }
+                        }
+                        Button(action: {
+                            print("Forward Map")
+                        }) { HStack {
+                            Image(systemName: "arrowshape.turn.up.left")
+                            Text("Forward Map") }
+                        }
+                        Button(action: {
+                            print("Open in maps")
+                            self.openMapForPlace()
+                        }) { HStack {
+                            Image(systemName: "arrowshape.turn.up.left")
+                            Text("Open in Maps") }
                         }
                     }
+                }
             } else if self.message.messageState == .deleted {
                 ZStack {
                     Text("deleted")
