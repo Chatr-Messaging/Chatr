@@ -310,27 +310,7 @@ struct mainHomeList: View {
                                 .animation(.spring(response: 0.4, dampingFraction: 0.8, blendDuration: 0))
                                 .resignKeyboardOnDragGesture()
                         }
-                        
-                        //Chat View
-                        if UserDefaults.standard.bool(forKey: "localOpen") {
-                            GeometryReader { geo in
-                                ChatMessagesView(activeView: self.$activeView, keyboardChange: self.$keyboardHeight, dialogID: self.$selectedDialogID, textFieldHeight: self.$textFieldHeight, keyboardDragState: self.$keyboardDragState, hasAttachment: self.$hasAttachments, newDialogFromSharedContact: self.$newDialogFromSharedContact)
-                                    .environmentObject(self.auth)
-                                    .frame(width: Constants.screenWidth, height: Constants.screenHeight - (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 123 : 87) : 197), alignment: .bottom)
-                                    .zIndex(1)
-                                    .contentShape(Rectangle())
-                                    .offset(y: -geo.frame(in: .global).minY + (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 123 : 87) : 197))
-                                    .padding(.bottom, self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 123 : 87) : 197)
-                                    .offset(y: self.activeView.height) // + (self.emptyQuickSnaps ? 25 : 197))
-                                    .animation(.spring(response: 0.35, dampingFraction: 0.8, blendDuration: 0))
-                                    .simultaneousGesture(DragGesture(minimumDistance: UserDefaults.standard.bool(forKey: "localOpen") ? 800 : 0))
-                                    .layoutPriority(1)
-                                    .onDisappear {
-                                        self.auth.leaveDialog()
-                                    }
-                            }
-                        }
-                        
+                                                
                         //MARK: Dialogs Section
                         if self.dialogs.results.filter { $0.isDeleted != true }.count == 0 {
                             VStack {
@@ -437,6 +417,26 @@ struct mainHomeList: View {
                                 .padding(.bottom, 25)
                                 .opacity(self.isLocalOpen ? 0 : 1)
                         }
+                    }
+                }
+                
+                //Chat View
+                if UserDefaults.standard.bool(forKey: "localOpen") {
+                    GeometryReader { geo in
+                        ChatMessagesView(activeView: self.$activeView, keyboardChange: self.$keyboardHeight, dialogID: self.$selectedDialogID, textFieldHeight: self.$textFieldHeight, keyboardDragState: self.$keyboardDragState, hasAttachment: self.$hasAttachments, newDialogFromSharedContact: self.$newDialogFromSharedContact)
+                            .environmentObject(self.auth)
+                            .frame(width: Constants.screenWidth, height: Constants.screenHeight - (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 123 : 87) : 197), alignment: .bottom)
+                            .zIndex(1)
+                            .contentShape(Rectangle())
+                            .offset(y: -geo.frame(in: .global).minY + (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 123 : 87) : 197))
+                            .padding(.bottom, self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 123 : 87) : 197)
+                            .offset(y: self.activeView.height) // + (self.emptyQuickSnaps ? 25 : 197))
+                            .animation(.spring(response: 0.35, dampingFraction: 0.8, blendDuration: 0))
+                            .simultaneousGesture(DragGesture(minimumDistance: UserDefaults.standard.bool(forKey: "localOpen") ? 800 : 0))
+                            .layoutPriority(1)
+                            .onDisappear {
+                                self.auth.leaveDialog()
+                            }
                     }
                 }
 

@@ -10,6 +10,7 @@ import SwiftUI
 import MobileCoreServices
 import SDWebImageSwiftUI
 import ConnectyCube
+import Firebase
 import RealmSwift
 import WKView
 
@@ -21,8 +22,11 @@ struct TextBubble: View {
     @State var avatar: String = ""
     @State private var typingOpacity: CGFloat = 1.0
     @State var showInteractions: Bool = false
+    @State var moveUpAnimation: Bool = false
+    @State var showLike: Bool = false
+    @State var showDislike: Bool = false
     @State var interactionSelected: String = ""
-    @State var reactions: [String] = ["like", "dislike", "question", "forward", "copy", "trash"]
+    @State var reactions: [String] = []
     var hasPrior: Bool = true
     var repeatingAnimation: Animation {
         Animation
@@ -31,163 +35,154 @@ struct TextBubble: View {
     }
     
     var body: some View {
-        ZStack(alignment: self.messagePosition == .right ? .bottomTrailing : .bottomLeading) {
-            //VStack(alignment: self.messagePosition == .right ? .trailing : .leading) {
-                // chack if there are 4 or more emoji's in text
-                //if self.message.text.containsEmoji && self.message.text.count <= 4 {
-//                    HStack() {
-//                        //converts string to image and loops through
-//                        ForEach(self.message.text.emojiToImage(text: self.message.text), id: \.self) { text in
-//                            Image(uiImage: text ?? UIImage())
-//                                .resizable()
-//                                .frame(width: 55, height: 55, alignment: .center)
-//                                .foregroundColor(.clear)
-//                                .shadow(color: Color.black.opacity(0.25), radius: 10, x: 0, y: 10)
-//                                .padding(.horizontal, 2.5)
-//                        }
-//                    }
-                //} else {
-                ZStack {
-                    if self.message.messageState != .isTyping || self.message.messageState == .deleted {
-                        if self.message.text.containsEmoji && self.message.text.count <= 4 {
-                            Text(self.message.text)
-                                .font(.system(size: 66))
-                                .offset(x: self.messagePosition == .right ? -10 : 10, y: -5)
-                                .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 5)
-                        } else {
-                            LinkedText(self.message.text, messageRight: self.messagePosition == .right)
-                                .onTapGesture(count: 2) {
-                                    print("Double tapped!")
-                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                }.gesture(DragGesture(minimumDistance: 0).onChanged(onChanged(value:)).onEnded(onEnded(value:)))
-                        }
-
-                        /*
-                        Menu {
-                            VStack {
-                                if messagePosition == .right {
-                                    if self.message.messageState != .deleted {
-                                        Button(action: {
-                                            self.auth.selectedConnectyDialog?.removeMessage(withID: self.message.id) { (error) in
-                                                if error != nil {
-                                                    UINotificationFeedbackGenerator().notificationOccurred(.error)
-                                                } else {
-                                                    changeMessageRealmData.updateMessageState(messageID: self.message.id, messageState: .deleted)
-                                                }
+        ZStack(alignment: self.messagePosition == .right ? .topTrailing : .topLeading) {
+            ZStack(alignment: self.messagePosition == .right ? .bottomTrailing : .bottomLeading) {
+                    ZStack {
+                        if self.message.messageState != .isTyping || self.message.messageState == .deleted {
+                            if self.message.text.containsEmoji && self.message.text.count <= 4 {
+                                Text(self.message.text)
+                                    .font(.system(size: 66))
+                                    .offset(x: self.messagePosition == .right ? -10 : 10, y: -5)
+                                    .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 5)
+                            } else {
+                                ZStack(alignment: self.messagePosition == .left ? .topTrailing : .topLeading) {
+                                    LinkedText(self.message.text, messageRight: self.messagePosition == .right)
+                                        .scaleEffect(self.showInteractions ? 1.1 : 1.0)
+                                        .onTapGesture(count: 2) {
+                                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                            likeMessage()
+                                        }.gesture(DragGesture(minimumDistance: 0).onChanged(onChanged(value:)).onEnded(onEnded(value:)))
+                                        .onChange(of: self.showInteractions) { _ in
+                                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                        }.onAppear() {
+                                            self.loadFirebase()
+                                            if self.messagePosition == .right {
+                                                self.reactions.append("trash")
+                                                self.reactions.append("edit")
+                                                self.reactions.append("copy")
+                                                self.reactions.append("reply")
+                                            } else {
+                                                self.reactions.append("like")
+                                                self.reactions.append("dislike")
+                                                self.reactions.append("reply")
+                                                self.reactions.append("copy")
                                             }
-                                        }) { HStack {
-                                            Image(systemName: "trash")
-                                            Text("Delete")
-                                                .foregroundColor(.red) }
                                         }
-                                    }
-                                    Button(action: {
-                                        print("Edit Message")
-                                    }) { HStack {
-                                        Image(systemName: "pencil")
-                                        Text("Edit") }
-                                    }
-                                }
 
-                                Button(action: {
-                                    print("Copy Message")
-                                    UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                    UIPasteboard.general.setValue(self.message.text,
-                                                forPasteboardType: kUTTypePlainText as String)
-                                    auth.notificationtext = "Successfully copied message"
-                                    NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
-                                }) { HStack {
-                                    Image(systemName: "doc.on.doc")
-                                    Text("Copy Text") }
-                                }
-                                
-                                ForEach(self.URLStrings, id: \.self) { link in
-                                    Button(action: {
-                                        UIApplication.shared.open(link as URL)
-                                        print("Open \(link) && \(link.absoluteString ?? "")")
-                                    }) { HStack {
-                                        Image(systemName: "safari")
-                                        Text("Open \(link)") }
+                                    HStack(spacing: 5) {
+                                        if showDislike {
+                                            Button(action: {
+                                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                                self.dislikeMessage()
+                                            }, label: {
+                                                HStack(spacing: 2) {
+                                                    Text(self.message.dislikes > 1 ? "\(self.message.dislikes)" : "")
+                                                        .font(.subheadline)
+                                                        .fontWeight(.medium)
+                                                        .foregroundColor(.primary)
+                                                    
+                                                    Image("dislike")
+                                                        .resizable()
+                                                        .scaledToFit()
+                                                        .frame(width: 25, height: 25, alignment: .center)
+                                                }.padding(.horizontal, 10)
+                                                .padding(.vertical, 5)
+                                                    
+                                            }).buttonStyle(highlightedButtonStyle())
+                                            .offset(x: self.messagePosition == .left ? 15 : -15, y: -20)
+                                        }
+
+                                        if showLike {
+                                            Button(action: {
+                                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                                self.likeMessage()
+                                            }, label: {
+                                                HStack(spacing: 2) {
+                                                    Text(self.message.likes > 1 ? "\(self.message.likes)" : "")
+                                                        .font(.subheadline)
+                                                        .fontWeight(.medium)
+                                                        .foregroundColor(.primary)
+                                                    
+                                                    Image("like")
+                                                        .resizable()
+                                                        .scaledToFit()
+                                                        .frame(width: 25, height: 25, alignment: .center)
+                                                }.padding(.horizontal, 10)
+                                                .padding(.vertical, 5)
+                                                    
+                                            }).buttonStyle(highlightedButtonStyle())
+                                            .offset(x: self.messagePosition == .left ? 15 : -15, y: -20)
+                                        }
                                     }
                                 }
                             }
-                        } label: {
-                            Text(self.message.messageState == .deleted ? "deleted" : self.message.text)
-                                .multilineTextAlignment(.leading)
-                                .foregroundColor(self.message.messageState != .deleted ? messagePosition == .right ? .white : .primary : .secondary)
-                                .padding(.horizontal, 15)
-                                .padding(.vertical, 10)
-                                .transition(AnyTransition.scale)
-                                .background(self.messagePosition == .right && self.message.messageState != .deleted ? LinearGradient(
-                                    gradient: Gradient(colors: [Color(red: 46 / 255, green: 168 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)]),
-                                    startPoint: .top, endPoint: .bottom) : LinearGradient(
-                                        gradient: Gradient(colors: [Color("buttonColor"), Color("buttonColor_darker")]), startPoint: .top, endPoint: .bottom))
-                                .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
-                                .contentShape(RoundedRectangle(cornerRadius: 20, style: .circular))
-                                .shadow(color: self.messagePosition == .right && self.message.messageState != .deleted ? Color.blue.opacity(0.15) : Color.black.opacity(0.15), radius: 6, x: 0, y: 6)
-                        }.simultaneousGesture(TapGesture()
-                            .onEnded { _ in
-                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                            })
-                        */
-                    } else if self.message.messageState == .isTyping {
-                        ZStack {
-                            Capsule()
-                                .frame(width: 65, height: 45, alignment: .center)
-                                .background(LinearGradient(gradient: Gradient(colors: [Color("buttonColor"), Color("buttonColor_darker")]), startPoint: .top, endPoint: .bottom))
-                                        .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
-                                        .contentShape(RoundedRectangle(cornerRadius: 20, style: .circular))
-                                .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 6)
-                            HStack(spacing: 6) {
-                                ForEach(0..<3) { type in
-                                    Circle()
-                                        .frame(width: 10, height: 10, alignment: .center)
-                                        .background(Color.secondary)
-                                        .opacity(Double(self.typingOpacity))
-                                        .animation(Animation.easeInOut(duration: 0.66).repeatForever(autoreverses: true).delay(Double(type + 1) * 0.22))
-                                        .onAppear() {
-                                            withAnimation(self.repeatingAnimation) {
-                                                self.typingOpacity = 0.20
+                        } else if self.message.messageState == .isTyping {
+                            ZStack {
+                                Capsule()
+                                    .frame(width: 65, height: 45, alignment: .center)
+                                    .background(LinearGradient(gradient: Gradient(colors: [Color("buttonColor"), Color("buttonColor_darker")]), startPoint: .top, endPoint: .bottom))
+                                            .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
+                                            .contentShape(RoundedRectangle(cornerRadius: 20, style: .circular))
+                                    .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 6)
+                                HStack(spacing: 6) {
+                                    ForEach(0..<3) { type in
+                                        Circle()
+                                            .frame(width: 10, height: 10, alignment: .center)
+                                            .background(Color.secondary)
+                                            .opacity(Double(self.typingOpacity))
+                                            .animation(Animation.easeInOut(duration: 0.66).repeatForever(autoreverses: true).delay(Double(type + 1) * 0.22))
+                                            .onAppear() {
+                                                withAnimation(self.repeatingAnimation) {
+                                                    self.typingOpacity = 0.20
+                                                }
                                             }
-                                        }
-                                }
-                            }.padding(.horizontal, 15)
-                            .padding(.vertical, 7.5)
+                                    }
+                                }.padding(.horizontal, 15)
+                                .padding(.vertical, 7.5)
+                            }
                         }
-                    }
-                }.padding(.bottom, self.hasPrior ? 0 : 15)
-                .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.45)), removal: AnyTransition.identity))
-            HStack {
-                if messagePosition == .right { Spacer() }
+                    }.padding(.bottom, self.hasPrior ? 0 : 15)
+                    .padding(.top, self.message.likes != 0 || self.message.dislikes != 0 ? 20 : 0)
+                    .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.45)), removal: AnyTransition.identity))
+                    .onChange(of: self.message.likes, perform: { value in
+                        self.checkLikes()
+                    })
                 
-                Text(self.subText.messageStatusText(message: self.message, positionRight: messagePosition == .right))
-                    .foregroundColor(self.hasPrior && self.message.messageState == .error ? .red : .gray)
-                    .font(.caption)
-                    .lineLimit(1)
-                    .padding(.horizontal)
-                    .multilineTextAlignment(messagePosition == .right ? .trailing : .leading)
-                    .opacity(self.hasPrior && self.message.messageState != .error ? 0 : 1)
+                HStack {
+                    if messagePosition == .right { Spacer() }
+                    
+                    Text(self.subText.messageStatusText(message: self.message, positionRight: messagePosition == .right))
+                        .foregroundColor(self.hasPrior && self.message.messageState == .error ? .red : .gray)
+                        .font(.caption)
+                        .lineLimit(1)
+                        .padding(.horizontal)
+                        .multilineTextAlignment(messagePosition == .right ? .trailing : .leading)
+                        .opacity(self.hasPrior && self.message.messageState != .error ? 0 : 1)
+                    
+                    if messagePosition == .left { Spacer() }
+                }
                 
-                if messagePosition == .left { Spacer() }
+                WebImage(url: URL(string: self.avatar))
+                    .resizable()
+                    .placeholder{ Image("empty-profile").resizable().frame(width: self.hasPrior ? 0 : Constants.smallAvitarSize, height: self.hasPrior ? 0 : Constants.smallAvitarSize, alignment: .bottom).scaledToFill() }
+                    .indicator(.activity)
+                    .scaledToFill()
+                    .clipShape(Circle())
+                    .frame(width: self.hasPrior ? 0 : Constants.smallAvitarSize, height: self.hasPrior ? 0 : Constants.smallAvitarSize, alignment: .bottom)
+                    .offset(x: messagePosition == .right ? (Constants.smallAvitarSize / 2) : -(Constants.smallAvitarSize / 2))
+                    .opacity(self.hasPrior ? 0 : 1)
+                    .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 6)
             }
-            
-            WebImage(url: URL(string: self.avatar))
-                .resizable()
-                .placeholder{ Image("empty-profile").resizable().frame(width: self.hasPrior ? 0 : Constants.smallAvitarSize, height: self.hasPrior ? 0 : Constants.smallAvitarSize, alignment: .bottom).scaledToFill() }
-                .indicator(.activity)
-                .scaledToFill()
-                .clipShape(Circle())
-                .frame(width: self.hasPrior ? 0 : Constants.smallAvitarSize, height: self.hasPrior ? 0 : Constants.smallAvitarSize, alignment: .bottom)
-                .offset(x: messagePosition == .right ? (Constants.smallAvitarSize / 2) : -(Constants.smallAvitarSize / 2))
-                .opacity(self.hasPrior ? 0 : 1)
-                .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 6)
-            
+
             if self.showInteractions {
-                ReactionsView(interactionSelected: $interactionSelected)
-                    .offset(y: -90)
-                    .padding(.leading, messagePosition == .left ? 30 : 0)
-                    .padding(.trailing, messagePosition == .right ? 30 : 0)
+                ReactionsView(interactionSelected: $interactionSelected, reactions: $reactions)
+                    .offset(y: moveUpAnimation ? -60 : -45)
                     .zIndex(2)
+                    .onAppear() {
+                        self.moveUpAnimation = true
+                    }.onDisappear() {
+                        self.moveUpAnimation = false
+                    }
             }
         }.onAppear() {
             if self.message.senderID == UserDefaults.standard.integer(forKey: "currentUserID") {
@@ -211,29 +206,135 @@ struct TextBubble: View {
             }
         }
     }
-    
+        
     func onChanged(value: DragGesture.Value){
         withAnimation(.easeIn) { showInteractions = true }
         
         // Simple Logic....
-        withAnimation(Animation.linear(duration: 0.085)) {
+        withAnimation(Animation.linear(duration: 0.065)) {
             let x = value.location.x
+            print("the drage vaule X is: \(x)")
+            if self.messagePosition == .left {
+                if x > 20 && x < 80 { interactionSelected = reactions[0] }
+                if x > 80 && x < 140 { interactionSelected = reactions[1] }
+                if x > 140 && x < 180 { interactionSelected = reactions[2] }
+                if x > 180 && x < 240 { interactionSelected = reactions[3] }
+                if x < 20 || x > 240 { interactionSelected = "" }
+            } else {
+                if x > 230 && x < 290 { interactionSelected = reactions[3] }
+                if x > 170 && x < 230 { interactionSelected = reactions[2] }
+                if x > 110 && x < 170 { interactionSelected = reactions[1] }
+                if x > 50 && x < 110 { interactionSelected = reactions[0] }
+                if x < 50 || x > 290 { interactionSelected = "" }
+            }
             
-            if x > 20 && x < 80 { interactionSelected = reactions[0] }
-            if x > 80 && x < 140 { interactionSelected = reactions[1] }
-            if x > 140 && x < 180 { interactionSelected = reactions[2] }
-            if x > 180 && x < 240 { interactionSelected = reactions[3] }
-            if x > 240 && x < 300 { interactionSelected = reactions[4] }
-            if x > 300 && x < 360 { interactionSelected = reactions[5] }
-            
-            // if less or exceeds no Reaction..
-            if x < 20 || x > 360 { interactionSelected = "" }
         }
     }
     
     func onEnded(value: DragGesture.Value){
-        withAnimation(Animation.linear.delay(0.1)){
+        withAnimation(Animation.linear){
             showInteractions = false
+        }
+        
+        if interactionSelected == "like" {
+            likeMessage()
+        } else if interactionSelected == "dislike" {
+            dislikeMessage()
+        } else if interactionSelected == "copy" {
+            copyMessage()
+        } else if interactionSelected == "reply" {
+            replyMessage()
+        } else if interactionSelected == "edit" {
+            editMessage()
+        } else if interactionSelected == "trash" {
+            trashMessage()
+        }
+    }
+    
+    func loadFirebase() {
+        let msg = Database.database().reference().child("Dialogs").child(self.message.dialogID).child(self.message.id)
+        msg.observe(.value, with: { snap in
+            print("value like: \(snap.childSnapshot(forPath: "likes").childrenCount) value dislike: \(snap.childSnapshot(forPath: "dislikes").childrenCount)")
+            changeMessageRealmData.updateMessageLike(messageID: self.message.id, messageLikeCount: Int(snap.childSnapshot(forPath: "likes").childrenCount))
+            changeMessageRealmData.updateMessageDislike(messageID: self.message.id, messageDislikeCount: Int(snap.childSnapshot(forPath: "dislikes").childrenCount))
+            self.checkLikes()
+        })
+    }
+    
+    func likeMessage() {
+        let msg = Database.database().reference().child("Dialogs").child(self.message.dialogID).child(self.message.id).child("likes")
+
+        msg.observeSingleEvent(of: .value, with: { snapshot in
+            let count = snapshot.childrenCount
+
+            if snapshot.childSnapshot(forPath: "\(Session.current.currentUserID)").exists() {
+                changeMessageRealmData.updateMessageLike(messageID: self.message.id, messageLikeCount: Int(count - 1))
+                msg.child("\(Session.current.currentUserID)").removeValue()
+            } else {
+                changeMessageRealmData.updateMessageLike(messageID: self.message.id, messageLikeCount: Int(count + 1))
+                msg.updateChildValues(["\(Session.current.currentUserID)" : "\(Date())"])
+            }
+            self.checkLikes()
+        })
+    }
+    
+    func dislikeMessage() {
+        let msg = Database.database().reference().child("Dialogs").child(self.message.dialogID).child(self.message.id).child("dislikes")
+
+        msg.observeSingleEvent(of: .value, with: { snapshot in
+            let count = snapshot.childrenCount
+            
+            if snapshot.childSnapshot(forPath: "\(Session.current.currentUserID)").exists() {
+                changeMessageRealmData.updateMessageDislike(messageID: self.message.id, messageDislikeCount: Int(count - 1))
+                msg.child("\(Session.current.currentUserID)").removeValue()
+            } else {
+                changeMessageRealmData.updateMessageDislike(messageID: self.message.id, messageDislikeCount: Int(count + 1))
+                msg.updateChildValues(["\(Session.current.currentUserID)" : "\(Date())"])
+            }
+            self.checkLikes()
+        })
+    }
+    
+    func copyMessage() {
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        UIPasteboard.general.setValue(self.message.text,
+                    forPasteboardType: kUTTypePlainText as String)
+        auth.notificationtext = "Successfully copied message"
+        NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+    }
+    
+    func replyMessage() {
+        print("reply message")
+    }
+    
+    func editMessage() {
+        print("edit message")
+    }
+    
+    func checkLikes() {
+        if self.message.likes > 0 {
+            self.showLike = true
+        } else {
+            self.showLike = false
+        }
+        
+        if self.message.dislikes > 0 {
+            self.showDislike = true
+        } else {
+            self.showDislike = false
+        }
+    }
+    
+    func trashMessage() {
+        print("trash message")
+        self.auth.selectedConnectyDialog?.removeMessage(withID: self.message.id) { (error) in
+            if error != nil {
+                UINotificationFeedbackGenerator().notificationOccurred(.error)
+            } else {
+                changeMessageRealmData.updateMessageState(messageID: self.message.id, messageState: .deleted)
+                auth.notificationtext = "Deleted Message"
+                NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+            }
         }
     }
 }

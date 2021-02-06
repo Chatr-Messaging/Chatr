@@ -95,7 +95,7 @@ struct ChatMessagesView: View {
                                         } else {
                                             TextBubble(message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
                                                 .environmentObject(self.auth)
-                                                .animation(.spring(response: 0.65, dampingFraction: 0.55, blendDuration: 0))
+                                                .animation(.spring(response: 0.58, dampingFraction: 0.55, blendDuration: 0))
                                                 .contentShape(Rectangle())
                                                 .transition(AnyTransition.scale)
                                         }

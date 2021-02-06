@@ -21,6 +21,8 @@ class MessageStruct : Object, Identifiable {
     @objc dynamic var longitude: Double = 0.0
     @objc dynamic var latitude: Double = 0.0
     @objc dynamic var contactID: Int = 0
+    @objc dynamic var likes: Int = 0
+    @objc dynamic var dislikes: Int = 0
     @objc dynamic var image: String = ""
     @objc dynamic var imageType: String = ""
     @objc dynamic var hadDelay: Bool = false
@@ -420,6 +422,40 @@ class changeMessageRealmData {
             }) { (error) in
                 print("there is an error uploading attachment: \(error.localizedDescription)")
             }
+        }
+    }
+    
+    static func updateMessageLike(messageID: String, messageLikeCount: Int) {
+        let config = Realm.Configuration(schemaVersion: 1)
+        do {
+            let realm = try Realm(configuration: config)
+            if let realmContact = realm.object(ofType: MessageStruct.self, forPrimaryKey: messageID) {
+                if realmContact.likes != messageLikeCount {
+                    try realm.safeWrite {
+                        realmContact.likes = messageLikeCount
+                        realm.add(realmContact, update: .all)
+                    }
+                }
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
+    static func updateMessageDislike(messageID: String, messageDislikeCount: Int) {
+        let config = Realm.Configuration(schemaVersion: 1)
+        do {
+            let realm = try Realm(configuration: config)
+            if let realmContact = realm.object(ofType: MessageStruct.self, forPrimaryKey: messageID) {
+                if realmContact.dislikes != messageDislikeCount {
+                    try realm.safeWrite {
+                        realmContact.dislikes = messageDislikeCount
+                        realm.add(realmContact, update: .all)
+                    }
+                }
+            }
+        } catch {
+            print(error.localizedDescription)
         }
     }
     
