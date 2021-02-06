@@ -20,6 +20,7 @@
 		0521234C24C8E338008123CF /* ProfileSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0521234B24C8E338008123CF /* ProfileSettingsView.swift */; };
 		052347B623E55C8A00EF9CEB /* FullNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052347B523E55C8A00EF9CEB /* FullNameView.swift */; };
 		052364C32439A37200AF825F /* DialogCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052364C22439A37200AF825F /* DialogCell.swift */; };
+		052E6E2025CE513B00C3EAE4 /* ReactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052E6E1F25CE513B00C3EAE4 /* ReactionsView.swift */; };
 		053AC4B225194C080036946E /* GIFController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053AC4B125194C080036946E /* GIFController.swift */; };
 		053AC4B7251982560036946E /* AttachmentBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053AC4B6251982550036946E /* AttachmentBubble.swift */; };
 		053D33F22393C97B00CEE03E /* DismissGuardian.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053D33F12393C97B00CEE03E /* DismissGuardian.swift */; };
@@ -169,6 +170,7 @@
 		0521234B24C8E338008123CF /* ProfileSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSettingsView.swift; sourceTree = "<group>"; };
 		052347B523E55C8A00EF9CEB /* FullNameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullNameView.swift; sourceTree = "<group>"; };
 		052364C22439A37200AF825F /* DialogCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogCell.swift; sourceTree = "<group>"; };
+		052E6E1F25CE513B00C3EAE4 /* ReactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReactionsView.swift; sourceTree = "<group>"; };
 		053A63982509647700571226 /* StoreKitTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKitTest.framework; path = Developer/Library/Frameworks/StoreKitTest.framework; sourceTree = SDKROOT; };
 		053A639A2509649A00571226 /* Configuration.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Configuration.storekit; sourceTree = "<group>"; };
 		053AC4B125194C080036946E /* GIFController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GIFController.swift; sourceTree = "<group>"; };
@@ -425,6 +427,7 @@
 				0583A84E251AFB740005B7E1 /* ContactBubble.swift */,
 				0569348F252312F7001BDFF0 /* LocationBubble.swift */,
 				05DD2D4125C9D44900B1ACB7 /* LinkedText.swift */,
+				052E6E1F25CE513B00C3EAE4 /* ReactionsView.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -952,6 +955,7 @@
 				05D8A8DC2502CB3A00D53BE2 /* MailView.swift in Sources */,
 				055AEE382512EC9500F35B8F /* EditProfileView.swift in Sources */,
 				050582FF24DA5F9600CBD4AC /* MessagesRealmModel.swift in Sources */,
+				052E6E2025CE513B00C3EAE4 /* ReactionsView.swift in Sources */,
 				0593C0A223CB2AFE00460AAA /* VerifyCodeView.swift in Sources */,
 				055AEE3A2512F63F00F35B8F /* MultilineTextView.swift in Sources */,
 				056B989E24C8F9E7003F7FBA /* ContactsButton.swift in Sources */,

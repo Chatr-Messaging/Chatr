@@ -18,11 +18,12 @@ struct TextBubble: View {
     @State var message: MessageStruct
     @State var messagePosition: messagePosition
     @State var subText: String = ""
-    var hasPrior: Bool = true
     @State var avatar: String = ""
     @State private var typingOpacity: CGFloat = 1.0
-    @State private var URLStrings: [NSURL] = [NSURL]()
-    
+    @State var showInteractions: Bool = false
+    @State var interactionSelected: String = ""
+    @State var reactions: [String] = ["like", "dislike", "question", "forward", "copy", "trash"]
+    var hasPrior: Bool = true
     var repeatingAnimation: Animation {
         Animation
             .easeInOut(duration: 0.66)
@@ -48,7 +49,18 @@ struct TextBubble: View {
                 //} else {
                 ZStack {
                     if self.message.messageState != .isTyping || self.message.messageState == .deleted {
-                        LinkedText(self.message.text, messageRight: self.messagePosition == .right)
+                        if self.message.text.containsEmoji && self.message.text.count <= 4 {
+                            Text(self.message.text)
+                                .font(.system(size: 66))
+                                .offset(x: self.messagePosition == .right ? -10 : 10, y: -5)
+                                .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 5)
+                        } else {
+                            LinkedText(self.message.text, messageRight: self.messagePosition == .right)
+                                .onTapGesture(count: 2) {
+                                    print("Double tapped!")
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                }.gesture(DragGesture(minimumDistance: 0).onChanged(onChanged(value:)).onEnded(onEnded(value:)))
+                        }
 
                         /*
                         Menu {
@@ -119,21 +131,29 @@ struct TextBubble: View {
                             })
                         */
                     } else if self.message.messageState == .isTyping {
-                        HStack(spacing: 6) {
-                            ForEach(0..<3) { type in
-                                Circle()
-                                    .frame(width: 10, height: 10, alignment: .center)
-                                    .background(Color.secondary)
-                                    .opacity(Double(self.typingOpacity))
-                                    .animation(Animation.easeInOut(duration: 0.66).repeatForever(autoreverses: true).delay(Double(type + 1) * 0.22))
-                                    .onAppear() {
-                                        withAnimation(self.repeatingAnimation) {
-                                            self.typingOpacity = 0.20
+                        ZStack {
+                            Capsule()
+                                .frame(width: 65, height: 45, alignment: .center)
+                                .background(LinearGradient(gradient: Gradient(colors: [Color("buttonColor"), Color("buttonColor_darker")]), startPoint: .top, endPoint: .bottom))
+                                        .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
+                                        .contentShape(RoundedRectangle(cornerRadius: 20, style: .circular))
+                                .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 6)
+                            HStack(spacing: 6) {
+                                ForEach(0..<3) { type in
+                                    Circle()
+                                        .frame(width: 10, height: 10, alignment: .center)
+                                        .background(Color.secondary)
+                                        .opacity(Double(self.typingOpacity))
+                                        .animation(Animation.easeInOut(duration: 0.66).repeatForever(autoreverses: true).delay(Double(type + 1) * 0.22))
+                                        .onAppear() {
+                                            withAnimation(self.repeatingAnimation) {
+                                                self.typingOpacity = 0.20
+                                            }
                                         }
-                                    }
-                            }
-                        }.padding(.horizontal, 15)
-                        .padding(.vertical, 7.5)
+                                }
+                            }.padding(.horizontal, 15)
+                            .padding(.vertical, 7.5)
+                        }
                     }
                 }.padding(.bottom, self.hasPrior ? 0 : 15)
                 .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.45)), removal: AnyTransition.identity))
@@ -161,8 +181,15 @@ struct TextBubble: View {
                 .offset(x: messagePosition == .right ? (Constants.smallAvitarSize / 2) : -(Constants.smallAvitarSize / 2))
                 .opacity(self.hasPrior ? 0 : 1)
                 .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 6)
+            
+            if self.showInteractions {
+                ReactionsView(interactionSelected: $interactionSelected)
+                    .offset(y: -90)
+                    .padding(.leading, messagePosition == .left ? 30 : 0)
+                    .padding(.trailing, messagePosition == .right ? 30 : 0)
+                    .zIndex(2)
+            }
         }.onAppear() {
-            self.fetchURLText(text: self.message.text)
             if self.message.senderID == UserDefaults.standard.integer(forKey: "currentUserID") {
                 self.avatar = self.auth.profile.results.first?.avatar ?? ""
             } else {
@@ -185,15 +212,28 @@ struct TextBubble: View {
         }
     }
     
-    func fetchURLText(text: String) {
-        self.URLStrings.removeAll()
-        let types: NSTextCheckingResult.CheckingType = .link
-        let detector = try? NSDataDetector(types: types.rawValue)
-        let matches = detector!.matches(in: text, options: .reportCompletion, range: NSMakeRange(0, text.count))
+    func onChanged(value: DragGesture.Value){
+        withAnimation(.easeIn) { showInteractions = true }
         
-        for match in matches {
-            print(match.url!)
-            self.URLStrings.append(match.url! as NSURL)
+        // Simple Logic....
+        withAnimation(Animation.linear(duration: 0.085)) {
+            let x = value.location.x
+            
+            if x > 20 && x < 80 { interactionSelected = reactions[0] }
+            if x > 80 && x < 140 { interactionSelected = reactions[1] }
+            if x > 140 && x < 180 { interactionSelected = reactions[2] }
+            if x > 180 && x < 240 { interactionSelected = reactions[3] }
+            if x > 240 && x < 300 { interactionSelected = reactions[4] }
+            if x > 300 && x < 360 { interactionSelected = reactions[5] }
+            
+            // if less or exceeds no Reaction..
+            if x < 20 || x > 360 { interactionSelected = "" }
+        }
+    }
+    
+    func onEnded(value: DragGesture.Value){
+        withAnimation(Animation.linear.delay(0.1)){
+            showInteractions = false
         }
     }
 }

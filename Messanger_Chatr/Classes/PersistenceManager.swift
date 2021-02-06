@@ -261,7 +261,7 @@ class PersistenceManager: ObservableObject {
             if let customData = try? JSONSerialization.jsonObject(with: data, options: []) as? [String : String] {
                 if let avatarUID = customData["avatar_uid"] {
                     let privateAvatarUrl = Blob.privateUrl(forFileUID: avatarUID)
-                    
+
                     return privateAvatarUrl ?? ""
                 }
             }
