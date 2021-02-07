@@ -20,11 +20,11 @@ struct ReactionsView: View {
                 Image(img)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: interactionSelected == img ? 70 : 40, height: interactionSelected == img ? 70 : 40, alignment: .center)
+                    .frame(width: interactionSelected == img ? 65 : 40, height: interactionSelected == img ? 65 : 40, alignment: .center)
                     .padding(interactionSelected == img ? -25 : 0)
                     .padding(.horizontal, interactionSelected == img ? 10 : 0)
                     .offset(y: interactionSelected == img ? -35 : 0)
-            }.padding(.vertical, 5)
+            }.padding(.vertical, 8)
         }.padding(.horizontal, 15)
         .background(BlurView(style: .systemThinMaterial).clipShape(Capsule()).shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 2))
         .onChange(of: self.interactionSelected) { _ in

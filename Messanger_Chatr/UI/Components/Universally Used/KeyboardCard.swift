@@ -56,11 +56,11 @@ struct KeyboardCardView: View {
                 ZStack(alignment: .topLeading) {
                     ResizableTextField(height: self.$height, text: self.$mainText)
                         .environmentObject(self.auth)
-                        .frame(height: self.height < 125 ? self.height : self.mainText.count != 0 ? 150 : 128)
+                        .frame(height: self.height < 140 ? self.height : 140)
                         .padding(.leading, 7)
                         .background(Color("buttonColor"))
                         .cornerRadius(10)
-                        .shadow(color: Color.black.opacity(self.mainText.count != 0 ? 0.08 : 0.15), radius: self.mainText.count != 0 ? 8 : 4, x: 0, y: self.mainText.count != 0 ? 8 : 3)
+                        .shadow(color: Color.black.opacity(self.mainText.count != 0 ? 0.05 : 0.15), radius: self.mainText.count != 0 ? 8 : 4, x: 0, y: self.mainText.count != 0 ? 8 : 3)
                     
                     Text("type message")
                         .padding(.vertical, 7.5)
@@ -384,11 +384,6 @@ struct ResizableTextField : UIViewRepresentable {
     func updateUIView(_ uiView: UITextView, context: Context) {
         DispatchQueue.main.async {
             self.height = uiView.contentSize.height
-//            if let typedText = self.auth.dialogs.selectedDia(dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").first?.typedText {
-//                self.text = typedText
-//            } else {
-//                self.text = ""
-//            }
             uiView.text = self.text
         }
     }
