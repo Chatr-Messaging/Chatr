@@ -224,7 +224,6 @@ class InstagramApi {
         })
         dataTask.resume()
     }
-
     
     func getInstagramUser(testUserData: InstagramTestUser, completion: @escaping (InstagramUser) -> Void) {
         let urlString = "\(BaseURL.graphApi.rawValue)\(testUserData.user_id)?fields=id,username&access_token=\(testUserData.access_token)"

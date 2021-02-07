@@ -40,6 +40,7 @@ class ProfileStruct : Object {
 class ProfileRealmModel<Element>: ObservableObject where Element: RealmSwift.RealmCollectionValue {
     var results: Results<Element>
     private var token: NotificationToken!
+    let messageApi = changeProfileRealmDate.shared
 
     init(results: Results<Element>) {
         self.results = results
@@ -96,6 +97,8 @@ class ProfileRealmModel<Element>: ObservableObject where Element: RealmSwift.Rea
 }
 
 class changeProfileRealmDate {
+    
+    static let shared = changeMessageRealmData()
     
     func observeFirebaseUser() {
         let user = Database.database().reference().child("Users").child("\(Session.current.currentUserID)")

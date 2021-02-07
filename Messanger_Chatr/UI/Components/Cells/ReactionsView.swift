@@ -26,8 +26,7 @@ struct ReactionsView: View {
                     .offset(y: interactionSelected == img ? -35 : 0)
             }.padding(.vertical, 5)
         }.padding(.horizontal, 15)
-        .background(BlurView(style: .systemThinMaterial).clipShape(Capsule()))
-        .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 5)
+        .background(BlurView(style: .systemThinMaterial).clipShape(Capsule()).shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 2))
         .onChange(of: self.interactionSelected) { _ in
             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
         }

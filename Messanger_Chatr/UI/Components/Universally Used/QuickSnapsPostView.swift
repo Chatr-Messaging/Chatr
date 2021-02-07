@@ -190,7 +190,7 @@ struct QuickSnapsPostView: View {
                             Text(self.selectedQuickSnapContact.isOnline ? "online now" : "last online \(self.selectedQuickSnapContact.lastOnline.getElapsedInterval(lastMsg: "moments")) ago")
                                 .font(.subheadline)
                                 .fontWeight(.light)
-                                .foregroundColor(Color("liteGray"))
+                                .foregroundColor(Color("lightGray"))
                                 .multilineTextAlignment(.leading)
                         }
                         
@@ -250,7 +250,7 @@ struct QuickSnapsPostView: View {
                                 Text(self.likePost ? "Liked" : "Like")
                                     .font(.caption)
                                     .fontWeight(.none)
-                                    .foregroundColor(Color("liteGray"))
+                                    .foregroundColor(Color("lightGray"))
                                     .shadow(color: Color.black.opacity(0.25), radius: 2, x: 0, y: 0)
                             }
                             
@@ -281,7 +281,7 @@ struct QuickSnapsPostView: View {
                                 Text("Reply")
                                     .font(.caption)
                                     .fontWeight(.none)
-                                    .foregroundColor(Color("liteGray"))
+                                    .foregroundColor(Color("lightGray"))
                                     .shadow(color: Color.black.opacity(0.25), radius: 2, x: 0, y: 0)
                             }
                             Spacer()
@@ -299,7 +299,7 @@ struct QuickSnapsPostView: View {
                             Text("Close")
                                 .font(.subheadline)
                                 .fontWeight(.none)
-                                .foregroundColor(Color("liteGray"))
+                                .foregroundColor(Color("lightGray"))
                                 .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 0)
                                 .padding(.all, 25)
                         }.buttonStyle(ClickButtonStyle())

@@ -13,6 +13,8 @@ import ConnectyCube
 
 struct ChatMessagesView: View {
     @EnvironmentObject var auth: AuthModel
+    @ObservedObject var viewModel = ChatMessageViewModel()
+    @StateObject var messages = MessagesRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(MessageStruct.self))
     @Binding var activeView: CGSize
     @Binding var keyboardChange: CGFloat
     @Binding var dialogID: String
@@ -20,16 +22,13 @@ struct ChatMessagesView: View {
     @Binding var keyboardDragState: CGSize
     @Binding var hasAttachment: Bool
     @Binding var newDialogFromSharedContact: Int
-    @State var isLoadingMore: Bool = false
-    @State var isLoadingAni: Bool = false
     @State private var delayViewMessages: Bool = false
     @State private var firstScroll: Bool = true
-    @State private var isPrevious: Bool = true
     @State private var mesgCount: Int = -1
-    let fontSize: CGFloat = CGFloat(12)
     
     var body: some View {
-        let currentMessages = self.auth.messages.selectedDialog(dialogID: self.dialogID)
+        let currentMessages = self.messages.selectedDialog(dialogID: self.dialogID)
+
         ScrollView(.vertical, showsIndicators: false) {
             LazyVStack() {
                 //No Messages found:
@@ -61,7 +60,6 @@ struct ChatMessagesView: View {
                                 if topMsg && currentMessages.count > 20 {
                                     Button(action: {
                                         self.firstScroll = false
-                                        self.auth.acceptScrolls = false
                                         changeMessageRealmData.loadMoreMessages(dialogID: currentMessages[message].dialogID, currentCount: currentMessages.count, completion: { _ in
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                                                 withAnimation {
@@ -69,7 +67,6 @@ struct ChatMessagesView: View {
                                                 }
                                             }
                                         })
-                                        
                                     }, label: {
                                         Text("Load More...")
                                             .foregroundColor(.blue)
@@ -124,23 +121,28 @@ struct ChatMessagesView: View {
                                 }
                             }
                         }.onChange(of: currentMessages) { msg in
-                            reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
+                            if firstScroll {
+                                reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
+                            } else {
+                                if currentMessages.last?.status != "isTyping" && !(currentMessages.last?.readIDs.contains(self.auth.profile.results.last?.id ?? 0) ?? (0 != 0)) {
+                                    withAnimation {
+                                        reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
+                                    }
+                                }
+                            }
                         }
                     }.resignKeyboardOnDragGesture()
                 }
             }.onAppear() {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                     self.delayViewMessages = true
-                    self.auth.acceptScrolls = true
                 }
             }
         }.frame(width: Constants.screenWidth)
         .contentShape(Rectangle())
         .onAppear() {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
-                changeMessageRealmData.getMessageUpdates(dialogID: self.dialogID, completion: { _ in
-                    self.auth.acceptScrolls = true
-                })
+                changeMessageRealmData.getMessageUpdates(dialogID: self.dialogID, completion: { _ in })
                 
                 Request.updateDialog(withID: self.dialogID, update: UpdateChatDialogParameters(), successBlock: { dialog in
                     self.auth.selectedConnectyDialog = dialog
@@ -206,7 +208,7 @@ struct ChatMessagesView: View {
     }
     
     func hasPrevious(index: Int) -> Bool {
-        let result = self.auth.messages.selectedDialog(dialogID: self.dialogID)
+        let result = self.messages.selectedDialog(dialogID: self.dialogID)
         return result[index] != result.last ? (result[index + 1].senderID == result[index].senderID ? true : false) : false
     }
 }

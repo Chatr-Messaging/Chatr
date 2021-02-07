@@ -7,8 +7,10 @@
 //
 
 import Foundation
+import Combine
 import UIKit
 import ConnectyCube
+import Firebase
 import RealmSwift
 
 class MessageStruct : Object, Identifiable {
@@ -40,7 +42,7 @@ class MessageStruct : Object, Identifiable {
 }
 
 class MessagesRealmModel<Element>: ObservableObject where Element: RealmSwift.RealmCollectionValue {
-    var results: Results<Element>
+    @Published var results: Results<Element>
     private var token: NotificationToken!
     
     private var itemsPerPage = 15
@@ -73,7 +75,7 @@ class MessagesRealmModel<Element>: ObservableObject where Element: RealmSwift.Re
         if dialogID == "" {
             return results.sorted(byKeyPath: "date", ascending: true)
         } else {
-            return results.filter("dialogID == %@", dialogID).sorted(byKeyPath: "date", ascending: true)
+            return results.filter("dialogID == %@", dialogID).filter("status != %@", messageStatus.removedTyping.rawValue).sorted(byKeyPath: "date", ascending: true)
         }
     }
 }
@@ -86,9 +88,7 @@ class changeMessageRealmData {
             self.insertMessages(messages, completion: {
                 completion(true)
             })
-            
-//            if messages.count < paginator.limit { return }
-//            paginator.skip += UInt(messages.count)
+
         }){ (error) in
             print("eror getting messages: \(error.localizedDescription)")
         }
@@ -125,7 +125,6 @@ class changeMessageRealmData {
                     newData.readIDs.append(Int(truncating: read))
                 }
                 if !hasRead {
-                    print("has NOT read and is now...")
                     Chat.instance.read(object) { (error) in }
                 }
                 hasRead = false
@@ -185,8 +184,13 @@ class changeMessageRealmData {
                 
                 try realm.write({
                     realm.add(newData, update: .all)
-                    print("Succsessfuly added new messagess to data! \(newData.text)")
-                    completion()
+
+                    let msg = Database.database().reference().child("Dialogs").child(object.dialogID ?? "").child(object.id ?? "")
+                    msg.observeSingleEvent(of: .value, with: { (snapshot: DataSnapshot) in
+                        updateMessageLike(messageID: object.id ?? "", messageLikeCount: Int(snapshot.childSnapshot(forPath: "likes").childrenCount))
+                        updateMessageDislike(messageID: object.id ?? "", messageDislikeCount: Int(snapshot.childSnapshot(forPath: "dislikes").childrenCount))
+                        completion()
+                    })
                 })
             } catch {
                 print(error.localizedDescription)
@@ -264,8 +268,13 @@ class changeMessageRealmData {
             
             try realm.write({
                 realm.add(newData, update: .all)
-                print("Succsessfuly added new message to data! \(newData.messageState)")
-                completion()
+
+                let msg = Database.database().reference().child("Dialogs").child(object.dialogID ?? "").child(object.id ?? "")
+                msg.observeSingleEvent(of: .value, with: { (snapshot: DataSnapshot) in
+                    updateMessageLike(messageID: object.id ?? "", messageLikeCount: Int(snapshot.childSnapshot(forPath: "likes").childrenCount))
+                    updateMessageDislike(messageID: object.id ?? "", messageDislikeCount: Int(snapshot.childSnapshot(forPath: "dislikes").childrenCount))
+                    completion()
+                })
             })
         } catch {
             print(error.localizedDescription)
@@ -486,6 +495,7 @@ class changeMessageRealmData {
                 if realmContact.messageState != .isTyping {
                     try realm.safeWrite {
                         realmContact.messageState = .isTyping
+                        realmContact.date = Date()
                         realm.add(realmContact, update: .all)
                     }
                 }
@@ -513,7 +523,8 @@ class changeMessageRealmData {
             if let typingMessage = realm.object(ofType: MessageStruct.self, forPrimaryKey: userID) {
                 //Contact is in Realm...
                 try realm.safeWrite {
-                    realm.delete(typingMessage)
+                    typingMessage.messageState = .removedTyping
+                    realm.add(typingMessage, update: .all)
                 }
             }
         } catch {

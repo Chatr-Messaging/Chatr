@@ -213,11 +213,12 @@ class changeDialogRealmData {
         let config = Realm.Configuration(schemaVersion: 1)
         do {
             let realm = try Realm(configuration: config)
-            let dialogResult = realm.object(ofType: DialogStruct.self, forPrimaryKey: dialogID)
-            try? realm.safeWrite({
-                dialogResult?.typedText = text
-                realm.add(dialogResult!, update: .all)
-            })
+            if let dialogResult = realm.object(ofType: DialogStruct.self, forPrimaryKey: dialogID) {
+                try? realm.safeWrite({
+                    dialogResult.typedText = text
+                    realm.add(dialogResult, update: .all)
+                })
+            }
         } catch {
             print(error.localizedDescription)
         }

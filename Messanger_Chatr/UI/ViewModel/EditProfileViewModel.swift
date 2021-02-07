@@ -11,7 +11,9 @@ import RealmSwift
 import ConnectyCube
 
 class EditProfileViewModel: ObservableObject {
+    
     private let instagramApi = InstagramApi.shared
+    
     var testUserData: InstagramTestUser {
         let config = Realm.Configuration(schemaVersion: 1)
         do {

@@ -44,8 +44,6 @@ class VerifyUIViewController: UIViewController {
             //self.authM.checkSecurityCode(securityCode: pin)
         }
         self.view.addSubview(self.otpView)
-
-        print("viewDidLoad \(self)")
     }
     
     override func viewDidAppear(_ animated: Bool) {

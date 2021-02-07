@@ -151,10 +151,8 @@ class changeContactsRealmData {
     }
     
     func observeFirebaseContact(contactID: Int) {
-        print("starting observe firebase CONTACT!")
         let user = Database.database().reference().child("Users").child("\(contactID)")
         user.observeSingleEvent(of: .value, with: { (snapshot: DataSnapshot) in
-            print("Metadata: Data fetched from \(snapshot.ref.database.isPersistenceEnabled)")
             if let dict = snapshot.value as? [String: Any] {
                 let config = Realm.Configuration(schemaVersion: 1)
                 do {

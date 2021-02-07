@@ -59,6 +59,15 @@ struct ClickMiniButtonStyle: ButtonStyle {
     }
 }
 
+struct keyboardButtonStyle: ButtonStyle {
+    public func makeBody(configuration: keyboardButtonStyle.Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.90 : 1.0)
+            .background(RoundedRectangle(cornerRadius: 15).shadow(color: Color.black.opacity(0.2), radius: 15, x: 0, y: 8))
+            .foregroundColor(configuration.isPressed ? Color("interactionBtnColorSelected") : Color("interactionBtnColor"))
+    }
+}
+
 struct changeBGButtonStyle: ButtonStyle {
     public func makeBody(configuration: changeBGButtonStyle.Configuration) -> some View {
         configuration.label
@@ -81,6 +90,16 @@ struct highlightedButtonStyle: ButtonStyle {
             .opacity(configuration.isPressed ? 0.95 : 1)
             .background(configuration.isPressed ? Color("bgColor_light") : Color("buttonColor"))
             .cornerRadius(20)
+    }
+}
+
+struct interactionButtonStyle: ButtonStyle {
+    public func makeBody(configuration: interactionButtonStyle.Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.9 : 1.0)
+            .opacity(configuration.isPressed ? 0.9 : 1)
+            .background(RoundedRectangle(cornerRadius: 12.5).shadow(color: Color.black.opacity(0.2), radius: 3, x: 0, y: 3))
+            .foregroundColor(configuration.isPressed ? Color("interactionBtnColorSelected") : Color("interactionBtnColor"))
     }
 }
 

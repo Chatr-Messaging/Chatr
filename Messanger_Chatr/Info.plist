@@ -202,8 +202,6 @@
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>SCSDKClientId</key>
-	<string>a84dd344-dc21-4f34-ae38-7ac9047a65b7</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -227,6 +225,8 @@
 	<string>Chatr needs your location.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Chatr needs the photo use.</string>
+	<key>SCSDKClientId</key>
+	<string>a84dd344-dc21-4f34-ae38-7ac9047a65b7</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

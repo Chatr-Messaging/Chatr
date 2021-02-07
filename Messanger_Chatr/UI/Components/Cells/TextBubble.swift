@@ -23,16 +23,9 @@ struct TextBubble: View {
     @State private var typingOpacity: CGFloat = 1.0
     @State var showInteractions: Bool = false
     @State var moveUpAnimation: Bool = false
-    @State var showLike: Bool = false
-    @State var showDislike: Bool = false
     @State var interactionSelected: String = ""
     @State var reactions: [String] = []
     var hasPrior: Bool = true
-    var repeatingAnimation: Animation {
-        Animation
-            .easeInOut(duration: 0.66)
-            .repeatForever(autoreverses: true)
-    }
     
     var body: some View {
         ZStack(alignment: self.messagePosition == .right ? .topTrailing : .topLeading) {
@@ -49,8 +42,10 @@ struct TextBubble: View {
                                     LinkedText(self.message.text, messageRight: self.messagePosition == .right)
                                         .scaleEffect(self.showInteractions ? 1.1 : 1.0)
                                         .onTapGesture(count: 2) {
-                                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                            likeMessage()
+                                            if self.messagePosition == .left {
+                                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                                likeMessage()
+                                            }
                                         }.gesture(DragGesture(minimumDistance: 0).onChanged(onChanged(value:)).onEnded(onEnded(value:)))
                                         .onChange(of: self.showInteractions) { _ in
                                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
@@ -70,48 +65,55 @@ struct TextBubble: View {
                                         }
 
                                     HStack(spacing: 5) {
-                                        if showDislike {
+                                        if self.message.dislikes > 0 {
                                             Button(action: {
-                                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                                self.dislikeMessage()
+                                                if self.messagePosition == .left {
+                                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                                    self.dislikeMessage()
+                                                }
                                             }, label: {
                                                 HStack(spacing: 2) {
-                                                    Text(self.message.dislikes > 1 ? "\(self.message.dislikes)" : "")
-                                                        .font(.subheadline)
-                                                        .fontWeight(.medium)
-                                                        .foregroundColor(.primary)
-                                                    
                                                     Image("dislike")
                                                         .resizable()
                                                         .scaledToFit()
-                                                        .frame(width: 25, height: 25, alignment: .center)
+                                                        .frame(width: 22, height: 22, alignment: .center)
+                                                        .offset(x: self.message.dislikes == 0 ? 4 : 0)
+
+                                                    Text(self.message.dislikes > 1 ? "\(self.message.dislikes)" : "")
+                                                        .font(.subheadline)
+                                                        .fontWeight(.bold)
+                                                        .foregroundColor(.primary)
+                                                        .padding(.horizontal, self.message.dislikes > 1 ? 3 : 0)
                                                 }.padding(.horizontal, 10)
                                                 .padding(.vertical, 5)
                                                     
-                                            }).buttonStyle(highlightedButtonStyle())
-                                            .offset(x: self.messagePosition == .left ? 15 : -15, y: -20)
+                                            }).buttonStyle(interactionButtonStyle())
+                                            .offset(x: self.messagePosition == .left ? 20 : -20, y: -20)
                                         }
 
-                                        if showLike {
+                                        if self.message.likes > 0 {
                                             Button(action: {
-                                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                                self.likeMessage()
+                                                if self.messagePosition == .left {
+                                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                                    self.likeMessage()
+                                                }
                                             }, label: {
                                                 HStack(spacing: 2) {
-                                                    Text(self.message.likes > 1 ? "\(self.message.likes)" : "")
-                                                        .font(.subheadline)
-                                                        .fontWeight(.medium)
-                                                        .foregroundColor(.primary)
-                                                    
                                                     Image("like")
                                                         .resizable()
                                                         .scaledToFit()
-                                                        .frame(width: 25, height: 25, alignment: .center)
+                                                        .frame(width: 22, height: 22, alignment: .center)
+                                                        .offset(x: self.message.likes == 0 ? 4 : 0)
+
+                                                    Text(self.message.likes > 1 ? "\(self.message.likes)" : "")
+                                                        .font(.subheadline)
+                                                        .fontWeight(.bold)
+                                                        .foregroundColor(.primary)
+                                                        .padding(.horizontal, self.message.likes > 1 ? 3 : 0)
                                                 }.padding(.horizontal, 10)
                                                 .padding(.vertical, 5)
-                                                    
-                                            }).buttonStyle(highlightedButtonStyle())
-                                            .offset(x: self.messagePosition == .left ? 15 : -15, y: -20)
+                                            }).buttonStyle(interactionButtonStyle())
+                                            .offset(x: self.messagePosition == .left ? 20 : -20, y: -20)
                                         }
                                     }
                                 }
@@ -120,19 +122,19 @@ struct TextBubble: View {
                             ZStack {
                                 Capsule()
                                     .frame(width: 65, height: 45, alignment: .center)
-                                    .background(LinearGradient(gradient: Gradient(colors: [Color("buttonColor"), Color("buttonColor_darker")]), startPoint: .top, endPoint: .bottom))
-                                            .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
-                                            .contentShape(RoundedRectangle(cornerRadius: 20, style: .circular))
+                                    .foregroundColor(Color("buttonColor"))
+                                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
                                     .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 6)
+
                                 HStack(spacing: 6) {
                                     ForEach(0..<3) { type in
                                         Circle()
                                             .frame(width: 10, height: 10, alignment: .center)
-                                            .background(Color.secondary)
+                                            .foregroundColor(.secondary)
                                             .opacity(Double(self.typingOpacity))
                                             .animation(Animation.easeInOut(duration: 0.66).repeatForever(autoreverses: true).delay(Double(type + 1) * 0.22))
                                             .onAppear() {
-                                                withAnimation(self.repeatingAnimation) {
+                                                withAnimation(Animation.easeInOut(duration: 0.66).repeatForever(autoreverses: true)) {
                                                     self.typingOpacity = 0.20
                                                 }
                                             }
@@ -144,9 +146,6 @@ struct TextBubble: View {
                     }.padding(.bottom, self.hasPrior ? 0 : 15)
                     .padding(.top, self.message.likes != 0 || self.message.dislikes != 0 ? 20 : 0)
                     .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.45)), removal: AnyTransition.identity))
-                    .onChange(of: self.message.likes, perform: { value in
-                        self.checkLikes()
-                    })
                 
                 HStack {
                     if messagePosition == .right { Spacer() }
@@ -213,7 +212,7 @@ struct TextBubble: View {
         // Simple Logic....
         withAnimation(Animation.linear(duration: 0.065)) {
             let x = value.location.x
-            print("the drage vaule X is: \(x)")
+
             if self.messagePosition == .left {
                 if x > 20 && x < 80 { interactionSelected = reactions[0] }
                 if x > 80 && x < 140 { interactionSelected = reactions[1] }
@@ -254,13 +253,11 @@ struct TextBubble: View {
     func loadFirebase() {
         let msg = Database.database().reference().child("Dialogs").child(self.message.dialogID).child(self.message.id)
         msg.observe(.value, with: { snap in
-            print("value like: \(snap.childSnapshot(forPath: "likes").childrenCount) value dislike: \(snap.childSnapshot(forPath: "dislikes").childrenCount)")
             changeMessageRealmData.updateMessageLike(messageID: self.message.id, messageLikeCount: Int(snap.childSnapshot(forPath: "likes").childrenCount))
             changeMessageRealmData.updateMessageDislike(messageID: self.message.id, messageDislikeCount: Int(snap.childSnapshot(forPath: "dislikes").childrenCount))
-            self.checkLikes()
         })
     }
-    
+        
     func likeMessage() {
         let msg = Database.database().reference().child("Dialogs").child(self.message.dialogID).child(self.message.id).child("likes")
 
@@ -274,7 +271,6 @@ struct TextBubble: View {
                 changeMessageRealmData.updateMessageLike(messageID: self.message.id, messageLikeCount: Int(count + 1))
                 msg.updateChildValues(["\(Session.current.currentUserID)" : "\(Date())"])
             }
-            self.checkLikes()
         })
     }
     
@@ -291,7 +287,6 @@ struct TextBubble: View {
                 changeMessageRealmData.updateMessageDislike(messageID: self.message.id, messageDislikeCount: Int(count + 1))
                 msg.updateChildValues(["\(Session.current.currentUserID)" : "\(Date())"])
             }
-            self.checkLikes()
         })
     }
     
@@ -311,22 +306,7 @@ struct TextBubble: View {
         print("edit message")
     }
     
-    func checkLikes() {
-        if self.message.likes > 0 {
-            self.showLike = true
-        } else {
-            self.showLike = false
-        }
-        
-        if self.message.dislikes > 0 {
-            self.showDislike = true
-        } else {
-            self.showDislike = false
-        }
-    }
-    
     func trashMessage() {
-        print("trash message")
         self.auth.selectedConnectyDialog?.removeMessage(withID: self.message.id) { (error) in
             if error != nil {
                 UINotificationFeedbackGenerator().notificationOccurred(.error)

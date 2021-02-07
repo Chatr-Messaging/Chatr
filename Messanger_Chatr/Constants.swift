@@ -207,6 +207,8 @@ extension String {
                 return "error"
             case .isTyping:
                 return "typing"
+            case .removedTyping:
+                return ""
             case .sent:
                 return "sent"
             }

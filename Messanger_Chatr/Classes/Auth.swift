@@ -35,7 +35,7 @@ enum messageKind: String {
 }
 
 enum messageStatus: String {
-    case delivered, sent, sending, read, isTyping, editied, deleted, error
+    case delivered, sent, sending, read, isTyping, removedTyping, editied, deleted, error
 }
 
 enum messagePosition {
@@ -89,7 +89,6 @@ class AuthModel: NSObject, ObservableObject {
     @Published public var notificationtext: String = ""
     
     @Published var avitarProgress: CGFloat = CGFloat(0.0)
-    @Published var acceptScrolls: Bool = true
     @Published var onlineCount: Int = 0
     
     @ObservedObject var profile = ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self))
@@ -678,7 +677,6 @@ extension AuthModel: ChatDelegate {
     
     func chatDidDeliverMessage(withID messageID: String, dialogID: String, toUserID userID: UInt) {
         print("messgae delivered is: \(messageID) & to user: \(userID)")
-        self.acceptScrolls = false
         let config = Realm.Configuration(schemaVersion: 1)
         do {
             let realm = try Realm(configuration: config)
@@ -696,7 +694,6 @@ extension AuthModel: ChatDelegate {
     func chatDidReadMessage(withID messageID: String, dialogID: String, readerID: UInt) {
         print("messgae read: \(messageID) & by user: \(readerID)")
         if readerID != UserDefaults.standard.integer(forKey: "currentUserID") {
-            self.acceptScrolls = false
             let config = Realm.Configuration(schemaVersion: 1)
             do {
                 let realm = try Realm(configuration: config)
@@ -717,7 +714,6 @@ extension AuthModel: ChatDelegate {
     
     func chatDidReceive(_ message: ChatMessage) {
         print("receved new message: \(String(describing: message.text)) from: \(message.senderID)")
-        self.acceptScrolls = true
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         if UserDefaults.standard.bool(forKey: "localOpen") {
             if (!message.removed) {
@@ -739,12 +735,10 @@ extension AuthModel: ChatDelegate {
         } else if (message.delayed) {
             changeMessageRealmData.updateMessageDelayState(messageID: message.id ?? "", messageDelayed: true)
         }
-        self.acceptScrolls = false
     }
     
     func chatRoomDidReceive(_ message: ChatMessage, fromDialogID dialogID: String) {
         print("receved new GROUP message: \(String(describing: message.text)) for dialogID: \(dialogID)")
-        //self.acceptScrolls = true
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         changeMessageRealmData.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
         if UserDefaults.standard.bool(forKey: "localOpen") {
@@ -764,7 +758,6 @@ extension AuthModel: ChatDelegate {
         } else if (message.delayed) {
             changeMessageRealmData.updateMessageDelayState(messageID: message.id ?? "", messageDelayed: true)
         }
-        //self.acceptScrolls = false
     }
         
     //MARK: BLOCK LIST DELEGATE

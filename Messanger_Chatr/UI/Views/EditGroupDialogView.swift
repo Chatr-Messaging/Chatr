@@ -86,7 +86,7 @@ struct EditGroupDialogView: View {
                                 }
                                 
                                 ZStack(alignment: .topLeading) {
-                                    ResizableTextField(height: self.$bioHeight, text: self.$bioText, emptyPlaceholder: true)
+                                    ResizableTextField(height: self.$bioHeight, text: self.$bioText)
                                         .padding(.horizontal, 2.5)
                                         .padding(.trailing, 5)
                                         .font(.none)

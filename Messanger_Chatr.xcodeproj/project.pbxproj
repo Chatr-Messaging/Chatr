@@ -11,6 +11,7 @@
 		050582FF24DA5F9600CBD4AC /* MessagesRealmModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 050582FE24DA5F9500CBD4AC /* MessagesRealmModel.swift */; };
 		050BF7CB23939777002B91BC /* welcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 050BF7CA23939777002B91BC /* welcomeView.swift */; };
 		0511CB7125A1911000E5F905 /* StoreReviewHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0511CB7025A1911000E5F905 /* StoreReviewHelper.swift */; };
+		0511CB8C25CF66940048F4DE /* ChatMessageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0511CB8B25CF66940048F4DE /* ChatMessageViewModel.swift */; };
 		05196DCA24E9EA4C0026B9A7 /* AnimatedGradientBG.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05196DC924E9EA4C0026B9A7 /* AnimatedGradientBG.swift */; };
 		05196DD424EB208C0026B9A7 /* ProfileRealmModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05196DD324EB208C0026B9A7 /* ProfileRealmModel.swift */; };
 		05196DD624ED90510026B9A7 /* NewConversationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05196DD524ED90500026B9A7 /* NewConversationView.swift */; };
@@ -161,6 +162,7 @@
 		050BF7CA23939777002B91BC /* welcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = welcomeView.swift; sourceTree = "<group>"; };
 		050C00B3254A7C620059CBC5 /* libswiftWebKit.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libswiftWebKit.tbd; path = usr/lib/swift/libswiftWebKit.tbd; sourceTree = SDKROOT; };
 		0511CB7025A1911000E5F905 /* StoreReviewHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreReviewHelper.swift; sourceTree = "<group>"; };
+		0511CB8B25CF66940048F4DE /* ChatMessageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessageViewModel.swift; sourceTree = "<group>"; };
 		05196DC924E9EA4C0026B9A7 /* AnimatedGradientBG.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedGradientBG.swift; sourceTree = "<group>"; };
 		05196DD324EB208C0026B9A7 /* ProfileRealmModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileRealmModel.swift; sourceTree = "<group>"; };
 		05196DD524ED90500026B9A7 /* NewConversationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewConversationView.swift; sourceTree = "<group>"; };
@@ -567,6 +569,7 @@
 		0596844C25ABED160051B707 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				0511CB8B25CF66940048F4DE /* ChatMessageViewModel.swift */,
 				0596844D25ABED4D0051B707 /* EditProfileViewModel.swift */,
 				0596845525AC16E80051B707 /* VisitContactViewModel.swift */,
 				056935D725B50B3D000705F6 /* MessagesViewModel.swift */,
@@ -986,6 +989,7 @@
 				05AACE1F239CE951006307EB /* BackgroundUI.swift in Sources */,
 				056B98A724C8FAC9003F7FBA /* SecurityView.swift in Sources */,
 				056B98A524C8FAA8003F7FBA /* AdvancedView.swift in Sources */,
+				0511CB8C25CF66940048F4DE /* ChatMessageViewModel.swift in Sources */,
 				05C6951624F5A29F00EEF819 /* ContactCell.swift in Sources */,
 				053D33F42394511400CEE03E /* BlurView.swift in Sources */,
 				05F5829825C12FC30043221D /* EditGroupDialogView.swift in Sources */,
@@ -1210,7 +1214,7 @@
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/swift",
 				);
-				MARKETING_VERSION = 0.9989;
+				MARKETING_VERSION = 0.9999;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1307,7 +1311,7 @@
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/swift",
 				);
-				MARKETING_VERSION = 0.9989;
+				MARKETING_VERSION = 0.9999;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

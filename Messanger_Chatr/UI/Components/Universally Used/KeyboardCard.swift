@@ -15,9 +15,9 @@ import SDWebImageSwiftUI
 
 struct KeyboardCardView: View {
     @EnvironmentObject var auth: AuthModel
-    @ObservedObject var dialogs = DialogRealmModel(results: try! Realm().objects(DialogStruct.self))
     @ObservedObject var viewModel = AdvancedViewModel()
     @Binding var height: CGFloat
+    @Binding var isOpen: Bool
     @State var open: Bool = UserDefaults.standard.bool(forKey: "localOpen")
     @Binding var mainText: String
     @Binding var hasAttachments: Bool
@@ -53,30 +53,36 @@ struct KeyboardCardView: View {
             
             //MARK: Text Field & Send Btn
             HStack(alignment: .bottom) {
-                ZStack {
+                ZStack(alignment: .topLeading) {
                     ResizableTextField(height: self.$height, text: self.$mainText)
-                        .frame(height: self.height < 125 ? self.height : 125)
-                        .padding(.leading, 2.5)
-                } .background(Color("buttonColor"))
-                .cornerRadius(20)
-                .onChange(of: self.mainText) { newValue in
-                    if self.mainText.count > 0 {
-                        self.auth.selectedConnectyDialog?.sendUserIsTyping()
+                        .environmentObject(self.auth)
+                        .frame(height: self.height < 125 ? self.height : self.mainText.count != 0 ? 150 : 128)
+                        .padding(.leading, 7)
+                        .background(Color("buttonColor"))
+                        .cornerRadius(10)
+                        .shadow(color: Color.black.opacity(self.mainText.count != 0 ? 0.08 : 0.15), radius: self.mainText.count != 0 ? 8 : 4, x: 0, y: self.mainText.count != 0 ? 8 : 3)
+                    
+                    Text("type message")
+                        .padding(.vertical, 7.5)
+                        .padding(.horizontal)
+                        .foregroundColor(self.mainText.count == 0 && self.isOpen ? Color("lightGray") : .clear)
+                }.onChange(of: self.isOpen, perform: { value in
+                    if value {
+                        if let typedText = UserDefaults.standard.string(forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText") {
+                            print("the saved keyboad text here: \(typedText)")
+                            self.mainText = typedText
+                        } else {
+                            self.mainText = ""
+                        }
                     } else {
-                        self.auth.selectedConnectyDialog?.sendUserStoppedTyping()
+                        UserDefaults.standard.setValue(self.mainText, forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText")
                     }
-                }
-                //.onAppear() {
-//                    if let selectedDiaSavedText = self.dialogs.selectedDia(dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").first?.typedText {
-//                        print("the smaed text here: \(selectedDiaSavedText)")
-//                        self.mainText = selectedDiaSavedText
-//                    }
-                //}
+                })
                 
                 ZStack {
                     //MARK: Send Button
                     Button(action: {
-                        if let selectedDialog = self.dialogs.results.filter("id == %@", UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").first {
+                        if let selectedDialog = self.auth.dialogs.results.filter("id == %@", UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").first {
                             if let connDia = self.auth.selectedConnectyDialog {
                                 connDia.sendUserStoppedTyping()
                             }
@@ -85,7 +91,6 @@ struct KeyboardCardView: View {
 //                                self.occupents.append(NSNumber(value: i))
 //                            }
                             if self.gifData.count > 0 {
-                                //have gifs
                                 changeMessageRealmData.sendGIFAttachment(dialog: selectedDialog, attachmentStrings: self.gifData.reversed(), occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                             
                                 self.gifData.removeAll()
@@ -93,7 +98,6 @@ struct KeyboardCardView: View {
                             }
                             
                             if self.photoData.count > 0 {
-                                //have gifs
                                 changeMessageRealmData.sendPhotoAttachment(dialog: selectedDialog, attachmentImages: self.photoData, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                             
                                 self.photoData.removeAll()
@@ -113,16 +117,19 @@ struct KeyboardCardView: View {
 
                         self.mainText = ""
                         self.height = 0
+                        UserDefaults.standard.setValue(self.mainText, forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText")
                     }, label: {
                         Image(systemName: "paperplane.fill")
                             .resizable()
                             .frame(width: 20, height: 20)
-                            .foregroundColor(self.mainText.count > 0 || self.gifData.count > 0 || self.photoData.count > 0 || self.enableLocation ? .white : .gray)
+                            .foregroundColor(self.mainText.count > 0 || self.gifData.count > 0 || self.photoData.count > 0 || self.enableLocation ? .white : Color("interactionBtnColorSelected"))
                             .padding(10)
-                    }).background(self.mainText.count > 0 || self.gifData.count > 0 || self.photoData.count > 0 || self.enableLocation ? LinearGradient(gradient: Gradient(colors: [Color(red: 46 / 255, green: 168 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom) : LinearGradient(gradient: Gradient(colors: [Color("bgColor_light"), Color("bgColor_light")]), startPoint: .top, endPoint: .bottom))
+                    }).background(self.mainText.count > 0 || self.gifData.count > 0 || self.photoData.count > 0 || self.enableLocation ? LinearGradient(gradient: Gradient(colors: [Color(red: 46 / 255, green: 168 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom) : LinearGradient(gradient: Gradient(colors: [Color("buttonColor"), Color("buttonColor")]), startPoint: .top, endPoint: .bottom))
                     .clipShape(Circle())
-                    .shadow(color: Color.blue.opacity(self.mainText.count > 0 || self.gifData.count > 0 || self.photoData.count > 0 || self.enableLocation ? 0.2 : 0.0), radius: 10, x: 0, y: 5)
-                    .padding(.horizontal, 5)
+                    .shadow(color: Color.black.opacity(self.mainText.count > 0 || self.gifData.count > 0 || self.photoData.count > 0 || self.enableLocation ? 0.2 : 0.08), radius: 5, x: 0, y: 3)
+                    .shadow(color: Color.blue.opacity(self.mainText.count > 0 || self.gifData.count > 0 || self.photoData.count > 0 || self.enableLocation ? 0.3 : 0.0), radius: 10, x: 0, y: 8)
+                    .padding(.trailing, 5)
+                    .scaleEffect(self.mainText.count != 0 ? 1.04 : 1.0)
                     .disabled(self.mainText.count > 0 || self.gifData.count > 0 || self.photoData.count > 0 || self.enableLocation ? false : true)
                 }
             }.padding(.horizontal, 5)
@@ -145,7 +152,7 @@ struct KeyboardCardView: View {
                                 }
                             
                             Button(action: {
-                                print("remove Location")
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 self.enableLocation = false
                                 self.hasAttachments = false
                             }, label: {
@@ -176,9 +183,9 @@ struct KeyboardCardView: View {
                                         .cornerRadius(15)
                                     
                                     Button(action: {
-                                        print("remove GIPHY")
+                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                         self.gifData.remove(at: url)
-                                        if self.gifData.count > 0 {
+                                        if self.photoData.count > 0 || self.gifData.count > 0 {
                                             self.hasAttachments = true
                                         } else {
                                             self.hasAttachments = false
@@ -218,9 +225,9 @@ struct KeyboardCardView: View {
                                         .cornerRadius(15)
                                     
                                     Button(action: {
-                                        print("remove Photo")
+                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                         self.photoData.remove(at: img)
-                                        if self.photoData.count > 0 || self.gifData.count > 0{
+                                        if self.photoData.count > 0 || self.gifData.count > 0 {
                                             self.hasAttachments = true
                                         } else {
                                             self.hasAttachments = false
@@ -243,92 +250,61 @@ struct KeyboardCardView: View {
             
             //MARK: Action Buttons
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(alignment: .center, spacing: 10) {
-                    Spacer()
+                HStack(alignment: .center, spacing: 25) {
+
                     Button(action: {
-                        print("Photos Btn")
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                         self.showImagePicker.toggle()
                     }, label: {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 15, style: .circular)
-                                .frame(width: Constants.screenWidth / 4.9, height: 60)
-                                .foregroundColor(Color("buttonColor"))
-                                .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 10)
-                            
-                            Image(systemName: "photo.on.rectangle")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 26, height: 22)
-                                .foregroundColor(.primary)
-                                .padding(30)
-                        }
-                        
-                    }).buttonStyle(ClickMiniButtonStyle())
+                        Image(systemName: "photo.on.rectangle")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 26, height: 24)
+                            .foregroundColor(.primary)
+                            .font(Font.title.weight(.medium))
+                            .padding(.horizontal, 25)
+                            .padding(.vertical)
+                    }).frame(width: Constants.screenWidth / 5.5, height: 60)
+                    .padding(.leading)
+                    .buttonStyle(keyboardButtonStyle())
                     .sheet(isPresented: $showImagePicker, onDismiss: loadImage) {
                         ImagePicker(image: self.$inputImage)
                     }
-
-//                    Button(action: {
-//                        print("Attachment Btn")
-//                        if let selectedDialogID = UserDefaults.standard.string(forKey: "selectedDialogID") {
-//                            ChatrApp.messages.getMessageUpdates(dialogID: selectedDialogID, completion: { newMessages in
-//                                print("Attachment Btn successfully pulled new messages!")
-//                            })
-//                        }
-//                    }, label: {
-//                        Image(systemName: "paperclip")
-//                            .resizable()
-//                            .frame(width: 24, height: 24)
-//                            .foregroundColor(.primary)
-//                            .padding(30)
-//                    }).buttonStyle(ClickMiniButtonStyle())
-//                    .frame(width: Constants.screenWidth / 4.9, height: 60)
-//                    .background(Color("buttonColor"))
-//                    .cornerRadius(15)
-//                    .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 10)
                     
                     Button(action: {
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                         self.presentGIF.toggle()
                     }, label: {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 15, style: .circular)
-                                .frame(width: Constants.screenWidth / 4.9, height: 60)
-                                .foregroundColor(Color("buttonColor"))
-                                .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 10)
-                            
-                            Text("GIF")
-                                .fontWeight(.bold)
-                                .frame(width: 28, height: 22)
-                                .foregroundColor(.primary)
-                                .padding(30)
-                        }
-                    }).buttonStyle(ClickMiniButtonStyle())
+                        Text("GIF")
+                            .fontWeight(.bold)
+                            .frame(width: 28, height: 24)
+                            .foregroundColor(.primary)
+                            .padding(.horizontal, 25)
+                            .padding(.vertical)
+                    }).frame(width: Constants.screenWidth / 5.5, height: 60)
+                    .buttonStyle(keyboardButtonStyle())
                     .sheet(isPresented: self.$presentGIF, content: {
                         GIFController(url: self.$gifURL, present: self.$presentGIF)
                     })
                     
                     Button(action: {
-                        print("Contact Btn")
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                         self.shareContact.toggle()
                     }, label: {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 15, style: .circular)
-                                .frame(width: Constants.screenWidth / 4.9, height: 60)
-                                .foregroundColor(Color("buttonColor"))
-                                .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 10)
-                            
-                            Image(systemName: "person.2")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 26, height: 22)
-                                .foregroundColor(.primary)
-                                .padding(30)
-                        }
-                    }).buttonStyle(ClickMiniButtonStyle())
+                        Image(systemName: "person.2")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 28, height: 24)
+                            .foregroundColor(.primary)
+                            .font(Font.title.weight(.bold))
+                            .padding(.horizontal, 25)
+                            .padding(.vertical)
+                    }).frame(width: Constants.screenWidth / 5.5, height: 60)
+                    .buttonStyle(keyboardButtonStyle())
                     .sheet(isPresented: self.$shareContact, onDismiss: {
                         if self.selectedContacts.count > 0 {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                                if let selectedDialog = self.dialogs.results.filter("id == %@", UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").first {
+                                if let selectedDialog = self.auth.dialogs.results.filter("id == %@", UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").first {
                                     changeMessageRealmData.sendContactMessage(dialog: selectedDialog, contactID: self.selectedContacts, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                                 }
                             }
@@ -338,7 +314,7 @@ struct KeyboardCardView: View {
                     }
 
                     Button(action: {
-                        print("Location Btn")
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                         self.hasAttachments.toggle()
                         self.enableLocation.toggle()
                         
@@ -350,27 +326,22 @@ struct KeyboardCardView: View {
                             self.viewModel.requestLocationPermission()
                         }
                     }, label: {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 15, style: .circular)
-                                .frame(width: Constants.screenWidth / 4.9, height: 60)
-                                .foregroundColor(Color("buttonColor"))
-                                .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 10)
-                            
-                            Image(systemName: self.enableLocation ? "location.fill" : "location")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 26, height: 22)
-                                .foregroundColor(self.enableLocation ? .blue : .primary)
-                                .shadow(color: Color.black.opacity(self.enableLocation ? 0.2 : 0.0), radius: 5, x: 0, y: 5)
-                                .padding(30)
-                                .cornerRadius(15)
-                        }
-                    }).buttonStyle(ClickMiniButtonStyle())
+                        Image(systemName: self.enableLocation ? "location.fill" : "location")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 26, height: 24)
+                            .foregroundColor(self.enableLocation ? .blue : .primary)
+                            .font(Font.title.weight(.medium))
+                            .padding(.horizontal, 24)
+                            .padding(.vertical)
+                    }).frame(width: Constants.screenWidth / 5.5, height: 60)
+                    .buttonStyle(keyboardButtonStyle())
+                    .padding(.trailing)
                                         
-                    Spacer()
-                }.padding(.bottom, 40)
-                //.padding(.top, self.hasAttachments ? 5 : 10)
+                }.padding(.top, 10)
+                .padding(.bottom, 40)
                 .background(Color.clear)
+                
                 Spacer()
             }
         }.padding(.vertical, 5)
@@ -389,9 +360,9 @@ struct KeyboardCardView: View {
 
 //MARK: Message Text Field
 struct ResizableTextField : UIViewRepresentable {
+    @EnvironmentObject var auth: AuthModel
     @Binding var height: CGFloat
     @Binding var text: String
-    @State var emptyPlaceholder: Bool = false
     
     func makeCoordinator() -> Coordinator {
         return ResizableTextField.Coordinator(parent1: self)
@@ -413,7 +384,7 @@ struct ResizableTextField : UIViewRepresentable {
     func updateUIView(_ uiView: UITextView, context: Context) {
         DispatchQueue.main.async {
             self.height = uiView.contentSize.height
-//            if let typedText = self.dialogs.selectedDia(dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").first?.typedText {
+//            if let typedText = self.auth.dialogs.selectedDia(dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").first?.typedText {
 //                self.text = typedText
 //            } else {
 //                self.text = ""
@@ -424,30 +395,42 @@ struct ResizableTextField : UIViewRepresentable {
     
     class Coordinator: NSObject, UITextViewDelegate {
         var parent : ResizableTextField
+        var hasTyped: Bool = false
         
         init(parent1: ResizableTextField) {
             parent = parent1
         }
         
         func textViewDidBeginEditing(_ textView: UITextView) {
+            self.hasTyped = false
             if self.parent.text == "" {
-                //textView.text = nil
-                textView.textColor = UIColor(named: "textColor")
+                textView.text = nil
+            }
+            if textView.text.count != 0 {
+                self.parent.auth.selectedConnectyDialog?.sendUserIsTyping()
             }
         }
         
         func textViewDidEndEditing(_ textView: UITextView) {
-            if self.parent.text == "" && self.parent.emptyPlaceholder == false {
-                //"write somehting to ~NAME~" as placholder option
-                textView.text = "type message"
-                textView.textColor = .gray
-            }
+            self.parent.auth.selectedConnectyDialog?.sendUserStoppedTyping()
+            UserDefaults.standard.setValue(textView.text, forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText")
         }
         
         func textViewDidChange(_ textView: UITextView) {
+            if textView.text.count == 0 {
+                self.hasTyped = false
+                self.parent.auth.selectedConnectyDialog?.sendUserStoppedTyping()
+            } else if !self.hasTyped {
+                self.hasTyped = true
+                self.parent.auth.selectedConnectyDialog?.sendUserIsTyping()
+            }
+            
             DispatchQueue.main.async {
                 self.parent.height = textView.contentSize.height
                 self.parent.text = textView.text
+                if self.parent.text == "" {
+                    textView.text = nil
+                }
             }
         }
     }

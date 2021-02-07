@@ -359,7 +359,7 @@ struct mainHomeList: View {
                         }
                         
                         //MARK: Main Dialog Cells
-                        ForEach(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }, id: \.self) { i in
+                        ForEach(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }, id: \.id) { i in
                             if self.isLocalOpen && i.isOpen && !self.disableDialog {
                                 Rectangle()
                                     .fill(Color.clear)
@@ -420,7 +420,7 @@ struct mainHomeList: View {
                     }
                 }
                 
-                //Chat View
+                //MARK: Chat Messages View
                 if UserDefaults.standard.bool(forKey: "localOpen") {
                     GeometryReader { geo in
                         ChatMessagesView(activeView: self.$activeView, keyboardChange: self.$keyboardHeight, dialogID: self.$selectedDialogID, textFieldHeight: self.$textFieldHeight, keyboardDragState: self.$keyboardDragState, hasAttachment: self.$hasAttachments, newDialogFromSharedContact: self.$newDialogFromSharedContact)
@@ -440,11 +440,11 @@ struct mainHomeList: View {
                     }
                 }
 
-                //keyboard View
-                KeyboardCardView(height: self.$textFieldHeight, mainText: self.$keyboardText, hasAttachments: self.$hasAttachments)
+                //MARK: Keyboard View
+                KeyboardCardView(height: self.$textFieldHeight, isOpen: self.$isLocalOpen, mainText: self.$keyboardText, hasAttachments: self.$hasAttachments)
                     .environmentObject(self.auth)
                     .frame(alignment: .center)
-                    .background(BlurView(style: .systemThinMaterial)) //Color("bgColor")
+                    .background(BlurView(style: .systemUltraThinMaterial)) //Color("bgColor")
                     .cornerRadius(20)
                     //.scaleEffect(1 - self.activeView.height / 2500)
                     //.offset(y: self.activeView.height / 6)
@@ -464,9 +464,11 @@ struct mainHomeList: View {
                                 self.keyboardDragState.height = 110
                             }
                             if self.keyboardDragState.height > 50 {
-                                //changeDialogRealmData().updateDialogTypedText(text: self.keyboardText, dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "")
                                 self.keyboardHeight = 0
                                 UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                                    UserDefaults.standard.setValue(self.keyboardText, forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText")
+                                }
                             }
                         }.onEnded { valueEnd in
                             if self.keyboardDragState.height > 50 {
@@ -617,10 +619,6 @@ struct mainHomeList: View {
                 if dialogType == "group" || dialogType == "public" {
                     self.auth.leaveDialog()
                 }
-                if self.keyboardText.count > 0 {
-                    self.auth.selectedConnectyDialog?.sendUserStoppedTyping()
-                }
-                //changeDialogRealmData().updateDialogTypedText(text: self.keyboardText, dialogID: i.id)
             }
         }
     }
@@ -637,7 +635,6 @@ struct mainHomeList: View {
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
             UserDefaults.standard.set(false, forKey: "localOpen")
             changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: id)
-            //changeDialogRealmData().updateDialogTypedText(text: self.keyboardText, dialogID: i.id)
             changeDialogRealmData().fetchDialogs(completion: { _ in })
 
             self.isLocalOpen = false
@@ -646,9 +643,6 @@ struct mainHomeList: View {
         self.activeView.height = .zero
         if dialogType == "group" || dialogType == "public" {
             self.auth.leaveDialog()
-        }
-        if self.keyboardText.count > 0 {
-            self.auth.selectedConnectyDialog?.sendUserStoppedTyping()
         }
     }
 }

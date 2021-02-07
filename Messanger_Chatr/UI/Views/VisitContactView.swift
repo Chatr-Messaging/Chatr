@@ -49,11 +49,11 @@ struct VisitContactView: View {
         ZStack {
             ScrollView(.vertical, showsIndicators: true) {
                 //MARK: Top Profile
-                topHeaderContactView(contact: self.$contact, quickSnapViewState: self.$quickSnapViewState, isProfileImgOpen: self.$isProfileImgOpen, isProfileBioOpen: self.$isProfileBioOpen, selectedImageUrl: self.$selectedImageUrl)
+                topHeaderContactView(viewModel: self.viewModel, contact: self.$contact, quickSnapViewState: self.$quickSnapViewState, isProfileImgOpen: self.$isProfileImgOpen, isProfileBioOpen: self.$isProfileBioOpen, selectedImageUrl: self.$selectedImageUrl)
                     .padding(.top, 20)
 
                 //MARK: Action Buttons
-                actionButtonView(contact: self.$contact, quickSnapViewState: self.$quickSnapViewState, contactRelationship: self.$contactRelationship, newMessage: self.$newMessage, dismissView: self.$dismissView)
+                actionButtonView(viewModel: self.viewModel, contact: self.$contact, quickSnapViewState: self.$quickSnapViewState, contactRelationship: self.$contactRelationship, newMessage: self.$newMessage, dismissView: self.$dismissView)
                     .padding(.vertical, 5)
 
                 //MARK: Phone Number Section
@@ -890,7 +890,7 @@ struct VisitContactView: View {
 
 //MARK: Top Header Contact View
 struct topHeaderContactView: View {
-    @ObservedObject var viewModel = VisitContactViewModel()
+    @ObservedObject var viewModel: VisitContactViewModel
     @Binding var contact: ContactStruct
     @Binding var quickSnapViewState: QuickSnapViewingState
     @Binding var isProfileImgOpen: Bool
@@ -1030,7 +1030,7 @@ struct topHeaderContactView: View {
 
 //MARK: Action Button View
 struct actionButtonView: View {
-    @ObservedObject var viewModel = VisitContactViewModel()
+    @ObservedObject var viewModel: VisitContactViewModel
     @Binding var contact: ContactStruct
     @Binding var quickSnapViewState: QuickSnapViewingState
     @Binding var contactRelationship: visitContactRelationship
