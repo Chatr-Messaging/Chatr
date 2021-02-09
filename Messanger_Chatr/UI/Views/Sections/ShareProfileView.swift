@@ -286,18 +286,22 @@ struct ShareProfileView: View {
             self.getURLLink()
         }.sheet(isPresented: self.$showShared) {
             ShareSheet(activityItems: [URL(string: self.shareURL)!])
-        }.slideOverCard(isPresented: $openScan) {
+        }.slideOverCard(isPresented: $openScan, onDismiss: {
+            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+        }) {
             VStack(alignment: .center) {
                 Text("Scan QR Code")
                     .font(.title)
                     .fontWeight(.bold)
                     .foregroundColor(.primary)
+                    .offset(y: -20)
 
                 Text("Scan a fellow Chatr user's QR code open their profile.")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
+                    .offset(y: -10)
 
                 ScanQRView(dimissView: self.$dimissView)
                     .environmentObject(self.auth)

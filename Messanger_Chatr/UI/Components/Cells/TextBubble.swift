@@ -89,7 +89,7 @@ struct TextBubble: View {
                                                 }.padding(.horizontal, 10)
                                                 .padding(.vertical, 5)
                                                     
-                                            }).buttonStyle(interactionButtonStyle(isHighlighted: self.$hasUserDisliked))
+                                            }).buttonStyle(interactionButtonStyle(isHighlighted: self.$hasUserDisliked, messagePosition: self.$messagePosition))
                                             .offset(x: self.messagePosition == .left ? 20 : -20, y: -20)
                                         }
 
@@ -114,7 +114,7 @@ struct TextBubble: View {
                                                         .padding(.horizontal, self.message.likedId.count > 1 ? 3 : 0)
                                                 }.padding(.horizontal, 10)
                                                 .padding(.vertical, 5)
-                                            }).buttonStyle(interactionButtonStyle(isHighlighted: self.$hasUserLiked))
+                                            }).buttonStyle(interactionButtonStyle(isHighlighted: self.$hasUserLiked, messagePosition: self.$messagePosition))
                                             .offset(x: self.messagePosition == .left ? 20 : -20, y: -20)
                                         }
                                     }
@@ -254,10 +254,11 @@ struct TextBubble: View {
             trashMessage()
         }
     }
-    
+
     func loadFirebase() {
         let msg = Database.database().reference().child("Dialogs").child(self.message.dialogID).child(self.message.id)
-        
+        let profileID = self.auth.profile.results.first?.id ?? 0
+
         msg.observe(.childAdded, with: { snapLikeAdded in
             let typeLike = snapLikeAdded.key
 
@@ -265,11 +266,11 @@ struct TextBubble: View {
                 let childSnap = child as! DataSnapshot
                 if typeLike == "likes" {
                     changeMessageRealmData.updateMessageLikeAdded(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
-                    self.hasUserLiked = self.message.likedId.contains(self.auth.profile.results.first?.id ?? 0)
-                    print("liked added: contain: \(self.message.likedId.contains(self.auth.profile.results.first?.id ?? 0)) && my id: \(self.auth.profile.results.first?.id ?? 0)")
+                    self.hasUserLiked = self.message.likedId.contains(profileID)
+                    print("liked added: contain: \(self.message.likedId.contains(profileID)) && my id: \(profileID)")
                 } else if childSnap.key == "dislikes" {
                     changeMessageRealmData.updateMessageDislikeAdded(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
-                    self.hasUserDisliked = self.message.dislikedId.contains(self.auth.profile.results.first?.id ?? 0)
+                    self.hasUserDisliked = self.message.dislikedId.contains(profileID)
                 }
             }
         })
@@ -281,10 +282,10 @@ struct TextBubble: View {
                 let childSnap = child as! DataSnapshot
                 if typeLike == "likes" {
                     changeMessageRealmData.updateMessageLikeRemoved(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
-                    self.hasUserLiked = self.message.likedId.contains(self.auth.profile.results.first?.id ?? 0)
+                    self.hasUserLiked = self.message.likedId.contains(profileID)
                 } else if childSnap.key == "dislikes" {
                     changeMessageRealmData.updateMessageDislikeRemoved(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
-                    self.hasUserDisliked = self.message.dislikedId.contains(self.auth.profile.results.first?.id ?? 0)
+                    self.hasUserDisliked = self.message.dislikedId.contains(profileID)
                 }
             }
         })

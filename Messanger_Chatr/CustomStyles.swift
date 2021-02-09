@@ -106,13 +106,14 @@ struct highlightedButtonStyle: ButtonStyle {
 
 struct interactionButtonStyle: ButtonStyle {
     @Binding var isHighlighted: Bool
+    @Binding var messagePosition: messagePosition
     
     public func makeBody(configuration: interactionButtonStyle.Configuration) -> some View {
         configuration.label
             .scaleEffect(configuration.isPressed ? 0.9 : 1.0)
             .opacity(configuration.isPressed ? 0.9 : 1)
             .background(RoundedRectangle(cornerRadius: 12.5).shadow(color: Color.black.opacity(0.2), radius: 3, x: 0, y: 3))
-            .foregroundColor(configuration.isPressed ? Color("interactionBtnColorSelected") : isHighlighted ? Color("main_lightblue") : Color("interactionBtnColor"))
+            .foregroundColor(configuration.isPressed ? Color("interactionBtnColorSelected") : isHighlighted ? Color("main_blue") : messagePosition == .right ? Color("main_blue") : Color("interactionBtnColor"))
     }
 }
 

@@ -200,6 +200,7 @@ class AuthModel: NSObject, ObservableObject {
                                         })
                                     })
                                 }
+
                                 changeProfileRealmDate().updateProfile(user, completion: {
                                     //Update Firebase Analitics log events by checking Firebase new user
                                     Chat.instance.connect(withUserID: UInt(user.id), password: Session.current.sessionDetails?.token ?? "") { (error) in

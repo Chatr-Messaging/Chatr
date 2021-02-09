@@ -445,9 +445,11 @@ struct mainHomeList: View {
                                 .opacity(self.isLocalOpen ? 0 : 1)
                         }
                     }
-                }.slideOverCard(isPresented: $showWelcomeNewUser, content: {
+                }.slideOverCard(isPresented: $showWelcomeNewUser, onDismiss: {
+                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                }) {
                     EarlyAdopterView(counter: self.$counter)
-                })
+                }
                 
                 //MARK: Chat Messages View
                 if UserDefaults.standard.bool(forKey: "localOpen") {
