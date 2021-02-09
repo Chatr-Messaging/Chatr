@@ -14,6 +14,7 @@ import CarBode
 import SDWebImageSwiftUI
 import AVFoundation
 import SCSDKCreativeKit
+import SlideOverCard
 
 struct ShareProfileView: View {
     @EnvironmentObject var auth: AuthModel
@@ -29,6 +30,7 @@ struct ShareProfileView: View {
     @State var hideQrCode = false
     @State var showShared = false
     @State var hasCopiedUrl = false
+    @State var openScan = false
 
     var body: some View {
         VStack {
@@ -166,7 +168,10 @@ struct ShareProfileView: View {
                         .shadow(color: Color(red: 255/255, green: 252/255, blue: 0/255, opacity: 0.3), radius: 20, x: 0, y: 10)
                     }.buttonStyle(ClickButtonStyle())
                     
-                    NavigationLink(destination: ScanQRView(dimissView: self.$dimissView).environmentObject(self.auth).edgesIgnoringSafeArea(.all)) {
+                    Button(action: {
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                        self.openScan.toggle()
+                    }) {
                         HStack(alignment: .center) {
                             Image(systemName: "qrcode.viewfinder")
                                 .resizable()
@@ -174,6 +179,7 @@ struct ShareProfileView: View {
                                 .frame(width: 26, height: 26, alignment: .center)
                                 .foregroundColor(.white)
                                 .padding(3)
+                                .padding(.leading, 4)
                             
                             Text("Scan QR")
                                 .font(.none)
@@ -194,10 +200,14 @@ struct ShareProfileView: View {
                         .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 3)
                         .shadow(color: Color.blue.opacity(0.3), radius: 20, x: 0, y: 10)
                     }.buttonStyle(ClickButtonStyle())
-                    .simultaneousGesture(TapGesture()
-                        .onEnded { _ in
-                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                        })
+                    
+//                    NavigationLink(destination: ScanQRView(dimissView: self.$dimissView).environmentObject(self.auth).edgesIgnoringSafeArea(.all)) {
+//
+//                    }.buttonStyle(ClickButtonStyle())
+//                    .simultaneousGesture(TapGesture()
+//                        .onEnded { _ in
+//                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+//                        })
 
                 }.padding(.top, 40)
                 .padding(.horizontal)
@@ -272,11 +282,29 @@ struct ShareProfileView: View {
                     .font(Font.system(size: 22, weight: .regular))
                     .foregroundColor(.primary)
             }.disabled(self.foundUser ? false : true)
-        )
-        .onAppear {
+        ).onAppear {
             self.getURLLink()
         }.sheet(isPresented: self.$showShared) {
             ShareSheet(activityItems: [URL(string: self.shareURL)!])
+        }.slideOverCard(isPresented: $openScan) {
+            VStack(alignment: .center) {
+                Text("Scan QR Code")
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .foregroundColor(.primary)
+
+                Text("Scan a fellow Chatr user's QR code open their profile.")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+
+                ScanQRView(dimissView: self.$dimissView)
+                    .environmentObject(self.auth)
+                    .frame(width: .infinity, height: Constants.screenWidth / 1.2, alignment: .center)
+                    .cornerRadius(20)
+                    .padding(.top, 5)
+            }
         }
     }
 

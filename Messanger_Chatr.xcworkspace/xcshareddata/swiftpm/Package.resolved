@@ -11,6 +11,15 @@
         }
       },
       {
+        "package": "ConfettiSwiftUI",
+        "repositoryURL": "https://github.com/simibac/ConfettiSwiftUI",
+        "state": {
+          "branch": null,
+          "revision": "4aac70f5264e59dfed75d6f1c282bb147f101a49",
+          "version": "0.2.1"
+        }
+      },
+      {
         "package": "PopupView",
         "repositoryURL": "https://github.com/exyte/PopupView.git",
         "state": {
@@ -35,6 +44,15 @@
           "branch": null,
           "revision": "612057010f5521d41559970306054f4c5b12632a",
           "version": "6.1.4"
+        }
+      },
+      {
+        "package": "SlideOverCard",
+        "repositoryURL": "https://github.com/joogps/SlideOverCard.git",
+        "state": {
+          "branch": null,
+          "revision": "1e2ac4f7c3f7dbcd46b76e7b8cc8a91554c42abb",
+          "version": "1.2.6"
         }
       },
       {

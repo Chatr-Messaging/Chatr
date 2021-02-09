@@ -31,6 +31,10 @@
 		054CAB7E25AA6E3700DD3F7C /* InstagramWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054CAB7D25AA6E3700DD3F7C /* InstagramWebView.swift */; };
 		054DA6C2250FF9DF00F28F74 /* AboutChatrView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054DA6C1250FF9DF00F28F74 /* AboutChatrView.swift */; };
 		054DBABD25AAE5430053B5C1 /* ImageViewerRemote in Frameworks */ = {isa = PBXBuildFile; productRef = 054DBABC25AAE5430053B5C1 /* ImageViewerRemote */; };
+		054E9B7725D22CF600365CE0 /* SlideOverCard in Frameworks */ = {isa = PBXBuildFile; productRef = 054E9B7625D22CF600365CE0 /* SlideOverCard */; };
+		054E9B7C25D242BB00365CE0 /* EarlyAdopterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054E9B7B25D242BB00365CE0 /* EarlyAdopterView.swift */; };
+		054E9B8225D246C800365CE0 /* ConfettiSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 054E9B8125D246C800365CE0 /* ConfettiSwiftUI */; };
+		054E9B8325D246C800365CE0 /* ConfettiSwiftUI in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 054E9B8125D246C800365CE0 /* ConfettiSwiftUI */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		0554281725AFE7AD00B6D106 /* ChatrStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0554281625AFE7AD00B6D106 /* ChatrStats.swift */; };
 		05578C2C242989A10016B1E5 /* Messanger_Chatr.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 05578C2A242989A10016B1E5 /* Messanger_Chatr.xcdatamodeld */; };
 		05578C362429CE030016B1E5 /* PersistenceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05578C352429CE030016B1E5 /* PersistenceManager.swift */; };
@@ -156,6 +160,20 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		054E9B8425D246C900365CE0 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				054E9B8325D246C800365CE0 /* ConfettiSwiftUI in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		050582FC24D8FCDF00CBD4AC /* DialogRealmModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogRealmModel.swift; sourceTree = "<group>"; };
 		050582FE24DA5F9500CBD4AC /* MessagesRealmModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesRealmModel.swift; sourceTree = "<group>"; };
@@ -183,6 +201,7 @@
 		054CAB7825AA6E1F00DD3F7C /* InstagramTestUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramTestUser.swift; sourceTree = "<group>"; };
 		054CAB7D25AA6E3700DD3F7C /* InstagramWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramWebView.swift; sourceTree = "<group>"; };
 		054DA6C1250FF9DF00F28F74 /* AboutChatrView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutChatrView.swift; sourceTree = "<group>"; };
+		054E9B7B25D242BB00365CE0 /* EarlyAdopterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EarlyAdopterView.swift; sourceTree = "<group>"; };
 		0554281625AFE7AD00B6D106 /* ChatrStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatrStats.swift; sourceTree = "<group>"; };
 		05578C2B242989A10016B1E5 /* Messanger_Chatr.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Messanger_Chatr.xcdatamodel; sourceTree = "<group>"; };
 		05578C352429CE030016B1E5 /* PersistenceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceManager.swift; sourceTree = "<group>"; };
@@ -300,6 +319,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				054E9B7725D22CF600365CE0 /* SlideOverCard in Frameworks */,
 				05C36C17252D62B90031CB3F /* PopupView in Frameworks */,
 				05FF35C92536C03400886576 /* StoreKit.framework in Frameworks */,
 				055E516625ACDC0B003BE668 /* WKView in Frameworks */,
@@ -309,6 +329,7 @@
 				05903A3F25925C3400D70A13 /* WKView in Frameworks */,
 				05670318256A3C43004123EB /* CarBode in Frameworks */,
 				059B18122522C32000988201 /* Realm in Frameworks */,
+				054E9B8225D246C800365CE0 /* ConfettiSwiftUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -448,6 +469,7 @@
 				054DA6C1250FF9DF00F28F74 /* AboutChatrView.swift */,
 				056B98A624C8FAC9003F7FBA /* SecurityView.swift */,
 				0554281625AFE7AD00B6D106 /* ChatrStats.swift */,
+				054E9B7B25D242BB00365CE0 /* EarlyAdopterView.swift */,
 			);
 			path = Sections;
 			sourceTree = "<group>";
@@ -716,6 +738,7 @@
 				05DB89AC238B851400D4581F /* Resources */,
 				054558D1254A87D700157AFD /* ShellScript */,
 				6AB1B1253C21D7849299420D /* [CP] Embed Pods Frameworks */,
+				054E9B8425D246C900365CE0 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -730,6 +753,8 @@
 				05903A3E25925C3400D70A13 /* WKView */,
 				054DBABC25AAE5430053B5C1 /* ImageViewerRemote */,
 				055E516525ACDC0B003BE668 /* WKView */,
+				054E9B7625D22CF600365CE0 /* SlideOverCard */,
+				054E9B8125D246C800365CE0 /* ConfettiSwiftUI */,
 			);
 			productName = Messanger_Chatr;
 			productReference = 05DB89AE238B851400D4581F /* Messanger_Chatr.app */;
@@ -809,6 +834,8 @@
 				05670316256A3C43004123EB /* XCRemoteSwiftPackageReference "CarBode-Barcode-Scanner-For-SwiftUI" */,
 				054CAB8B25AADD7500DD3F7C /* XCRemoteSwiftPackageReference "swiftui-image-viewer" */,
 				055E516425ACDC0B003BE668 /* XCRemoteSwiftPackageReference "WKView" */,
+				054E9B7525D22CF600365CE0 /* XCRemoteSwiftPackageReference "SlideOverCard" */,
+				054E9B8025D246C800365CE0 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */,
 			);
 			productRefGroup = 05DB89AF238B851400D4581F /* Products */;
 			projectDirPath = "";
@@ -997,6 +1024,7 @@
 				054CAB7425AA6DF700DD3F7C /* InstagramApi.swift in Sources */,
 				05A7BD5524FAED250001BFC9 /* CameraViewController.swift in Sources */,
 				05AACE5F23A60AB6006307EB /* ImagePicker.swift in Sources */,
+				054E9B7C25D242BB00365CE0 /* EarlyAdopterView.swift in Sources */,
 				05BCE40F250C55E100E29F39 /* ShareProfileView.swift in Sources */,
 				056B989C24C8F9BD003F7FBA /* MenuButton.swift in Sources */,
 				056B98A024C8FA41003F7FBA /* AppearanceView.swift in Sources */,
@@ -1518,6 +1546,22 @@
 				minimumVersion = 2.1.0;
 			};
 		};
+		054E9B7525D22CF600365CE0 /* XCRemoteSwiftPackageReference "SlideOverCard" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/joogps/SlideOverCard.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.6;
+			};
+		};
+		054E9B8025D246C800365CE0 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/simibac/ConfettiSwiftUI";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.2.1;
+			};
+		};
 		055E516425ACDC0B003BE668 /* XCRemoteSwiftPackageReference "WKView" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/rebeloper/WKView.git";
@@ -1557,6 +1601,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 054CAB8B25AADD7500DD3F7C /* XCRemoteSwiftPackageReference "swiftui-image-viewer" */;
 			productName = ImageViewerRemote;
+		};
+		054E9B7625D22CF600365CE0 /* SlideOverCard */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 054E9B7525D22CF600365CE0 /* XCRemoteSwiftPackageReference "SlideOverCard" */;
+			productName = SlideOverCard;
+		};
+		054E9B8125D246C800365CE0 /* ConfettiSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 054E9B8025D246C800365CE0 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */;
+			productName = ConfettiSwiftUI;
 		};
 		055E516525ACDC0B003BE668 /* WKView */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -15,7 +15,8 @@ import PopupView
 import RealmSwift
 import LocalAuthentication
 import UserNotifications
-
+import SlideOverCard
+import ConfettiSwiftUI
 
 // MARK: Preview View
 struct ContentView_Previews: PreviewProvider {
@@ -169,12 +170,14 @@ struct mainHomeList: View {
     @State var showSharedContact: Bool = false
     @State var receivedNotification: Bool = false
     @State var disableDialog: Bool = false
+    @State var showWelcomeNewUser: Bool = false
     @State var isLocalOpen : Bool = UserDefaults.standard.bool(forKey: "localOpen")
     @State var activeView = CGSize.zero
     @State var keyboardDragState = CGSize.zero
     @State var keyboardHeight: CGFloat = 0
     @State var textFieldHeight: CGFloat = 0
     @State var selectedContacts: [Int] = []
+    @State var counter: Int = 0
     @State var quickSnapViewState: QuickSnapViewingState = .closed
     @State var selectedQuickSnapContact: ContactStruct = ContactStruct()
     @ObservedObject var dialogs = DialogRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(DialogStruct.self))
@@ -212,6 +215,16 @@ struct mainHomeList: View {
                                     NotificationCenter.default.addObserver(forName: NSNotification.Name("NotificationAlert"), object: nil, queue: .main) { (_) in
                                         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                                         self.receivedNotification.toggle()
+                                    }
+                                    
+                                    if self.auth.isFirstTimeUser {
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                                            self.showWelcomeNewUser.toggle()
+                                            UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                                                self.counter += 1
+                                            }
+                                        }
                                     }
                                 }
                         }.frame(height: Constants.btnSize + 100)
@@ -288,6 +301,20 @@ struct mainHomeList: View {
                         }) {
                             NewConversationView(usedAsNew: true, selectedContact: self.$selectedContacts, newDialogID: self.$newDialogID)
                                 .environmentObject(self.auth)
+                                .sheet(isPresented: self.$showSharedContact, onDismiss: {
+                                    if self.newDialogFromContact != 0 {
+                                        self.isLocalOpen = false
+                                        UserDefaults.standard.set(false, forKey: "localOpen")
+                                        changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: "\(self.newDialogFromContact)")
+                                    }
+                                    self.loadSelectedDialog()
+                                }) {
+                                    NavigationView {
+                                        VisitContactView(fromDialogCell: true, newMessage: self.$newDialogFromContact, dismissView: self.$showSharedContact, viewState: .fromDynamicLink)
+                                            .environmentObject(self.auth)
+                                            .edgesIgnoringSafeArea(.all)
+                                    }
+                                }
                         }
                         
 //                        //MARK: Pull to refresh - loading dialogs
@@ -334,7 +361,7 @@ struct mainHomeList: View {
                                 
                                 Text("Start a new conversation!")
                                     .font(.system(size: 18))
-                                    .foregroundColor(Color.secondary)
+                                    .foregroundColor(.secondary)
                                     .padding(.bottom, 25)
                                 
                                 Button(action: {
@@ -418,7 +445,9 @@ struct mainHomeList: View {
                                 .opacity(self.isLocalOpen ? 0 : 1)
                         }
                     }
-                }
+                }.slideOverCard(isPresented: $showWelcomeNewUser, content: {
+                    EarlyAdopterView(counter: self.$counter)
+                })
                 
                 //MARK: Chat Messages View
                 if UserDefaults.standard.bool(forKey: "localOpen") {
@@ -488,21 +517,7 @@ struct mainHomeList: View {
                                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             }
                         }
-                    ).sheet(isPresented: self.$showSharedContact, onDismiss: {
-                        if self.newDialogFromContact != 0 {
-                            self.isLocalOpen = false
-                            UserDefaults.standard.set(false, forKey: "localOpen")
-                            changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: "\(self.newDialogFromContact)")
-                        }
-                        self.loadSelectedDialog()
-                    }) {
-                        NavigationView {
-                            VisitContactView(fromDialogCell: true, newMessage: self.$newDialogFromContact, dismissView: self.$showSharedContact, viewState: .fromDynamicLink)
-                                .environmentObject(self.auth)
-                                .edgesIgnoringSafeArea(.all)
-                        }
-                    }
-                    .onChange(of: self.auth.visitContactProfile) { newValue in
+                    ).onChange(of: self.auth.visitContactProfile) { newValue in
                         if newValue {
                             self.showSharedContact.toggle()
                             self.auth.visitContactProfile = false
@@ -555,6 +570,8 @@ struct mainHomeList: View {
                     NotificationSection()
                         .environmentObject(self.auth)
                 }
+            
+            ConfettiCannon(counter: $counter, repetitions: 3, repetitionInterval: 0.2)
         }
     }
     

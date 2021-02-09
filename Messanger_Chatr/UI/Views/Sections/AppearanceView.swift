@@ -94,7 +94,7 @@ struct appearanceView: View {
                                         
                                         Spacer()
                                         
-                                        if self.auth.subscriptionStatus == .subscribed || self.AppIconDataArray[results].title == "Original" {
+                                        if self.auth.subscriptionStatus == .subscribed || self.AppIconDataArray[results].title == "Original" || (self.AppIconDataArray[results].title == "Original Dark" && UserDefaults.standard.bool(forKey: "isEarlyAdopter")) {
                                             if self.selectedIcon?.title == self.AppIconDataArray[results].title {
                                                 Image(systemName: "checkmark.circle.fill" )
                                                     .resizable()
@@ -136,7 +136,7 @@ struct appearanceView: View {
                                         .navigationBarTitle("")
                                 })
                                 .onTapGesture {
-                                    if self.auth.subscriptionStatus == .subscribed || self.AppIconDataArray[results].title == self.AppIconDataArray.first?.title {
+                                    if self.auth.subscriptionStatus == .subscribed || self.AppIconDataArray[results].title == self.AppIconDataArray.first?.title || (self.AppIconDataArray[results].title == "Original Dark" && UserDefaults.standard.bool(forKey: "isEarlyAdopter")) {
                                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                         self.selectedIcon = self.AppIconDataArray[results]
                                         UserDefaults.standard.set(results, forKey: "selectedAppIcon")

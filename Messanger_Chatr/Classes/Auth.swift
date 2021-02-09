@@ -183,17 +183,20 @@ class AuthModel: NSObject, ObservableObject {
                                     if self.persistenceManager.getCubeProfileImage(usersID: user) != nil {
                                         self.haveUserProfileImg = true
                                     }
-                                    if Chat.instance.isConnected {
-                                        Chat.instance.disconnect { (error) in
-                                            print("chat did disconnect. error?: \(String(describing: error?.localizedDescription))")
-                                        }
-                                    }
+//                                    if Chat.instance.isConnected {
+//                                        Chat.instance.disconnect { (error) in
+//                                            print("chat did disconnect. error?: \(String(describing: error?.localizedDescription))")
+//                                        }
+//                                    }
                                 } else {
                                     self.isFirstTimeUser = true
                                     changeAddressBookRealmData().removeAllAddressBook(completion: { _ in
                                         Analytics.logEvent(AnalyticsEventSignUp, parameters: [AnalyticsParameterMethod: "Phone Number Security Code - from Sign Up"])
                                         self.fetchTotalUserCount(completion: { count in
                                             Database.database().reference().child("Users").child("\(user.id)").updateChildValues(["userNumber" : count])
+                                            if count <= 1000 {
+                                                UserDefaults.standard.set(true, forKey: "isEarlyAdopter")
+                                            }
                                         })
                                     })
                                 }
@@ -466,7 +469,7 @@ class AuthModel: NSObject, ObservableObject {
             completion(count)
         })
     }
-    
+
     func fetchTotalQuickSnapCount(completion: @escaping (Int) -> Void) {
         Database.database().reference().child("Quick Snaps").observe(.value, with: {
             snapshot in
