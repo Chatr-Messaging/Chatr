@@ -121,7 +121,9 @@ class changeProfileRealmDate {
                             foundContact.isInfoPrivate = dict["isInfoPrivate"] as? Bool ?? false
                             foundContact.isMessagingPrivate = dict["isMessagingPrivate"] as? Bool ?? false
                             
-                            realm.add(foundContact, update: .all)
+                            try realm.safeWrite({
+                                realm.add(foundContact, update: .all)
+                            })
                         })
                     } else {
                         print("Contact NOT in Realm: \(snapshot.key)")

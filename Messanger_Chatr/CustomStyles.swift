@@ -19,6 +19,17 @@ struct MainButtonStyle: ButtonStyle {
     }
 }
 
+struct MainButtonStyleMini: ButtonStyle {
+    public func makeBody(configuration: MainButtonStyleMini.Configuration) -> some View {
+        configuration.label
+            .frame(minWidth: 40, maxWidth: .infinity, minHeight: 40, maxHeight: 40)
+            .foregroundColor(.white)
+            .background(configuration.isPressed ? Color(.sRGB, red: 78/255, green: 153/255, blue: 255/255, opacity: 1.0) : Color(.sRGB, red: 31/255, green: 127/255, blue: 255/255, opacity: 1.0))
+            .cornerRadius(12.5)
+            .scaleEffect(configuration.isPressed ? 0.975 : 1.0)
+    }
+}
+
 struct MainButtonStyleDeselected: ButtonStyle {
     public func makeBody(configuration: MainButtonStyleDeselected.Configuration) -> some View {
         configuration.label

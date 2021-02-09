@@ -208,6 +208,7 @@ struct CameraView: View {
                         .padding(.all)
                         .padding(.top, 20)
                     }
+
                     Spacer()
                     HStack() {
                         Button(action: {
@@ -236,7 +237,7 @@ struct CameraView: View {
                         .padding(.trailing, 20)
                         .opacity(self.loadSending ? 0 : 1)
                         .disabled(self.loadSending)
-                        
+
                         Button(action: {
                             if !self.camera.isSaved {
                                 UINotificationFeedbackGenerator().notificationOccurred(.success)
@@ -268,9 +269,8 @@ struct CameraView: View {
                         Spacer()
                         
                         Button(action: {
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                             self.isAddNewUserOpen = true
-                            print("add contact")
                         }) {
                             VStack(alignment: .center) {
                                 Image(systemName: "person.crop.circle.badge.plus")
@@ -381,15 +381,15 @@ struct CameraView: View {
     }
     
     private func sendQuickPic() {
-        changeQuickSnapsRealmData.sendQuickSnap(image: self.inputCameraRollImage != nil ? self.inputCameraRollImage?.pngData() ?? Data() : UIImage(data: self.camera.picData)?.pngData() ?? Data(), sendTo: self.selectedContacts, completion: { result in
+        changeQuickSnapsRealmData().sendQuickSnap(image: self.inputCameraRollImage != nil ? self.inputCameraRollImage?.pngData() ?? Data() : UIImage(data: self.camera.picData ?? Data())?.fixedOrientation()?.pngData() ?? Data(), sendTo: self.selectedContacts, completion: { result in
             if result == false {
                 //error sending post
                 self.loadAni = false
                 self.loadSending = false
             } else {
-                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                 self.cameraState = .closed
-                
+
                 let event = Event()
                 event.notificationType = .push
                 var occs: [NSNumber] = []
@@ -427,7 +427,7 @@ struct CameraView: View {
                     self.loadSending = false
                     self.camera.isTaken = false
                     self.camera.isSaved = false
-                    self.camera.picData = Data(count: 0)
+                    self.camera.picData = nil
                 }
             }
         })

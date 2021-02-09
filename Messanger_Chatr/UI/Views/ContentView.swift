@@ -386,7 +386,7 @@ struct mainHomeList: View {
                                     .onTapGesture {
                                         self.onCellTapGesture(id: i.id, dialogType: i.dialogType)
                                     }.simultaneousGesture(DragGesture(minimumDistance: i.isOpen ? 0 : 500).onChanged { value in
-                                        guard value.translation.height < 150 else { UIApplication.shared.endEditing(true); return }
+                                        guard value.translation.height < 150 else { return }
                                         guard value.translation.height > 0 else { return }
                                         
                                         self.activeView = value.translation
@@ -602,8 +602,8 @@ struct mainHomeList: View {
     }
     
     func onCellTapGesture(id: String, dialogType: String) {
-        self.selectedDialogID = id
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        self.selectedDialogID = id
         UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
         UserDefaults.standard.set(id, forKey: "selectedDialogID")
         if !UserDefaults.standard.bool(forKey: "localOpen") {
@@ -614,7 +614,7 @@ struct mainHomeList: View {
             self.isLocalOpen = false
             UserDefaults.standard.set(false, forKey: "localOpen")
             changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: id)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                 changeDialogRealmData().fetchDialogs(completion: { _ in })
                 if dialogType == "group" || dialogType == "public" {
                     self.auth.leaveDialog()
@@ -630,17 +630,17 @@ struct mainHomeList: View {
         self.activeView = value.translation
     }
     
-    func onEnd(value: DragGesture.Value, index: Int, id: String, dialogType: String){
+    func onEnd(value: DragGesture.Value, index: Int, id: String, dialogType: String) {
         if self.activeView.height > 50 {
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
             UserDefaults.standard.set(false, forKey: "localOpen")
             changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: id)
             changeDialogRealmData().fetchDialogs(completion: { _ in })
-
             self.isLocalOpen = false
-            UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
         }
         self.activeView.height = .zero
+        
         if dialogType == "group" || dialogType == "public" {
             self.auth.leaveDialog()
         }

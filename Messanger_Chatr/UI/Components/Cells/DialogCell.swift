@@ -79,6 +79,10 @@ struct DialogCell: View {
                     }
                 } else if self.dialogModel.dialogType == "group" {
                     ZStack {
+                        Circle()
+                            .frame(width: 55, height: 1, alignment: .center)
+                            .foregroundColor(.clear)
+
                         ForEach(self.groupOccUserAvatar.indices, id: \.self) { id in
                             if id < 3 {
                                 ZStack {

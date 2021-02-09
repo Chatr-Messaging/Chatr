@@ -53,31 +53,34 @@ struct KeyboardCardView: View {
             
             //MARK: Text Field & Send Btn
             HStack(alignment: .bottom) {
-                ZStack(alignment: .topLeading) {
-                    ResizableTextField(height: self.$height, text: self.$mainText)
-                        .environmentObject(self.auth)
-                        .frame(height: self.height < 140 ? self.height : 140)
-                        .padding(.leading, 7)
-                        .background(Color("buttonColor"))
-                        .cornerRadius(10)
-                        .shadow(color: Color.black.opacity(self.mainText.count != 0 ? 0.05 : 0.15), radius: self.mainText.count != 0 ? 8 : 4, x: 0, y: self.mainText.count != 0 ? 8 : 3)
-                    
-                    Text("type message")
-                        .padding(.vertical, 7.5)
-                        .padding(.horizontal)
-                        .foregroundColor(self.mainText.count == 0 && self.isOpen ? Color("lightGray") : .clear)
-                }.onChange(of: self.isOpen, perform: { value in
-                    if value {
-                        if let typedText = UserDefaults.standard.string(forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText") {
-                            print("the saved keyboad text here: \(typedText)")
-                            self.mainText = typedText
-                        } else {
-                            self.mainText = ""
+                ResizableTextField(height: self.$height, text: self.$mainText)
+                    .environmentObject(self.auth)
+                    .frame(height: self.height < 175 ? self.height : 175)
+                    .padding(.leading, 7)
+                    .background(
+                        ZStack(alignment: .topLeading) {
+                            RoundedRectangle(cornerRadius: self.height < 160 ? 10 : 15)
+                                .foregroundColor(Color("buttonColor"))
+                                .shadow(color: Color.black.opacity(self.mainText.count != 0 ? 0.1 : 0.15), radius: self.mainText.count != 0 ? 6 : 4, x: 0, y: self.mainText.count != 0 ? 6 : 3)
+
+                            Text("type message")
+                                .padding(.vertical, 7.5)
+                                .padding(.horizontal)
+                                .foregroundColor(self.mainText.count == 0 && self.isOpen ? Color("lightGray") : .clear)
                         }
-                    } else {
-                        UserDefaults.standard.setValue(self.mainText, forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText")
-                    }
-                })
+                    )
+                    .onChange(of: self.isOpen, perform: { value in
+                        if value {
+                            if let typedText = UserDefaults.standard.string(forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText") {
+                                print("the saved keyboad text here: \(typedText)")
+                                self.mainText = typedText
+                            } else {
+                                self.mainText = ""
+                            }
+                        } else {
+                            UserDefaults.standard.setValue(self.mainText, forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText")
+                        }
+                    })
                 
                 ZStack {
                     //MARK: Send Button
@@ -122,12 +125,12 @@ struct KeyboardCardView: View {
                         Image(systemName: "paperplane.fill")
                             .resizable()
                             .frame(width: 20, height: 20)
-                            .foregroundColor(self.mainText.count > 0 || self.gifData.count > 0 || self.photoData.count > 0 || self.enableLocation ? .white : Color("interactionBtnColorSelected"))
+                            .foregroundColor(self.mainText.count > 0 || self.gifData.count > 0 || self.photoData.count > 0 || self.enableLocation ? .white : .secondary)
                             .padding(10)
                     }).background(self.mainText.count > 0 || self.gifData.count > 0 || self.photoData.count > 0 || self.enableLocation ? LinearGradient(gradient: Gradient(colors: [Color(red: 46 / 255, green: 168 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom) : LinearGradient(gradient: Gradient(colors: [Color("buttonColor"), Color("buttonColor")]), startPoint: .top, endPoint: .bottom))
                     .clipShape(Circle())
-                    .shadow(color: Color.black.opacity(self.mainText.count > 0 || self.gifData.count > 0 || self.photoData.count > 0 || self.enableLocation ? 0.2 : 0.08), radius: 5, x: 0, y: 3)
-                    .shadow(color: Color.blue.opacity(self.mainText.count > 0 || self.gifData.count > 0 || self.photoData.count > 0 || self.enableLocation ? 0.3 : 0.0), radius: 10, x: 0, y: 8)
+                    .shadow(color: Color.black.opacity(self.mainText.count > 0 || self.gifData.count > 0 || self.photoData.count > 0 || self.enableLocation ? 0.2 : 0.1), radius: 4, x: 0, y: 3)
+                    .shadow(color: Color.blue.opacity(self.mainText.count > 0 || self.gifData.count > 0 || self.photoData.count > 0 || self.enableLocation ? 0.3 : 0.0), radius: 8, x: 0, y: 6)
                     .padding(.trailing, 5)
                     .scaleEffect(self.mainText.count != 0 ? 1.04 : 1.0)
                     .disabled(self.mainText.count > 0 || self.gifData.count > 0 || self.photoData.count > 0 || self.enableLocation ? false : true)

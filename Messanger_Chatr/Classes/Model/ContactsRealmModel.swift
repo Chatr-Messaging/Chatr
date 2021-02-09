@@ -167,7 +167,9 @@ class changeContactsRealmData {
                             foundContact.instagramId = dict["instagramId"] as? Int ?? 0
                             foundContact.isPremium = dict["isPremium"] as? Bool ?? false
                             
-                            realm.add(foundContact, update: .all)
+                            try realm.safeWrite({
+                                realm.add(foundContact, update: .all)
+                            })
                         })
                     } else {
                         print("Contact NOT in Realm: \(snapshot.key)")

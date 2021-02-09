@@ -17,8 +17,10 @@ struct QuickSnapsPostView: View {
     @Binding var selectedQuickSnapContact: ContactStruct
     @Binding var viewState: QuickSnapViewingState
     @State var loadAni: Bool = false
+    @State var errorLoading: Bool = false
     @State var timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     @State var timeRemaining: Int = 10
+    @State var timeLoading: Int = 0
     @State var likePost: Bool = false
     @Binding var selectedContacts: [Int]
     
@@ -121,16 +123,57 @@ struct QuickSnapsPostView: View {
                     if let image = self.quickSnapsRealm.results.filter("id == %@", selectedQuickSnapContact.quickSnaps.first ?? "").sorted(by: { $0.sentDate.compare($1.sentDate) == .orderedDescending }).first?.imageUrl {
                         WebImage(url: URL(string: image))
                             .resizable()
-                            .placeholder{                                
-                                Text("loading...")
-                                    .font(.subheadline)
-                                    .fontWeight(.none)
-                                    .foregroundColor(.primary)
-                                    .onAppear() {
-                                        self.loadAni = true
-                                    }.onDisappear() {
-                                        self.loadAni = false
+                            .placeholder{
+                                VStack {
+                                    HStack(spacing: self.errorLoading ? 10 : 0) {
+                                        if self.errorLoading {
+                                            Button(action: {
+                                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                                self.timer.upstream.connect().cancel()
+                                                self.timeLoading = 0
+                                                self.timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+                                                self.errorLoading = false
+                                            }, label: {
+                                                Image(systemName: "arrow.counterclockwise")
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .frame(width: 20, height: 20, alignment: .center)
+                                                    .foregroundColor(.white)
+                                            }).opacity(self.errorLoading ? 1 : 0)
+                                        }
+
+                                        Text(self.errorLoading ? "taking a while..." : "loading...")
+                                            .font(.subheadline)
+                                            .fontWeight(.none)
+                                            .foregroundColor(.white)
+                                            .onAppear() {
+                                                self.loadAni = true
+                                                print("well the url is: \(image)")
+                                            }.onDisappear() {
+                                                self.loadAni = false
+                                                self.errorLoading = false
+                                                self.timeLoading = 0
+                                            }.onReceive(timer) { _ in
+                                                self.timeLoading += 1
+                                                if timeLoading == 4 {
+                                                    self.errorLoading = true
+                                                }
+                                            }
                                     }
+                                    
+                                    Button(action: {
+                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                        self.deletePost()
+                                    }, label: {
+                                        Text("skip")
+                                            .fontWeight(.semibold)
+                                    }).buttonStyle(MainButtonStyleMini())
+                                    .frame(maxWidth: 120)
+                                    .shadow(color: Color.black.opacity(0.1), radius: 14, x: 0, y: 8)
+                                    .opacity(self.errorLoading ? 1 : 0)
+                                    .padding(.top, 45)
+                                    .disabled(self.errorLoading ? false : true)
+                                }
                             }.scaledToFit()
                             .shadow(color: Color.black.opacity(0.25), radius: 8, x: 0, y: 8)
                             .onAppear() {
@@ -140,7 +183,7 @@ struct QuickSnapsPostView: View {
                             .onTapGesture {
                                 if !self.loadAni {
                                     print("Tap a da tap - DONE WITH THIS POST!!")
-                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                     self.timer.upstream.connect().cancel()
                                     self.deletePost()
                                 }
@@ -309,8 +352,7 @@ struct QuickSnapsPostView: View {
                 }
                 
                 Spacer()
-            }//.frame(width: Constants.screenWidth, alignment: .center)
-            .background(BlurView(style: .systemMaterialDark))
+            }.background(BlurView(style: .systemThinMaterialDark))
             .cornerRadius(20)
         }.onAppear() {
             NotificationCenter.default.addObserver(forName: UIApplication.userDidTakeScreenshotNotification, object: nil, queue: OperationQueue.main) { notification in

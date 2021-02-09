@@ -48,7 +48,7 @@ class QuickSnapsRealmModel<Element>: ObservableObject where Element: RealmSwift.
 
 class changeQuickSnapsRealmData {
     
-    static func sendQuickSnap(image: Data, sendTo: [Int], completion: @escaping (Bool) -> Void) {
+    func sendQuickSnap(image: Data, sendTo: [Int], completion: @escaping (Bool) -> Void) {
         uploadSnapToFirebaseStorage(data: image, onSuccess: { (snapImgUrl) in
             if snapImgUrl != "error" {
                 let newPostId = Database.database().reference().child("Quick Snaps").childByAutoId().key
@@ -90,11 +90,7 @@ class changeQuickSnapsRealmData {
         })
     }
     
-    static func setQuickSnapToRead(quickSnapID: String, completion: @escaping (Bool) -> Void) {
-        //let snapReference = Database.database().reference().child("Quick Snaps").child(newPostId ?? "no post id")
-    }
-    
-    static func uploadSnapToFirebaseStorage(data: Data, onSuccess: @escaping (_ imageUrl: String) -> Void) {       
+    func uploadSnapToFirebaseStorage(data: Data, onSuccess: @escaping (_ imageUrl: String) -> Void) {
         let photoIdString = NSUUID().uuidString
         let storageRef = Storage.storage().reference(forURL: Constants.FirebaseStoragePath).child("QuickSnaps").child("\(Session.current.currentUser?.fullName ?? "no name")" + photoIdString)
         let metadata = StorageMetadata()
@@ -108,7 +104,7 @@ class changeQuickSnapsRealmData {
             }
             storageRef.downloadURL { url, error in
                 if error != nil {
-                    
+
                 } else {
                     print("the metatdata is: \(String(describing: metadata))")
                     onSuccess((url?.absoluteString)!)
