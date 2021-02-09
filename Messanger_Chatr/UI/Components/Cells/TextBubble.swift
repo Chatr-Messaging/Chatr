@@ -25,6 +25,8 @@ struct TextBubble: View {
     @State var moveUpAnimation: Bool = false
     @State var interactionSelected: String = ""
     @State var reactions: [String] = []
+    @State var hasUserLiked: Bool = false
+    @State var hasUserDisliked: Bool = false
     var hasPrior: Bool = true
     
     var body: some View {
@@ -65,7 +67,7 @@ struct TextBubble: View {
                                         }
 
                                     HStack(spacing: 5) {
-                                        if self.message.dislikes > 0 {
+                                        if self.message.dislikedId.count > 0 {
                                             Button(action: {
                                                 if self.messagePosition == .left {
                                                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
@@ -77,21 +79,21 @@ struct TextBubble: View {
                                                         .resizable()
                                                         .scaledToFit()
                                                         .frame(width: 22, height: 22, alignment: .center)
-                                                        .offset(x: self.message.dislikes == 0 ? 4 : 0)
+                                                        .offset(x: self.message.dislikedId.count == 0 ? 4 : 0)
 
-                                                    Text(self.message.dislikes > 1 ? "\(self.message.dislikes)" : "")
+                                                    Text(self.message.dislikedId.count > 1 ? "\(self.message.dislikedId.count)" : "")
                                                         .font(.subheadline)
                                                         .fontWeight(.bold)
                                                         .foregroundColor(.primary)
-                                                        .padding(.horizontal, self.message.dislikes > 1 ? 3 : 0)
+                                                        .padding(.horizontal, self.message.dislikedId.count > 1 ? 3 : 0)
                                                 }.padding(.horizontal, 10)
                                                 .padding(.vertical, 5)
                                                     
-                                            }).buttonStyle(interactionButtonStyle())
+                                            }).buttonStyle(interactionButtonStyle(isHighlighted: self.$hasUserDisliked))
                                             .offset(x: self.messagePosition == .left ? 20 : -20, y: -20)
                                         }
 
-                                        if self.message.likes > 0 {
+                                        if self.message.likedId.count > 0 {
                                             Button(action: {
                                                 if self.messagePosition == .left {
                                                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
@@ -103,16 +105,16 @@ struct TextBubble: View {
                                                         .resizable()
                                                         .scaledToFit()
                                                         .frame(width: 22, height: 22, alignment: .center)
-                                                        .offset(x: self.message.likes == 0 ? 4 : 0)
+                                                        .offset(x: self.message.likedId.count == 0 ? 4 : 0)
 
-                                                    Text(self.message.likes > 1 ? "\(self.message.likes)" : "")
+                                                    Text(self.message.likedId.count > 1 ? "\(self.message.likedId.count)" : "")
                                                         .font(.subheadline)
                                                         .fontWeight(.bold)
                                                         .foregroundColor(.primary)
-                                                        .padding(.horizontal, self.message.likes > 1 ? 3 : 0)
+                                                        .padding(.horizontal, self.message.likedId.count > 1 ? 3 : 0)
                                                 }.padding(.horizontal, 10)
                                                 .padding(.vertical, 5)
-                                            }).buttonStyle(interactionButtonStyle())
+                                            }).buttonStyle(interactionButtonStyle(isHighlighted: self.$hasUserLiked))
                                             .offset(x: self.messagePosition == .left ? 20 : -20, y: -20)
                                         }
                                     }
@@ -144,7 +146,7 @@ struct TextBubble: View {
                             }
                         }
                     }.padding(.bottom, self.hasPrior ? 0 : 15)
-                    .padding(.top, self.message.likes != 0 || self.message.dislikes != 0 ? 20 : 0)
+                    .padding(.top, self.message.likedId.count != 0 || self.message.dislikedId.count != 0 ? 20 : 0)
                     .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.45)), removal: AnyTransition.identity))
                 
                 HStack {
@@ -203,6 +205,9 @@ struct TextBubble: View {
                     
                 }
             }
+            
+            self.hasUserLiked = self.message.likedId.contains(self.auth.profile.results.first?.id ?? 0)
+            self.hasUserDisliked = self.message.dislikedId.contains(self.auth.profile.results.first?.id ?? 0)
         }
     }
         
@@ -252,9 +257,36 @@ struct TextBubble: View {
     
     func loadFirebase() {
         let msg = Database.database().reference().child("Dialogs").child(self.message.dialogID).child(self.message.id)
-        msg.observe(.value, with: { snap in
-            changeMessageRealmData.updateMessageLike(messageID: self.message.id, messageLikeCount: Int(snap.childSnapshot(forPath: "likes").childrenCount))
-            changeMessageRealmData.updateMessageDislike(messageID: self.message.id, messageDislikeCount: Int(snap.childSnapshot(forPath: "dislikes").childrenCount))
+        
+        msg.observe(.childAdded, with: { snapLikeAdded in
+            let typeLike = snapLikeAdded.key
+
+            for child in snapLikeAdded.children {
+                let childSnap = child as! DataSnapshot
+                if typeLike == "likes" {
+                    changeMessageRealmData.updateMessageLikeAdded(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
+                    self.hasUserLiked = self.message.likedId.contains(self.auth.profile.results.first?.id ?? 0)
+                    print("liked added: contain: \(self.message.likedId.contains(self.auth.profile.results.first?.id ?? 0)) && my id: \(self.auth.profile.results.first?.id ?? 0)")
+                } else if childSnap.key == "dislikes" {
+                    changeMessageRealmData.updateMessageDislikeAdded(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
+                    self.hasUserDisliked = self.message.dislikedId.contains(self.auth.profile.results.first?.id ?? 0)
+                }
+            }
+        })
+        
+        msg.observe(.childRemoved, with: { snapLikeRemoved in
+            let typeLike = snapLikeRemoved.key
+            
+            for child in snapLikeRemoved.children {
+                let childSnap = child as! DataSnapshot
+                if typeLike == "likes" {
+                    changeMessageRealmData.updateMessageLikeRemoved(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
+                    self.hasUserLiked = self.message.likedId.contains(self.auth.profile.results.first?.id ?? 0)
+                } else if childSnap.key == "dislikes" {
+                    changeMessageRealmData.updateMessageDislikeRemoved(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
+                    self.hasUserDisliked = self.message.dislikedId.contains(self.auth.profile.results.first?.id ?? 0)
+                }
+            }
         })
     }
         
@@ -262,14 +294,12 @@ struct TextBubble: View {
         let msg = Database.database().reference().child("Dialogs").child(self.message.dialogID).child(self.message.id).child("likes")
 
         msg.observeSingleEvent(of: .value, with: { snapshot in
-            let count = snapshot.childrenCount
-
-            if snapshot.childSnapshot(forPath: "\(Session.current.currentUserID)").exists() {
-                changeMessageRealmData.updateMessageLike(messageID: self.message.id, messageLikeCount: Int(count - 1))
-                msg.child("\(Session.current.currentUserID)").removeValue()
+            if snapshot.childSnapshot(forPath: "\(self.auth.profile.results.first?.id ?? 0)").exists() {
+                self.hasUserLiked = false
+                msg.child("\(self.auth.profile.results.first?.id ?? 0)").removeValue()
             } else {
-                changeMessageRealmData.updateMessageLike(messageID: self.message.id, messageLikeCount: Int(count + 1))
-                msg.updateChildValues(["\(Session.current.currentUserID)" : "\(Date())"])
+                self.hasUserLiked = true
+                msg.updateChildValues(["\(self.auth.profile.results.first?.id ?? 0)" : "\(Date())"])
             }
         })
     }
@@ -277,15 +307,13 @@ struct TextBubble: View {
     func dislikeMessage() {
         let msg = Database.database().reference().child("Dialogs").child(self.message.dialogID).child(self.message.id).child("dislikes")
 
-        msg.observeSingleEvent(of: .value, with: { snapshot in
-            let count = snapshot.childrenCount
-            
-            if snapshot.childSnapshot(forPath: "\(Session.current.currentUserID)").exists() {
-                changeMessageRealmData.updateMessageDislike(messageID: self.message.id, messageDislikeCount: Int(count - 1))
-                msg.child("\(Session.current.currentUserID)").removeValue()
+        msg.observeSingleEvent(of: .value, with: { snapshot in            
+            if snapshot.childSnapshot(forPath: "\(self.auth.profile.results.first?.id ?? 0)").exists() {
+                self.hasUserDisliked = false
+                msg.child("\(self.auth.profile.results.first?.id ?? 0)").removeValue()
             } else {
-                changeMessageRealmData.updateMessageDislike(messageID: self.message.id, messageDislikeCount: Int(count + 1))
-                msg.updateChildValues(["\(Session.current.currentUserID)" : "\(Date())"])
+                self.hasUserDisliked = false
+                msg.updateChildValues(["\(self.auth.profile.results.first?.id ?? 0)" : "\(Date())"])
             }
         })
     }

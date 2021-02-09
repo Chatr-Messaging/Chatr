@@ -23,8 +23,6 @@ class MessageStruct : Object, Identifiable {
     @objc dynamic var longitude: Double = 0.0
     @objc dynamic var latitude: Double = 0.0
     @objc dynamic var contactID: Int = 0
-    @objc dynamic var likes: Int = 0
-    @objc dynamic var dislikes: Int = 0
     @objc dynamic var image: String = ""
     @objc dynamic var imageType: String = ""
     @objc dynamic var hadDelay: Bool = false
@@ -35,6 +33,8 @@ class MessageStruct : Object, Identifiable {
     }
     let readIDs = List<Int>()
     let deliveredIDs = List<Int>()
+    let likedId = List<Int>()
+    let dislikedId = List<Int>()
 
     override static func primaryKey() -> String? {
         return "id"
@@ -185,12 +185,13 @@ class changeMessageRealmData {
                 try realm.write({
                     realm.add(newData, update: .all)
 
-                    let msg = Database.database().reference().child("Dialogs").child(object.dialogID ?? "").child(object.id ?? "")
-                    msg.observeSingleEvent(of: .value, with: { (snapshot: DataSnapshot) in
-                        updateMessageLike(messageID: object.id ?? "", messageLikeCount: Int(snapshot.childSnapshot(forPath: "likes").childrenCount))
-                        updateMessageDislike(messageID: object.id ?? "", messageDislikeCount: Int(snapshot.childSnapshot(forPath: "dislikes").childrenCount))
-                        completion()
-                    })
+//                    let msg = Database.database().reference().child("Dialogs").child(object.dialogID ?? "").child(object.id ?? "")
+//                    msg.observeSingleEvent(of: .value, with: { (snapshot: DataSnapshot) in
+//                        updateMessageLike(messageID: object.id ?? "", messageLikeCount: Int(snapshot.childSnapshot(forPath: "likes").childrenCount))
+//                        updateMessageDislike(messageID: object.id ?? "", messageDislikeCount: Int(snapshot.childSnapshot(forPath: "dislikes").childrenCount))
+//                        completion()
+//                    })
+                    completion()
                 })
             } catch {
                 print(error.localizedDescription)
@@ -269,12 +270,13 @@ class changeMessageRealmData {
             try realm.write({
                 realm.add(newData, update: .all)
 
-                let msg = Database.database().reference().child("Dialogs").child(object.dialogID ?? "").child(object.id ?? "")
-                msg.observeSingleEvent(of: .value, with: { (snapshot: DataSnapshot) in
-                    updateMessageLike(messageID: object.id ?? "", messageLikeCount: Int(snapshot.childSnapshot(forPath: "likes").childrenCount))
-                    updateMessageDislike(messageID: object.id ?? "", messageDislikeCount: Int(snapshot.childSnapshot(forPath: "dislikes").childrenCount))
-                    completion()
-                })
+//                let msg = Database.database().reference().child("Dialogs").child(object.dialogID ?? "").child(object.id ?? "")
+//                msg.observeSingleEvent(of: .value, with: { (snapshot: DataSnapshot) in
+//                    updateMessageLike(messageID: object.id ?? "", messageLikeCount: Int(snapshot.childSnapshot(forPath: "likes").childrenCount))
+//                    updateMessageDislike(messageID: object.id ?? "", messageDislikeCount: Int(snapshot.childSnapshot(forPath: "dislikes").childrenCount))
+//                    completion()
+//                })
+                completion()
             })
         } catch {
             print(error.localizedDescription)
@@ -434,14 +436,14 @@ class changeMessageRealmData {
         }
     }
     
-    static func updateMessageLike(messageID: String, messageLikeCount: Int) {
+    static func updateMessageDislikeAdded(messageID: String, userID: Int) {
         let config = Realm.Configuration(schemaVersion: 1)
         do {
             let realm = try Realm(configuration: config)
             if let realmContact = realm.object(ofType: MessageStruct.self, forPrimaryKey: messageID) {
-                if realmContact.likes != messageLikeCount {
-                    try realm.safeWrite {
-                        realmContact.likes = messageLikeCount
+                try realm.safeWrite {
+                    if !realmContact.dislikedId.contains(userID) {
+                        realmContact.dislikedId.append(userID)
                         realm.add(realmContact, update: .all)
                     }
                 }
@@ -451,16 +453,50 @@ class changeMessageRealmData {
         }
     }
     
-    static func updateMessageDislike(messageID: String, messageDislikeCount: Int) {
+    static func updateMessageDislikeRemoved(messageID: String, userID: Int) {
         let config = Realm.Configuration(schemaVersion: 1)
         do {
             let realm = try Realm(configuration: config)
             if let realmContact = realm.object(ofType: MessageStruct.self, forPrimaryKey: messageID) {
-                if realmContact.dislikes != messageDislikeCount {
-                    try realm.safeWrite {
-                        realmContact.dislikes = messageDislikeCount
+                try realm.safeWrite {
+                    guard let removedDislikeIndex = realmContact.dislikedId.index(of: userID) else { return }
+
+                    realmContact.dislikedId.remove(at: removedDislikeIndex)
+                    realm.add(realmContact, update: .all)
+                }
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+        
+    static func updateMessageLikeAdded(messageID: String, userID: Int) {
+        let config = Realm.Configuration(schemaVersion: 1)
+        do {
+            let realm = try Realm(configuration: config)
+            if let realmContact = realm.object(ofType: MessageStruct.self, forPrimaryKey: messageID) {
+                try realm.safeWrite {
+                    if !realmContact.likedId.contains(userID) {
+                        realmContact.likedId.append(userID)
                         realm.add(realmContact, update: .all)
                     }
+                }
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
+    static func updateMessageLikeRemoved(messageID: String, userID: Int) {
+        let config = Realm.Configuration(schemaVersion: 1)
+        do {
+            let realm = try Realm(configuration: config)
+            if let realmContact = realm.object(ofType: MessageStruct.self, forPrimaryKey: messageID) {
+                try realm.safeWrite {
+                    guard let removedLikeIndex = realmContact.likedId.index(of: userID) else { return }
+
+                    realmContact.likedId.remove(at: removedLikeIndex)
+                    realm.add(realmContact, update: .all)
                 }
             }
         } catch {

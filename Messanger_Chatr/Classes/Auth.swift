@@ -194,7 +194,7 @@ class AuthModel: NSObject, ObservableObject {
                                         Analytics.logEvent(AnalyticsEventSignUp, parameters: [AnalyticsParameterMethod: "Phone Number Security Code - from Sign Up"])
                                         self.fetchTotalUserCount(completion: { count in
                                             Database.database().reference().child("Users").child("\(user.id)").updateChildValues(["userNumber" : count])
-                                            if count <= 1000 {
+                                            if count <= Constants.maxNumberEarlyAdopters {
                                                 UserDefaults.standard.set(true, forKey: "isEarlyAdopter")
                                             }
                                         })
