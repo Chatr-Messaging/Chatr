@@ -143,7 +143,7 @@ struct ChatMessagesView: View {
         .onAppear() {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
                 changeMessageRealmData.getMessageUpdates(dialogID: self.dialogID, completion: { _ in })
-                
+
                 Request.updateDialog(withID: self.dialogID, update: UpdateChatDialogParameters(), successBlock: { dialog in
                     self.auth.selectedConnectyDialog = dialog
                     dialog.sendUserStoppedTyping()
@@ -184,7 +184,7 @@ struct ChatMessagesView: View {
                             print("on leave occupant: \(userID)")
                             self.auth.setOnlineCount()
                         }
-                        
+
                         if Chat.instance.isConnected || !Chat.instance.isConnecting {
                             if !dialog.isJoined() {
                                 dialog.join(completionBlock: { error in

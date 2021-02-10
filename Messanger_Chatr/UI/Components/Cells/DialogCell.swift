@@ -163,7 +163,6 @@ struct DialogCell: View {
                             .font(.headline)
                             .fontWeight(.semibold)
                             .foregroundColor(Color.primary)
-                            .frame(width: .infinity)
                     }.offset(y: 2)
                     
                     Spacer()
@@ -178,32 +177,31 @@ struct DialogCell: View {
                             .resizable()
                             .font(Font.title.weight(.bold))
                             .foregroundColor(.secondary)
-                            .frame(width: self.dialogModel.isOpen ? 0 : 7, height: 10, alignment: .center)
-                            .rotationEffect(.degrees(dialogModel.isOpen ? 90 : 0))
+                            .frame(width: self.dialogModel.isOpen ? 0 : 7, height: self.dialogModel.isOpen ? 10 : 0, alignment: .center)
                             .opacity(dialogModel.isOpen ? 0 : 1)
                     }
                 }.frame(height: 25)
                 .offset(x: self.groupOccUserAvatar.count == 2 ? -4 : -2)
-                
+
                 HStack(spacing: 5) {
                     Text((self.dialogModel.isOpen ? self.dialogModel.dialogType == "private" ? (self.privateDialogContact.isOnline ? "online now" : "last online \(self.privateDialogContact.lastOnline.getElapsedInterval(lastMsg: "moments")) ago") : "\(self.dialogModel.occupentsID.count) members \(self.auth.onlineCount != 0 ? "•" : "")" : dialogModel.lastMessage))
                         .font(self.dialogModel.isOpen ? .footnote : .subheadline)
                         .fontWeight(.regular)
                         .lineLimit(2)
                         .multilineTextAlignment(.leading)
-                        .offset(x: -2, y: -6)
-                        .frame(width: .infinity)
-                        .foregroundColor(Color.gray)
+                        .offset(x: -2, y: -4)
+                        .foregroundColor(.gray)
                         .fixedSize(horizontal: false, vertical: true)
-                    
-                    Text(self.auth.onlineCount != 0 && self.isOpen && (self.dialogModel.dialogType == "group" || self.dialogModel.dialogType == "public") ? "\(self.auth.onlineCount) online" : "")
-                        .font(.footnote)
-                        .fontWeight(.regular)
-                        .lineLimit(1)
-                        .frame(width: .infinity)
-                        .multilineTextAlignment(.leading)
-                        .offset(x: -4, y: -6)
-                        .foregroundColor(Color.green)
+
+                    if self.auth.onlineCount != 0 && self.isOpen && (self.dialogModel.dialogType == "group" || self.dialogModel.dialogType == "public") {
+                        Text("\(self.auth.onlineCount) online")
+                            .font(.footnote)
+                            .fontWeight(.regular)
+                            .lineLimit(1)
+                            .multilineTextAlignment(.leading)
+                            .offset(x: -4, y: -4)
+                            .foregroundColor(Color.green)
+                    }
                 }
             }.onTapGesture {
                 if isOpen {

@@ -74,7 +74,7 @@ struct iMessageCompose: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> MFMessageComposeViewController {
         let composeVC = MFMessageComposeViewController()
         composeVC.messageComposeDelegate = self.msgDelegate
-        composeVC.body = "Let's chat on Chatr! It's a simple, fast, & secure messaging app we can use to talk for FREE! Download at: " + Constants.appStoreLink
+        composeVC.body = "Let's chat on Chatr! It's a simple, fun, & secure messaging app we can use to message eachother for FREE! Download at: " + Constants.appStoreLink
         composeVC.recipients = [self.recipientNumber]
         
         return composeVC

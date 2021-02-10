@@ -199,6 +199,8 @@
 	<array>
 		<string>twitter</string>
 		<string>snapchat</string>
+		<string>instagram</string>
+		<string>instagram-stories</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>

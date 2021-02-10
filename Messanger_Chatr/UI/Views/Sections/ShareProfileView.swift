@@ -118,101 +118,7 @@ struct ShareProfileView: View {
                     }.padding(.bottom, 30)
                     .opacity(self.shareURL != "" ? 1 : 0)
                 }.padding(.top)
-                
-                //MARK: Action Buttons
-                HStack(alignment: .center, spacing: 30) {
-                    Button(action: {
-                        print("snapchat sticker")
-                        let photo = SCSDKSnapPhoto(imageUrl: URL(string: "https://homepages.cae.wisc.edu/~ece533/images/frymire.png")!)
-                        let snap = SCSDKPhotoSnapContent(snapPhoto: photo)
-                        let sticker = SCSDKSnapSticker(stickerImage: #imageLiteral(resourceName: "iconCoin"))
-                        snap.sticker = sticker
-                        snap.caption = "Add me on Chatr!"
-                        //snap.attachmentUrl = self.shareURL
-                        
-                        let api = SCSDKSnapAPI()
-                        api.startSending(snap, completionHandler: { (error: Error?) in
-                            print("Shared \(self.shareURL)) on SnapChat.")
-                            if let error = error {
-                                print(error.localizedDescription)
-                                UINotificationFeedbackGenerator().notificationOccurred(.error)
-                            } else {
-                                UINotificationFeedbackGenerator().notificationOccurred(.success)
-                            }
-                        })
-                    }) {
-                        HStack(alignment: .center) {
-                            Image("snapchatIcon")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 28, height: 26, alignment: .center)
-                                .padding(3)
-                            
-                            Text("Sticker")
-                                .font(.none)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.black)
-                                .padding(.trailing)
 
-                            Image(systemName: "chevron.right")
-                                .resizable()
-                                .font(Font.title.weight(.bold))
-                                .scaledToFit()
-                                .frame(width: 7, height: 15, alignment: .center)
-                                .foregroundColor(.black)
-                        }.padding(.vertical, 15)
-                        .padding(.horizontal, 10)
-                        .background(Color(red: 255/255, green: 252/255, blue: 0/255, opacity: 1.0))
-                        .cornerRadius(15)
-                        .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 3)
-                        .shadow(color: Color(red: 255/255, green: 252/255, blue: 0/255, opacity: 0.3), radius: 20, x: 0, y: 10)
-                    }.buttonStyle(ClickButtonStyle())
-                    
-                    Button(action: {
-                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                        self.openScan.toggle()
-                    }) {
-                        HStack(alignment: .center) {
-                            Image(systemName: "qrcode.viewfinder")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 26, height: 26, alignment: .center)
-                                .foregroundColor(.white)
-                                .padding(3)
-                                .padding(.leading, 4)
-                            
-                            Text("Scan QR")
-                                .font(.none)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.white)
-                                .padding(.trailing)
-                            
-                            Image(systemName: "chevron.right")
-                                .resizable()
-                                .font(Font.title.weight(.bold))
-                                .scaledToFit()
-                                .frame(width: 7, height: 15, alignment: .center)
-                                .foregroundColor(.white)
-                        }.padding(.vertical, 15)
-                        .padding(.horizontal, 10)
-                        .background(Color.blue)
-                        .cornerRadius(15)
-                        .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 3)
-                        .shadow(color: Color.blue.opacity(0.3), radius: 20, x: 0, y: 10)
-                    }.buttonStyle(ClickButtonStyle())
-                    
-//                    NavigationLink(destination: ScanQRView(dimissView: self.$dimissView).environmentObject(self.auth).edgesIgnoringSafeArea(.all)) {
-//
-//                    }.buttonStyle(ClickButtonStyle())
-//                    .simultaneousGesture(TapGesture()
-//                        .onEnded { _ in
-//                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-//                        })
-
-                }.padding(.top, 40)
-                .padding(.horizontal)
-                .frame(width: Constants.screenWidth)
-                
                 //MARK: Copy Link
                 HStack {
                     Text("PROFILE LINK:")
@@ -223,7 +129,7 @@ struct ShareProfileView: View {
                         .padding(.horizontal)
                         .offset(y: 2)
                     Spacer()
-                }.padding(.top, 40)
+                }.padding(.top)
                 
                 HStack() {
                     HStack {
@@ -262,6 +168,90 @@ struct ShareProfileView: View {
                 }.padding(.horizontal)
                 .padding(.bottom)
                 
+                
+                //MARK: Action Buttons
+                HStack(alignment: .center, spacing: 20) {
+                    Button(action: {
+                        let photo = SCSDKSnapPhoto(imageUrl: URL(string: "https://homepages.cae.wisc.edu/~ece533/images/frymire.png")!)
+                        let snap = SCSDKPhotoSnapContent(snapPhoto: photo)
+                        let sticker = SCSDKSnapSticker(stickerImage: #imageLiteral(resourceName: "iconCoin"))
+                        snap.sticker = sticker
+                        snap.caption = "Add me on Chatr! It's a simple, fun, & secure messaging app we can use to message eachother for FREE! Download at: " + Constants.appStoreLink
+                        snap.attachmentUrl = self.shareURL
+                        
+                        SCSDKSnapAPI().startSending(snap, completionHandler: { error in
+                            print("Shared \(self.shareURL)) on SnapChat.")
+                            if let error = error {
+                                print(error.localizedDescription)
+                                UINotificationFeedbackGenerator().notificationOccurred(.error)
+                            } else {
+                                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                            }
+                        })
+                    }) {
+                        VStack {
+                            Image("snapchatIcon")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 30, height: 30, alignment: .center)
+                                .foregroundColor(.white)
+
+                            Text("Snapchat")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.black)
+                        }.frame(width: 100, height: 75, alignment: .center)
+                        .background(Color(red: 255/255, green: 252/255, blue: 0/255, opacity: 1.0))
+                        .cornerRadius(15)
+                        .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 3)
+                        .shadow(color: Color(red: 255/255, green: 252/255, blue: 0/255, opacity: 0.3), radius: 20, x: 0, y: 10)
+                    }.buttonStyle(ClickButtonStyle())
+                    
+                    Button(action: {
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                        self.shareBackgroundImage()
+                    }) {
+                        VStack {
+                            Image("instagramIcon_black")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 30, height: 30, alignment: .center)
+                                .foregroundColor(.white)
+                            
+                            Text("Instagram")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.primary)
+                        }.frame(width: 100, height: 75, alignment: .center)
+                        .background(Color("buttonColor"))
+                        .cornerRadius(15)
+                        .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 3)
+                    }.buttonStyle(ClickButtonStyle())
+                    
+                    Button(action: {
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                        self.openScan.toggle()
+                    }) {
+                        VStack {
+                            Image(systemName: "qrcode.viewfinder")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 30, height: 30, alignment: .center)
+                                .foregroundColor(.white)
+
+                            Text("Scan QR")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.white)
+                        }.frame(width: 100, height: 75, alignment: .center)
+                        .background(Color.blue)
+                        .cornerRadius(15)
+                        .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
+                        .shadow(color: Color.blue.opacity(0.2), radius: 10, x: 0, y: 6)
+                    }.buttonStyle(ClickButtonStyle())
+                }.padding(.all)
+                .frame(width: Constants.screenWidth)
+
                 FooterInformation()
                     .padding(.top, 50)
                     .padding(.bottom, 35)
@@ -296,7 +286,7 @@ struct ShareProfileView: View {
                     .foregroundColor(.primary)
                     .offset(y: -20)
 
-                Text("Scan a fellow Chatr user's QR code open their profile.")
+                Text("Scan any Chatr QR code to open to the profile.")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
@@ -307,6 +297,7 @@ struct ShareProfileView: View {
                     .environmentObject(self.auth)
                     .frame(width: .infinity, height: Constants.screenWidth / 1.2, alignment: .center)
                     .cornerRadius(20)
+                    .shadow(color: Color.black.opacity(0.25), radius: 10, x: 0, y: 0)
                     .padding(.top, 5)
             }
         }
@@ -352,6 +343,13 @@ struct ShareProfileView: View {
             self.shareURL = url.absoluteString
             self.foundUser = true
         })
+    }
+    
+    func shareBackgroundImage() {
+        let image = UIImage(imageLiteralResourceName: "SoftChatBubbles_DarkWallpaper")
+        let sticker = UIImage(imageLiteralResourceName: "like")
+
+        InstagramStories.Shared.post(bgImage: image, stickerImage: sticker, contentURL: self.shareURL)
     }
 }
 

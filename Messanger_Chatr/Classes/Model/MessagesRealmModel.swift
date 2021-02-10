@@ -110,28 +110,119 @@ class changeMessageRealmData {
             let config = Realm.Configuration(schemaVersion: 1)
             do {
                 let realm = try Realm(configuration: config)
+                if realm.object(ofType: MessageStruct.self, forPrimaryKey: object.id ?? "") == nil {
+                    let newData = MessageStruct()
+                    var hasRead = false
+                    
+                    newData.id = object.id ?? ""
+                    newData.text = object.text ?? ""
+                    newData.dialogID = object.dialogID ?? ""
+                    newData.date = object.dateSent ?? Date()
+                    newData.senderID = Int(object.senderID)
+                    for read in object.readIDs ?? [] {
+                        if read.intValue == Session.current.currentUserID {
+                            hasRead = true
+                        }
+                        newData.readIDs.append(Int(truncating: read))
+                    }
+                    if !hasRead {
+                        Chat.instance.read(object) { (error) in }
+                    }
+                    hasRead = false
+                    for deliv in object.deliveredIDs ?? [] {
+                        newData.deliveredIDs.append(Int(truncating: deliv))
+                    }
+                    
+                    //case delivered, sending, read, isTyping, editied, deleted, error
+                    if object.deliveredIDs?.count ?? 0 > 1 {
+                        newData.messageState = .delivered
+                    } else {
+                        newData.messageState = .sending
+                    }
+                    if object.readIDs?.count ?? 0 > 0 {
+                        newData.messageState = .read
+                    }
+                    if object.edited {
+                        newData.messageState = .editied
+                    }
+                    if object.removed {
+                        newData.messageState = .deleted
+                    }
+                    if object.delayed {
+                        newData.hadDelay = true
+                    }
+                    if (object.destroyAfterInterval > 0) {
+                        newData.destroyDate = Int(object.destroyAfterInterval)
+                    }
+                    
+                    if let attachments = object.attachments {
+                        for attach in attachments {
+                            //image/video attachment
+                            print("the pulled image type is: \(attach.type ?? "")")
+                            if let uid = attach.id {
+                                let fileURL = Blob.privateUrl(forFileUID: uid)
+                                print("the file attachent private url is: \(String(describing: fileURL)) && the type22: \(attach.type ?? "")")
+                                newData.image = fileURL ?? ""
+                                newData.imageType = attach.type ?? ""
+                            }
+                            
+                            if let contactID = attach.customParameters as? [String: String] {
+                                newData.contactID = Int(contactID["contactID"] ?? "") ?? 0
+                                print("the shared contact ID is: \(newData.contactID)")
+                            }
+                            
+                            if let longitude = attach.customParameters["longitude"] {
+                                newData.longitude = Double("\(longitude)") ?? 0
+                                print("the shared longitude ID is: \(newData.longitude) && \(longitude)")
+                            }
+                            
+                            if let latitude = attach.customParameters["latitude"] {
+                                newData.latitude = Double("\(latitude)") ?? 0
+                                print("the shared latitude is: \(newData.latitude) && \(latitude)")
+                            }
+                        }
+                    }
+                    
+                    try realm.write({
+                        realm.add(newData, update: .all)
+                        completion()
+                    })
+                }
+//                else {
+//                    let msg = Database.database().reference().child("Dialogs").child(object.dialogID ?? "").child(object.id ?? "")
+//                    msg.observeSingleEvent(of: .value, with: { (snapshot: DataSnapshot) in
+//                        updateMessageLike(messageID: object.id ?? "", messageLikeCount: Int(snapshot.childSnapshot(forPath: "likes").childrenCount))
+//                        updateMessageDislike(messageID: object.id ?? "", messageDislikeCount: Int(snapshot.childSnapshot(forPath: "dislikes").childrenCount))
+//                        completion()
+//                    })
+//                }
+            } catch {
+                print(error.localizedDescription)
+                completion()
+            }
+        })
+        completion()
+    }
+    
+    static func insertMessage<T>(_ object: T, completion: @escaping () -> Void) where T: ChatMessage {
+        let config = Realm.Configuration(schemaVersion: 1)
+        do {
+            let realm = try Realm(configuration: config)
+            if realm.object(ofType: MessageStruct.self, forPrimaryKey: object.id ?? "") == nil {
                 let newData = MessageStruct()
-                var hasRead = false
-                
                 newData.id = object.id ?? ""
                 newData.text = object.text ?? ""
                 newData.dialogID = object.dialogID ?? ""
                 newData.date = object.dateSent ?? Date()
                 newData.senderID = Int(object.senderID)
+                
                 for read in object.readIDs ?? [] {
-                    if read.intValue == Session.current.currentUserID {
-                        hasRead = true
-                    }
                     newData.readIDs.append(Int(truncating: read))
                 }
-                if !hasRead {
-                    Chat.instance.read(object) { (error) in }
-                }
-                hasRead = false
                 for deliv in object.deliveredIDs ?? [] {
                     newData.deliveredIDs.append(Int(truncating: deliv))
                 }
-                
+                            
                 //case delivered, sending, read, isTyping, editied, deleted, error
                 if object.deliveredIDs?.count ?? 0 > 1 {
                     newData.messageState = .delivered
@@ -157,10 +248,8 @@ class changeMessageRealmData {
                 if let attachments = object.attachments {
                     for attach in attachments {
                         //image/video attachment
-                        print("the pulled image type is: \(attach.type ?? "")")
                         if let uid = attach.id {
                             let fileURL = Blob.privateUrl(forFileUID: uid)
-                            print("the file attachent private url is: \(String(describing: fileURL)) && the type22: \(attach.type ?? "")")
                             newData.image = fileURL ?? ""
                             newData.imageType = attach.type ?? ""
                         }
@@ -172,7 +261,7 @@ class changeMessageRealmData {
                         
                         if let longitude = attach.customParameters["longitude"] {
                             newData.longitude = Double("\(longitude)") ?? 0
-                            print("the shared longitude ID is: \(newData.longitude) && \(longitude)")
+                            print("the shared longitude ID is: \(newData.longitude) & \(longitude)")
                         }
                         
                         if let latitude = attach.customParameters["latitude"] {
@@ -185,99 +274,18 @@ class changeMessageRealmData {
                 try realm.write({
                     realm.add(newData, update: .all)
 
-//                    let msg = Database.database().reference().child("Dialogs").child(object.dialogID ?? "").child(object.id ?? "")
-//                    msg.observeSingleEvent(of: .value, with: { (snapshot: DataSnapshot) in
-//                        updateMessageLike(messageID: object.id ?? "", messageLikeCount: Int(snapshot.childSnapshot(forPath: "likes").childrenCount))
-//                        updateMessageDislike(messageID: object.id ?? "", messageDislikeCount: Int(snapshot.childSnapshot(forPath: "dislikes").childrenCount))
-//                        completion()
-//                    })
+
                     completion()
                 })
-            } catch {
-                print(error.localizedDescription)
-                completion()
             }
-        })
-        completion()
-    }
-    
-    static func insertMessage<T>(_ object: T, completion: @escaping () -> Void) where T: ChatMessage {
-        let config = Realm.Configuration(schemaVersion: 1)
-        do {
-            let realm = try Realm(configuration: config)
-            let newData = MessageStruct()
-            newData.id = object.id ?? ""
-            newData.text = object.text ?? ""
-            newData.dialogID = object.dialogID ?? ""
-            newData.date = object.dateSent ?? Date()
-            newData.senderID = Int(object.senderID)
-            
-            for read in object.readIDs ?? [] {
-                newData.readIDs.append(Int(truncating: read))
+            else {
+                //                let msg = Database.database().reference().child("Dialogs").child(object.dialogID ?? "").child(object.id ?? "")
+                //                msg.observeSingleEvent(of: .value, with: { (snapshot: DataSnapshot) in
+                //                    updateMessageLike(messageID: object.id ?? "", messageLikeCount: Int(snapshot.childSnapshot(forPath: "likes").childrenCount))
+                //                    updateMessageDislike(messageID: object.id ?? "", messageDislikeCount: Int(snapshot.childSnapshot(forPath: "dislikes").childrenCount))
+                //                    completion()
+                //                })
             }
-            for deliv in object.deliveredIDs ?? [] {
-                newData.deliveredIDs.append(Int(truncating: deliv))
-            }
-                        
-            //case delivered, sending, read, isTyping, editied, deleted, error
-            if object.deliveredIDs?.count ?? 0 > 1 {
-                newData.messageState = .delivered
-            } else {
-                newData.messageState = .sending
-            }
-            if object.readIDs?.count ?? 0 > 0 {
-                newData.messageState = .read
-            }
-            if object.edited {
-                newData.messageState = .editied
-            }
-            if object.removed {
-                newData.messageState = .deleted
-            }
-            if object.delayed {
-                newData.hadDelay = true
-            }
-            if (object.destroyAfterInterval > 0) {
-                newData.destroyDate = Int(object.destroyAfterInterval)
-            }
-            
-            if let attachments = object.attachments {
-                for attach in attachments {
-                    //image/video attachment
-                    if let uid = attach.id {
-                        let fileURL = Blob.privateUrl(forFileUID: uid)
-                        newData.image = fileURL ?? ""
-                        newData.imageType = attach.type ?? ""
-                    }
-                    
-                    if let contactID = attach.customParameters as? [String: String] {
-                        newData.contactID = Int(contactID["contactID"] ?? "") ?? 0
-                        print("the shared contact ID is: \(newData.contactID)")
-                    }
-                    
-                    if let longitude = attach.customParameters["longitude"] {
-                        newData.longitude = Double("\(longitude)") ?? 0
-                        print("the shared longitude ID is: \(newData.longitude) & \(longitude)")
-                    }
-                    
-                    if let latitude = attach.customParameters["latitude"] {
-                        newData.latitude = Double("\(latitude)") ?? 0
-                        print("the shared latitude is: \(newData.latitude) && \(latitude)")
-                    }
-                }
-            }
-            
-            try realm.write({
-                realm.add(newData, update: .all)
-
-//                let msg = Database.database().reference().child("Dialogs").child(object.dialogID ?? "").child(object.id ?? "")
-//                msg.observeSingleEvent(of: .value, with: { (snapshot: DataSnapshot) in
-//                    updateMessageLike(messageID: object.id ?? "", messageLikeCount: Int(snapshot.childSnapshot(forPath: "likes").childrenCount))
-//                    updateMessageDislike(messageID: object.id ?? "", messageDislikeCount: Int(snapshot.childSnapshot(forPath: "dislikes").childrenCount))
-//                    completion()
-//                })
-                completion()
-            })
         } catch {
             print(error.localizedDescription)
             completion()
