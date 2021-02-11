@@ -56,9 +56,8 @@ struct TextBubble: View {
                                             self.loadFirebase()
                                             if self.messagePosition == .right {
                                                 self.reactions.append("trash")
-                                                self.reactions.append("edit")
                                                 self.reactions.append("copy")
-                                                self.reactions.append("reply")
+                                                self.reactions.append("edit")
                                             } else {
                                                 self.reactions.append("like")
                                                 self.reactions.append("dislike")
@@ -75,14 +74,14 @@ struct TextBubble: View {
                                                     self.dislikeMessage()
                                                 }
                                             }, label: {
-                                                HStack(spacing: 2) {
+                                                HStack(spacing: self.message.dislikedId.count > 1 && self.hasUserDisliked ? 2 : 0) {
                                                     Image("dislike")
                                                         .resizable()
                                                         .scaledToFit()
                                                         .frame(width: 22, height: 22, alignment: .center)
                                                         .offset(x: self.message.dislikedId.count == 0 ? 4 : 0)
 
-                                                    Text(self.message.dislikedId.count > 1 ? "\(self.message.dislikedId.count)" : "")
+                                                    Text(self.message.dislikedId.count > 1 && self.hasUserDisliked ? "\(self.message.dislikedId.count)" : "")
                                                         .font(.subheadline)
                                                         .fontWeight(.bold)
                                                         .foregroundColor(.primary)
@@ -101,14 +100,14 @@ struct TextBubble: View {
                                                     self.likeMessage()
                                                 }
                                             }, label: {
-                                                HStack(spacing: 2) {
+                                                HStack(spacing: self.message.dislikedId.count > 1 && self.hasUserDisliked ? 2 : 0) {
                                                     Image("like")
                                                         .resizable()
                                                         .scaledToFit()
                                                         .frame(width: 22, height: 22, alignment: .center)
                                                         .offset(x: self.message.likedId.count == 0 ? 4 : 0)
 
-                                                    Text(self.message.likedId.count > 1 ? "\(self.message.likedId.count)" : "")
+                                                    Text(self.message.likedId.count > 1 && self.hasUserLiked ? "\(self.message.likedId.count)" : "")
                                                         .font(.subheadline)
                                                         .fontWeight(.bold)
                                                         .foregroundColor(.primary)
@@ -218,21 +217,20 @@ struct TextBubble: View {
         // Simple Logic....
         withAnimation(Animation.linear(duration: 0.065)) {
             let x = value.location.x
-            print("the x value is: \(x)")
             
-            if self.messagePosition == .left {
-                if x > 20 && x < 80 { interactionSelected = reactions[0] }
-                if x > 80 && x < 140 { interactionSelected = reactions[1] }
-                if x > 140 && x < 180 { interactionSelected = reactions[2] }
-                if x > 180 && x < 240 { interactionSelected = reactions[3] }
-                if x < 20 || x > 240 { interactionSelected = "" }
-            } else {
-                if x > 230 && x < 290 { interactionSelected = reactions[3] }
-                if x > 170 && x < 230 { interactionSelected = reactions[2] }
-                if x > 110 && x < 170 { interactionSelected = reactions[1] }
-                if x > 50 && x < 110 { interactionSelected = reactions[0] }
-                if x < 50 || x > 290 { interactionSelected = "" }
-            }
+            //if self.messagePosition == .left {
+            if x > 20 && x < 80 { interactionSelected = reactions[0] }
+            if x > 80 && x < 140 { interactionSelected = reactions[1] }
+            if x > 140 && x < 180 { interactionSelected = reactions[2] }
+            if x > 180 && x < 240 && reactions.count >= 4 { interactionSelected = reactions[3] }
+            if x < 20 || x > 240 { interactionSelected = "" }
+//            } else {
+//                if x > Constants.screenWidth - 160 && x < Constants.screenWidth - 100 { interactionSelected = reactions[3] }
+//                if x > Constants.screenWidth - 280 && x < Constants.screenWidth - 220 { interactionSelected = reactions[2] }
+//                if x > Constants.screenWidth - 340 && x < Constants.screenWidth - 280 { interactionSelected = reactions[1] }
+//                if x > Constants.screenWidth - 390 && x < Constants.screenWidth - 340 { interactionSelected = reactions[0] }
+//                if x < 50 || x > Constants.screenWidth - 50 { interactionSelected = "" }
+//            }
             
         }
     }

@@ -28,7 +28,8 @@ struct ChatMessagesView: View {
     
     var body: some View {
         let currentMessages = self.messages.selectedDialog(dialogID: self.dialogID)
-
+        //let currentMessages = self.auth.dialogs.results.filter("id == %@", self.dialogID).sorted(byKeyPath: "lastMessageDate", ascending: false)
+        
         ScrollView(.vertical, showsIndicators: false) {
             LazyVStack() {
                 //No Messages found:
@@ -61,11 +62,11 @@ struct ChatMessagesView: View {
                                     Button(action: {
                                         self.firstScroll = false
                                         changeMessageRealmData.loadMoreMessages(dialogID: currentMessages[message].dialogID, currentCount: currentMessages.count, completion: { _ in
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                                                withAnimation {
-                                                    reader.scrollTo(currentMessages[message + 20].id, anchor: .top)
-                                                }
-                                            }
+//                                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+//                                                withAnimation {
+//                                                    reader.scrollTo(currentMessages[message + 20].id, anchor: .top)
+//                                                }
+//                                            }
                                         })
                                     }, label: {
                                         Text("Load More...")
@@ -107,8 +108,8 @@ struct ChatMessagesView: View {
                                     .padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 120 ? self.textFieldHeight : 120) + (self.hasAttachment ? 95 : 0) + 60)
                                 }.opacity(self.firstScroll ? 0 : 1)
                                 .onAppear {
-                                    if currentMessages[message].id == currentMessages.last?.id {
-                                        reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
+                                    if currentMessages[message].id == self.messages.selectedDialog(dialogID: self.dialogID).last?.id {
+                                        reader.scrollTo(self.messages.selectedDialog(dialogID: self.dialogID).last?.id, anchor: .bottom)
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                                             self.firstScroll = false
                                         }

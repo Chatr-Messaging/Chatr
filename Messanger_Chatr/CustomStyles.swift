@@ -112,9 +112,9 @@ struct interactionButtonStyle: ButtonStyle {
         configuration.label
             .scaleEffect(configuration.isPressed ? 0.9 : 1.0)
             .opacity(configuration.isPressed ? 0.9 : 1)
-            .background(RoundedRectangle(cornerRadius: 10).shadow(color: Color.black.opacity(0.2), radius: 3, x: 0, y: 3))
+            .background(RoundedRectangle(cornerRadius: 20).shadow(color: Color.black.opacity(0.2), radius: 3, x: 0, y: 3))
             .foregroundColor(configuration.isPressed ? (isHighlighted ? Color.blue.opacity(0.15) : Color("bgColor").opacity(0.15)) : isHighlighted ? Color("main_blue").opacity(0.3) : Color("interactionBtnColor").opacity(0.75))
-            .overlay(RoundedRectangle(cornerRadius: 10).stroke(isHighlighted ? (configuration.isPressed ? Color.blue.opacity(0.15) : Color.blue.opacity(0.4)) : (configuration.isPressed ? Color("bgColor").opacity(0.2) : Color("bgColor").opacity(0.85)), lineWidth: 1.5))
+            .overlay(RoundedRectangle(cornerRadius: 20).stroke(isHighlighted ? (configuration.isPressed ? Color.blue.opacity(0.15) : Color.blue.opacity(0.4)) : (configuration.isPressed ? Color("interactionBtnBorderUnselected").opacity(0.2) : Color("interactionBtnBorderUnselected")), lineWidth: 1.5))
     }
 }
 
