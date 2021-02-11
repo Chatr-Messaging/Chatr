@@ -23,7 +23,7 @@ struct PullToRefreshIndicator: View {
                         .trim(from: 0, to: geometry.frame(in: .global).minY > self.startLocation + 50 || self.isLoading ? 0.8 : (geometry.frame(in: .global).minY - self.startLocation) / 62.5)
                         .stroke(Color.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                         .frame(width: 25, height: 25)
-                        .frame(maxWidth: .infinity, alignment: .center)
+                        .frame(maxWidth: Constants.screenWidth, alignment: .center)
                         .rotationEffect(.degrees(self.isLoading ? 360 : 0))
                         .animation(Animation.linear(duration: 0.55).repeatForever(autoreverses: false))
                         .opacity(self.preLoading ? self.isLoading && !self.localOpen ? 1 : Double((geometry.frame(in: .global).minY - self.startLocation) / 15) : 0)

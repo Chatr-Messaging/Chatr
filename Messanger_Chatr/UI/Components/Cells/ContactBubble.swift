@@ -13,6 +13,7 @@ import RealmSwift
 
 struct ContactBubble: View {
     @EnvironmentObject var auth: AuthModel
+    @StateObject var viewModel: ChatMessageViewModel
     @Binding var chatContact: Int
     @State var showContact: Bool = false
     var message: MessageStruct

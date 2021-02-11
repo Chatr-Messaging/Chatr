@@ -76,6 +76,10 @@
 		058AC52F2599064F0027FD11 /* DiscoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058AC52E2599064F0027FD11 /* DiscoverView.swift */; };
 		058AC5342599158D0027FD11 /* DiscoverCarouselSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058AC5332599158C0027FD11 /* DiscoverCarouselSection.swift */; };
 		05903A3F25925C3400D70A13 /* WKView in Frameworks */ = {isa = PBXBuildFile; productRef = 05903A3E25925C3400D70A13 /* WKView */; };
+		0591F3C225D5079D00C35FA4 /* AppIcon-Colorful.png in Resources */ = {isa = PBXBuildFile; fileRef = 0591F3C125D5079D00C35FA4 /* AppIcon-Colorful.png */; };
+		0591F3C825D507A900C35FA4 /* AppIcon-Colorful-Dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 0591F3C725D507A900C35FA4 /* AppIcon-Colorful-Dark.png */; };
+		0591F3CC25D507B100C35FA4 /* AppIcon-Original.png in Resources */ = {isa = PBXBuildFile; fileRef = 0591F3CB25D507B100C35FA4 /* AppIcon-Original.png */; };
+		0591F3D025D507B500C35FA4 /* AppIcon-Original-Dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 0591F3CF25D507B500C35FA4 /* AppIcon-Original-Dark.png */; };
 		0593C0A223CB2AFE00460AAA /* VerifyCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0593C0A123CB2AFE00460AAA /* VerifyCodeView.swift */; };
 		0596844E25ABED4D0051B707 /* EditProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0596844D25ABED4D0051B707 /* EditProfileViewModel.swift */; };
 		0596845625AC16E80051B707 /* VisitContactViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0596845525AC16E80051B707 /* VisitContactViewModel.swift */; };
@@ -115,10 +119,6 @@
 		05C93BDB25145EF10059D1AA /* VisitGroupChannelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C93BDA25145EF10059D1AA /* VisitGroupChannelView.swift */; };
 		05C93BDD251578100059D1AA /* DialogContactCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C93BDC251578100059D1AA /* DialogContactCell.swift */; };
 		05CE07ED2529930300F09754 /* NotificationSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05CE07EC2529930300F09754 /* NotificationSection.swift */; };
-		05D77A4425A18BCE00776B93 /* AppIcon-Original-Dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 05D77A4225A18BCE00776B93 /* AppIcon-Original-Dark.png */; };
-		05D77A4525A18BCE00776B93 /* AppIcon-Original.png in Resources */ = {isa = PBXBuildFile; fileRef = 05D77A4325A18BCE00776B93 /* AppIcon-Original.png */; };
-		05D77A4B25A18BDD00776B93 /* AppIcon-Colorful.png in Resources */ = {isa = PBXBuildFile; fileRef = 05D77A4925A18BDC00776B93 /* AppIcon-Colorful.png */; };
-		05D77A4C25A18BDD00776B93 /* AppIcon-Colorful-Dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 05D77A4A25A18BDD00776B93 /* AppIcon-Colorful-Dark.png */; };
 		05D8A8DC2502CB3A00D53BE2 /* MailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05D8A8DB2502CB3A00D53BE2 /* MailView.swift */; };
 		05D8A8DE250318FA00D53BE2 /* AddressBookRealmModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05D8A8DD250318FA00D53BE2 /* AddressBookRealmModel.swift */; };
 		05DB89B2238B851400D4581F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05DB89B1238B851400D4581F /* AppDelegate.swift */; };
@@ -243,6 +243,11 @@
 		0583A84E251AFB740005B7E1 /* ContactBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactBubble.swift; sourceTree = "<group>"; };
 		058AC52E2599064F0027FD11 /* DiscoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverView.swift; sourceTree = "<group>"; };
 		058AC5332599158C0027FD11 /* DiscoverCarouselSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverCarouselSection.swift; sourceTree = "<group>"; };
+		0591F3BB25D5077200C35FA4 /* AppIcon-Colorful.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-Colorful.png"; sourceTree = "<group>"; };
+		0591F3C125D5079D00C35FA4 /* AppIcon-Colorful.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon-Colorful.png"; path = "../../../../../Chatr Designs/Chatr Icons/Production Icons/AppIcon-Colorful.png"; sourceTree = "<group>"; };
+		0591F3C725D507A900C35FA4 /* AppIcon-Colorful-Dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon-Colorful-Dark.png"; path = "../../../../../Chatr Designs/Chatr Icons/Production Icons/AppIcon-Colorful-Dark.png"; sourceTree = "<group>"; };
+		0591F3CB25D507B100C35FA4 /* AppIcon-Original.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon-Original.png"; path = "../../../../../Chatr Designs/Chatr Icons/Production Icons/AppIcon-Original.png"; sourceTree = "<group>"; };
+		0591F3CF25D507B500C35FA4 /* AppIcon-Original-Dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon-Original-Dark.png"; path = "../../../../../Chatr Designs/Chatr Icons/Production Icons/AppIcon-Original-Dark.png"; sourceTree = "<group>"; };
 		0593C0A123CB2AFE00460AAA /* VerifyCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifyCodeView.swift; sourceTree = "<group>"; };
 		0596844D25ABED4D0051B707 /* EditProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileViewModel.swift; sourceTree = "<group>"; };
 		0596845525AC16E80051B707 /* VisitContactViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitContactViewModel.swift; sourceTree = "<group>"; };
@@ -279,10 +284,6 @@
 		05C93BDA25145EF10059D1AA /* VisitGroupChannelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitGroupChannelView.swift; sourceTree = "<group>"; };
 		05C93BDC251578100059D1AA /* DialogContactCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogContactCell.swift; sourceTree = "<group>"; };
 		05CE07EC2529930300F09754 /* NotificationSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSection.swift; sourceTree = "<group>"; };
-		05D77A4225A18BCE00776B93 /* AppIcon-Original-Dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon-Original-Dark.png"; path = "../../../../../Chatr Designs/Chatr Icons/Icon 9.19.20/AppIcon-Original-Dark.png"; sourceTree = "<group>"; };
-		05D77A4325A18BCE00776B93 /* AppIcon-Original.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon-Original.png"; path = "../../../../../Chatr Designs/Chatr Icons/Icon 9.19.20/AppIcon-Original.png"; sourceTree = "<group>"; };
-		05D77A4925A18BDC00776B93 /* AppIcon-Colorful.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon-Colorful.png"; path = "../../../../../Chatr Designs/Chatr Icons/Icon 9.19.20/AppIcon-Colorful.png"; sourceTree = "<group>"; };
-		05D77A4A25A18BDD00776B93 /* AppIcon-Colorful-Dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon-Colorful-Dark.png"; path = "../../../../../Chatr Designs/Chatr Icons/Icon 9.19.20/AppIcon-Colorful-Dark.png"; sourceTree = "<group>"; };
 		05D8A8DB2502CB3A00D53BE2 /* MailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailView.swift; sourceTree = "<group>"; };
 		05D8A8DD250318FA00D53BE2 /* AddressBookRealmModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBookRealmModel.swift; sourceTree = "<group>"; };
 		05DB89AE238B851400D4581F /* Messanger_Chatr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Messanger_Chatr.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -573,14 +574,14 @@
 		0583A83123BD34B400F9220B /* AppIcons */ = {
 			isa = PBXGroup;
 			children = (
-				05D77A4225A18BCE00776B93 /* AppIcon-Original-Dark.png */,
-				05D77A4325A18BCE00776B93 /* AppIcon-Original.png */,
+				0591F3CF25D507B500C35FA4 /* AppIcon-Original-Dark.png */,
+				0591F3CB25D507B100C35FA4 /* AppIcon-Original.png */,
 				056EAB5E2516D8E500DC72FA /* AppIcon-Flat.png */,
 				056EAB5F2516D8E600DC72FA /* AppIcon-Flat-Dark.png */,
 				056EAB652516D8F300DC72FA /* AppIcon-PaperAirplane.png */,
 				056EAB6A2516D8FD00DC72FA /* AppIcon-PaperAirplane-Dark.png */,
-				05D77A4A25A18BDD00776B93 /* AppIcon-Colorful-Dark.png */,
-				05D77A4925A18BDC00776B93 /* AppIcon-Colorful.png */,
+				0591F3C725D507A900C35FA4 /* AppIcon-Colorful-Dark.png */,
+				0591F3C125D5079D00C35FA4 /* AppIcon-Colorful.png */,
 			);
 			path = AppIcons;
 			sourceTree = "<group>";
@@ -619,6 +620,7 @@
 		05DB89A5238B851400D4581F = {
 			isa = PBXGroup;
 			children = (
+				0591F3BB25D5077200C35FA4 /* AppIcon-Colorful.png */,
 				05DB89B0238B851400D4581F /* Messanger_Chatr */,
 				05DB89C7238B851800D4581F /* Messanger_ChatrTests */,
 				05DB89D2238B851900D4581F /* Messanger_ChatrUITests */,
@@ -862,13 +864,13 @@
 				05DB89BE238B851800D4581F /* LaunchScreen.storyboard in Resources */,
 				05DB89BB238B851800D4581F /* Preview Assets.xcassets in Resources */,
 				05DB89B8238B851800D4581F /* Assets.xcassets in Resources */,
+				0591F3C825D507A900C35FA4 /* AppIcon-Colorful-Dark.png in Resources */,
+				0591F3D025D507B500C35FA4 /* AppIcon-Original-Dark.png in Resources */,
 				05DB89E2238B854400D4581F /* GoogleService-Info.plist in Resources */,
-				05D77A4425A18BCE00776B93 /* AppIcon-Original-Dark.png in Resources */,
 				056EAB6B2516D8FD00DC72FA /* AppIcon-PaperAirplane-Dark.png in Resources */,
 				056EAB602516D8E600DC72FA /* AppIcon-Flat.png in Resources */,
-				05D77A4B25A18BDD00776B93 /* AppIcon-Colorful.png in Resources */,
-				05D77A4525A18BCE00776B93 /* AppIcon-Original.png in Resources */,
-				05D77A4C25A18BDD00776B93 /* AppIcon-Colorful-Dark.png in Resources */,
+				0591F3C225D5079D00C35FA4 /* AppIcon-Colorful.png in Resources */,
+				0591F3CC25D507B100C35FA4 /* AppIcon-Original.png in Resources */,
 				056EAB662516D8F300DC72FA /* AppIcon-PaperAirplane.png in Resources */,
 				056EAB612516D8E600DC72FA /* AppIcon-Flat-Dark.png in Resources */,
 			);

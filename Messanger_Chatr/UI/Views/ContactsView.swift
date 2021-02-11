@@ -275,7 +275,7 @@ struct ContactsView: View {
                                     .font(.largeTitle)
                                     .foregroundColor(.primary)
                                     .fontWeight(.bold)
-                                    .frame(maxWidth: .infinity, alignment: .center)
+                                    .frame(maxWidth: Constants.screenWidth, alignment: .center)
                                     .padding(.top, 15)
                                     .padding(.bottom, 5)
                                 

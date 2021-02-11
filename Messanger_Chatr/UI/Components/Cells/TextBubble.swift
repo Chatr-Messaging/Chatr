@@ -16,6 +16,7 @@ import WKView
 
 struct TextBubble: View {
     @EnvironmentObject var auth: AuthModel
+    @StateObject var viewModel: ChatMessageViewModel
     @State var message: MessageStruct
     @State var messagePosition: messagePosition
     @State var subText: String = ""
@@ -217,7 +218,8 @@ struct TextBubble: View {
         // Simple Logic....
         withAnimation(Animation.linear(duration: 0.065)) {
             let x = value.location.x
-
+            print("the x value is: \(x)")
+            
             if self.messagePosition == .left {
                 if x > 20 && x < 80 { interactionSelected = reactions[0] }
                 if x > 80 && x < 140 { interactionSelected = reactions[1] }
@@ -241,17 +243,17 @@ struct TextBubble: View {
         }
         
         if interactionSelected == "like" {
-            likeMessage()
+            self.likeMessage()
         } else if interactionSelected == "dislike" {
-            dislikeMessage()
+            self.dislikeMessage()
         } else if interactionSelected == "copy" {
-            copyMessage()
+            self.copyMessage()
         } else if interactionSelected == "reply" {
-            replyMessage()
+            self.replyMessage()
         } else if interactionSelected == "edit" {
-            editMessage()
+            self.editMessage()
         } else if interactionSelected == "trash" {
-            trashMessage()
+            self.trashMessage()
         }
     }
 
@@ -308,7 +310,7 @@ struct TextBubble: View {
     func dislikeMessage() {
         let msg = Database.database().reference().child("Dialogs").child(self.message.dialogID).child(self.message.id).child("dislikes")
 
-        msg.observeSingleEvent(of: .value, with: { snapshot in            
+        msg.observeSingleEvent(of: .value, with: { snapshot in
             if snapshot.childSnapshot(forPath: "\(self.auth.profile.results.first?.id ?? 0)").exists() {
                 self.hasUserDisliked = false
                 msg.child("\(self.auth.profile.results.first?.id ?? 0)").removeValue()

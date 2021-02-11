@@ -13,6 +13,7 @@ import RealmSwift
 
 struct AttachmentBubble: View {
     @EnvironmentObject var auth: AuthModel
+    @StateObject var viewModel: ChatMessageViewModel
     @State var message: MessageStruct
     @State var messagePosition: messagePosition
     @State var subText: String = ""

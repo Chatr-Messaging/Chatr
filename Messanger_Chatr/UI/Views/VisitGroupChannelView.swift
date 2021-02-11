@@ -517,7 +517,7 @@ struct VisitGroupChannelView: View {
                             }.padding(.all)
                             .contentShape(Rectangle())
                         }.buttonStyle(changeBGButtonStyle())
-                        .frame(minWidth: 100, maxWidth: .infinity)
+                        .frame(minWidth: 100, maxWidth: Constants.screenWidth)
                         .actionSheet(isPresented: $showingMoreSheet) {
                             ActionSheet(title: Text("More..."), message: nil, buttons: [
                                             .default(Text(self.notificationsOn ? "Turn Notifications Off" : "Turn Notifications On"), action: {

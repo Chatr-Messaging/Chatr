@@ -31,7 +31,6 @@ struct KeyboardCardView: View {
     @State var enableLocation: Bool = false
     @State var presentGIF: Bool = false
     @State var shareContact: Bool = false
-    @State var isLoadingPhotoLibrary: Bool = false
     @State var gifURL: String = ""
     @State private var inputImage: UIImage? = nil
     @State private var userTrackingMode: MapUserTrackingMode = .follow
@@ -50,50 +49,42 @@ struct KeyboardCardView: View {
                 .opacity(0.1)
 
             //MARK: Attachments Section
-            ScrollView(.horizontal, showsIndicators: true, content: {
-                HStack {
+            ScrollView(.horizontal, showsIndicators: false, content: {
+                HStack(spacing: 8) {
                     //MARK: Location Section
                     if self.enableLocation {
                         ZStack(alignment: .topLeading) {
-                            Map(coordinateRegion: $region, interactionModes: MapInteractionModes.all, showsUserLocation: true, userTrackingMode: $userTrackingMode)
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 110, height: 90)
-                                .cornerRadius(8)
-                                .onAppear() {
-                                    self.region.span = MKCoordinateSpan(latitudeDelta: 0.25, longitudeDelta: 0.25)
-                                }
-                            
                             Button(action: {
                                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 self.enableLocation = false
                                 self.checkAttachments()
                             }, label: {
-                                Image(systemName: "xmark.circle.fill")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 24, height: 24, alignment: .center)
-                                    .foregroundColor(.primary)
-                                    .offset(x: -10, y: -10)
-                            }).background(Color.clear)
+                                Map(coordinateRegion: $region, interactionModes: MapInteractionModes.all, showsUserLocation: true, userTrackingMode: $userTrackingMode)
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 130, height: 90)
+                                    .cornerRadius(10)
+                                    .onAppear() {
+                                        self.region.span = MKCoordinateSpan(latitudeDelta: 0.25, longitudeDelta: 0.25)
+                                    }
+                            }).buttonStyle(ClickMiniButtonStyle())
+                            .background(Color.clear)
                         }
                     }
                     
                     //MARK: GIPHY Section
                     HStack {
                         ForEach(self.gifData.indices, id: \.self) { url in
-                            HStack(spacing: 8) {
+                            HStack(spacing: 10) {
                                 ZStack(alignment: .topLeading) {
                                     AnimatedImage(url: URL(string: self.gifData[url]))
                                         .resizable()
                                         .placeholder{ Image(systemName: "photo.on.rectangle.angled") }
                                         .indicator(.activity)
-                                        .aspectRatio(contentMode: .fill)
                                         .scaledToFit()
                                         .frame(height: 90)
                                         .frame(minWidth: 65)
-                                        //.frame(idealWidth: 90, alignment: .center)
                                         .transition(.fade(duration: 0.05))
-                                        .cornerRadius(8)
+                                        .cornerRadius(10)
                                     
                                     Button(action: {
                                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
@@ -118,37 +109,34 @@ struct KeyboardCardView: View {
                     
                     //MARK: Photo Section
                     HStack {
-                        ForEach(self.imagePicker.fetchedPhotos.filter({ $0.selected == true }), id: \.self) { img in
-                            HStack(spacing: 8) {
-                                ZStack(alignment: .topLeading) {
-                                    Image(uiImage: img.image)
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fit)
-                                        .scaledToFit()
-                                        .frame(height: 90)
-                                        .frame(minWidth: 60)
-                                        .transition(.fade(duration: 0.05))
-                                        .cornerRadius(8)
-
-                                    Button(action: {
-                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                        guard let imgRemove = self.imagePicker.fetchedPhotos.firstIndex(of: img) else { return }
-                                        
-                                        self.imagePicker.fetchedPhotos.remove(at: imgRemove)
-                                        self.checkAttachments()                                        
-                                    }, label: {
-                                        Image(systemName: "xmark.circle.fill")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 24, height: 24, alignment: .center)
-                                            .foregroundColor(.primary)
-                                            .offset(x: -10, y: -10)
-                                    }).background(Color.clear)
-                                }
+                        ForEach(self.imagePicker.selectedPhotos, id: \.self) { img in
+                            HStack(spacing: 10) {
+                                Image(uiImage: img.image)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(height: 90)
+                                    .frame(minWidth: 70)
+                                    .transition(.fade(duration: 0.05))
+                                    .cornerRadius(10)
                             }
                         }
                     }
-                }.padding(.top, self.hasAttachments ? 20 : 0)
+
+                    //MARK: Video Section
+                    HStack {
+                        ForEach(self.imagePicker.selectedVideos, id: \.self) { vid in
+                            HStack(spacing: 10) {
+                                Image(uiImage: vid.image)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(height: 90)
+                                    .frame(minWidth: 70)
+                                    .transition(.fade(duration: 0.05))
+                                    .cornerRadius(10)
+                            }
+                        }
+                    }
+                }.padding(.top, self.hasAttachments ? 10 : 0)
                 .padding(.bottom, self.hasAttachments ? 5 : 0)
                 .padding(.horizontal)
             }).shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 8)
@@ -193,33 +181,42 @@ struct KeyboardCardView: View {
                             if let connDia = self.auth.selectedConnectyDialog {
                                 connDia.sendUserStoppedTyping()
                             }
-                            
-//                            for i in selectedDialog.occupentsID {
-//                                self.occupents.append(NSNumber(value: i))
-//                            }
+
                             if self.gifData.count > 0 {
                                 changeMessageRealmData.sendGIFAttachment(dialog: selectedDialog, attachmentStrings: self.gifData.reversed(), occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                             
                                 self.gifData.removeAll()
-                                self.hasAttachments = false
                             }
                             
-                            if self.photoData.count > 0 {
-                                changeMessageRealmData.sendPhotoAttachment(dialog: selectedDialog, attachmentImages: self.photoData, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
+                            if self.imagePicker.selectedPhotos.count > 0 {
+                                var uploadImg: [UIImage] = []
+                                
+                                for i in self.imagePicker.selectedPhotos {
+                                    uploadImg.append(i.image)
+                                }
+                                
+                                changeMessageRealmData.sendPhotoAttachment(dialog: selectedDialog, attachmentImages: uploadImg, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                             
-                                self.photoData.removeAll()
-                                self.hasAttachments = false
+                                uploadImg.removeAll()
+                                self.imagePicker.selectedPhotos.removeAll()
+                            }
+
+                            if self.imagePicker.selectedVideos.count > 0 {
+                                //COME BACK AND ADD THE UPLOADING VIDEOS SECTION
+                                //changeMessageRealmData.sendPhotoAttachment(dialog: selectedDialog, attachmentImages: self.photoData, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
+                                print("There are selected videos we will remove later...")
                             }
                             
                             if self.enableLocation {
                                 changeMessageRealmData.sendLocationMessage(dialog: selectedDialog, longitude: self.region.center.longitude, latitude: self.region.center.latitude, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                                 self.enableLocation = false
-                                self.hasAttachments = false
                             }
                             
                             if self.mainText.count > 0 {
                                 changeMessageRealmData.sendMessage(dialog: selectedDialog, text: self.mainText, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                             }
+
+                            self.checkAttachments()
                         }
 
                         self.mainText = ""
@@ -239,48 +236,32 @@ struct KeyboardCardView: View {
                     .scaleEffect(self.mainText.count != 0 ? 1.04 : 1.0)
                     .disabled(self.mainText.count > 0 || self.gifData.count > 0 || self.photoData.count > 0 || self.enableLocation ? false : true)
                 }
-            }
-                .padding(.horizontal, 5)
-                .padding(.leading, 5)
-                .padding(.top, 7.5)
+            }.padding(.horizontal, 5)
+            .padding(.leading, 5)
+            .padding(.top, 7.5)
+
              
             //MARK: Action Buttons
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(alignment: .center, spacing: 24) {
                     Button(action: {
                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                        self.isLoadingPhotoLibrary = true
+                        if !showImagePicker { UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true) }
                         self.imagePicker.openImagePicker(completion: {
                             self.showImagePicker.toggle()
-                            self.isLoadingPhotoLibrary = false
-                            self.checkAttachments()
                         })
+                        self.checkAttachments()
                     }, label: {
-                        ZStack {
-                            Circle()
-                                .trim(from: 0, to: 0.9)
-                                .stroke(Color.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
-                                .frame(width: 26, height: 26, alignment: .center)
-                                .rotationEffect(.degrees(self.isLoadingPhotoLibrary ? 360 : 0))
-                                .opacity(self.isLoadingPhotoLibrary ? 1 : 0)
-                                .padding(.horizontal, self.isLoadingPhotoLibrary ? 25 : 0)
-                                .padding(.vertical, self.isLoadingPhotoLibrary ? 20 : 0)
-                                .animation(Animation.linear(duration: 0.55).repeatForever(autoreverses: false))
-
-                            if !isLoadingPhotoLibrary {
-                                Image(systemName: "photo.on.rectangle")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 26, height: 24)
-                                    .foregroundColor(showImagePicker ? .blue : .primary)
-                                    .font(Font.title.weight(.medium))
-                                    .padding(.horizontal, 25)
-                                    .padding(.vertical)
-                            }
-                        }
+                        Image(systemName: "photo.on.rectangle")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 26, height: 24)
+                            .foregroundColor(showImagePicker ? .blue : .primary)
+                            .font(Font.title.weight(.medium))
+                            .padding(.horizontal, 25)
+                            .padding(.vertical)
                     }).frame(width: Constants.screenWidth / 5.5, height: 65)
                     .padding(.leading)
-                    .disabled(isLoadingPhotoLibrary ? true : false)
                     .buttonStyle(keyboardButtonStyle())
 //                    .sheet(isPresented: $showImagePicker, onDismiss: loadImage) {
 //                        ImagePicker(image: self.$inputImage)
@@ -356,7 +337,8 @@ struct KeyboardCardView: View {
                     .buttonStyle(keyboardButtonStyle())
                     .padding(.trailing)
                                         
-                }.padding(.vertical, showImagePicker ? 5 : 30)
+                }.padding(.top, 15)
+                .padding(.bottom, 10)
                 .background(Color.clear)
             }
             
@@ -367,15 +349,52 @@ struct KeyboardCardView: View {
                     ForEach(imagePicker.fetchedPhotos.indices, id: \.self) { photo in
                         Button(action: {
                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                            self.isLoadingPhotoLibrary = true
                             imagePicker.extractPreviewData(asset: self.imagePicker.fetchedPhotos[photo].asset, completion: {
-                                self.imagePicker.fetchedPhotos[photo].selected.toggle()
-                                self.isLoadingPhotoLibrary = false
+                                if self.imagePicker.fetchedPhotos[photo].selected {
+                                    if self.imagePicker.fetchedPhotos[photo].asset.mediaType == .video {
+                                        for i in self.imagePicker.selectedVideos {
+                                            if i.asset == self.imagePicker.fetchedPhotos[photo].asset {
+                                                self.imagePicker.selectedVideos.removeAll(where: { $0 == i })
+                                                self.imagePicker.fetchedPhotos[photo].selected.toggle()
+                                                self.checkAttachments()
+                                                
+                                                break
+                                            }
+                                            
+                                            if self.imagePicker.selectedVideos.last == i && self.imagePicker.fetchedPhotos[photo].selected {
+                                                self.imagePicker.fetchedPhotos[photo].selected = false
+                                            }
+                                        }
+                                    } else if self.imagePicker.fetchedPhotos[photo].asset.mediaType == .image {
+                                        for i in self.imagePicker.selectedPhotos {
+                                            if i.asset == self.imagePicker.fetchedPhotos[photo].asset {
+                                                self.imagePicker.selectedPhotos.removeAll(where: { $0 == i })
+                                                self.imagePicker.fetchedPhotos[photo].selected.toggle()
+                                                self.checkAttachments()
+                                                
+                                                break
+                                            }
+                                            
+                                            if self.imagePicker.selectedPhotos.last == i && self.imagePicker.fetchedPhotos[photo].selected {
+                                                self.imagePicker.fetchedPhotos[photo].selected = false
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    if self.imagePicker.fetchedPhotos[photo].asset.mediaType == .video {
+                                        self.imagePicker.selectedVideos.append(self.imagePicker.fetchedPhotos[photo])
+                                    } else if self.imagePicker.fetchedPhotos[photo].asset.mediaType == .image {
+                                        self.imagePicker.selectedPhotos.append(self.imagePicker.fetchedPhotos[photo])
+                                    }
+
+                                    self.imagePicker.fetchedPhotos[photo].selected.toggle()
+                                }
+                                
                                 self.checkAttachments()
                             })
                         }, label: {
                             ThumbnailView(photo: self.imagePicker.fetchedPhotos[photo])
-                        }).buttonStyle(ClickButtonStyle())
+                        }).buttonStyle(ClickMiniButtonStyle())
                     }
                     
                     // More Or Give Access Button...
@@ -400,10 +419,14 @@ struct KeyboardCardView: View {
                         }.frame(width: 175)
                     }
                 }.padding()
+                .background(Color.clear)
             }.frame(height: showImagePicker ? 200 : 0)
             .padding(.top, 5)
             .opacity(showImagePicker ? 1 : 0)
-            .onAppear(perform: imagePicker.setUpAuthStatus)
+            .onAppear() {
+                self.imagePicker.setUpAuthStatus()
+                self.imagePicker.fetchPhotos(completion: {  })
+            }
             
             Spacer()
         }.padding(.vertical, 5)
@@ -416,7 +439,7 @@ struct KeyboardCardView: View {
     }
     
     func checkAttachments() {
-        if self.imagePicker.imageData.count > 0 || self.gifData.count > 0 || self.imagePicker.videoData.count > 0 || self.enableLocation {
+        if self.imagePicker.selectedPhotos.count > 0 || self.gifData.count > 0 || self.imagePicker.selectedVideos.count > 0 || self.enableLocation {
             self.hasAttachments = true
         } else {
             self.hasAttachments = false

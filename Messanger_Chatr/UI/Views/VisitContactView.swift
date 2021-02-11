@@ -485,7 +485,7 @@ struct VisitContactView: View {
                         }.padding(.horizontal)
                         .padding(.vertical, 15)
                     }.buttonStyle(changeBGButtonStyle())
-                    .frame(minWidth: 100, maxWidth: .infinity)
+                    .frame(minWidth: 100, maxWidth: Constants.screenWidth)
                     .actionSheet(isPresented: $showingMoreSheet) {
                         ActionSheet(title: Text("More..."), message: nil, buttons: [.default(Text(self.contactRelationship == .contact ? "Remove from Contacts" : self.contactRelationship == .pendingRequest ? "Pending..." : self.contactRelationship == .pendingRequestForYou ? "waiting for you..." : "Add Contact"), action: {
                                 self.viewModel.actionSheetMoreBtn(contactRelationship: self.contactRelationship, contactId: self.contact.id, completion: { contactState in

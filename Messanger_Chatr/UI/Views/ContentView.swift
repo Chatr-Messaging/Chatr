@@ -261,8 +261,8 @@ struct mainHomeList: View {
                         GeometryReader { geometry in
                             ZStack(alignment: .top) {
                                 BlurView(style: .systemUltraThinMaterial)
-                                    .allowsHitTesting(!UserDefaults.standard.bool(forKey: "localOpen") ? false : true)
-                                    .simultaneousGesture(DragGesture(minimumDistance: self.isLocalOpen ? 0 : 500))
+                                    //.allowsHitTesting(!UserDefaults.standard.bool(forKey: "localOpen") ? false : true)
+                                    //.simultaneousGesture(DragGesture(minimumDistance: self.isLocalOpen ? 0 : 500))
                                     .frame(width: Constants.screenWidth, height: Constants.screenHeight, alignment: .center)
                                     .offset(y: self.isLocalOpen ? -geometry.frame(in: .global).minY : -35)
                                     .opacity(self.isLocalOpen ? Double((275 - self.activeView.height) / 150) : 0)
@@ -277,7 +277,7 @@ struct mainHomeList: View {
                                     .opacity(self.isLocalOpen ? Double((275 - self.activeView.height) / 150) : 0)
                                     .animation(.spring(response: 0.45, dampingFraction: self.isLocalOpen ? 0.65 : 0.75, blendDuration: 0))
                                     .allowsHitTesting(!UserDefaults.standard.bool(forKey: "localOpen") ? false : true)
-                                    .simultaneousGesture(DragGesture(minimumDistance: self.isLocalOpen ? 0 : 500))
+                                    //.simultaneousGesture(DragGesture(minimumDistance: self.isLocalOpen ? 0 : 500))
 
                                 QuickSnapsSection(viewState: self.$quickSnapViewState, selectedQuickSnapContact: self.$selectedQuickSnapContact, emptyQuickSnaps: self.$emptyQuickSnaps, isLocalOpen: self.$isLocalOpen)
                                     .environmentObject(self.auth)
@@ -336,6 +336,26 @@ struct mainHomeList: View {
                                 .blur(radius: self.isLocalOpen ? ((950 - (self.activeView.height * 3)) / 600) * 2 : 0)
                                 .animation(.spring(response: 0.4, dampingFraction: 0.8, blendDuration: 0))
                                 .resignKeyboardOnDragGesture()
+                        }
+
+                        //MARK: Chat Messages View
+                        if UserDefaults.standard.bool(forKey: "localOpen") {
+                            GeometryReader { geo in
+                                ChatMessagesView(activeView: self.$activeView, keyboardChange: self.$keyboardHeight, dialogID: self.$selectedDialogID, textFieldHeight: self.$textFieldHeight, keyboardDragState: self.$keyboardDragState, hasAttachment: self.$hasAttachments, newDialogFromSharedContact: self.$newDialogFromSharedContact)
+                                    .environmentObject(self.auth)
+                                    .frame(width: Constants.screenWidth, height: Constants.screenHeight - (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 125 : 89) : 199), alignment: .bottom)
+                                    .zIndex(1)
+                                    .contentShape(Rectangle())
+                                    .offset(y: -geo.frame(in: .global).minY + (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 125 : 89) : 199))
+                                    .padding(.bottom, self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 125 : 89) : 199)
+                                    .offset(y: self.activeView.height) // + (self.emptyQuickSnaps ? 25 : 197))
+                                    .animation(.spring(response: 0.35, dampingFraction: 0.8, blendDuration: 0))
+                                    .simultaneousGesture(DragGesture(minimumDistance: UserDefaults.standard.bool(forKey: "localOpen") ? 800 : 0))
+                                    .layoutPriority(1)
+                                    .onDisappear {
+                                        self.auth.leaveDialog()
+                                    }
+                            }
                         }
                                                 
                         //MARK: Dialogs Section
@@ -451,59 +471,39 @@ struct mainHomeList: View {
                     EarlyAdopterView(counter: self.$counter)
                 }
                 
-                //MARK: Chat Messages View
-                if UserDefaults.standard.bool(forKey: "localOpen") {
-                    GeometryReader { geo in
-                        ChatMessagesView(activeView: self.$activeView, keyboardChange: self.$keyboardHeight, dialogID: self.$selectedDialogID, textFieldHeight: self.$textFieldHeight, keyboardDragState: self.$keyboardDragState, hasAttachment: self.$hasAttachments, newDialogFromSharedContact: self.$newDialogFromSharedContact)
-                            .environmentObject(self.auth)
-                            .frame(width: Constants.screenWidth, height: Constants.screenHeight - (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 125 : 89) : 199), alignment: .bottom)
-                            .zIndex(1)
-                            .contentShape(Rectangle())
-                            .offset(y: -geo.frame(in: .global).minY + (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 125 : 89) : 199))
-                            .padding(.bottom, self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 125 : 89) : 199)
-                            .offset(y: self.activeView.height) // + (self.emptyQuickSnaps ? 25 : 197))
-                            .animation(.spring(response: 0.35, dampingFraction: 0.8, blendDuration: 0))
-                            .simultaneousGesture(DragGesture(minimumDistance: UserDefaults.standard.bool(forKey: "localOpen") ? 800 : 0))
-                            .layoutPriority(1)
-                            .onDisappear {
-                                self.auth.leaveDialog()
-                            }
-                    }
-                }
-
                 //MARK: Keyboard View
                 GeometryReader { geo in
                     KeyboardCardView(height: self.$textFieldHeight, isOpen: self.$isLocalOpen, mainText: self.$keyboardText, hasAttachments: self.$hasAttachments, showImagePicker: self.$showKeyboardMediaAssets)
                         .environmentObject(self.auth)
-                        .frame(width: Constants.screenWidth, height: 800, alignment: .center)
-                        .background(Color("bgColor")) //Color("bgColor")
+                        .frame(width: Constants.screenWidth, alignment: .center)
+                        .background(BlurView(style: .systemUltraThinMaterial)) //Color("bgColor")
                         .cornerRadius(20)
-                        .shadow(color: Color.black.opacity(0.15), radius: 12, x: 0, y: -8)
-                        .animation(.spring(response: 0.65, dampingFraction: 0.75, blendDuration: 0))
-                        .offset(y: self.isLocalOpen ? geo.frame(in: .global).maxY - (UIDevice.current.hasNotch || self.keyboardHeight != 0 ? 100 : 80) - (self.hasAttachments ? 100 : 0) - (self.showKeyboardMediaAssets ? 180 : 0) - self.keyboardHeight + self.keyboardDragState.height : geo.frame(in: .global).maxY)
-                        //(UIDevice.current.hasNotch || self.keyboardHeight != 0 ? 50 : 30) - (self.textFieldHeight <= 120 ? self.textFieldHeight : 120) - (self.hasAttachments ? 95 : 0)
+                        .shadow(color: Color.black.opacity(0.15), radius: 14, x: 0, y: -5)
+                        .animation(.easeOut(duration: 0.4))
+                        .offset(y: self.isLocalOpen ? geo.frame(in: .global).maxY - 40 -
+                                    (UIDevice.current.hasNotch ? 20 : 0) - (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) - (self.hasAttachments ? (self.showKeyboardMediaAssets ? 140 : 100) : 0) - (self.showKeyboardMediaAssets ? 220 : 0) - self.keyboardHeight + self.keyboardDragState.height : geo.frame(in: .global).maxY)
                         .zIndex(2)
-                        .gesture(DragGesture().onChanged { value in
+                        .simultaneousGesture(DragGesture().onChanged { value in
                             self.keyboardDragState = value.translation
-//                            if self.showFullKeyboard {
-//                                self.keyboardDragState.height += -100
-//                            }
-//                            if self.keyboardDragState.height < -120 {
-//                                self.keyboardDragState.height = -110
-//                            }
-//                            if self.keyboardDragState.height > 100 {
-//                                self.keyboardDragState.height = 110
-//                            }
+                            if self.showFullKeyboard {
+                                self.keyboardDragState.height += -100
+                            }
+                            if self.keyboardDragState.height < -70 {
+                                self.keyboardDragState.height = -70
+                            }
+                            if self.keyboardDragState.height > 140 {
+                                self.keyboardDragState.height = 110
+                            }
                         }.onEnded { valueEnd in
                             if self.keyboardDragState.height > 50 {
                                 self.showFullKeyboard = false
                                 self.keyboardDragState = .zero
                                 self.keyboardHeight = 0
                                 UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
-                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                             }
                             if self.keyboardDragState.height < -50 {
-                                self.keyboardDragState.height = -100
+                                self.keyboardDragState.height = -75
                                 self.showFullKeyboard = true
                                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                             } else {
@@ -529,8 +529,8 @@ struct mainHomeList: View {
                             }
                         }
                     }
-                
-//                GeometryReader { geometry in
+
+ //                GeometryReader { geometry in
 //                    NotificationSection()
 //                        .environmentObject(self.auth)
 //                        .offset(y: self.receivedNotification ? -geometry.frame(in: .global).minY + (UIDevice.current.hasNotch ? 40 : 25) : -geometry.frame(in: .global).minY - 80)

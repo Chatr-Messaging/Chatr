@@ -32,7 +32,7 @@ struct QuickSnapCell: View {
                         Circle()
                             .stroke(Constants.snapPurpleGradient, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                             .frame(width: Constants.quickSnapBtnSize + 8, height: Constants.quickSnapBtnSize + 8)
-                            .frame(maxWidth: .infinity, alignment: .center)
+                            .frame(maxWidth: Constants.screenWidth, alignment: .center)
                             .foregroundColor(.clear)
                             .background(Color.clear)
                     }

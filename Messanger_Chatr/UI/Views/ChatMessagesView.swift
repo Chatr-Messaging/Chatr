@@ -78,19 +78,19 @@ struct ChatMessagesView: View {
                                         if messagePosition == .right { Spacer() }
 
                                         if currentMessages[message].image != "" {
-                                            AttachmentBubble(message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
+                                            AttachmentBubble(viewModel: self.viewModel, message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
                                                 .environmentObject(self.auth)
                                                 .contentShape(Rectangle())
                                         } else if currentMessages[message].imageType == "video" {
                                             Text("Video here")
                                         } else if currentMessages[message].contactID != 0 {
-                                            ContactBubble(chatContact: self.$newDialogFromSharedContact, message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
+                                            ContactBubble(viewModel: self.viewModel, chatContact: self.$newDialogFromSharedContact, message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
                                                 .environmentObject(self.auth)
                                                 .contentShape(Rectangle())
                                         } else if currentMessages[message].longitude != 0 && currentMessages[message].latitude != 0 {
                                             LocationBubble(message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
                                         } else {
-                                            TextBubble(message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
+                                            TextBubble(viewModel: self.viewModel, message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
                                                 .environmentObject(self.auth)
                                                 .animation(.spring(response: 0.58, dampingFraction: 0.55, blendDuration: 0))
                                                 .contentShape(Rectangle())
@@ -99,11 +99,12 @@ struct ChatMessagesView: View {
                                         
                                         if messagePosition == .left { Spacer() }
                                     }.id(currentMessages[message].id)
+                                    .frame(width: Constants.screenWidth - 50)
                                     .background(Color.clear)
                                     .padding(.horizontal, 25)
                                     .padding(.top, topMsg && currentMessages.count < 20 ? 20 : 0)
                                     .padding(.bottom, self.hasPrevious(index: message) ? -6 : 10)
-                                    .padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 120 ? self.textFieldHeight : 120) + (self.hasAttachment ? 95 : 0) + 50)
+                                    .padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 120 ? self.textFieldHeight : 120) + (self.hasAttachment ? 95 : 0) + 60)
                                 }.opacity(self.firstScroll ? 0 : 1)
                                 .onAppear {
                                     if currentMessages[message].id == currentMessages.last?.id {
@@ -120,25 +121,27 @@ struct ChatMessagesView: View {
                                     reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
                                 }
                             }
-                        }.onChange(of: currentMessages) { msg in
-                            if firstScroll {
-                                reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
-                            } else {
-                                if currentMessages.last?.status != "isTyping" && !(currentMessages.last?.readIDs.contains(self.auth.profile.results.last?.id ?? 0) ?? (0 != 0)) {
-                                    withAnimation {
-                                        reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
-                                    }
-                                }
-                            }
                         }
-                    }.resignKeyboardOnDragGesture()
+//                        .onChange(of: currentMessages) { msg in
+//                            if firstScroll {
+//                                reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
+//                            } else {
+//                                if currentMessages.last?.status != "isTyping" && !(currentMessages.last?.readIDs.contains(self.auth.profile.results.last?.id ?? 0) ?? (0 != 0)) {
+//                                    withAnimation {
+//                                        reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
+//                                    }
+//                                }
+//                            }
+//                        }
+                    }
                 }
             }.onAppear() {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     self.delayViewMessages = true
                 }
             }
-        }.frame(width: Constants.screenWidth)
+        }.resignKeyboardOnDragGesture()
+        .frame(width: Constants.screenWidth)
         .contentShape(Rectangle())
         .onAppear() {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {

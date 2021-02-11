@@ -31,7 +31,7 @@ class DialogStruct : Object {
 
     var messages: Results<MessageStruct> {
         if let realm = self.realm {
-            return realm.objects(MessageStruct.self).filter(NSPredicate(format: "dialogID == %@", self.id)).sorted(byKeyPath: "date", ascending: true)
+            return realm.objects(MessageStruct.self).filter(NSPredicate(format: "dialogID == %@", self.id)).filter("status != %@", messageStatus.removedTyping.rawValue).sorted(byKeyPath: "date", ascending: true)
         } else {
             return RealmSwift.List<MessageStruct>().filter("1 != 1")
         }

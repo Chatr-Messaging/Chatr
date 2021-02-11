@@ -27,18 +27,19 @@ struct KeyboardMediaAsset: Identifiable, Hashable {
 
 class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObserver {
     var locationManager: CLLocationManager = CLLocationManager()
-    @Published var showImagePicker = false
     @Published var locationPermission: Bool = false
     @Published var library_status = LibraryStatus.denied
     @Published var allPhotos : PHFetchResult<PHAsset>!
     @Published var selectedImagePreview: UIImage!
     @Published var selectedVideoPreview: AVAsset!
     @Published var fetchedPhotos : [KeyboardMediaAsset] = []
+    @Published var selectedPhotos : [KeyboardMediaAsset] = []
+    @Published var selectedVideos : [KeyboardMediaAsset] = []
     @Published var imageData: [UIImage] = []
     @Published var videoData: [AVAsset] = []
     
     func openImagePicker(completion: @escaping () -> Void) {
-        if fetchedPhotos.isEmpty{
+        if fetchedPhotos.isEmpty {
             fetchPhotos(completion: {
                 completion()
             })

@@ -11,7 +11,7 @@ import SwiftUI
 struct MainButtonStyle: ButtonStyle {
     public func makeBody(configuration: MainButtonStyle.Configuration) -> some View {
         configuration.label
-            .frame(minWidth: 40, maxWidth: .infinity, minHeight: 55, maxHeight: 55)
+            .frame(minWidth: 40, maxWidth: Constants.screenWidth, minHeight: 55, maxHeight: 55)
             .foregroundColor(.white)
             .background(configuration.isPressed ? Color(.sRGB, red: 78/255, green: 153/255, blue: 255/255, opacity: 1.0) : Color(.sRGB, red: 31/255, green: 127/255, blue: 255/255, opacity: 1.0))
             .cornerRadius(15)
@@ -22,7 +22,7 @@ struct MainButtonStyle: ButtonStyle {
 struct MainButtonStyleMini: ButtonStyle {
     public func makeBody(configuration: MainButtonStyleMini.Configuration) -> some View {
         configuration.label
-            .frame(minWidth: 40, maxWidth: .infinity, minHeight: 40, maxHeight: 40)
+            .frame(minWidth: 40, maxWidth: Constants.screenWidth, minHeight: 40, maxHeight: 40)
             .foregroundColor(.white)
             .background(configuration.isPressed ? Color(.sRGB, red: 78/255, green: 153/255, blue: 255/255, opacity: 1.0) : Color(.sRGB, red: 31/255, green: 127/255, blue: 255/255, opacity: 1.0))
             .cornerRadius(12.5)
@@ -33,7 +33,7 @@ struct MainButtonStyleMini: ButtonStyle {
 struct MainButtonStyleDeselected: ButtonStyle {
     public func makeBody(configuration: MainButtonStyleDeselected.Configuration) -> some View {
         configuration.label
-            .frame(minWidth: 40, maxWidth: .infinity, minHeight: 55, maxHeight: 55)
+            .frame(minWidth: 40, maxWidth: Constants.screenWidth, minHeight: 55, maxHeight: 55)
             .foregroundColor(Color("disabledButton"))
             .background(configuration.isPressed ? Color.secondary : Color(.clear))
             .cornerRadius(15)
@@ -112,8 +112,9 @@ struct interactionButtonStyle: ButtonStyle {
         configuration.label
             .scaleEffect(configuration.isPressed ? 0.9 : 1.0)
             .opacity(configuration.isPressed ? 0.9 : 1)
-            .background(RoundedRectangle(cornerRadius: 12.5).shadow(color: Color.black.opacity(0.2), radius: 3, x: 0, y: 3))
-            .foregroundColor(configuration.isPressed ? Color("interactionBtnColorSelected") : isHighlighted ? Color("main_blue") : messagePosition == .right ? Color("main_blue") : Color("interactionBtnColor"))
+            .background(RoundedRectangle(cornerRadius: 10).shadow(color: Color.black.opacity(0.2), radius: 3, x: 0, y: 3))
+            .foregroundColor(configuration.isPressed ? (isHighlighted ? Color.blue.opacity(0.15) : Color("bgColor").opacity(0.15)) : isHighlighted ? Color("main_blue").opacity(0.3) : Color("interactionBtnColor").opacity(0.75))
+            .overlay(RoundedRectangle(cornerRadius: 10).stroke(isHighlighted ? (configuration.isPressed ? Color.blue.opacity(0.15) : Color.blue.opacity(0.4)) : (configuration.isPressed ? Color("bgColor").opacity(0.2) : Color("bgColor").opacity(0.85)), lineWidth: 1.5))
     }
 }
 
@@ -168,7 +169,7 @@ struct NeumorphismBtnStyle: ButtonStyle {
 struct plainButtonStyle: ButtonStyle {
     public func makeBody(configuration: plainButtonStyle.Configuration) -> some View {
         configuration.label
-            .frame(minWidth: 40, maxWidth: .infinity, minHeight: 45, maxHeight: 60)
+            .frame(minWidth: 40, maxWidth: Constants.screenWidth, minHeight: 45, maxHeight: 60)
             .foregroundColor(configuration.isPressed ? .gray : .blue)
             .cornerRadius(18)
             .opacity(configuration.isPressed ? 0.95 : 1)

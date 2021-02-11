@@ -86,23 +86,19 @@ struct DialogCell: View {
                         ForEach(self.groupOccUserAvatar.indices, id: \.self) { id in
                             if id < 3 {
                                 ZStack {
-                                    Circle()
-                                        .frame(width: self.groupOccUserAvatar.count > 2 ? 31 : self.groupOccUserAvatar.count > 1 ? 34 : 55, height: self.groupOccUserAvatar.count > 2 ? 31 : self.groupOccUserAvatar.count > 1 ? 34 : 55, alignment: .center)
-                                        .foregroundColor(Color("buttonColor"))
-                                        .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 5)
-                                    
                                     WebImage(url: URL(string: self.groupOccUserAvatar[id]))
                                         .resizable()
-                                        .placeholder{ Image("empty-profile").resizable().frame(width: self.groupOccUserAvatar.count >= 3 ? 28 : self.groupOccUserAvatar.count == 2 ? 31 : 55, height: self.groupOccUserAvatar.count >= 3 ? 28 : self.groupOccUserAvatar.count == 2 ? 31 : 55, alignment: .center).scaledToFill() }
+                                        .placeholder{ Image("empty-profile").resizable().frame(width: self.groupOccUserAvatar.count >= 3 ? 31 : self.groupOccUserAvatar.count == 2 ? 34 : 55, height: self.groupOccUserAvatar.count >= 3 ? 31 : self.groupOccUserAvatar.count == 2 ? 34 : 55, alignment: .center).scaledToFill() }
                                         .indicator(.activity)
                                         .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.05)), removal: AnyTransition.identity))
                                         .scaledToFill()
                                         .clipShape(Circle())
-                                        .frame(width: self.groupOccUserAvatar.count >= 3 ? 28 : self.groupOccUserAvatar.count == 2 ? 31 : 55, height: self.groupOccUserAvatar.count >= 3 ? 28 : self.groupOccUserAvatar.count == 2 ? 31 : 55, alignment: .center)
+                                        .frame(width: self.groupOccUserAvatar.count >= 3 ? 31 : self.groupOccUserAvatar.count == 2 ? 34 : 55, height: self.groupOccUserAvatar.count >= 3 ? 31 : self.groupOccUserAvatar.count == 2 ? 34 : 55, alignment: .center)
+                                        .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 5)
                                     
                                     if id == 2 && self.dialogModel.occupentsID.count >= 5 {
                                         Circle()
-                                            .frame(width: 28, height: 28)
+                                            .frame(width: 31, height: 31)
                                             .foregroundColor(.black)
                                             .opacity(0.6)
                                         
@@ -139,7 +135,7 @@ struct DialogCell: View {
                                 })
                             }
                         }
-                        
+
                         AlertIndicator(dialogModel: self.dialogModel)
                             .offset(x: self.groupOccUserAvatar.count == 2 ? -37 : -34, y: -25)
                             .opacity(self.isOpen ? 0 : 1)
@@ -177,7 +173,7 @@ struct DialogCell: View {
                             .resizable()
                             .font(Font.title.weight(.bold))
                             .foregroundColor(.secondary)
-                            .frame(width: self.dialogModel.isOpen ? 0 : 7, height: self.dialogModel.isOpen ? 10 : 0, alignment: .center)
+                            .frame(width: self.dialogModel.isOpen ? 0 : 7, height: self.dialogModel.isOpen ? 0 : 10, alignment: .center)
                             .opacity(dialogModel.isOpen ? 0 : 1)
                     }
                 }.frame(height: 25)
@@ -277,8 +273,8 @@ struct DialogCell: View {
                     self.isOpen = false
                     UserDefaults.standard.set(false, forKey: "localOpen")
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
                         changeDialogRealmData().fetchDialogs(completion: { _ in })
                     }
                 }, label: {

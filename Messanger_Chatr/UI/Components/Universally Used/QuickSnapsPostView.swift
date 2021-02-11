@@ -175,6 +175,7 @@ struct QuickSnapsPostView: View {
                                     .disabled(self.errorLoading ? false : true)
                                 }
                             }.scaledToFit()
+                            .clipShape(RoundedRectangle(cornerRadius: 15))
                             .shadow(color: Color.black.opacity(0.25), radius: 8, x: 0, y: 8)
                             .onAppear() {
                                 self.timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
