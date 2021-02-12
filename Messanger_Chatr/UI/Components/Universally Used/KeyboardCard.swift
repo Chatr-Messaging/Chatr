@@ -142,7 +142,13 @@ struct KeyboardCardView: View {
             }).shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 8)
             
             //MARK: Text Field & Send Btn
-            HStack(alignment: .bottom) {
+            HStack(alignment: .bottom, spacing: 5) {
+                Button(action: {
+                    
+                }) {
+                    Image
+                }
+                
                 ResizableTextField(height: self.$height, text: self.$mainText)
                     .environmentObject(self.auth)
                     .frame(height: self.height < 175 ? self.height : 175)
@@ -164,11 +170,8 @@ struct KeyboardCardView: View {
                     .onChange(of: self.isOpen, perform: { value in
                         if value {
                             if let typedText = UserDefaults.standard.string(forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText") {
-                                print("the saved keyboad text here: \(typedText)")
                                 self.mainText = typedText
-                            } else {
-                                self.mainText = ""
-                            }
+                            } else { self.mainText = "" }
                         } else {
                             UserDefaults.standard.setValue(self.mainText, forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText")
                         }
@@ -232,7 +235,6 @@ struct KeyboardCardView: View {
                     .clipShape(Circle())
                     .shadow(color: Color.black.opacity(self.mainText.count > 0 || self.gifData.count > 0 || self.photoData.count > 0 || self.enableLocation ? 0.2 : 0.1), radius: 4, x: 0, y: 3)
                     .shadow(color: Color.blue.opacity(self.mainText.count > 0 || self.gifData.count > 0 || self.photoData.count > 0 || self.enableLocation ? 0.3 : 0.0), radius: 8, x: 0, y: 6)
-                    .padding(.trailing, 5)
                     .scaleEffect(self.mainText.count != 0 ? 1.04 : 1.0)
                     .disabled(self.mainText.count > 0 || self.gifData.count > 0 || self.photoData.count > 0 || self.enableLocation ? false : true)
                 }

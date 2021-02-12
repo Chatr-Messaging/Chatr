@@ -90,9 +90,15 @@ struct ChatMessagesView: View {
                                 }.opacity(self.firstScroll ? 0 : 1)
                                 .onAppear {
                                     if !notLast {
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                                            reader.scrollTo(currentMessages[message].id, anchor: .bottom)
-                                            self.firstScroll = false
+                                        DispatchQueue.main.async {
+                                            if self.firstScroll {
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                                    reader.scrollTo(self.messages.selectedDialog(dialogID: self.dialogID)[message].id, anchor: .bottom)
+                                                    self.firstScroll = false
+                                                }
+                                            } else {
+                                                reader.scrollTo(self.messages.selectedDialog(dialogID: self.dialogID)[message].id, anchor: .bottom)
+                                            }
                                         }
                                     }
                                 }
@@ -100,7 +106,9 @@ struct ChatMessagesView: View {
                         }.onChange(of: self.keyboardChange) { value in
                             if value > 0 {
                                 withAnimation {
-                                    reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
+                                    DispatchQueue.main.async {
+                                        reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
+                                    }
                                 }
                             }
                         }

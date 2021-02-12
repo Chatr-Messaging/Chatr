@@ -479,7 +479,7 @@ struct mainHomeList: View {
                         .background(BlurView(style: .systemUltraThinMaterial)) //Color("bgColor")
                         .cornerRadius(20)
                         .shadow(color: Color.black.opacity(0.15), radius: 14, x: 0, y: -5)
-                        .animation(.easeOut(duration: 0.4))
+                        .animation(.easeOut(duration: 0.65))
                         .offset(y: self.isLocalOpen ? geo.frame(in: .global).maxY - 40 -
                                     (UIDevice.current.hasNotch ? 20 : 0) - (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) - (self.hasAttachments ? (self.showKeyboardMediaAssets ? 140 : 100) : 0) - (self.showKeyboardMediaAssets ? 220 : 0) - self.keyboardHeight + self.keyboardDragState.height : geo.frame(in: .global).maxY)
                         .zIndex(2)
@@ -645,7 +645,7 @@ struct mainHomeList: View {
     
     func onEnd(value: DragGesture.Value, index: Int, id: String, dialogType: String) {
         if self.activeView.height > 50 {
-            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
             UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
             UserDefaults.standard.set(false, forKey: "localOpen")
             changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: id)
