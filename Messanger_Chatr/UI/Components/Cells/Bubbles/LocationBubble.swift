@@ -134,7 +134,6 @@ struct LocationBubble: View {
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
                     .contentShape(RoundedRectangle(cornerRadius: 20, style: .circular))
                     .shadow(color: self.messagePosition == .right && self.message.messageState != .deleted ? Color.blue.opacity(0.2) : Color.black.opacity(0.15), radius: 10, x: 0, y: 10)
-                    
                 }
                 
                 HStack {

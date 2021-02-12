@@ -20,7 +20,7 @@ struct Constants {
     static let menuBtnSize = CGFloat(48)
     static let quickSnapBtnSize = CGFloat(54)
     static let avitarSize = CGFloat(55)
-    static let smallAvitarSize = CGFloat(28)
+    static let smallAvitarSize = CGFloat(30)
     static let maxNumberGroupOccu = 10
     static let maxNumberEarlyAdopters = 1000
     static let screenWidth = UIScreen.main.bounds.width

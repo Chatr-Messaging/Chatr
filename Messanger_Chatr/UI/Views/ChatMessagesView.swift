@@ -41,12 +41,7 @@ struct ChatMessagesView: View {
                     .offset(y: self.mesgCount >= 1 && self.delayViewMessages ? 0 : 40)
                     .opacity(self.mesgCount >= 1 && self.delayViewMessages ? 0 : 1)
                     .onAppear() {
-                        if !Session.current.tokenHasExpired {
-                            Request.countOfMessages(forDialogID: self.dialogID, extendedRequest: ["sort_desc" : "lastMessageDate"], successBlock: { count in
-                                print("success getting message count: \(count)")
-                                self.mesgCount = Int(count)
-                            })
-                        }
+
                     }
                 
                 //CUSTOM MESSAGE BUBBLE:
@@ -73,44 +68,30 @@ struct ChatMessagesView: View {
                                             .foregroundColor(.blue)
                                     }).padding(.top)
                                 }
-                                
+
                                 VStack(spacing: 0) {
                                     HStack() {
                                         if messagePosition == .right { Spacer() }
 
-                                        if currentMessages[message].image != "" {
-                                            AttachmentBubble(viewModel: self.viewModel, message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
-                                                .environmentObject(self.auth)
-                                                .contentShape(Rectangle())
-                                        } else if currentMessages[message].imageType == "video" {
-                                            Text("Video here")
-                                        } else if currentMessages[message].contactID != 0 {
-                                            ContactBubble(viewModel: self.viewModel, chatContact: self.$newDialogFromSharedContact, message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
-                                                .environmentObject(self.auth)
-                                                .contentShape(Rectangle())
-                                        } else if currentMessages[message].longitude != 0 && currentMessages[message].latitude != 0 {
-                                            LocationBubble(message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
-                                        } else {
-                                            TextBubble(viewModel: self.viewModel, message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
-                                                .environmentObject(self.auth)
-                                                .animation(.spring(response: 0.58, dampingFraction: 0.55, blendDuration: 0))
-                                                .contentShape(Rectangle())
-                                                .transition(AnyTransition.scale)
-                                        }
-                                        
+                                        ContainerBubble(viewModel: self.viewModel, newDialogFromSharedContact: self.$newDialogFromSharedContact, message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
+                                            .environmentObject(self.auth)
+                                            .contentShape(Rectangle())
+                                            .animation(.spring(response: 0.58, dampingFraction: 0.55, blendDuration: 0))
+                                            .transition(AnyTransition.scale)
+
                                         if messagePosition == .left { Spacer() }
-                                    }.id(currentMessages[message].id)
-                                    .frame(width: Constants.screenWidth - 50)
+                                    }.frame(width: Constants.screenWidth - 50)
                                     .background(Color.clear)
                                     .padding(.horizontal, 25)
                                     .padding(.top, topMsg && currentMessages.count < 20 ? 20 : 0)
                                     .padding(.bottom, self.hasPrevious(index: message) ? -6 : 10)
                                     .padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 120 ? self.textFieldHeight : 120) + (self.hasAttachment ? 95 : 0) + 60)
+                                    .id(currentMessages[message].id)
                                 }.opacity(self.firstScroll ? 0 : 1)
                                 .onAppear {
-                                    if currentMessages[message].id == self.messages.selectedDialog(dialogID: self.dialogID).last?.id {
-                                        reader.scrollTo(self.messages.selectedDialog(dialogID: self.dialogID).last?.id, anchor: .bottom)
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                    if !notLast {
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                            reader.scrollTo(currentMessages[message].id, anchor: .bottom)
                                             self.firstScroll = false
                                         }
                                     }
@@ -148,10 +129,17 @@ struct ChatMessagesView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
                 changeMessageRealmData.getMessageUpdates(dialogID: self.dialogID, completion: { _ in })
 
+                if !Session.current.tokenHasExpired {
+                    Request.countOfMessages(forDialogID: self.dialogID, extendedRequest: ["sort_desc" : "lastMessageDate"], successBlock: { count in
+                        print("success getting message count: \(count)")
+                        self.mesgCount = Int(count)
+                    })
+                }
+
                 Request.updateDialog(withID: self.dialogID, update: UpdateChatDialogParameters(), successBlock: { dialog in
                     self.auth.selectedConnectyDialog = dialog
                     dialog.sendUserStoppedTyping()
-                    
+
                     dialog.onUserIsTyping = { (userID: UInt) in
                         if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
                             withAnimation { () -> () in
@@ -159,7 +147,7 @@ struct ChatMessagesView: View {
                             }
                         }
                     }
-                    
+
                     dialog.onUserStoppedTyping = { (userID: UInt) in
                         if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
                             withAnimation { () -> () in
@@ -167,23 +155,23 @@ struct ChatMessagesView: View {
                             }
                         }
                     }
-                    
+
                     if dialog.type == .group || dialog.type == .public {
                         dialog.requestOnlineUsers(completionBlock: { (online, error) in
                             print("The online count is!!: \(String(describing: online?.count))")
                             self.auth.onlineCount = online?.count ?? 0
                         })
-                        
+
                         dialog.onUpdateOccupant = { (userID: UInt) in
                             print("update occupant: \(userID)")
                             self.auth.setOnlineCount()
                         }
-                        
+
                         dialog.onJoinOccupant = { (userID: UInt) in
                             print("on join occupant: \(userID)")
                             self.auth.setOnlineCount()
                         }
-                        
+
                         dialog.onLeaveOccupant = { (userID: UInt) in
                             print("on leave occupant: \(userID)")
                             self.auth.setOnlineCount()

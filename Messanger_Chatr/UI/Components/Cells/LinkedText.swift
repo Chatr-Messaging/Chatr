@@ -11,10 +11,12 @@ struct LinkColoredText: View {
     let text: String
     let components: [Component]
     let messageRight: Bool
-    
-    init(text: String, links: [NSTextCheckingResult], messageRight: Bool) {
+    let messageState: messageStatus
+
+    init(text: String, links: [NSTextCheckingResult], messageRight: Bool, messageState: messageStatus) {
         self.messageRight = messageRight
         self.text = text
+        self.messageState = messageState
         let nsText = text as NSString
 
         var components: [Component] = []
@@ -40,6 +42,8 @@ struct LinkColoredText: View {
                 switch component {
                 case .text(let text):
                     return Text(verbatim: text)
+                        .foregroundColor(self.messageState != .error ? (self.messageRight ? .white : .primary) : .red)
+
                 case .link(let text, _):
                     return Text(verbatim: text)
                         .foregroundColor(self.messageRight ? .white : .blue)
@@ -68,19 +72,21 @@ struct LinkedText: View {
     @State var displayOverlay = true
     @State var showWebsite: Bool = false
     @State var websiteUrl: String = ""
+    @State var messageState: messageStatus = .sending
 
-    init (_ text: String, messageRight: Bool) {
+    init (_ text: String, messageRight: Bool, messageState: messageStatus) {
         self.messageRight = messageRight
         self.text = text
+        self.messageState = messageState
         let nsText = text as NSString
 
         // find the ranges of the string that have URLs
         let wholeString = NSRange(location: 0, length: nsText.length)
         links = linkDetector.matches(in: text, options: [], range: wholeString)
     }
-    
+
     var body: some View {
-        LinkColoredText(text: text, links: links, messageRight: messageRight)
+        LinkColoredText(text: text, links: links, messageRight: messageRight, messageState: messageState)
             .font(.body) // enforce here because the link tapping won't be right if it's different
             .overlay(displayOverlay ? LinkTapOverlay(text: text, links: links, showWebsite: self.$showWebsite, websiteUrl: self.$websiteUrl) : nil)
             .onChange(of: links, perform: { _ in

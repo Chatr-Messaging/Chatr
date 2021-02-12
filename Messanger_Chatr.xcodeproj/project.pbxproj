@@ -87,6 +87,7 @@
 		0599798A24D5468E00969318 /* TextBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0599798924D5468E00969318 /* TextBubble.swift */; };
 		059B18102522C32000988201 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 059B180F2522C32000988201 /* RealmSwift */; };
 		059B18122522C32000988201 /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = 059B18112522C32000988201 /* Realm */; };
+		059D1C4E25D6028800A7FB96 /* ContainerBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 059D1C4D25D6028800A7FB96 /* ContainerBubble.swift */; };
 		059EF95224C9153A004BA17C /* ChatMessagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 059EF95124C9153A004BA17C /* ChatMessagesView.swift */; };
 		05A1223124AEE6D300EEDD72 /* KeyboardCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A1223024AEE6D300EEDD72 /* KeyboardCard.swift */; };
 		05A6D54725B021E400AD66DD /* AdvancedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A6D54625B021E400AD66DD /* AdvancedViewModel.swift */; };
@@ -253,6 +254,7 @@
 		0596845525AC16E80051B707 /* VisitContactViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitContactViewModel.swift; sourceTree = "<group>"; };
 		0599798724D53C9500969318 /* AlertIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertIndicator.swift; sourceTree = "<group>"; };
 		0599798924D5468E00969318 /* TextBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextBubble.swift; sourceTree = "<group>"; };
+		059D1C4D25D6028800A7FB96 /* ContainerBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerBubble.swift; sourceTree = "<group>"; };
 		059EF95124C9153A004BA17C /* ChatMessagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagesView.swift; sourceTree = "<group>"; };
 		05A1223024AEE6D300EEDD72 /* KeyboardCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardCard.swift; sourceTree = "<group>"; };
 		05A6D54625B021E400AD66DD /* AdvancedViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedViewModel.swift; sourceTree = "<group>"; };
@@ -451,12 +453,8 @@
 				05A7BD4E24F9E8D20001BFC9 /* ContactRealmCell.swift */,
 				05A7633B2506FD42002712FA /* ContactRequestCell.swift */,
 				05C93BDC251578100059D1AA /* DialogContactCell.swift */,
-				0599798924D5468E00969318 /* TextBubble.swift */,
-				053AC4B6251982550036946E /* AttachmentBubble.swift */,
-				0583A84E251AFB740005B7E1 /* ContactBubble.swift */,
-				0569348F252312F7001BDFF0 /* LocationBubble.swift */,
+				059D1C5325D63A7600A7FB96 /* Bubbles */,
 				05DD2D4125C9D44900B1ACB7 /* LinkedText.swift */,
-				052E6E1F25CE513B00C3EAE4 /* ReactionsView.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -607,6 +605,19 @@
 				05EE519225CA5C160063A558 /* WebViewStateModel.swift */,
 			);
 			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		059D1C5325D63A7600A7FB96 /* Bubbles */ = {
+			isa = PBXGroup;
+			children = (
+				059D1C4D25D6028800A7FB96 /* ContainerBubble.swift */,
+				0599798924D5468E00969318 /* TextBubble.swift */,
+				052E6E1F25CE513B00C3EAE4 /* ReactionsView.swift */,
+				053AC4B6251982550036946E /* AttachmentBubble.swift */,
+				0583A84E251AFB740005B7E1 /* ContactBubble.swift */,
+				0569348F252312F7001BDFF0 /* LocationBubble.swift */,
+			);
+			path = Bubbles;
 			sourceTree = "<group>";
 		};
 		05D77A5025A190BA00776B93 /* Helpers */ = {
@@ -1060,6 +1071,7 @@
 				05C93BDD251578100059D1AA /* DialogContactCell.swift in Sources */,
 				05A1223124AEE6D300EEDD72 /* KeyboardCard.swift in Sources */,
 				05FD085B2394784600575727 /* ProgressBar.swift in Sources */,
+				059D1C4E25D6028800A7FB96 /* ContainerBubble.swift in Sources */,
 				05A7BD5D24FDDFD10001BFC9 /* QuickSnapCell.swift in Sources */,
 				05EA572524148A1600372F1A /* Mesages.swift in Sources */,
 				05C6951424F1EC5400EEF819 /* StorageView.swift in Sources */,

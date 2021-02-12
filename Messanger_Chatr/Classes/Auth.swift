@@ -664,14 +664,14 @@ extension AuthModel: ChatDelegate {
         self.profile.removeContactRequest(userID: userID)
     }
     
-    func chatContactListDidChange(_ contactList: ContactList) {
-        print("contact list did change: \(contactList.contacts.count)")
-        if contactList.contacts.count > 0 {
-            changeContactsRealmData().updateContacts(contactList: contactList.contacts, completion: { _ in })
-        } else {
-//                changeContactsRealmData().removeAllContacts()
-        }
-    }
+//    func chatContactListDidChange(_ contactList: ContactList) {
+//        print("contact list did change: \(contactList.contacts.count)")
+//        if contactList.contacts.count > 0 {
+//            changeContactsRealmData().updateContacts(contactList: contactList.contacts, completion: { _ in })
+//        } else {
+////                changeContactsRealmData().removeAllContacts()
+//        }
+//    }
     
     func chatDidReceiveContactItemActivity(_ userID: UInt, isOnline: Bool, status: String?) {
         print("contact list did receive new activity from: \(userID). Is online: \(isOnline). Status: \(String(describing: status))")
@@ -732,6 +732,7 @@ extension AuthModel: ChatDelegate {
         } else {
             changeDialogRealmData().fetchDialogs(completion: { _ in })
         }
+
         if (message.removed) {
             changeMessageRealmData.updateMessageState(messageID: message.id ?? "", messageState: .deleted)
         } else if (message.edited) {

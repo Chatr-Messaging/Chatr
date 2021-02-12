@@ -127,11 +127,9 @@ struct DialogCell: View {
                                         changeDialogRealmData().updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
                                     }
                                 }.sheet(isPresented: self.$openGroupProfile, content: {
-                                    NavigationView {
-                                        VisitGroupChannelView(dismissView: self.$openGroupProfile, openNewDialogID: self.$openNewDialogID, groupOccUserAvatar: self.groupOccUserAvatar, fromDialogCell: true, viewState: .fromContacts, dialogRelationship: .subscribed, dialogModel: self.dialogModel)
-                                            .environmentObject(self.auth)
-                                            .edgesIgnoringSafeArea(.all)
-                                    }
+                                    VisitGroupChannelView(dismissView: self.$openGroupProfile, openNewDialogID: self.$openNewDialogID, groupOccUserAvatar: self.groupOccUserAvatar, fromDialogCell: true, viewState: .fromContacts, dialogRelationship: .subscribed, dialogModel: self.dialogModel)
+                                        .environmentObject(self.auth)
+                                        .edgesIgnoringSafeArea(.all)
                                 })
                             }
                         }
@@ -313,7 +311,7 @@ struct DialogCell: View {
                         if self.privateDialogContact.avatar == "" || self.privateDialogContact.id == 0 && !Session.current.tokenHasExpired {
                             self.pullPrivateAvatatr()
                         } else if Session.current.tokenHasExpired {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                                 self.pullPrivateAvatatr()
                             }
                         }
@@ -321,7 +319,7 @@ struct DialogCell: View {
                         if !Session.current.tokenHasExpired {
                             self.pullPrivateAvatatr()
                         } else {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                                 self.pullPrivateAvatatr()
                             }
                         }
@@ -331,7 +329,7 @@ struct DialogCell: View {
                 self.pullGroupAvatar()
             } else {
                 if self.dialogModel.dialogType == "group" {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                         self.pullGroupAvatar()
                     }
                 }

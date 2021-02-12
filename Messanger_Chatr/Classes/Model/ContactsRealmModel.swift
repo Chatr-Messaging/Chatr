@@ -158,7 +158,7 @@ class changeContactsRealmData {
                 do {
                     let realm = try Realm(configuration: config)
                     if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: contactID) {
-                        print("Contact FOUND in Realm: \(snapshot.key) anddd faceID? : \(String(describing: dict["faceID"] as? Bool))")
+                        print("Contact FOUND in Realm: \(snapshot.key) anddd contacts faceID? : \(String(describing: dict["faceID"] as? Bool))")
                         try realm.safeWrite ({
                             foundContact.bio = dict["bio"] as? String ?? ""
                             foundContact.facebook = dict["facebook"] as? String ?? ""

@@ -427,7 +427,7 @@ struct mainHomeList: View {
                                     .opacity(self.isLocalOpen ? (i.isOpen ? 1 : 0) : 1)
                                     .offset(y: i.isOpen && self.isLocalOpen ? -geo.frame(in: .global).minY + (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 50 : 25) : 125) : self.emptyQuickSnaps ? -45 : 50)
                                     .offset(y: self.isLocalOpen ? self.activeView.height : 0)
-                                    .shadow(color: Color.black.opacity(self.isLocalOpen ? (self.colorScheme == .dark ? 0.40 : 0.15) : 0.15), radius: self.isLocalOpen ? 15 : 8, x: 0, y: self.isLocalOpen ? (self.colorScheme == .dark ? 15 : 5) : 5)
+                                    .shadow(color: Color.black.opacity(self.isLocalOpen ? (self.colorScheme == .dark ? 0.25 : 0.15) : 0.15), radius: self.isLocalOpen ? 15 : 8, x: 0, y: self.isLocalOpen ? (self.colorScheme == .dark ? 15 : 5) : 5)
                                     .animation(.spring(response: 0.45, dampingFraction: 0.95, blendDuration: 0))
                                     .id(i.id)
                                     .onTapGesture {

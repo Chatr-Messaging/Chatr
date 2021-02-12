@@ -53,13 +53,13 @@ class MessagesRealmModel<Element>: ObservableObject where Element: RealmSwift.Re
         self.results = results
         lateInit()
     }
-    
+
     func lateInit() {
         token = results.observe { [weak self] _ in
             self?.objectWillChange.send()
         }
     }
-    
+
     deinit {
         token.invalidate()
     }
