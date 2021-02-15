@@ -71,11 +71,12 @@ struct QuickSnapsSection: View {
                                     }
                                 }
                             }.padding(.leading, 5)
-                        }.scaleEffect(self.isLocalOpen ? 0.85 : 1)
-                        .padding(.horizontal)
+                            
+                            Spacer()
+                        }.padding(.leading, 10)
+                        .scaleEffect(self.isLocalOpen ? 0.85 : 1)
                     }.frame(height: self.emptyQuickSnaps ? geometry.size.height : 0)
-                }
-                .onAppear() {
+                }.onAppear() {
                     self.emptyQuickSnaps = false
                 }
             } else {

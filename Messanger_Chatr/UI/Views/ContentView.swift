@@ -172,6 +172,7 @@ struct mainHomeList: View {
     @State var textFieldHeight: CGFloat = 0
     @State var selectedContacts: [Int] = []
     @State var counter: Int = 0
+    @State var isKeyboardActionOpen: Bool = false
     @State var quickSnapViewState: QuickSnapViewingState = .closed
     @State var selectedQuickSnapContact: ContactStruct = ContactStruct()
     @ObservedObject var dialogs = DialogRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(DialogStruct.self))
@@ -275,7 +276,7 @@ struct mainHomeList: View {
                                 QuickSnapsSection(viewState: self.$quickSnapViewState, selectedQuickSnapContact: self.$selectedQuickSnapContact, emptyQuickSnaps: self.$emptyQuickSnaps, isLocalOpen: self.$isLocalOpen)
                                     .environmentObject(self.auth)
                                     .frame(width: Constants.screenWidth)
-                                    .offset(y: self.isLocalOpen ? -geometry.frame(in: .global).minY - (UIDevice.current.hasNotch ? -60 : 5) : 0)
+                                    .offset(y: self.isLocalOpen ? -geometry.frame(in: .global).minY - (UIDevice.current.hasNotch ? -50 : 5) : 0)
                                     .offset(y: self.isLocalOpen ? self.activeView.height / 1.5 : 0)
                                     //.scaleEffect(self.isLocalOpen ? ((self.activeView.height / 150) * 22.5) / 150 + 0.85 : 1.0)
                                     .animation(.spring(response: 0.45, dampingFraction: self.isLocalOpen ? 0.65 : 0.75, blendDuration: 0))
@@ -339,8 +340,8 @@ struct mainHomeList: View {
                                     .frame(width: Constants.screenWidth, height: Constants.screenHeight - (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 125 : 89) : 199), alignment: .bottom)
                                     .zIndex(1)
                                     .contentShape(Rectangle())
-                                    .offset(y: -geo.frame(in: .global).minY + (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 125 : 89) : 199))
-                                    .padding(.bottom, self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 125 : 89) : 199)
+                                    .offset(y: -geo.frame(in: .global).minY + (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 125 : 89) : 184))
+                                    .padding(.bottom, self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 125 : 89) : 184)
                                     .offset(y: self.activeView.height) // + (self.emptyQuickSnaps ? 25 : 197))
                                     .animation(.spring(response: 0.35, dampingFraction: 0.8, blendDuration: 0))
                                     .simultaneousGesture(DragGesture(minimumDistance: UserDefaults.standard.bool(forKey: "localOpen") ? 800 : 0))
@@ -404,13 +405,6 @@ struct mainHomeList: View {
                         
                         //MARK: Main Dialog Cells
                         ForEach(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }, id: \.id) { i in
-//                            if self.isLocalOpen && i.isOpen && !self.disableDialog {
-//                                Rectangle()
-//                                    .fill(Color.clear)
-//                                    .frame(height: 75, alignment: .center)
-//                                    .padding(.all)
-//                            }
-                            
                             GeometryReader { geo in
                                 DialogCell(dialogModel: i,
                                            isOpen: self.$isLocalOpen,
@@ -422,7 +416,7 @@ struct mainHomeList: View {
                                     .fixedSize(horizontal: false, vertical: true)
                                     .zIndex(i.isOpen ? 2 : 0)
                                     .opacity(self.isLocalOpen ? (i.isOpen ? 1 : 0) : 1)
-                                    .offset(y: i.isOpen && self.isLocalOpen ? -geo.frame(in: .global).minY + (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 50 : 25) : 125) : self.emptyQuickSnaps ? -45 : 50)
+                                    .offset(y: i.isOpen && self.isLocalOpen ? -geo.frame(in: .global).minY + (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 50 : 25) : 110) : self.emptyQuickSnaps ? -45 : 50)
                                     .offset(y: self.isLocalOpen ? self.activeView.height : 0)
                                     .shadow(color: Color.black.opacity(self.isLocalOpen ? (self.colorScheme == .dark ? 0.25 : 0.15) : 0.15), radius: self.isLocalOpen ? 15 : 8, x: 0, y: self.isLocalOpen ? (self.colorScheme == .dark ? 15 : 5) : 5)
                                     .animation(.spring(response: 0.45, dampingFraction: 0.95, blendDuration: 0))
@@ -470,16 +464,36 @@ struct mainHomeList: View {
                 
                 //MARK: Keyboard View
                 GeometryReader { geo in
-                    KeyboardCardView(height: self.$textFieldHeight, isOpen: self.$isLocalOpen, mainText: self.$keyboardText, hasAttachments: self.$hasAttachments, showImagePicker: self.$showKeyboardMediaAssets)
+                    KeyboardCardView(height: self.$textFieldHeight, isOpen: self.$isLocalOpen, mainText: self.$keyboardText, hasAttachments: self.$hasAttachments, showImagePicker: self.$showKeyboardMediaAssets, isKeyboardActionOpen: self.$isKeyboardActionOpen)
                         .environmentObject(self.auth)
                         .frame(width: Constants.screenWidth, height: Constants.screenHeight * 0.75, alignment: .center)
                         .background(BlurView(style: .systemUltraThinMaterial)) //Color("bgColor")
                         .cornerRadius(20)
                         .shadow(color: Color.black.opacity(0.15), radius: 14, x: 0, y: -5)
-                        .animation(.easeOut(duration: 0.65))
                         .offset(y: self.isLocalOpen ? geo.frame(in: .global).maxY - 40 -
-                                    (UIDevice.current.hasNotch ? 20 : 0) - (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) - (self.hasAttachments ? (self.showKeyboardMediaAssets ? 140 : 100) : 0) - (self.showKeyboardMediaAssets ? 220 : 0) - self.keyboardHeight + self.keyboardDragState.height : geo.frame(in: .global).maxY)
+                            (UIDevice.current.hasNotch ? 0 : -20) - (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) - (self.hasAttachments ? (self.showKeyboardMediaAssets ? 140 : 100) : 0) - (self.showKeyboardMediaAssets ? 220 : 0) - self.keyboardHeight + (self.isKeyboardActionOpen ? -90 : 0) : geo.frame(in: .global).maxY)
                         .zIndex(2)
+                        .onChange(of: self.auth.visitContactProfile) { newValue in
+                            if newValue {
+                                self.showSharedContact.toggle()
+                                self.auth.visitContactProfile = false
+                            }
+                        }.onAppear {
+                            self.selectedDialogID = UserDefaults.standard.string(forKey: "selectedDialogID") ?? ""
+                            NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { (data) in
+                                let height1 = data.userInfo![UIResponder.keyboardFrameEndUserInfoKey] as! NSValue
+                                withAnimation(.easeOut(duration: 0.65), {
+                                    self.keyboardHeight = height1.cgRectValue.height - 20
+                                })
+                            }
+                            
+                            NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { (_) in
+                                withAnimation(.easeOut(duration: 0.65), {
+                                    self.keyboardHeight = 0
+                                })
+                            }
+                        }
+                        /*
                         .simultaneousGesture(DragGesture().onChanged { value in
                             self.keyboardDragState = value.translation
                             if self.showFullKeyboard {
@@ -508,23 +522,8 @@ struct mainHomeList: View {
                                 self.showFullKeyboard = false
                                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             }
-                        }
-                        ).onChange(of: self.auth.visitContactProfile) { newValue in
-                            if newValue {
-                                self.showSharedContact.toggle()
-                                self.auth.visitContactProfile = false
-                            }
-                        }.onAppear {
-                            self.selectedDialogID = UserDefaults.standard.string(forKey: "selectedDialogID") ?? ""
-                            NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { (data) in
-                                let height1 = data.userInfo![UIResponder.keyboardFrameEndUserInfoKey] as! NSValue
-                                self.keyboardHeight = height1.cgRectValue.height - 20
-                            }
-                            
-                            NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { (_) in
-                                self.keyboardHeight = 0
-                            }
-                        }
+                        })
+                        */
                 }
             } else {
                 //MARK: LOCKED OUT VIEW

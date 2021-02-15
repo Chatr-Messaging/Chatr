@@ -23,6 +23,7 @@ struct KeyboardCardView: View {
     @Binding var mainText: String
     @Binding var hasAttachments: Bool
     @Binding var showImagePicker: Bool
+    @Binding var isKeyboardActionOpen: Bool
     @State var selectedContacts: [Int] = []
     @State var newDialogID: String = ""
     @State var gifData: [String] = []
@@ -40,13 +41,13 @@ struct KeyboardCardView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            //MARK: Grabber Icon
-            Rectangle()
-                .background(Color("bgColor_light"))
-                .frame(width: 40, height: 5)
-                .cornerRadius(2.5)
-                .padding(.top, 2.5)
-                .opacity(0.1)
+//            //MARK: Grabber Icon
+//            Rectangle()
+//                .background(Color("bgColor_light"))
+//                .frame(width: 40, height: 5)
+//                .cornerRadius(2.5)
+//                .padding(.top, 2.5)
+//                .opacity(0.1)
 
             //MARK: Attachments Section
             ScrollView(.horizontal, showsIndicators: false, content: {
@@ -143,21 +144,32 @@ struct KeyboardCardView: View {
             
             //MARK: Text Field & Send Btn
             HStack(alignment: .bottom, spacing: 5) {
-//                Button(action: {
-//                    
-//                }) {
-//                    Image
-//                }
+                Button(action: {
+                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                    withAnimation(.easeInOut(duration: 0.35) , {
+                        self.isKeyboardActionOpen.toggle()
+                    })
+                }) {
+                    Image(systemName: "paperclip")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 25, height: 25, alignment: .center)
+                        .foregroundColor(.black)
+                        .padding(8)
+                }.buttonStyle(changeBGButtonStyle())
+                .cornerRadius(12)
+                .shadow(color: Color.black.opacity(self.mainText.count != 0 ? 0.1 : 0.15), radius: self.mainText.count != 0 ? 6 : 4, x: 0, y: self.mainText.count != 0 ? 6 : 2.5)
 
                 ResizableTextField(height: self.$height, text: self.$mainText)
                     .environmentObject(self.auth)
                     .frame(height: self.height < 175 ? self.height : 175)
-                    .padding(.leading, 5)
+                    .padding(.leading, 10)
                     .padding(.vertical, 2)
                     .background(
                         ZStack(alignment: .topLeading) {
                             RoundedRectangle(cornerRadius: self.height < 160 ? 12.5 : 17.5)
                                 .foregroundColor(Color("buttonColor"))
+                                .padding(.horizontal, 5)
                                 .shadow(color: Color.black.opacity(self.mainText.count != 0 ? 0.1 : 0.15), radius: self.mainText.count != 0 ? 6 : 4, x: 0, y: self.mainText.count != 0 ? 6 : 2.5)
 
                             Text("type message")
@@ -178,69 +190,69 @@ struct KeyboardCardView: View {
                     })
                 
                 //MARK: Send Button
-                ZStack {
-                    Button(action: {
-                        if let selectedDialog = self.auth.dialogs.results.filter("id == %@", UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").first {
-                            if let connDia = self.auth.selectedConnectyDialog {
-                                connDia.sendUserStoppedTyping()
-                            }
+                Button(action: {
+                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                    self.isKeyboardActionOpen = false
 
-                            if self.gifData.count > 0 {
-                                changeMessageRealmData.sendGIFAttachment(dialog: selectedDialog, attachmentStrings: self.gifData.reversed(), occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
-                            
-                                self.gifData.removeAll()
-                            }
-                            
-                            if self.imagePicker.selectedPhotos.count > 0 {
-                                var uploadImg: [UIImage] = []
-                                
-                                for i in self.imagePicker.selectedPhotos {
-                                    uploadImg.append(i.image)
-                                }
-                                
-                                changeMessageRealmData.sendPhotoAttachment(dialog: selectedDialog, attachmentImages: uploadImg, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
-                            
-                                uploadImg.removeAll()
-                                self.imagePicker.selectedPhotos.removeAll()
-                            }
-
-                            if self.imagePicker.selectedVideos.count > 0 {
-                                //COME BACK AND ADD THE UPLOADING VIDEOS SECTION
-                                //changeMessageRealmData.sendPhotoAttachment(dialog: selectedDialog, attachmentImages: self.photoData, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
-                                print("There are selected videos we will remove later...")
-                            }
-                            
-                            if self.enableLocation {
-                                changeMessageRealmData.sendLocationMessage(dialog: selectedDialog, longitude: self.region.center.longitude, latitude: self.region.center.latitude, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
-                                self.enableLocation = false
-                            }
-                            
-                            if self.mainText.count > 0 {
-                                changeMessageRealmData.sendMessage(dialog: selectedDialog, text: self.mainText, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
-                            }
-
-                            self.checkAttachments()
+                    if let selectedDialog = self.auth.dialogs.results.filter("id == %@", UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").first {
+                        if let connDia = self.auth.selectedConnectyDialog {
+                            connDia.sendUserStoppedTyping()
                         }
 
-                        self.mainText = ""
-                        self.height = 0
-                        UserDefaults.standard.setValue(self.mainText, forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText")
-                    }, label: {
-                        Image(systemName: "paperplane.fill")
-                            .resizable()
-                            .frame(width: 22, height: 22)
-                            .foregroundColor(self.mainText.count > 0 || self.gifData.count > 0 || self.photoData.count > 0 || self.enableLocation ? .white : .secondary)
-                            .padding(10)
-                    }).background(self.mainText.count > 0 || self.gifData.count > 0 || self.photoData.count > 0 || self.enableLocation ? LinearGradient(gradient: Gradient(colors: [Color(red: 46 / 255, green: 168 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom) : LinearGradient(gradient: Gradient(colors: [Color("buttonColor"), Color("buttonColor")]), startPoint: .top, endPoint: .bottom))
-                    .clipShape(Circle())
-                    .shadow(color: Color.black.opacity(self.mainText.count > 0 || self.gifData.count > 0 || self.photoData.count > 0 || self.enableLocation ? 0.2 : 0.1), radius: 4, x: 0, y: 3)
-                    .shadow(color: Color.blue.opacity(self.mainText.count > 0 || self.gifData.count > 0 || self.photoData.count > 0 || self.enableLocation ? 0.3 : 0.0), radius: 8, x: 0, y: 6)
-                    .scaleEffect(self.mainText.count != 0 ? 1.04 : 1.0)
-                    .disabled(self.mainText.count > 0 || self.gifData.count > 0 || self.photoData.count > 0 || self.enableLocation ? false : true)
-                }
-            }.padding(.horizontal, 5)
-            .padding(.leading, 5)
-            .padding(.top, 7.5)
+                        if self.gifData.count > 0 {
+                            changeMessageRealmData.sendGIFAttachment(dialog: selectedDialog, attachmentStrings: self.gifData.reversed(), occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
+                        
+                            self.gifData.removeAll()
+                        }
+                        
+                        if self.imagePicker.selectedPhotos.count > 0 {
+                            var uploadImg: [UIImage] = []
+                            
+                            for i in self.imagePicker.selectedPhotos {
+                                uploadImg.append(i.image)
+                            }
+                            
+                            changeMessageRealmData.sendPhotoAttachment(dialog: selectedDialog, attachmentImages: uploadImg, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
+                        
+                            uploadImg.removeAll()
+                            self.imagePicker.selectedPhotos.removeAll()
+                        }
+
+                        if self.imagePicker.selectedVideos.count > 0 {
+                            //COME BACK AND ADD THE UPLOADING VIDEOS SECTION
+                            //changeMessageRealmData.sendPhotoAttachment(dialog: selectedDialog, attachmentImages: self.photoData, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
+                            print("There are selected videos we will remove later...")
+                        }
+                        
+                        if self.enableLocation {
+                            changeMessageRealmData.sendLocationMessage(dialog: selectedDialog, longitude: self.region.center.longitude, latitude: self.region.center.latitude, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
+                            self.enableLocation = false
+                        }
+                        
+                        if self.mainText.count > 0 {
+                            changeMessageRealmData.sendMessage(dialog: selectedDialog, text: self.mainText, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
+                        }
+
+                        self.checkAttachments()
+                    }
+
+                    self.mainText = ""
+                    self.height = 0
+                    UserDefaults.standard.setValue(self.mainText, forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText")
+                }, label: {
+                    Image(systemName: "paperplane.fill")
+                        .resizable()
+                        .frame(width: 22, height: 22)
+                        .foregroundColor(self.mainText.count > 0 || self.gifData.count > 0 || self.imagePicker.selectedPhotos.count > 0 || self.imagePicker.selectedVideos.count > 0 || self.enableLocation ? .white : .secondary)
+                        .padding(10)
+                }).background(self.mainText.count > 0 || self.gifData.count > 0 || self.imagePicker.selectedPhotos.count > 0 || self.imagePicker.selectedVideos.count > 0 || self.enableLocation ? LinearGradient(gradient: Gradient(colors: [Color(red: 46 / 255, green: 168 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom) : LinearGradient(gradient: Gradient(colors: [Color("buttonColor"), Color("buttonColor")]), startPoint: .top, endPoint: .bottom))
+                .clipShape(Circle())
+                .shadow(color: Color.black.opacity(self.mainText.count > 0 || self.gifData.count > 0 || self.imagePicker.selectedPhotos.count > 0 || self.imagePicker.selectedVideos.count > 0 || self.enableLocation ? 0.2 : 0.1), radius: 4, x: 0, y: 3)
+                .shadow(color: Color.blue.opacity(self.mainText.count > 0 || self.gifData.count > 0 || self.imagePicker.selectedPhotos.count > 0 || self.imagePicker.selectedVideos.count > 0 || self.enableLocation ? 0.3 : 0.0), radius: 8, x: 0, y: 6)
+                .scaleEffect(self.mainText.count > 0 || self.gifData.count > 0 || self.imagePicker.selectedPhotos.count > 0 || self.imagePicker.selectedVideos.count > 0 || self.enableLocation ? 1.04 : 1.0)
+                .disabled(self.mainText.count > 0 || self.gifData.count > 0 || self.imagePicker.selectedPhotos.count > 0 || self.imagePicker.selectedVideos.count > 0 || self.enableLocation ? false : true)
+            }.padding(.horizontal)
+            .padding(.top, 10)
 
              
             //MARK: Action Buttons

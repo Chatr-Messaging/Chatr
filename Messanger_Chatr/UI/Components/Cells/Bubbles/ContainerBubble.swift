@@ -53,8 +53,8 @@ struct ContainerBubble: View {
                         ZStack {
                             VStack(spacing: 0) {
                                 if self.message.image != "" {
-                                    //AttachmentBubble(viewModel: self.viewModel, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior)
-                                        //.environmentObject(self.auth)
+                                    AttachmentBubble(viewModel: self.viewModel, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior)
+                                        .environmentObject(self.auth)
                                     EmptyView()
                                 } else if self.message.imageType == "video" {
                                     Text("Video here")

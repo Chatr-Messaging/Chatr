@@ -95,7 +95,7 @@ struct DialogCell: View {
                                         Circle()
                                             .frame(width: 31, height: 31)
                                             .foregroundColor(.black)
-                                            .opacity(0.6)
+                                            .opacity(0.4)
                                         
                                         Text("+\(self.dialogModel.occupentsID.count - 2)")
                                             .font(.caption)

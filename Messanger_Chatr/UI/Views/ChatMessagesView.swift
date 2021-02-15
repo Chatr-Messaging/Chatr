@@ -53,11 +53,11 @@ struct ChatMessagesView: View {
                                     Button(action: {
                                         self.firstScroll = false
                                         changeMessageRealmData.loadMoreMessages(dialogID: currentMessages[message].dialogID, currentCount: currentMessages.count, completion: { _ in
-//                                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-//                                                withAnimation {
-//                                                    reader.scrollTo(currentMessages[message + 20].id, anchor: .top)
-//                                                }
-//                                            }
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                                                withAnimation {
+                                                    reader.scrollTo(currentMessages[message + 20].id, anchor: .top)
+                                                }
+                                            }
                                         })
                                     }, label: {
                                         Text("Load More...")
@@ -81,7 +81,7 @@ struct ChatMessagesView: View {
                                     .padding(.horizontal, 25)
                                     .padding(.top, topMsg && currentMessages.count < 20 ? 20 : 0)
                                     .padding(.bottom, self.hasPrevious(index: message) ? -6 : 10)
-                                    .padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 120 ? self.textFieldHeight : 120) + (self.hasAttachment ? 95 : 0) + 60)
+                                    .padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 95 : 0) + 20)
                                     .id(currentMessages[message].id)
                                 }.opacity(self.firstScroll ? 0 : 1)
                                 .onAppear {
@@ -92,7 +92,9 @@ struct ChatMessagesView: View {
                                                 self.firstScroll = false
                                             }
                                         } else {
-                                            reader.scrollTo(currentMessages[message].id, anchor: .bottom)
+                                            withAnimation(.linear(duration: 0.6)) {
+                                                reader.scrollTo(currentMessages[message].id, anchor: .bottom)
+                                            }
                                         }
                                     }
                                 }
@@ -110,8 +112,8 @@ struct ChatMessagesView: View {
                 }
             }//.resignKeyboardOnDragGesture()
             .onAppear() {
+                self.loadDialog()
                 DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 0.5) {
-                    self.loadDialog()
                     self.delayViewMessages = true
                 }
             }
