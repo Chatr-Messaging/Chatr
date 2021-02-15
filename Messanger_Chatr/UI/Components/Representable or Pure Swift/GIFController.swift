@@ -17,6 +17,7 @@ struct GIFController : UIViewControllerRepresentable {
     func makeCoordinator() -> Coordinator {
         return GIFController.Coordinator(parent: self)
     }
+
     func makeUIViewController(context: Context) -> some GiphyViewController {
         Giphy.configure(apiKey: "ZeBVD7S60sCcampPx2iQDVO8SwLvG00P")
         let controller = GiphyViewController()

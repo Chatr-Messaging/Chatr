@@ -634,11 +634,8 @@ struct VisitContactView: View {
                                 }
                             }
                             
-                            for request in ChatrApp.dialogs.contactRequestIDs {
-                                if request == self.connectyContact.id {
-                                    self.contactRelationship = .pendingRequestForYou
-                                    break
-                                }
+                            if (self.auth.profile.results.first?.contactRequests.contains(self.contact.id) != nil) {
+                                self.contactRelationship = .pendingRequestForYou
                             }
                         }
                     } else {
@@ -721,11 +718,8 @@ struct VisitContactView: View {
                                                 }
                                             }
 
-                                            for request in ChatrApp.dialogs.contactRequestIDs {
-                                                if request == self.connectyContact.id {
-                                                    self.contactRelationship = .pendingRequestForYou
-                                                    break
-                                                }
+                                            if (self.auth.profile.results.first?.contactRequests.contains(self.contact.id) != nil) {
+                                                self.contactRelationship = .pendingRequestForYou
                                             }
                                         }
 
@@ -847,12 +841,9 @@ struct VisitContactView: View {
                 break
             }
         }
-        
-        for request in ChatrApp.dialogs.contactRequestIDs {
-            if request == self.connectyContact.id {
-                self.contactRelationship = .pendingRequestForYou
-                break
-            }
+                
+        if (self.auth.profile.results.first?.contactRequests.contains(self.contact.id) != nil) {
+            self.contactRelationship = .pendingRequestForYou
         }
         
         changeContactsRealmData().observeFirebaseContactReturn(contactID: self.connectyContact.id != 0 ? Int(self.connectyContact.id) : self.contact.id, completion: { firebaseContact in

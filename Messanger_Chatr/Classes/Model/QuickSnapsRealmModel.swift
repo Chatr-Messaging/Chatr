@@ -27,7 +27,7 @@ class QuickSnapsStruct : Object {
 }
 
 class QuickSnapsRealmModel<Element>: ObservableObject where Element: RealmSwift.RealmCollectionValue {
-    var results: Results<Element>
+    @Published var results: Results<Element>
     private var token: NotificationToken!
     
     init(results: Results<Element>) {

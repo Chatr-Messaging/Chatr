@@ -35,7 +35,7 @@ struct ProgressBar: View {
      }
      
      func getProgressBarWidth(geometry:GeometryProxy) -> CGFloat {
-         let frame = geometry.frame(in: .global)
+        let frame = geometry.frame(in: .global)
         return frame.size.width * CGFloat(value) * 0.33
      }
      

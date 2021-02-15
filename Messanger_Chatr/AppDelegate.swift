@@ -19,7 +19,7 @@ import PushKit
 import Purchases
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate, PKPushRegistryDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
@@ -38,12 +38,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, PKPushRegistryDelegate, U
         
         UNUserNotificationCenter.current().delegate = self
         UIApplication.shared.registerForRemoteNotifications()
-        self.voipRegistration()
-        
-        StoreReviewHelper.incrementAppOpenedCount()
-        
-        Messaging.messaging().delegate = self
-        
+                        
         return true
     }
 
@@ -62,14 +57,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, PKPushRegistryDelegate, U
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
-        print("chat instance did disconnect")
         Chat.instance.disconnect { (error) in
             print("chat instance did disconnect \(String(describing: error?.localizedDescription))")
         }
     }
 
     func applicationDidEnterBackground(_ application: UIApplication) {
-        print("chat instance did disconnect")
         Chat.instance.disconnect { (error) in
             print("chat instance did disconnect \(String(describing: error?.localizedDescription))")
         }
@@ -123,6 +116,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, PKPushRegistryDelegate, U
         }
     }
     
+    /*
     func voipRegistration() {
         let mainQueue = DispatchQueue.main
         // Create a push registry object
@@ -172,6 +166,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, PKPushRegistryDelegate, U
         }
         return false
     }
+ */
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
         if let dynamicLink = DynamicLinks.dynamicLinks().dynamicLink(fromCustomSchemeURL: url) {

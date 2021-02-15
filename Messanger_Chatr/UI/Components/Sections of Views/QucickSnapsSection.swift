@@ -77,7 +77,6 @@ struct QuickSnapsSection: View {
                 }
                 .onAppear() {
                     self.emptyQuickSnaps = false
-                    print("quick snaps is NOT empty: \(self.emptyQuickSnaps)")
                 }
             } else {
                 Text("")

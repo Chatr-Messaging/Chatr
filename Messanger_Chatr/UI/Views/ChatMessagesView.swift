@@ -14,7 +14,6 @@ import ConnectyCube
 struct ChatMessagesView: View {
     @EnvironmentObject var auth: AuthModel
     @ObservedObject var viewModel = ChatMessageViewModel()
-    @StateObject var messages = MessagesRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(MessageStruct.self))
     @Binding var activeView: CGSize
     @Binding var keyboardChange: CGFloat
     @Binding var dialogID: String
@@ -27,7 +26,7 @@ struct ChatMessagesView: View {
     @State private var mesgCount: Int = -1
     
     var body: some View {
-        let currentMessages = self.messages.selectedDialog(dialogID: self.dialogID)
+        let currentMessages = self.auth.messages.selectedDialog(dialogID: self.dialogID)
         //let currentMessages = self.auth.dialogs.results.filter("id == %@", self.dialogID).sorted(byKeyPath: "lastMessageDate", ascending: false)
         
         ScrollView(.vertical, showsIndicators: false) {
@@ -40,9 +39,6 @@ struct ChatMessagesView: View {
                     .padding(.all, self.mesgCount >= 1 && self.delayViewMessages ? 0 : 20)
                     .offset(y: self.mesgCount >= 1 && self.delayViewMessages ? 0 : 40)
                     .opacity(self.mesgCount >= 1 && self.delayViewMessages ? 0 : 1)
-                    .onAppear() {
-
-                    }
                 
                 //CUSTOM MESSAGE BUBBLE:
                 if self.delayViewMessages {
@@ -90,15 +86,13 @@ struct ChatMessagesView: View {
                                 }.opacity(self.firstScroll ? 0 : 1)
                                 .onAppear {
                                     if !notLast {
-                                        DispatchQueue.main.async {
-                                            if self.firstScroll {
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                                                    reader.scrollTo(self.messages.selectedDialog(dialogID: self.dialogID)[message].id, anchor: .bottom)
-                                                    self.firstScroll = false
-                                                }
-                                            } else {
-                                                reader.scrollTo(self.messages.selectedDialog(dialogID: self.dialogID)[message].id, anchor: .bottom)
+                                        if self.firstScroll {
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                                                reader.scrollTo(currentMessages[message].id, anchor: .bottom)
+                                                self.firstScroll = false
                                             }
+                                        } else {
+                                            reader.scrollTo(currentMessages[message].id, anchor: .bottom)
                                         }
                                     }
                                 }
@@ -106,109 +100,101 @@ struct ChatMessagesView: View {
                         }.onChange(of: self.keyboardChange) { value in
                             if value > 0 {
                                 withAnimation {
-                                    DispatchQueue.main.async {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                         reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
                                     }
                                 }
                             }
                         }
-//                        .onChange(of: currentMessages) { msg in
-//                            if firstScroll {
-//                                reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
-//                            } else {
-//                                if currentMessages.last?.status != "isTyping" && !(currentMessages.last?.readIDs.contains(self.auth.profile.results.last?.id ?? 0) ?? (0 != 0)) {
-//                                    withAnimation {
-//                                        reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
-//                                    }
-//                                }
-//                            }
-//                        }
                     }
                 }
-            }.onAppear() {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            }//.resignKeyboardOnDragGesture()
+            .onAppear() {
+                DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 0.5) {
+                    self.loadDialog()
                     self.delayViewMessages = true
                 }
             }
-        }.resignKeyboardOnDragGesture()
-        .frame(width: Constants.screenWidth)
+        }.frame(width: Constants.screenWidth)
         .contentShape(Rectangle())
         .onAppear() {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
-                changeMessageRealmData.getMessageUpdates(dialogID: self.dialogID, completion: { _ in })
-
+            DispatchQueue.global(qos: .utility).async {
                 if !Session.current.tokenHasExpired {
                     Request.countOfMessages(forDialogID: self.dialogID, extendedRequest: ["sort_desc" : "lastMessageDate"], successBlock: { count in
-                        print("success getting message count: \(count)")
-                        self.mesgCount = Int(count)
+                        DispatchQueue.main.async {
+                            self.mesgCount = Int(count)
+                        }
                     })
                 }
-
-                Request.updateDialog(withID: self.dialogID, update: UpdateChatDialogParameters(), successBlock: { dialog in
-                    self.auth.selectedConnectyDialog = dialog
-                    dialog.sendUserStoppedTyping()
-
-                    dialog.onUserIsTyping = { (userID: UInt) in
-                        if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
-                            withAnimation { () -> () in
-                                changeMessageRealmData.addTypingMessage(userID: String(userID), dialogID: self.dialogID)
-                            }
-                        }
-                    }
-
-                    dialog.onUserStoppedTyping = { (userID: UInt) in
-                        if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
-                            withAnimation { () -> () in
-                                changeMessageRealmData.removeTypingMessage(userID: String(userID), dialogID: self.dialogID)
-                            }
-                        }
-                    }
-
-                    if dialog.type == .group || dialog.type == .public {
-                        dialog.requestOnlineUsers(completionBlock: { (online, error) in
-                            print("The online count is!!: \(String(describing: online?.count))")
-                            self.auth.onlineCount = online?.count ?? 0
-                        })
-
-                        dialog.onUpdateOccupant = { (userID: UInt) in
-                            print("update occupant: \(userID)")
-                            self.auth.setOnlineCount()
-                        }
-
-                        dialog.onJoinOccupant = { (userID: UInt) in
-                            print("on join occupant: \(userID)")
-                            self.auth.setOnlineCount()
-                        }
-
-                        dialog.onLeaveOccupant = { (userID: UInt) in
-                            print("on leave occupant: \(userID)")
-                            self.auth.setOnlineCount()
-                        }
-
-                        if Chat.instance.isConnected || !Chat.instance.isConnecting {
-                            if !dialog.isJoined() {
-                                dialog.join(completionBlock: { error in
-                                    print("we have joined the dialog!! \(String(describing: error))")
-                                })
-                            }
-                        } else {
-                            ChatrApp.connect()
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                                if !dialog.isJoined() {
-                                    dialog.join(completionBlock: { error in
-                                        print("we have joined the dialog after atempt 2!! \(String(describing: error))")
-                                    })
-                                }
-                            }
-                        }
-                    }
-                })
             }
         }
     }
     
     func hasPrevious(index: Int) -> Bool {
-        let result = self.messages.selectedDialog(dialogID: self.dialogID)
+        let result = self.auth.messages.selectedDialog(dialogID: self.dialogID)
         return result[index] != result.last ? (result[index + 1].senderID == result[index].senderID ? true : false) : false
+    }
+    
+    func loadDialog() {
+        DispatchQueue.global(qos: .utility).async {
+            Request.updateDialog(withID: self.dialogID, update: UpdateChatDialogParameters(), successBlock: { dialog in
+                self.auth.selectedConnectyDialog = dialog
+
+                dialog.onUserIsTyping = { (userID: UInt) in
+                    if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
+                        changeMessageRealmData.addTypingMessage(userID: String(userID), dialogID: self.dialogID)
+                    }
+                }
+
+                dialog.onUserStoppedTyping = { (userID: UInt) in
+                    if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
+                        changeMessageRealmData.removeTypingMessage(userID: String(userID), dialogID: self.dialogID)
+                    }
+                }
+
+                if dialog.type == .group || dialog.type == .public {
+                    dialog.requestOnlineUsers(completionBlock: { (online, error) in
+                        print("The online count is!!: \(String(describing: online?.count))")
+                        self.auth.onlineCount = online?.count ?? 0
+                    })
+
+                    dialog.onUpdateOccupant = { (userID: UInt) in
+                        print("update occupant: \(userID)")
+                        self.auth.setOnlineCount()
+                    }
+
+                    dialog.onJoinOccupant = { (userID: UInt) in
+                        print("on join occupant: \(userID)")
+                        self.auth.setOnlineCount()
+                    }
+
+                    dialog.onLeaveOccupant = { (userID: UInt) in
+                        print("on leave occupant: \(userID)")
+                        self.auth.setOnlineCount()
+                    }
+
+                    if Chat.instance.isConnected || !Chat.instance.isConnecting {
+                        if !dialog.isJoined() {
+                            dialog.join(completionBlock: { error in
+                                print("we have joined the dialog!! \(String(describing: error))")
+                                dialog.sendUserStoppedTyping()
+                            })
+                        }
+                    } else {
+                        DispatchQueue.main.async {
+                            ChatrApp.connect()
+                            if !dialog.isJoined() {
+                                dialog.join(completionBlock: { error in
+                                    print("we have joined the dialog after atempt 2!! \(String(describing: error))")
+                                    dialog.sendUserStoppedTyping()
+                                })
+                            }
+                        }
+                    }
+                }
+            })
+        }
+        
+        changeMessageRealmData.getMessageUpdates(dialogID: self.dialogID, completion: { _ in })
     }
 }

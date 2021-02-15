@@ -97,14 +97,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func sceneWillEnterForeground(_ scene: UIScene) {
-        print("scene will enter forground")
+        // Called as the scene transitions from the background to the foreground.
+        // Use this method to undo the changes made on entering the background.
+
+        print("scene will enter forground \(Thread.isMainThread)")
         if self.environment.isUserAuthenticated == .signedIn {
             ChatrApp.connect()
             self.sendLocalAuth()
             UserDefaults.standard.set(Session.current.currentUserID, forKey: "currentUserID")
         }
-        // Called as the scene transitions from the background to the foreground.
-        // Use this method to undo the changes made on entering the background.
+        
+        StoreReviewHelper.incrementAppOpenedCount()
+        StoreReviewHelper.checkAndAskForReview()
     }
     
     func sceneDidEnterBackground(_ scene: UIScene) {

@@ -25,7 +25,6 @@ struct ContainerBubble: View {
     
     ///Interaction variables:
     @State var showInteractions: Bool = false
-    @State var moveUpAnimation: Bool = false
     @State var likeBtnAnimation: Bool = false
     @State var dislikeBtnAnimation: Bool = false
     @State var interactionSelected: String = ""
@@ -56,20 +55,22 @@ struct ContainerBubble: View {
                                 if self.message.image != "" {
                                     //AttachmentBubble(viewModel: self.viewModel, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior)
                                         //.environmentObject(self.auth)
+                                    EmptyView()
                                 } else if self.message.imageType == "video" {
                                     Text("Video here")
                                 } else if self.message.contactID != 0 {
                                     //ContactBubble(viewModel: self.viewModel, chatContact: self.$newDialogFromSharedContact, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior)
                                         //.environmentObject(self.auth)
+                                    EmptyView()
                                 } else if self.message.longitude != 0 && self.message.latitude != 0 {
                                     LocationBubble(message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior)
                                 } else {
                                     TextBubble(message: self.message, messagePosition: messagePosition)
+                                        .transition(.asymmetric(insertion: AnyTransition.scale.animation(.spring()), removal: AnyTransition.identity))
                                 }
                             }
                         }.padding(.bottom, self.hasPrior ? 0 : 15)
                         .padding(.top, self.message.likedId.count != 0 || self.message.dislikedId.count != 0 ? 22 : 0)
-                        .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.45)), removal: AnyTransition.identity))
                         .scaleEffect(self.showInteractions ? 1.1 : 1.0)
                         .onTapGesture(count: 2) {
                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
@@ -194,7 +195,9 @@ struct ContainerBubble: View {
                     .offset(x: messagePosition == .right ? (Constants.smallAvitarSize / 2) : -(Constants.smallAvitarSize / 2))
                     .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 6)
                     .opacity(self.hasPrior && self.message.messageState != .error ? 0 : 1)
-            }.actionSheet(isPresented: self.$deleteActionSheet) {
+            }.padding(.leading, self.messagePosition == .right ? 40 : 0)
+            .padding(.trailing, self.messagePosition == .left ? 40 : 0)
+            .actionSheet(isPresented: self.$deleteActionSheet) {
                 ActionSheet(title: Text("Are you sure?"), message: Text("The message will be gone forever."), buttons: [
                     .default(Text("Select More")) {
                         print("select more btn...")
@@ -215,14 +218,11 @@ struct ContainerBubble: View {
             //MARK: Interactions Section
             if self.showInteractions {
                 ReactionsView(interactionSelected: $interactionSelected, reactions: $reactions)
-                    .offset(y: moveUpAnimation ? -65 : -45)
+                    .transition(.asymmetric(insertion: AnyTransition.opacity.combined(with: .move(edge: .bottom)).animation(.spring()), removal: AnyTransition.opacity.combined(with: .move(edge: .bottom))))
+                    .animation(.spring())
+                    .offset(y: -65)
                     .zIndex(2)
                     .padding(.horizontal)
-                    .onAppear() {
-                        self.moveUpAnimation = true
-                    }.onDisappear() {
-                        self.moveUpAnimation = false
-                    }
             }
         }.onAppear() {
             self.viewModel.getUserAvatar(senderId: self.message.senderID, compleation: { url in
@@ -257,17 +257,21 @@ struct ContainerBubble: View {
     }
     
     func onEndedInteraction(value: DragGesture.Value) {
-        withAnimation(Animation.linear){ showInteractions = false }
+        withAnimation(Animation.linear) { showInteractions = false }
         
         if interactionSelected == "like" {
             UINotificationFeedbackGenerator().notificationOccurred(.success)
             self.viewModel.likeMessage(from: self.auth.profile.results.last?.id ?? 0, messageId: self.message.id, dialogId: self.message.dialogID, completion: { like in
-                self.hasUserLiked = like
+                withAnimation {
+                    self.hasUserLiked = like
+                }
             })
         } else if interactionSelected == "dislike" {
             UINotificationFeedbackGenerator().notificationOccurred(.success)
             self.viewModel.dislikeMessage(from: self.auth.profile.results.last?.id ?? 0, messageId: self.message.id, dialogId: self.message.dialogID, completion: { dislike in
-                self.hasUserDisliked = dislike
+                withAnimation {
+                    self.hasUserDisliked = dislike
+                } 
             })
         } else if interactionSelected == "copy" {
             self.copyMessage()
@@ -295,31 +299,31 @@ struct ContainerBubble: View {
         let msg = Database.database().reference().child("Dialogs").child(self.message.dialogID).child(self.message.id)
         let profileID = self.auth.profile.results.first?.id ?? 0
 
-        msg.observe(.childAdded, with: { snapLikeAdded in
-            let typeLike = snapLikeAdded.key
+        msg.observe(.childAdded, with: { snapAdded in
+            let typeLike = snapAdded.key
 
-            for child in snapLikeAdded.children {
+            for child in snapAdded.children {
                 let childSnap = child as! DataSnapshot
                 if typeLike == "likes" {
                     changeMessageRealmData.updateMessageLikeAdded(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
                     self.hasUserLiked = self.message.likedId.contains(profileID)
                     print("liked added: contain: \(self.message.likedId.contains(profileID)) && my id: \(profileID)")
-                } else if childSnap.key == "dislikes" {
+                } else if typeLike == "dislikes" {
                     changeMessageRealmData.updateMessageDislikeAdded(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
                     self.hasUserDisliked = self.message.dislikedId.contains(profileID)
                 }
             }
         })
         
-        msg.observe(.childRemoved, with: { snapLikeRemoved in
-            let typeLike = snapLikeRemoved.key
+        msg.observe(.childRemoved, with: { snapRemoved in
+            let typeLike = snapRemoved.key
             
-            for child in snapLikeRemoved.children {
+            for child in snapRemoved.children {
                 let childSnap = child as! DataSnapshot
                 if typeLike == "likes" {
                     changeMessageRealmData.updateMessageLikeRemoved(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
                     self.hasUserLiked = self.message.likedId.contains(profileID)
-                } else if childSnap.key == "dislikes" {
+                } else if typeLike == "dislikes" {
                     changeMessageRealmData.updateMessageDislikeRemoved(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
                     self.hasUserDisliked = self.message.dislikedId.contains(profileID)
                 }

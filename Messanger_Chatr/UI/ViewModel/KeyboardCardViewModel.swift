@@ -122,18 +122,20 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
     }
     
     func getImageFromAsset(asset: PHAsset, size: CGSize, completion: @escaping (UIImage)->()) {
-        let imageManager = PHCachingImageManager()
-        imageManager.allowsCachingHighQualityImages = true
-        
-        // Your Own Properties For Images...
-        let imageOptions = PHImageRequestOptions()
-        imageOptions.deliveryMode = .highQualityFormat
-        imageOptions.isSynchronous = false
-        
-        imageManager.requestImage(for: asset, targetSize: size, contentMode: .aspectFill, options: imageOptions) { (image, _) in
-            guard let resizedImage = image else{return}
+        DispatchQueue.global(qos: .background).async {
+            let imageManager = PHCachingImageManager()
+            imageManager.allowsCachingHighQualityImages = true
             
-            completion(resizedImage)
+            // Your Own Properties For Images...
+            let imageOptions = PHImageRequestOptions()
+            imageOptions.deliveryMode = .highQualityFormat
+            imageOptions.isSynchronous = false
+            
+            imageManager.requestImage(for: asset, targetSize: size, contentMode: .aspectFill, options: imageOptions) { (image, _) in
+                guard let resizedImage = image else{return}
+                
+                completion(resizedImage)
+            }
         }
     }
     

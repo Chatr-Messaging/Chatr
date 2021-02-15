@@ -107,6 +107,9 @@ class AuthModel: NSObject, ObservableObject {
         anyCancellable = profile.objectWillChange.sink { (_) in
             self.objectWillChange.send()
         }
+        anyCancellable = messages.objectWillChange.sink { (_) in
+            self.objectWillChange.send()
+        }
         anyCancellable1 = contacts.objectWillChange.sink { (_) in
             self.objectWillChange.send()
         }
@@ -150,6 +153,7 @@ class AuthModel: NSObject, ObservableObject {
                 print("error: \(String(describing: error?.localizedDescription))")
                 self.verifyCodeStatus = .error
                 completion(false)
+            
                 return
            } else {
                 //Save to firestore...
@@ -160,9 +164,10 @@ class AuthModel: NSObject, ObservableObject {
                         print("error when adding the user to firestore: \(result)")
                         self.verifyCodeStatus = .error
                         completion(false)
+                        
                         return
                     }
-                    print("you have successfuly added the user to firestore: \(result)... onto merging to ConnectyCube")
+
                     Auth.auth().currentUser?.getIDTokenForcingRefresh(true) { idToken, error in
                         if error != nil {
                             // Handle error
@@ -239,7 +244,7 @@ class AuthModel: NSObject, ObservableObject {
             if error != nil {
                 print("error getting IAP offerings: \(String(describing: error?.localizedDescription))")
             } else {
-                print("received the IAP offerings: \(String(describing: offerings?.current))")
+                print("\(Thread.current.isMainThread) received the IAP offerings: \(String(describing: offerings?.current))")
                 self.monthlySubscription = offerings?.current?.monthly
                 self.threeMonthSubscription = offerings?.current?.threeMonth
                 self.yearlySubscription = offerings?.current?.annual
@@ -311,9 +316,7 @@ class AuthModel: NSObject, ObservableObject {
                 if self.isUserAuthenticated == .signedIn {
                     self.dynamicLinkContactID = Int(contactId) ?? 0
                     self.visitContactProfile = true
-                } else {
-                    print("user is logged out")
-                }
+                } else { print("user is logged out") }
             }
         }
     }
@@ -516,30 +519,27 @@ class AuthModel: NSObject, ObservableObject {
     }
     
     func leaveDialog() {
-        if let dialog = self.selectedConnectyDialog {
-            if dialog.type == .group || dialog.type == .public{
-                dialog.leave { (error) in
-                    self.onlineCount = 0
-                    print("just left dialog! error?: \(String(describing: error?.localizedDescription))")
-                }
-            }
+        guard let dialog = self.selectedConnectyDialog, dialog.isJoined() else {
+            return
+        }
+        
+        dialog.leave { error in
+            self.onlineCount = 0
             dialog.sendUserStoppedTyping()
+            print("just left dialog! error?: \(String(describing: error?.localizedDescription))")
         }
     }
     
     public func setOnlineCount() {
-        if let dialog = self.selectedConnectyDialog {
-            if dialog.type == .group || dialog.type == .public {
-                self.onlineCount = 0
-                dialog.requestOnlineUsers(completionBlock: { (online, error) in
-                    self.onlineCount = online?.count ?? 0
-                    print("the online count is: \(self.onlineCount)")
-                })
-                print("done getting online")
-            } else {
-                print("not a group dialog \(String(describing: self.selectedConnectyDialog?.type))")
-            }
+        guard let dialog = self.selectedConnectyDialog, dialog.type == .group || dialog.type == .public else {
+            return
         }
+        
+        self.onlineCount = 0
+        dialog.requestOnlineUsers(completionBlock: { (online, error) in
+            self.onlineCount = online?.count ?? 0
+            print("the online count is: \(self.onlineCount)")
+        })
     }
     
     func createTopFloater(alertType: String, message: String) -> some View {

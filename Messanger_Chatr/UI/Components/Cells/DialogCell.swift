@@ -17,13 +17,11 @@ struct DialogCell: View {
     @State var dialogModel: DialogStruct = DialogStruct()
     @State var privateDialogContact: ContactStruct = ContactStruct()
     @State var connectyContact: User = User()
-    @State private var privateUserID: Int = 0
     @State var groupOccUserAvatar: [String] = []
     @State private var openActionSheet: Bool = false
     @State private var openContactProfile: Bool = false
     @State private var openGroupProfile: Bool = false
     @State var openNewDialogID: Int = 0
-    @State private var isAdmin: Bool = false
     @Binding var isOpen: Bool
     @Binding var activeView: CGSize
     @Binding var selectedDialogID: String
@@ -31,7 +29,7 @@ struct DialogCell: View {
     var body: some View {
         //MARK: Main Dialog Cell
         HStack {
-            ZStack {
+            ZStack(alignment: .center) {
                 if self.privateDialogContact.quickSnaps.count > 0 {
                     Circle()
                         .stroke(Constants.snapPurpleGradient, style: StrokeStyle(lineWidth: 2, lineCap: .round))
@@ -54,15 +52,12 @@ struct DialogCell: View {
                             .shadow(color: Color.black.opacity(0.23), radius: 7, x: 0, y: 5)
                             .onTapGesture {
                                 if isOpen {
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                     if self.dialogModel.dialogType == "private" {
                                         self.openContactProfile.toggle()
                                     } else if self.dialogModel.dialogType == "group" || self.dialogModel.dialogType == "public" {
                                         self.openGroupProfile.toggle()
                                     }
-                                    if let connDia = self.auth.selectedConnectyDialog {
-                                        connDia.sendUserStoppedTyping()
-                                    }
-                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 } else {
                                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                     self.isOpen = true
@@ -113,16 +108,18 @@ struct DialogCell: View {
                                 .padding(.leading, self.groupOccUserAvatar.count == 1 ? 0 : 10)
                                 .onTapGesture {
                                     if isOpen {
-                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                        self.openGroupProfile.toggle()
-                                        if let connDia = self.auth.selectedConnectyDialog {
-                                            connDia.sendUserStoppedTyping()
+                                        DispatchQueue.global(qos: .userInteractive).async {
+                                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                            self.openContactProfile.toggle()
                                         }
                                     } else {
-                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                        self.isOpen = true
+                                        DispatchQueue.global(qos: .userInteractive).async {
+                                            self.isOpen = true
+                                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                            UserDefaults.standard.set(true, forKey: "localOpen")
+                                        }
+  
                                         self.selectedDialogID = self.dialogModel.id
-                                        UserDefaults.standard.set(true, forKey: "localOpen")
                                         UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")
                                         changeDialogRealmData().updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
                                     }
@@ -205,16 +202,16 @@ struct DialogCell: View {
                     } else if self.dialogModel.dialogType == "group" || self.dialogModel.dialogType == "public" {
                         self.openGroupProfile.toggle()
                     }
-                    if let connDia = self.auth.selectedConnectyDialog {
-                        connDia.sendUserStoppedTyping()
-                    }
                 } else {
-                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                    self.isOpen = true
-                    self.selectedDialogID = self.dialogModel.id
-                    UserDefaults.standard.set(true, forKey: "localOpen")
-                    UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")
                     changeDialogRealmData().updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
+                    DispatchQueue.global(qos: .userInteractive).async {
+                        self.isOpen = true
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                        UserDefaults.standard.set(true, forKey: "localOpen")
+                    }
+                    
+                    self.selectedDialogID = self.dialogModel.id
+                    UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")
                 }
             }
 
@@ -248,17 +245,18 @@ struct DialogCell: View {
                             }
                         },
                         .destructive(Text(self.dialogModel.dialogType == "private" ? "Delete Dialog" : (self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? "Destroy Group" : "Leave Group")), action: {
-                            self.isOpen = false
-                            UserDefaults.standard.set(false, forKey: "localOpen")
                             changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
-                            self.openActionSheet = false
 
-                            if self.dialogModel.dialogType == "private" || self.dialogModel.dialogType == "group" {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.50) {
+                            DispatchQueue.global(qos: .userInteractive).async {
+                                self.isOpen = false
+                                self.openActionSheet = false
+                                UserDefaults.standard.set(false, forKey: "localOpen")
+                            }
+                            
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                if self.dialogModel.dialogType == "private" || self.dialogModel.dialogType == "group" {
                                     changeDialogRealmData().deletePrivateConnectyDialog(dialogID: self.dialogModel.id, isOwner: self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? true : false)
-                                }
-                            } else if self.dialogModel.dialogType == "public" {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.50) {
+                                } else if self.dialogModel.dialogType == "public" {
                                     changeDialogRealmData().unsubscribePublicConnectyDialog(dialogID: self.dialogModel.id)
                                 }
                             }
@@ -268,11 +266,11 @@ struct DialogCell: View {
                 }
                 
                 Button(action: {
-                    self.isOpen = false
-                    UserDefaults.standard.set(false, forKey: "localOpen")
-                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    DispatchQueue.global(qos: .userInteractive).async {
+                        self.isOpen = false
+                        UserDefaults.standard.set(false, forKey: "localOpen")
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
                         changeDialogRealmData().fetchDialogs(completion: { _ in })
                     }
                 }, label: {
@@ -296,14 +294,14 @@ struct DialogCell: View {
             if self.dialogModel.dialogType == "private" {
                 for occ in self.dialogModel.occupentsID {
                     if occ != UserDefaults.standard.integer(forKey: "currentUserID") {
-                        self.privateUserID = occ
+                        self.privateDialogContact.id = occ
                         break
                     }
                 }
                 
                 do {
                     let realm = try Realm(configuration: Realm.Configuration(schemaVersion: 1))
-                    if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: self.privateUserID) {
+                    if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: self.privateDialogContact.id) {
                         //MARK: COME BACK TO THIS** Crashes below
                         //changeContactsRealmData().observeFirebaseContact(contactID: foundContact.id)
                         self.privateDialogContact = foundContact
@@ -338,75 +336,75 @@ struct DialogCell: View {
     }
     
     func pullGroupAvatar() {
-        for admin in self.dialogModel.adminID {
-            if admin == UserDefaults.standard.integer(forKey: "currentUserID") {
-                self.isAdmin = true
-                break
-            }
-        }
-        
         self.groupOccUserAvatar.removeAll()
+
         for occ in self.dialogModel.occupentsID {
-            if self.groupOccUserAvatar.count != 3 {
-                if occ != UserDefaults.standard.integer(forKey: "currentUserID") {
-                    do {
-                        let realm = try Realm(configuration: Realm.Configuration(schemaVersion: 1))
-                        if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: occ) {
-                            if foundContact.avatar == "" {
-                                Request.users(withIDs: [NSNumber(value: occ)], paginator: Paginator.limit(1, skip: 0), successBlock: { (paginator, users) in
+            guard self.groupOccUserAvatar.count < 3 else {
+                return
+            }
+            
+            if occ != UserDefaults.standard.integer(forKey: "currentUserID"){
+                do {
+                    let realm = try Realm(configuration: Realm.Configuration(schemaVersion: 1))
+                    if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: occ) {
+                        if foundContact.avatar == "" {
+                            Request.users(withIDs: [NSNumber(value: occ)], paginator: Paginator.limit(1, skip: 0), successBlock: { (paginator, users) in
+                                DispatchQueue.global(qos: .userInitiated).async {
                                     for i in users {
                                         self.groupOccUserAvatar.append(PersistenceManager().getCubeProfileImage(usersID: i) ?? "")
-                                        if self.groupOccUserAvatar.count >= 3 { break }
+                                        if self.groupOccUserAvatar.count >= 3 { return }
                                     }
-                                })
-                            } else {
-                                self.groupOccUserAvatar.append(foundContact.avatar)
-                                print("group occ user av #: \(self.groupOccUserAvatar.count) and now: \(foundContact.avatar)")
-                                if self.groupOccUserAvatar.count >= 3 { break }
-                            }
-                        } else {
-                            Request.users(withIDs: [NSNumber(value: occ)], paginator: Paginator.limit(1, skip: 0), successBlock: { (paginator, users) in
-                                for i in users {
-                                    self.groupOccUserAvatar.append(PersistenceManager().getCubeProfileImage(usersID: i) ?? "")
-                                    if self.groupOccUserAvatar.count >= 3 { break }
                                 }
                             })
+                        } else {
+                            self.groupOccUserAvatar.append(foundContact.avatar)
                         }
-                    } catch { }
-                }
-            } else { break }
+                    } else {
+                        Request.users(withIDs: [NSNumber(value: occ)], paginator: Paginator.limit(1, skip: 0), successBlock: { (paginator, users) in
+                            DispatchQueue.global(qos: .userInitiated).async {
+                                for i in users {
+                                    self.groupOccUserAvatar.append(PersistenceManager().getCubeProfileImage(usersID: i) ?? "")
+                                    if self.groupOccUserAvatar.count >= 3 { return }
+                                }
+                            }
+                        })
+                    }
+                } catch { }
+            }
         }
     }
     
     func pullPrivateAvatatr() {
-        Request.users(withIDs: [NSNumber(value: self.privateUserID)], paginator: Paginator.limit(5, skip: 0), successBlock: { (paginator, users) in
-            for user in users {
-                if user.id == self.privateUserID {
-                    self.connectyContact = user
-                    changeContactsRealmData().observeFirebaseContactReturn(contactID: Int(user.id), completion: { firebaseContact in
-                        let newContact = ContactStruct()
-                        newContact.id = Int(self.connectyContact.id)
-                        newContact.fullName = self.connectyContact.fullName ?? ""
-                        newContact.phoneNumber = self.connectyContact.phone ?? ""
-                        newContact.lastOnline = self.connectyContact.lastRequestAt ?? Date()
-                        newContact.createdAccount = self.connectyContact.createdAt ?? Date()
-                        newContact.avatar = PersistenceManager.shared.getCubeProfileImage(usersID: self.connectyContact) ?? ""
-                        newContact.bio = firebaseContact.bio
-                        newContact.facebook = firebaseContact.facebook
-                        newContact.twitter = firebaseContact.twitter
-                        newContact.instagramAccessToken = firebaseContact.instagramAccessToken
-                        newContact.instagramId = firebaseContact.instagramId
-                        newContact.isPremium = firebaseContact.isPremium
-                        newContact.emailAddress = self.connectyContact.email ?? "empty email address"
-                        newContact.website = self.connectyContact.website ?? "empty website"
-                        newContact.isInfoPrivate = firebaseContact.isInfoPrivate
-                        newContact.isMessagingPrivate = firebaseContact.isMessagingPrivate
-                        
-                        self.privateDialogContact = newContact
-                    })
-                    return
+        Request.users(withIDs: [NSNumber(value: self.privateDialogContact.id)], paginator: Paginator.limit(5, skip: 0), successBlock: { (paginator, users) in
+            //DispatchQueue.global(qos: .userInitiated).async {
+                for user in users {
+                    if user.id == self.privateDialogContact.id {
+                        self.connectyContact = user
+                        changeContactsRealmData().observeFirebaseContactReturn(contactID: Int(user.id), completion: { firebaseContact in
+                            let newContact = ContactStruct()
+                            newContact.id = Int(self.connectyContact.id)
+                            newContact.fullName = self.connectyContact.fullName ?? ""
+                            newContact.phoneNumber = self.connectyContact.phone ?? ""
+                            newContact.lastOnline = self.connectyContact.lastRequestAt ?? Date()
+                            newContact.createdAccount = self.connectyContact.createdAt ?? Date()
+                            newContact.avatar = PersistenceManager.shared.getCubeProfileImage(usersID: self.connectyContact) ?? ""
+                            newContact.bio = firebaseContact.bio
+                            newContact.facebook = firebaseContact.facebook
+                            newContact.twitter = firebaseContact.twitter
+                            newContact.instagramAccessToken = firebaseContact.instagramAccessToken
+                            newContact.instagramId = firebaseContact.instagramId
+                            newContact.isPremium = firebaseContact.isPremium
+                            newContact.emailAddress = self.connectyContact.email ?? "empty email address"
+                            newContact.website = self.connectyContact.website ?? "empty website"
+                            newContact.isInfoPrivate = firebaseContact.isInfoPrivate
+                            newContact.isMessagingPrivate = firebaseContact.isMessagingPrivate
+                            
+                            self.privateDialogContact = newContact
+                        })
+                        return
+                    }
                 }
-            }
+            //}
         })
     }
 }

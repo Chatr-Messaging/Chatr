@@ -38,7 +38,7 @@ class ProfileStruct : Object {
 }
 
 class ProfileRealmModel<Element>: ObservableObject where Element: RealmSwift.RealmCollectionValue {
-    var results: Results<Element>
+    @Published var results: Results<Element>
     private var token: NotificationToken!
     let messageApi = changeProfileRealmDate.shared
 
@@ -65,10 +65,8 @@ class ProfileRealmModel<Element>: ObservableObject where Element: RealmSwift.Rea
                 try realm.safeWrite ({
                     if !oldData.contactRequests.contains(Int(userID)) {
                         oldData.contactRequests.append(Int(userID))
-                        print("contacts does NOT contain a TRUE contact")
-                    } else {
-                        print("contacts DOES contain contact request id.")
                     }
+                    
                     realm.add(oldData, update: .all)
                 })
             }
@@ -101,54 +99,55 @@ class changeProfileRealmDate {
     static let shared = changeMessageRealmData()
     
     func observeFirebaseUser() {
-        let user = Database.database().reference().child("Users").child("\(Session.current.currentUserID)")
-        user.observe(.value, with: { (snapshot: DataSnapshot) in
-            if let dict = snapshot.value as? [String: Any] {
-                let config = Realm.Configuration(schemaVersion: 1)
-                do {
-                    let realm = try Realm(configuration: config)
-                    if let foundContact = realm.object(ofType: ProfileStruct.self, forPrimaryKey: Session.current.currentUserID) {
-                        print("Contact FOUND in Realm: \(snapshot.key) anddd faceID? : \(String(describing: dict["faceID"] as? Bool))")
-                        try realm.safeWrite({
-                            foundContact.bio = dict["bio"] as? String ?? ""
-                            foundContact.facebook = dict["facebook"] as? String ?? ""
-                            foundContact.twitter = dict["twitter"] as? String ?? ""
-                            foundContact.instagramAccessToken = dict["instagramAccessToken"] as? String ?? ""
-                            foundContact.instagramId = dict["instagramId"] as? Int ?? 0
-                            foundContact.lastAddressBookUpdate = dict["lastAddressBookUpload"] as? String ?? ""
-                            foundContact.isLocalAuthOn = dict["faceID"] as? Bool ?? false
-                            foundContact.isPremium = dict["isPremium"] as? Bool ?? false
-                            foundContact.isInfoPrivate = dict["isInfoPrivate"] as? Bool ?? false
-                            foundContact.isMessagingPrivate = dict["isMessagingPrivate"] as? Bool ?? false
-                            
+        let queue = DispatchQueue.init(label: "com.brandon.chatrFirebbase", qos: .utility)
+        queue.async {
+            let user = Database.database().reference().child("Users").child("\(Session.current.currentUserID)")
+            user.observe(.value, with: { (snapshot: DataSnapshot) in
+                if let dict = snapshot.value as? [String: Any] {
+                    let config = Realm.Configuration(schemaVersion: 1)
+                    do {
+                        let realm = try Realm(configuration: config)
+                        if let foundContact = realm.object(ofType: ProfileStruct.self, forPrimaryKey: Session.current.currentUserID) {
+                            print("Contact FOUND in Realm: \(snapshot.key) anddd faceID? : \(String(describing: dict["faceID"] as? Bool))")
                             try realm.safeWrite({
+                                foundContact.bio = dict["bio"] as? String ?? ""
+                                foundContact.facebook = dict["facebook"] as? String ?? ""
+                                foundContact.twitter = dict["twitter"] as? String ?? ""
+                                foundContact.instagramAccessToken = dict["instagramAccessToken"] as? String ?? ""
+                                foundContact.instagramId = dict["instagramId"] as? Int ?? 0
+                                foundContact.lastAddressBookUpdate = dict["lastAddressBookUpload"] as? String ?? ""
+                                foundContact.isLocalAuthOn = dict["faceID"] as? Bool ?? false
+                                foundContact.isPremium = dict["isPremium"] as? Bool ?? false
+                                foundContact.isInfoPrivate = dict["isInfoPrivate"] as? Bool ?? false
+                                foundContact.isMessagingPrivate = dict["isMessagingPrivate"] as? Bool ?? false
+                                
                                 realm.add(foundContact, update: .all)
                             })
-                        })
-                    } else {
-                        print("Contact NOT in Realm: \(snapshot.key)")
-                        let newData = ProfileStruct()
-                        newData.id = Int(snapshot.key) ?? 0
-                        newData.bio = dict["bio"] as? String ?? ""
-                        newData.facebook = dict["facebook"] as? String ?? ""
-                        newData.twitter = dict["twitter"] as? String ?? ""
-                        newData.instagramAccessToken = dict["instagramAccessToken"] as? String ?? ""
-                        newData.instagramId = dict["instagramId"] as? Int ?? 0
-                        newData.lastAddressBookUpdate = dict["lastAddressBookUpload"] as? String ?? ""
-                        newData.isLocalAuthOn = dict["faceID"] as? Bool ?? false
-                        newData.isPremium = dict["isPremium"] as? Bool ?? false
-                        newData.isInfoPrivate = dict["isInfoPrivate"] as? Bool ?? false
-                        newData.isMessagingPrivate = dict["isMessagingPrivate"] as? Bool ?? false
+                        } else {
+                            print("Contact NOT in Realm: \(snapshot.key)")
+                            let newData = ProfileStruct()
+                            newData.id = Int(snapshot.key) ?? 0
+                            newData.bio = dict["bio"] as? String ?? ""
+                            newData.facebook = dict["facebook"] as? String ?? ""
+                            newData.twitter = dict["twitter"] as? String ?? ""
+                            newData.instagramAccessToken = dict["instagramAccessToken"] as? String ?? ""
+                            newData.instagramId = dict["instagramId"] as? Int ?? 0
+                            newData.lastAddressBookUpdate = dict["lastAddressBookUpload"] as? String ?? ""
+                            newData.isLocalAuthOn = dict["faceID"] as? Bool ?? false
+                            newData.isPremium = dict["isPremium"] as? Bool ?? false
+                            newData.isInfoPrivate = dict["isInfoPrivate"] as? Bool ?? false
+                            newData.isMessagingPrivate = dict["isMessagingPrivate"] as? Bool ?? false
 
-                        try realm.safeWrite({
-                            realm.add(newData, update: .all)
-                        })
+                            try realm.safeWrite({
+                                realm.add(newData, update: .all)
+                            })
+                        }
+                    } catch {
+                        print(error.localizedDescription)
                     }
-                } catch {
-                    print(error.localizedDescription)
                 }
-            }
-        })
+            })
+        }
     }
     
     func updateProfile<T>(_ objects: T, completion: @escaping () -> Void) where T: User {

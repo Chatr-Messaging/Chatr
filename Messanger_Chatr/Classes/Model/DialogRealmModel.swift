@@ -43,7 +43,7 @@ class DialogStruct : Object {
 }
 
 class DialogRealmModel<Element>: ObservableObject where Element: RealmSwift.RealmCollectionValue {
-    var results: Results<Element>
+    @Published var results: Results<Element>
     private var token: NotificationToken!
     
     init(results: Results<Element>) {
@@ -78,53 +78,44 @@ class changeDialogRealmData {
     lazy var shared = changeDialogRealmData()
 
     func fetchDialogs(completion: @escaping (Bool) -> ()) {
-        let extRequest : [String: String] = ["sort_desc" : "lastMessageDate"]
-        Request.dialogs(with: Paginator.limit(100, skip: 0), extendedRequest: extRequest, successBlock: { (dialogs, usersIDs, paginator) in
-            if dialogs.count > 0 {
-                self.insertDialogs(dialogs) {
-                    completion(true)
-                }
-            } else {
-                let config = Realm.Configuration(schemaVersion: 1)
-                do {
-                    let realm = try! Realm(configuration: config)
-                    let realmDialogs = realm.objects(DialogStruct.self)
+        //let queue = DispatchQueue(label: "com.brandon.chatrQueue", qos: .utility)
 
-                    try! realm.safeWrite {
-                        for dia in realmDialogs {
-                            dia.isDeleted = true
-                            realm.add(dia, update: .all)
+        //queue.async {
+            print("the thread fwefawefor featching dialogs: \(Thread.isMultiThreaded()) and the thread: \(Thread.isMainThread)")
+            let extRequest : [String: String] = ["sort_desc" : "lastMessageDate"]
+            Request.dialogs(with: Paginator.limit(100, skip: 0), extendedRequest: extRequest, successBlock: { (dialogs, usersIDs, paginator) in
+                if dialogs.count > 0 {
+                    self.insertDialogs(dialogs) { }
+                } else {
+                    let config = Realm.Configuration(schemaVersion: 1)
+                    do {
+                        let realm = try! Realm(configuration: config)
+                        let realmDialogs = realm.objects(DialogStruct.self)
+
+                        try! realm.safeWrite {
+                            for dia in realmDialogs {
+                                dia.isDeleted = true
+                                realm.add(dia, update: .all)
+                            }
                         }
                     }
-                    completion(true)
                 }
-            }
-            if dialogs.count < paginator.limit { return }
-            paginator.skip += UInt(dialogs.count)
-        }) { (error) in
-            print("Error in feteching dialogs... error: \(error.localizedDescription)")
-            ChatrApp.connect()
+                if dialogs.count < paginator.limit { return }
+                paginator.skip += UInt(dialogs.count)
+            }) { (error) in
+                print("Error in feteching dialogs... error: \(error.localizedDescription)")
+                ChatrApp.connect()
+                completion(false)
+           }
+            
             completion(true)
-       }
+        //}
     }
     
     func insertDialogs<T>(_ objects: [T], completion: @escaping () -> Void) where T: ChatDialog {
-        objects.forEach({ (object) in
-            //var onlineUsers = 0
-//            if !object.isJoined() {
-//                object.join(completionBlock: { error in
-//                    print("done joining dialog: \(String(describing: object.name)) && error: \(String(describing: error?.localizedDescription))")
-//                })
-//            }
-            
-//            if object.type == .group || object.type == .public {
-//                onlineUsers = 0
-//                object.requestOnlineUsers(completionBlock: { (online, error) in
-//                    onlineUsers = online?.count ?? 0
-//                    print("done getting online count22: \(String(describing: online?.count))")
-//                })
-//            }
+        objects.forEach({ object in
             let config = Realm.Configuration(schemaVersion: 1)
+
             do {
                 let realm = try Realm(configuration: config)
                 let newData = DialogStruct()
@@ -140,18 +131,10 @@ class changeDialogRealmData {
                     newData.occupentsID.append(Int(truncating: occu))
                 }
 
-                if object.type == .private {
-                    newData.dialogType = "private"
-                } else if object.type == .group {
-                    newData.dialogType = "group"
-//                    if object.occupantsCount == 0 {
-//                        self.deletePrivateConnectyDialog(dialogID: object.id ?? "", isOwner: false)
-//                    }
-                } else if object.type == .broadcast {
-                    newData.dialogType = "broadcast"
-                } else if object.type == .public {
-                    newData.dialogType = "public"
-                }
+                if object.type == .private { newData.dialogType = "private" }
+                else if object.type == .group { newData.dialogType = "group" }
+                else if object.type == .broadcast { newData.dialogType = "broadcast" }
+                else if object.type == .public { newData.dialogType = "public" }
 
                 if object.type == .group || object.type == .public {
                     for admin in object.adminsIDs ?? [] {
@@ -167,7 +150,7 @@ class changeDialogRealmData {
                 
                 try realm.safeWrite({
                     realm.add(newData, update: .all)
-                    print("Succsessfuly added new Dialog data! \(newData.isDeleted)")
+                    print("Succsessfuly added new Dialog data! \(newData.isDeleted) and the threadis: \(Thread.current)")
                     completion()
                 })
             } catch {
@@ -185,7 +168,7 @@ class changeDialogRealmData {
                 if let dialogResult = realm.object(ofType: DialogStruct.self, forPrimaryKey: dialogID) {
                     dialogResult.isOpen = isOpen
                     realm.add(dialogResult, update: .all)
-                    print("Succsessfuly added new Dialog data from updateOpen! \(String(describing: dialogResult.isOpen))")
+                    print("Succsessfuly added new Dialog data from updateOpen\(Thread.isMainThread)! \(String(describing: dialogResult.isOpen))")
                 }
             })
         } catch {

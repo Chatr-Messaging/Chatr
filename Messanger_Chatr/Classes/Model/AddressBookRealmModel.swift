@@ -53,12 +53,8 @@ class changeAddressBookRealmData {
     let advancedViewModel = AdvancedViewModel()
     
     func uploadAddressBook(completion: @escaping (Bool) -> ()) {
-        let status = CNContactStore.authorizationStatus(for: .contacts)
-        if status == .denied || status == .restricted {
-            advancedViewModel.requestContacts()
-            completion(false)
-        }
         let store = CNContactStore()
+
         store.requestAccess(for: .contacts) { granted, error in
             guard granted else {
                 DispatchQueue.main.async {
@@ -67,10 +63,10 @@ class changeAddressBookRealmData {
                 return
             }
 
-            // get the contacts
             var contacts = [CNContact]()
             let keys = [CNContactGivenNameKey, CNContactFamilyNameKey, CNContactPhoneNumbersKey, CNContactImageDataKey]
             let request = CNContactFetchRequest(keysToFetch: keys as [CNKeyDescriptor])
+
             do {
                 try store.enumerateContacts(with: request) { contact, stop in
                     contacts.append(contact)
@@ -79,54 +75,53 @@ class changeAddressBookRealmData {
                 print(error)
             }
 
-            if contacts.count > 0 {
-                //self.removeAllAddressBook(completion: { _ in
-                    let addressBook = NSMutableOrderedSet()
-                    for contact in contacts {
-                        if let contactPhone = contact.phoneNumbers.first?.value.stringValue {
-                            //Loacl address book to upload online
-                            let newContact = AddressBookContact()
-                            newContact.name = contact.givenName + " " + contact.familyName
-                            newContact.phone = contactPhone
-                        
-                            addressBook.add(newContact)
+            if !contacts.isEmpty {
+                let addressBook = NSMutableOrderedSet()
 
-                            //Realm contact book
-                            let config = Realm.Configuration(schemaVersion: 1)
-                            do {
-                                let realm = try Realm(configuration: config)
-                                if let oldData = realm.object(ofType: AddressBookStruct.self, forPrimaryKey: contactPhone) {
-                                    try realm.safeWrite({
-                                        oldData.name = contact.givenName + " " + contact.familyName
-                                        
-                                        realm.add(oldData, update: .all)
-                                    })
-                                } else {
-                                    let newData = AddressBookStruct()
-                                    newData.name = contact.givenName + " " + contact.familyName
-                                    newData.phone = contactPhone
+                for contact in contacts {
+                    if let contactPhone = contact.phoneNumbers.first?.value.stringValue {
+                        //Loacl address book to upload online
+                        let newContact = AddressBookContact()
+                        newContact.name = contact.givenName + " " + contact.familyName
+                        newContact.phone = contactPhone
+                    
+                        addressBook.add(newContact)
 
-                                    try realm.safeWrite({
-                                        realm.add(newData, update: .all)
-                                    })
-                                }
-                            } catch {
-                                print(error.localizedDescription)
+                        //Realm contact book
+                        let config = Realm.Configuration(schemaVersion: 1)
+                        do {
+                            let realm = try Realm(configuration: config)
+                            if let oldData = realm.object(ofType: AddressBookStruct.self, forPrimaryKey: contactPhone) {
+                                try realm.safeWrite({
+                                    oldData.name = contact.givenName + " " + contact.familyName
+                                    
+                                    realm.add(oldData, update: .all)
+                                })
+                            } else {
+                                let newData = AddressBookStruct()
+                                newData.name = contact.givenName + " " + contact.familyName
+                                newData.phone = contactPhone
+
+                                try realm.safeWrite({
+                                    realm.add(newData, update: .all)
+                                })
                             }
+                        } catch {
+                            print(error.localizedDescription)
                         }
                     }
+                }
 
-                    Request.uploadAddressBook(withUdid: UIDevice.current.identifierForVendor?.uuidString, addressBook: addressBook, force: false, successBlock: { (updates) in
-                        print("Successfully uploaded all of your contacts to ConnectyCube backend! :D \(addressBook.count)")
-
+                Request.uploadAddressBook(withUdid: UIDevice.current.identifierForVendor?.uuidString, addressBook: addressBook, force: false, successBlock: { (updates) in
+                    DispatchQueue.main.async {
                         changeProfileRealmDate().updateAddressBookSyncDate()
                         
                         completion(true)
-                    }) { (error) in
-                        print("Failed to uploaded all of your contacts to ConnectyCube backend: \(error.localizedDescription)")
-                        completion(false)
                     }
-                //})
+                }) { (error) in
+                    print("Failed to uploaded all of your contacts to ConnectyCube backend: \(error.localizedDescription)")
+                    completion(false)
+                }
             }
         }
     }

@@ -23,7 +23,6 @@ struct ProfileView: View {
     @State var userPhoneNumber: String = String()
     @State var selectionPersonalProfile: Int? = nil
     @State var profileImgSize = CGFloat(55)
-    @State var alertNum: Int = ChatrApp.dialogs.contactRequestIDs.count
     @ObservedObject var profile = ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self))
     @State private var editProfileAction: Int? = 0
     @State var localAuth: Bool = false

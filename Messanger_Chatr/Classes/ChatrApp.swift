@@ -15,10 +15,7 @@ import Purchases
 struct ChatrApp {
     ///Users Service
     static let users = Users()
-    ///Dialogs Service
-    static let dialogs = Dialogs()
-    ///Message Service
-    static let messages = MessagesObject()
+
     ///Auth & other Service
     static let auth = AuthModel()
 }
@@ -27,7 +24,7 @@ extension ChatrApp {
     /// Connect to chat / Login if needed / Dialogs updates & more...
     static func connect() {
         if let user = self.auth.profile.results.first {
-            print("logged in with: \(user.fullName)")
+            print("\(Thread.current.isMainThread) logged in with: \(user.fullName)")
             Chat.instance.addDelegate(ChatrApp.auth)
             Purchases.shared.identify("\(user.id)") { (_, _) in }
             if Session.current.tokenHasExpired {
@@ -51,12 +48,14 @@ extension ChatrApp {
                 print("there is a error connecting to session! \(String(describing: error?.localizedDescription)) user id: \(id)")
                 changeContactsRealmData().observeQuickSnaps()
             } else {
-                print("Success joining session! the current user: \(String(describing: Session.current.currentUser)) && expirationSate: \(String(describing: Session.current.sessionDetails?.token))")
+                print("\(Thread.current.isMainThread) Success joining session! the current user: \(String(describing: Session.current.currentUser)) && expirationSate: \(String(describing: Session.current.sessionDetails?.token))")
 
-                changeDialogRealmData().fetchDialogs(completion: { _ in
-                    changeContactsRealmData().observeQuickSnaps()
-                    changeProfileRealmDate().observeFirebaseUser()
-                    self.auth.initIAPurchase()
+                changeDialogRealmData().fetchDialogs(completion: { worked in
+                    if worked {
+                        changeContactsRealmData().observeQuickSnaps()
+                        changeProfileRealmDate().observeFirebaseUser()
+                        self.auth.initIAPurchase()
+                    }
                 })
             }
         }

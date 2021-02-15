@@ -11,6 +11,7 @@ import MobileCoreServices
 import RealmSwift
 import FirebaseDynamicLinks
 import CarBode
+import Social
 import SDWebImageSwiftUI
 import AVFoundation
 import SCSDKCreativeKit
@@ -31,6 +32,7 @@ struct ShareProfileView: View {
     @State var showShared = false
     @State var hasCopiedUrl = false
     @State var openScan = false
+    @State var showingTwitter = false
 
     var body: some View {
         VStack {

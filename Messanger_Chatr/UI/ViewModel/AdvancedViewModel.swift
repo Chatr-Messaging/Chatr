@@ -42,7 +42,6 @@ class AdvancedViewModel: ObservableObject {
                 }
             }
         } else if CNContactStore.authorizationStatus(for: .contacts) == .authorized {
-            print("Contacts are authorized")
             self.contactsPermission = true
 
         } else if CNContactStore.authorizationStatus(for: .contacts) == .denied {

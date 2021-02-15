@@ -61,8 +61,9 @@ struct HomeView: View {
                 if !self.auth.preventDismissal {
                     Text("")
                         .onAppear(perform: {
-                            ChatrApp.connect()
-                            StoreReviewHelper.checkAndAskForReview()
+                            DispatchQueue.main.async {
+                                ChatrApp.connect()
+                            }
                             
                             if self.auth.profile.results.first?.isLocalAuthOn ?? false {
                                 self.auth.isLoacalAuth = true
@@ -75,18 +76,10 @@ struct HomeView: View {
                                     context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, authenticationError in
                                         if success {
                                             self.auth.isLoacalAuth = false
-                                        } else {
-                                            // error
-                                            print("error! logging in")
                                         }
                                     }
-                                } else {
-                                    // no biometry
-                                    print("error with biometry!")
                                 }
-                            } else {
-                                self.auth.isLoacalAuth = false
-                            }
+                            } else { self.auth.isLoacalAuth = false }
                         })
                         .onDisappear(perform: {
                             self.auth.haveUserFullName = false
@@ -228,7 +221,7 @@ struct mainHomeList: View {
                                     }
                                 }
                         }.frame(height: Constants.btnSize + 100)
-                            
+                        
                         // MARK: "Message" Title
                         HomeMessagesTitle(isLocalOpen: self.$isLocalOpen, contacts: self.$showContacts, newChat: self.$showNewChat, selectedContacts: self.$selectedContacts)
                             .frame(height: 50)
@@ -256,7 +249,7 @@ struct mainHomeList: View {
                                     }
                                 }
                             }
-                                                
+                        
                         //MARK: Quick Snaps Section
                         GeometryReader { geometry in
                             ZStack(alignment: .top) {
@@ -277,8 +270,8 @@ struct mainHomeList: View {
                                     .opacity(self.isLocalOpen ? Double((275 - self.activeView.height) / 150) : 0)
                                     .animation(.spring(response: 0.45, dampingFraction: self.isLocalOpen ? 0.65 : 0.75, blendDuration: 0))
                                     .allowsHitTesting(!UserDefaults.standard.bool(forKey: "localOpen") ? false : true)
-                                    //.simultaneousGesture(DragGesture(minimumDistance: self.isLocalOpen ? 0 : 500))
-
+                                //.simultaneousGesture(DragGesture(minimumDistance: self.isLocalOpen ? 0 : 500))
+                                
                                 QuickSnapsSection(viewState: self.$quickSnapViewState, selectedQuickSnapContact: self.$selectedQuickSnapContact, emptyQuickSnaps: self.$emptyQuickSnaps, isLocalOpen: self.$isLocalOpen)
                                     .environmentObject(self.auth)
                                     .frame(width: Constants.screenWidth)
@@ -317,14 +310,14 @@ struct mainHomeList: View {
                                 }
                         }
                         
-//                        //MARK: Pull to refresh - loading dialogs
-//                        PullToRefreshIndicator(isLoading: self.$isLoading, preLoading: self.$isPreLoading, localOpen: self.$isLocalOpen)
-//                            .environmentObject(self.auth)
-//                            .offset(y: self.emptyQuickSnaps ? -70 : 60)
-//                            .onAppear() {
-//                                self.isLoading = false
-//                                self.isPreLoading = false
-//                            }
+                        //                        //MARK: Pull to refresh - loading dialogs
+                        //                        PullToRefreshIndicator(isLoading: self.$isLoading, preLoading: self.$isPreLoading, localOpen: self.$isLocalOpen)
+                        //                            .environmentObject(self.auth)
+                        //                            .offset(y: self.emptyQuickSnaps ? -70 : 60)
+                        //                            .onAppear() {
+                        //                                self.isLoading = false
+                        //                                self.isPreLoading = false
+                        //                            }
                         
                         //MARK: Search Bar
                         if self.dialogs.results.filter { $0.isDeleted != true }.count != 0 {
@@ -337,7 +330,7 @@ struct mainHomeList: View {
                                 .animation(.spring(response: 0.4, dampingFraction: 0.8, blendDuration: 0))
                                 .resignKeyboardOnDragGesture()
                         }
-
+                        
                         //MARK: Chat Messages View
                         if UserDefaults.standard.bool(forKey: "localOpen") {
                             GeometryReader { geo in
@@ -353,11 +346,15 @@ struct mainHomeList: View {
                                     .simultaneousGesture(DragGesture(minimumDistance: UserDefaults.standard.bool(forKey: "localOpen") ? 800 : 0))
                                     .layoutPriority(1)
                                     .onDisappear {
+                                        guard let dialog = self.auth.selectedConnectyDialog, dialog.isJoined() else {
+                                            return
+                                        }
+                                        
                                         self.auth.leaveDialog()
                                     }
                             }
                         }
-                                                
+                        
                         //MARK: Dialogs Section
                         if self.dialogs.results.filter { $0.isDeleted != true }.count == 0 {
                             VStack {
@@ -407,12 +404,12 @@ struct mainHomeList: View {
                         
                         //MARK: Main Dialog Cells
                         ForEach(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }, id: \.id) { i in
-                            if self.isLocalOpen && i.isOpen && !self.disableDialog {
-                                Rectangle()
-                                    .fill(Color.clear)
-                                    .frame(height: 75, alignment: .center)
-                                    .padding(.all)
-                            }
+//                            if self.isLocalOpen && i.isOpen && !self.disableDialog {
+//                                Rectangle()
+//                                    .fill(Color.clear)
+//                                    .frame(height: 75, alignment: .center)
+//                                    .padding(.all)
+//                            }
                             
                             GeometryReader { geo in
                                 DialogCell(dialogModel: i,
@@ -444,7 +441,7 @@ struct mainHomeList: View {
                                         self.activeView.height = .zero
                                     })
                             }.frame(height: 75, alignment: .center)
-                            .padding(.horizontal, self.isLocalOpen ? 0 : 20)
+                            .padding(.horizontal, self.isLocalOpen && i.isOpen ? 0 : 20)
                         }.offset(y: 60)
                         .disabled(self.disableDialog)
                         .onChange(of: UserDefaults.standard.bool(forKey: "localOpen")) { _ in
@@ -454,10 +451,10 @@ struct mainHomeList: View {
                             }
                         }
                         //.onAppear {
-                            //UserDefaults.standard.set(false, forKey: "localOpen")
-                            //ChatrApp.dialogs.getDialogUpdates() { result in }
+                        //UserDefaults.standard.set(false, forKey: "localOpen")
+                        //ChatrApp.dialogs.getDialogUpdates() { result in }
                         //}
-
+                        
                         if self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.count >= 3 {
                             FooterInformation()
                                 .padding(.top, 140)
@@ -528,30 +525,7 @@ struct mainHomeList: View {
                                 self.keyboardHeight = 0
                             }
                         }
-                    }
-
- //                GeometryReader { geometry in
-//                    NotificationSection()
-//                        .environmentObject(self.auth)
-//                        .offset(y: self.receivedNotification ? -geometry.frame(in: .global).minY + (UIDevice.current.hasNotch ? 40 : 25) : -geometry.frame(in: .global).minY - 80)
-//                        .animation(.spring(response: 0.65, dampingFraction: 0.55, blendDuration: 0))
-//                        .onAppear() {
-//                            NotificationCenter.default.addObserver(forName: NSNotification.Name("NotificationAlert"), object: nil, queue: .main) { (_) in
-//                                print("received notification!! ;D \(self.auth.notificationtext)")
-//                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-//                                self.receivedNotification = true
-//                                DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-//                                    self.receivedNotification = false
-//                                }
-//                            }
-//                        }.onTapGesture {
-//                            if self.receivedNotification {
-//                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-//                                self.receivedNotification = false
-//                            }
-//                        }
-//                }
-                
+                }
             } else {
                 //MARK: LOCKED OUT VIEW
                 LockedOutView()
@@ -577,17 +551,17 @@ struct mainHomeList: View {
                 for occu in dia.occupentsID {
                     if occu == self.newDialogFromContact && dia.dialogType == "private" {
                         self.newDialogFromContact = 0
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
-                            self.isLocalOpen = true
-                            UserDefaults.standard.set(true, forKey: "localOpen")
-                            changeDialogRealmData().updateDialogOpen(isOpen: self.isLocalOpen, dialogID: dia.id)
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                            UserDefaults.standard.set(dia.id, forKey: "selectedDialogID")
-                        }
+                        self.isLocalOpen = true
+                        UserDefaults.standard.set(true, forKey: "localOpen")
+                        changeDialogRealmData().updateDialogOpen(isOpen: self.isLocalOpen, dialogID: dia.id)
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        UserDefaults.standard.set(dia.id, forKey: "selectedDialogID")
                         
                         break
                     }
                 }
+                
+                if self.newDialogFromContact == 0 { break }
             }
 
             if self.newDialogFromContact != 0 {
@@ -615,19 +589,21 @@ struct mainHomeList: View {
     }
     
     func onCellTapGesture(id: String, dialogType: String) {
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-        self.selectedDialogID = id
         UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
+        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
         UserDefaults.standard.set(id, forKey: "selectedDialogID")
+        
         if !UserDefaults.standard.bool(forKey: "localOpen") {
-            self.isLocalOpen = true
             UserDefaults.standard.set(true, forKey: "localOpen")
+            self.isLocalOpen = true
+            self.selectedDialogID = id
             changeDialogRealmData().updateDialogOpen(isOpen: true, dialogID: id)
         } else {
             self.isLocalOpen = false
             UserDefaults.standard.set(false, forKey: "localOpen")
             changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: id)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                 changeDialogRealmData().fetchDialogs(completion: { _ in })
                 if dialogType == "group" || dialogType == "public" {
                     self.auth.leaveDialog()
@@ -636,7 +612,7 @@ struct mainHomeList: View {
         }
     }
     
-    func onChanged(value: DragGesture.Value, index: Int){
+    func onChanged(value: DragGesture.Value, index: Int) {
         guard value.translation.height < 150 else { UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true); return }
         guard value.translation.height > 0 else { return }
         
@@ -648,15 +624,17 @@ struct mainHomeList: View {
             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
             UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
             UserDefaults.standard.set(false, forKey: "localOpen")
-            changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: id)
-            changeDialogRealmData().fetchDialogs(completion: { _ in })
             self.isLocalOpen = false
+            changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: id)
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                changeDialogRealmData().fetchDialogs(completion: { _ in })
+                if dialogType == "group" || dialogType == "public" {
+                    self.auth.leaveDialog()
+                }
+            }
         }
         self.activeView.height = .zero
-        
-        if dialogType == "group" || dialogType == "public" {
-            self.auth.leaveDialog()
-        }
     }
 }
 

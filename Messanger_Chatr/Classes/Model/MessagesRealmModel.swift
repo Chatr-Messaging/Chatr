@@ -83,31 +83,34 @@ class MessagesRealmModel<Element>: ObservableObject where Element: RealmSwift.Re
 class changeMessageRealmData {
 
     static func getMessageUpdates(dialogID: String, completion: @escaping (Bool) -> ()) {
-        let extRequest : [String: String] = ["sort_desc" : "date_sent", "mark_as_read" : "0"]
-        Request.messages(withDialogID: dialogID, extendedRequest: extRequest, paginator: Paginator.limit(20, skip: 0), successBlock: { (messages, paginator) in
-            self.insertMessages(messages, completion: {
-                completion(true)
-            })
+        //let queue = DispatchQueue(label: "com.brandon.chatrMessageQueue", qos: .utility)
 
-        }){ (error) in
-            print("eror getting messages: \(error.localizedDescription)")
-        }
+        //queue.async {
+            let extRequest : [String: String] = ["sort_desc" : "date_sent", "mark_as_read" : "0"]
+            Request.messages(withDialogID: dialogID, extendedRequest: extRequest, paginator: Paginator.limit(20, skip: 0), successBlock: { (messages, _) in
+                self.insertMessages(messages, completion: { })
+            }){ (error) in
+                print("eror getting messages: \(error.localizedDescription)")
+            }
+            completion(true)
+        //}
     }
     
     static func loadMoreMessages(dialogID: String, currentCount: Int, completion: @escaping (Bool) -> ()) {
         let extRequest : [String: String] = ["sort_desc" : "date_sent", "mark_as_read" : "0"]
-        Request.messages(withDialogID: dialogID, extendedRequest: extRequest, paginator: Paginator.limit(UInt(currentCount + 20), skip: 0), successBlock: { (messages, paginator) in
-            self.insertMessages(messages, completion: {
-                completion(true)
-            })
+        Request.messages(withDialogID: dialogID, extendedRequest: extRequest, paginator: Paginator.limit(UInt(currentCount + 20), skip: 0), successBlock: { (messages, _) in
+            self.insertMessages(messages, completion: { })
         }){ (error) in
             print("eror getting messages: \(error.localizedDescription)")
         }
+
+        completion(true)
     }
     
     static func insertMessages<T>(_ objects: [T], completion: @escaping () -> Void) where T: ChatMessage {
         objects.forEach({ (object) in
             let config = Realm.Configuration(schemaVersion: 1)
+
             do {
                 let realm = try Realm(configuration: config)
                 if realm.object(ofType: MessageStruct.self, forPrimaryKey: object.id ?? "") == nil {
@@ -158,7 +161,6 @@ class changeMessageRealmData {
                     if let attachments = object.attachments {
                         for attach in attachments {
                             //image/video attachment
-                            print("the pulled image type is: \(attach.type ?? "")")
                             if let uid = attach.id {
                                 let fileURL = Blob.privateUrl(forFileUID: uid)
                                 print("the file attachent private url is: \(String(describing: fileURL)) && the type22: \(attach.type ?? "")")

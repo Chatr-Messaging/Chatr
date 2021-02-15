@@ -143,12 +143,12 @@ struct KeyboardCardView: View {
             
             //MARK: Text Field & Send Btn
             HStack(alignment: .bottom, spacing: 5) {
-                Button(action: {
-                    
-                }) {
-                    Image
-                }
-                
+//                Button(action: {
+//                    
+//                }) {
+//                    Image
+//                }
+
                 ResizableTextField(height: self.$height, text: self.$mainText)
                     .environmentObject(self.auth)
                     .frame(height: self.height < 175 ? self.height : 175)

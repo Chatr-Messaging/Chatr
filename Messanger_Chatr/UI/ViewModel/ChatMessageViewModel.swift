@@ -12,6 +12,68 @@ import ConnectyCube
 import Firebase
 
 class ChatMessageViewModel: ObservableObject {
+    
+    func loadDialog(auth: AuthModel, dialogId: String) {
+        //DispatchQueue.global(qos: .utility).async {
+            changeMessageRealmData.getMessageUpdates(dialogID: dialogId, completion: { _ in })
+
+            Request.updateDialog(withID: dialogId, update: UpdateChatDialogParameters(), successBlock: { dialog in
+                auth.selectedConnectyDialog = dialog
+                dialog.sendUserStoppedTyping()
+
+                dialog.onUserIsTyping = { (userID: UInt) in
+                    if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
+                        changeMessageRealmData.addTypingMessage(userID: String(userID), dialogID: dialogId)
+                    }
+                }
+
+                dialog.onUserStoppedTyping = { (userID: UInt) in
+                    if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
+                        changeMessageRealmData.removeTypingMessage(userID: String(userID), dialogID: dialogId)
+                    }
+                }
+
+                if dialog.type == .group || dialog.type == .public {
+                    dialog.requestOnlineUsers(completionBlock: { (online, error) in
+                        print("The online count is!!: \(String(describing: online?.count))")
+                        auth.onlineCount = online?.count ?? 0
+                    })
+
+                    dialog.onUpdateOccupant = { (userID: UInt) in
+                        print("update occupant: \(userID)")
+                        auth.setOnlineCount()
+                    }
+
+                    dialog.onJoinOccupant = { (userID: UInt) in
+                        print("on join occupant: \(userID)")
+                        auth.setOnlineCount()
+                    }
+
+                    dialog.onLeaveOccupant = { (userID: UInt) in
+                        print("on leave occupant: \(userID)")
+                        auth.setOnlineCount()
+                    }
+
+                    if Chat.instance.isConnected || !Chat.instance.isConnecting {
+                        if !dialog.isJoined() {
+                            dialog.join(completionBlock: { error in
+                                print("we have joined the dialog!! \(String(describing: error))")
+                            })
+                        }
+                    } else {
+                        DispatchQueue.main.async {
+                            ChatrApp.connect()
+                            if !dialog.isJoined() {
+                                dialog.join(completionBlock: { error in
+                                    print("we have joined the dialog after atempt 2!! \(String(describing: error))")
+                                })
+                            }
+                        }
+                    }
+                }
+            })
+        //}
+    }
 
     func getUserAvatar(senderId: Int, compleation: @escaping (String) -> Void) {
         if senderId == UserDefaults.standard.integer(forKey: "currentUserID") {
@@ -58,7 +120,7 @@ class ChatMessageViewModel: ObservableObject {
 
                 completion(false)
             } else {
-                msg.updateChildValues([userId : "\(Date())"])
+                msg.updateChildValues(["\(userId)" : "\(Date())"])
                 
                 completion(true)
             }
