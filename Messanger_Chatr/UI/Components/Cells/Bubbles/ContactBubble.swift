@@ -38,18 +38,20 @@ struct ContactBubble: View {
                                 
                                 WebImage(url: URL(string: self.contact.avatar))
                                     .resizable()
-                                    .placeholder{ Image("empty-profile").resizable().frame(width: 45, height: 45, alignment: .bottom).scaledToFill() }
+                                    .placeholder{ Image("empty-profile").resizable().frame(width: 50, height: 50, alignment: .bottom).scaledToFill() }
                                     .indicator(.activity)
                                     .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                                     .scaledToFill()
                                     .clipShape(Circle())
-                                    .frame(width: 45, height: 45, alignment: .center)
+                                    .frame(width: 50, height: 50, alignment: .center)
+                                    .shadow(color: Color.black.opacity(0.25), radius: 6, x: 0, y: 4)
+
                             }
                             
                             VStack(alignment: .leading) {
                                 Text(self.contact.fullName)
-                                    .font(.headline)
-                                    .fontWeight(.semibold)
+                                    .font(.system(size: 18))
+                                    .fontWeight(.bold)
                                     .foregroundColor(.primary)
 
                                 Text(contact.isOnline ? "online now" : "last online \(contact.lastOnline.getElapsedInterval(lastMsg: "moments")) ago")
@@ -62,7 +64,7 @@ struct ContactBubble: View {
                             
                             if self.contactRelationship == .pendingRequestForYou {
                                 Button(action: {
-                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                     Chat.instance.confirmAddContactRequest(UInt(self.contact.id)) { (error) in
                                         print("accepted new contact:")
                                         self.contactRelationship = .contact

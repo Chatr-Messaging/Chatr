@@ -108,16 +108,18 @@ struct ChatMessagesView: View {
                             }
                         }
                     }
-                }.resignKeyboardOnDragGesture()
+                }//.resignKeyboardOnDragGesture()
                 .onAppear() {
-                    self.loadDialog()
                     DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 0.5) {
+                        self.loadDialog()
                         self.delayViewMessages = true
                     }
                 }
             }.frame(width: Constants.screenWidth)
             .contentShape(Rectangle())
             .onAppear() {
+                UIScrollView.appearance().keyboardDismissMode = .interactive
+
                 DispatchQueue.global(qos: .utility).async {
                     if !Session.current.tokenHasExpired {
                         Request.countOfMessages(forDialogID: self.dialogID, extendedRequest: ["sort_desc" : "lastMessageDate"], successBlock: { count in

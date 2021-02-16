@@ -199,6 +199,7 @@ struct mainHomeList: View {
                                         }
                                     }
                                 }.onAppear {
+                                    UIScrollView.appearance().keyboardDismissMode = .interactive
                                     NotificationCenter.default.addObserver(forName: NSNotification.Name("NotificationAlert"), object: nil, queue: .main) { (_) in
                                         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                                         self.receivedNotification.toggle()
@@ -477,10 +478,16 @@ struct mainHomeList: View {
                                 })
                             }
                             
-                            NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { (_) in
-                                withAnimation(.easeOut(duration: 0.2), {
-                                    self.keyboardHeight = 0
-                                })
+                            NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { (data) in
+                                let height2 = data.userInfo![UIResponder.keyboardFrameEndUserInfoKey] as! NSValue
+
+                                if height2.cgRectValue.height != 0 {
+                                    self.keyboardHeight = height2.cgRectValue.height - 10
+                                } else {
+                                    withAnimation(.easeOut(duration: 0.2), {
+                                        self.keyboardHeight = 0
+                                    })
+                                }
                             }
                         }
                         /*
