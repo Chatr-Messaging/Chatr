@@ -54,22 +54,22 @@ class ChatMessageViewModel: ObservableObject {
                         auth.setOnlineCount()
                     }
 
-                    if Chat.instance.isConnected || !Chat.instance.isConnecting {
-                        if !dialog.isJoined() {
-                            dialog.join(completionBlock: { error in
-                                print("we have joined the dialog!! \(String(describing: error))")
-                            })
-                        }
-                    } else {
-                        DispatchQueue.main.async {
-                            ChatrApp.connect()
-                            if !dialog.isJoined() {
-                                dialog.join(completionBlock: { error in
-                                    print("we have joined the dialog after atempt 2!! \(String(describing: error))")
-                                })
-                            }
-                        }
-                    }
+//                    if Chat.instance.isConnected || !Chat.instance.isConnecting {
+//                        if !dialog.isJoined() {
+//                            dialog.join(completionBlock: { error in
+//                                print("we have joined the dialog!! \(String(describing: error))")
+//                            })
+//                        }
+//                    } else {
+//                        DispatchQueue.main.async {
+//                            ChatrApp.connect()
+//                            if !dialog.isJoined() {
+//                                dialog.join(completionBlock: { error in
+//                                    print("we have joined the dialog after atempt 2!! \(String(describing: error))")
+//                                })
+//                            }
+//                        }
+//                    }
                 }
             })
         //}
@@ -138,6 +138,7 @@ class ChatMessageViewModel: ObservableObject {
     func trashMessage(connectyDialog: ChatDialog, messageId: String, completion: @escaping () -> Void) {
         connectyDialog.removeMessage(withID: messageId) { (error) in
             if error != nil {
+                print("the error deleting: \(String(describing: error?.localizedDescription))")
                 UINotificationFeedbackGenerator().notificationOccurred(.error)
             } else {
                 changeMessageRealmData.updateMessageState(messageID: messageId, messageState: .deleted)

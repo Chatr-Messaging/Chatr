@@ -104,7 +104,7 @@ class changeDialogRealmData {
                 paginator.skip += UInt(dialogs.count)
             }) { (error) in
                 print("Error in feteching dialogs... error: \(error.localizedDescription)")
-                ChatrApp.connect()
+                //ChatrApp.connect()
                 completion(false)
            }
             

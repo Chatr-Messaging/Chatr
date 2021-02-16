@@ -19,7 +19,7 @@ struct ContainerBubble: View {
     @Binding var newDialogFromSharedContact: Int
     @State var message: MessageStruct
     @State var messagePosition: messagePosition
-    @State var hasPrior: Bool = true
+    var hasPrior: Bool = true
     @State var subText: String = ""
     @State var avatar: String = ""
     
@@ -37,137 +37,122 @@ struct ContainerBubble: View {
         ZStack(alignment: self.messagePosition == .right ? .topTrailing : .topLeading) {
             ZStack(alignment: self.messagePosition == .right ? .bottomTrailing : .bottomLeading) {
                //MARK: Main content section:
-                if self.message.messageState == .deleted {
+                ZStack(alignment: self.messagePosition == .left ? .topTrailing : .topLeading) {
                     ZStack {
-                        Text("deleted")
-                            .multilineTextAlignment(.leading)
-                            .foregroundColor(.white)
-                            .padding(.vertical, 8)
-                            .lineLimit(nil)
-                    }.padding(.horizontal, 15)
-                    .background(Color("deadViewBG"))
-                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
-                    .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 8)
-                } else {
-                    ZStack(alignment: self.messagePosition == .left ? .topTrailing : .topLeading) {
-                        ZStack {
-                            VStack(spacing: 0) {
-                                if self.message.image != "" {
-                                    AttachmentBubble(viewModel: self.viewModel, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior)
-                                        .environmentObject(self.auth)
-                                    EmptyView()
-                                } else if self.message.imageType == "video" {
-                                    Text("Video here")
-                                } else if self.message.contactID != 0 {
-                                    //ContactBubble(viewModel: self.viewModel, chatContact: self.$newDialogFromSharedContact, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior)
-                                        //.environmentObject(self.auth)
-                                    EmptyView()
-                                } else if self.message.longitude != 0 && self.message.latitude != 0 {
-                                    LocationBubble(message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior)
-                                } else {
-                                    TextBubble(message: self.message, messagePosition: messagePosition)
-                                        .transition(.asymmetric(insertion: AnyTransition.scale.animation(.spring()), removal: AnyTransition.identity))
-                                }
-                            }
-                        }.padding(.bottom, self.hasPrior ? 0 : 15)
-                        .padding(.top, self.message.likedId.count != 0 || self.message.dislikedId.count != 0 ? 22 : 0)
-                        .scaleEffect(self.showInteractions ? 1.1 : 1.0)
-                        .onTapGesture(count: 2) {
-                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                            if self.messagePosition == .left && self.message.messageState != .deleted  {
-                                self.viewModel.likeMessage(from: self.auth.profile.results.last?.id ?? 0, messageId: self.message.id, dialogId: self.message.dialogID, completion: { like in
-                                    self.hasUserLiked = like
-                                })
-                            }
-                        }.gesture(DragGesture(minimumDistance: 0).onChanged(onChangedInteraction(value:)).onEnded(onEndedInteraction(value:)))
-                        .onChange(of: self.showInteractions) { _ in
-                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                        }.onAppear() {
-                            self.observeInteractions()
-                            if self.messagePosition == .right {
-                                self.reactions.append("edit")
-                                self.reactions.append("copy")
-                                self.reactions.append("trash")
+                        VStack(spacing: 0) {
+                            if self.message.image != "" {
+                                AttachmentBubble(viewModel: self.viewModel, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior)
+                                    .environmentObject(self.auth)
+                            } else if self.message.imageType == "video" {
+                                Text("Video here")
+                            } else if self.message.contactID != 0 {
+                                ContactBubble(viewModel: self.viewModel, chatContact: self.$newDialogFromSharedContact, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior)
+                                    .environmentObject(self.auth)
+                            } else if self.message.longitude != 0 && self.message.latitude != 0 {
+                                LocationBubble(message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior)
                             } else {
-                                self.reactions.append("like")
-                                self.reactions.append("dislike")
-                                self.reactions.append("reply")
-                                self.reactions.append("copy")
+                                TextBubble(message: self.message, messagePosition: messagePosition)
+                                    .transition(.asymmetric(insertion: AnyTransition.scale.animation(.spring()), removal: AnyTransition.identity))
                             }
-                        }.zIndex(self.showInteractions ? 1 : 0)
-                        
-                        //MARK: Interaction Lables / Buttons
-                        HStack(spacing: 5) {
-                            if self.message.dislikedId.count > 0 {
-                                Button(action: {
-                                    if self.messagePosition == .left {
-                                        UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                        self.viewModel.dislikeMessage(from: self.auth.profile.results.last?.id ?? 0, messageId: self.message.id, dialogId: self.message.dialogID, completion: { dislike in
-                                            self.hasUserDisliked = dislike
-                                        })
-                                    }
-                                }, label: {
-                                    HStack(spacing: self.message.dislikedId.count > 1 && self.hasUserDisliked ? 2 : 0) {
-                                        Image("dislike")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 22, height: 22, alignment: .center)
-                                            .offset(x: self.message.dislikedId.count == 0 ? 4 : 0)
-                                            .rotationEffect(Angle(degrees: self.dislikeBtnAnimation ? 0 : 45))
-
-                                        Text(self.message.dislikedId.count > 1 && self.hasUserDisliked ? "\(self.message.dislikedId.count)" : "")
-                                            .font(.subheadline)
-                                            .fontWeight(.bold)
-                                            .foregroundColor(.primary)
-                                            .padding(.horizontal, self.message.dislikedId.count > 1 ? 3 : 0)
-                                    }.padding(.horizontal, 10)
-                                    .padding(.vertical, 5)
-                                }).buttonStyle(interactionButtonStyle(isHighlighted: self.$hasUserDisliked, messagePosition: self.$messagePosition))
-                                .offset(x: self.messagePosition == .left ? 20 : -20, y: 2)
-                                .scaleEffect(self.dislikeBtnAnimation ? 1.0 : 0.15)
-                                .animation(.spring(response: 0.5, dampingFraction: 0.4, blendDuration: 0))
-                                .onAppear() {
-                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.5, blendDuration: 0)) { self.dislikeBtnAnimation = true }
-                                }.onDisappear() {
-                                    withAnimation(.easeIn(duration: 0.5)) { self.dislikeBtnAnimation = false }
+                        }
+                    }.padding(.bottom, self.hasPrior ? 0 : 15)
+                    .padding(.top, self.message.likedId.count != 0 || self.message.dislikedId.count != 0 ? 22 : 0)
+                    .scaleEffect(self.showInteractions ? 1.1 : 1.0)
+                    .onTapGesture(count: 2) {
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                        if self.messagePosition == .left && self.message.messageState != .deleted  {
+                            self.viewModel.likeMessage(from: self.auth.profile.results.last?.id ?? 0, messageId: self.message.id, dialogId: self.message.dialogID, completion: { like in
+                                self.hasUserLiked = like
+                            })
+                        }
+                    }.gesture(DragGesture(minimumDistance: 0).onChanged(onChangedInteraction(value:)).onEnded(onEndedInteraction(value:)))
+                    .onChange(of: self.showInteractions) { _ in
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                    }.onAppear() {
+                        self.observeInteractions()
+                        if self.messagePosition == .right {
+                            self.reactions.append("edit")
+                            self.reactions.append("copy")
+                            self.reactions.append("trash")
+                        } else {
+                            self.reactions.append("like")
+                            self.reactions.append("dislike")
+                            self.reactions.append("reply")
+                            self.reactions.append("copy")
+                        }
+                    }.zIndex(self.showInteractions ? 1 : 0)
+                    
+                    //MARK: Interaction Lables / Buttons
+                    HStack(spacing: 5) {
+                        if self.message.dislikedId.count > 0 {
+                            Button(action: {
+                                if self.messagePosition == .left {
+                                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                    self.viewModel.dislikeMessage(from: self.auth.profile.results.last?.id ?? 0, messageId: self.message.id, dialogId: self.message.dialogID, completion: { dislike in
+                                        self.hasUserDisliked = dislike
+                                    })
                                 }
+                            }, label: {
+                                HStack(spacing: self.message.dislikedId.count > 1 && self.hasUserDisliked ? 2 : 0) {
+                                    Image("dislike")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 22, height: 22, alignment: .center)
+                                        .offset(x: self.message.dislikedId.count == 0 ? 4 : 0)
+                                        .rotationEffect(Angle(degrees: self.dislikeBtnAnimation ? 0 : 45))
+
+                                    Text(self.message.dislikedId.count > 1 && self.hasUserDisliked ? "\(self.message.dislikedId.count)" : "")
+                                        .font(.subheadline)
+                                        .fontWeight(.bold)
+                                        .foregroundColor(.primary)
+                                        .padding(.horizontal, self.message.dislikedId.count > 1 ? 3 : 0)
+                                }.padding(.horizontal, 10)
+                                .padding(.vertical, 5)
+                            }).buttonStyle(interactionButtonStyle(isHighlighted: self.$hasUserDisliked, messagePosition: self.$messagePosition))
+                            .offset(x: self.messagePosition == .left ? 20 : -20, y: 2)
+                            .scaleEffect(self.dislikeBtnAnimation ? 1.0 : 0.15)
+                            .animation(.spring(response: 0.5, dampingFraction: 0.4, blendDuration: 0))
+                            .onAppear() {
+                                withAnimation(.spring(response: 0.5, dampingFraction: 0.5, blendDuration: 0)) { self.dislikeBtnAnimation = true }
+                            }.onDisappear() {
+                                withAnimation(.easeIn(duration: 0.5)) { self.dislikeBtnAnimation = false }
                             }
+                        }
 
-                            if self.message.likedId.count > 0 {
-                                Button(action: {
-                                    if self.messagePosition == .left {
-                                        UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                        self.viewModel.likeMessage(from: self.auth.profile.results.last?.id ?? 0, messageId: self.message.id, dialogId: self.message.dialogID, completion: { like in
-                                            self.hasUserLiked = like
-                                        })
-                                    }
-                                }, label: {
-                                    HStack(spacing: self.message.dislikedId.count > 1 && self.hasUserDisliked ? 2 : 0) {
-                                        Image("like")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 22, height: 22, alignment: .center)
-                                            .offset(x: self.message.likedId.count == 0 ? 4 : 0)
-                                            .rotationEffect(Angle(degrees: self.likeBtnAnimation ? 0 : 45))
-
-                                        Text(self.message.likedId.count > 1 && self.hasUserLiked ? "\(self.message.likedId.count)" : "")
-                                            .font(.subheadline)
-                                            .fontWeight(.bold)
-                                            .foregroundColor(.primary)
-                                            .padding(.horizontal, self.message.likedId.count > 1 ? 3 : 0)
-                                    }.padding(.horizontal, 10)
-                                    .padding(.vertical, 5)
-                                }).buttonStyle(interactionButtonStyle(isHighlighted: self.$hasUserLiked, messagePosition: self.$messagePosition))
-                                .offset(x: self.messagePosition == .left ? 20 : -20, y: 2)
-                                .scaleEffect(self.likeBtnAnimation ? 1.0 : 0.15)
-                                .onAppear() {
-                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.5, blendDuration: 0)) { self.likeBtnAnimation = true }
-                                }.onDisappear() {
-                                    withAnimation(.easeIn(duration: 0.5)) { self.likeBtnAnimation = false }
+                        if self.message.likedId.count > 0 {
+                            Button(action: {
+                                if self.messagePosition == .left {
+                                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                    self.viewModel.likeMessage(from: self.auth.profile.results.last?.id ?? 0, messageId: self.message.id, dialogId: self.message.dialogID, completion: { like in
+                                        self.hasUserLiked = like
+                                    })
                                 }
+                            }, label: {
+                                HStack(spacing: self.message.dislikedId.count > 1 && self.hasUserDisliked ? 2 : 0) {
+                                    Image("like")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 22, height: 22, alignment: .center)
+                                        .offset(x: self.message.likedId.count == 0 ? 4 : 0)
+                                        .rotationEffect(Angle(degrees: self.likeBtnAnimation ? 0 : 45))
+
+                                    Text(self.message.likedId.count > 1 && self.hasUserLiked ? "\(self.message.likedId.count)" : "")
+                                        .font(.subheadline)
+                                        .fontWeight(.bold)
+                                        .foregroundColor(.primary)
+                                        .padding(.horizontal, self.message.likedId.count > 1 ? 3 : 0)
+                                }.padding(.horizontal, 10)
+                                .padding(.vertical, 5)
+                            }).buttonStyle(interactionButtonStyle(isHighlighted: self.$hasUserLiked, messagePosition: self.$messagePosition))
+                            .offset(x: self.messagePosition == .left ? 20 : -20, y: 2)
+                            .scaleEffect(self.likeBtnAnimation ? 1.0 : 0.15)
+                            .onAppear() {
+                                withAnimation(.spring(response: 0.5, dampingFraction: 0.5, blendDuration: 0)) { self.likeBtnAnimation = true }
+                            }.onDisappear() {
+                                withAnimation(.easeIn(duration: 0.5)) { self.likeBtnAnimation = false }
                             }
-                        }.zIndex(self.showInteractions ? 2 : 0)
-                    }
+                        }
+                    }.zIndex(self.showInteractions ? 2 : 0)
                 }
                 
                 //MARK: Bottomm User Info / Message Status Section
@@ -195,9 +180,7 @@ struct ContainerBubble: View {
                     .offset(x: messagePosition == .right ? (Constants.smallAvitarSize / 2) : -(Constants.smallAvitarSize / 2))
                     .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 6)
                     .opacity(self.hasPrior && self.message.messageState != .error ? 0 : 1)
-            }.padding(.leading, self.messagePosition == .right ? 40 : 0)
-            .padding(.trailing, self.messagePosition == .left ? 40 : 0)
-            .actionSheet(isPresented: self.$deleteActionSheet) {
+            }.actionSheet(isPresented: self.$deleteActionSheet) {
                 ActionSheet(title: Text("Are you sure?"), message: Text("The message will be gone forever."), buttons: [
                     .default(Text("Select More")) {
                         print("select more btn...")
@@ -217,7 +200,7 @@ struct ContainerBubble: View {
             
             //MARK: Interactions Section
             if self.showInteractions {
-                ReactionsView(interactionSelected: $interactionSelected, reactions: $reactions)
+                ReactionsView(interactionSelected: $interactionSelected, reactions: $reactions, message: self.$message)
                     .transition(.asymmetric(insertion: AnyTransition.opacity.combined(with: .move(edge: .bottom)).animation(.spring()), removal: AnyTransition.opacity.combined(with: .move(edge: .bottom))))
                     .animation(.spring())
                     .offset(y: -65)
@@ -239,19 +222,24 @@ struct ContainerBubble: View {
     func onChangedInteraction(value: DragGesture.Value) {
         withAnimation(.easeIn) { showInteractions = true }
         withAnimation(Animation.linear(duration: 0.065)) {
-            let x = value.location.x
+            let y = value.translation.width
             
-            if self.messagePosition == .left {
-                if x > 20 && x < 70 { interactionSelected = reactions[0] }
-                if x > 70 && x < 120 { interactionSelected = reactions[1] }
-                if x > 120 && x < 170 { interactionSelected = reactions[2] }
-                if x > 170 && x < 230 && reactions.count >= 4 { interactionSelected = reactions[3] }
-                if x < 20 || x > 230 { interactionSelected = "" }
+            if message.messageState != .error {
+                if self.messagePosition == .left {
+                    if y > 10 && y < 60 { interactionSelected = reactions[0] }
+                    if y > 60 && y < 110 { interactionSelected = reactions[1] }
+                    if y > 110 && y < 160 { interactionSelected = reactions[2] }
+                    if y > 160 && y < 210 && reactions.count >= 4 { interactionSelected = reactions[3] }
+                    if y < 10 || y > 210 { interactionSelected = "" }
+                } else {
+                    if y > -160 && y < -110 { interactionSelected = reactions[0] }
+                    if y > -110 && y < -60 { interactionSelected = reactions[1] }
+                    if y > -60 && y < -10 { interactionSelected = reactions[2] }
+                    if y < -160 || y > -10 { interactionSelected = "" }
+                }
             } else {
-                if x > -70 && x < 0 { interactionSelected = reactions[0] }
-                if x > 0 && x < 65 { interactionSelected = reactions[1] }
-                if x > 65 && x < 100 { interactionSelected = reactions[2] }
-                if x < -70 || x > 100 { interactionSelected = "" }
+                if y > -150 && y < -10 { interactionSelected = "try again" }
+                if y < -150 || y > -10 { interactionSelected = "" }
             }
         }
     }
@@ -262,14 +250,14 @@ struct ContainerBubble: View {
         if interactionSelected == "like" {
             UINotificationFeedbackGenerator().notificationOccurred(.success)
             self.viewModel.likeMessage(from: self.auth.profile.results.last?.id ?? 0, messageId: self.message.id, dialogId: self.message.dialogID, completion: { like in
-                withAnimation {
+                withAnimation(Animation.easeOut(duration: 0.5).delay(0.8)) {
                     self.hasUserLiked = like
                 }
             })
         } else if interactionSelected == "dislike" {
             UINotificationFeedbackGenerator().notificationOccurred(.success)
             self.viewModel.dislikeMessage(from: self.auth.profile.results.last?.id ?? 0, messageId: self.message.id, dialogId: self.message.dialogID, completion: { dislike in
-                withAnimation {
+                withAnimation(Animation.easeOut(duration: 0.5).delay(0.8)) {
                     self.hasUserDisliked = dislike
                 } 
             })
@@ -284,6 +272,9 @@ struct ContainerBubble: View {
         } else if interactionSelected == "trash" {
             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
             self.deleteActionSheet.toggle()
+        } else if interactionSelected == "try again" {
+            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+            self.tryAgain()
         }
     }
     
@@ -293,6 +284,10 @@ struct ContainerBubble: View {
         
         auth.notificationtext = "Successfully copied message"
         NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+    }
+
+    func tryAgain() {
+        print("try again action")
     }
 
     func observeInteractions() {

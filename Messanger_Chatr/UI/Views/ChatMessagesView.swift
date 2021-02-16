@@ -28,105 +28,104 @@ struct ChatMessagesView: View {
     var body: some View {
         let currentMessages = self.auth.messages.selectedDialog(dialogID: self.dialogID)
         //let currentMessages = self.auth.dialogs.results.filter("id == %@", self.dialogID).sorted(byKeyPath: "lastMessageDate", ascending: false)
-        
-        ScrollView(.vertical, showsIndicators: false) {
-            LazyVStack() {
-                //No Messages found:
-                Text(self.mesgCount == 0 ? "no messages found" : self.mesgCount == -1 ? "loading messages..." : "")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .frame(width: Constants.screenWidth)
-                    .padding(.all, self.mesgCount >= 1 && self.delayViewMessages ? 0 : 20)
-                    .offset(y: self.mesgCount >= 1 && self.delayViewMessages ? 0 : 40)
-                    .opacity(self.mesgCount >= 1 && self.delayViewMessages ? 0 : 1)
-                
-                //CUSTOM MESSAGE BUBBLE:
-                if self.delayViewMessages {
-                    ScrollViewReader { reader in
-                        VStack {
-                            ForEach(currentMessages.indices, id: \.self) { message in
-                                let messagePosition: messagePosition = UInt(currentMessages[message].senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? .right : .left
-                                let notLast = currentMessages[message] != currentMessages.last
-                                let topMsg = currentMessages[message] == currentMessages.first
+        if UserDefaults.standard.bool(forKey: "localOpen") {
+            ScrollView(.vertical, showsIndicators: false) {
+                LazyVStack() {
+                    //No Messages found:
+                    Text(self.mesgCount == 0 ? "no messages found" : self.mesgCount == -1 ? "loading messages..." : "")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .frame(width: Constants.screenWidth)
+                        .padding(.all, self.mesgCount >= 1 && self.delayViewMessages ? 0 : 20)
+                        .offset(y: self.mesgCount >= 1 && self.delayViewMessages ? 0 : 40)
+                        .opacity(self.mesgCount >= 1 && self.delayViewMessages ? 0 : 1)
+                    
+                    //CUSTOM MESSAGE BUBBLE:
+                    if self.delayViewMessages {
+                        ScrollViewReader { reader in
+                            VStack {
+                                ForEach(currentMessages.indices, id: \.self) { message in
+                                    let messagePosition: messagePosition = UInt(currentMessages[message].senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? .right : .left
+                                    let notLast = currentMessages[message] != currentMessages.last
+                                    let topMsg = currentMessages[message] == currentMessages.first
 
-                                if topMsg && currentMessages.count > 20 {
-                                    Button(action: {
-                                        self.firstScroll = false
-                                        changeMessageRealmData.loadMoreMessages(dialogID: currentMessages[message].dialogID, currentCount: currentMessages.count, completion: { _ in
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
-                                                withAnimation {
-                                                    reader.scrollTo(currentMessages[message + 20].id, anchor: .top)
+                                    if topMsg && currentMessages.count > 20 {
+                                        Button(action: {
+                                            self.firstScroll = false
+                                            changeMessageRealmData.loadMoreMessages(dialogID: currentMessages[message].dialogID, currentCount: currentMessages.count, completion: { _ in
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                                                    withAnimation {
+                                                        reader.scrollTo(currentMessages[message + 20].id, anchor: .top)
+                                                    }
                                                 }
-                                            }
-                                        })
-                                    }, label: {
-                                        Text("Load More...")
-                                            .foregroundColor(.blue)
-                                    }).padding(.top)
-                                }
+                                            })
+                                        }, label: {
+                                            Text("Load More...")
+                                                .foregroundColor(.blue)
+                                        }).padding(.top)
+                                    }
 
-                                VStack(spacing: 0) {
-                                    HStack() {
-                                        if messagePosition == .right { Spacer() }
+                                    VStack(spacing: 0) {
+                                        HStack() {
+                                            if messagePosition == .right { Spacer() }
 
-                                        ContainerBubble(viewModel: self.viewModel, newDialogFromSharedContact: self.$newDialogFromSharedContact, message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
-                                            .environmentObject(self.auth)
-                                            .contentShape(Rectangle())
-                                            .animation(.spring(response: 0.58, dampingFraction: 0.55, blendDuration: 0))
-                                            .transition(AnyTransition.scale)
+                                            ContainerBubble(viewModel: self.viewModel, newDialogFromSharedContact: self.$newDialogFromSharedContact, message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
+                                                .transition(AnyTransition.scale)
+                                                .environmentObject(self.auth)
+                                                .contentShape(Rectangle())
+                                                .animation(.spring(response: 0.58, dampingFraction: 0.6, blendDuration: 0))
+                                                .padding(.horizontal, 25)
 
-                                        if messagePosition == .left { Spacer() }
-                                    }.frame(width: Constants.screenWidth - 50)
-                                    .background(Color.clear)
-                                    .padding(.horizontal, 25)
-                                    .padding(.top, topMsg && currentMessages.count < 20 ? 20 : 0)
-                                    .padding(.bottom, self.hasPrevious(index: message) ? -6 : 10)
-                                    .padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 95 : 0) + 20)
-                                    .id(currentMessages[message].id)
-                                }.opacity(self.firstScroll ? 0 : 1)
-                                .onAppear {
-                                    if !notLast {
-                                        if self.firstScroll {
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
-                                                reader.scrollTo(currentMessages[message].id, anchor: .bottom)
-                                                self.firstScroll = false
-                                            }
-                                        } else {
-                                            withAnimation(.linear(duration: 0.6)) {
-                                                reader.scrollTo(currentMessages[message].id, anchor: .bottom)
+                                            if messagePosition == .left { Spacer() }
+                                        }.frame(width: Constants.screenWidth)
+                                        .background(Color.clear)
+                                        .padding(.top, topMsg && currentMessages.count < 20 ? 20 : 0)
+                                        .padding(.bottom, self.hasPrevious(index: message) ? -6 : 10)
+                                        .padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 95 : 0) + 20)
+                                        .id(currentMessages[message].id)
+                                    }.opacity(self.firstScroll ? 0 : 1)
+                                    .onAppear {
+                                        if !notLast {
+                                            if self.firstScroll {
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                                    reader.scrollTo(currentMessages[message].id, anchor: .bottom)
+                                                    self.firstScroll = false
+                                                }
+                                            } else {
+                                                withAnimation(Animation.easeOut(duration: 0.6).delay(0.2)) {
+                                                    reader.scrollTo(currentMessages[message].id, anchor: .bottom)
+                                                }
                                             }
                                         }
                                     }
-                                }
-                            }.contentShape(Rectangle())
-                        }.onChange(of: self.keyboardChange) { value in
-                            if value > 0 {
-                                withAnimation {
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                }.contentShape(Rectangle())
+                            }.onChange(of: self.keyboardChange) { value in
+                                if value > 0 {
+                                    withAnimation(Animation.easeOut(duration: 0.5)) {
                                         reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
                                     }
                                 }
                             }
                         }
                     }
+                }.resignKeyboardOnDragGesture()
+                .onAppear() {
+                    self.loadDialog()
+                    DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 0.5) {
+                        self.delayViewMessages = true
+                    }
                 }
-            }//.resignKeyboardOnDragGesture()
+            }.frame(width: Constants.screenWidth)
+            .contentShape(Rectangle())
             .onAppear() {
-                self.loadDialog()
-                DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 0.5) {
-                    self.delayViewMessages = true
-                }
-            }
-        }.frame(width: Constants.screenWidth)
-        .contentShape(Rectangle())
-        .onAppear() {
-            DispatchQueue.global(qos: .utility).async {
-                if !Session.current.tokenHasExpired {
-                    Request.countOfMessages(forDialogID: self.dialogID, extendedRequest: ["sort_desc" : "lastMessageDate"], successBlock: { count in
-                        DispatchQueue.main.async {
-                            self.mesgCount = Int(count)
-                        }
-                    })
+                DispatchQueue.global(qos: .utility).async {
+                    if !Session.current.tokenHasExpired {
+                        Request.countOfMessages(forDialogID: self.dialogID, extendedRequest: ["sort_desc" : "lastMessageDate"], successBlock: { count in
+                            DispatchQueue.main.async {
+                                self.mesgCount = Int(count)
+                            }
+                        })
+                    }
                 }
             }
         }
@@ -183,8 +182,7 @@ struct ChatMessagesView: View {
                             })
                         }
                     } else {
-                        DispatchQueue.main.async {
-                            ChatrApp.connect()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                             if !dialog.isJoined() {
                                 dialog.join(completionBlock: { error in
                                     print("we have joined the dialog after atempt 2!! \(String(describing: error))")

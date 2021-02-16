@@ -50,7 +50,7 @@ struct LinkColoredText: View {
                         .underline()
                 }
             }.reduce(Text(""), +)
-        }.foregroundColor(self.messageRight ? .white : .primary)
+        }.foregroundColor(self.messageState != .error ? (self.messageRight ? .white : .primary) : .red)
         .padding(.horizontal, 15)
         .padding(.vertical, 10)
         .transition(AnyTransition.scale)

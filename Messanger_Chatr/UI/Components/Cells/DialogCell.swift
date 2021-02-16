@@ -124,9 +124,11 @@ struct DialogCell: View {
                                         changeDialogRealmData().updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
                                     }
                                 }.sheet(isPresented: self.$openGroupProfile, content: {
-                                    VisitGroupChannelView(dismissView: self.$openGroupProfile, openNewDialogID: self.$openNewDialogID, groupOccUserAvatar: self.groupOccUserAvatar, fromDialogCell: true, viewState: .fromContacts, dialogRelationship: .subscribed, dialogModel: self.dialogModel)
-                                        .environmentObject(self.auth)
-                                        .edgesIgnoringSafeArea(.all)
+                                    NavigationView {
+                                        VisitGroupChannelView(dismissView: self.$openGroupProfile, openNewDialogID: self.$openNewDialogID, groupOccUserAvatar: self.groupOccUserAvatar, fromDialogCell: true, viewState: .fromContacts, dialogRelationship: .subscribed, dialogModel: self.dialogModel)
+                                            .environmentObject(self.auth)
+                                            .edgesIgnoringSafeArea(.all)
+                                    }
                                 })
                             }
                         }

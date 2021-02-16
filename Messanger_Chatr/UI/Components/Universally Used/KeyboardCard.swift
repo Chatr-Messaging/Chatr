@@ -146,7 +146,7 @@ struct KeyboardCardView: View {
             HStack(alignment: .bottom, spacing: 5) {
                 Button(action: {
                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                    withAnimation(.easeInOut(duration: 0.35) , {
+                    withAnimation(Animation.easeInOut(duration: 0.3), {
                         self.isKeyboardActionOpen.toggle()
                     })
                 }) {
@@ -154,7 +154,7 @@ struct KeyboardCardView: View {
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 25, height: 25, alignment: .center)
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .padding(8)
                 }.buttonStyle(changeBGButtonStyle())
                 .cornerRadius(12)
@@ -476,6 +476,7 @@ struct ResizableTextField : UIViewRepresentable {
         view.isEditable = true
         view.isScrollEnabled = true
         view.text = self.text
+        view.keyboardDismissMode = .interactive
         view.font = .systemFont(ofSize: 18)
         view.textColor = UIColor(named: "textColor")
         view.backgroundColor = .clear

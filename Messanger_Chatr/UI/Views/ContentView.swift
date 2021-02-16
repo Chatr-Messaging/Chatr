@@ -60,27 +60,23 @@ struct HomeView: View {
             case .signedIn:
                 if !self.auth.preventDismissal {
                     Text("")
-                        .onAppear(perform: {
-                            DispatchQueue.main.async {
-                                ChatrApp.connect()
-                            }
-                            
-                            if self.auth.profile.results.first?.isLocalAuthOn ?? false {
-                                self.auth.isLoacalAuth = true
-                                let context = LAContext()
-                                var error: NSError?
-
-                                if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
-                                    let reason = "Identify yourself!"
-
-                                    context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, authenticationError in
-                                        if success {
-                                            self.auth.isLoacalAuth = false
-                                        }
-                                    }
-                                }
-                            } else { self.auth.isLoacalAuth = false }
-                        })
+//                        .onAppear(perform: {
+//                            if self.auth.profile.results.first?.isLocalAuthOn ?? false {
+//                                self.auth.isLoacalAuth = true
+//                                let context = LAContext()
+//                                var error: NSError?
+//
+//                                if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
+//                                    let reason = "Identify yourself!"
+//
+//                                    context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, authenticationError in
+//                                        if success {
+//                                            self.auth.isLoacalAuth = false
+//                                        }
+//                                    }
+//                                }
+//                            } else { self.auth.isLoacalAuth = false }
+//                        })
                         .onDisappear(perform: {
                             self.auth.haveUserFullName = false
                             self.auth.haveUserProfileImg = false
@@ -134,9 +130,6 @@ struct HomeView: View {
         .onOpenURL { url in
             let link = url.absoluteString
             print("opened from URL!! :D \(link)")
-        }
-        .onAppear {
-            self.auth.configureFirebaseStateDidChange()
         }
     }
 }
@@ -255,8 +248,8 @@ struct mainHomeList: View {
                         GeometryReader { geometry in
                             ZStack(alignment: .top) {
                                 BlurView(style: .systemUltraThinMaterial)
-                                    //.allowsHitTesting(!UserDefaults.standard.bool(forKey: "localOpen") ? false : true)
-                                    //.simultaneousGesture(DragGesture(minimumDistance: self.isLocalOpen ? 0 : 500))
+                                    .allowsHitTesting(!UserDefaults.standard.bool(forKey: "localOpen") ? false : true)
+                                    .simultaneousGesture(DragGesture(minimumDistance: self.isLocalOpen ? 0 : 500))
                                     .frame(width: Constants.screenWidth, height: Constants.screenHeight, alignment: .center)
                                     .offset(y: self.isLocalOpen ? -geometry.frame(in: .global).minY : -35)
                                     .opacity(self.isLocalOpen ? Double((275 - self.activeView.height) / 150) : 0)
@@ -271,14 +264,13 @@ struct mainHomeList: View {
                                     .opacity(self.isLocalOpen ? Double((275 - self.activeView.height) / 150) : 0)
                                     .animation(.spring(response: 0.45, dampingFraction: self.isLocalOpen ? 0.65 : 0.75, blendDuration: 0))
                                     .allowsHitTesting(!UserDefaults.standard.bool(forKey: "localOpen") ? false : true)
-                                //.simultaneousGesture(DragGesture(minimumDistance: self.isLocalOpen ? 0 : 500))
+                                    .simultaneousGesture(DragGesture(minimumDistance: self.isLocalOpen ? 0 : 500))
                                 
                                 QuickSnapsSection(viewState: self.$quickSnapViewState, selectedQuickSnapContact: self.$selectedQuickSnapContact, emptyQuickSnaps: self.$emptyQuickSnaps, isLocalOpen: self.$isLocalOpen)
                                     .environmentObject(self.auth)
                                     .frame(width: Constants.screenWidth)
                                     .offset(y: self.isLocalOpen ? -geometry.frame(in: .global).minY - (UIDevice.current.hasNotch ? -50 : 5) : 0)
                                     .offset(y: self.isLocalOpen ? self.activeView.height / 1.5 : 0)
-                                    //.scaleEffect(self.isLocalOpen ? ((self.activeView.height / 150) * 22.5) / 150 + 0.85 : 1.0)
                                     .animation(.spring(response: 0.45, dampingFraction: self.isLocalOpen ? 0.65 : 0.75, blendDuration: 0))
                                     .padding(.vertical, self.emptyQuickSnaps ? 0 : 20)
                             }
@@ -331,31 +323,7 @@ struct mainHomeList: View {
                                 .animation(.spring(response: 0.4, dampingFraction: 0.8, blendDuration: 0))
                                 .resignKeyboardOnDragGesture()
                         }
-                        
-                        //MARK: Chat Messages View
-                        if UserDefaults.standard.bool(forKey: "localOpen") {
-                            GeometryReader { geo in
-                                ChatMessagesView(activeView: self.$activeView, keyboardChange: self.$keyboardHeight, dialogID: self.$selectedDialogID, textFieldHeight: self.$textFieldHeight, keyboardDragState: self.$keyboardDragState, hasAttachment: self.$hasAttachments, newDialogFromSharedContact: self.$newDialogFromSharedContact)
-                                    .environmentObject(self.auth)
-                                    .frame(width: Constants.screenWidth, height: Constants.screenHeight - (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 125 : 89) : 199), alignment: .bottom)
-                                    .zIndex(1)
-                                    .contentShape(Rectangle())
-                                    .offset(y: -geo.frame(in: .global).minY + (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 125 : 89) : 184))
-                                    .padding(.bottom, self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 125 : 89) : 184)
-                                    .offset(y: self.activeView.height) // + (self.emptyQuickSnaps ? 25 : 197))
-                                    .animation(.spring(response: 0.35, dampingFraction: 0.8, blendDuration: 0))
-                                    .simultaneousGesture(DragGesture(minimumDistance: UserDefaults.standard.bool(forKey: "localOpen") ? 800 : 0))
-                                    .layoutPriority(1)
-                                    .onDisappear {
-                                        guard let dialog = self.auth.selectedConnectyDialog, dialog.isJoined() else {
-                                            return
-                                        }
-                                        
-                                        self.auth.leaveDialog()
-                                    }
-                            }
-                        }
-                        
+                                                
                         //MARK: Dialogs Section
                         if self.dialogs.results.filter { $0.isDeleted != true }.count == 0 {
                             VStack {
@@ -456,7 +424,29 @@ struct mainHomeList: View {
                                 .opacity(self.isLocalOpen ? 0 : 1)
                         }
                     }
-                }.slideOverCard(isPresented: $showWelcomeNewUser, onDismiss: {
+                }.overlay(
+                    //MARK: Chat Messages View                    
+                    GeometryReader { geo in
+                        ChatMessagesView(activeView: self.$activeView, keyboardChange: self.$keyboardHeight, dialogID: self.$selectedDialogID, textFieldHeight: self.$textFieldHeight, keyboardDragState: self.$keyboardDragState, hasAttachment: self.$hasAttachments, newDialogFromSharedContact: self.$newDialogFromSharedContact)
+                            .environmentObject(self.auth)
+                            .frame(width: Constants.screenWidth, height: Constants.screenHeight - (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 125 : 89) : 199), alignment: .bottom)
+                            .zIndex(1)
+                            .contentShape(Rectangle())
+                            .offset(y: -geo.frame(in: .global).minY + (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 125 : 89) : 184))
+                            .padding(.bottom, self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 125 : 89) : 184)
+                            .offset(y: self.activeView.height) // + (self.emptyQuickSnaps ? 25 : 197))
+                            .simultaneousGesture(DragGesture(minimumDistance: UserDefaults.standard.bool(forKey: "localOpen") ? 800 : 0))
+                            .layoutPriority(1)
+                            .onDisappear {
+                                guard let dialog = self.auth.selectedConnectyDialog, dialog.isJoined() else {
+                                    return
+                                }
+                                
+                                self.auth.leaveDialog()
+                            }
+                    }
+                )
+                .slideOverCard(isPresented: $showWelcomeNewUser, onDismiss: {
                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                 }) {
                     EarlyAdopterView(counter: self.$counter)
@@ -482,13 +472,13 @@ struct mainHomeList: View {
                             self.selectedDialogID = UserDefaults.standard.string(forKey: "selectedDialogID") ?? ""
                             NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { (data) in
                                 let height1 = data.userInfo![UIResponder.keyboardFrameEndUserInfoKey] as! NSValue
-                                withAnimation(.easeOut(duration: 0.65), {
-                                    self.keyboardHeight = height1.cgRectValue.height - 20
+                                withAnimation(.easeOut(duration: 0.3), {
+                                    self.keyboardHeight = height1.cgRectValue.height - 10
                                 })
                             }
                             
                             NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { (_) in
-                                withAnimation(.easeOut(duration: 0.65), {
+                                withAnimation(.easeOut(duration: 0.2), {
                                     self.keyboardHeight = 0
                                 })
                             }

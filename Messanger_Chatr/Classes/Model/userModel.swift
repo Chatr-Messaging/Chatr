@@ -28,6 +28,8 @@ class Users: NSObject {
                         UserDefaults.standard.set(Session.current.currentUserID, forKey: "currentUserID")
                         changeProfileRealmDate().updateProfile(userPulled, completion: {
                             changeProfileRealmDate().observeFirebaseUser()
+                            ChatrApp.chatInstanceConnect(id: Session.current.currentUserID)
+
                             completion()
                         })
                     }, errorBlock: { error in

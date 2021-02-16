@@ -73,9 +73,9 @@ class MessagesRealmModel<Element>: ObservableObject where Element: RealmSwift.Re
     
     func selectedDialog(dialogID: String) -> Results<Element> {
         if dialogID == "" {
-            return results.sorted(byKeyPath: "date", ascending: true)
+            return results.filter("status != %@", messageStatus.deleted.rawValue).sorted(byKeyPath: "date", ascending: true)
         } else {
-            return results.filter("dialogID == %@", dialogID).filter("status != %@", messageStatus.removedTyping.rawValue).sorted(byKeyPath: "date", ascending: true)
+            return results.filter("dialogID == %@", dialogID).filter("status != %@", messageStatus.removedTyping.rawValue).filter("status != %@", messageStatus.deleted.rawValue).sorted(byKeyPath: "date", ascending: true)
         }
     }
 }

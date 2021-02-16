@@ -101,6 +101,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Use this method to undo the changes made on entering the background.
 
         print("scene will enter forground \(Thread.isMainThread)")
+        self.environment.configureFirebaseStateDidChange()
         if self.environment.isUserAuthenticated == .signedIn {
             ChatrApp.connect()
             self.sendLocalAuth()

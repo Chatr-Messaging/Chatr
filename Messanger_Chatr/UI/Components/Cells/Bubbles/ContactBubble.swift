@@ -18,32 +18,12 @@ struct ContactBubble: View {
     @State var showContact: Bool = false
     var message: MessageStruct
     @State var messagePosition: messagePosition
-    @State var subText: String = ""
     var hasPrior: Bool = false
-    @State var avatar: String = ""
     @State var contact: ContactStruct = ContactStruct()
     @State var contactRelationship: visitContactRelationship = .unknown
     
     var body: some View {
-        ZStack(alignment: self.messagePosition == .right ? .bottomTrailing : .bottomLeading) {
-            if self.message.messageState == .deleted {
-                ZStack {
-                    Text("deleted")
-                        .multilineTextAlignment(.leading)
-                        .foregroundColor(self.message.messageState != .deleted ? messagePosition == .right ? .white : .primary : .secondary)
-                        .padding(.vertical, 8)
-                        .lineLimit(nil)
-                }.padding(.horizontal, 15)
-                .background(self.messagePosition == .right && self.message.messageState != .deleted ? LinearGradient(
-                    gradient: Gradient(colors: [Color(red: 46 / 255, green: 168 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)]),
-                    startPoint: .top, endPoint: .bottom) : LinearGradient(
-                        gradient: Gradient(colors: [Color("buttonColor"), Color("buttonColor_darker")]), startPoint: .top, endPoint: .bottom))
-                .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
-                .contentShape(RoundedRectangle(cornerRadius: 20, style: .circular))
-                .shadow(color: self.messagePosition == .right && self.message.messageState != .deleted ? Color.blue.opacity(0.2) : Color.black.opacity(0.15), radius: 10, x: 0, y: 10)
-                
-            }
-            
+        ZStack() {
             if self.message.messageState != .deleted {
                 HStack {
                     Button(action: {
@@ -71,9 +51,9 @@ struct ContactBubble: View {
                                     .font(.headline)
                                     .fontWeight(.semibold)
                                     .foregroundColor(.primary)
-                                
-                                Text(self.contact.phoneNumber.format(phoneNumber: String(self.contact.phoneNumber.dropFirst())))
-                                    .font(.subheadline)
+
+                                Text(contact.isOnline ? "online now" : "last online \(contact.lastOnline.getElapsedInterval(lastMsg: "moments")) ago")
+                                    .font(.caption)
                                     .fontWeight(.regular)
                                     .lineLimit(1)
                                     .foregroundColor(.secondary)
@@ -166,12 +146,13 @@ struct ContactBubble: View {
                                 .font(Font.title.weight(.bold))
                                 .foregroundColor(.secondary)
                                 .frame(width: 7, height: 10, alignment: .center)
-                        }.frame(width: Constants.screenWidth * 0.7, height: 70)
+                        }.frame(width: Constants.screenWidth * 0.6, height: 70)
                         .padding(.horizontal)
                         //.clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
                         //.contentShape(RoundedRectangle(cornerRadius: 20, style: .circular))
                     }).buttonStyle(highlightedButtonStyle())
                     .shadow(color: Color.black.opacity(0.15), radius: 12, x: 0, y: 14)
+                    .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.5) : Color.clear, lineWidth: 2.5))
                     .sheet(isPresented: self.$showContact, onDismiss: {
                         if self.chatContact != 0 && self.chatContact != self.message.senderID {
                            print("need to open Chat view!!")
@@ -183,53 +164,7 @@ struct ContactBubble: View {
                                 .edgesIgnoringSafeArea(.all)
                         }
                     }
-                    .contextMenu {
-                        VStack {
-                            if messagePosition == .right {
-                                if self.message.messageState != .deleted {
-                                    Button(action: {
-                                        self.auth.selectedConnectyDialog?.removeMessage(withID: self.message.id) { (error) in
-                                            if error != nil {
-                                                UINotificationFeedbackGenerator().notificationOccurred(.error)
-                                            } else {
-                                                changeMessageRealmData.updateMessageState(messageID: self.message.id, messageState: .deleted)
-                                            }
-                                        }
-                                    }) { HStack {
-                                        Image(systemName: "trash")
-                                        Text("Delete")
-                                            .foregroundColor(.red) }
-                                    }
-                                }
-                                Button(action: {
-                                    print("Edit Message")
-                                }) { HStack {
-                                    Image(systemName: "pencil")
-                                    Text("Edit") }
-                                }
-                            }
-                            Button(action: {
-                                print("Share Message")
-                            }) { HStack {
-                                Image(systemName: "arrowshape.turn.up.left")
-                                Text("Share") }
-                            }
-                            Button(action: {
-                                print("Copy Message")
-                            }) { HStack {
-                                Image(systemName: "doc.on.doc")
-                                Text("Copy Text") }
-                            }
-    //                            Button(action: {
-    //                                print("Like Message")
-    //                            }) { HStack {
-    //                                Image(systemName: "heart")
-    //                                Text("Like") }
-    //                            }
-                        }
-                    }
-                }.padding(.bottom, self.hasPrior ? 0 : 15)
-                .onAppear() {
+                }.onAppear() {
                     let config = Realm.Configuration(schemaVersion: 1)
                     do {
                         let realm = try Realm(configuration: config)
@@ -280,53 +215,6 @@ struct ContactBubble: View {
                     }
                 }
             }
-            
-            HStack {
-                if messagePosition == .right { Spacer() }
-                
-                Text(self.subText.messageStatusText(message: self.message, positionRight: messagePosition == .right))
-                    .foregroundColor(self.message.messageState == .error ? .red : .gray)
-                    .font(.caption)
-                    .lineLimit(1)
-                    .padding(.horizontal)
-                    .multilineTextAlignment(messagePosition == .right ? .trailing : .leading)
-                    .opacity(self.hasPrior && self.message.messageState != .error ? 0 : 1)
-                
-                if messagePosition == .left { Spacer() }
-            }
-            
-            WebImage(url: URL(string: self.avatar))
-                .resizable()
-                .placeholder{ Image("empty-profile").resizable().frame(width: self.hasPrior ? 0 : Constants.smallAvitarSize, height: self.hasPrior ? 0 : Constants.smallAvitarSize, alignment: .bottom).scaledToFill() }
-                .indicator(.activity)
-                .scaledToFill()
-                .clipShape(Circle())
-                .frame(width: self.hasPrior ? 0 : Constants.smallAvitarSize, height: self.hasPrior ? 0 : Constants.smallAvitarSize, alignment: .bottom)
-                .offset(x: messagePosition == .right ? (Constants.smallAvitarSize / 2) : -(Constants.smallAvitarSize / 2))
-                .opacity(self.hasPrior ? 0 : 1)
-                .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 6)
-        }.onAppear() {
-            if self.message.senderID == UserDefaults.standard.integer(forKey: "currentUserID") {
-                //get profile image
-                self.avatar = ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.avatar ?? ""
-            } else {
-                let config = Realm.Configuration(schemaVersion: 1)
-                do {
-                    let realm = try Realm(configuration: config)
-                    if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: self.message.senderID) {
-                        self.avatar = foundContact.avatar
-                    } else {
-                        Request.users(withIDs: [NSNumber(value: self.message.senderID)], paginator: Paginator.limit(1, skip: 0), successBlock: { (paginator, users) in
-                            self.avatar = PersistenceManager().getCubeProfileImage(usersID: users.first!) ?? ""
-                        })
-                    }
-                } catch {
-                    
-                }
-            }
-            
-            
-            
         }
     }
 }

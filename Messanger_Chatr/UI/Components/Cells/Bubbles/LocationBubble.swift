@@ -44,14 +44,14 @@ struct LocationBubble: View {
                     .padding(.bottom, self.hasPrior ? 0 : 15)
                     .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 10)
                     .animation(nil)
-                    //.disabled(!self.isOpen ? true : false)
                     .onAppear() {
                         self.region.center.latitude = self.message.latitude
                         self.region.center.longitude = self.message.longitude
                     }
                 }.buttonStyle(ClickMiniButtonStyle())
+                .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.5) : Color.clear, lineWidth: 5))
             }
-        }
+        }.simultaneousGesture(DragGesture(minimumDistance: self.isOpen ? 0 : 500))
     }
     
     func openMapForPlace() {
