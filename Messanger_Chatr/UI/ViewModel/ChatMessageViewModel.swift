@@ -15,7 +15,7 @@ class ChatMessageViewModel: ObservableObject {
     
     func loadDialog(auth: AuthModel, dialogId: String) {
         //DispatchQueue.global(qos: .utility).async {
-            changeMessageRealmData.getMessageUpdates(dialogID: dialogId, completion: { _ in })
+            changeMessageRealmData.shared.getMessageUpdates(dialogID: dialogId, completion: { _ in })
 
             Request.updateDialog(withID: dialogId, update: UpdateChatDialogParameters(), successBlock: { dialog in
                 auth.selectedConnectyDialog = dialog
@@ -23,13 +23,13 @@ class ChatMessageViewModel: ObservableObject {
 
                 dialog.onUserIsTyping = { (userID: UInt) in
                     if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
-                        changeMessageRealmData.addTypingMessage(userID: String(userID), dialogID: dialogId)
+                        changeMessageRealmData.shared.addTypingMessage(userID: String(userID), dialogID: dialogId)
                     }
                 }
 
                 dialog.onUserStoppedTyping = { (userID: UInt) in
                     if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
-                        changeMessageRealmData.removeTypingMessage(userID: String(userID), dialogID: dialogId)
+                        changeMessageRealmData.shared.removeTypingMessage(userID: String(userID), dialogID: dialogId)
                     }
                 }
 
@@ -86,8 +86,10 @@ class ChatMessageViewModel: ObservableObject {
                     compleation(foundContact.avatar)
                 } else {
                     Request.users(withIDs: [NSNumber(value: senderId)], paginator: Paginator.limit(1, skip: 0), successBlock: { (paginator, users) in
-                        if let firstUser = users.first {
-                            compleation(PersistenceManager().getCubeProfileImage(usersID: firstUser) ?? "")
+                        DispatchQueue.main.async {
+                            if let firstUser = users.first {
+                                compleation(PersistenceManager.shared.getCubeProfileImage(usersID: firstUser) ?? "")
+                            }
                         }
                     })
                 }
@@ -141,7 +143,7 @@ class ChatMessageViewModel: ObservableObject {
                 print("the error deleting: \(String(describing: error?.localizedDescription))")
                 UINotificationFeedbackGenerator().notificationOccurred(.error)
             } else {
-                changeMessageRealmData.updateMessageState(messageID: messageId, messageState: .deleted)
+                changeMessageRealmData.shared.updateMessageState(messageID: messageId, messageState: .deleted)
 
                 completion()
             }

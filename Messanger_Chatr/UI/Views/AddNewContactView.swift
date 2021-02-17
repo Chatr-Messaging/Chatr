@@ -22,7 +22,6 @@ struct addNewContactView: View {
     @State var grandUsers: [User] = []
     @State var regristeredAddressBook: [User] = []
     @ObservedObject var addressBook = AddressBookRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(AddressBookStruct.self))
-    let persistenceManager = PersistenceManager()
     
     var body: some View {
         NavigationView {
@@ -106,7 +105,7 @@ struct addNewContactView: View {
                                     NavigationLink(destination: VisitContactView(newMessage: self.$newDialogID, dismissView: self.$dismissView, viewState: .fromSearch, connectyContact: contact).environmentObject(self.auth).edgesIgnoringSafeArea(.all)) {
                                         VStack(alignment: .trailing, spacing: 0) {
                                             HStack {
-                                                WebImage(url: URL(string: persistenceManager.getCubeProfileImage(usersID: contact) ?? ""))
+                                                WebImage(url: URL(string: PersistenceManager.shared.getCubeProfileImage(usersID: contact) ?? ""))
                                                     .resizable()
                                                     .placeholder{ Image("empty-profile").resizable().frame(width: 45, height: 45, alignment: .center).scaledToFill() }
                                                     .indicator(.activity)
@@ -234,7 +233,7 @@ struct addNewContactView: View {
                                                     .frame(width: 35, height: 35, alignment: .center)
                                                     .foregroundColor(Color("bgColor"))
                                                 
-                                                WebImage(url: URL(string: persistenceManager.getCubeProfileImage(usersID: contact) ?? ""))
+                                                WebImage(url: URL(string: PersistenceManager.shared.getCubeProfileImage(usersID: contact) ?? ""))
                                                     .resizable()
                                                     .placeholder{ Image("empty-profile").resizable().frame(width: 45, height: 45, alignment: .center).scaledToFill() }
                                                     .indicator(.activity)

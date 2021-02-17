@@ -303,7 +303,7 @@ struct advancedView: View {
                             Button(action: {
                                 self.diabaleSyncAddressBook = true
                                 self.loadingSyncAddressBook = true
-                                changeAddressBookRealmData().uploadAddressBook(completion: { _ in
+                                changeAddressBookRealmData.shared.uploadAddressBook(completion: { _ in
                                     self.loadingSyncAddressBook = false
                                 })
                             }) {

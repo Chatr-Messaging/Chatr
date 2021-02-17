@@ -75,12 +75,13 @@ class DialogRealmModel<Element>: ObservableObject where Element: RealmSwift.Real
 }
 
 class changeDialogRealmData {
-    lazy var shared = changeDialogRealmData()
+    init() { }
+    static let shared = changeDialogRealmData()
 
     func fetchDialogs(completion: @escaping (Bool) -> ()) {
-        //let queue = DispatchQueue(label: "com.brandon.chatrQueue", qos: .utility)
+        let queue = DispatchQueue(label: "com.brandon.chatrQueue", qos: .utility)
 
-        //queue.async {
+        queue.async {
             print("the thread fwefawefor featching dialogs: \(Thread.isMultiThreaded()) and the thread: \(Thread.isMainThread)")
             let extRequest : [String: String] = ["sort_desc" : "lastMessageDate"]
             Request.dialogs(with: Paginator.limit(100, skip: 0), extendedRequest: extRequest, successBlock: { (dialogs, usersIDs, paginator) in
@@ -109,7 +110,7 @@ class changeDialogRealmData {
            }
             
             completion(true)
-        //}
+        }
     }
     
     func insertDialogs<T>(_ objects: [T], completion: @escaping () -> Void) where T: ChatDialog {
@@ -225,16 +226,16 @@ class changeDialogRealmData {
     
     func deletePrivateConnectyDialog(dialogID: String, isOwner: Bool) {
         Request.deleteDialogs(withIDs: Set<String>([dialogID]), forAllUsers: isOwner ? true : false, successBlock: { (deletedObjectsIDs, notFoundObjectsIDs, wrongPermissionsObjectsIDs) in
-            self.shared.updateDialogDelete(isDelete: true, dialogID: dialogID)
+            self.updateDialogDelete(isDelete: true, dialogID: dialogID)
         }) { (error) in
             print("error deleting dialog: \(error.localizedDescription) for dialog: \(dialogID)")
-            self.shared.updateDialogDelete(isDelete: true, dialogID: dialogID)
+            self.updateDialogDelete(isDelete: true, dialogID: dialogID)
         }
     }
-    
+
     func unsubscribePublicConnectyDialog(dialogID: String) {
         Request.unsubscribeFromPublicDialog(withID: dialogID, successBlock: {
-            self.shared.updateDialogDelete(isDelete: true, dialogID: dialogID)
+            self.updateDialogDelete(isDelete: true, dialogID: dialogID)
         }, errorBlock: { error in
             print("error deleting public: \(error.localizedDescription) for dialog: \(dialogID)")
         })

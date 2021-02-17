@@ -59,7 +59,6 @@ struct LinkColoredText: View {
             startPoint: .top, endPoint: .bottom) : LinearGradient(
                 gradient: Gradient(colors: [Color("buttonColor"), Color("buttonColor_darker")]), startPoint: .top, endPoint: .bottom))
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
-        .contentShape(RoundedRectangle(cornerRadius: 20, style: .circular))
         .shadow(color: self.messageRight ? Color.blue.opacity(0.15) : Color.black.opacity(0.15), radius: 6, x: 0, y: 6)
     }
 }

@@ -413,7 +413,7 @@ struct EditProfileView: View {
                     }.padding(.top, 70)
                     .resignKeyboardOnDragGesture()
                     .onAppear {
-                        changeProfileRealmDate().observeFirebaseUser()
+                        changeProfileRealmDate.shared.observeFirebaseUser()
                     }
                 }.frame(height: Constants.screenHeight - 50 - self.keyboardHeight)
                 .navigationBarTitle("Edit Profile", displayMode: .inline)
@@ -425,14 +425,14 @@ struct EditProfileView: View {
                             let updateParameters = UpdateUserParameters()
                             updateParameters.fullName = self.fullNameText
                             updateParameters.website = self.websiteText
-                            if changeProfileRealmDate().isValidEmail(self.emailText) {
+                            if changeProfileRealmDate.shared.isValidEmail(self.emailText) {
                                 updateParameters.email = self.emailText
                                 self.errorEmail = false
                             } else {
                                 self.errorEmail = true
                             }
                             Request.updateCurrentUser(updateParameters, successBlock: { (user) in
-                                changeProfileRealmDate().updateProfile(user, completion: {
+                                changeProfileRealmDate.shared.updateProfile(user, completion: {
                                     Database.database().reference().child("Users").child("\(UserDefaults.standard.integer(forKey: "currentUserID"))").updateChildValues(["bio" : self.bioText, "facebook" : self.facebookText, "twitter" : self.twitterText])
                                     UINotificationFeedbackGenerator().notificationOccurred(.success)
                                     self.loadingSave = false

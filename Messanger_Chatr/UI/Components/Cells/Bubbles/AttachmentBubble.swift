@@ -61,6 +61,9 @@ struct AttachmentBubble: View {
                     .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 14)
                     .offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
                     .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.5) : Color.clear, lineWidth: 5).offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0))
+                    .onAppear() {
+                        print("image has initiated")
+                    }
             }
         }
     }

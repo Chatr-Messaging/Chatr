@@ -208,14 +208,16 @@ struct ContainerBubble: View {
                     .padding(.horizontal)
             }
         }.onAppear() {
-            self.viewModel.getUserAvatar(senderId: self.message.senderID, compleation: { url in
-                if url == "self" {
-                    self.avatar = self.auth.profile.results.first?.avatar ?? ""
-                } else { self.avatar = url }
-            })
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                self.viewModel.getUserAvatar(senderId: self.message.senderID, compleation: { url in
+                    if url == "self" {
+                        self.avatar = self.auth.profile.results.first?.avatar ?? ""
+                    } else { self.avatar = url }
+                })
 
-            self.hasUserLiked = self.message.likedId.contains(self.auth.profile.results.first?.id ?? 0)
-            self.hasUserDisliked = self.message.dislikedId.contains(self.auth.profile.results.first?.id ?? 0)
+                self.hasUserLiked = self.message.likedId.contains(self.auth.profile.results.first?.id ?? 0)
+                self.hasUserDisliked = self.message.dislikedId.contains(self.auth.profile.results.first?.id ?? 0)
+            }
         }
     }
     
@@ -226,20 +228,20 @@ struct ContainerBubble: View {
             
             if message.messageState != .error {
                 if self.messagePosition == .left {
-                    if y > 10 && y < 60 { interactionSelected = reactions[0] }
-                    if y > 60 && y < 110 { interactionSelected = reactions[1] }
-                    if y > 110 && y < 160 { interactionSelected = reactions[2] }
-                    if y > 160 && y < 210 && reactions.count >= 4 { interactionSelected = reactions[3] }
-                    if y < 10 || y > 210 { interactionSelected = "" }
+                    if y > 5 && y < 50 { interactionSelected = reactions[0] }
+                    if y > 50 && y < 100 { interactionSelected = reactions[1] }
+                    if y > 100 && y < 150 { interactionSelected = reactions[2] }
+                    if y > 150 && y < 200 && reactions.count >= 4 { interactionSelected = reactions[3] }
+                    if y < 5 || y > 200 { interactionSelected = "" }
                 } else {
-                    if y > -160 && y < -110 { interactionSelected = reactions[0] }
-                    if y > -110 && y < -60 { interactionSelected = reactions[1] }
-                    if y > -60 && y < -10 { interactionSelected = reactions[2] }
-                    if y < -160 || y > -10 { interactionSelected = "" }
+                    if y > -150 && y < -100 { interactionSelected = reactions[0] }
+                    if y > -100 && y < -50 { interactionSelected = reactions[1] }
+                    if y > -50 && y < -5 { interactionSelected = reactions[2] }
+                    if y < -150 || y > -5 { interactionSelected = "" }
                 }
             } else {
-                if y > -150 && y < -10 { interactionSelected = "try again" }
-                if y < -150 || y > -10 { interactionSelected = "" }
+                if y > -150 && y < -5 { interactionSelected = "try again" }
+                if y < -150 || y > -5 { interactionSelected = "" }
             }
         }
     }
@@ -300,11 +302,11 @@ struct ContainerBubble: View {
             for child in snapAdded.children {
                 let childSnap = child as! DataSnapshot
                 if typeLike == "likes" {
-                    changeMessageRealmData.updateMessageLikeAdded(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
+                    changeMessageRealmData.shared.updateMessageLikeAdded(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
                     self.hasUserLiked = self.message.likedId.contains(profileID)
                     print("liked added: contain: \(self.message.likedId.contains(profileID)) && my id: \(profileID)")
                 } else if typeLike == "dislikes" {
-                    changeMessageRealmData.updateMessageDislikeAdded(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
+                    changeMessageRealmData.shared.updateMessageDislikeAdded(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
                     self.hasUserDisliked = self.message.dislikedId.contains(profileID)
                 }
             }
@@ -316,10 +318,10 @@ struct ContainerBubble: View {
             for child in snapRemoved.children {
                 let childSnap = child as! DataSnapshot
                 if typeLike == "likes" {
-                    changeMessageRealmData.updateMessageLikeRemoved(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
+                    changeMessageRealmData.shared.updateMessageLikeRemoved(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
                     self.hasUserLiked = self.message.likedId.contains(profileID)
                 } else if typeLike == "dislikes" {
-                    changeMessageRealmData.updateMessageDislikeRemoved(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
+                    changeMessageRealmData.shared.updateMessageDislikeRemoved(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
                     self.hasUserDisliked = self.message.dislikedId.contains(profileID)
                 }
             }

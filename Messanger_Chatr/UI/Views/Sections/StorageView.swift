@@ -8,6 +8,7 @@
 
 import SwiftUI
 import RealmSwift
+import SDWebImageSwiftUI
 
 struct storageView: View {
     @EnvironmentObject var auth: AuthModel
@@ -94,6 +95,8 @@ struct storageView: View {
                         VStack {
                             Button(action: {
                                 self.loadingClearData = true
+                                SDImageCache.shared.clearMemory()
+                                SDImageCache.shared.clearDisk(onCompletion: nil)
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
                                     UINotificationFeedbackGenerator().notificationOccurred(.success)
                                     self.loadingClearData = false
@@ -121,7 +124,7 @@ struct storageView: View {
                             VStack {
                                 Button(action: {
                                     print("delete all Dialog data")
-                                    changeDialogRealmData().removeAllDialogs()
+                                    changeDialogRealmData.shared.removeAllDialogs()
                                     self.removeDialogData = true
                                 }) {
                                     HStack {
@@ -151,7 +154,7 @@ struct storageView: View {
                             VStack {
                                 Button(action: {
                                     print("delete all Contacts data")
-                                    changeContactsRealmData().removeAllContacts()
+                                    changeContactsRealmData.shared.removeAllContacts()
                                     self.removeContactsData = true
                                 }) {
                                     HStack {
@@ -181,7 +184,7 @@ struct storageView: View {
                             VStack {
                                 Button(action: {
                                     print("delete all Message data")
-                                    changeMessageRealmData().removeAllMessages(completion: { _ in })
+                                    changeMessageRealmData.shared.removeAllMessages(completion: { _ in })
                                     self.removeMessagesData = true
                                 }) {
                                     HStack {
@@ -211,7 +214,7 @@ struct storageView: View {
                             VStack {
                                 Button(action: {
                                     print("delete all Quick Snap data")
-                                    changeQuickSnapsRealmData().removeAllQuickSnaps()
+                                    changeQuickSnapsRealmData.shared.removeAllQuickSnaps()
                                     self.removeQuickSnapsData = true
                                 }) {
                                     HStack {

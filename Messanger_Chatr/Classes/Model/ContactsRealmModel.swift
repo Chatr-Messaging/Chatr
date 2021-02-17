@@ -73,7 +73,9 @@ class ContactsRealmModel<Element>: ObservableObject where Element: RealmSwift.Re
 }
 
 class changeContactsRealmData {
-    
+    init() { }
+    static let shared = changeContactsRealmData()
+
     func observeQuickSnaps() {
         //always looking at Users section
         let usersQuery = Database.database().reference().child("Users").child("\(UserDefaults.standard.integer(forKey: "currentUserID"))").child("quickSnaps")
@@ -238,7 +240,7 @@ class changeContactsRealmData {
                                     foundContact.emailAddress = user.email ?? "empty email address"
                                     foundContact.website = user.website ?? "empty website"
                                     foundContact.lastOnline = user.lastRequestAt ?? Date()
-                                    foundContact.avatar = PersistenceManager().getCubeProfileImage(usersID: user) ?? ""
+                                    foundContact.avatar = PersistenceManager.shared.getCubeProfileImage(usersID: user) ?? ""
                                     foundContact.isMyContact = true
                                     foundContact.isInfoPrivate = false
                                     foundContact.isMessagingPrivate = false
@@ -259,7 +261,7 @@ class changeContactsRealmData {
                                 newData.isMessagingPrivate = false
                                 newData.isMyContact = true
                                 newData.lastOnline = user.lastRequestAt ?? Date()
-                                newData.avatar = PersistenceManager().getCubeProfileImage(usersID: user) ?? ""
+                                newData.avatar = PersistenceManager.shared.getCubeProfileImage(usersID: user) ?? ""
                                 newData.createdAccount = user.createdAt ?? Date()
                                     
                                 try realm.safeWrite ({
@@ -327,7 +329,7 @@ class changeContactsRealmData {
         var avitarURLs: [String] = []
         Request.users(withIDs: occuIDs, paginator: Paginator.limit(100, skip: 0), successBlock: { (paginator, users) in
             for user in users {
-                avitarURLs.append(PersistenceManager().getCubeProfileImage(usersID: user) ?? "")
+                avitarURLs.append(PersistenceManager.shared.getCubeProfileImage(usersID: user) ?? "")
             }
             completion(avitarURLs)
         })
@@ -347,7 +349,7 @@ class changeContactsRealmData {
                             foundContact.emailAddress = user.email ?? "empty email address"
                             foundContact.website = user.website ?? "empty website"
                             foundContact.lastOnline = user.lastRequestAt ?? Date()
-                            foundContact.avatar = PersistenceManager().getCubeProfileImage(usersID: user) ?? ""
+                            foundContact.avatar = PersistenceManager.shared.getCubeProfileImage(usersID: user) ?? ""
                             foundContact.isMyContact = true
                             
                             realm.add(foundContact, update: .all)
@@ -363,7 +365,7 @@ class changeContactsRealmData {
                         newData.isFavourite = false
                         newData.isMyContact = true
                         newData.lastOnline = user.lastRequestAt ?? Date()
-                        newData.avatar = PersistenceManager().getCubeProfileImage(usersID: user) ?? ""
+                        newData.avatar = PersistenceManager.shared.getCubeProfileImage(usersID: user) ?? ""
                         newData.createdAccount = user.createdAt ?? Date()
                             
                         try realm.safeWrite ({

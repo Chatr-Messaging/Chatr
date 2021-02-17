@@ -185,7 +185,7 @@ class VisitContactViewModel: ObservableObject {
         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
         if contactRelationship == .contact {
             Chat.instance.removeUser(fromContactList: UInt(contactId)) { (error) in
-                changeContactsRealmData().deleteContact(contactID: contactId, isMyContact: false, completion: { _ in
+                changeContactsRealmData.shared.deleteContact(contactID: contactId, isMyContact: false, completion: { _ in
                     completion(.notContact)
                 })
             }

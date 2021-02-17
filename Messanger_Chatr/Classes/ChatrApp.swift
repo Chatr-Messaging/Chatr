@@ -48,14 +48,14 @@ extension ChatrApp {
         Chat.instance.connect(withUserID: id, password: Session.current.sessionDetails?.token ?? "") { (error) in
             if error != nil {
                 print("there is a error connecting to session! \(String(describing: error?.localizedDescription)) user id: \(id)")
-                changeContactsRealmData().observeQuickSnaps()
+                changeContactsRealmData.shared.observeQuickSnaps()
             } else {
                 print("\(Thread.current.isMainThread) Success joining session! the current user: \(String(describing: Session.current.currentUser?.fullName)) && expirationSate: \(String(describing: Session.current.sessionDetails?.token))")
 
-                changeDialogRealmData().fetchDialogs(completion: { worked in
+                changeDialogRealmData.shared.fetchDialogs(completion: { worked in
                     if worked {
-                        changeContactsRealmData().observeQuickSnaps()
-                        changeProfileRealmDate().observeFirebaseUser()
+                        changeContactsRealmData.shared.observeQuickSnaps()
+                        changeProfileRealmDate.shared.observeFirebaseUser()
                         self.auth.initIAPurchase()
                     }
                 })

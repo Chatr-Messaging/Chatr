@@ -25,7 +25,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         // Create the SwiftUI view that provides the window contents.
         let contentView = HomeView().environmentObject(environment)
-            //.environment(\.managedObjectContext, PersistenceManager.shared.context)
         
         // Use a UIHostingController as window root view controller.
         if let windowScene = scene as? UIWindowScene {
@@ -66,13 +65,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneDidBecomeActive(_ scene: UIScene) {
         print("scene did become active")
         //if self.environment.isUserAuthenticated == .signedIn {
-            //changeContactsRealmData().updateContacts(contactList: Chat.instance.contactList?.contacts ?? [], completion: { _ in })
-//            changeContactsRealmData().observeQuickSnaps()
-//            changeProfileRealmDate().observeFirebaseUser()
+            //changeContactsRealmData.shared.updateContacts(contactList: Chat.instance.contactList?.contacts ?? [], completion: { _ in })
+//            changeContactsRealmData.shared.observeQuickSnaps()
+//            changeProfileRealmDate.shared.observeFirebaseUser()
             //ChatrApp.connect()
-//            changeDialogRealmData().fetchDialogs(completion: { _ in
-//                changeContactsRealmData().observeQuickSnaps()
-//                changeProfileRealmDate().observeFirebaseUser()
+//            changeDialogRealmData.shared.fetchDialogs(completion: { _ in
+//                changeContactsRealmData.shared.observeQuickSnaps()
+//                changeProfileRealmDate.shared.observeFirebaseUser()
 //                self.environment.initIAPurchase()
 //            })
         //}
@@ -100,7 +99,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Called as the scene transitions from the background to the foreground.
         // Use this method to undo the changes made on entering the background.
 
-        print("scene will enter forground \(Thread.isMainThread)")
+        print("scene will enter foreground \(Thread.isMainThread)")
         self.environment.configureFirebaseStateDidChange()
         if self.environment.isUserAuthenticated == .signedIn {
             ChatrApp.connect()

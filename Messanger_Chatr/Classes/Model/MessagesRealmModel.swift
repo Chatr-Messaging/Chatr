@@ -81,11 +81,13 @@ class MessagesRealmModel<Element>: ObservableObject where Element: RealmSwift.Re
 }
 
 class changeMessageRealmData {
+    init() { }
+    static let shared = changeMessageRealmData()
 
-    static func getMessageUpdates(dialogID: String, completion: @escaping (Bool) -> ()) {
-        //let queue = DispatchQueue(label: "com.brandon.chatrMessageQueue", qos: .utility)
+    func getMessageUpdates(dialogID: String, completion: @escaping (Bool) -> ()) {
+        let queue = DispatchQueue(label: "com.brandon.chatrMessageQueue", qos: .utility)
 
-        //queue.async {
+        queue.async {
             let extRequest : [String: String] = ["sort_desc" : "date_sent", "mark_as_read" : "0"]
             Request.messages(withDialogID: dialogID, extendedRequest: extRequest, paginator: Paginator.limit(20, skip: 0), successBlock: { (messages, _) in
                 self.insertMessages(messages, completion: { })
@@ -93,11 +95,14 @@ class changeMessageRealmData {
                 print("eror getting messages: \(error.localizedDescription)")
             }
             completion(true)
-        //}
+        }
     }
     
-    static func loadMoreMessages(dialogID: String, currentCount: Int, completion: @escaping (Bool) -> ()) {
+    func loadMoreMessages(dialogID: String, currentCount: Int, completion: @escaping (Bool) -> ()) {
         let extRequest : [String: String] = ["sort_desc" : "date_sent", "mark_as_read" : "0"]
+        
+        //For the 'skip' paginator... you need to get to total unread count & if greater than ~10 apply unread count
+        //No need to scroll to bottom. When you hit the bottom, load ~10 more or so.
         Request.messages(withDialogID: dialogID, extendedRequest: extRequest, paginator: Paginator.limit(UInt(currentCount + 20), skip: 0), successBlock: { (messages, _) in
             self.insertMessages(messages, completion: { })
         }){ (error) in
@@ -107,7 +112,7 @@ class changeMessageRealmData {
         completion(true)
     }
     
-    static func insertMessages<T>(_ objects: [T], completion: @escaping () -> Void) where T: ChatMessage {
+    func insertMessages<T>(_ objects: [T], completion: @escaping () -> Void) where T: ChatMessage {
         objects.forEach({ (object) in
             let config = Realm.Configuration(schemaVersion: 1)
 
@@ -206,7 +211,7 @@ class changeMessageRealmData {
         completion()
     }
     
-    static func insertMessage<T>(_ object: T, completion: @escaping () -> Void) where T: ChatMessage {
+    func insertMessage<T>(_ object: T, completion: @escaping () -> Void) where T: ChatMessage {
         let config = Realm.Configuration(schemaVersion: 1)
         do {
             let realm = try Realm(configuration: config)
@@ -294,7 +299,7 @@ class changeMessageRealmData {
         }
     }
     
-    static func sendMessage(dialog: DialogStruct, text: String, occupentID: [NSNumber]) {
+    func sendMessage(dialog: DialogStruct, text: String, occupentID: [NSNumber]) {
         let message = ChatMessage.markable()
         message.markable = true
         message.text = text
@@ -314,7 +319,7 @@ class changeMessageRealmData {
         }
     }
     
-    static func sendContactMessage(dialog: DialogStruct, contactID: [Int], occupentID: [NSNumber]) {
+    func sendContactMessage(dialog: DialogStruct, contactID: [Int], occupentID: [NSNumber]) {
         for id in contactID {
             let attachment = ChatAttachment()
             attachment["contactID"] = "\(id)"
@@ -340,7 +345,7 @@ class changeMessageRealmData {
         }
     }
     
-    static func sendLocationMessage(dialog: DialogStruct, longitude: Double, latitude: Double, occupentID: [NSNumber]) {
+    func sendLocationMessage(dialog: DialogStruct, longitude: Double, latitude: Double, occupentID: [NSNumber]) {
         let attachment = ChatAttachment()
         attachment["longitude"] = "\(longitude)"
         attachment["latitude"] = "\(latitude)"
@@ -365,7 +370,7 @@ class changeMessageRealmData {
         }
     }
     
-    static func sendGIFAttachment(dialog: DialogStruct, attachmentStrings: [String], occupentID: [NSNumber]) {
+    func sendGIFAttachment(dialog: DialogStruct, attachmentStrings: [String], occupentID: [NSNumber]) {
         for attachment in attachmentStrings {
             do {
                 let attachURL = try Data(contentsOf: URL(string: attachment)!, options: [.alwaysMapped , .uncached])
@@ -408,7 +413,7 @@ class changeMessageRealmData {
         }
     }
     
-    static func sendPhotoAttachment(dialog: DialogStruct, attachmentImages: [UIImage], occupentID: [NSNumber]) {
+    func sendPhotoAttachment(dialog: DialogStruct, attachmentImages: [UIImage], occupentID: [NSNumber]) {
         for attachment in attachmentImages {
             let data = attachment.jpegData(compressionQuality: 0.2)
             Request.uploadFile(with: data!,
@@ -446,7 +451,7 @@ class changeMessageRealmData {
         }
     }
     
-    static func updateMessageDislikeAdded(messageID: String, userID: Int) {
+    func updateMessageDislikeAdded(messageID: String, userID: Int) {
         let config = Realm.Configuration(schemaVersion: 1)
         do {
             let realm = try Realm(configuration: config)
@@ -463,7 +468,7 @@ class changeMessageRealmData {
         }
     }
     
-    static func updateMessageDislikeRemoved(messageID: String, userID: Int) {
+    func updateMessageDislikeRemoved(messageID: String, userID: Int) {
         let config = Realm.Configuration(schemaVersion: 1)
         do {
             let realm = try Realm(configuration: config)
@@ -480,7 +485,7 @@ class changeMessageRealmData {
         }
     }
         
-    static func updateMessageLikeAdded(messageID: String, userID: Int) {
+    func updateMessageLikeAdded(messageID: String, userID: Int) {
         let config = Realm.Configuration(schemaVersion: 1)
         do {
             let realm = try Realm(configuration: config)
@@ -497,7 +502,7 @@ class changeMessageRealmData {
         }
     }
     
-    static func updateMessageLikeRemoved(messageID: String, userID: Int) {
+    func updateMessageLikeRemoved(messageID: String, userID: Int) {
         let config = Realm.Configuration(schemaVersion: 1)
         do {
             let realm = try Realm(configuration: config)
@@ -514,7 +519,7 @@ class changeMessageRealmData {
         }
     }
     
-    static func updateMessageState(messageID: String, messageState: messageStatus) {
+    func updateMessageState(messageID: String, messageState: messageStatus) {
         let config = Realm.Configuration(schemaVersion: 1)
         do {
             let realm = try Realm(configuration: config)
@@ -532,7 +537,7 @@ class changeMessageRealmData {
         }
     }
     
-    static func addTypingMessage(userID: String, dialogID: String) {
+    func addTypingMessage(userID: String, dialogID: String) {
         let config = Realm.Configuration(schemaVersion: 1)
         do {
             let realm = try Realm(configuration: config)
@@ -562,7 +567,7 @@ class changeMessageRealmData {
         }
     }
     
-    static func removeTypingMessage(userID: String, dialogID: String) {
+    func removeTypingMessage(userID: String, dialogID: String) {
         let config = Realm.Configuration(schemaVersion: 1)
         do {
             let realm = try Realm(configuration: config)
@@ -578,7 +583,7 @@ class changeMessageRealmData {
         }
     }
     
-    static func updateMessageDelayState(messageID: String, messageDelayed: Bool) {
+    func updateMessageDelayState(messageID: String, messageDelayed: Bool) {
         let config = Realm.Configuration(schemaVersion: 1)
         do {
             let realm = try Realm(configuration: config)
@@ -596,7 +601,7 @@ class changeMessageRealmData {
         }
     }
     
-    static func removeAllMessages(completion: @escaping (Bool) -> ()) {
+    func removeAllMessages(completion: @escaping (Bool) -> ()) {
         let config = Realm.Configuration(schemaVersion: 1)
         do {
             let realm = try! Realm(configuration: config)

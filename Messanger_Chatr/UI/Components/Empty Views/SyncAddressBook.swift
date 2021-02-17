@@ -40,7 +40,7 @@ struct SyncAddressBook: View {
                 
                 Button(action: {
                     print("add the fetch address book function here")
-                    changeAddressBookRealmData().uploadAddressBook(completion: { result in })
+                    changeAddressBookRealmData.shared.uploadAddressBook(completion: { result in })
                 }) {
                     HStack {
                         Image(systemName: "book")
@@ -63,7 +63,7 @@ struct SyncAddressBook: View {
         }.onAppear() {
             Request.addressBook(withUdid: nil, successBlock: { (contacts) in
                 if contacts.count > 0 {
-                    changeAddressBookRealmData().uploadAddressBook(completion: { _ in
+                    changeAddressBookRealmData.shared.uploadAddressBook(completion: { _ in
                         self.confirmZeroAddress = true
                     })
                 } else {

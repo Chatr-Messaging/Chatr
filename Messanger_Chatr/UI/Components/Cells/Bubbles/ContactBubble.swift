@@ -175,7 +175,7 @@ struct ContactBubble: View {
                             self.contactRelationship = .contact
                         } else {
                             Request.users(withIDs: [NSNumber(value: self.message.contactID)], paginator: Paginator.limit(1, skip: 0), successBlock: { (paginator, users) in
-                                changeContactsRealmData().observeFirebaseContactReturn(contactID: Int(users.first?.id ?? 0), completion: { contact in
+                                changeContactsRealmData.shared.observeFirebaseContactReturn(contactID: Int(users.first?.id ?? 0), completion: { contact in
                                     if let firstUser = users.first {
                                         let newContact = ContactStruct()
                                         newContact.id = Int(firstUser.id)

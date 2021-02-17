@@ -73,7 +73,7 @@ struct QuickSnapsSection: View {
                             }.padding(.leading, 5)
                             
                             Spacer()
-                        }.padding(.leading, 10)
+                        }.padding(.leading, self.isLocalOpen ? 0 : 10)
                         .scaleEffect(self.isLocalOpen ? 0.85 : 1)
                     }.frame(height: self.emptyQuickSnaps ? geometry.size.height : 0)
                 }.onAppear() {
@@ -84,7 +84,7 @@ struct QuickSnapsSection: View {
                     .onAppear() {
                         if self.auth.isUserAuthenticated != .signedOut {
                             self.emptyQuickSnaps = true
-                            changeContactsRealmData().updateContacts(contactList: Chat.instance.contactList?.contacts ?? [], completion: { _ in
+                            changeContactsRealmData.shared.updateContacts(contactList: Chat.instance.contactList?.contacts ?? [], completion: { _ in
                                 print("done refreshing quick snap contacts!... just in case")
                             })
                             print("empty quick snaps so try to refresh to dubble check: \(self.emptyQuickSnaps)")

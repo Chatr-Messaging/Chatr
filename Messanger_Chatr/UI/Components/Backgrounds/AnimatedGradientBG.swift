@@ -18,6 +18,7 @@ struct AnimatedGradientGradientBG: View {
             .fill(LinearGradient(gradient: Gradient(colors: self.gradient), startPoint: self.startPoint, endPoint: self.endPoint))
             .frame(width: Constants.screenHeight, height: Constants.screenHeight)
             .blur(radius: 50)
+            .drawingGroup()
             .onAppear() {
                 withAnimation (Animation.easeInOut(duration: 8).repeatForever(autoreverses: true)){
                     self.startPoint = UnitPoint(x: 1, y: -1)

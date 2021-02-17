@@ -50,6 +50,8 @@ class AddressBookRealmModel<Element>: ObservableObject where Element: RealmSwift
 }
 
 class changeAddressBookRealmData {
+    init() { }
+    static let shared = changeAddressBookRealmData()
     let advancedViewModel = AdvancedViewModel()
     
     func uploadAddressBook(completion: @escaping (Bool) -> ()) {
@@ -114,7 +116,7 @@ class changeAddressBookRealmData {
 
                 Request.uploadAddressBook(withUdid: UIDevice.current.identifierForVendor?.uuidString, addressBook: addressBook, force: false, successBlock: { (updates) in
                     DispatchQueue.main.async {
-                        changeProfileRealmDate().updateAddressBookSyncDate()
+                        changeProfileRealmDate.shared.updateAddressBookSyncDate()
                         
                         completion(true)
                     }

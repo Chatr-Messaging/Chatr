@@ -497,7 +497,7 @@ struct VisitContactView: View {
                             privateChatPrivacyItem.mutualBlock = true
                             let groupChatPrivacyItem = PrivacyItem.init(privacyType: .groupUserID, userID: UInt(self.contact.id), allow: false)
                             let privacyList = PrivacyList.init(name: "PrivacyList", items: [privateChatPrivacyItem, groupChatPrivacyItem])
-                            changeContactsRealmData().deleteContact(contactID: self.contact.id, isMyContact: false, completion: { _ in })
+                            changeContactsRealmData.shared.deleteContact(contactID: self.contact.id, isMyContact: false, completion: { _ in })
                             Chat.instance.setPrivacyList(privacyList)
                             self.contactRelationship = .unknown
                         }), .cancel(Text("Done"))])
@@ -647,7 +647,7 @@ struct VisitContactView: View {
                 }
             } else if self.viewState == .fromContacts {
                 self.contactRelationship = .contact
-                changeContactsRealmData().observeFirebaseContact(contactID: self.contact.id)
+                changeContactsRealmData.shared.observeFirebaseContact(contactID: self.contact.id)
                 if self.contact.instagramAccessToken != "" && self.contact.instagramId != 0 {
                     self.viewModel.loadInstagramImages(testUser: InstagramTestUser(access_token: self.contact.instagramAccessToken, user_id: self.contact.instagramId))
                 }
@@ -723,7 +723,7 @@ struct VisitContactView: View {
                                             }
                                         }
 
-                                        changeContactsRealmData().observeFirebaseContactReturn(contactID: Int(self.connectyContact.id), completion: { firebaseContact in
+                                        changeContactsRealmData.shared.observeFirebaseContactReturn(contactID: Int(self.connectyContact.id), completion: { firebaseContact in
                                             let newContact = ContactStruct()
                                             newContact.id = Int(self.connectyContact.id)
                                             newContact.fullName = self.connectyContact.fullName ?? ""
@@ -775,7 +775,7 @@ struct VisitContactView: View {
                         //replace below with selected contact id:
                         if self.selectedContact.contains(id) {
                             if let selectedDialog = self.auth.dialogs.results.filter("id == %@", dialog.id).first {
-                                changeMessageRealmData.sendContactMessage(dialog: selectedDialog, contactID: [self.contact.id], occupentID: [NSNumber(value: id), NSNumber(value: Int(self.auth.profile.results.first?.id ?? 0))])
+                                changeMessageRealmData.shared.sendContactMessage(dialog: selectedDialog, contactID: [self.contact.id], occupentID: [NSNumber(value: id), NSNumber(value: Int(self.auth.profile.results.first?.id ?? 0))])
                                 
                                 if let index = self.selectedContact.firstIndex(of: id) {
                                     self.selectedContact.remove(at: index)
@@ -808,10 +808,10 @@ struct VisitContactView: View {
                    message.attachments = [attachment]
                    
                    dialog.send(message) { (error) in
-                       changeMessageRealmData.insertMessage(message, completion: {
+                       changeMessageRealmData.shared.insertMessage(message, completion: {
                            if error != nil {
                                print("error sending message: \(String(describing: error?.localizedDescription))")
-                               changeMessageRealmData.updateMessageState(messageID: message.id ?? "", messageState: .error)
+                               changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .error)
                            } else {
                                print("Success sending message to ConnectyCube server!")
                            }
@@ -821,7 +821,7 @@ struct VisitContactView: View {
                     print("error making dialog: \(error.localizedDescription)")
                 }
 
-                changeDialogRealmData().fetchDialogs(completion: { _ in
+                changeDialogRealmData.shared.fetchDialogs(completion: { _ in
                     self.selectedContact.removeAll()
                     self.auth.notificationtext = "Forwarded Contact"
                     UINotificationFeedbackGenerator().notificationOccurred(.success)
@@ -846,7 +846,7 @@ struct VisitContactView: View {
             self.contactRelationship = .pendingRequestForYou
         }
         
-        changeContactsRealmData().observeFirebaseContactReturn(contactID: self.connectyContact.id != 0 ? Int(self.connectyContact.id) : self.contact.id, completion: { firebaseContact in
+        changeContactsRealmData.shared.observeFirebaseContactReturn(contactID: self.connectyContact.id != 0 ? Int(self.connectyContact.id) : self.contact.id, completion: { firebaseContact in
             let newContact = ContactStruct()
             newContact.id = self.viewState == .fromGroupDialog ? self.contact.id : Int(self.connectyContact.id)
             newContact.fullName = self.viewState == .fromGroupDialog ? self.contact.fullName : self.connectyContact.fullName ?? ""
@@ -1112,7 +1112,7 @@ struct actionButtonView: View {
                     ActionSheet(title: Text("Are you sure you want to un-send your contact request?"), message: nil, buttons: [
                         .destructive(Text("Remove Request"), action: {
                             Chat.instance.removeUser(fromContactList: UInt(self.contact.id)) { (error) in
-                                changeContactsRealmData().deleteContact(contactID: self.contact.id, isMyContact: false, completion: { _ in
+                                changeContactsRealmData.shared.deleteContact(contactID: self.contact.id, isMyContact: false, completion: { _ in
                                     self.contactRelationship = .notContact
                                 })
                             }

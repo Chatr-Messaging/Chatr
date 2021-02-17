@@ -59,9 +59,9 @@ struct HighlightedContactCell: View {
                             print("Favourite tap")
                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             if self.contact.isFavourite {
-                                changeContactsRealmData().updateContactFavouriteStatus(userID: UInt(self.contact.id), favourite: false)
+                                changeContactsRealmData.shared.updateContactFavouriteStatus(userID: UInt(self.contact.id), favourite: false)
                             } else {
-                                changeContactsRealmData().updateContactFavouriteStatus(userID: UInt(self.contact.id), favourite: true)
+                                changeContactsRealmData.shared.updateContactFavouriteStatus(userID: UInt(self.contact.id), favourite: true)
                             }
                         }) {
                             Image(systemName: "star.fill")

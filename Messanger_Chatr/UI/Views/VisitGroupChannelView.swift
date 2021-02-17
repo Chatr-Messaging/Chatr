@@ -406,7 +406,7 @@ struct VisitGroupChannelView: View {
                                             updateParameters.occupantsIDsToAdd = occu
                                             
                                             Request.updateDialog(withID: self.dialogModel.id, update: updateParameters, successBlock: { (updatedDialog) in
-                                                changeDialogRealmData().insertDialogs([updatedDialog]) { }
+                                                changeDialogRealmData.shared.insertDialogs([updatedDialog]) { }
                                                 occu.removeAll()
                                                 self.addNewMemberID = ""
                                                 self.selectedNewMembers.removeAll()
@@ -537,10 +537,10 @@ struct VisitGroupChannelView: View {
                                                 })
                                             }), .destructive(Text(self.isOwner ? "Destroy Group" : "Leave Group"), action: {
                                                 UserDefaults.standard.set(false, forKey: "localOpen")
-                                                changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
+                                                changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
                                                 self.showingMoreSheet = false
                                                 
-                                                changeDialogRealmData().deletePrivateConnectyDialog(dialogID: self.dialogModel.id, isOwner: self.isOwner)
+                                                changeDialogRealmData.shared.deletePrivateConnectyDialog(dialogID: self.dialogModel.id, isOwner: self.isOwner)
                                                 print("done deleting dialog: \(self.dialogModel.id)")
                                             }), .cancel(Text("Done"))])
                         }.simultaneousGesture(TapGesture()

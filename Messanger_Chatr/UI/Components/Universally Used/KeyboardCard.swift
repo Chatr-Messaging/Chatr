@@ -200,7 +200,7 @@ struct KeyboardCardView: View {
                         }
 
                         if self.gifData.count > 0 {
-                            changeMessageRealmData.sendGIFAttachment(dialog: selectedDialog, attachmentStrings: self.gifData.reversed(), occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
+                            changeMessageRealmData.shared.sendGIFAttachment(dialog: selectedDialog, attachmentStrings: self.gifData.reversed(), occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                         
                             self.gifData.removeAll()
                         }
@@ -212,7 +212,7 @@ struct KeyboardCardView: View {
                                 uploadImg.append(i.image)
                             }
                             
-                            changeMessageRealmData.sendPhotoAttachment(dialog: selectedDialog, attachmentImages: uploadImg, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
+                            changeMessageRealmData.shared.sendPhotoAttachment(dialog: selectedDialog, attachmentImages: uploadImg, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                         
                             uploadImg.removeAll()
                             self.imagePicker.selectedPhotos.removeAll()
@@ -220,17 +220,17 @@ struct KeyboardCardView: View {
 
                         if self.imagePicker.selectedVideos.count > 0 {
                             //COME BACK AND ADD THE UPLOADING VIDEOS SECTION
-                            //changeMessageRealmData.sendPhotoAttachment(dialog: selectedDialog, attachmentImages: self.photoData, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
+                            //changeMessageRealmData.shared.sendPhotoAttachment(dialog: selectedDialog, attachmentImages: self.photoData, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                             print("There are selected videos we will remove later...")
                         }
                         
                         if self.enableLocation {
-                            changeMessageRealmData.sendLocationMessage(dialog: selectedDialog, longitude: self.region.center.longitude, latitude: self.region.center.latitude, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
+                            changeMessageRealmData.shared.sendLocationMessage(dialog: selectedDialog, longitude: self.region.center.longitude, latitude: self.region.center.latitude, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                             self.enableLocation = false
                         }
                         
                         if self.mainText.count > 0 {
-                            changeMessageRealmData.sendMessage(dialog: selectedDialog, text: self.mainText, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
+                            changeMessageRealmData.shared.sendMessage(dialog: selectedDialog, text: self.mainText, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                         }
 
                         self.checkAttachments()
@@ -317,7 +317,7 @@ struct KeyboardCardView: View {
                         if self.selectedContacts.count > 0 {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                                 if let selectedDialog = self.auth.dialogs.results.filter("id == %@", UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").first {
-                                    changeMessageRealmData.sendContactMessage(dialog: selectedDialog, contactID: self.selectedContacts, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
+                                    changeMessageRealmData.shared.sendContactMessage(dialog: selectedDialog, contactID: self.selectedContacts, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                                 }
                             }
                         }
@@ -514,7 +514,7 @@ struct ResizableTextField : UIViewRepresentable {
             self.parent.auth.selectedConnectyDialog?.sendUserStoppedTyping()
             UserDefaults.standard.setValue(textView.text, forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText")
         }
-        
+                
         func textViewDidChange(_ textView: UITextView) {
             if textView.text.count == 0 {
                 self.hasTyped = false

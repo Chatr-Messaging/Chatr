@@ -327,7 +327,7 @@ struct CameraView: View {
                                         
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                                             self.sendQuickPic()
-                                            changeContactsRealmData().updateContactHasQuickSnap(userID: self.selectedContacts, hasQuickSnap: true)
+                                            changeContactsRealmData.shared.updateContactHasQuickSnap(userID: self.selectedContacts, hasQuickSnap: true)
                                         }
                                         
                                     }) {
@@ -381,7 +381,7 @@ struct CameraView: View {
     }
     
     private func sendQuickPic() {
-        changeQuickSnapsRealmData().sendQuickSnap(image: self.inputCameraRollImage != nil ? self.inputCameraRollImage?.pngData() ?? Data() : UIImage(data: self.camera.picData ?? Data())?.fixedOrientation()?.pngData() ?? Data(), sendTo: self.selectedContacts, completion: { result in
+        changeQuickSnapsRealmData.shared.sendQuickSnap(image: self.inputCameraRollImage != nil ? self.inputCameraRollImage?.pngData() ?? Data() : UIImage(data: self.camera.picData ?? Data())?.fixedOrientation()?.pngData() ?? Data(), sendTo: self.selectedContacts, completion: { result in
             if result == false {
                 //error sending post
                 self.loadAni = false

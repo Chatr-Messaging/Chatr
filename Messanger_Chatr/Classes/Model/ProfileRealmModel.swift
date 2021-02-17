@@ -95,8 +95,8 @@ class ProfileRealmModel<Element>: ObservableObject where Element: RealmSwift.Rea
 }
 
 class changeProfileRealmDate {
-    
-    static let shared = changeMessageRealmData()
+    init() { }
+    static let shared = changeProfileRealmDate()
     
     func observeFirebaseUser() {
         let queue = DispatchQueue.init(label: "com.brandon.chatrFirebbase", qos: .utility)
@@ -158,7 +158,7 @@ class changeProfileRealmDate {
                 try realm.safeWrite({
                     oldData.fullName = objects.fullName ?? "No Name"
                     oldData.lastOnline = objects.lastRequestAt ?? Date()
-                    oldData.avatar = PersistenceManager().getCubeProfileImage(usersID: objects) ?? ""
+                    oldData.avatar = PersistenceManager.shared.getCubeProfileImage(usersID: objects) ?? ""
                     oldData.website = objects.website ?? ""
                     oldData.emailAddress = objects.email ?? ""
                     //oldData.isLocalAuthOn = self.getCubeProfileLocalAuthSetting(usersID: objects) ?? false
@@ -172,7 +172,7 @@ class changeProfileRealmDate {
                 newData.id = Int(objects.id)
                 newData.fullName = objects.fullName ?? "No Name"
                 newData.lastOnline = objects.lastRequestAt ?? Date()
-                newData.avatar = PersistenceManager().getCubeProfileImage(usersID: objects) ?? ""
+                newData.avatar = PersistenceManager.shared.getCubeProfileImage(usersID: objects) ?? ""
                 newData.website = objects.website ?? ""
                 newData.emailAddress = objects.email ?? ""
                 //newData.isLocalAuthOn = self.getCubeProfileLocalAuthSetting(usersID: objects) ?? false

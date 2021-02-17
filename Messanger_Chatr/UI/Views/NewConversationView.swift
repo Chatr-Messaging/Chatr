@@ -385,7 +385,7 @@ struct NewConversationView: View {
                                 dialog.name = "\(self.auth.profile.results.first?.fullName ?? "Chatr User")'s Group Chat"
                             }
                             Request.createDialog(dialog, successBlock: { (dialog) in
-                                changeDialogRealmData().fetchDialogs(completion: { _ in
+                                changeDialogRealmData.shared.fetchDialogs(completion: { _ in
                                     self.auth.sendPushNoti(userIDs: occu, title: "Created New Group", message: "\(self.auth.profile.results.first?.fullName ?? "Chatr User") created a new group chat with you")
                                     self.selectedContact.removeAll()
                                     self.newDialogID = "\(String(describing: dialog.id))"
@@ -433,7 +433,7 @@ struct NewConversationView: View {
         if searchText != "" {
             Request.users(withFullName: searchText, paginator: Paginator.limit(20, skip: 0), successBlock: { (paginator, users) in
                 for i in users {
-                    changeContactsRealmData().observeFirebaseContactReturn(contactID: Int(i.id), completion: { firebaseContact in
+                    changeContactsRealmData.shared.observeFirebaseContactReturn(contactID: Int(i.id), completion: { firebaseContact in
                         if !firebaseContact.isMessagingPrivate {
                             self.grandUsers.append(i)
                             self.grandUsers.removeDuplicates()
@@ -446,7 +446,7 @@ struct NewConversationView: View {
             
             Request.users(withPhoneNumbers: [searchText], paginator: Paginator.limit(5, skip: 0), successBlock: { (paginator, users) in
                 for i in users {
-                    changeContactsRealmData().observeFirebaseContactReturn(contactID: Int(i.id), completion: { firebaseContact in
+                    changeContactsRealmData.shared.observeFirebaseContactReturn(contactID: Int(i.id), completion: { firebaseContact in
                         if !firebaseContact.isMessagingPrivate {
                             self.grandUsers.append(i)
                             self.grandUsers.removeDuplicates()

@@ -100,8 +100,6 @@ class AuthModel: NSObject, ObservableObject {
     var anyCancellable1: AnyCancellable? = nil
     var authStateDidChangeListenerHandle: AuthStateDidChangeListenerHandle?
     
-    let persistenceManager = PersistenceManager()
-
     override init() {
         super.init()
         anyCancellable = profile.objectWillChange.sink { (_) in
@@ -185,7 +183,7 @@ class AuthModel: NSObject, ObservableObject {
                                     if user.fullName != nil {
                                         self.haveUserFullName = true
                                     }
-                                    if self.persistenceManager.getCubeProfileImage(usersID: user) != nil {
+                                    if PersistenceManager.shared.getCubeProfileImage(usersID: user) != nil {
                                         self.haveUserProfileImg = true
                                     }
 //                                    if Chat.instance.isConnected {
@@ -195,7 +193,7 @@ class AuthModel: NSObject, ObservableObject {
 //                                    }
                                 } else {
                                     self.isFirstTimeUser = true
-                                    changeAddressBookRealmData().removeAllAddressBook(completion: { _ in
+                                    changeAddressBookRealmData.shared.removeAllAddressBook(completion: { _ in
                                         Analytics.logEvent(AnalyticsEventSignUp, parameters: [AnalyticsParameterMethod: "Phone Number Security Code - from Sign Up"])
                                         self.fetchTotalUserCount(completion: { count in
                                             Database.database().reference().child("Users").child("\(user.id)").updateChildValues(["userNumber" : count])
@@ -206,7 +204,7 @@ class AuthModel: NSObject, ObservableObject {
                                     })
                                 }
 
-                                changeProfileRealmDate().updateProfile(user, completion: {
+                                changeProfileRealmDate.shared.updateProfile(user, completion: {
                                     //Update Firebase Analitics log events by checking Firebase new user
                                     Chat.instance.connect(withUserID: UInt(user.id), password: Session.current.sessionDetails?.token ?? "") { (error) in
                                         if error != nil {
@@ -338,7 +336,7 @@ class AuthModel: NSObject, ObservableObject {
         updateParameters.fullName = fullName
         Request.updateCurrentUser(updateParameters, successBlock: { (user) in
             //self.persistenceManager.setCubeProfile(user)
-            changeProfileRealmDate().updateProfile(user, completion: {
+            changeProfileRealmDate.shared.updateProfile(user, completion: {
                 //upload that data to firebase firestore
                 if let phoneNum = user.phone {
                     let reference = Firestore.firestore().collection("Profiles").document(phoneNum)
@@ -371,7 +369,7 @@ class AuthModel: NSObject, ObservableObject {
                 parameters.customData = String(data: theJSONData, encoding: .utf8)
             }
             Request.updateCurrentUser(parameters, successBlock: { (user) in
-                changeProfileRealmDate().updateProfile(user, completion: {
+                changeProfileRealmDate.shared.updateProfile(user, completion: {
                     self.haveUserProfileImg = true
                     completion(true)
                 })        
@@ -493,11 +491,11 @@ class AuthModel: NSObject, ObservableObject {
         Request.logOut(successBlock: {
             print("success logging out of connecty cube")
             self.verifyPhoneNumberStatus = .undefined
-            changeProfileRealmDate().removeAllProfile()
-            changeMessageRealmData.removeAllMessages(completion: { _ in })
-            changeDialogRealmData().removeAllDialogs()
-            changeContactsRealmData().removeAllContacts()
-            changeQuickSnapsRealmData().removeAllQuickSnaps()
+            changeProfileRealmDate.shared.removeAllProfile()
+            changeMessageRealmData.shared.removeAllMessages(completion: { _ in })
+            changeDialogRealmData.shared.removeAllDialogs()
+            changeContactsRealmData.shared.removeAllContacts()
+            changeQuickSnapsRealmData.shared.removeAllQuickSnaps()
         }) { (error) in
             print("Error logging out of ConnectyCube: \(error.localizedDescription)")
         }
@@ -655,7 +653,7 @@ extension AuthModel: ChatDelegate {
     
     func chatDidReceiveAcceptContactRequest(fromUser userID: UInt) {
         print("chat did receive ACCEPTED new Contact! userID: \(userID)")
-        changeContactsRealmData().updateSingleRealmContact(userID: Int(userID), completion: { _ in })
+        changeContactsRealmData.shared.updateSingleRealmContact(userID: Int(userID), completion: { _ in })
         self.profile.removeContactRequest(userID: userID)
     }
     
@@ -676,7 +674,7 @@ extension AuthModel: ChatDelegate {
     func chatDidReceiveContactItemActivity(_ userID: UInt, isOnline: Bool, status: String?) {
         print("contact list did receive new activity from: \(userID). Is online: \(isOnline). Status: \(String(describing: status))")
         self.setOnlineCount()
-        changeContactsRealmData().updateContactOnlineStatus(userID: userID, isOnline: isOnline)
+        changeContactsRealmData.shared.updateContactOnlineStatus(userID: userID, isOnline: isOnline)
     }
     
     func chatDidDeliverMessage(withID messageID: String, dialogID: String, toUserID userID: UInt) {
@@ -721,7 +719,7 @@ extension AuthModel: ChatDelegate {
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         if UserDefaults.standard.bool(forKey: "localOpen") {
             if (!message.removed) {
-                changeMessageRealmData.insertMessage(message, completion: { })
+                changeMessageRealmData.shared.insertMessage(message, completion: { })
                 
                 if message.senderID != UserDefaults.standard.integer(forKey: "currentUserID") {
                     Chat.instance.read(message) { (error) in
@@ -730,38 +728,38 @@ extension AuthModel: ChatDelegate {
                 }
             }
         } else {
-            changeDialogRealmData().fetchDialogs(completion: { _ in })
+            changeDialogRealmData.shared.fetchDialogs(completion: { _ in })
         }
 
         if (message.removed) {
-            changeMessageRealmData.updateMessageState(messageID: message.id ?? "", messageState: .deleted)
+            changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .deleted)
         } else if (message.edited) {
-            changeMessageRealmData.updateMessageState(messageID: message.id ?? "", messageState: .editied)
+            changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .editied)
         } else if (message.delayed) {
-            changeMessageRealmData.updateMessageDelayState(messageID: message.id ?? "", messageDelayed: true)
+            changeMessageRealmData.shared.updateMessageDelayState(messageID: message.id ?? "", messageDelayed: true)
         }
     }
     
     func chatRoomDidReceive(_ message: ChatMessage, fromDialogID dialogID: String) {
         print("receved new GROUP message: \(String(describing: message.text)) for dialogID: \(dialogID)")
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-        changeMessageRealmData.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
+        changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
         if UserDefaults.standard.bool(forKey: "localOpen") {
             if (!message.removed) {
                 Chat.instance.read(message) { (error) in
-                    changeMessageRealmData.insertMessage(message, completion: { })
+                    changeMessageRealmData.shared.insertMessage(message, completion: { })
                 }
             }
             self.setOnlineCount()
         } else {
-            changeDialogRealmData().fetchDialogs(completion: { _ in })
+            changeDialogRealmData.shared.fetchDialogs(completion: { _ in })
         }
         if (message.removed) {
-            changeMessageRealmData.updateMessageState(messageID: message.id ?? "", messageState: .deleted)
+            changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .deleted)
         } else if (message.edited) {
-            changeMessageRealmData.updateMessageState(messageID: message.id ?? "", messageState: .editied)
+            changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .editied)
         } else if (message.delayed) {
-            changeMessageRealmData.updateMessageDelayState(messageID: message.id ?? "", messageDelayed: true)
+            changeMessageRealmData.shared.updateMessageDelayState(messageID: message.id ?? "", messageDelayed: true)
         }
     }
         

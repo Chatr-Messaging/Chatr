@@ -270,7 +270,7 @@ struct mainHomeList: View {
                                 QuickSnapsSection(viewState: self.$quickSnapViewState, selectedQuickSnapContact: self.$selectedQuickSnapContact, emptyQuickSnaps: self.$emptyQuickSnaps, isLocalOpen: self.$isLocalOpen)
                                     .environmentObject(self.auth)
                                     .frame(width: Constants.screenWidth)
-                                    .offset(y: self.isLocalOpen ? -geometry.frame(in: .global).minY - (UIDevice.current.hasNotch ? -50 : 5) : 0)
+                                    .offset(y: self.isLocalOpen ? -geometry.frame(in: .global).minY - (UIDevice.current.hasNotch ? -55 : -10) : 0)
                                     .offset(y: self.isLocalOpen ? self.activeView.height / 1.5 : 0)
                                     .animation(.spring(response: 0.45, dampingFraction: self.isLocalOpen ? 0.65 : 0.75, blendDuration: 0))
                                     .padding(.vertical, self.emptyQuickSnaps ? 0 : 20)
@@ -280,7 +280,7 @@ struct mainHomeList: View {
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
                                     self.isLocalOpen = true
                                     UserDefaults.standard.set(self.isLocalOpen, forKey: "localOpen")
-                                    changeDialogRealmData().updateDialogOpen(isOpen: self.isLocalOpen, dialogID: self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id ?? "")
+                                    changeDialogRealmData.shared.updateDialogOpen(isOpen: self.isLocalOpen, dialogID: self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id ?? "")
                                     UserDefaults.standard.set(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id, forKey: "selectedDialogID")
                                     self.newDialogID = ""
                                 }
@@ -292,7 +292,7 @@ struct mainHomeList: View {
                                     if self.newDialogFromContact != 0 {
                                         self.isLocalOpen = false
                                         UserDefaults.standard.set(false, forKey: "localOpen")
-                                        changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: "\(self.newDialogFromContact)")
+                                        changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: "\(self.newDialogFromContact)")
                                     }
                                     self.loadSelectedDialog()
                                 }) {
@@ -304,14 +304,14 @@ struct mainHomeList: View {
                                 }
                         }
                         
-                        //                        //MARK: Pull to refresh - loading dialogs
-                        //                        PullToRefreshIndicator(isLoading: self.$isLoading, preLoading: self.$isPreLoading, localOpen: self.$isLocalOpen)
-                        //                            .environmentObject(self.auth)
-                        //                            .offset(y: self.emptyQuickSnaps ? -70 : 60)
-                        //                            .onAppear() {
-                        //                                self.isLoading = false
-                        //                                self.isPreLoading = false
-                        //                            }
+//                        //MARK: Pull to refresh - loading dialogs
+//                        PullToRefreshIndicator(isLoading: self.$isLoading, preLoading: self.$isPreLoading, localOpen: self.$isLocalOpen)
+//                            .environmentObject(self.auth)
+//                            .offset(y: self.emptyQuickSnaps ? -70 : 60)
+//                            .onAppear() {
+//                                self.isLoading = false
+//                                self.isPreLoading = false
+//                            }
                         
                         //MARK: Search Bar
                         if self.dialogs.results.filter { $0.isDeleted != true }.count != 0 {
@@ -335,7 +335,7 @@ struct mainHomeList: View {
                                     .frame(height: Constants.screenWidth < 375 ? 250 : 200)
                                     .padding(.horizontal, 10)
                                     .onAppear() {
-                                        changeDialogRealmData().fetchDialogs(completion: { _ in })
+                                        changeDialogRealmData.shared.fetchDialogs(completion: { _ in })
                                     }
                                 
                                 Text("No Messages Found")
@@ -405,7 +405,7 @@ struct mainHomeList: View {
                                     })
                             }.frame(height: 75, alignment: .center)
                             .padding(.horizontal, self.isLocalOpen && i.isOpen ? 0 : 20)
-                        }.offset(y: 60)
+                        }
                         .disabled(self.disableDialog)
                         .onChange(of: UserDefaults.standard.bool(forKey: "localOpen")) { _ in
                             self.disableDialog = true
@@ -430,11 +430,11 @@ struct mainHomeList: View {
                     GeometryReader { geo in
                         ChatMessagesView(activeView: self.$activeView, keyboardChange: self.$keyboardHeight, dialogID: self.$selectedDialogID, textFieldHeight: self.$textFieldHeight, keyboardDragState: self.$keyboardDragState, hasAttachment: self.$hasAttachments, newDialogFromSharedContact: self.$newDialogFromSharedContact)
                             .environmentObject(self.auth)
-                            .frame(width: Constants.screenWidth, height: Constants.screenHeight - (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 125 : 89) : 199), alignment: .bottom)
+                            .frame(width: Constants.screenWidth, height: Constants.screenHeight - (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 127 : 91) : 201), alignment: .bottom)
                             .zIndex(1)
                             .contentShape(Rectangle())
-                            .offset(y: -geo.frame(in: .global).minY + (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 125 : 89) : 184))
-                            .padding(.bottom, self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 125 : 89) : 184)
+                            .offset(y: -geo.frame(in: .global).minY + (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 127 : 91) : 186))
+                            .padding(.bottom, self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 127 : 91) : 186)
                             .offset(y: self.activeView.height) // + (self.emptyQuickSnaps ? 25 : 197))
                             .simultaneousGesture(DragGesture(minimumDistance: UserDefaults.standard.bool(forKey: "localOpen") ? 800 : 0))
                             .layoutPriority(1)
@@ -549,7 +549,7 @@ struct mainHomeList: View {
                         self.newDialogFromContact = 0
                         self.isLocalOpen = true
                         UserDefaults.standard.set(true, forKey: "localOpen")
-                        changeDialogRealmData().updateDialogOpen(isOpen: self.isLocalOpen, dialogID: dia.id)
+                        changeDialogRealmData.shared.updateDialogOpen(isOpen: self.isLocalOpen, dialogID: dia.id)
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                         UserDefaults.standard.set(dia.id, forKey: "selectedDialogID")
                         
@@ -565,12 +565,12 @@ struct mainHomeList: View {
                 dialog.occupantIDs = [NSNumber(value: self.newDialogFromContact)]  // an ID of opponent
 
                 Request.createDialog(dialog, successBlock: { (dialog) in
-                    changeDialogRealmData().fetchDialogs(completion: { _ in
+                    changeDialogRealmData.shared.fetchDialogs(completion: { _ in
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                             print("opening new dialog: \(self.newDialogID) & \(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id ?? "")")
                             self.isLocalOpen = true
                             UserDefaults.standard.set(self.isLocalOpen, forKey: "localOpen")
-                            changeDialogRealmData().updateDialogOpen(isOpen: self.isLocalOpen, dialogID: self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id ?? "")
+                            changeDialogRealmData.shared.updateDialogOpen(isOpen: self.isLocalOpen, dialogID: self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id ?? "")
                             UserDefaults.standard.set(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id, forKey: "selectedDialogID")
                             self.newDialogFromContact = 0
                         }
@@ -591,16 +591,18 @@ struct mainHomeList: View {
         
         if !UserDefaults.standard.bool(forKey: "localOpen") {
             UserDefaults.standard.set(true, forKey: "localOpen")
-            self.isLocalOpen = true
-            self.selectedDialogID = id
-            changeDialogRealmData().updateDialogOpen(isOpen: true, dialogID: id)
+            withAnimation {
+                self.isLocalOpen = true
+                self.selectedDialogID = id
+            }
+            changeDialogRealmData.shared.updateDialogOpen(isOpen: true, dialogID: id)
         } else {
             self.isLocalOpen = false
             UserDefaults.standard.set(false, forKey: "localOpen")
-            changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: id)
+            changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: id)
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                changeDialogRealmData().fetchDialogs(completion: { _ in })
+                changeDialogRealmData.shared.fetchDialogs(completion: { _ in })
                 if dialogType == "group" || dialogType == "public" {
                     self.auth.leaveDialog()
                 }
@@ -621,10 +623,10 @@ struct mainHomeList: View {
             UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
             UserDefaults.standard.set(false, forKey: "localOpen")
             self.isLocalOpen = false
-            changeDialogRealmData().updateDialogOpen(isOpen: false, dialogID: id)
+            changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: id)
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                changeDialogRealmData().fetchDialogs(completion: { _ in })
+                changeDialogRealmData.shared.fetchDialogs(completion: { _ in })
                 if dialogType == "group" || dialogType == "public" {
                     self.auth.leaveDialog()
                 }

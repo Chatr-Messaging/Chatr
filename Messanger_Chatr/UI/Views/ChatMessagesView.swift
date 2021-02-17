@@ -24,7 +24,8 @@ struct ChatMessagesView: View {
     @State private var delayViewMessages: Bool = false
     @State private var firstScroll: Bool = true
     @State private var mesgCount: Int = -1
-    
+    @State private var pagination: Int = 18
+
     var body: some View {
         let currentMessages = self.auth.messages.selectedDialog(dialogID: self.dialogID)
         //let currentMessages = self.auth.dialogs.results.filter("id == %@", self.dialogID).sorted(byKeyPath: "lastMessageDate", ascending: false)
@@ -44,15 +45,15 @@ struct ChatMessagesView: View {
                     if self.delayViewMessages {
                         ScrollViewReader { reader in
                             VStack {
-                                ForEach(currentMessages.indices, id: \.self) { message in
+                                ForEach(currentMessages.count - self.pagination ..< currentMessages.count, id: \.self) { message in
                                     let messagePosition: messagePosition = UInt(currentMessages[message].senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? .right : .left
-                                    let notLast = currentMessages[message] != currentMessages.last
-                                    let topMsg = currentMessages[message] == currentMessages.first
+                                    let notLast = currentMessages[message].id != currentMessages.last?.id
+                                    let topMsg = currentMessages[message].id == currentMessages.first?.id
 
                                     if topMsg && currentMessages.count > 20 {
                                         Button(action: {
                                             self.firstScroll = false
-                                            changeMessageRealmData.loadMoreMessages(dialogID: currentMessages[message].dialogID, currentCount: currentMessages.count, completion: { _ in
+                                            changeMessageRealmData.shared.loadMoreMessages(dialogID: currentMessages[message].dialogID, currentCount: currentMessages.count, completion: { _ in
                                                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
                                                     withAnimation {
                                                         reader.scrollTo(currentMessages[message + 20].id, anchor: .top)
@@ -83,16 +84,15 @@ struct ChatMessagesView: View {
                                         .padding(.bottom, self.hasPrevious(index: message) ? -6 : 10)
                                         .padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 95 : 0) + 20)
                                         .id(currentMessages[message].id)
-                                    }.opacity(self.firstScroll ? 0 : 1)
-                                    .onAppear {
+                                    }.onAppear {
                                         if !notLast {
                                             if self.firstScroll {
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
                                                     reader.scrollTo(currentMessages[message].id, anchor: .bottom)
                                                     self.firstScroll = false
                                                 }
                                             } else {
-                                                withAnimation(Animation.easeOut(duration: 0.6).delay(0.2)) {
+                                                withAnimation(Animation.easeOut(duration: 0.6).delay(0.1)) {
                                                     reader.scrollTo(currentMessages[message].id, anchor: .bottom)
                                                 }
                                             }
@@ -105,12 +105,12 @@ struct ChatMessagesView: View {
                                         reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
                                     }
                                 }
-                            }
+                            }.opacity(self.firstScroll ? 0 : 1)
                         }
                     }
                 }//.resignKeyboardOnDragGesture()
                 .onAppear() {
-                    DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 0.5) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                         self.loadDialog()
                         self.delayViewMessages = true
                     }
@@ -118,8 +118,6 @@ struct ChatMessagesView: View {
             }.frame(width: Constants.screenWidth)
             .contentShape(Rectangle())
             .onAppear() {
-                UIScrollView.appearance().keyboardDismissMode = .interactive
-
                 DispatchQueue.global(qos: .utility).async {
                     if !Session.current.tokenHasExpired {
                         Request.countOfMessages(forDialogID: self.dialogID, extendedRequest: ["sort_desc" : "lastMessageDate"], successBlock: { count in
@@ -145,13 +143,13 @@ struct ChatMessagesView: View {
 
                 dialog.onUserIsTyping = { (userID: UInt) in
                     if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
-                        changeMessageRealmData.addTypingMessage(userID: String(userID), dialogID: self.dialogID)
+                        changeMessageRealmData.shared.addTypingMessage(userID: String(userID), dialogID: self.dialogID)
                     }
                 }
 
                 dialog.onUserStoppedTyping = { (userID: UInt) in
                     if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
-                        changeMessageRealmData.removeTypingMessage(userID: String(userID), dialogID: self.dialogID)
+                        changeMessageRealmData.shared.removeTypingMessage(userID: String(userID), dialogID: self.dialogID)
                     }
                 }
 
@@ -197,6 +195,6 @@ struct ChatMessagesView: View {
             })
         }
         
-        changeMessageRealmData.getMessageUpdates(dialogID: self.dialogID, completion: { _ in })
+        changeMessageRealmData.shared.getMessageUpdates(dialogID: self.dialogID, completion: { _ in })
     }
 }

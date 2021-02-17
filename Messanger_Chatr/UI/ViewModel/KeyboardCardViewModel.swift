@@ -122,7 +122,7 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
     }
     
     func getImageFromAsset(asset: PHAsset, size: CGSize, completion: @escaping (UIImage)->()) {
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.global(qos: .utility).async {
             let imageManager = PHCachingImageManager()
             imageManager.allowsCachingHighQualityImages = true
             

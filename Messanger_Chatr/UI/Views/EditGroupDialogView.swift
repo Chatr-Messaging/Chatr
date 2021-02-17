@@ -158,11 +158,11 @@ struct EditGroupDialogView: View {
             parameters.dialogDescription = self.bioText
 
             Request.updateDialog(withID: self.dialogModel.id, update: parameters, successBlock: { (updatedDialog) in
-                changeDialogRealmData().updateDialogNameDescription(name: self.fullNameText, description: self.bioText, dialogID: self.dialogModel.id)
+                changeDialogRealmData.shared.updateDialogNameDescription(name: self.fullNameText, description: self.bioText, dialogID: self.dialogModel.id)
                 UINotificationFeedbackGenerator().notificationOccurred(.success)
                 self.loadingSave = false
                 self.didSave = true
-                //changeDialogRealmData().fetchDialogs(completion: { _ in })
+                //changeDialogRealmData.shared.fetchDialogs(completion: { _ in })
             }) { (error) in
                 UINotificationFeedbackGenerator().notificationOccurred(.error)
                 self.loadingSave = false
