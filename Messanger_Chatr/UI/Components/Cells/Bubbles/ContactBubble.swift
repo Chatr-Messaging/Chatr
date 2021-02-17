@@ -51,7 +51,7 @@ struct ContactBubble: View {
                             VStack(alignment: .leading) {
                                 Text(self.contact.fullName)
                                     .font(.system(size: 18))
-                                    .fontWeight(.bold)
+                                    .fontWeight(.semibold)
                                     .foregroundColor(.primary)
 
                                 Text(contact.isOnline ? "online now" : "last online \(contact.lastOnline.getElapsedInterval(lastMsg: "moments")) ago")

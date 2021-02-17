@@ -24,7 +24,13 @@ struct ChatMessagesView: View {
     @State private var delayViewMessages: Bool = false
     @State private var firstScroll: Bool = true
     @State private var mesgCount: Int = -1
-    @State private var pagination: Int = 18
+    var pagination: Int {
+        if self.auth.messages.selectedDialog(dialogID: self.dialogID).count < 15 {
+            return self.auth.messages.selectedDialog(dialogID: self.dialogID).count
+        } else {
+            return 15
+        }
+    }
 
     var body: some View {
         let currentMessages = self.auth.messages.selectedDialog(dialogID: self.dialogID)

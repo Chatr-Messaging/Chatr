@@ -50,7 +50,7 @@ struct VisitContactView: View {
             ScrollView(.vertical, showsIndicators: true) {
                 //MARK: Top Profile
                 topHeaderContactView(viewModel: self.viewModel, contact: self.$contact, quickSnapViewState: self.$quickSnapViewState, isProfileImgOpen: self.$isProfileImgOpen, isProfileBioOpen: self.$isProfileBioOpen, selectedImageUrl: self.$selectedImageUrl)
-                    .padding(.top, 20)
+                    .padding(.top, 10)
 
                 //MARK: Action Buttons
                 actionButtonView(viewModel: self.viewModel, contact: self.$contact, quickSnapViewState: self.$quickSnapViewState, contactRelationship: self.$contactRelationship, newMessage: self.$newMessage, dismissView: self.$dismissView)
@@ -902,18 +902,18 @@ struct topHeaderContactView: View {
                 ZStack {
                     WebImage(url: URL(string: contact.avatar))
                         .resizable()
-                        .placeholder{ Image("empty-profile").resizable().frame(width: 80, height: 80, alignment: .center).scaledToFill() }
+                        .placeholder{ Image("empty-profile").resizable().frame(width: 110, height: 110, alignment: .center).scaledToFill() }
                         .indicator(.activity)
                         .transition(.fade(duration: 0.25))
                         .scaledToFill()
                         .clipShape(Circle())
-                        .frame(width: 80, height: 80, alignment: .center)
+                        .frame(width: 110, height: 110, alignment: .center)
                         .shadow(color: Color.black.opacity(0.25), radius: 10, x: 0, y: 8)
                     
                     if self.contact.quickSnaps.count > 0 {
                         Circle()
                             .stroke(Constants.snapPurpleGradient, style: StrokeStyle(lineWidth: 2, lineCap: .round))
-                            .frame(width: 88, height: 88)
+                            .frame(width: 118, height: 118)
                             .foregroundColor(.clear)
                     }
                     
@@ -949,7 +949,7 @@ struct topHeaderContactView: View {
                                     }
                                     
                                     Text(self.contact.fullName)
-                                        .font(.system(size: 24))
+                                        .font(.system(size: 26))
                                         .fontWeight(.semibold)
                                         .foregroundColor(.primary)
                                         .lineLimit(2)
