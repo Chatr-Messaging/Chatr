@@ -208,16 +208,14 @@ struct ContainerBubble: View {
                     .padding(.horizontal)
             }
         }.onAppear() {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                self.viewModel.getUserAvatar(senderId: self.message.senderID, compleation: { url in
-                    if url == "self" {
-                        self.avatar = self.auth.profile.results.first?.avatar ?? ""
-                    } else { self.avatar = url }
-                })
+            self.viewModel.getUserAvatar(senderId: self.message.senderID, compleation: { url in
+                if url == "self" {
+                    self.avatar = self.auth.profile.results.first?.avatar ?? ""
+                } else { self.avatar = url }
+            })
 
-                self.hasUserLiked = self.message.likedId.contains(self.auth.profile.results.first?.id ?? 0)
-                self.hasUserDisliked = self.message.dislikedId.contains(self.auth.profile.results.first?.id ?? 0)
-            }
+            self.hasUserLiked = self.message.likedId.contains(self.auth.profile.results.first?.id ?? 0)
+            self.hasUserDisliked = self.message.dislikedId.contains(self.auth.profile.results.first?.id ?? 0)
         }
     }
     
@@ -228,20 +226,20 @@ struct ContainerBubble: View {
             
             if message.messageState != .error {
                 if self.messagePosition == .left {
-                    if y > 5 && y < 50 { interactionSelected = reactions[0] }
-                    if y > 50 && y < 100 { interactionSelected = reactions[1] }
-                    if y > 100 && y < 150 { interactionSelected = reactions[2] }
-                    if y > 150 && y < 200 && reactions.count >= 4 { interactionSelected = reactions[3] }
-                    if y < 5 || y > 200 { interactionSelected = "" }
+                    if y > 5 && y < 35 { interactionSelected = reactions[0] }
+                    if y > 35 && y < 65 { interactionSelected = reactions[1] }
+                    if y > 65 && y < 95 { interactionSelected = reactions[2] }
+                    if y > 95 && y < 125 && reactions.count >= 4 { interactionSelected = reactions[3] }
+                    if y < 5 || y > 125 { interactionSelected = "" }
                 } else {
-                    if y > -150 && y < -100 { interactionSelected = reactions[0] }
-                    if y > -100 && y < -50 { interactionSelected = reactions[1] }
-                    if y > -50 && y < -5 { interactionSelected = reactions[2] }
-                    if y < -150 || y > -5 { interactionSelected = "" }
+                    if y > -95 && y < -65 { interactionSelected = reactions[0] }
+                    if y > -65 && y < -35 { interactionSelected = reactions[1] }
+                    if y > -35 && y < -5 { interactionSelected = reactions[2] }
+                    if y < -95 || y > -5 { interactionSelected = "" }
                 }
             } else {
-                if y > -150 && y < -5 { interactionSelected = "try again" }
-                if y < -150 || y > -5 { interactionSelected = "" }
+                if y > -120 && y < -5 { interactionSelected = "try again" }
+                if y < -120 || y > -5 { interactionSelected = "" }
             }
         }
     }

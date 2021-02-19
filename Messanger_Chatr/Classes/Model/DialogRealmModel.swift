@@ -79,9 +79,9 @@ class changeDialogRealmData {
     static let shared = changeDialogRealmData()
 
     func fetchDialogs(completion: @escaping (Bool) -> ()) {
-        let queue = DispatchQueue(label: "com.brandon.chatrQueue", qos: .utility)
+        //let queue = DispatchQueue(label: "com.brandon.chatrQueue", qos: .utility)
 
-        queue.async {
+        //queue.async {
             print("the thread fwefawefor featching dialogs: \(Thread.isMultiThreaded()) and the thread: \(Thread.isMainThread)")
             let extRequest : [String: String] = ["sort_desc" : "lastMessageDate"]
             Request.dialogs(with: Paginator.limit(100, skip: 0), extendedRequest: extRequest, successBlock: { (dialogs, usersIDs, paginator) in
@@ -110,10 +110,10 @@ class changeDialogRealmData {
            }
             
             completion(true)
-        }
+        //}
     }
     
-    func insertDialogs<T>(_ objects: [T], completion: @escaping () -> Void) where T: ChatDialog {
+    func insertDialogs(_ objects: [ChatDialog], completion: @escaping () -> Void) {
         objects.forEach({ object in
             let config = Realm.Configuration(schemaVersion: 1)
 

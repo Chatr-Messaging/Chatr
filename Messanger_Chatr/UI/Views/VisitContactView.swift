@@ -921,7 +921,7 @@ struct topHeaderContactView: View {
                         .frame(width: 12, height: 12)
                         .foregroundColor(.green)
                         .opacity(self.contact.isOnline ? 1 : 0)
-                        .offset(x: 28, y: 28)
+                        .offset(x: 55, y: 55)
                 }
             }.buttonStyle(ClickButtonStyle())
             .offset(y: 50)

@@ -99,8 +99,8 @@ class changeProfileRealmDate {
     static let shared = changeProfileRealmDate()
     
     func observeFirebaseUser() {
-        let queue = DispatchQueue.init(label: "com.brandon.chatrFirebbase", qos: .utility)
-        queue.async {
+        //let queue = DispatchQueue.init(label: "com.brandon.chatrFirebbase", qos: .utility)
+        //queue.async {
             let user = Database.database().reference().child("Users").child("\(Session.current.currentUserID)")
             user.observe(.value, with: { (snapshot: DataSnapshot) in
                 if let dict = snapshot.value as? [String: Any] {
@@ -147,7 +147,7 @@ class changeProfileRealmDate {
                     }
                 }
             })
-        }
+        //}
     }
     
     func updateProfile<T>(_ objects: T, completion: @escaping () -> Void) where T: User {
@@ -162,7 +162,7 @@ class changeProfileRealmDate {
                     oldData.website = objects.website ?? ""
                     oldData.emailAddress = objects.email ?? ""
                     //oldData.isLocalAuthOn = self.getCubeProfileLocalAuthSetting(usersID: objects) ?? false
-                    
+
                     realm.add(oldData, update: .all)
                     print("Succsessfuly updated Profile to Realm!")
                     completion()

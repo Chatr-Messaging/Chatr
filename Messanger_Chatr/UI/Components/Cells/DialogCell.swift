@@ -206,20 +206,20 @@ struct DialogCell: View {
                     }
                 } else {
                     changeDialogRealmData.shared.updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
-                    DispatchQueue.global(qos: .userInteractive).async {
-                        self.isOpen = true
-                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                        UserDefaults.standard.set(true, forKey: "localOpen")
-                    }
-                    
+                    self.isOpen = true
                     self.selectedDialogID = self.dialogModel.id
+
+                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                    UserDefaults.standard.set(true, forKey: "localOpen")
                     UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")
                 }
             }
 
             HStack() {
                 Button(action: {
+                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                     self.openActionSheet.toggle()
+                    UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
                 }, label: {
                     Image(systemName: "ellipsis")
                         .resizable()
@@ -249,11 +249,9 @@ struct DialogCell: View {
                         .destructive(Text(self.dialogModel.dialogType == "private" ? "Delete Dialog" : (self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? "Destroy Group" : "Leave Group")), action: {
                             changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
 
-                            DispatchQueue.global(qos: .userInteractive).async {
-                                self.isOpen = false
-                                self.openActionSheet = false
-                                UserDefaults.standard.set(false, forKey: "localOpen")
-                            }
+                            self.isOpen = false
+                            self.openActionSheet = false
+                            UserDefaults.standard.set(false, forKey: "localOpen")
                             
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                 if self.dialogModel.dialogType == "private" || self.dialogModel.dialogType == "group" {
@@ -268,13 +266,12 @@ struct DialogCell: View {
                 }
                 
                 Button(action: {
+                    self.isOpen = false
+                    UserDefaults.standard.set(false, forKey: "localOpen")
+                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                    UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
                     changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
-                    DispatchQueue.global(qos: .userInteractive).async {
-                        self.isOpen = false
-                        UserDefaults.standard.set(false, forKey: "localOpen")
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        changeDialogRealmData.shared.fetchDialogs(completion: { _ in })
-                    }
+                    changeDialogRealmData.shared.fetchDialogs(completion: { _ in })
                 }, label: {
                     Image(systemName: "chevron.down.circle")
                         .resizable()
@@ -304,8 +301,6 @@ struct DialogCell: View {
                 do {
                     let realm = try Realm(configuration: Realm.Configuration(schemaVersion: 1))
                     if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: self.privateDialogContact.id) {
-                        //MARK: COME BACK TO THIS** Crashes below
-                        //changeContactsRealmData.shared.observeFirebaseContact(contactID: foundContact.id)
                         self.privateDialogContact = foundContact
                         self.connectyContact.id = UInt(foundContact.id)
                         if self.privateDialogContact.avatar == "" || self.privateDialogContact.id == 0 && !Session.current.tokenHasExpired {
@@ -351,11 +346,9 @@ struct DialogCell: View {
                     if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: occ) {
                         if foundContact.avatar == "" {
                             Request.users(withIDs: [NSNumber(value: occ)], paginator: Paginator.limit(1, skip: 0), successBlock: { (paginator, users) in
-                                DispatchQueue.global(qos: .userInitiated).async {
-                                    for i in users {
-                                        self.groupOccUserAvatar.append(PersistenceManager().getCubeProfileImage(usersID: i) ?? "")
-                                        if self.groupOccUserAvatar.count >= 3 { return }
-                                    }
+                                for i in users {
+                                    self.groupOccUserAvatar.append(PersistenceManager().getCubeProfileImage(usersID: i) ?? "")
+                                    if self.groupOccUserAvatar.count >= 3 { return }
                                 }
                             })
                         } else {
@@ -363,11 +356,9 @@ struct DialogCell: View {
                         }
                     } else {
                         Request.users(withIDs: [NSNumber(value: occ)], paginator: Paginator.limit(1, skip: 0), successBlock: { (paginator, users) in
-                            DispatchQueue.global(qos: .userInitiated).async {
-                                for i in users {
-                                    self.groupOccUserAvatar.append(PersistenceManager().getCubeProfileImage(usersID: i) ?? "")
-                                    if self.groupOccUserAvatar.count >= 3 { return }
-                                }
+                            for i in users {
+                                self.groupOccUserAvatar.append(PersistenceManager().getCubeProfileImage(usersID: i) ?? "")
+                                if self.groupOccUserAvatar.count >= 3 { return }
                             }
                         })
                     }

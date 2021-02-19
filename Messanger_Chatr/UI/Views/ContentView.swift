@@ -200,6 +200,7 @@ struct mainHomeList: View {
                                     }
                                 }.onAppear {
                                     UIScrollView.appearance().keyboardDismissMode = .interactive
+
                                     NotificationCenter.default.addObserver(forName: NSNotification.Name("NotificationAlert"), object: nil, queue: .main) { (_) in
                                         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                                         self.receivedNotification.toggle()
@@ -452,7 +453,7 @@ struct mainHomeList: View {
                 }) {
                     EarlyAdopterView(counter: self.$counter)
                 }
-                
+
                 //MARK: Keyboard View
                 GeometryReader { geo in
                     KeyboardCardView(height: self.$textFieldHeight, isOpen: self.$isLocalOpen, mainText: self.$keyboardText, hasAttachments: self.$hasAttachments, showImagePicker: self.$showKeyboardMediaAssets, isKeyboardActionOpen: self.$isKeyboardActionOpen)
@@ -462,7 +463,7 @@ struct mainHomeList: View {
                         .cornerRadius(20)
                         .shadow(color: Color.black.opacity(0.15), radius: 14, x: 0, y: -5)
                         .offset(y: self.isLocalOpen ? geo.frame(in: .global).maxY - 40 -
-                            (UIDevice.current.hasNotch ? 0 : -20) - (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) - (self.hasAttachments ? (self.showKeyboardMediaAssets ? 140 : 100) : 0) - (self.showKeyboardMediaAssets ? 220 : 0) - self.keyboardHeight + (self.isKeyboardActionOpen ? -90 : 0) : geo.frame(in: .global).maxY)
+                            (UIDevice.current.hasNotch ? 0 : -20) - (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) - (self.hasAttachments ? (self.showKeyboardMediaAssets ? 110 : 120) : 0) - (self.showKeyboardMediaAssets ? 220 : 0) - self.keyboardHeight + (self.isKeyboardActionOpen ? -80 : 0) : geo.frame(in: .global).maxY)
                         .zIndex(2)
                         .onChange(of: self.auth.visitContactProfile) { newValue in
                             if newValue {
@@ -471,24 +472,6 @@ struct mainHomeList: View {
                             }
                         }.onAppear {
                             self.selectedDialogID = UserDefaults.standard.string(forKey: "selectedDialogID") ?? ""
-                            NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { (data) in
-                                let height1 = data.userInfo![UIResponder.keyboardFrameEndUserInfoKey] as! NSValue
-                                withAnimation(.easeOut(duration: 0.3), {
-                                    self.keyboardHeight = height1.cgRectValue.height - 10
-                                })
-                            }
-                            
-                            NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { (data) in
-                                let height2 = data.userInfo![UIResponder.keyboardFrameEndUserInfoKey] as! NSValue
-
-                                if height2.cgRectValue.height != 0 {
-                                    self.keyboardHeight = height2.cgRectValue.height - 10
-                                } else {
-                                    withAnimation(.easeOut(duration: 0.2), {
-                                        self.keyboardHeight = 0
-                                    })
-                                }
-                            }
                         }
                         /*
                         .simultaneousGesture(DragGesture().onChanged { value in

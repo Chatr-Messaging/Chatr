@@ -299,7 +299,6 @@ class InstagramApi {
                     let task = session.dataTask(with: request, completionHandler: { data, _, error in
                         do { let jsonData = try JSONDecoder().decode(InstagramMedia.self, from: data!)                            
                             DispatchQueue.main.async {
-                                print("the timeline ig is: \(jsonData.timestamp)")
                                 self.igMedia.append(jsonData)
                             }
                         }

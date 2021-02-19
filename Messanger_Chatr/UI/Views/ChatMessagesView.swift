@@ -24,6 +24,7 @@ struct ChatMessagesView: View {
     @State private var delayViewMessages: Bool = false
     @State private var firstScroll: Bool = true
     @State private var mesgCount: Int = -1
+    let keyboard = KeyboardObserver()
     var pagination: Int {
         if self.auth.messages.selectedDialog(dialogID: self.dialogID).count < 15 {
             return self.auth.messages.selectedDialog(dialogID: self.dialogID).count
@@ -80,16 +81,17 @@ struct ChatMessagesView: View {
                                                 .transition(AnyTransition.scale)
                                                 .environmentObject(self.auth)
                                                 .contentShape(Rectangle())
+                                                .fixedSize(horizontal: false, vertical: true)
                                                 .animation(.spring(response: 0.58, dampingFraction: 0.6, blendDuration: 0))
                                                 .padding(.horizontal, 25)
+                                                .padding(.bottom, self.hasPrevious(index: message) ? -6 : 10)
+                                                .padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 95 : 0) + 40)
+                                                .id(currentMessages[message].id)
 
                                             if messagePosition == .left { Spacer() }
                                         }.frame(width: Constants.screenWidth)
                                         .background(Color.clear)
                                         .padding(.top, topMsg && currentMessages.count < 20 ? 20 : 0)
-                                        .padding(.bottom, self.hasPrevious(index: message) ? -6 : 10)
-                                        .padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 95 : 0) + 20)
-                                        .id(currentMessages[message].id)
                                     }.onAppear {
                                         if !notLast {
                                             if self.firstScroll {
@@ -105,10 +107,24 @@ struct ChatMessagesView: View {
                                         }
                                     }
                                 }.contentShape(Rectangle())
-                            }.onChange(of: self.keyboardChange) { value in
-                                if value > 0 {
-                                    withAnimation(Animation.easeOut(duration: 0.5)) {
-                                        reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
+                            }.onAppear {
+                                keyboard.observe { (event) in
+                                    let keyboardFrameEnd = event.keyboardFrameEnd
+
+                                    switch event.type {
+                                    case .willShow:
+                                        UIView.animate(withDuration: event.duration, delay: 0.0, options: [event.options], animations: {
+                                            self.keyboardChange = keyboardFrameEnd.height - 10
+                                            reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
+                                        }, completion: nil)
+                                       
+                                    case .willHide:
+                                        UIView.animate(withDuration: event.duration, delay: 0.0, options: [event.options], animations: {
+                                            self.keyboardChange = 0
+                                        }, completion: nil)
+
+                                    default:
+                                        break
                                     }
                                 }
                             }.opacity(self.firstScroll ? 0 : 1)

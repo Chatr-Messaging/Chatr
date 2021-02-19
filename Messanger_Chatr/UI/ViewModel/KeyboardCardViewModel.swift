@@ -37,6 +37,7 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
     @Published var selectedVideos : [KeyboardMediaAsset] = []
     @Published var imageData: [UIImage] = []
     @Published var videoData: [AVAsset] = []
+    @Published var pastedImages: [UIImage] = []
     
     func openImagePicker(completion: @escaping () -> Void) {
         if fetchedPhotos.isEmpty {

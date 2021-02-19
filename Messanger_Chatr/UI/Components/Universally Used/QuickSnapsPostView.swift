@@ -356,11 +356,11 @@ struct QuickSnapsPostView: View {
             }.background(BlurView(style: .systemThinMaterialDark))
             .cornerRadius(20)
         }.onAppear() {
-            NotificationCenter.default.addObserver(forName: UIApplication.userDidTakeScreenshotNotification, object: nil, queue: OperationQueue.main) { notification in
+            NotificationCenter.default.addObserver(forName: UIApplication.userDidTakeScreenshotNotification, object: nil, queue: .main) { notification in
                 print("Screenshot taken!")
                 if self.viewState == .viewing {
                     UINotificationFeedbackGenerator().notificationOccurred(.error)
- 
+                    
                     let event = Event()
                     event.notificationType = .push
                     event.usersIDs = [NSNumber(value: self.selectedQuickSnapContact.id)]

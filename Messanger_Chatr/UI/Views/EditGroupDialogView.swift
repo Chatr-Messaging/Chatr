@@ -12,6 +12,7 @@ import FirebaseDatabase
 
 struct EditGroupDialogView: View {
     @EnvironmentObject var auth: AuthModel
+    @StateObject var imagePicker = KeyboardCardViewModel()
     @Binding var dialogModel: DialogStruct
     @State var fullNameText: String = ""
     @State var bioText: String = "Description"
@@ -86,7 +87,7 @@ struct EditGroupDialogView: View {
                                 }
                                 
                                 ZStack(alignment: .topLeading) {
-                                    ResizableTextField(height: self.$bioHeight, text: self.$bioText)
+                                    ResizableTextField(imagePicker: self.imagePicker, height: self.$bioHeight, text: self.$bioText)
                                         .padding(.horizontal, 2.5)
                                         .padding(.trailing, 5)
                                         .font(.none)
@@ -137,10 +138,8 @@ struct EditGroupDialogView: View {
             }.disabled((220 - self.bioText.count) > 220 && loadingSave ? true : self.didSave ? true : false)
         ).onAppear {
             NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { (data) in
-                DispatchQueue.main.async {
-                    let height1 = data.userInfo![UIResponder.keyboardFrameEndUserInfoKey] as! NSValue
-                    self.keyboardHeight = height1.cgRectValue.height + 10
-                }
+                let height1 = data.userInfo![UIResponder.keyboardFrameEndUserInfoKey] as! NSValue
+                self.keyboardHeight = height1.cgRectValue.height + 10
             }
             
             NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { (_) in

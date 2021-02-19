@@ -14,11 +14,10 @@ struct ProfileImage: View {
     @EnvironmentObject var auth: AuthModel
     @Binding var size: CGFloat
     @Binding var alertCount: Int
-    @ObservedObject var profile = ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self))
 
     var body: some View {
         ZStack {
-            if let avatarURL = self.profile.results.first?.avatar {
+            if let avatarURL = self.auth.profile.results.first?.avatar {
                 WebImage(url: URL(string: avatarURL))
                     .resizable()
                     .placeholder{ Image("empty-profile").resizable().frame(width: size, height: size, alignment: .center).scaledToFill() }

@@ -74,8 +74,15 @@ struct keyboardButtonStyle: ButtonStyle {
     public func makeBody(configuration: keyboardButtonStyle.Configuration) -> some View {
         configuration.label
             .scaleEffect(configuration.isPressed ? 0.90 : 1.0)
-            .background(RoundedRectangle(cornerRadius: 15).shadow(color: Color.black.opacity(0.2), radius: 15, x: 0, y: 8))
-            .foregroundColor(configuration.isPressed ? Color("interactionBtnColorSelected") : Color("interactionBtnColor"))
+            .background(RoundedRectangle(cornerRadius: 15))
+            .foregroundColor(configuration.isPressed ? Color("interactionBtnColor") : Color("interactionBtnBorderUnselected"))
+    }
+}
+
+struct changeBGPaperclipButtonStyle: ButtonStyle {
+    public func makeBody(configuration: changeBGPaperclipButtonStyle.Configuration) -> some View {
+        configuration.label
+            .background(configuration.isPressed ? Color("bgColor") : Color.clear)
     }
 }
 

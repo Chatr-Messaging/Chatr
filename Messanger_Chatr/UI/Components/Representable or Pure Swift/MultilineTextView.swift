@@ -25,8 +25,8 @@ struct MultilineTextView: UIViewRepresentable {
     }
 
     func updateUIView(_ uiView: UITextView, context: Context) {
-        uiView.text = text
         DispatchQueue.main.async {
+            uiView.text = text
             self.height = uiView.contentSize.height
         }
     }

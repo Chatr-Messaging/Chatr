@@ -1161,6 +1161,7 @@ struct welcomeBackView: View {
                         .cornerRadius(10)
                         .foregroundColor(Color("bgColor").opacity(0.45))
                         .shadow(color: Color("buttonShadow"), radius: 8, x: 0, y: 5)
+                        .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(Color("interactionBtnBorderUnselected").opacity(0.5), lineWidth: 1.5))
                     
                     HStack(alignment: .center) {
                         if self.auth.verifyCodeStatus == .success  && self.auth.haveUserProfileImg == true {

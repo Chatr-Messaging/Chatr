@@ -44,6 +44,13 @@ struct ChatrStats: View {
                                     .foregroundColor(.primary)
 
                                 Spacer()
+                                if self.userCount != UserDefaults.standard.integer(forKey: "chatrUserStats") {
+                                    Text("+\(UserDefaults.standard.integer(forKey: "chatrUserStats"))")
+                                        .fontWeight(.medium)
+                                        .foregroundColor(.green)
+                                        .offset(x: 2)
+                                }
+
                                 Text("\(self.userCount)")
                                     .fontWeight(.bold)
                                     .foregroundColor(.primary)
@@ -69,8 +76,13 @@ struct ChatrStats: View {
                             self.auth.fetchTotalUserCount(completion: { count in
                                 self.userCount = count
                             })
+                        }.onDisappear() {
+                            if self.userCount != UserDefaults.standard.integer(forKey: "chatrUserStats") || self.quickSnapCount != UserDefaults.standard.integer(forKey: "chatrQuickSnapsStats") {
+                                UserDefaults.standard.set(self.userCount, forKey: "chatrUserStats")
+                                UserDefaults.standard.set(self.quickSnapCount, forKey: "chatrQuickSnapsStats")
+                            }
                         }
-                        
+                                                
                         Button(action: {
                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                             self.auth.fetchTotalQuickSnapCount(completion: { count in
@@ -82,6 +94,13 @@ struct ChatrStats: View {
                                     .foregroundColor(.primary)
 
                                 Spacer()
+                                if self.quickSnapCount != UserDefaults.standard.integer(forKey: "chatrQuickSnapsStats") {
+                                    Text("+\(UserDefaults.standard.integer(forKey: "chatrQuickSnapsStats"))")
+                                        .fontWeight(.medium)
+                                        .foregroundColor(.green)
+                                        .offset(x: 2)
+                                }
+                                
                                 Text("\(self.quickSnapCount)")
                                     .fontWeight(.bold)
                                     .foregroundColor(.primary)

@@ -134,6 +134,7 @@
 		05EE518B25CA5BCD0063A558 /* WebsiteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05EE518A25CA5BCD0063A558 /* WebsiteView.swift */; };
 		05EE519325CA5C160063A558 /* WebViewStateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05EE519225CA5C160063A558 /* WebViewStateModel.swift */; };
 		05F08B5E252DAD1A005222FA /* MoreContactsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F08B5D252DAD1A005222FA /* MoreContactsView.swift */; };
+		05F37C0225DF95B300F92005 /* KeyboardObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F37C0125DF95B300F92005 /* KeyboardObserver.swift */; };
 		05F5829825C12FC30043221D /* EditGroupDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F5829725C12FC30043221D /* EditGroupDialogView.swift */; };
 		05F58CEB25BFCF5400839590 /* CameraViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F58CEA25BFCF5400839590 /* CameraViewModel.swift */; };
 		05F8E11523F0DDFF0066954C /* ContactsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F8E11423F0DDFF0066954C /* ContactsView.swift */; };
@@ -302,6 +303,7 @@
 		05EE518A25CA5BCD0063A558 /* WebsiteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsiteView.swift; sourceTree = "<group>"; };
 		05EE519225CA5C160063A558 /* WebViewStateModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewStateModel.swift; sourceTree = "<group>"; };
 		05F08B5D252DAD1A005222FA /* MoreContactsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreContactsView.swift; sourceTree = "<group>"; };
+		05F37C0125DF95B300F92005 /* KeyboardObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardObserver.swift; sourceTree = "<group>"; };
 		05F5829725C12FC30043221D /* EditGroupDialogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditGroupDialogView.swift; sourceTree = "<group>"; };
 		05F58CEA25BFCF5400839590 /* CameraViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewModel.swift; sourceTree = "<group>"; };
 		05F8E11423F0DDFF0066954C /* ContactsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsView.swift; sourceTree = "<group>"; };
@@ -612,6 +614,7 @@
 			isa = PBXGroup;
 			children = (
 				0511CB7025A1911000E5F905 /* StoreReviewHelper.swift */,
+				05F37C0125DF95B300F92005 /* KeyboardObserver.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -1001,6 +1004,7 @@
 				05196DCA24E9EA4C0026B9A7 /* AnimatedGradientBG.swift in Sources */,
 				05DB89B6238B851400D4581F /* ContentView.swift in Sources */,
 				0599798824D53C9500969318 /* AlertIndicator.swift in Sources */,
+				05F37C0225DF95B300F92005 /* KeyboardObserver.swift in Sources */,
 				05F8E11823F122490066954C /* userModel.swift in Sources */,
 				056B98AB24C900D7003F7FBA /* PullToRefreshIndicator.swift in Sources */,
 				05196DD424EB208C0026B9A7 /* ProfileRealmModel.swift in Sources */,
