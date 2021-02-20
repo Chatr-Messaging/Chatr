@@ -42,16 +42,15 @@ struct LinkColoredText: View {
                 switch component {
                 case .text(let text):
                     return Text(verbatim: text)
-                        .foregroundColor(self.messageState != .error ? (self.messageRight ? .white : .primary) : .red)
+                        .foregroundColor(self.messageRight ? (self.messageState == .error ? .red : .white) : .primary)
 
                 case .link(let text, _):
                     return Text(verbatim: text)
-                        .foregroundColor(self.messageRight ? .white : .blue)
+                        .foregroundColor(self.messageRight ? (self.messageState == .error ? .red : .white) : .blue)
                         .underline()
                 }
             }.reduce(Text(""), +)
-        }.foregroundColor(self.messageState != .error ? (self.messageRight ? .white : .primary) : .red)
-        .padding(.horizontal, 15)
+        }.padding(.horizontal, 15)
         .padding(.vertical, 10)
         .transition(AnyTransition.scale)
         .background(self.messageRight ? LinearGradient(

@@ -94,11 +94,13 @@ struct ProfileView: View {
                                 .frame(width: 7, height: 15, alignment: .center)
                                 .foregroundColor(.secondary)
                         }.padding(.horizontal)
-                    }.onTapGesture {
-                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                        self.editProfileAction = 1
                     }
                 }.buttonStyle(ClickMiniButtonStyle())
+                .simultaneousGesture(TapGesture()
+                    .onEnded { _ in
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                        self.editProfileAction = 1
+                    })
                 .frame(height: 60, alignment: .center)
                 .background(Color.clear)
                 .padding(.top)

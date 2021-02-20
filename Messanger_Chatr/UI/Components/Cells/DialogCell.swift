@@ -14,7 +14,7 @@ import ConnectyCube
 
 struct DialogCell: View {
     @EnvironmentObject var auth: AuthModel
-    @State var dialogModel: DialogStruct = DialogStruct()
+    @StateObject var dialogModel: DialogStruct = DialogStruct()
     @State var privateDialogContact: ContactStruct = ContactStruct()
     @State var connectyContact: User = User()
     @State var groupOccUserAvatar: [String] = []
@@ -109,8 +109,10 @@ struct DialogCell: View {
                                 .onTapGesture {
                                     if isOpen {
                                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                        withAnimation(Animation.easeOut(duration: 0.6)) {
+                                        if self.dialogModel.dialogType == "private" {
                                             self.openContactProfile.toggle()
+                                        } else if self.dialogModel.dialogType == "group" || self.dialogModel.dialogType == "public" {
+                                            self.openGroupProfile.toggle()
                                         }
                                     } else {
                                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
@@ -136,7 +138,7 @@ struct DialogCell: View {
                         AlertIndicator(dialogModel: self.dialogModel)
                             .offset(x: self.groupOccUserAvatar.count == 2 ? -37 : -34, y: -25)
                             .opacity(self.isOpen ? 0 : 1)
-                    }.padding(.vertical, self.groupOccUserAvatar.count == 2 ? 11 : 11.5)
+                    }.padding(.vertical, self.groupOccUserAvatar.count == 2 ? 11 : 12)
                 }
             }
             

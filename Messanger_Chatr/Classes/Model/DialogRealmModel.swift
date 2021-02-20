@@ -79,38 +79,34 @@ class changeDialogRealmData {
     static let shared = changeDialogRealmData()
 
     func fetchDialogs(completion: @escaping (Bool) -> ()) {
-        //let queue = DispatchQueue(label: "com.brandon.chatrQueue", qos: .utility)
+        let extRequest : [String: String] = ["sort_desc" : "lastMessageDate"]
 
-        //queue.async {
-            print("the thread fwefawefor featching dialogs: \(Thread.isMultiThreaded()) and the thread: \(Thread.isMainThread)")
-            let extRequest : [String: String] = ["sort_desc" : "lastMessageDate"]
-            Request.dialogs(with: Paginator.limit(100, skip: 0), extendedRequest: extRequest, successBlock: { (dialogs, usersIDs, paginator) in
-                if dialogs.count > 0 {
-                    self.insertDialogs(dialogs) { }
-                } else {
-                    let config = Realm.Configuration(schemaVersion: 1)
-                    do {
-                        let realm = try! Realm(configuration: config)
-                        let realmDialogs = realm.objects(DialogStruct.self)
+        Request.dialogs(with: Paginator.limit(100, skip: 0), extendedRequest: extRequest, successBlock: { (dialogs, usersIDs, paginator) in
+            if dialogs.count > 0 {
+                self.insertDialogs(dialogs) { }
+            } else {
+                let config = Realm.Configuration(schemaVersion: 1)
+                do {
+                    let realm = try! Realm(configuration: config)
+                    let realmDialogs = realm.objects(DialogStruct.self)
 
-                        try! realm.safeWrite {
-                            for dia in realmDialogs {
-                                dia.isDeleted = true
-                                realm.add(dia, update: .all)
-                            }
+                    try! realm.safeWrite {
+                        for dia in realmDialogs {
+                            dia.isDeleted = true
+                            realm.add(dia, update: .all)
                         }
                     }
                 }
-                if dialogs.count < paginator.limit { return }
-                paginator.skip += UInt(dialogs.count)
-            }) { (error) in
-                print("Error in feteching dialogs... error: \(error.localizedDescription)")
-                //ChatrApp.connect()
-                completion(false)
-           }
-            
-            completion(true)
-        //}
+            }
+            if dialogs.count < paginator.limit { return }
+            paginator.skip += UInt(dialogs.count)
+        }) { (error) in
+            print("Error in feteching dialogs... error: \(error.localizedDescription)")
+            //ChatrApp.connect()
+            completion(false)
+       }
+        
+        completion(true)
     }
     
     func insertDialogs(_ objects: [ChatDialog], completion: @escaping () -> Void) {

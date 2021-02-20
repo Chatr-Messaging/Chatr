@@ -74,6 +74,7 @@ struct QuickSnapsPostView: View {
                             RoundedRectangle(cornerRadius: 5)
                                 .frame(width: 10, height: 10)
                                 .foregroundColor(.green)
+                                .overlay(Circle().stroke(Color("bgColor"), lineWidth: 2))
                                 .opacity(selectedQuickSnapContact.isOnline ? 1 : 0)
                                 .offset(x: 14, y: 14)
                         }
@@ -219,6 +220,7 @@ struct QuickSnapsPostView: View {
                             RoundedRectangle(cornerRadius: 10)
                                 .frame(width: 15, height: 15)
                                 .foregroundColor(.green)
+                                .overlay(Circle().stroke(Color("bgColor"), lineWidth: 2))
                                 .opacity(self.selectedQuickSnapContact.isOnline ? 1 : 0)
                                 .offset(x: 30, y: 30)
                             

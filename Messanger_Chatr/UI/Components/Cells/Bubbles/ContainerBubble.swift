@@ -38,13 +38,11 @@ struct ContainerBubble: View {
             ZStack(alignment: self.messagePosition == .right ? .bottomTrailing : .bottomLeading) {
                //MARK: Main content section:
                 ZStack(alignment: self.messagePosition == .left ? .topTrailing : .topLeading) {
-                    ZStack {
+                    ZStack(alignment: self.messagePosition == .left ? .trailing : .leading) {
                         VStack(spacing: 0) {
                             if self.message.image != "" {
                                 AttachmentBubble(viewModel: self.viewModel, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior)
                                     .environmentObject(self.auth)
-                            } else if self.message.imageType == "video" {
-                                Text("Video here")
                             } else if self.message.contactID != 0 {
                                 ContactBubble(viewModel: self.viewModel, chatContact: self.$newDialogFromSharedContact, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior)
                                     .environmentObject(self.auth)
@@ -54,6 +52,15 @@ struct ContainerBubble: View {
                                 TextBubble(message: self.message, messagePosition: messagePosition)
                                     .transition(.asymmetric(insertion: AnyTransition.scale.animation(.spring()), removal: AnyTransition.identity))
                             }
+                        }
+                        
+                        if self.message.messageState == .error {
+                            Image(systemName: "exclamationmark.icloud")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 22, height: 22, alignment: .center)
+                                .foregroundColor(.red)
+                                .offset(x: messagePosition == .right ? -30 : 30)
                         }
                     }.padding(.bottom, self.hasPrior ? 0 : 15)
                     .padding(.top, self.message.likedId.count != 0 || self.message.dislikedId.count != 0 ? 22 : 0)
@@ -165,7 +172,7 @@ struct ContainerBubble: View {
                         .lineLimit(1)
                         .padding(.horizontal, 22)
                         .multilineTextAlignment(messagePosition == .right ? .trailing : .leading)
-                        .opacity(self.hasPrior && self.message.messageState != .error ? 0 : 1)
+                        .opacity(self.hasPrior ? 0 : 1)
 
                     if messagePosition == .left { Spacer() }
                 }
@@ -220,26 +227,36 @@ struct ContainerBubble: View {
     }
     
     func onChangedInteraction(value: DragGesture.Value) {
-        withAnimation(.easeIn) { showInteractions = true }
+        self.showInteractions = true
         withAnimation(Animation.linear(duration: 0.065)) {
             let y = value.translation.width
-            
+            let c = value.startLocation.x
+
+            print("the y value is: \(y) start location: \(c)")
             if message.messageState != .error {
-                if self.messagePosition == .left {
+                if c <= Constants.screenWidth / 2 - 50 {
                     if y > 5 && y < 35 { interactionSelected = reactions[0] }
                     if y > 35 && y < 65 { interactionSelected = reactions[1] }
                     if y > 65 && y < 95 { interactionSelected = reactions[2] }
                     if y > 95 && y < 125 && reactions.count >= 4 { interactionSelected = reactions[3] }
-                    if y < 5 || y > 125 { interactionSelected = "" }
+                    if y < 5 || y > (reactions.count >= 4 ? 125 : 95) { interactionSelected = "" }
                 } else {
-                    if y > -95 && y < -65 { interactionSelected = reactions[0] }
-                    if y > -65 && y < -35 { interactionSelected = reactions[1] }
-                    if y > -35 && y < -5 { interactionSelected = reactions[2] }
-                    if y < -95 || y > -5 { interactionSelected = "" }
+                    if messagePosition == .left {
+                        if y > -125 && y < -95 { interactionSelected = reactions[0] }
+                        if y > -95 && y < -65 { interactionSelected = reactions[1] }
+                        if y > -65 && y < -35 { interactionSelected = reactions[2] }
+                        if y > -35 && y < -5 { interactionSelected = reactions[3] }
+                        if y < -125 || y > -5 { interactionSelected = "" }
+                    } else {
+                        if y > -95 && y < -65 { interactionSelected = reactions[0] }
+                        if y > -65 && y < -35 { interactionSelected = reactions[1] }
+                        if y > -35 && y < -5 { interactionSelected = reactions[2] }
+                        if y < -95 || y > -5 { interactionSelected = "" }
+                    }
                 }
             } else {
-                if y > -120 && y < -5 { interactionSelected = "try again" }
-                if y < -120 || y > -5 { interactionSelected = "" }
+                if y > -100 && y < -5 { interactionSelected = "try again" }
+                if y < -100 || y > -5 { interactionSelected = "" }
             }
         }
     }

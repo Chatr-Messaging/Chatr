@@ -131,6 +131,8 @@
 		05DD2D4225C9D44900B1ACB7 /* LinkedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05DD2D4125C9D44900B1ACB7 /* LinkedText.swift */; };
 		05E5B3292430747E00354C01 /* UserDialogs+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E5B3282430747E00354C01 /* UserDialogs+Extensions.swift */; };
 		05EA572724148BA100372F1A /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05EA572624148BA100372F1A /* Profile.swift */; };
+		05ECD98C25E0FA6800B5783A /* CacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05ECD98B25E0FA6800B5783A /* CacheManager.swift */; };
+		05ECD99025E0FBE600B5783A /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05ECD98F25E0FBE600B5783A /* PlayerView.swift */; };
 		05EE518B25CA5BCD0063A558 /* WebsiteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05EE518A25CA5BCD0063A558 /* WebsiteView.swift */; };
 		05EE519325CA5C160063A558 /* WebViewStateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05EE519225CA5C160063A558 /* WebViewStateModel.swift */; };
 		05F08B5E252DAD1A005222FA /* MoreContactsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F08B5D252DAD1A005222FA /* MoreContactsView.swift */; };
@@ -300,6 +302,8 @@
 		05DD2D4125C9D44900B1ACB7 /* LinkedText.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinkedText.swift; sourceTree = "<group>"; };
 		05E5B3282430747E00354C01 /* UserDialogs+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDialogs+Extensions.swift"; sourceTree = "<group>"; };
 		05EA572624148BA100372F1A /* Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
+		05ECD98B25E0FA6800B5783A /* CacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheManager.swift; sourceTree = "<group>"; };
+		05ECD98F25E0FBE600B5783A /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
 		05EE518A25CA5BCD0063A558 /* WebsiteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsiteView.swift; sourceTree = "<group>"; };
 		05EE519225CA5C160063A558 /* WebViewStateModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewStateModel.swift; sourceTree = "<group>"; };
 		05F08B5D252DAD1A005222FA /* MoreContactsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreContactsView.swift; sourceTree = "<group>"; };
@@ -615,6 +619,7 @@
 			children = (
 				0511CB7025A1911000E5F905 /* StoreReviewHelper.swift */,
 				05F37C0125DF95B300F92005 /* KeyboardObserver.swift */,
+				05ECD98B25E0FA6800B5783A /* CacheManager.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -704,6 +709,7 @@
 				05A7BD5224FAED230001BFC9 /* CameraController.swift */,
 				05A7BD5324FAED250001BFC9 /* CameraViewController.swift */,
 				053AC4B125194C080036946E /* GIFController.swift */,
+				05ECD98F25E0FBE600B5783A /* PlayerView.swift */,
 				0572BAB62398998700AE9061 /* PhoneNumberView.swift */,
 				05D8A8DB2502CB3A00D53BE2 /* MailView.swift */,
 				0593C0A123CB2AFE00460AAA /* VerifyCodeView.swift */,
@@ -961,6 +967,7 @@
 				057F2B4E250B026F005DFB21 /* ContactCarouselSection.swift in Sources */,
 				05A7633C2506FD42002712FA /* ContactRequestCell.swift in Sources */,
 				056B98A924C8FD1D003F7FBA /* SearchBar.swift in Sources */,
+				05ECD99025E0FBE600B5783A /* PlayerView.swift in Sources */,
 				054CAB7E25AA6E3700DD3F7C /* InstagramWebView.swift in Sources */,
 				05DB89B2238B851400D4581F /* AppDelegate.swift in Sources */,
 				05EE519325CA5C160063A558 /* WebViewStateModel.swift in Sources */,
@@ -1026,6 +1033,7 @@
 				05AACE1F239CE951006307EB /* BackgroundUI.swift in Sources */,
 				056B98A724C8FAC9003F7FBA /* SecurityView.swift in Sources */,
 				056B98A524C8FAA8003F7FBA /* AdvancedView.swift in Sources */,
+				05ECD98C25E0FA6800B5783A /* CacheManager.swift in Sources */,
 				0511CB8C25CF66940048F4DE /* ChatMessageViewModel.swift in Sources */,
 				05C6951624F5A29F00EEF819 /* ContactCell.swift in Sources */,
 				053D33F42394511400CEE03E /* BlurView.swift in Sources */,

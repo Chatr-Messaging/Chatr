@@ -362,6 +362,7 @@ struct VisitGroupChannelView: View {
                             VStack(alignment: .trailing, spacing: 0) {
                                 if id == 0 {
                                     Button(action: {
+                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                         self.showAddMembers.toggle()
                                     }) {
                                         VStack(alignment: .trailing, spacing: 0) {
@@ -413,6 +414,7 @@ struct VisitGroupChannelView: View {
                                                 self.notiType = "success"
                                                 self.notiText = occu.count == 0 ? "Successfully added a new member" : "Successfully added new members."
                                                 self.showAlert = true
+                                                UINotificationFeedbackGenerator().notificationOccurred(.success)
                                             }) { (error) in
                                                 self.notiType = "error"
                                                 self.notiText = "One or more of the selected contacts are already in the chat."

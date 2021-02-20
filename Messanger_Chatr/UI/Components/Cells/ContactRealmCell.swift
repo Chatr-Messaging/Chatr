@@ -45,6 +45,7 @@ struct ContactRealmCell: View {
                 RoundedRectangle(cornerRadius: 5)
                     .frame(width: 10, height: 10)
                     .foregroundColor(.green)
+                    .overlay(Circle().stroke(Color("bgColor"), lineWidth: 2))
                     .opacity(contact.isOnline ? 1 : 0)
                     .offset(x: 16, y: 16)
                 

@@ -671,7 +671,7 @@ struct VisitContactView: View {
                         self.contactWebsiteUrl = foundContact.website
                     }
                     
-                    if self.contactRelationship == .notContact || self.contactRelationship == .unknown {
+                    if self.contactRelationship == .notContact || (self.contactRelationship == .unknown && self.auth.profile.results.first?.id != self.contact.id) {
                         self.pullNonContact()
                     }
                 } catch {
@@ -909,7 +909,7 @@ struct topHeaderContactView: View {
                         .clipShape(Circle())
                         .frame(width: 110, height: 110, alignment: .center)
                         .shadow(color: Color.black.opacity(0.25), radius: 10, x: 0, y: 8)
-                    
+
                     if self.contact.quickSnaps.count > 0 {
                         Circle()
                             .stroke(Constants.snapPurpleGradient, style: StrokeStyle(lineWidth: 2, lineCap: .round))
@@ -920,8 +920,9 @@ struct topHeaderContactView: View {
                     RoundedRectangle(cornerRadius: 5)
                         .frame(width: 12, height: 12)
                         .foregroundColor(.green)
+                        .overlay(Circle().stroke(Color("bgColor"), lineWidth: 2.5))
                         .opacity(self.contact.isOnline ? 1 : 0)
-                        .offset(x: 55, y: 55)
+                        .offset(x: 38, y: 38)
                 }
             }.buttonStyle(ClickButtonStyle())
             .offset(y: 50)
@@ -1043,7 +1044,7 @@ struct actionButtonView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 38, height: 26)
-                        .background(RoundedRectangle(cornerRadius: 15, style: .circular).frame(width: 54, height: 54).foregroundColor(Constants.baseBlue).shadow(color: Color.blue.opacity(0.25), radius: 8, x: 0, y: 6))
+                        .background(RoundedRectangle(cornerRadius: 15, style: .circular).frame(width: 54, height: 54).foregroundColor(Constants.baseBlue).shadow(color: Color.blue.opacity(0.4), radius: 10, x: 0, y: 6))
                 }.buttonStyle(ClickButtonStyle())
                 .padding(.vertical, 8)
             }
@@ -1058,7 +1059,7 @@ struct actionButtonView: View {
                         .scaledToFit()
                         .foregroundColor(.white)
                         .frame(width: 36, height: 24)
-                        .background(RoundedRectangle(cornerRadius: 15, style: .circular).frame(width: 54, height: 54).foregroundColor(.purple).shadow(color: Color.purple.opacity(0.25), radius: 8, x: 0, y: 6))
+                        .background(RoundedRectangle(cornerRadius: 15, style: .circular).frame(width: 54, height: 54).foregroundColor(.purple).shadow(color: Color.purple.opacity(0.45), radius: 10, x: 0, y: 6))
                 }.buttonStyle(ClickButtonStyle())
             } else if self.contactRelationship == .notContact && self.contact.id != UserDefaults.standard.integer(forKey: "currentUserID") {
                 Button(action: {

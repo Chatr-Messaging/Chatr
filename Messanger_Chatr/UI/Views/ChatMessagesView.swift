@@ -13,6 +13,7 @@ import ConnectyCube
 
 struct ChatMessagesView: View {
     @EnvironmentObject var auth: AuthModel
+    @Environment(\.colorScheme) var colorScheme
     @ObservedObject var viewModel = ChatMessageViewModel()
     @Binding var activeView: CGSize
     @Binding var keyboardChange: CGFloat
@@ -35,7 +36,7 @@ struct ChatMessagesView: View {
 
     var body: some View {
         let currentMessages = self.auth.messages.selectedDialog(dialogID: self.dialogID)
-        //let currentMessages = self.auth.dialogs.results.filter("id == %@", self.dialogID).sorted(byKeyPath: "lastMessageDate", ascending: false)
+
         if UserDefaults.standard.bool(forKey: "localOpen") {
             ScrollView(.vertical, showsIndicators: false) {
                 LazyVStack() {
@@ -85,7 +86,7 @@ struct ChatMessagesView: View {
                                                 .animation(.spring(response: 0.58, dampingFraction: 0.6, blendDuration: 0))
                                                 .padding(.horizontal, 25)
                                                 .padding(.bottom, self.hasPrevious(index: message) ? -6 : 10)
-                                                .padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 95 : 0) + 40)
+                                                .padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 95 : 0) + 32)
                                                 .id(currentMessages[message].id)
 
                                             if messagePosition == .left { Spacer() }
@@ -135,6 +136,17 @@ struct ChatMessagesView: View {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                         self.loadDialog()
                         self.delayViewMessages = true
+
+                        Request.countOfMessages(forDialogID: self.dialogID, extendedRequest: ["sort_desc" : "lastMessageDate"], successBlock: { (count) in
+                            print("the total count for this dialog: \(count)")
+                        }) { (error) in
+
+                        }
+                        Request.totalUnreadMessageCountForDialogs(withIDs: Set([self.dialogID]), successBlock: { (count, dialogs) in
+                            print("the count for this dialog: \(count)")
+                        }) { (error) in
+
+                        }
                     }
                 }
             }.frame(width: Constants.screenWidth)

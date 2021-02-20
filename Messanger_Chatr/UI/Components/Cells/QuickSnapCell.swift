@@ -20,12 +20,9 @@ struct QuickSnapCell: View {
         VStack {
             Button(action: {
                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
                 self.selectedQuickSnapContact = self.quickSnap
-                if self.selectedQuickSnapContact.quickSnaps.count > 0 {
-                    self.viewState = .viewing
-                } else {
-                    self.viewState = .camera
-                }
+                self.viewState = self.selectedQuickSnapContact.quickSnaps.count > 0 ? .viewing : .camera
             }) {
                 ZStack(alignment: .center) {
                     if self.quickSnap.quickSnaps.count > 0 {
@@ -76,6 +73,7 @@ struct QuickSnapCell: View {
                     RoundedRectangle(cornerRadius: 6)
                         .frame(width: 10, height: 10)
                         .foregroundColor(.green)
+                        .overlay(Circle().stroke(Color("bgColor"), lineWidth: 2))
                         .opacity(quickSnap.isOnline ? 1 : 0)
                         .offset(x: 19, y: 19)
                     

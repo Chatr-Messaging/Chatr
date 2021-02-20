@@ -29,6 +29,7 @@ struct TextBubble: View {
                         .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 5)
                 } else {
                     LinkedText(self.message.text, messageRight: self.messagePosition == .right, messageState: self.message.messageState)
+                        .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.8) : Color.clear, lineWidth: 1.5))
                 }
             } else if self.message.messageState == .isTyping {
                 ZStack {

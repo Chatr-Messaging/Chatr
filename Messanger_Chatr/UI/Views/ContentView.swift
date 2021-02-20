@@ -608,7 +608,7 @@ struct mainHomeList: View {
             self.isLocalOpen = false
             changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: id)
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                 changeDialogRealmData.shared.fetchDialogs(completion: { _ in })
                 if dialogType == "group" || dialogType == "public" {
                     self.auth.leaveDialog()

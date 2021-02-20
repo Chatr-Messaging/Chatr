@@ -100,10 +100,7 @@ struct KeyboardCardView: View {
                                     }).background(Color.clear)
                                 }.transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(.spring()), removal: AnyTransition.move(edge: .bottom).animation(.easeOut(duration: 0.2))))
                             }
-                        }.onChange(of: self.gifURL, perform: { giphyURL in
-                            self.gifData.append(giphyURL)
-                            self.checkAttachments()
-                        })
+                        }
                     }
 
                     //MARK: Pasted Photo Section
@@ -181,7 +178,7 @@ struct KeyboardCardView: View {
                                             .resizable()
                                             .scaledToFill()
                                             .frame(height: 90)
-                                            .frame(minWidth: 100, maxWidth: Constants.screenWidth * 0.4)
+                                            .frame(minWidth: 85, maxWidth: Constants.screenWidth * 0.4)
                                             .cornerRadius(10)
                                         
                                         HStack {
@@ -233,25 +230,21 @@ struct KeyboardCardView: View {
                             if self.showImagePicker == true { self.showImagePicker = false }
                         })
                     }) {
-                        HStack(spacing: 0) {
-                            Image(systemName: self.isKeyboardActionOpen ? "xmark" : "paperclip")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: self.isKeyboardActionOpen ? 18 : 25, height: self.isKeyboardActionOpen ? 18 : 25, alignment: .center)
-                                .font(Font.title.weight(.medium))
-                                .foregroundColor(.secondary)
-                                .padding(self.isKeyboardActionOpen ? 11.5 : 8)
-
-                            Divider().frame(height: 25)
-                        }
+                        Image(systemName: self.isKeyboardActionOpen ? "xmark" : "paperclip")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: self.isKeyboardActionOpen ? 16 : 25, height: self.isKeyboardActionOpen ? 18 : 25, alignment: .center)
+                            .font(Font.title.weight(.medium))
+                            .foregroundColor(.secondary)
+                            .padding(self.isKeyboardActionOpen ? 12.5 : 8)
                     }.buttonStyle(changeBGPaperclipButtonStyle())
                     .cornerRadius(self.height < 160 ? 12.5 : 17.5)
-                    .padding(.trailing, 5)
 
                     ResizableTextField(imagePicker: self.imagePicker, height: self.$height, text: self.$mainText)
                         .environmentObject(self.auth)
                         .padding(.vertical, 2)
                         .frame(height: self.height < 175 ? self.height : 175)
+                        .offset(x: -5)
                         .onChange(of: self.isOpen, perform: { value in
                             if value {
                                 if let typedText = UserDefaults.standard.string(forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText") {
@@ -271,7 +264,7 @@ struct KeyboardCardView: View {
                         Text("type message")
                             .font(.system(size: 18))
                             .padding(.vertical, 10)
-                            .padding(.leading, 52)
+                            .padding(.leading, 42)
                             .foregroundColor(self.mainText.count == 0 && self.isOpen ? Color("lightGray") : .clear)
                     }
                 )
@@ -311,9 +304,16 @@ struct KeyboardCardView: View {
                         }
 
                         if self.imagePicker.selectedVideos.count > 0 {
-                            //COME BACK AND ADD THE UPLOADING VIDEOS SECTION
-                            //changeMessageRealmData.shared.sendPhotoAttachment(dialog: selectedDialog, attachmentImages: self.photoData, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
-                            print("There are selected videos we will remove later...")
+                            var uploadVid: [PHAsset] = []
+
+                            for i in self.imagePicker.selectedVideos {
+                                uploadVid.append(i.asset)
+                            }
+
+                            changeMessageRealmData.shared.sendVideoAttachment(dialog: selectedDialog, attachmentVideos: uploadVid, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
+                            
+                            uploadVid.removeAll()
+                            self.imagePicker.selectedVideos.removeAll()
                         }
                         
                         if self.enableLocation {
@@ -338,10 +338,10 @@ struct KeyboardCardView: View {
                         .foregroundColor(self.contentAvailable ? .white : .secondary)
                         .padding(10)
                 }).background(self.contentAvailable ? LinearGradient(gradient: Gradient(colors: [Color(red: 46 / 255, green: 168 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom) : LinearGradient(gradient: Gradient(colors: [Color("buttonColor"), Color("buttonColor")]), startPoint: .top, endPoint: .bottom))
-                .overlay(Circle().strokeBorder(Color("interactionBtnBorderUnselected").opacity(0.5), lineWidth: 1.5))
+                .overlay(Circle().strokeBorder(Color("interactionBtnBorderUnselected").opacity(0.4), lineWidth: 1).blur(radius: 1.8))
                 .clipShape(Circle())
-                .shadow(color: Color.black.opacity(self.contentAvailable  ? 0.2 : 0.1), radius: 4, x: 0, y: 3)
-                .shadow(color: Color.blue.opacity(self.contentAvailable ? 0.3 : 0.0), radius: 8, x: 0, y: 6)
+                .shadow(color: Color.black.opacity(self.contentAvailable  ? 0.15 : 0.1), radius: 4, x: 0, y: 3)
+                .shadow(color: Color.blue.opacity(self.contentAvailable ? 0.25 : 0.0), radius: 10, x: 0, y: 6)
                 .scaleEffect(self.contentAvailable ? 1.04 : 1.0)
                 .disabled(self.contentAvailable ? false : true)
             }.padding(.horizontal)
@@ -385,6 +385,9 @@ struct KeyboardCardView: View {
                     }).frame(width: Constants.screenWidth / 5.5, height: 65)
                     .buttonStyle(keyboardButtonStyle())
                     .sheet(isPresented: self.$presentGIF, onDismiss: {
+                        guard !self.gifData.contains(self.gifURL) else { return }
+
+                        self.gifData.append(gifURL)
                         self.checkAttachments()
                     }) {
                         GIFController(url: self.$gifURL, present: self.$presentGIF)

@@ -461,6 +461,7 @@ struct ContactsView: View {
                                                                     RoundedRectangle(cornerRadius: 5)
                                                                         .frame(width: 10, height: 10)
                                                                         .foregroundColor(.green)
+                                                                        .overlay(Circle().stroke(Color("bgColor"), lineWidth: 2))
                                                                         .opacity(contact.isOnline ? 1 : 0)
                                                                         .offset(x: 12, y: 15)
                                                                     
@@ -567,6 +568,7 @@ struct ContactsView: View {
                                                                 RoundedRectangle(cornerRadius: 5)
                                                                     .frame(width: 10, height: 10)
                                                                     .foregroundColor(.green)
+                                                                    .overlay(Circle().stroke(Color("bgColor"), lineWidth: 2))
                                                                     .opacity(contact.isOnline ? 1 : 0)
                                                                     .offset(x: 12, y: 15)
                                                                 

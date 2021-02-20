@@ -79,6 +79,7 @@ struct DialogContactCell: View {
                             RoundedRectangle(cornerRadius: 5)
                                 .frame(width: 10, height: 10)
                                 .foregroundColor(.green)
+                                .overlay(Circle().stroke(Color("bgColor"), lineWidth: 2))
                                 .opacity(contact.isOnline ? 1 : 0)
                                 .offset(x: 12, y: 15)
                         }
@@ -93,7 +94,7 @@ struct DialogContactCell: View {
                                         .frame(width: 16, height: 16, alignment: .center)
                                         .foregroundColor(Color("main_blue"))
                                 }
-                                                                                            
+                                                        
                                 Text(contact.fullName)
                                     .font(.headline)
                                     .fontWeight(.semibold)
@@ -101,7 +102,7 @@ struct DialogContactCell: View {
                                     .multilineTextAlignment(.leading)
                             }.offset(y: contact.isPremium ? 3 : 0)
                             
-                            Text(contact.isOnline ? "online now" : "last online \(contact.lastOnline.getElapsedInterval(lastMsg: "moments")) ago")
+                            Text(self.auth.profile.results.first?.id != contact.id ? (contact.isOnline ? "online now" : "last online \(contact.lastOnline.getElapsedInterval(lastMsg: "moments")) ago") : "yourself")
                                 .font(.caption)
                                 .fontWeight(.regular)
                                 .foregroundColor(.secondary)
@@ -213,6 +214,7 @@ struct DialogContactCell: View {
                     self.contact = foundContact
                     self.connectyContact.id = UInt(foundContact.id)
                     print("DialogContact Cellid:\(self.contactID) - found contact: \(foundContact.fullName) & \(foundContact.avatar)")
+                    if self.contact.id != 0 { return }
                 }
                 
                 if self.contact.id == 0 || self.contact.avatar == "" {
@@ -240,9 +242,7 @@ struct DialogContactCell: View {
                                 self.connectyContact.id = firstUser.id
                             }
                         })
-                    }) { (error) in
-
-                    }
+                    })
                 }
             } catch {
                 

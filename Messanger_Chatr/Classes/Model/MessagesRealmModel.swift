@@ -9,6 +9,8 @@
 import Foundation
 import Combine
 import UIKit
+import Photos
+import AVKit
 import ConnectyCube
 import Firebase
 import RealmSwift
@@ -415,7 +417,7 @@ class changeMessageRealmData {
     
     func sendPhotoAttachment(dialog: DialogStruct, attachmentImages: [UIImage], occupentID: [NSNumber]) {
         for attachment in attachmentImages {
-            let data = attachment.jpegData(compressionQuality: 0.2)
+            let data = attachment.jpegData(compressionQuality: 0.75)
             Request.uploadFile(with: data!,
                                fileName: "\(UserDefaults.standard.integer(forKey: "currentUserID"))\(dialog.id)\(dialog.fullName)\(Date()).png",
                                contentType: "image/png",
@@ -448,6 +450,58 @@ class changeMessageRealmData {
             }) { (error) in
                 print("there is an error uploading attachment: \(error.localizedDescription)")
             }
+        }
+    }
+
+    func sendVideoAttachment(dialog: DialogStruct, attachmentVideos: [PHAsset], occupentID: [NSNumber]) {
+        for vid in attachmentVideos {
+            
+            let resourceManager = PHAssetResourceManager.default()
+            let resource = PHAssetResource.assetResources(for: vid).first!
+            let name = resource.originalFilename
+            let videoLocalPath = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(name)
+            print("the uploading video url is: \(videoLocalPath)")
+            //Storing the resource to local temporary path
+            resourceManager.writeData(for: resource, toFile: videoLocalPath, options: nil, completionHandler: { error in
+                    if error != nil{
+                        do {
+                            let vidData = try Data(contentsOf: videoLocalPath)
+
+                            Request.uploadFile(with: vidData,
+                                               fileName: "\(UserDefaults.standard.integer(forKey: "currentUserID"))\(dialog.id)\(dialog.fullName)\(Date()).MOV",
+                                               contentType: "video/mov",
+                                               isPublic: occupentID.count > 2 ? true : false,
+                                               progressBlock: { (progress) in
+                                                //Update UI with upload progress
+                                                print("upload video progress is: \(progress)")
+                            }, successBlock: { (blob) in
+                                let attachment = ChatAttachment()
+                                attachment.type = "video/mov"
+                                attachment.id = blob.uid
+                                
+                                let pDialog = ChatDialog(dialogID: dialog.id, type: occupentID.count > 2 ? .group : .private)
+                                pDialog.occupantIDs = occupentID
+                                
+                                let message = ChatMessage()
+                                message.text = "Video Attachment"
+                                message.attachments = [attachment]
+                                
+                                pDialog.send(message) { (error) in
+                                    self.insertMessage(message, completion: {
+                                        if error != nil {
+                                            print("error sending attachment: \(String(describing: error?.localizedDescription))")
+                                            self.updateMessageState(messageID: message.id ?? "", messageState: .error)
+                                        } else {
+                                            print("Success sending attachment to ConnectyCube server!")
+                                        }
+                                    })
+                                }
+                            }) { (error) in
+                                print("there is an error uploading attachment: \(error.localizedDescription)")
+                            }
+                        } catch { }
+                    }
+                })
         }
     }
     

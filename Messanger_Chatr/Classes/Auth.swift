@@ -357,7 +357,7 @@ class AuthModel: NSObject, ObservableObject {
     
     func setUserAvatar(image: UIImage, completion: @escaping (Bool) -> Void) {
         let image = image
-        let data = image.jpegData(compressionQuality: 0.2)
+        let data = image.jpegData(compressionQuality: 0.25)
         
         Request.uploadFile(with: data!, fileName: "user's_profileImg", contentType: "image/jpeg", isPublic: false, progressBlock: { (progress) in
             print("the upload progress is: \(progress)")
@@ -761,6 +761,11 @@ extension AuthModel: ChatDelegate {
         } else if (message.delayed) {
             changeMessageRealmData.shared.updateMessageDelayState(messageID: message.id ?? "", messageDelayed: true)
         }
+    }
+    
+    func chatDidReceivePresence(withStatus status: String, fromUser userID: Int) {
+        print("chatDidReceivePresence: \(status)")
+        //changeContactsRealmData.shared.updateContactOnlineStatus(userID: userID, isOnline: isOnline)
     }
         
     //MARK: BLOCK LIST DELEGATE

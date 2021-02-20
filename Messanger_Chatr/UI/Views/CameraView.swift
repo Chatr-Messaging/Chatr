@@ -10,6 +10,7 @@ import SwiftUI
 import SDWebImageSwiftUI
 import ConnectyCube
 import RealmSwift
+import SlideOverCard
 
 struct CameraView: View {
     @StateObject var camera = CameraViewModel()
@@ -87,18 +88,6 @@ struct CameraView: View {
                         }
 
                         Spacer()
-                        Button(action: {
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                            self.cameraState = .closed
-                        }) {
-                            Image(systemName: "xmark")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: Constants.microBtnSize, height: Constants.microBtnSize, alignment: .center)
-                                .foregroundColor(.white)
-                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 0, y: 0)
-                                .padding()
-                        }.buttonStyle(ClickButtonStyle())
                     }.padding(.all)
                     .padding(.top)
                     
@@ -151,65 +140,9 @@ struct CameraView: View {
                 }
             } else {
                 //MARK: EDIT & REVIEW PHOTO
-                VStack(alignment: .trailing) {
-                    HStack {
-//                                Spacer()
-//                                ZStack {
-//                                    Circle()
-//                                        .foregroundColor(.white)
-//                                        .frame(width: Constants.smallAvitarSize + 2, height: Constants.smallAvitarSize + 2, alignment: .center)
-//                                        .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 0)
-//
-//                                    WebImage(url: URL(string: contact.avatar))
-//                                        .resizable()
-//                                        .placeholder{ Image(systemName: "person.fill") }
-//                                        .indicator(.activity)
-//                                        .transition(.fade(duration: 0.25))
-//                                        .scaledToFill()
-//                                        .clipShape(Circle())
-//                                        .foregroundColor(Color("bgColor"))
-//                                        .frame(width: Constants.smallAvitarSize, height: Constants.smallAvitarSize, alignment: .center)
-//                                        .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 0)
-//                                }
-//                                VStack(alignment: .leading) {
-//                                    if self.contact.fullName != "No Name" {
-//                                        Text(contact.fullName)
-//                                            .font(.body)
-//                                            .fontWeight(.semibold)
-//                                            .foregroundColor(.white)
-//                                            .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 0)
-//
-//                                        if self.selectedContacts.count > 1 {
-//                                            Text("and \(self.selectedContacts.count - 1) more...")
-//                                                .font(.caption)
-//                                                .fontWeight(.regular)
-//                                                .foregroundColor(.white)
-//                                                .opacity(0.8)
-//                                                .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 0)
-//                                        }
-//                                    }
-//                                }.padding(.top, 35)
-                        Spacer()
-                        
-                        Button(action: {
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                            self.savedTakenImg = false
-                            self.selectedContacts.removeAll()
-                            self.cameraState = .closed
-                        }) {
-                            Image(systemName: "xmark")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: Constants.microBtnSize, height: Constants.microBtnSize, alignment: .center)
-                                .foregroundColor(.white)
-                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 0, y: 0)
-                                .padding(.all)
-                        }.buttonStyle(ClickButtonStyle())
-                        .padding(.all)
-                        .padding(.top, 20)
-                    }
-
+                VStack() {
                     Spacer()
+
                     HStack() {
                         Button(action: {
                             UIImpactFeedbackGenerator(style: .light).impactOccurred()

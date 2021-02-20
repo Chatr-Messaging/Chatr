@@ -27,7 +27,8 @@ struct QuickSnapsSection: View {
                             //New Button
                             VStack(alignment: .center) {
                                 Button(action: {
-                                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                    UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
                                     self.viewState = .camera
                                     self.selectedQuickSnapContact = ContactStruct()
                                 }) {
