@@ -15,8 +15,6 @@ class ChatMessageViewModel: ObservableObject {
     
     func loadDialog(auth: AuthModel, dialogId: String) {
         //DispatchQueue.global(qos: .utility).async {
-            changeMessageRealmData.shared.getMessageUpdates(dialogID: dialogId, completion: { _ in })
-
             Request.updateDialog(withID: dialogId, update: UpdateChatDialogParameters(), successBlock: { dialog in
                 auth.selectedConnectyDialog = dialog
                 dialog.sendUserStoppedTyping()

@@ -148,13 +148,14 @@ class changeDialogRealmData {
                 try realm.safeWrite({
                     realm.add(newData, update: .all)
                     print("Succsessfuly added new Dialog data! \(newData.isDeleted) and the threadis: \(Thread.current)")
-                    completion()
                 })
             } catch {
                 print(error.localizedDescription)
                 completion()
             }
         })
+        
+        completion()
     }
     
     func updateDialogOpen(isOpen: Bool, dialogID: String) {

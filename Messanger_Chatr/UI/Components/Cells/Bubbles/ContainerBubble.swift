@@ -38,20 +38,18 @@ struct ContainerBubble: View {
             ZStack(alignment: self.messagePosition == .right ? .bottomTrailing : .bottomLeading) {
                //MARK: Main content section:
                 ZStack(alignment: self.messagePosition == .left ? .topTrailing : .topLeading) {
-                    ZStack(alignment: self.messagePosition == .left ? .trailing : .leading) {
-                        VStack(spacing: 0) {
-                            if self.message.image != "" {
-                                AttachmentBubble(viewModel: self.viewModel, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior)
-                                    .environmentObject(self.auth)
-                            } else if self.message.contactID != 0 {
-                                ContactBubble(viewModel: self.viewModel, chatContact: self.$newDialogFromSharedContact, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior)
-                                    .environmentObject(self.auth)
-                            } else if self.message.longitude != 0 && self.message.latitude != 0 {
-                                LocationBubble(message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior)
-                            } else {
-                                TextBubble(message: self.message, messagePosition: messagePosition)
-                                    .transition(.asymmetric(insertion: AnyTransition.scale.animation(.spring()), removal: AnyTransition.identity))
-                            }
+                    ZStack(alignment: self.messagePosition == .left ? .bottomTrailing : .bottomLeading) {
+                        if self.message.image != "" {
+                            AttachmentBubble(viewModel: self.viewModel, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior)
+                                .environmentObject(self.auth)
+                        } else if self.message.contactID != 0 {
+                            ContactBubble(viewModel: self.viewModel, chatContact: self.$newDialogFromSharedContact, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior)
+                                .environmentObject(self.auth)
+                        } else if self.message.longitude != 0 && self.message.latitude != 0 {
+                            LocationBubble(message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior)
+                        } else {
+                            TextBubble(message: self.message, messagePosition: messagePosition)
+                                .transition(.asymmetric(insertion: AnyTransition.scale.animation(.spring()), removal: AnyTransition.identity))
                         }
                         
                         if self.message.messageState == .error {
@@ -61,6 +59,7 @@ struct ContainerBubble: View {
                                 .frame(width: 22, height: 22, alignment: .center)
                                 .foregroundColor(.red)
                                 .offset(x: messagePosition == .right ? -30 : 30)
+                                .padding(.bottom, 10)
                         }
                     }.padding(.bottom, self.hasPrior ? 0 : 15)
                     .padding(.top, self.message.likedId.count != 0 || self.message.dislikedId.count != 0 ? 22 : 0)
@@ -164,7 +163,7 @@ struct ContainerBubble: View {
                 
                 //MARK: Bottomm User Info / Message Status Section
                 HStack(spacing: 4) {
-                    if messagePosition == .right { Spacer() }
+                    //if messagePosition == .right { Spacer() }
                     
                     Text(self.subText.messageStatusText(message: self.message, positionRight: messagePosition == .right))
                         .foregroundColor(self.message.messageState == .error ? .red : .gray)
@@ -174,7 +173,7 @@ struct ContainerBubble: View {
                         .multilineTextAlignment(messagePosition == .right ? .trailing : .leading)
                         .opacity(self.hasPrior ? 0 : 1)
 
-                    if messagePosition == .left { Spacer() }
+                    //if messagePosition == .left { Spacer() }
                 }
 
                 WebImage(url: URL(string: self.avatar))

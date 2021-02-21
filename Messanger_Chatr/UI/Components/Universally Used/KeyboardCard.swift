@@ -11,6 +11,7 @@ import Photos
 import MapKit
 import UIKit
 import RealmSwift
+import ConnectyCube
 import SDWebImageSwiftUI
 import AVKit
 
@@ -36,6 +37,7 @@ struct KeyboardCardView: View {
     @State private var inputImage: UIImage? = nil
     @State private var userTrackingMode: MapUserTrackingMode = .follow
     @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 25.7617, longitude: 80.1918), span: MKCoordinateSpan(latitudeDelta: 10, longitudeDelta: 10))
+    let keyboard = KeyboardObserver()
     var contentAvailable: Bool {
         if self.mainText.count > 0 || self.gifData.count > 0 || self.imagePicker.selectedPhotos.count > 0 || self.imagePicker.selectedVideos.count > 0 || self.enableLocation || self.imagePicker.pastedImages.count > 0 {
             return true
@@ -234,7 +236,7 @@ struct KeyboardCardView: View {
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: self.isKeyboardActionOpen ? 16 : 25, height: self.isKeyboardActionOpen ? 18 : 25, alignment: .center)
-                            .font(Font.title.weight(.medium))
+                            .font(Font.title.weight(.regular))
                             .foregroundColor(.secondary)
                             .padding(self.isKeyboardActionOpen ? 12.5 : 8)
                     }.buttonStyle(changeBGPaperclipButtonStyle())
@@ -242,7 +244,6 @@ struct KeyboardCardView: View {
 
                     ResizableTextField(imagePicker: self.imagePicker, height: self.$height, text: self.$mainText)
                         .environmentObject(self.auth)
-                        .padding(.vertical, 2)
                         .frame(height: self.height < 175 ? self.height : 175)
                         .offset(x: -5)
                         .onChange(of: self.isOpen, perform: { value in
@@ -273,6 +274,7 @@ struct KeyboardCardView: View {
                 Button(action: {
                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                     self.isKeyboardActionOpen = false
+                    self.showImagePicker = false
 
                     if let selectedDialog = self.auth.dialogs.results.filter("id == %@", UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").first {
                         if let connDia = self.auth.selectedConnectyDialog {
@@ -536,6 +538,19 @@ struct KeyboardCardView: View {
             .onAppear() {
                 self.imagePicker.setUpAuthStatus()
                 self.imagePicker.fetchPhotos(completion: {  })
+
+                keyboard.observe { (event) in
+                    switch event.type {
+                    case .willShow:
+                        if self.hasAttachments && self.showImagePicker {
+                            UIView.animate(withDuration: event.duration, delay: 0.0, options: [event.options], animations: {
+                                self.showImagePicker = false
+                            }, completion: nil)
+                        }
+                    default:
+                        break
+                    }
+                }
             }
             
             Spacer()

@@ -11,6 +11,14 @@ import RealmSwift
 import SDWebImageSwiftUI
 import ConnectyCube
 
+struct ViewOffsetKey: PreferenceKey {
+    typealias Value = CGFloat
+    static var defaultValue = CGFloat.zero
+    static func reduce(value: inout Value, nextValue: () -> Value) {
+        value += nextValue()
+    }
+}
+
 struct ChatMessagesView: View {
     @EnvironmentObject var auth: AuthModel
     @Environment(\.colorScheme) var colorScheme
@@ -24,13 +32,23 @@ struct ChatMessagesView: View {
     @Binding var newDialogFromSharedContact: Int
     @State private var delayViewMessages: Bool = false
     @State private var firstScroll: Bool = true
-    @State private var mesgCount: Int = -1
+    @State private var totalMessageCount: Int = -1
+    @State private var unreadMessageCount: Int = 0
+    @State private var scrollPage: Int = 1
     let keyboard = KeyboardObserver()
-    var pagination: Int {
-        if self.auth.messages.selectedDialog(dialogID: self.dialogID).count < 15 {
+    let pageShowCount = 15
+    var maxPagination: Int {
+        if self.auth.messages.selectedDialog(dialogID: self.dialogID).count < pageShowCount {
             return self.auth.messages.selectedDialog(dialogID: self.dialogID).count
         } else {
-            return 15
+            return pageShowCount * self.scrollPage
+        }
+    }
+    var minPagination: Int {
+        if scrollPage <= 2 {
+            return self.auth.messages.selectedDialog(dialogID: self.dialogID).count
+        } else {
+            return self.auth.messages.selectedDialog(dialogID: self.dialogID).count - (pageShowCount * (self.scrollPage - 2))
         }
     }
 
@@ -41,37 +59,56 @@ struct ChatMessagesView: View {
             ScrollView(.vertical, showsIndicators: false) {
                 LazyVStack() {
                     //No Messages found:
-                    Text(self.mesgCount == 0 ? "no messages found" : self.mesgCount == -1 ? "loading messages..." : "")
+                    Text(self.totalMessageCount == 0 ? "no messages found" : self.totalMessageCount == -1 ? "loading messages..." : "")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .frame(width: Constants.screenWidth)
-                        .padding(.all, self.mesgCount >= 1 && self.delayViewMessages ? 0 : 20)
-                        .offset(y: self.mesgCount >= 1 && self.delayViewMessages ? 0 : 40)
-                        .opacity(self.mesgCount >= 1 && self.delayViewMessages ? 0 : 1)
+                        .padding(.all, self.totalMessageCount >= 1 && self.delayViewMessages ? 0 : 20)
+                        .offset(y: self.totalMessageCount >= 1 && self.delayViewMessages ? 0 : 40)
+                        .opacity(self.totalMessageCount >= 1 && self.delayViewMessages ? 0 : 1)
                     
                     //CUSTOM MESSAGE BUBBLE:
                     if self.delayViewMessages {
                         ScrollViewReader { reader in
                             VStack {
-                                ForEach(currentMessages.count - self.pagination ..< currentMessages.count, id: \.self) { message in
+                                ForEach(currentMessages.count - self.maxPagination ..< self.minPagination, id: \.self) { message in
                                     let messagePosition: messagePosition = UInt(currentMessages[message].senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? .right : .left
                                     let notLast = currentMessages[message].id != currentMessages.last?.id
                                     let topMsg = currentMessages[message].id == currentMessages.first?.id
 
-                                    if topMsg && currentMessages.count > 20 {
-                                        Button(action: {
-                                            self.firstScroll = false
-                                            changeMessageRealmData.shared.loadMoreMessages(dialogID: currentMessages[message].dialogID, currentCount: currentMessages.count, completion: { _ in
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
-                                                    withAnimation {
-                                                        reader.scrollTo(currentMessages[message + 20].id, anchor: .top)
+                                    if message == (currentMessages.count - self.maxPagination) {
+                                        VStack(alignment: .center) {
+                                            //let load = geo.frame(in: .global).origin.y - 200 > -geo.frame(in: .global).minY
+                                            
+                                            //if load && !firstScroll {
+                                                //Text("loading...")
+                                                    //.font(.caption)
+                                                    //.foregroundColor(.secondary)
+//                                                        .onAppear {
+//                                                            print("From Empty view the load is: \(load) origin: \(geo.frame(in: .global).origin.y)")
+//                                                            changeMessageRealmData.shared.getMessageUpdates(dialogID: self.dialogID, limit: pageShowCount * (self.scrollPage + 1), skip: self.minPagination, completion: { _ in
+//                                                                DispatchQueue.main.async {
+//                                                                    self.scrollPage += 1
+//                                                                }
+//                                                            })
+//                                                        }
+                                            //}
+                                            Button(action: {
+                                                self.firstScroll = false
+
+                                                changeMessageRealmData.shared.getMessageUpdates(dialogID: self.dialogID, limit: pageShowCount * (self.scrollPage + 1), skip: self.minPagination - currentMessages.count, completion: { _ in
+                                                    DispatchQueue.main.async {
+                                                        self.scrollPage += 1
+                                                        withAnimation {
+                                                            reader.scrollTo(currentMessages[message].id, anchor: .top)
+                                                        }
                                                     }
-                                                }
-                                            })
-                                        }, label: {
-                                            Text("Load More...")
-                                                .foregroundColor(.blue)
-                                        }).padding(.top)
+                                                })
+                                            }, label: {
+                                                Text("Load More...")
+                                                    .foregroundColor(.blue)
+                                            }).padding(.top)
+                                        }
                                     }
 
                                     VStack(spacing: 0) {
@@ -108,7 +145,25 @@ struct ChatMessagesView: View {
                                         }
                                     }
                                 }.contentShape(Rectangle())
-                            }.onAppear {
+                            }.background(GeometryReader {
+                                Color.clear.preference(key: ViewOffsetKey.self,
+                                    value: -$0.frame(in: .named("scroll")).origin.y)
+                            })
+                            .onPreferenceChange(ViewOffsetKey.self) {
+                                print("offset >> \($0)")
+                                if $0 > -1.34 && $0 < 0 {
+                                    print("ran the laod more...")
+                                    changeMessageRealmData.shared.getMessageUpdates(dialogID: self.dialogID, limit: pageShowCount * (self.scrollPage + 1), skip: self.minPagination - currentMessages.count, completion: { _ in
+                                        DispatchQueue.main.async {
+                                            self.scrollPage += 1
+//                                            withAnimation(Animation.easeOut(duration: 0.6).delay(0.1)) {
+//                                                reader.scrollTo(currentMessages[currentMessages.count - self.maxPagination].id, anchor: .bottom)
+//                                            }
+                                        }
+                                    })
+                                }
+                            }
+                            .onAppear {
                                 keyboard.observe { (event) in
                                     let keyboardFrameEnd = event.keyboardFrameEnd
 
@@ -136,27 +191,29 @@ struct ChatMessagesView: View {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                         self.loadDialog()
                         self.delayViewMessages = true
-
-                        Request.countOfMessages(forDialogID: self.dialogID, extendedRequest: ["sort_desc" : "lastMessageDate"], successBlock: { (count) in
-                            print("the total count for this dialog: \(count)")
-                        }) { (error) in
-
-                        }
-                        Request.totalUnreadMessageCountForDialogs(withIDs: Set([self.dialogID]), successBlock: { (count, dialogs) in
-                            print("the count for this dialog: \(count)")
-                        }) { (error) in
-
-                        }
                     }
                 }
-            }.frame(width: Constants.screenWidth)
+            }.coordinateSpace(name: "scroll")
+            .frame(width: Constants.screenWidth)
             .contentShape(Rectangle())
             .onAppear() {
                 DispatchQueue.global(qos: .utility).async {
                     if !Session.current.tokenHasExpired {
                         Request.countOfMessages(forDialogID: self.dialogID, extendedRequest: ["sort_desc" : "lastMessageDate"], successBlock: { count in
+                            if self.auth.messages.selectedDialog(dialogID: self.dialogID).count != Int(count) {
+                                print("local and pulled do not match... pulling delta: \(count) && \(self.auth.messages.selectedDialog(dialogID: self.dialogID).count)")
+                                changeMessageRealmData.shared.getMessageUpdates(dialogID: self.dialogID, limit: self.maxPagination, skip: self.minPagination - currentMessages.count, completion: { _ in })
+                            }
                             DispatchQueue.main.async {
-                                self.mesgCount = Int(count)
+                                print("the total count for this dialog: \(count)")
+                                self.totalMessageCount = Int(count)
+                            }
+                        })
+
+                        Request.totalUnreadMessageCountForDialogs(withIDs: Set([self.dialogID]), successBlock: { (count, dialogs) in
+                            DispatchQueue.main.async {
+                                print("the count for this dialog: \(count)")
+                                self.unreadMessageCount = Int(count)
                             }
                         })
                     }
@@ -228,7 +285,5 @@ struct ChatMessagesView: View {
                 }
             })
         }
-        
-        changeMessageRealmData.shared.getMessageUpdates(dialogID: self.dialogID, completion: { _ in })
     }
 }

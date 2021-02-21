@@ -86,18 +86,14 @@ class changeMessageRealmData {
     init() { }
     static let shared = changeMessageRealmData()
 
-    func getMessageUpdates(dialogID: String, completion: @escaping (Bool) -> ()) {
-        //let queue = DispatchQueue(label: "com.brandon.chatrMessageQueue", qos: .utility)
-
-        //queue.async {
-            let extRequest : [String: String] = ["sort_desc" : "date_sent", "mark_as_read" : "0"]
-            Request.messages(withDialogID: dialogID, extendedRequest: extRequest, paginator: Paginator.limit(20, skip: 0), successBlock: { (messages, _) in
-                self.insertMessages(messages, completion: { })
-            }){ (error) in
-                print("eror getting messages: \(error.localizedDescription)")
-            }
-            completion(true)
-        //}
+    func getMessageUpdates(dialogID: String, limit: Int, skip: Int, completion: @escaping (Bool) -> ()) {
+        let extRequest : [String: String] = ["sort_desc" : "date_sent", "mark_as_read" : "0"]
+        Request.messages(withDialogID: dialogID, extendedRequest: extRequest, paginator: Paginator.limit(UInt(limit), skip: UInt(skip)), successBlock: { (messages, _) in
+            self.insertMessages(messages, completion: { })
+        }){ (error) in
+            print("eror getting messages: \(error.localizedDescription)")
+        }
+        completion(true)
     }
     
     func loadMoreMessages(dialogID: String, currentCount: Int, completion: @escaping (Bool) -> ()) {

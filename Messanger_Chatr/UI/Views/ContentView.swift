@@ -440,7 +440,7 @@ struct mainHomeList: View {
                             .simultaneousGesture(DragGesture(minimumDistance: UserDefaults.standard.bool(forKey: "localOpen") ? 800 : 0))
                             .layoutPriority(1)
                             .onDisappear {
-                                guard let dialog = self.auth.selectedConnectyDialog, dialog.isJoined() else {
+                                guard let dialog = self.auth.selectedConnectyDialog, dialog.isJoined(), dialog.type == .group || dialog.type == .public else {
                                     return
                                 }
                                 

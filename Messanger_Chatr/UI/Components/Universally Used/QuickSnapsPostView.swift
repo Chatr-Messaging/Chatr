@@ -255,12 +255,12 @@ struct QuickSnapsPostView: View {
                                         event.notificationType = .push
                                         event.usersIDs = [NSNumber(value: self.selectedQuickSnapContact.id)]
                                         event.type = .oneShot
-                                        event.name = "Liked Qucik Snap"
+                                        event.name = "Liked Quick Snap"
 
                                         var pushParameters = [String : String]()
                                         pushParameters["message"] = "\(ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.fullName ?? "A user") liked your quick snap ❤️"
                                         pushParameters["ios_sound"] = "app_sound.wav"
-                                        pushParameters["title"] = "Liked Quci Snap"
+                                        pushParameters["title"] = "Liked Quick Snap"
 
                                         if let jsonData = try? JSONSerialization.data(withJSONObject: pushParameters, options: .prettyPrinted) {
                                             let jsonString = String(bytes: jsonData, encoding: String.Encoding.utf8)

@@ -520,10 +520,10 @@ class AuthModel: NSObject, ObservableObject {
         guard let dialog = self.selectedConnectyDialog, dialog.isJoined() else {
             return
         }
-        
+
+        dialog.sendUserStoppedTyping()
         dialog.leave { error in
             self.onlineCount = 0
-            dialog.sendUserStoppedTyping()
             print("just left dialog! error?: \(String(describing: error?.localizedDescription))")
         }
     }
@@ -644,7 +644,7 @@ extension AuthModel: ChatDelegate {
     func chatDidNotConnectWithError(_ error: Error) {
         print("Chat did not connect:")
     }
-    
+
     func chatDidReceiveContactAddRequest(fromUser userID: UInt) {
         self.profile.addContactRequest(userID: userID)
         
