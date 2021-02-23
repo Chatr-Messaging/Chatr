@@ -221,6 +221,19 @@ class changeDialogRealmData {
         }
     }
     
+    func getRealmDialog(dialogId: String) -> DialogStruct {
+        let config = Realm.Configuration(schemaVersion: 1)
+        do {
+            let realm = try Realm(configuration: config)
+            if let dialogResult = realm.object(ofType: DialogStruct.self, forPrimaryKey: dialogId) {
+                return dialogResult
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+        return DialogStruct()
+    }
+    
     func deletePrivateConnectyDialog(dialogID: String, isOwner: Bool) {
         Request.deleteDialogs(withIDs: Set<String>([dialogID]), forAllUsers: isOwner ? true : false, successBlock: { (deletedObjectsIDs, notFoundObjectsIDs, wrongPermissionsObjectsIDs) in
             self.updateDialogDelete(isDelete: true, dialogID: dialogID)
