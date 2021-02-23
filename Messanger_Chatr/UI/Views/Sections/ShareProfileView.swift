@@ -40,9 +40,17 @@ struct ShareProfileView: View {
                 //MARK: QR Code
                 ZStack(alignment: .center) {
                     if !foundUser {
-                        Text("Loading QR Code...")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
+                        VStack {
+                            Image(systemName: "qrcode")
+                                .resizable()
+                                .frame(width: 26, height: 26)
+                                .foregroundColor(.primary)
+                                .padding(10)
+
+                            Text("loading QR code...")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                        }
                     }
                     
                     ZStack(alignment: .bottom) {
@@ -139,13 +147,14 @@ struct ShareProfileView: View {
                             .resizable()
                             .scaledToFit()
                             .frame(height: 22)
-                            .padding(.leading, 8)
+                            .padding(.leading, 10)
                         
                         Text(self.shareURL)
                             .foregroundColor(.primary)
                             .font(.system(size: 16))
                             .lineLimit(1)
                             .padding(.vertical, 15)
+                            .padding(.trailing, 10)
                     }.foregroundColor(.gray)
                     .background(Color("buttonColor"))
                     .clipShape(RoundedRectangle(cornerRadius: 14, style: .circular))

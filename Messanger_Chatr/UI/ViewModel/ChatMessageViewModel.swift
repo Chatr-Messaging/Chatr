@@ -95,8 +95,8 @@ class ChatMessageViewModel: ObservableObject {
         }
     }
 
-    func likeMessage(from userId: Int, messageId: String, dialogId: String, completion: @escaping (Bool) -> Void) {
-        let msg = Database.database().reference().child("Dialogs").child(dialogId).child(messageId).child("likes")
+    func likeMessage(from userId: Int, name: String, message: MessageStruct, completion: @escaping (Bool) -> Void) {
+        let msg = Database.database().reference().child("Dialogs").child(message.dialogID).child(message.id).child("likes")
 
         msg.observeSingleEvent(of: .value, with: { snapshot in
             if snapshot.childSnapshot(forPath: "\(userId)").exists() {
@@ -105,14 +105,15 @@ class ChatMessageViewModel: ObservableObject {
                 completion(false)
             } else {
                 msg.updateChildValues(["\(userId)" : "\(Date())"])
-                
+                self.sendPushNoti(userIDs: [NSNumber(value: message.senderID)], title: "Liked Message", message: "\(name) liked your message '\(message.text)'")
+
                 completion(true)
             }
         })
     }
     
-    func dislikeMessage(from userId: Int, messageId: String, dialogId: String, completion: @escaping (Bool) -> Void) {
-        let msg = Database.database().reference().child("Dialogs").child(dialogId).child(messageId).child("dislikes")
+    func dislikeMessage(from userId: Int, name: String, message: MessageStruct, completion: @escaping (Bool) -> Void) {
+        let msg = Database.database().reference().child("Dialogs").child(message.dialogID).child(message.id).child("dislikes")
 
         msg.observeSingleEvent(of: .value, with: { snapshot in
             if snapshot.childSnapshot(forPath: "\(userId)").exists() {
@@ -121,6 +122,7 @@ class ChatMessageViewModel: ObservableObject {
                 completion(false)
             } else {
                 msg.updateChildValues(["\(userId)" : "\(Date())"])
+                self.sendPushNoti(userIDs: [NSNumber(value: message.senderID)], title: "Disliked Message", message: "\(name) disliked your message '\(message.text)'")
                 
                 completion(true)
             }
@@ -145,6 +147,31 @@ class ChatMessageViewModel: ObservableObject {
 
                 completion()
             }
+        }
+    }
+
+    func sendPushNoti(userIDs: [NSNumber], title: String, message: String) {
+        let event = Event()
+        event.notificationType = .push
+        event.usersIDs = userIDs
+        event.type = .oneShot
+        event.name = title
+
+        var pushParameters = [String : String]()
+        pushParameters["title"] = title
+        pushParameters["message"] = message
+        pushParameters["ios_sound"] = "app_sound.wav"
+
+        if let jsonData = try? JSONSerialization.data(withJSONObject: pushParameters, options: .prettyPrinted) {
+            let jsonString = String(bytes: jsonData, encoding: String.Encoding.utf8)
+
+            event.message = jsonString
+
+            Request.createEvent(event, successBlock: {(events) in
+                print("sent push notification!! \(events)")
+            }, errorBlock: {(error) in
+                print("error sending noti: \(error.localizedDescription)")
+            })
         }
     }
 }

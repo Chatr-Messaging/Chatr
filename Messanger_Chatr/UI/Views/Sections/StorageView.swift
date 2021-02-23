@@ -119,7 +119,7 @@ struct storageView: View {
                                 }.padding(.all)
                             }.buttonStyle(changeBGButtonStyle())
                             .disabled(self.clearData ? true : false)
-                                                    
+                       
                             /*
                             VStack {
                                 Button(action: {

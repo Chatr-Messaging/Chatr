@@ -437,7 +437,7 @@ class changeContactsRealmData {
         }
     }
 
-    func getRealmContact(userID: Int) -> ContactStruct {
+    func getRealmContact(userID: Int) -> ContactStruct? {
         let config = Realm.Configuration(schemaVersion: 1)
         do {
             let realm = try Realm(configuration: config)
@@ -447,7 +447,7 @@ class changeContactsRealmData {
         } catch {
             print(error.localizedDescription)
         }
-        return ContactStruct()
+        return nil
     }
     
     func removeAllContacts() {

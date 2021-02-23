@@ -151,7 +151,7 @@ struct ChatMessagesView: View {
                             })
                             .onPreferenceChange(ViewOffsetKey.self) {
                                 print("offset >> \($0)")
-                                if $0 > -1.34 && $0 < 0 {
+                                if $0 > -1 && $0 < 0 {
                                     print("ran the laod more...")
                                     changeMessageRealmData.shared.getMessageUpdates(dialogID: self.dialogID, limit: pageShowCount * (self.scrollPage + 1), skip: self.minPagination - currentMessages.count, completion: { _ in
                                         DispatchQueue.main.async {
@@ -186,24 +186,19 @@ struct ChatMessagesView: View {
                             }.opacity(self.firstScroll ? 0 : 1)
                         }
                     }
-                }//.resignKeyboardOnDragGesture()
-                .onAppear() {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        self.loadDialog()
-                        self.delayViewMessages = true
-                    }
                 }
             }.coordinateSpace(name: "scroll")
             .frame(width: Constants.screenWidth)
             .contentShape(Rectangle())
             .onAppear() {
                 DispatchQueue.global(qos: .utility).async {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        self.loadDialog()
+                        self.delayViewMessages = true
+                    }
+                    
                     if !Session.current.tokenHasExpired {
                         Request.countOfMessages(forDialogID: self.dialogID, extendedRequest: ["sort_desc" : "lastMessageDate"], successBlock: { count in
-                            if self.auth.messages.selectedDialog(dialogID: self.dialogID).count != Int(count) {
-                                print("local and pulled do not match... pulling delta: \(count) && \(self.auth.messages.selectedDialog(dialogID: self.dialogID).count)")
-                                changeMessageRealmData.shared.getMessageUpdates(dialogID: self.dialogID, limit: self.maxPagination, skip: self.minPagination - currentMessages.count, completion: { _ in })
-                            }
                             DispatchQueue.main.async {
                                 print("the total count for this dialog: \(count)")
                                 self.totalMessageCount = Int(count)
@@ -216,6 +211,10 @@ struct ChatMessagesView: View {
                                 self.unreadMessageCount = Int(count)
                             }
                         })
+                        
+                        DispatchQueue.main.async {
+                            //changeMessageRealmData.shared.getMessageUpdates(dialogID: self.dialogID, limit: pageShowCount * (self.scrollPage + 1), skip: self.minPagination - currentMessages.count, completion: { _ in })
+                        }
                     }
                 }
             }

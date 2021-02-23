@@ -50,7 +50,7 @@ class MessagesRealmModel<Element>: ObservableObject where Element: RealmSwift.Re
     private var itemsPerPage = 15
     private var start = -15
     private var stop = -1
-    
+
     init(results: Results<Element>) {
         self.results = results
         lateInit()
