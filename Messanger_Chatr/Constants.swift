@@ -181,7 +181,7 @@ extension String {
         }
     }
     
-    func messageStatusText(message: MessageStruct, positionRight: Bool) -> String {
+    func messageStatusText(message: MessageStruct, positionRight: Bool, isGroup: Bool, fullName: String?) -> String {
         if positionRight == true {
             //if is your message
             switch message.messageState {
@@ -198,23 +198,31 @@ extension String {
                         return "read"
                     }
                 } else {
-                    return  message.readIDs.count.description + " read"
+                    return message.readIDs.count.description + " read"
                 }
             case .editied:
                 return "edited"
+
             case .deleted:
                 return "deleted"
+
             case .error:
                 return "error"
+
             case .isTyping:
                 return "typing"
+
             case .removedTyping:
                 return ""
+
             case .sent:
                 return "sent"
+
             }
         } else {
-            return message.date.getElapsedInterval(lastMsg: "now")
+            guard let fullName = fullName, isGroup else { return message.date.getElapsedInterval(lastMsg: "now") + " ago" }
+
+            return "\(fullName.byWords.first?.description ?? fullName) • " + message.date.getElapsedInterval(lastMsg: "now") + " ago"
         }
     }
 }

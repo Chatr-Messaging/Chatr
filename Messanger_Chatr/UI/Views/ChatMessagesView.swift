@@ -37,6 +37,7 @@ struct ChatMessagesView: View {
     @State private var unreadMessageCount: Int = 0
     @State private var scrollPage: Int = 1
     @State private var scrollToId: String = ""
+    @State var topAvatarUrls: [String] = []
     let keyboard = KeyboardObserver()
     let pageShowCount = 15
     var maxPagination: Int {
@@ -100,18 +101,47 @@ struct ChatMessagesView: View {
                                             }
                                             
                                             if self.maxPagination == self.totalMessageCount && !firstScroll {
-                                                Text("Begining of Conversation")
-                                                    .font(.subheadline)
-                                                    .fontWeight(.medium)
-                                                    .foregroundColor(.primary)
-                                                    .padding(.top, 10)
-                                                
-                                                Text("created \(changeDialogRealmData.shared.getRealmDialog(dialogId: self.dialogID).createdAt.getElapsedInterval(lastMsg: "moments")) ago")
-                                                    .font(.caption)
-                                                    .fontWeight(.regular)
-                                                    .foregroundColor(.secondary)
-                                                    .multilineTextAlignment(.center)
-                                                    .padding(.bottom)
+                                                VStack {
+                                                    HStack(spacing: -7) {
+                                                        ForEach(self.topAvatarUrls, id: \.self) { url in
+                                                            WebImage(url: URL(string: url))
+                                                                .resizable()
+                                                                .placeholder{ Image("empty-profile").resizable().frame(width: 30, height: 30, alignment: .center).scaledToFill() }
+                                                                .indicator(.activity)
+                                                                .scaledToFill()
+                                                                .clipShape(Circle())
+                                                                .frame(width: 30, height: 30, alignment: .center)
+                                                                .overlay(Circle().stroke(Color("bgColor"), lineWidth: 2))
+                                                                .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 5)
+                                                        }
+                                                    }.padding(.top, 5)
+                                                    .onAppear {
+                                                        for occu in changeDialogRealmData.shared.getRealmDialog(dialogId: self.dialogID).occupentsID {
+                                                            self.viewModel.getUserAvatar(senderId: occu) { (avatar, _) in
+                                                                guard avatar != "self" else {
+                                                                    self.topAvatarUrls.append(self.auth.profile.results.first?.avatar ?? "")
+                                                                    return
+                                                                }
+                                                                self.topAvatarUrls.append(avatar)
+                                                            }
+                                                        }
+                                                    }
+                                                    
+                                                    Text("Begining of Conversation")
+                                                        .font(.subheadline)
+                                                        .fontWeight(.medium)
+                                                        .foregroundColor(.primary)
+                                                        .padding(.top, 2.5)
+                                                        .padding(.horizontal, 40)
+                                                    
+                                                    Text("created \(self.viewModel.dateFormatTime(date: changeDialogRealmData.shared.getRealmDialog(dialogId: self.dialogID).createdAt))")
+                                                        .font(.caption)
+                                                        .fontWeight(.regular)
+                                                        .foregroundColor(.secondary)
+                                                        .multilineTextAlignment(.center)
+                                                        .padding(.bottom)
+                                                        .offset(y: 2)
+                                                }
                                             }
                                         }
                                     }

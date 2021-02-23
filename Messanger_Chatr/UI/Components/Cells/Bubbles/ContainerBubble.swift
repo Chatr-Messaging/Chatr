@@ -22,7 +22,8 @@ struct ContainerBubble: View {
     var hasPrior: Bool = true
     @State var subText: String = ""
     @State var avatar: String = ""
-    
+    @State var fullName: String = ""
+
     ///Interaction variables:
     @State var showInteractions: Bool = false
     @State var likeBtnAnimation: Bool = false
@@ -165,11 +166,12 @@ struct ContainerBubble: View {
                 HStack(spacing: 4) {
                     //if messagePosition == .right { Spacer() }
                     
-                    Text(self.subText.messageStatusText(message: self.message, positionRight: messagePosition == .right))
+                    Text(self.subText.messageStatusText(message: self.message, positionRight: messagePosition == .right, isGroup: true, fullName: self.fullName))
                         .foregroundColor(self.message.messageState == .error ? .red : .gray)
                         .font(.caption)
                         .lineLimit(1)
-                        .padding(.horizontal, 22)
+                        .padding(.horizontal, 18)
+                        .offset(y: 2)
                         .multilineTextAlignment(messagePosition == .right ? .trailing : .leading)
                         .opacity(self.hasPrior ? 0 : 1)
 
@@ -214,10 +216,14 @@ struct ContainerBubble: View {
                     .padding(.horizontal)
             }
         }.onAppear() {
-            self.viewModel.getUserAvatar(senderId: self.message.senderID, compleation: { url in
-                if url == "self" {
+            self.viewModel.getUserAvatar(senderId: self.message.senderID, compleation: { (url, fullName) in
+                if url == "self" || fullName == "self" {
                     self.avatar = self.auth.profile.results.first?.avatar ?? ""
-                } else { self.avatar = url }
+                    self.fullName = self.auth.profile.results.first?.fullName ?? ""
+                } else {
+                    self.avatar = url
+                    self.fullName = fullName
+                }
             })
 
             self.hasUserLiked = self.message.likedId.contains(self.auth.profile.results.first?.id ?? 0)

@@ -73,20 +73,20 @@ class ChatMessageViewModel: ObservableObject {
         //}
     }
 
-    func getUserAvatar(senderId: Int, compleation: @escaping (String) -> Void) {
+    func getUserAvatar(senderId: Int, compleation: @escaping (String, String) -> Void) {
         if senderId == UserDefaults.standard.integer(forKey: "currentUserID") {
-            compleation("self")
+            compleation("self", "self")
         } else {
             let config = Realm.Configuration(schemaVersion: 1)
             do {
                 let realm = try Realm(configuration: config)
                 if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: senderId) {
-                    compleation(foundContact.avatar)
+                    compleation(foundContact.avatar, foundContact.fullName)
                 } else {
                     Request.users(withIDs: [NSNumber(value: senderId)], paginator: Paginator.limit(1, skip: 0), successBlock: { (paginator, users) in
                         DispatchQueue.main.async {
                             if let firstUser = users.first {
-                                compleation(PersistenceManager.shared.getCubeProfileImage(usersID: firstUser) ?? "")
+                                compleation(PersistenceManager.shared.getCubeProfileImage(usersID: firstUser) ?? "", firstUser.fullName ?? "Chatr User")
                             }
                         }
                     })
@@ -173,5 +173,16 @@ class ChatMessageViewModel: ObservableObject {
                 print("error sending noti: \(error.localizedDescription)")
             })
         }
+    }
+
+    func dateFormatTime(date: Date) -> String {
+        let dateFormatter = DateFormatter()
+        
+        dateFormatter.dateStyle = .long
+        dateFormatter.timeStyle = .short
+        
+        dateFormatter.timeZone = TimeZone(identifier: "UTC")
+     
+        return dateFormatter.string(from: date)
     }
 }
