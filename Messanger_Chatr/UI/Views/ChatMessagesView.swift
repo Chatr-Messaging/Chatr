@@ -66,6 +66,79 @@ struct ChatMessagesView: View {
             ScrollView(.vertical, showsIndicators: false) {
                 LazyVStack() {
                     //No Messages found:
+                    if (self.totalMessageCount == 0 || self.maxPagination == self.totalMessageCount) {
+                        VStack {
+                            HStack(spacing: -7) {
+                                ForEach(self.topAvatarUrls.indices, id: \.self) { url in
+                                    if url < 7 {
+                                        ZStack {
+                                            Circle()
+                                                .background(Color.clear)
+                                                .frame(width: 30, height: 30, alignment: .center)
+
+                                            WebImage(url: URL(string: self.topAvatarUrls[url]))
+                                                .resizable()
+                                                .placeholder{ Image("empty-profile").resizable().frame(width: 30, height: 30, alignment: .center).scaledToFill() }
+                                                .indicator(.activity)
+                                                .scaledToFill()
+                                                .clipShape(Circle())
+                                                .frame(width: 30, height: 30, alignment: .center)
+                                                .overlay(Circle().stroke(Color.white.opacity(0.85), lineWidth: 2.2))
+                                                .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 5)
+                                            
+                                            if url == 6 && self.topAvatarUrls.count >= 7 {
+                                                Circle()
+                                                    .frame(width: 30, height: 30)
+                                                    .foregroundColor(.black)
+                                                    .opacity(0.4)
+                                                
+                                                Text("+\(self.topAvatarUrls.count - 6)")
+                                                    .font(.caption)
+                                                    .fontWeight(.medium)
+                                                    .foregroundColor(.white)
+                                            }
+                                        }
+                                    }
+                                }
+                            }.padding(.top, 15)
+                            .onAppear {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                    self.topAvatarUrls.removeAll()
+                                    for occu in changeDialogRealmData.shared.getRealmDialog(dialogId: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").occupentsID {
+                                        print("the found occc: \(occu)")
+                                        self.viewModel.getUserAvatar(senderId: occu) { (avatar, _) in
+                                            print("the found occc2222: \(avatar)")
+                                            
+                                            guard avatar != "self" else {
+                                                self.topAvatarUrls.append(self.auth.profile.results.first?.avatar ?? "")
+                                                return
+                                            }
+                                            self.topAvatarUrls.append(avatar)
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            Text("Start of Chatr")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                                .foregroundColor(.primary)
+                                .padding(.top, 2.5)
+                                .padding(.horizontal, 40)
+                            
+                            Text("created \(self.viewModel.dateFormatTime(date: changeDialogRealmData.shared.getRealmDialog(dialogId: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").createdAt))")
+                                .font(.caption)
+                                .fontWeight(.regular)
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
+                                .offset(y: 2)
+
+                            Divider()
+                                .padding(.top, 10)
+                                .padding(.horizontal, 30)
+                        }
+                    }
+
                     Text(self.totalMessageCount == 0 ? "no messages found" : self.totalMessageCount == -1 ? "loading messages..." : "")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
@@ -77,12 +150,21 @@ struct ChatMessagesView: View {
                     //CUSTOM MESSAGE BUBBLE:
                     if self.delayViewMessages {
                         ScrollViewReader { reader in
-                            VStack {
+                            VStack(alignment: .center) {
                                 ForEach(currentMessages.count - self.maxPagination ..< self.minPagination, id: \.self) { message in
                                     let messagePosition: messagePosition = UInt(currentMessages[message].senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? .right : .left
                                     let notLast = currentMessages[message].id != currentMessages.last?.id
                                     //let topMsg = currentMessages[message].id == currentMessages.first?.id
-
+                                    if needsTimestamp(index: message) {
+                                        Text("\(self.viewModel.dateFormatTime(date: currentMessages[message].date))")
+                                            .font(.caption)
+                                            .fontWeight(.semibold)
+                                            .foregroundColor(.secondary)
+                                            .multilineTextAlignment(.center)
+                                            .padding(.top, message == 0 ? 0 : 15)
+                                            .padding(.bottom, 15)
+                                    }
+                                    
                                     if message == (currentMessages.count - self.maxPagination) {
                                         VStack(alignment: .center) {
                                             if self.isLoadingMore && !firstScroll && self.maxPagination != self.totalMessageCount {
@@ -98,50 +180,6 @@ struct ChatMessagesView: View {
                                                 Text("loading more...")
                                                     .font(.caption)
                                                     .foregroundColor(.secondary)
-                                            }
-                                            
-                                            if self.maxPagination == self.totalMessageCount && !firstScroll {
-                                                VStack {
-                                                    HStack(spacing: -7) {
-                                                        ForEach(self.topAvatarUrls, id: \.self) { url in
-                                                            WebImage(url: URL(string: url))
-                                                                .resizable()
-                                                                .placeholder{ Image("empty-profile").resizable().frame(width: 30, height: 30, alignment: .center).scaledToFill() }
-                                                                .indicator(.activity)
-                                                                .scaledToFill()
-                                                                .clipShape(Circle())
-                                                                .frame(width: 30, height: 30, alignment: .center)
-                                                                .overlay(Circle().stroke(Color("bgColor"), lineWidth: 2))
-                                                                .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 5)
-                                                        }
-                                                    }.padding(.top, 5)
-                                                    .onAppear {
-                                                        for occu in changeDialogRealmData.shared.getRealmDialog(dialogId: self.dialogID).occupentsID {
-                                                            self.viewModel.getUserAvatar(senderId: occu) { (avatar, _) in
-                                                                guard avatar != "self" else {
-                                                                    self.topAvatarUrls.append(self.auth.profile.results.first?.avatar ?? "")
-                                                                    return
-                                                                }
-                                                                self.topAvatarUrls.append(avatar)
-                                                            }
-                                                        }
-                                                    }
-                                                    
-                                                    Text("Begining of Conversation")
-                                                        .font(.subheadline)
-                                                        .fontWeight(.medium)
-                                                        .foregroundColor(.primary)
-                                                        .padding(.top, 2.5)
-                                                        .padding(.horizontal, 40)
-                                                    
-                                                    Text("created \(self.viewModel.dateFormatTime(date: changeDialogRealmData.shared.getRealmDialog(dialogId: self.dialogID).createdAt))")
-                                                        .font(.caption)
-                                                        .fontWeight(.regular)
-                                                        .foregroundColor(.secondary)
-                                                        .multilineTextAlignment(.center)
-                                                        .padding(.bottom)
-                                                        .offset(y: 2)
-                                                }
                                             }
                                         }
                                     }
@@ -276,7 +314,15 @@ struct ChatMessagesView: View {
     
     func hasPrevious(index: Int) -> Bool {
         let result = self.auth.messages.selectedDialog(dialogID: self.dialogID)
+
         return result[index] != result.last ? (result[index + 1].senderID == result[index].senderID ? true : false) : false
+    }
+    
+    func needsTimestamp(index: Int) -> Bool {
+        //need to filter out the deleted messages
+        let result = self.auth.messages.selectedDialog(dialogID: self.dialogID)
+
+        return result[index] != result.first ? (result[index - 1].senderID != result[index].senderID ? (result[index].date >= result[index - 1].date.addingTimeInterval(86400) ? true : false) : false) : false
     }
     
     func loadDialog() {

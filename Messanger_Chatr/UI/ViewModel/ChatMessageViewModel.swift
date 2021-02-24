@@ -10,6 +10,7 @@ import SwiftUI
 import RealmSwift
 import ConnectyCube
 import Firebase
+import SDWebImageSwiftUI
 
 class ChatMessageViewModel: ObservableObject {
     
@@ -179,7 +180,7 @@ class ChatMessageViewModel: ObservableObject {
         let dateFormatter = DateFormatter()
         
         dateFormatter.dateStyle = .long
-        dateFormatter.timeStyle = .short
+        dateFormatter.timeStyle = .none
         
         dateFormatter.timeZone = TimeZone(identifier: "UTC")
      

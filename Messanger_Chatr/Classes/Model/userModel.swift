@@ -20,15 +20,16 @@ class Users: NSObject {
         //user.password = Session.current.sessionDetails!.token'
         Auth.auth().currentUser?.getIDTokenResult(completion: { idToken, error in
             if error != nil {
+                print("the error getting the id token: \(error.debugDescription)")
                 completion()
             } else {
                 if let tokenId = idToken {
                     Request.logIn(withFirebaseProjectID: Constants.FirebaseProjectID, accessToken: tokenId.token, successBlock: { (userPulled) in
                         // save user core data here...
-                        UserDefaults.standard.set(Session.current.currentUserID, forKey: "currentUserID")
+                        UserDefaults.standard.set(userPulled.id, forKey: "currentUserID")
                         changeProfileRealmDate.shared.updateProfile(userPulled, completion: {
-                            changeProfileRealmDate.shared.observeFirebaseUser()
-                            ChatrApp.chatInstanceConnect(id: Session.current.currentUserID)
+                            ChatrApp.chatInstanceConnect(id: userPulled.id)
+                            print("success updating the profile and all... \(String(describing: userPulled.fullName))")
 
                             completion()
                         })

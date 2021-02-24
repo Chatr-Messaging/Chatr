@@ -45,17 +45,21 @@ extension ChatrApp {
     static func chatInstanceConnect(id: UInt) {
         guard !Chat.instance.isConnected && !Chat.instance.isConnecting else { return }
         
+        print("the session token is: \(Session.current.tokenHasExpired) &&&& \(Session.current.sessionDetails?.token ?? "")")
         Chat.instance.connect(withUserID: id, password: Session.current.sessionDetails?.token ?? "") { (error) in
             if error != nil {
                 print("there is a error connecting to session! \(String(describing: error?.localizedDescription)) user id: \(id)")
-                changeContactsRealmData.shared.observeQuickSnaps()
+                users.login(completion: {
+                    changeContactsRealmData.shared.observeQuickSnaps()
+                    changeProfileRealmDate.shared.observeFirebaseUser(with: Int(id))
+                })
             } else {
                 print("\(Thread.current.isMainThread) Success joining session! the current user: \(String(describing: Session.current.currentUser?.fullName)) && expirationSate: \(String(describing: Session.current.sessionDetails?.token))")
 
                 changeDialogRealmData.shared.fetchDialogs(completion: { worked in
                     if worked {
                         changeContactsRealmData.shared.observeQuickSnaps()
-                        changeProfileRealmDate.shared.observeFirebaseUser()
+                        changeProfileRealmDate.shared.observeFirebaseUser(with: Int(id))
                         self.auth.initIAPurchase()
                     }
                 })

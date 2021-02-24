@@ -98,16 +98,16 @@ class changeProfileRealmDate {
     init() { }
     static let shared = changeProfileRealmDate()
     
-    func observeFirebaseUser() {
+    func observeFirebaseUser(with id: Int) {
         //let queue = DispatchQueue.init(label: "com.brandon.chatrFirebbase", qos: .utility)
         //queue.async {
-            let user = Database.database().reference().child("Users").child("\(Session.current.currentUserID)")
+            let user = Database.database().reference().child("Users").child("\(id)")
             user.observe(.value, with: { (snapshot: DataSnapshot) in
                 if let dict = snapshot.value as? [String: Any] {
                     let config = Realm.Configuration(schemaVersion: 1)
                     do {
                         let realm = try Realm(configuration: config)
-                        if let foundContact = realm.object(ofType: ProfileStruct.self, forPrimaryKey: Session.current.currentUserID) {
+                        if let foundContact = realm.object(ofType: ProfileStruct.self, forPrimaryKey: id) {
                             print("Contact FOUND in Realm: \(snapshot.key) anddd faceID? : \(String(describing: dict["faceID"] as? Bool))")
                             try realm.safeWrite({
                                 foundContact.bio = dict["bio"] as? String ?? ""

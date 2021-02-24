@@ -35,7 +35,7 @@ struct ContactCell: View {
             VStack(alignment: .leading) {
                 Text(self.user.fullName ?? "No Name")
                     .font(.headline)
-                    .fontWeight(.semibold)
+                    .fontWeight(.medium)
                     .foregroundColor(Color.primary)
 
                 Text("last online \(self.user.lastRequestAt?.getElapsedInterval(lastMsg: "moments") ?? "recently") ago")

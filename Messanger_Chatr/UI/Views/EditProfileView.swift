@@ -414,7 +414,7 @@ struct EditProfileView: View {
                     }.padding(.top, 70)
                     .resignKeyboardOnDragGesture()
                     .onAppear {
-                        changeProfileRealmDate.shared.observeFirebaseUser()
+                        changeProfileRealmDate.shared.observeFirebaseUser(with: self.auth.profile.results.first?.id ?? 0)
                     }
                 }.frame(height: Constants.screenHeight - 50 - self.keyboardHeight)
                 .navigationBarTitle("Edit Profile", displayMode: .inline)

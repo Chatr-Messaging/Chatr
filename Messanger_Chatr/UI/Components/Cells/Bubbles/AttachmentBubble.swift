@@ -17,8 +17,6 @@ struct AttachmentBubble: View {
     @StateObject var viewModel: ChatMessageViewModel
     @State var message: MessageStruct
     @State var messagePosition: messagePosition
-    @State var subText: String = ""
-    @State var avatar: String = ""
     @State var localVideoURL: URL?
     var hasPrior: Bool = false
     @State var player: AVPlayer = AVPlayer()
@@ -41,7 +39,7 @@ struct AttachmentBubble: View {
                     .transition(.asymmetric(insertion: AnyTransition.scale.animation(.easeOut(duration: 0.35)), removal: AnyTransition.scale.animation(.easeOut(duration: 0.25))))
                     .aspectRatio(contentMode: .fit)
                     .clipShape(CustomGIFShape())
-                    .frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * 0.65))
+                    .frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * 0.65), alignment: self.messagePosition == .right ? .trailing : .leading)
                     .frame(maxHeight: CGFloat(Constants.screenHeight * 0.65))
                     .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 14)
                     .offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
@@ -60,7 +58,7 @@ struct AttachmentBubble: View {
                     }.transition(.asymmetric(insertion: AnyTransition.scale.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                     .aspectRatio(contentMode: .fit)
                     .clipShape(CustomGIFShape())
-                    .frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.8 : 0.85)))
+                    .frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.8 : 0.85)), alignment: self.messagePosition == .right ? .trailing : .leading)
                     .frame(maxHeight: CGFloat(Constants.screenHeight * 0.65))
                     .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 14)
                     .offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
@@ -72,7 +70,7 @@ struct AttachmentBubble: View {
                         .transition(.asymmetric(insertion: AnyTransition.scale.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                         .aspectRatio(contentMode: .fit)
                         .clipShape(CustomGIFShape())
-                        .frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * 0.75))
+                        .frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * 0.75), alignment: self.messagePosition == .right ? .trailing : .leading)
                         .frame(maxHeight: CGFloat(Constants.screenHeight * 0.65))
                         .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 14)
                         .offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)

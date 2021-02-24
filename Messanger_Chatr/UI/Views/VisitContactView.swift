@@ -765,7 +765,7 @@ struct VisitContactView: View {
             }
         }
     }
-    
+
     func forwardContact() {
         for dialog in self.auth.dialogs.results {
             if dialog.dialogType == "private" {
@@ -786,7 +786,7 @@ struct VisitContactView: View {
                 }
             }
         }
-        
+
         //selectedContact
         if self.selectedContact.count == 0 {
             self.auth.notificationtext = "Forwarded Contact"
@@ -912,8 +912,8 @@ struct topHeaderContactView: View {
 
                     if self.contact.quickSnaps.count > 0 {
                         Circle()
-                            .stroke(Constants.snapPurpleGradient, style: StrokeStyle(lineWidth: 2, lineCap: .round))
-                            .frame(width: 118, height: 118)
+                            .stroke(Constants.snapPurpleGradient, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                            .frame(width: 120, height: 120)
                             .foregroundColor(.clear)
                     }
                     

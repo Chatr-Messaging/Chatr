@@ -222,7 +222,7 @@ extension String {
         } else {
             guard let fullName = fullName, isGroup else { return message.date.getElapsedInterval(lastMsg: "now") + " ago" }
 
-            return "\(fullName.byWords.first?.description ?? fullName) • " + message.date.getElapsedInterval(lastMsg: "now") + " ago"
+            return "\(fullName)" //.byWords.first?.description ?? fullName
         }
     }
 }
