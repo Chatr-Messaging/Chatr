@@ -62,7 +62,7 @@ struct ContainerBubble: View {
                                 .offset(x: messagePosition == .right ? -30 : 30)
                                 .padding(.bottom, 10)
                         }
-                    }.padding(.bottom, self.hasPrior ? 0 : 15)
+                    }.padding(.bottom, self.hasPrior ? 0 : 10)
                     .padding(.top, self.message.likedId.count != 0 || self.message.dislikedId.count != 0 ? 22 : 0)
                     .scaleEffect(self.showInteractions ? 1.1 : 1.0)
                     .onTapGesture(count: 2) {
@@ -165,13 +165,13 @@ struct ContainerBubble: View {
                 //MARK: Bottomm User Info / Message Status Section
                 HStack(spacing: 4) {
                     //if messagePosition == .right { Spacer() }
-                    
-                    Text(self.subText.messageStatusText(message: self.message, positionRight: messagePosition == .right, isGroup: true, fullName: self.fullName))
+
+                    Text(self.subText.messageStatusText(message: self.message, positionRight: messagePosition == .right, isGroup: self.auth.selectedConnectyDialog?.type == .group || self.auth.selectedConnectyDialog?.type == .public, fullName: self.fullName))
                         .foregroundColor(self.message.messageState == .error ? .red : .gray)
                         .font(.caption)
                         .lineLimit(1)
                         .padding(.horizontal, 18)
-                        .offset(y: 2)
+                        .offset(y: 4)
                         .multilineTextAlignment(messagePosition == .right ? .trailing : .leading)
                         .opacity(self.hasPrior ? 0 : 1)
 
@@ -186,6 +186,7 @@ struct ContainerBubble: View {
                     .clipShape(Circle())
                     .frame(width: self.hasPrior ? 0 : Constants.smallAvitarSize, height: self.hasPrior ? 0 : Constants.smallAvitarSize, alignment: .bottom)
                     .offset(x: messagePosition == .right ? (Constants.smallAvitarSize / 2) : -(Constants.smallAvitarSize / 2))
+                    .offset(y: 2)
                     .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 6)
                     .opacity(self.hasPrior && self.message.messageState != .error ? 0 : 1)
             }.actionSheet(isPresented: self.$deleteActionSheet) {

@@ -22,7 +22,7 @@ struct TextBubble: View {
     var body: some View {
         ZStack {
             if self.message.messageState != .isTyping {
-               if self.message.text.containsEmoji && self.message.text.count <= 4 {
+                if self.message.text.containsEmoji && self.message.text.count <= 4 {
                     Text(self.message.text)
                         .font(.system(size: 66))
                         .offset(x: self.messagePosition == .right ? -10 : 10, y: -5)

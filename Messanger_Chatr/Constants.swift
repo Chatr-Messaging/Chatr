@@ -181,7 +181,7 @@ extension String {
         }
     }
     
-    func messageStatusText(message: MessageStruct, positionRight: Bool, isGroup: Bool, fullName: String?) -> String {
+    func  messageStatusText(message: MessageStruct, positionRight: Bool, isGroup: Bool, fullName: String?) -> String {
         if positionRight == true {
             //if is your message
             switch message.messageState {
@@ -220,9 +220,40 @@ extension String {
 
             }
         } else {
-            guard let fullName = fullName, isGroup else { return message.date.getElapsedInterval(lastMsg: "now") + " ago" }
+            switch message.messageState {
+            case .read:
 
-            return "\(fullName)" //.byWords.first?.description ?? fullName
+                guard let fullName = fullName?.byWords.first?.description, message.readIDs.count >= 2, isGroup else {
+                    guard message.readIDs.count >= 2, isGroup else { return "" }
+
+                    return message.readIDs.count.description + " read"
+                }
+
+                return fullName + " • " + message.readIDs.count.description + " read"
+                
+            case .editied:
+                if message.readIDs.count >= 2 {
+                    guard let fullName = fullName?.byWords.first?.description, message.readIDs.count >= 2, isGroup else {
+                        guard message.readIDs.count >= 2, isGroup else { return "edited" }
+
+                        return "editied • " + message.readIDs.count.description + " read"
+                    }
+
+                    return fullName + " • " + " • editied • " + message.readIDs.count.description + " read"
+                } else {
+                    guard let fullName = fullName?.byWords.first?.description, isGroup else {
+                        return "edited"
+                    }
+                    
+                    return fullName + " • editied"
+                }
+
+            default:
+                guard let fullName = fullName?.byWords.first?.description, isGroup else { return "" }
+                
+                return fullName //.byWords.first?.description ?? fullName
+
+            }
         }
     }
 }

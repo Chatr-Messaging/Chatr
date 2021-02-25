@@ -19,6 +19,15 @@ struct ViewOffsetKey: PreferenceKey {
     }
 }
 
+struct SizePreferenceKey: PreferenceKey {
+    typealias Value = CGSize
+    static var defaultValue: Value = .zero
+
+    static func reduce(value: inout Value, nextValue: () -> Value) {
+        _ = nextValue()
+    }
+}
+
 struct ChatMessagesView: View {
     @EnvironmentObject var auth: AuthModel
     @Environment(\.colorScheme) var colorScheme
@@ -40,22 +49,36 @@ struct ChatMessagesView: View {
     @State var topAvatarUrls: [String] = []
     let keyboard = KeyboardObserver()
     let pageShowCount = 15
-    var maxPagination: Int {
-        if self.auth.messages.selectedDialog(dialogID: self.dialogID).count < pageShowCount {
-            return self.auth.messages.selectedDialog(dialogID: self.dialogID).count
-        } else if pageShowCount * self.scrollPage < self.totalMessageCount {
-            return pageShowCount * self.scrollPage
+    var minPagination: Int {
+        guard UserDefaults.standard.bool(forKey: "localOpen") else {
+            return 0
+        }
+        let count = self.auth.messages.selectedDialog(dialogID: self.dialogID).count
+        
+        if scrollPage <= 2 {
+            return count
+        } else if pageShowCount * self.scrollPage < count {
+            return count - (pageShowCount * (self.scrollPage - 2))
         } else {
-            return self.auth.messages.selectedDialog(dialogID: self.dialogID).count
+            return count - (pageShowCount * (self.scrollPage - 2))
         }
     }
-    var minPagination: Int {
-        if scrollPage <= 2 {
-            return self.auth.messages.selectedDialog(dialogID: self.dialogID).count
-        } else if pageShowCount * self.scrollPage < self.totalMessageCount {
-            return self.auth.messages.selectedDialog(dialogID: self.dialogID).count - (pageShowCount * (self.scrollPage - 2))
+    var maxPagination: Int {
+        guard UserDefaults.standard.bool(forKey: "localOpen") else {
+            return 0
+        }
+        let count = self.auth.messages.selectedDialog(dialogID: self.dialogID).count
+
+        if count < pageShowCount {
+            return 0
+        } else if pageShowCount * self.scrollPage < count {
+            guard minPagination > pageShowCount * self.scrollPage else {
+                return 0
+            }
+
+            return pageShowCount * self.scrollPage
         } else {
-            return self.auth.messages.selectedDialog(dialogID: self.dialogID).count - (pageShowCount * (self.scrollPage - 2))
+            return 0
         }
     }
 
@@ -66,7 +89,7 @@ struct ChatMessagesView: View {
             ScrollView(.vertical, showsIndicators: false) {
                 LazyVStack() {
                     //No Messages found:
-                    if (self.totalMessageCount == 0 || self.maxPagination == self.totalMessageCount) {
+                    if (self.totalMessageCount == 0 || self.maxPagination == 0) {
                         VStack {
                             HStack(spacing: -7) {
                                 ForEach(self.topAvatarUrls.indices, id: \.self) { url in
@@ -104,11 +127,9 @@ struct ChatMessagesView: View {
                             .onAppear {
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                     self.topAvatarUrls.removeAll()
+
                                     for occu in changeDialogRealmData.shared.getRealmDialog(dialogId: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").occupentsID {
-                                        print("the found occc: \(occu)")
                                         self.viewModel.getUserAvatar(senderId: occu) { (avatar, _) in
-                                            print("the found occc2222: \(avatar)")
-                                            
                                             guard avatar != "self" else {
                                                 self.topAvatarUrls.append(self.auth.profile.results.first?.avatar ?? "")
                                                 return
@@ -116,10 +137,11 @@ struct ChatMessagesView: View {
                                             self.topAvatarUrls.append(avatar)
                                         }
                                     }
+                                    self.topAvatarUrls.removeDuplicates()
                                 }
                             }
                             
-                            Text("Start of Chatr")
+                            Text("Beginning of Chat")
                                 .font(.subheadline)
                                 .fontWeight(.medium)
                                 .foregroundColor(.primary)
@@ -151,7 +173,7 @@ struct ChatMessagesView: View {
                     if self.delayViewMessages {
                         ScrollViewReader { reader in
                             VStack(alignment: .center) {
-                                ForEach(currentMessages.count - self.maxPagination ..< self.minPagination, id: \.self) { message in
+                                ForEach(self.maxPagination ..< self.minPagination, id: \.self) { message in
                                     let messagePosition: messagePosition = UInt(currentMessages[message].senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? .right : .left
                                     let notLast = currentMessages[message].id != currentMessages.last?.id
                                     //let topMsg = currentMessages[message].id == currentMessages.first?.id
@@ -165,9 +187,9 @@ struct ChatMessagesView: View {
                                             .padding(.bottom, 15)
                                     }
                                     
-                                    if message == (currentMessages.count - self.maxPagination) {
+                                    if message == self.maxPagination {
                                         VStack(alignment: .center) {
-                                            if self.isLoadingMore && !firstScroll && self.maxPagination != self.totalMessageCount {
+                                            if self.isLoadingMore && !firstScroll && self.maxPagination != 0 {
                                                 Circle()
                                                     .trim(from: 0, to: 0.8)
                                                     .stroke(Color.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
@@ -187,7 +209,7 @@ struct ChatMessagesView: View {
                                     VStack(spacing: 0) {
                                         HStack() {
                                             if messagePosition == .right { Spacer() }
-
+                                            
                                             ContainerBubble(viewModel: self.viewModel, newDialogFromSharedContact: self.$newDialogFromSharedContact, message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
                                                 .transition(AnyTransition.scale)
                                                 .environmentObject(self.auth)
@@ -198,11 +220,20 @@ struct ChatMessagesView: View {
                                                 .padding(.bottom, self.hasPrevious(index: message) ? -6 : 10)
                                                 .padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 95 : 0) + 32)
                                                 .id(currentMessages[message].id)
+                                                .background(
+                                                    GeometryReader { proxy in
+                                                        Color.clear
+                                                            .preference(key: SizePreferenceKey.self, value: proxy.size)
+                                                    })
 
                                             if messagePosition == .left { Spacer() }
                                         }.frame(width: Constants.screenWidth)
                                         .background(Color.clear)
-                                    }.onAppear {
+                                    }.onPreferenceChange(SizePreferenceKey.self) { preferences in
+                                        //self.childSize = preferences
+                                        print("the size for the message is: \(preferences.width) &&& \(currentMessages[message].text)")
+                                    }
+                                    .onAppear {
                                         //print("the adding mesg id is: \(currentMessages[message].id) but the on i am looking for is: \(currentMessages[(pageShowCount * self.scrollPage) + self.pageShowCount].id) at index: \((pageShowCount * self.scrollPage) - self.pageShowCount)")
                                         if !notLast {
                                             print("called on appear: \(message)")
@@ -231,11 +262,11 @@ struct ChatMessagesView: View {
                             })
                             .onPreferenceChange(ViewOffsetKey.self) {
                                 print("offset >> \($0)")
-                                if $0 < 0 && !firstScroll && !self.isLoadingMore && self.maxPagination != self.totalMessageCount {
+                                if $0 < 0 && !firstScroll && !self.isLoadingMore && self.maxPagination != 0 {
                                     self.isLoadingMore = true
                                     changeMessageRealmData.shared.getMessageUpdates(dialogID: self.dialogID, limit: pageShowCount * (self.scrollPage + 0), skip: currentMessages.count - self.minPagination, completion: { _ in
                                         DispatchQueue.main.async {
-                                            self.scrollToId = currentMessages[currentMessages.count - self.maxPagination - 1].id
+                                            self.scrollToId = currentMessages[self.maxPagination].id
                                             self.scrollPage += 1
                                         }
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
@@ -244,7 +275,7 @@ struct ChatMessagesView: View {
 
                                         //need to make the very last ending of convo scroll to item due to the page not being divisible.
                                         //also need to add the scroll down functions
-                                        print("From Empty view the load limit: \(pageShowCount * (self.scrollPage + 1)) and the skip:\(currentMessages.count - self.minPagination)...... the indexes are \(currentMessages.count - self.maxPagination).....< \(self.minPagination) anddddd nowww the scroll to index is: \(currentMessages.count - self.maxPagination - 1)")
+                                        print("From Empty view the load limit: \(pageShowCount * (self.scrollPage + 1)) and the skip:\(currentMessages.count - self.minPagination)...... the indexes are \(self.maxPagination).....< \(self.minPagination) anddddd nowww the scroll to index is: \(self.maxPagination + 1)")
                                         
                                         if self.auth.messages.selectedDialog(dialogID: self.dialogID).count != self.totalMessageCount {
                                             print("pulling delta from scrolling...\(self.totalMessageCount) && \(self.auth.messages.selectedDialog(dialogID: self.dialogID).count)")
@@ -315,14 +346,13 @@ struct ChatMessagesView: View {
     func hasPrevious(index: Int) -> Bool {
         let result = self.auth.messages.selectedDialog(dialogID: self.dialogID)
 
-        return result[index] != result.last ? (result[index + 1].senderID == result[index].senderID ? true : false) : false
+        return result[index] != result.last ? (result[index + 1].senderID == result[index].senderID && result[index + 1].date <= result[index].date.addingTimeInterval(86400) ? true : false) : false
     }
-    
+
     func needsTimestamp(index: Int) -> Bool {
-        //need to filter out the deleted messages
         let result = self.auth.messages.selectedDialog(dialogID: self.dialogID)
 
-        return result[index] != result.first ? (result[index - 1].senderID != result[index].senderID ? (result[index].date >= result[index - 1].date.addingTimeInterval(86400) ? true : false) : false) : false
+        return result[index] != result.first ? (result[index].date >= result[index - 1].date.addingTimeInterval(86400) ? true : false) : false
     }
     
     func loadDialog() {

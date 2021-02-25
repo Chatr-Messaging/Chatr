@@ -75,7 +75,7 @@ class MessagesRealmModel<Element>: ObservableObject where Element: RealmSwift.Re
     
     func selectedDialog(dialogID: String) -> Results<Element> {
         if dialogID == "" {
-            return results.filter("status != %@", messageStatus.deleted.rawValue).sorted(byKeyPath: "date", ascending: true)
+            return results.filter("status != %@", messageStatus.deleted.rawValue).filter("status != %@", messageStatus.deleted.rawValue).sorted(byKeyPath: "date", ascending: true)
         } else {
             return results.filter("dialogID == %@", dialogID).filter("status != %@", messageStatus.removedTyping.rawValue).filter("status != %@", messageStatus.deleted.rawValue).sorted(byKeyPath: "date", ascending: true)
         }
@@ -119,7 +119,7 @@ class changeMessageRealmData {
                 if realm.object(ofType: MessageStruct.self, forPrimaryKey: object.id ?? "") == nil {
                     let newData = MessageStruct()
                     var hasRead = false
-                    
+
                     newData.id = object.id ?? ""
                     newData.text = object.text ?? ""
                     newData.dialogID = object.dialogID ?? ""
@@ -157,6 +157,7 @@ class changeMessageRealmData {
                     if object.delayed {
                         newData.hadDelay = true
                     }
+
                     if (object.destroyAfterInterval > 0) {
                         newData.destroyDate = Int(object.destroyAfterInterval)
                     }
