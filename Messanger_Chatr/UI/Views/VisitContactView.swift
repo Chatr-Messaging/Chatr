@@ -422,7 +422,7 @@ struct VisitContactView: View {
                                     self.viewModel.openTwitterApp(screenName: self.contact.twitter)
                                 }) {
                                     HStack(alignment: .center) {
-                                        Image("twitterIcon_light")
+                                        Image("twitterIcon_black")
                                             .resizable()
                                             .scaledToFit()
                                             .frame(width: 20, height: 20, alignment: .center)
