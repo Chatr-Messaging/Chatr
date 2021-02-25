@@ -89,7 +89,7 @@ struct ChatMessagesView: View {
             ScrollView(.vertical, showsIndicators: false) {
                 LazyVStack() {
                     //No Messages found:
-                    if (self.totalMessageCount == 0 || self.maxPagination == 0) {
+                    if (self.totalMessageCount == 0 || self.maxPagination == 0) && self.delayViewMessages {
                         VStack {
                             HStack(spacing: -7) {
                                 ForEach(self.topAvatarUrls.indices, id: \.self) { url in
@@ -141,23 +141,25 @@ struct ChatMessagesView: View {
                                 }
                             }
                             
-                            Text("Beginning of Chat")
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                                .foregroundColor(.primary)
-                                .padding(.top, 2.5)
-                                .padding(.horizontal, 40)
-                            
-                            Text("created \(self.viewModel.dateFormatTime(date: changeDialogRealmData.shared.getRealmDialog(dialogId: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").createdAt))")
-                                .font(.caption)
-                                .fontWeight(.regular)
-                                .foregroundColor(.secondary)
-                                .multilineTextAlignment(.center)
-                                .offset(y: 2)
+                            if self.topAvatarUrls.count > 0 {
+                                Text("Beginning of Chat")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(.primary)
+                                    .padding(.top, 2.5)
+                                    .padding(.horizontal, 40)
+                                
+                                Text("created \(self.viewModel.dateFormatTime(date: changeDialogRealmData.shared.getRealmDialog(dialogId: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").createdAt))")
+                                    .font(.caption)
+                                    .fontWeight(.regular)
+                                    .foregroundColor(.secondary)
+                                    .multilineTextAlignment(.center)
+                                    .offset(y: 2)
 
-                            Divider()
-                                .padding(.top, 10)
-                                .padding(.horizontal, 30)
+                                Divider()
+                                    .padding(.top, 10)
+                                    .padding(.horizontal, 30)
+                            }
                         }
                     }
 
@@ -210,7 +212,7 @@ struct ChatMessagesView: View {
                                         HStack() {
                                             if messagePosition == .right { Spacer() }
                                             
-                                            ContainerBubble(viewModel: self.viewModel, newDialogFromSharedContact: self.$newDialogFromSharedContact, message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
+                                            ContainerBubble(viewModel: self.viewModel, newDialogFromSharedContact: self.$newDialogFromSharedContact, isPriorWider: self.isPriorWider(index: message), message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
                                                 .transition(AnyTransition.scale)
                                                 .environmentObject(self.auth)
                                                 .contentShape(Rectangle())
@@ -220,20 +222,11 @@ struct ChatMessagesView: View {
                                                 .padding(.bottom, self.hasPrevious(index: message) ? -6 : 10)
                                                 .padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 95 : 0) + 32)
                                                 .id(currentMessages[message].id)
-                                                .background(
-                                                    GeometryReader { proxy in
-                                                        Color.clear
-                                                            .preference(key: SizePreferenceKey.self, value: proxy.size)
-                                                    })
 
                                             if messagePosition == .left { Spacer() }
                                         }.frame(width: Constants.screenWidth)
                                         .background(Color.clear)
-                                    }.onPreferenceChange(SizePreferenceKey.self) { preferences in
-                                        //self.childSize = preferences
-                                        print("the size for the message is: \(preferences.width) &&& \(currentMessages[message].text)")
-                                    }
-                                    .onAppear {
+                                    }.onAppear {
                                         //print("the adding mesg id is: \(currentMessages[message].id) but the on i am looking for is: \(currentMessages[(pageShowCount * self.scrollPage) + self.pageShowCount].id) at index: \((pageShowCount * self.scrollPage) - self.pageShowCount)")
                                         if !notLast {
                                             print("called on appear: \(message)")
@@ -353,6 +346,12 @@ struct ChatMessagesView: View {
         let result = self.auth.messages.selectedDialog(dialogID: self.dialogID)
 
         return result[index] != result.first ? (result[index].date >= result[index - 1].date.addingTimeInterval(86400) ? true : false) : false
+    }
+    
+    func isPriorWider(index: Int) -> Bool {
+        let result = self.auth.messages.selectedDialog(dialogID: self.dialogID)
+
+        return result[index] != result.first ? (result[index].senderID == result[index - 1].senderID && (result[index].date >= result[index - 1].date.addingTimeInterval(86400) ? false : true) && result[index].bubbleWidth > result[index - 1].bubbleWidth ? false : true) : true //- (result[index].dislikedId.count >= 1 && result[index].likedId.count >= 1 ? 48 : 16)
     }
     
     func loadDialog() {

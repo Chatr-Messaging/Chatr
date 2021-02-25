@@ -17,6 +17,7 @@ struct ContainerBubble: View {
     @EnvironmentObject var auth: AuthModel
     @StateObject var viewModel: ChatMessageViewModel
     @Binding var newDialogFromSharedContact: Int
+    var isPriorWider: Bool
     @State var message: MessageStruct
     @State var messagePosition: messagePosition
     var hasPrior: Bool = true
@@ -63,8 +64,16 @@ struct ContainerBubble: View {
                                 .padding(.bottom, 10)
                         }
                     }.padding(.bottom, self.hasPrior ? 0 : 10)
-                    .padding(.top, self.message.likedId.count != 0 || self.message.dislikedId.count != 0 ? 22 : 0)
+                    .padding(.top, (self.message.likedId.count != 0 || self.message.dislikedId.count != 0) && (self.isPriorWider) ? 22 : 0)
                     .scaleEffect(self.showInteractions ? 1.1 : 1.0)
+                    .background(
+                        GeometryReader { proxy in
+                            Color.clear
+                                .preference(key: SizePreferenceKey.self, value: proxy.size)
+                        })
+                    .onPreferenceChange(SizePreferenceKey.self) { preferences in
+                        changeMessageRealmData.shared.updateBubbleWidth(messageId: self.message.id, width: Int(preferences.width))
+                    }
                     .onTapGesture(count: 2) {
                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                         if self.messagePosition == .left && self.message.messageState != .deleted  {
@@ -160,6 +169,7 @@ struct ContainerBubble: View {
                             }
                         }
                     }.zIndex(self.showInteractions ? 2 : 0)
+                    .offset(y: self.isPriorWider ? 0 : -22)
                 }
                 
                 //MARK: Bottomm User Info / Message Status Section

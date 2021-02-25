@@ -22,6 +22,7 @@ class MessageStruct : Object, Identifiable {
     @objc dynamic var date: Date = Date()
     @objc dynamic var destroyDate: Int = 0
     @objc dynamic var senderID: Int = 0
+    @objc dynamic var bubbleWidth: Int = 0
     @objc dynamic var longitude: Double = 0.0
     @objc dynamic var latitude: Double = 0.0
     @objc dynamic var contactID: Int = 0
@@ -633,7 +634,25 @@ class changeMessageRealmData {
             print(error.localizedDescription)
         }
     }
-    
+
+    func updateBubbleWidth(messageId: String, width: Int) {
+        let config = Realm.Configuration(schemaVersion: 1)
+        do {
+            let realm = try Realm(configuration: config)
+            if let realmContact = realm.object(ofType: MessageStruct.self, forPrimaryKey: messageId) {
+                //Contact is in Realm...
+                if realmContact.bubbleWidth != width {
+                    try realm.safeWrite {
+                        realmContact.bubbleWidth = width
+                        realm.add(realmContact, update: .all)
+                    }
+                }
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+
     func updateMessageDelayState(messageID: String, messageDelayed: Bool) {
         let config = Realm.Configuration(schemaVersion: 1)
         do {
