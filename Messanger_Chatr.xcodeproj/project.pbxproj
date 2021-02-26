@@ -109,6 +109,7 @@
 		05BB401625008A3200B8DD37 /* FooterInformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BB401525008A3200B8DD37 /* FooterInformation.swift */; };
 		05BCE40D250B4EA400E29F39 /* HighlightedContactCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BCE40C250B4EA400E29F39 /* HighlightedContactCell.swift */; };
 		05BCE40F250C55E100E29F39 /* ShareProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BCE40E250C55E100E29F39 /* ShareProfileView.swift */; };
+		05BDDFA925E85EE700CFA2A7 /* BubbleDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BDDFA825E85EE700CFA2A7 /* BubbleDetailView.swift */; };
 		05C36C17252D62B90031CB3F /* PopupView in Frameworks */ = {isa = PBXBuildFile; productRef = 05C36C16252D62B90031CB3F /* PopupView */; };
 		05C6951424F1EC5400EEF819 /* StorageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C6951324F1EC5400EEF819 /* StorageView.swift */; };
 		05C6951624F5A29F00EEF819 /* ContactCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C6951524F5A29F00EEF819 /* ContactCell.swift */; };
@@ -276,6 +277,7 @@
 		05BB401525008A3200B8DD37 /* FooterInformation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FooterInformation.swift; sourceTree = "<group>"; };
 		05BCE40C250B4EA400E29F39 /* HighlightedContactCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightedContactCell.swift; sourceTree = "<group>"; };
 		05BCE40E250C55E100E29F39 /* ShareProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareProfileView.swift; sourceTree = "<group>"; };
+		05BDDFA825E85EE700CFA2A7 /* BubbleDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BubbleDetailView.swift; sourceTree = "<group>"; };
 		05C6951324F1EC5400EEF819 /* StorageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageView.swift; sourceTree = "<group>"; };
 		05C6951524F5A29F00EEF819 /* ContactCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactCell.swift; sourceTree = "<group>"; };
 		05C6951724F73C5000EEF819 /* ContactRequestView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactRequestView.swift; sourceTree = "<group>"; };
@@ -491,6 +493,7 @@
 			children = (
 				05DB89B5238B851400D4581F /* ContentView.swift */,
 				059EF95124C9153A004BA17C /* ChatMessagesView.swift */,
+				05BDDFA825E85EE700CFA2A7 /* BubbleDetailView.swift */,
 				05F8E11423F0DDFF0066954C /* ContactsView.swift */,
 				058AC52E2599064F0027FD11 /* DiscoverView.swift */,
 				0521234B24C8E338008123CF /* ProfileSettingsView.swift */,
@@ -1038,6 +1041,7 @@
 				05C6951624F5A29F00EEF819 /* ContactCell.swift in Sources */,
 				053D33F42394511400CEE03E /* BlurView.swift in Sources */,
 				05F5829825C12FC30043221D /* EditGroupDialogView.swift in Sources */,
+				05BDDFA925E85EE700CFA2A7 /* BubbleDetailView.swift in Sources */,
 				054CAB7925AA6E1F00DD3F7C /* InstagramTestUser.swift in Sources */,
 				054CAB7425AA6DF700DD3F7C /* InstagramApi.swift in Sources */,
 				05A7BD5524FAED250001BFC9 /* CameraViewController.swift in Sources */,

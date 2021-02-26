@@ -13,7 +13,7 @@ import RealmSwift
 
 struct ContactBubble: View {
     @EnvironmentObject var auth: AuthModel
-    @StateObject var viewModel: ChatMessageViewModel
+    @ObservedObject var viewModel: ChatMessageViewModel
     @Binding var chatContact: Int
     @State var showContact: Bool = false
     var message: MessageStruct
@@ -21,7 +21,8 @@ struct ContactBubble: View {
     var hasPrior: Bool = false
     @State var contact: ContactStruct = ContactStruct()
     @State var contactRelationship: visitContactRelationship = .unknown
-    
+    var namespace: Namespace.ID
+
     var body: some View {
         ZStack() {
             if self.message.messageState != .deleted {

@@ -15,7 +15,7 @@ import MobileCoreServices
 
 struct ContainerBubble: View {
     @EnvironmentObject var auth: AuthModel
-    @StateObject var viewModel: ChatMessageViewModel
+    @ObservedObject var viewModel: ChatMessageViewModel
     @Binding var newDialogFromSharedContact: Int
     var isPriorWider: Bool
     @State var message: MessageStruct
@@ -34,6 +34,7 @@ struct ContainerBubble: View {
     @State var hasUserLiked: Bool = false
     @State var hasUserDisliked: Bool = false
     @State private var deleteActionSheet: Bool = false
+    var namespace: Namespace.ID
 
     var body: some View {
         ZStack(alignment: self.messagePosition == .right ? .topTrailing : .topLeading) {
@@ -42,15 +43,21 @@ struct ContainerBubble: View {
                 ZStack(alignment: self.messagePosition == .left ? .topTrailing : .topLeading) {
                     ZStack(alignment: self.messagePosition == .left ? .bottomTrailing : .bottomLeading) {
                         if self.message.image != "" {
-                            AttachmentBubble(viewModel: self.viewModel, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior)
-                                .environmentObject(self.auth)
+                            Button(action: {
+                                self.viewModel.selectedMessageId = self.message.id.description
+                                self.viewModel.isDetailOpen = true
+                            }) {
+                                AttachmentBubble(viewModel: self.viewModel, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior, namespace: self.namespace)
+                                    .environmentObject(self.auth)
+                            }.buttonStyle(ClickMiniButtonStyle())
+
                         } else if self.message.contactID != 0 {
-                            ContactBubble(viewModel: self.viewModel, chatContact: self.$newDialogFromSharedContact, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior)
+                            ContactBubble(viewModel: self.viewModel, chatContact: self.$newDialogFromSharedContact, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior, namespace: self.namespace)
                                 .environmentObject(self.auth)
                         } else if self.message.longitude != 0 && self.message.latitude != 0 {
-                            LocationBubble(message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior)
+                            LocationBubble(viewModel: self.viewModel, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior, namespace: self.namespace)
                         } else {
-                            TextBubble(message: self.message, messagePosition: messagePosition)
+                            TextBubble(message: self.message, messagePosition: messagePosition, namespace: self.namespace)
                                 .transition(.asymmetric(insertion: AnyTransition.scale.animation(.spring()), removal: AnyTransition.identity))
                         }
                         
@@ -192,11 +199,13 @@ struct ContainerBubble: View {
                     .resizable()
                     .placeholder{ Image("empty-profile").resizable().frame(width: self.hasPrior ? 0 : Constants.smallAvitarSize, height: self.hasPrior ? 0 : Constants.smallAvitarSize, alignment: .bottom).scaledToFill() }
                     .indicator(.activity)
+                    .transition(.asymmetric(insertion: AnyTransition.scale.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                     .scaledToFill()
                     .clipShape(Circle())
                     .frame(width: self.hasPrior ? 0 : Constants.smallAvitarSize, height: self.hasPrior ? 0 : Constants.smallAvitarSize, alignment: .bottom)
                     .offset(x: messagePosition == .right ? (Constants.smallAvitarSize / 2) : -(Constants.smallAvitarSize / 2))
                     .offset(y: 2)
+                    .matchedGeometryEffect(id: message.id + "avatar", in: namespace)
                     .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 6)
                     .opacity(self.hasPrior && self.message.messageState != .error ? 0 : 1)
             }.actionSheet(isPresented: self.$deleteActionSheet) {
@@ -219,7 +228,7 @@ struct ContainerBubble: View {
             
             //MARK: Interactions Section
             if self.showInteractions {
-                ReactionsView(interactionSelected: $interactionSelected, reactions: $reactions, message: self.$message)
+                ReactionsView(interactionSelected: $interactionSelected, reactions: $reactions, message: self.$message, namespace: self.namespace)
                     .transition(.asymmetric(insertion: AnyTransition.opacity.combined(with: .move(edge: .bottom)).animation(.spring()), removal: AnyTransition.opacity.combined(with: .move(edge: .bottom))))
                     .animation(.spring())
                     .offset(y: -65)

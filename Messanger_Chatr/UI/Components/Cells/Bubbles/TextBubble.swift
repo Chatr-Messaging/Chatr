@@ -18,7 +18,8 @@ struct TextBubble: View {
     @State var message: MessageStruct
     @State var messagePosition: messagePosition
     @State private var typingOpacity: CGFloat = 1.0
-    
+    var namespace: Namespace.ID
+
     var body: some View {
         ZStack {
             if self.message.messageState != .isTyping {

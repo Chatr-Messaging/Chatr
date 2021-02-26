@@ -140,6 +140,7 @@ struct mainHomeList: View {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @EnvironmentObject var auth: AuthModel
     @Environment(\.colorScheme) var colorScheme
+    @ObservedObject var messageViewModel = ChatMessageViewModel()
     @GestureState var isDragging = false
     @State var showContacts: Bool = false
     @State var showUserProfile: Bool = false
@@ -168,6 +169,7 @@ struct mainHomeList: View {
     @State var isKeyboardActionOpen: Bool = false
     @State var quickSnapViewState: QuickSnapViewingState = .closed
     @State var selectedQuickSnapContact: ContactStruct = ContactStruct()
+    @Namespace var namespace
     @ObservedObject var dialogs = DialogRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(DialogStruct.self))
     let wallpaperNames = ["", "SoftChatBubbles_DarkWallpaper", "SoftPaperAirplane-Wallpaper", "oldHouseWallpaper", "nycWallpaper", "michaelAngelWallpaper"]
     
@@ -427,9 +429,9 @@ struct mainHomeList: View {
                         }
                     }
                 }.overlay(
-                    //MARK: Chat Messages View                    
+                    //MARK: Chat Messages View
                     GeometryReader { geo in
-                        ChatMessagesView(activeView: self.$activeView, keyboardChange: self.$keyboardHeight, dialogID: self.$selectedDialogID, textFieldHeight: self.$textFieldHeight, keyboardDragState: self.$keyboardDragState, hasAttachment: self.$hasAttachments, newDialogFromSharedContact: self.$newDialogFromSharedContact)
+                        ChatMessagesView(viewModel: self.messageViewModel, activeView: self.$activeView, keyboardChange: self.$keyboardHeight, dialogID: self.$selectedDialogID, textFieldHeight: self.$textFieldHeight, keyboardDragState: self.$keyboardDragState, hasAttachment: self.$hasAttachments, newDialogFromSharedContact: self.$newDialogFromSharedContact, namespace: self.namespace)
                             .environmentObject(self.auth)
                             .frame(width: Constants.screenWidth, height: Constants.screenHeight - (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 127 : 91) : 201), alignment: .bottom)
                             .zIndex(1)
@@ -504,6 +506,13 @@ struct mainHomeList: View {
                             }
                         })
                         */
+                }
+
+                if self.messageViewModel.isDetailOpen {
+                    BubbleDetailView(viewModel: self.messageViewModel, namespace: self.namespace)
+                        .environmentObject(self.auth)
+                        .frame(width: Constants.screenWidth, height: Constants.screenHeight, alignment: .center)
+                        .zIndex(2)
                 }
             } else {
                 //MARK: LOCKED OUT VIEW

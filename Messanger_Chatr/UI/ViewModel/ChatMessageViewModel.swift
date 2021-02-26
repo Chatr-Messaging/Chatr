@@ -13,7 +13,9 @@ import Firebase
 import SDWebImageSwiftUI
 
 class ChatMessageViewModel: ObservableObject {
-    
+    @Published var isDetailOpen: Bool = false
+    @Published var selectedMessageId: String = ""
+
     func loadDialog(auth: AuthModel, dialogId: String) {
         //DispatchQueue.global(qos: .utility).async {
             Request.updateDialog(withID: dialogId, update: UpdateChatDialogParameters(), successBlock: { dialog in
@@ -148,6 +150,22 @@ class ChatMessageViewModel: ObservableObject {
 
                 completion()
             }
+        }
+    }
+
+    func fetchMessage(messageId: String) -> MessageStruct {
+        let config = Realm.Configuration(schemaVersion: 1)
+        do {
+            let realm = try Realm(configuration: config)
+            if let realmContact = realm.object(ofType: MessageStruct.self, forPrimaryKey: messageId) {
+                //Contact is in Realm...
+                return realmContact
+            } else {
+                return MessageStruct()
+            }
+        } catch {
+            print(error.localizedDescription)
+            return MessageStruct()
         }
     }
 

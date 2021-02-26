@@ -31,7 +31,7 @@ struct SizePreferenceKey: PreferenceKey {
 struct ChatMessagesView: View {
     @EnvironmentObject var auth: AuthModel
     @Environment(\.colorScheme) var colorScheme
-    @ObservedObject var viewModel = ChatMessageViewModel()
+    @ObservedObject var viewModel: ChatMessageViewModel
     @Binding var activeView: CGSize
     @Binding var keyboardChange: CGFloat
     @Binding var dialogID: String
@@ -47,6 +47,7 @@ struct ChatMessagesView: View {
     @State private var scrollPage: Int = 1
     @State private var scrollToId: String = ""
     @State var topAvatarUrls: [String] = []
+    var namespace: Namespace.ID
     let keyboard = KeyboardObserver()
     let pageShowCount = 15
     var minPagination: Int {
@@ -212,7 +213,7 @@ struct ChatMessagesView: View {
                                         HStack() {
                                             if messagePosition == .right { Spacer() }
                                             
-                                            ContainerBubble(viewModel: self.viewModel, newDialogFromSharedContact: self.$newDialogFromSharedContact, isPriorWider: self.isPriorWider(index: message), message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message))
+                                            ContainerBubble(viewModel: self.viewModel, newDialogFromSharedContact: self.$newDialogFromSharedContact, isPriorWider: self.isPriorWider(index: message), message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message), namespace: self.namespace)
                                                 .transition(AnyTransition.scale)
                                                 .environmentObject(self.auth)
                                                 .contentShape(Rectangle())

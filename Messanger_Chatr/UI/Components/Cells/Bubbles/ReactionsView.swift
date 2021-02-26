@@ -12,6 +12,7 @@ struct ReactionsView: View {
     @Binding var interactionSelected: String
     @Binding var reactions: [String]
     @Binding var message: MessageStruct
+    var namespace: Namespace.ID
 
     var body: some View {
         HStack(spacing: 12.5) {

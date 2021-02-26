@@ -21,29 +21,34 @@ struct MyAnnotationItem: Identifiable {
 
 struct LocationBubble: View {
     @EnvironmentObject var auth: AuthModel
+    @ObservedObject var viewModel: ChatMessageViewModel
     @State var message: MessageStruct
     @State var messagePosition: messagePosition
     var hasPrior: Bool = false
     @State private var userTrackingMode: MapUserTrackingMode = .follow
-    @State var isOpen: Bool = false
     @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 25.7617, longitude: 80.1918), span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
+    var namespace: Namespace.ID
 
     var body: some View {
         ZStack {
             if self.message.messageState != .deleted {
                 Button(action: {
                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                    self.isOpen.toggle()
+                    withAnimation {
+                        self.viewModel.selectedMessageId = self.message.id.description
+                        self.viewModel.isDetailOpen = true
+                    }
                 }) {
                     Map(coordinateRegion: $region, interactionModes: MapInteractionModes.all, showsUserLocation: true, userTrackingMode: $userTrackingMode, annotationItems: [MyAnnotationItem(coordinate: CLLocationCoordinate2D(latitude: self.message.latitude, longitude: self.message.longitude))]) { marker in
                         MapPin(coordinate: marker.coordinate)
                     }.frame(height: CGFloat(Constants.screenWidth * 0.6))
+                    .transition(.asymmetric(insertion: AnyTransition.scale.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                     .cornerRadius(20)
                     .padding(.leading, self.messagePosition == .right ? 35 : 0)
                     .padding(.trailing, self.messagePosition == .right ? 0 : 35)
                     .padding(.bottom, self.hasPrior ? 0 : 15)
                     .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 10)
-                    .animation(nil)
+                    .matchedGeometryEffect(id: message.id + "map", in: namespace)
                     .onAppear() {
                         self.region.center.latitude = self.message.latitude
                         self.region.center.longitude = self.message.longitude
@@ -51,7 +56,7 @@ struct LocationBubble: View {
                 }.buttonStyle(ClickMiniButtonStyle())
                 .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.5) : Color.clear, lineWidth: 5))
             }
-        }.simultaneousGesture(DragGesture(minimumDistance: self.isOpen ? 0 : 500))
+        }.simultaneousGesture(DragGesture(minimumDistance: self.viewModel.isDetailOpen ? 0 : 500))
     }
     
     func openMapForPlace() {
