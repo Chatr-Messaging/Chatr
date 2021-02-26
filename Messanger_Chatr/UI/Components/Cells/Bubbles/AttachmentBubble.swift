@@ -45,7 +45,7 @@ struct AttachmentBubble: View {
                     .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 14)
                     .offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
                     .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.5) : Color.clear, lineWidth: 5).offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0))
-                    .matchedGeometryEffect(id: self.viewModel.selectedMessageId + "gif", in: namespace)
+                    .matchedGeometryEffect(id: self.message.id.description + "gif", in: namespace)
             } else if self.message.imageType == "image/png" && self.message.messageState != .deleted {
                 WebImage(url: URL(string: self.message.image))
                     .resizable()
@@ -65,12 +65,11 @@ struct AttachmentBubble: View {
                     .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 14)
                     .offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
                     .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.8) : Color.clear, lineWidth: 3).offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0))
-                    .matchedGeometryEffect(id: self.viewModel.selectedMessageId + "png", in: namespace)
+                    .matchedGeometryEffect(id: self.message.id.description + "png", in: namespace)
             } else if self.message.imageType == "video/mov" && self.message.messageState != .deleted {
                 ZStack(alignment: .bottomLeading) {
                     //PlayerContainerView(player: self.$player, gravity: .resize)
                     VideoPlayer(player: self.player)
-                        .matchedGeometryEffect(id: message.id, in: namespace)
                         .transition(.asymmetric(insertion: AnyTransition.scale.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                         .aspectRatio(contentMode: .fit)
                         .clipShape(CustomGIFShape())
@@ -79,6 +78,7 @@ struct AttachmentBubble: View {
                         .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 14)
                         .offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
                         .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.5) : Color.clear, lineWidth: 5).offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0))
+                        .matchedGeometryEffect(id: self.message.id.description + "mov", in: namespace)
                         .onTapGesture {
                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                             self.isPlaying.toggle()

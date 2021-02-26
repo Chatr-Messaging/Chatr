@@ -29,8 +29,9 @@ struct BubbleDetailView: View {
             VStack {
                 //MARK: Main Content Section
                 HStack {
-                    Text("")
-                        .font(.none)
+                    Text("\(self.viewModel.dateFormatTimeExtended(date: message.date))")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
 
                     
                     Spacer()

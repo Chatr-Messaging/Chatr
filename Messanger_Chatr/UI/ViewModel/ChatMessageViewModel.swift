@@ -204,4 +204,15 @@ class ChatMessageViewModel: ObservableObject {
      
         return dateFormatter.string(from: date)
     }
+    
+    func dateFormatTimeExtended(date: Date) -> String {
+        let dateFormatter = DateFormatter()
+        
+        dateFormatter.dateStyle = .long
+        dateFormatter.timeStyle = .medium
+        
+        dateFormatter.timeZone = TimeZone(identifier: "UTC")
+     
+        return dateFormatter.string(from: date)
+    }
 }
