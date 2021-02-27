@@ -209,7 +209,7 @@ class ChatMessageViewModel: ObservableObject {
         let dateFormatter = DateFormatter()
         
         dateFormatter.dateStyle = .long
-        dateFormatter.timeStyle = .medium
+        dateFormatter.timeStyle = .short
         
         dateFormatter.timeZone = TimeZone(identifier: "UTC")
      
