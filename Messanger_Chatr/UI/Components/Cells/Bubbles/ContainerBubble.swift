@@ -116,7 +116,7 @@ struct ContainerBubble: View {
                                     })
                                 }
                             }, label: {
-                                HStack(spacing: self.message.dislikedId.count > 1 && self.hasUserDisliked ? 2 : 0) {
+                                HStack(spacing: self.message.dislikedId.count > 1 ? 2 : 0) {
                                     Image("dislike")
                                         .resizable()
                                         .scaledToFit()
@@ -151,7 +151,7 @@ struct ContainerBubble: View {
                                     })
                                 }
                             }, label: {
-                                HStack(spacing: self.message.dislikedId.count > 1 && self.hasUserDisliked ? 2 : 0) {
+                                HStack(spacing: self.message.likedId.count > 1 ? 2 : 0) {
                                     Image("like")
                                         .resizable()
                                         .scaledToFit()
@@ -191,6 +191,7 @@ struct ContainerBubble: View {
                         .offset(y: 4)
                         .multilineTextAlignment(messagePosition == .right ? .trailing : .leading)
                         .opacity(self.hasPrior ? 0 : 1)
+                        .matchedGeometryEffect(id: message.id.description + "subtext", in: namespace)
 
                     //if messagePosition == .left { Spacer() }
                 }
@@ -205,7 +206,7 @@ struct ContainerBubble: View {
                     .frame(width: self.hasPrior ? 0 : Constants.smallAvitarSize, height: self.hasPrior ? 0 : Constants.smallAvitarSize, alignment: .bottom)
                     .offset(x: messagePosition == .right ? (Constants.smallAvitarSize / 2) : -(Constants.smallAvitarSize / 2))
                     .offset(y: 2)
-                    .matchedGeometryEffect(id: message.id + "avatar", in: namespace)
+                    .matchedGeometryEffect(id: message.id.description + "avatar", in: namespace)
                     .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 6)
                     .opacity(self.hasPrior && self.message.messageState != .error ? 0 : 1)
             }.actionSheet(isPresented: self.$deleteActionSheet) {

@@ -167,7 +167,8 @@ struct ContactBubble: View {
                                 .edgesIgnoringSafeArea(.all)
                         }
                     }
-                }.onAppear() {
+                }.padding(.bottom, self.hasPrior ? 0 : 4)
+                .onAppear() {
                     let config = Realm.Configuration(schemaVersion: 1)
                     do {
                         let realm = try Realm(configuration: config)

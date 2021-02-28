@@ -46,7 +46,7 @@ struct LocationBubble: View {
                     .cornerRadius(20)
                     .padding(.leading, self.messagePosition == .right ? 35 : 0)
                     .padding(.trailing, self.messagePosition == .right ? 0 : 35)
-                    .padding(.bottom, self.hasPrior ? 0 : 15)
+                    .padding(.bottom, self.hasPrior ? 0 : 4)
                     .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 10)
                     .matchedGeometryEffect(id: message.id + "map", in: namespace)
                     .onAppear() {
