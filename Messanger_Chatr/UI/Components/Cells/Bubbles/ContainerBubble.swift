@@ -124,7 +124,7 @@ struct ContainerBubble: View {
                                         .offset(x: self.message.dislikedId.count == 0 ? 4 : 0)
                                         .rotationEffect(Angle(degrees: self.dislikeBtnAnimation ? 0 : 45))
 
-                                    Text(self.message.dislikedId.count > 1 && self.hasUserDisliked ? "\(self.message.dislikedId.count)" : "")
+                                    Text(self.message.dislikedId.count > 1 ? "\(self.message.dislikedId.count)" : "")
                                         .font(.subheadline)
                                         .fontWeight(.bold)
                                         .foregroundColor(.primary)
@@ -159,7 +159,7 @@ struct ContainerBubble: View {
                                         .offset(x: self.message.likedId.count == 0 ? 4 : 0)
                                         .rotationEffect(Angle(degrees: self.likeBtnAnimation ? 0 : 45))
 
-                                    Text(self.message.likedId.count > 1 && self.hasUserLiked ? "\(self.message.likedId.count)" : "")
+                                    Text(self.message.likedId.count > 1 ? "\(self.message.likedId.count)" : "")
                                         .font(.subheadline)
                                         .fontWeight(.bold)
                                         .foregroundColor(.primary)

@@ -22,6 +22,7 @@ struct BubbleDetailView: View {
     @State var fullName: String = ""
     @State var subText: String = ""
     @State var height: CGFloat = 175
+    @State var cardDrag = CGSize.zero
     @State var mainReplyText: String = ""
     @State var hasUserLiked: Bool = false
     @State var hasUserDisliked: Bool = false
@@ -63,12 +64,12 @@ struct BubbleDetailView: View {
 
                             VStack(alignment: .leading) {
                                 Text(self.fullName)
-                                    .foregroundColor(self.message.messageState == .error ? .red : .primary)
+                                    .foregroundColor(.primary)
                                     .font(.none)
                                     .fontWeight(.medium)
                                     .lineLimit(1)
 
-                                Text("last seen 2hrs ago")
+                                Text("last seen 2 hrs ago")
                                     .foregroundColor(.secondary)
                                     .font(.caption)
                                     .lineLimit(1)
@@ -219,16 +220,15 @@ struct BubbleDetailView: View {
                                         Text("try again")
                                             .foregroundColor(.red)
                                             .fontWeight(.medium)
-                                            .frame(height: 50)
+                                            .frame(height: 35)
                                     }.padding(.horizontal, 10)
                                     .padding(.vertical, 5)
                                 }).buttonStyle(ClickButtonStyle())
                             }
                         }.padding(.horizontal, 10)
-                        .offset(y: -2.5)
                         
                         HStack {
-                            Text(self.viewModel.dateFormatTimeExtended(date: message.date))
+                            Text("sent " + self.viewModel.dateFormatTimeExtended(date: message.date))
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                                 .matchedGeometryEffect(id: message.id.description + "subtext", in: namespace)
@@ -243,11 +243,38 @@ struct BubbleDetailView: View {
                     }
                 }.padding(.vertical, 10)
             }.background(RoundedRectangle(cornerRadius: 20).foregroundColor(Color("bgColor")))
-            .padding(.vertical, UIDevice.current.hasNotch ? 40 : 20)
+            .padding(.vertical, UIDevice.current.hasNotch ? 60 : 40)
             .padding(.horizontal)
-            .animation(.easeOut)
+            .animation(.spring(response: 0.45, dampingFraction: 0.8, blendDuration: 0))
+            .offset(y: self.cardDrag.height)
             .offset(y: self.height < 175 ? -height : 0)
             .shadow(color: Color.black.opacity(0.2), radius: 15, x: 0, y: 12)
+            .rotation3DEffect(.degrees(-Double(self.cardDrag.height > 0 ? (self.cardDrag.height / 8 > 8 ? 8 : self.cardDrag.height / 8) : 0)), axis: (x: 1, y: 0, z: 0))
+            .simultaneousGesture(DragGesture().onChanged { value in
+                if self.message.longitude == 0 && self.message.latitude == 0 {
+                    self.cardDrag = value.translation
+                    
+                    if self.cardDrag.height > 50 {
+                        self.cardDrag.height = 50 + (value.translation.height / 3)
+                    }
+                    
+                    if self.cardDrag.height < 0 {
+                        self.cardDrag.height = (value.translation.height / 3)
+                    }
+                }
+            }.onEnded { valueEnd in
+                if self.cardDrag.height > 50 {
+                    self.cardDrag = .zero
+                    withAnimation {
+                        self.viewModel.isDetailOpen = false
+                    }
+                    UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
+                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                } else {
+                    self.cardDrag = .zero
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                }
+            })
 
             Spacer()
             //MARK: Reply Section
@@ -285,7 +312,7 @@ struct BubbleDetailView: View {
                     .padding(.bottom, UIDevice.current.hasNotch ? 40 : 20)
             }
         }.frame(width: Constants.screenWidth, height: Constants.screenHeight, alignment: .center)
-        .background(BlurView(style: .systemUltraThinMaterial))
+        .background(BlurView(style: .systemUltraThinMaterial).opacity(Double((100 - self.cardDrag.height) / 100)))
         .onAppear() {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                 print("the selected message id is: \(self.viewModel.selectedMessageId)")

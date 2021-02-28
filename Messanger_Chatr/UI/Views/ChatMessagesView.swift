@@ -176,7 +176,7 @@ struct ChatMessagesView: View {
                     if self.delayViewMessages {
                         ScrollViewReader { reader in
                             VStack(alignment: .center) {
-                                ForEach(self.maxPagination ..< self.minPagination, id: \.self) { message in
+                                ForEach(currentMessages.count - 15 ..< currentMessages.count, id: \.self) { message in
                                     let messagePosition: messagePosition = UInt(currentMessages[message].senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? .right : .left
                                     let notLast = currentMessages[message].id != currentMessages.last?.id
                                     //let topMsg = currentMessages[message].id == currentMessages.first?.id

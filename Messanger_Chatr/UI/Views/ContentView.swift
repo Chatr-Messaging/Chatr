@@ -514,6 +514,7 @@ struct mainHomeList: View {
                         .environmentObject(self.auth)
                         .frame(width: Constants.screenWidth, height: Constants.screenHeight, alignment: .center)
                         .zIndex(2)
+                        .disabled(self.messageViewModel.isDetailOpen ? false : true)
                 }
             } else {
                 //MARK: LOCKED OUT VIEW
