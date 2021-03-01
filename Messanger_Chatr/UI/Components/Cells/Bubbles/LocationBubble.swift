@@ -35,7 +35,7 @@ struct LocationBubble: View {
                 Button(action: {
                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                     withAnimation {
-                        self.viewModel.selectedMessageId = self.message.id.description
+                        self.viewModel.message = self.message
                         self.viewModel.isDetailOpen = true
                     }
                 }) {

@@ -14,7 +14,7 @@ import SDWebImageSwiftUI
 
 class ChatMessageViewModel: ObservableObject {
     @Published var isDetailOpen: Bool = false
-    @Published var selectedMessageId: String = ""
+    @Published var message: MessageStruct = MessageStruct()
 
     func loadDialog(auth: AuthModel, dialogId: String) {
         //DispatchQueue.global(qos: .utility).async {
@@ -76,20 +76,20 @@ class ChatMessageViewModel: ObservableObject {
         //}
     }
 
-    func getUserAvatar(senderId: Int, compleation: @escaping (String, String) -> Void) {
+    func getUserAvatar(senderId: Int, compleation: @escaping (String, String, Date) -> Void) {
         if senderId == UserDefaults.standard.integer(forKey: "currentUserID") {
-            compleation("self", "self")
+            compleation("self", "self", Date())
         } else {
             let config = Realm.Configuration(schemaVersion: 1)
             do {
                 let realm = try Realm(configuration: config)
                 if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: senderId) {
-                    compleation(foundContact.avatar, foundContact.fullName)
+                    compleation(foundContact.avatar, foundContact.fullName, foundContact.lastOnline)
                 } else {
                     Request.users(withIDs: [NSNumber(value: senderId)], paginator: Paginator.limit(1, skip: 0), successBlock: { (paginator, users) in
                         DispatchQueue.main.async {
                             if let firstUser = users.first {
-                                compleation(PersistenceManager.shared.getCubeProfileImage(usersID: firstUser) ?? "", firstUser.fullName ?? "Chatr User")
+                                compleation(PersistenceManager.shared.getCubeProfileImage(usersID: firstUser) ?? "", firstUser.fullName ?? "Chatr User", firstUser.lastRequestAt ?? Date())
                             }
                         }
                     })
@@ -98,7 +98,7 @@ class ChatMessageViewModel: ObservableObject {
         }
     }
 
-    func likeMessage(from userId: Int, name: String, message: MessageStruct, completion: @escaping (Bool) -> Void) {
+    func likeMessage(from userId: Int, name: String, completion: @escaping (Bool) -> Void) {
         let msg = Database.database().reference().child("Dialogs").child(message.dialogID).child(message.id).child("likes")
 
         msg.observeSingleEvent(of: .value, with: { snapshot in
@@ -108,14 +108,14 @@ class ChatMessageViewModel: ObservableObject {
                 completion(false)
             } else {
                 msg.updateChildValues(["\(userId)" : "\(Date())"])
-                self.sendPushNoti(userIDs: [NSNumber(value: message.senderID)], title: "Liked Message", message: "\(name) liked your message \"\(message.text)\"")
+                self.sendPushNoti(userIDs: [NSNumber(value: self.message.senderID)], title: "Liked Message", message: "\(name) liked your message \"\(self.message.text)\"")
 
                 completion(true)
             }
         })
     }
     
-    func dislikeMessage(from userId: Int, name: String, message: MessageStruct, completion: @escaping (Bool) -> Void) {
+    func dislikeMessage(from userId: Int, name: String, completion: @escaping (Bool) -> Void) {
         let msg = Database.database().reference().child("Dialogs").child(message.dialogID).child(message.id).child("dislikes")
 
         msg.observeSingleEvent(of: .value, with: { snapshot in
@@ -125,11 +125,37 @@ class ChatMessageViewModel: ObservableObject {
                 completion(false)
             } else {
                 msg.updateChildValues(["\(userId)" : "\(Date())"])
-                self.sendPushNoti(userIDs: [NSNumber(value: message.senderID)], title: "Disliked Message", message: "\(name) disliked your message \"\(message.text)\"")
+                self.sendPushNoti(userIDs: [NSNumber(value: self.message.senderID)], title: "Disliked Message", message: "\(name) disliked your message \"\(self.message.text)\"")
                 
                 completion(true)
             }
         })
+    }
+    
+    func sendReply(text: String, name: String, completion: @escaping () -> Void) {
+        let msg = Database.database().reference().child("Dialogs").child(message.dialogID).child(message.id).child("replies")
+        let newPostId = msg.childByAutoId().key
+        let newPostReference = msg.child(newPostId ?? "no post id")
+        
+        let date = Date()
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZ"
+        formatter.timeZone = TimeZone(abbreviation: "UTC")
+        let utcTimeZoneStr = formatter.string(from: date)
+        
+        newPostReference.updateChildValues(["fromId" : "\(UserDefaults.standard.integer(forKey: "currentUserID"))", "text" : text, "timestamp" : utcTimeZoneStr])
+        self.sendPushNoti(userIDs: [NSNumber(value: self.message.senderID)], title: "Reply", message: "\(name) replied to your message \"\(self.message.text)\"")
+
+        completion()
+    }
+    
+    func deleteReply(messageId: String, completion: @escaping () -> Void) {
+        let msg = Database.database().reference().child("Dialogs").child(message.dialogID).child(message.id).child("replies")
+
+        msg.child("\(messageId)").removeValue()
+
+        completion()
     }
         
     func replyMessage() {

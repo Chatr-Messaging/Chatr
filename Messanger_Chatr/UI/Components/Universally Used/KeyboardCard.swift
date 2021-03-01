@@ -588,6 +588,7 @@ struct ResizableTextField : UIViewRepresentable {
     @StateObject var imagePicker: KeyboardCardViewModel
     @Binding var height: CGFloat
     @Binding var text: String
+    var isMessageView: Bool?
     
     func makeCoordinator() -> Coordinator {
         return ResizableTextField.Coordinator(parent1: self)
@@ -633,17 +634,22 @@ struct ResizableTextField : UIViewRepresentable {
         }
         
         func textViewDidEndEditing(_ textView: UITextView) {
-            self.parent.auth.selectedConnectyDialog?.sendUserStoppedTyping()
-            UserDefaults.standard.setValue(textView.text, forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText")
+            if self.parent.isMessageView ?? true {
+                self.parent.auth.selectedConnectyDialog?.sendUserStoppedTyping()
+
+                UserDefaults.standard.setValue(textView.text, forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText")
+            }
         }
                         
         func textViewDidChange(_ textView: UITextView) {
-            if textView.text.count == 0 {
-                self.hasTyped = false
-                self.parent.auth.selectedConnectyDialog?.sendUserStoppedTyping()
-            } else if !self.hasTyped {
-                self.hasTyped = true
-                self.parent.auth.selectedConnectyDialog?.sendUserIsTyping()
+            if self.parent.isMessageView ?? true {
+                if textView.text.count == 0 {
+                    self.hasTyped = false
+                    self.parent.auth.selectedConnectyDialog?.sendUserStoppedTyping()
+                } else if !self.hasTyped {
+                    self.hasTyped = true
+                    self.parent.auth.selectedConnectyDialog?.sendUserIsTyping()
+                }
             }
             
             DispatchQueue.main.async {
@@ -654,25 +660,28 @@ struct ResizableTextField : UIViewRepresentable {
                 }
             }
         }
-        
+
         func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-            let pasteboard = UIPasteboard.general
-            
-            if text == pasteboard.string && pasteboard.hasImages {
-                if let images = pasteboard.images {
-                    for image in images {
-                        withAnimation {
-                            self.parent.imagePicker.pastedImages.append(image)
+            if self.parent.isMessageView ?? true {
+                let pasteboard = UIPasteboard.general
+                
+                if text == pasteboard.string && pasteboard.hasImages {
+                    if let images = pasteboard.images {
+                        for image in images {
+                            withAnimation {
+                                self.parent.imagePicker.pastedImages.append(image)
+                            }
                         }
                     }
+                    
+                    return false
                 }
-                
-                return false
-            }
 
-            return true
+                return true
+            } else {
+                return true
+            }
         }
-        
     }
 }
 

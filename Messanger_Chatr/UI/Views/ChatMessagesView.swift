@@ -50,6 +50,14 @@ struct ChatMessagesView: View {
     var namespace: Namespace.ID
     let keyboard = KeyboardObserver()
     let pageShowCount = 15
+    var tempPagination: Int {
+        let count = self.auth.messages.selectedDialog(dialogID: self.dialogID).count
+        if count > 15 {
+            return count - 15
+        } else {
+            return 0
+        }
+    }
     var minPagination: Int {
         guard UserDefaults.standard.bool(forKey: "localOpen") else {
             return 0
@@ -130,7 +138,7 @@ struct ChatMessagesView: View {
                                     self.topAvatarUrls.removeAll()
 
                                     for occu in changeDialogRealmData.shared.getRealmDialog(dialogId: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").occupentsID {
-                                        self.viewModel.getUserAvatar(senderId: occu) { (avatar, _) in
+                                        self.viewModel.getUserAvatar(senderId: occu) { (avatar, _, _) in
                                             guard avatar != "self" else {
                                                 self.topAvatarUrls.append(self.auth.profile.results.first?.avatar ?? "")
                                                 return
@@ -176,7 +184,7 @@ struct ChatMessagesView: View {
                     if self.delayViewMessages {
                         ScrollViewReader { reader in
                             VStack(alignment: .center) {
-                                ForEach(currentMessages.count - 15 ..< currentMessages.count, id: \.self) { message in
+                                ForEach(tempPagination ..< currentMessages.count, id: \.self) { message in
                                     let messagePosition: messagePosition = UInt(currentMessages[message].senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? .right : .left
                                     let notLast = currentMessages[message].id != currentMessages.last?.id
                                     //let topMsg = currentMessages[message].id == currentMessages.first?.id
@@ -280,8 +288,10 @@ struct ChatMessagesView: View {
                             }
                             .onAppear {
                                 keyboard.observe { (event) in
-                                    let keyboardFrameEnd = event.keyboardFrameEnd
+                                    guard !self.viewModel.isDetailOpen else { return }
 
+                                    let keyboardFrameEnd = event.keyboardFrameEnd
+                                    
                                     switch event.type {
                                     case .willShow:
                                         UIView.animate(withDuration: event.duration, delay: 0.0, options: [event.options], animations: {

@@ -21,6 +21,8 @@
 		0521234C24C8E338008123CF /* ProfileSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0521234B24C8E338008123CF /* ProfileSettingsView.swift */; };
 		052347B623E55C8A00EF9CEB /* FullNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052347B523E55C8A00EF9CEB /* FullNameView.swift */; };
 		052364C32439A37200AF825F /* DialogCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052364C22439A37200AF825F /* DialogCell.swift */; };
+		0525E4C125EC98A90086EB54 /* PinchZoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0525E4C025EC98A90086EB54 /* PinchZoomView.swift */; };
+		0525E4C525ECC4440086EB54 /* MessageReplyCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0525E4C425ECC4440086EB54 /* MessageReplyCell.swift */; };
 		052E6E2025CE513B00C3EAE4 /* ReactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052E6E1F25CE513B00C3EAE4 /* ReactionsView.swift */; };
 		053AC4B225194C080036946E /* GIFController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053AC4B125194C080036946E /* GIFController.swift */; };
 		053AC4B7251982560036946E /* AttachmentBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053AC4B6251982550036946E /* AttachmentBubble.swift */; };
@@ -193,6 +195,8 @@
 		0521234B24C8E338008123CF /* ProfileSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSettingsView.swift; sourceTree = "<group>"; };
 		052347B523E55C8A00EF9CEB /* FullNameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullNameView.swift; sourceTree = "<group>"; };
 		052364C22439A37200AF825F /* DialogCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogCell.swift; sourceTree = "<group>"; };
+		0525E4C025EC98A90086EB54 /* PinchZoomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinchZoomView.swift; sourceTree = "<group>"; };
+		0525E4C425ECC4440086EB54 /* MessageReplyCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageReplyCell.swift; sourceTree = "<group>"; };
 		052E6E1F25CE513B00C3EAE4 /* ReactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReactionsView.swift; sourceTree = "<group>"; };
 		053A63982509647700571226 /* StoreKitTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKitTest.framework; path = Developer/Library/Frameworks/StoreKitTest.framework; sourceTree = SDKROOT; };
 		053A639A2509649A00571226 /* Configuration.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Configuration.storekit; sourceTree = "<group>"; };
@@ -452,6 +456,7 @@
 				05A7BD4E24F9E8D20001BFC9 /* ContactRealmCell.swift */,
 				05A7633B2506FD42002712FA /* ContactRequestCell.swift */,
 				05C93BDC251578100059D1AA /* DialogContactCell.swift */,
+				0525E4C425ECC4440086EB54 /* MessageReplyCell.swift */,
 				059D1C5325D63A7600A7FB96 /* Bubbles */,
 				05DD2D4125C9D44900B1ACB7 /* LinkedText.swift */,
 			);
@@ -535,6 +540,7 @@
 				053D33F12393C97B00CEE03E /* DismissGuardian.swift */,
 				05AACE5E23A60AB6006307EB /* ImagePicker.swift */,
 				0572046D25B3FDB700542CCF /* ImagePickerView.swift */,
+				0525E4C025EC98A90086EB54 /* PinchZoomView.swift */,
 			);
 			path = Others;
 			sourceTree = "<group>";
@@ -967,6 +973,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0525E4C125EC98A90086EB54 /* PinchZoomView.swift in Sources */,
 				057F2B4E250B026F005DFB21 /* ContactCarouselSection.swift in Sources */,
 				05A7633C2506FD42002712FA /* ContactRequestCell.swift in Sources */,
 				056B98A924C8FD1D003F7FBA /* SearchBar.swift in Sources */,
@@ -999,6 +1006,7 @@
 				05A6D54725B021E400AD66DD /* AdvancedViewModel.swift in Sources */,
 				0583073E240E2F120013B93B /* ChatrApp.swift in Sources */,
 				0596845625AC16E80051B707 /* VisitContactViewModel.swift in Sources */,
+				0525E4C525ECC4440086EB54 /* MessageReplyCell.swift in Sources */,
 				0596844E25ABED4D0051B707 /* EditProfileViewModel.swift in Sources */,
 				05C93BDB25145EF10059D1AA /* VisitGroupChannelView.swift in Sources */,
 				05BCE40D250B4EA400E29F39 /* HighlightedContactCell.swift in Sources */,
