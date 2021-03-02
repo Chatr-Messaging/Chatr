@@ -22,6 +22,7 @@ struct BubbleDetailView: View {
     @State var fullName: String = ""
     @State var subText: String = ""
     @State var height: CGFloat = 175
+    @State var replyScrollHeight: CGFloat = 0
     @State var cardDrag = CGSize.zero
     @State var keyboardChange: CGFloat = CGFloat.zero
     @State var mainReplyText: String = ""
@@ -38,7 +39,7 @@ struct BubbleDetailView: View {
             if self.keyboardChange == 0 { Spacer() }
 
             //MARK: Content Section
-            ZStack(alignment: .center) {
+            ZStack(alignment: .bottom) {
                 VStack() {
                     //Top Header
                     HStack(alignment: .center, spacing: 10) {
@@ -240,29 +241,55 @@ struct BubbleDetailView: View {
             .shadow(color: Color.black.opacity(0.2), radius: 15, x: 0, y: 12)
             .rotation3DEffect(.degrees(-Double(self.cardDrag.height > 20 ? ((self.cardDrag.height - 20) / 8 > 8 ? 8 : (self.cardDrag.height - 20) / 8) : 0)), axis: (x: 1, y: 0, z: 0))
             .simultaneousGesture(DragGesture().onChanged { value in
-                if self.viewModel.message.longitude == 0 && self.viewModel.message.latitude == 0 {
+                if self.viewModel.message.longitude == 0 && self.viewModel.message.latitude == 0 && self.viewModel.isDetailOpen {
                     self.cardDrag.height = value.translation.height / 2
                     if self.keyboardChange != 0 {
                         UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
                     }
                 }
             }.onEnded { valueEnd in
-                if self.cardDrag.height > 60 {
-                    self.cardDrag = .zero
-                    withAnimation {
-                        self.viewModel.isDetailOpen = false
+                if self.viewModel.message.longitude == 0 && self.viewModel.message.latitude == 0 && self.viewModel.isDetailOpen {
+                    if self.cardDrag.height > 60 {
+                        self.cardDrag = .zero
+                        withAnimation {
+                            self.viewModel.isDetailOpen = false
+                        }
+                        UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                    } else {
+                        self.cardDrag = .zero
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     }
-                    UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
-                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                } else {
-                    self.cardDrag = .zero
-                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 }
             })
 
-            Spacer()
             //MARK: Reply Section
             ZStack(alignment: .bottom) {
+                if self.replies.isEmpty {
+                    Text("empty replies")
+                        .font(.caption)
+                        .foregroundColor(.primary)
+                        .padding(.vertical, 50)
+                } else {
+                    ScrollView(.vertical, showsIndicators: false) {
+                        LazyVStack(alignment: .leading) {
+                            ForEach(self.replies.indices) { reply in
+                                MessageReplyCell(reply: self.replies[reply])
+                            }
+                        }.padding(.horizontal)
+                    }.frame(width: Constants.screenWidth)
+                    .frame(maxHeight: Constants.screenWidth / 1.5)
+                    .overlay(
+                        GeometryReader { proxy in
+                            Color.clear
+                                .onAppear { self.replyScrollHeight = proxy.size.height }
+                                .onChange(of: self.replies.indices) { _ in
+                                    self.replyScrollHeight = proxy.size.height
+                                }
+                        }
+                    )
+                }
+
                 ResizableTextField(imagePicker: self.imagePicker, height: self.$height, text: self.$mainReplyText, isMessageView: false)
                     .environmentObject(self.auth)
                     .frame(height: self.height < 175 ? self.height : 175)
@@ -285,6 +312,7 @@ struct BubbleDetailView: View {
                                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 self.viewModel.sendReply(text: self.mainReplyText, name: self.fullName, completion: {
                                     self.mainReplyText = ""
+                                    self.height = 0 
                                     print("done")
                                 })
                             }) {
@@ -366,10 +394,16 @@ struct BubbleDetailView: View {
                 } else if typeLike == "replies" {
                     guard let dict = childSnap.value as? [String: Any] else { return }
 
-                    let reply = messageReplyStruct(id: childSnap.key, fromId: dict["fromId"] as? String ?? "", text: dict["text"] as? String ?? "", date: dict["timestamp"] as? String ?? "")
-                    
-                    self.replies.append(reply)
-                    print("Adding reply!!!! \(reply.fromId) && \(reply.text)")
+                    if let timeStamp = dict["timestamp"] as? String {
+                        let dateFormatter = DateFormatter()
+                        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZ"
+                        if let timestampDate = dateFormatter.date(from: timeStamp) {
+                            let reply = messageReplyStruct(id: childSnap.key, fromId: dict["fromId"] as? String ?? "", text: dict["text"] as? String ?? "", date: timestampDate)
+                            
+                            self.replies.append(reply)
+                            print("Adding reply!!!! \(reply.fromId) && \(reply.text)")
+                        }
+                    }
                 }
             }
         })

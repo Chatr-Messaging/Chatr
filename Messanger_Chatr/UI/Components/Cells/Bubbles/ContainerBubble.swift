@@ -83,11 +83,13 @@ struct ContainerBubble: View {
                         changeMessageRealmData.shared.updateBubbleWidth(messageId: self.message.id, width: Int(preferences.width))
                     }
                     .onTapGesture(count: 2) {
-                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                        if self.messagePosition == .left && self.message.messageState != .deleted  {
-                            self.viewModel.likeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", completion: { like in
-                                self.hasUserLiked = like
-                            })
+                        if self.messagePosition == .left {
+                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                            if self.messagePosition == .left && self.message.messageState != .deleted  {
+                                self.viewModel.likeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", completion: { like in
+                                    self.hasUserLiked = like
+                                })
+                            }
                         }
                     }.gesture(DragGesture(minimumDistance: 0).onChanged(onChangedInteraction(value:)).onEnded(onEndedInteraction(value:)))
                     .onChange(of: self.showInteractions) { _ in
