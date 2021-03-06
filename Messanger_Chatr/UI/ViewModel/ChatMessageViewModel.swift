@@ -157,9 +157,25 @@ class ChatMessageViewModel: ObservableObject {
 
         completion()
     }
-        
-    func replyMessage() {
-        print("reply message")
+    
+    func fetchTotalReplyCount(completion: @escaping (Int) -> Void) {
+        guard self.message.id.description != "" else {
+            completion(0)
+            return
+        }
+        Database.database().reference().child("Dialogs").child(message.dialogID).child(message.id).child("replies").observe(.value, with: {
+            snapshot in
+            let count = Int(snapshot.childrenCount)
+            completion(count)
+        })
+    }
+    
+    func fetchReplyCount(message: MessageStruct, completion: @escaping (Int) -> Void) {
+        Database.database().reference().child("Dialogs").child(message.dialogID).child(message.id).child("replies").observe(.value, with: {
+            snapshot in
+            let count = Int(snapshot.childrenCount)
+            completion(count)
+        })
     }
     
     func editMessage() {

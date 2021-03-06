@@ -21,8 +21,7 @@ struct BubbleDetailView: View {
     @State var lastOnline: Date = Date()
     @State var fullName: String = ""
     @State var subText: String = ""
-    @State var height: CGFloat = 175
-    @State var replyScrollHeight: CGFloat = 0
+    @State var height: CGFloat = 50
     @State var cardDrag = CGSize.zero
     @State var keyboardChange: CGFloat = CGFloat.zero
     @State var mainReplyText: String = ""
@@ -35,11 +34,11 @@ struct BubbleDetailView: View {
     let keyboard = KeyboardObserver()
 
     var body: some View {
-        VStack {
-            if self.keyboardChange == 0 { Spacer() }
+        VStack(spacing: 0) {
+            if self.keyboardChange == 0 && self.replies.count == 0 { Spacer() }
 
             //MARK: Content Section
-            ZStack(alignment: .bottom) {
+            ZStack() {
                 VStack() {
                     //Top Header
                     HStack(alignment: .center, spacing: 10) {
@@ -80,7 +79,7 @@ struct BubbleDetailView: View {
                                 .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 0)
                         }
                     }.padding(.horizontal).padding(.top, 10)
-                    
+
                     //Message Content View
                     if self.viewModel.message.image != "" {
                         //Attachment
@@ -95,12 +94,13 @@ struct BubbleDetailView: View {
                                             .font(.caption)
                                             .foregroundColor(.secondary)
                                     }
-                                }.frame(maxHeight: Constants.screenHeight * 0.6, alignment: .center)
+                                }//.frame(maxHeight: Constants.screenHeight * 0.85, alignment: .center)
                                 .transition(.asymmetric(insertion: AnyTransition.scale.animation(.easeOut(duration: 0.35)), removal: AnyTransition.scale.animation(.easeOut(duration: 0.25))))
                                 .aspectRatio(contentMode: .fit)
-                                .zIndex(4)
                                 .pinchToZoom()
+                                .fixedSize(horizontal: false, vertical: true)
                                 .matchedGeometryEffect(id: self.viewModel.message.id.description + "gif", in: namespace)
+                                .zIndex(4)
                         } else if self.viewModel.message.imageType == "image/png" && self.viewModel.message.messageState != .deleted {
                             WebImage(url: URL(string: self.viewModel.message.image))
                                 .resizable()
@@ -112,12 +112,13 @@ struct BubbleDetailView: View {
                                             .font(.caption)
                                             .foregroundColor(.secondary)
                                     }
-                                }.frame(maxHeight: Constants.screenHeight * 0.6, alignment: .center)
+                                }//.frame(maxHeight: Constants.screenHeight * 0.85, alignment: .center)
                                 .transition(.asymmetric(insertion: AnyTransition.scale.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                                 .aspectRatio(contentMode: .fit)
-                                .zIndex(4)
                                 .pinchToZoom()
+                                .fixedSize(horizontal: false, vertical: true)
                                 .matchedGeometryEffect(id: self.viewModel.message.id.description + "png", in: namespace)
+                                .zIndex(4)
                         } else if self.viewModel.message.imageType == "video/mov" && self.viewModel.message.messageState != .deleted {
 
                         }
@@ -137,7 +138,7 @@ struct BubbleDetailView: View {
                     } else {
                         //Text
                     }
-                    
+
                     //Footer Section
                     VStack() {
                         //MARK: Interaction Btns
@@ -192,9 +193,26 @@ struct BubbleDetailView: View {
                                 }).buttonStyle(interactionButtonStyle(isHighlighted: self.$hasUserDisliked, messagePosition: self.$messagePosition))
                                 
                                 Spacer()
-                                Button(action: {
-                                    print("more button")
-                                }, label: {
+                                Menu {
+                                    Button(action: {
+                                        print("more button")
+                                    }) {
+                                        Label("Add", systemImage: "plus.circle")
+                                    }
+
+                                    Button(action: {
+                                        print("more button")
+                                    }) {
+                                        Label("Edit", systemImage: "pencil.circle")
+                                    }
+                                    
+                                    Button(action: {
+                                        print("more button")
+                                    }) {
+                                        Label("Delete", systemImage: "minus.circle")
+                                            .foregroundColor(.red)
+                                    }
+                                } label: {
                                     HStack {
                                         Image(systemName: "ellipsis")
                                             .resizable()
@@ -202,7 +220,7 @@ struct BubbleDetailView: View {
                                             .frame(width: 22, height: 25, alignment: .center)
                                     }.padding(.horizontal, 10)
                                     .padding(.vertical, 5)
-                                }).buttonStyle(ClickButtonStyle())
+                                }.buttonStyle(ClickButtonStyle())
                             } else {
                                 Button(action: {
                                     print("try again btn")
@@ -217,7 +235,7 @@ struct BubbleDetailView: View {
                                 }).buttonStyle(ClickButtonStyle())
                             }
                         }.padding(.horizontal, 10)
-                        
+
                         HStack {
                             Text("sent " + self.viewModel.dateFormatTimeExtended(date: self.viewModel.message.date))
                                 .font(.caption)
@@ -230,15 +248,19 @@ struct BubbleDetailView: View {
                                     .foregroundColor(.secondary)
                             }
                         }.padding(.horizontal, 15)
-                    }.padding(.bottom, 10)
+                    }
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.bottom, 10)
                 }
-            }.background(RoundedRectangle(cornerRadius: 20).foregroundColor(Color("bgColor")))
-            .padding(.vertical, UIDevice.current.hasNotch ? 80 : 60)
-            .padding(.horizontal)
+            }
+            .background(RoundedRectangle(cornerRadius: 20).foregroundColor(Color("bgColor")))
+            //.padding(.top, UIDevice.current.hasNotch ? 40 : 20)
+            .padding(.horizontal, 10)
             .animation(.spring(response: 0.45, dampingFraction: 0.7, blendDuration: 0))
-            .offset(y: self.cardDrag.height)
-            .offset(y: self.height < 175 ? -height : 0)
+            .offset(y: self.cardDrag.height + 7)
+            .offset(y: self.height > 175 ? -height : 0)
             .shadow(color: Color.black.opacity(0.2), radius: 15, x: 0, y: 12)
+            .zIndex(3)
             .rotation3DEffect(.degrees(-Double(self.cardDrag.height > 20 ? ((self.cardDrag.height - 20) / 8 > 8 ? 8 : (self.cardDrag.height - 20) / 8) : 0)), axis: (x: 1, y: 0, z: 0))
             .simultaneousGesture(DragGesture().onChanged { value in
                 if self.viewModel.message.longitude == 0 && self.viewModel.message.latitude == 0 && self.viewModel.isDetailOpen {
@@ -262,72 +284,98 @@ struct BubbleDetailView: View {
                     }
                 }
             })
+//            .actionSheet(isPresented: $openMoreOptions) {
+//                ActionSheet(title: Text("Options:"), message: nil, buttons: [
+//                    .default(Text("Copy")) {
+//                        print("")
+//                    },
+//                    .destructive(Text(self.dialogModel.dialogType == "private" ? "Delete Dialog" : (self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? "Destroy Group" : "Leave Group")), action: {
+//                        changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
+//
+//                        self.isOpen = false
+//                        self.openActionSheet = false
+//                        UserDefaults.standard.set(false, forKey: "localOpen")
+//
+//                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+//                            if self.dialogModel.dialogType == "private" || self.dialogModel.dialogType == "group" {
+//                                changeDialogRealmData.shared.deletePrivateConnectyDialog(dialogID: self.dialogModel.id, isOwner: self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? true : false)
+//                            } else if self.dialogModel.dialogType == "public" {
+//                                changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: self.dialogModel.id)
+//                            }
+//                        }
+//                    }),
+//                    .cancel()
+//                ])
+//            }
 
             //MARK: Reply Section
-            ZStack(alignment: .bottom) {
+            VStack(alignment: .center, spacing: 0) {
                 if self.replies.isEmpty {
-                    Text("empty replies")
-                        .font(.caption)
-                        .foregroundColor(.primary)
-                        .padding(.vertical, 50)
+                    Text("no replies")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .padding(.vertical, 40)
                 } else {
                     ScrollView(.vertical, showsIndicators: false) {
                         LazyVStack(alignment: .leading) {
                             ForEach(self.replies.indices) { reply in
                                 MessageReplyCell(reply: self.replies[reply])
-                            }
-                        }.padding(.horizontal)
-                    }.frame(width: Constants.screenWidth)
-                    .frame(maxHeight: Constants.screenWidth / 1.5)
-                    .overlay(
-                        GeometryReader { proxy in
-                            Color.clear
-                                .onAppear { self.replyScrollHeight = proxy.size.height }
-                                .onChange(of: self.replies.indices) { _ in
-                                    self.replyScrollHeight = proxy.size.height
-                                }
-                        }
-                    )
+                                    .padding(.top, reply == 0 ? 20 : 0)
+                                    .transition(AnyTransition.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(.easeOut(duration: 0.2)), removal: AnyTransition.move(edge: .bottom).animation(.easeOut(duration: 0.2))))
+                            }.animation(.easeOut(duration: 0.4))
+                        }.padding(.horizontal, 30)
+                    }
+                    .frame(maxHeight: (Constants.screenHeight / 7.5) + (self.cardDrag.height < 0 ? -self.cardDrag.height : 0))
+                    .opacity(Double((300 - self.cardDrag.height) / 300))
+                    .offset(y: -2)
                 }
 
                 ResizableTextField(imagePicker: self.imagePicker, height: self.$height, text: self.$mainReplyText, isMessageView: false)
                     .environmentObject(self.auth)
                     .frame(height: self.height < 175 ? self.height : 175)
                     .padding(.horizontal, 30)
-                    .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color("lightGray"), lineWidth: 2).padding(.horizontal))
                     .background(
-                        HStack {
-                            Text("type reply")
-                                .font(.system(size: 18))
-                                .padding(.vertical, 10)
-                                .padding(.leading, 35)
-                                .offset(y: -1)
-                                .foregroundColor(self.mainReplyText.count == 0 ? Color("lightGray") : .clear)
-                            Spacer()
+                        ZStack() {
+                            RoundedRectangle(cornerRadius: 20).stroke(Color("lightGray"), lineWidth: 2).padding(.horizontal)
+                            HStack {
+                                Text("type reply")
+                                    .font(.system(size: 18))
+                                    .padding(.vertical, 10)
+                                    .padding(.leading, 35)
+                                    .offset(y: -1)
+                                    .foregroundColor(self.mainReplyText.count == 0 ? Color("lightGray") : .clear)
+                                Spacer()
+                            }
                         }
                     ).overlay(
-                        HStack(alignment: .bottom) {
+                        VStack {
                             Spacer()
-                            Button(action: {
-                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                self.viewModel.sendReply(text: self.mainReplyText, name: self.fullName, completion: {
-                                    self.mainReplyText = ""
-                                    self.height = 0 
-                                    print("done")
-                                })
-                            }) {
-                                Image(systemName: "arrow.up.circle.fill")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 32, height: 32)
-                                    .padding(.trailing, 20)
-                                    .foregroundColor(self.mainReplyText.count == 0 ? Color("lightGray") : .blue)
-                            }
-                        }.frame(height: self.height < 175 ? self.height : 175)
+                            HStack {
+                                Spacer()
+                                Button(action: {
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                    self.viewModel.sendReply(text: self.mainReplyText, name: self.fullName, completion: {
+                                        self.mainReplyText = ""
+                                        self.height = 0
+                                    })
+                                }) {
+                                    Image(systemName: "arrow.up.circle.fill")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 32, height: 32)
+                                        .padding(.trailing, 20)
+                                        .foregroundColor(self.mainReplyText.count == 0 ? Color("lightGray") : .blue)
+                                }
+                            }.offset(y: -4)
+                        }
                     )
-                    .padding(.bottom, self.keyboardChange == 0 ? (UIDevice.current.hasNotch ? 50 : 30) : 0)
-            }.padding(.bottom, self.keyboardChange != 0 ? (self.keyboardChange - (UIDevice.current.hasNotch ? 50 : 30)) : 0)
-        }.frame(width: Constants.screenWidth, height: Constants.screenHeight, alignment: .center)
+            }.frame(maxWidth: .infinity)
+            .offset(y: self.cardDrag.height > 0 ? self.cardDrag.height / 4 : 0)
+            .padding(.bottom, self.keyboardChange != 0 ? (self.keyboardChange - (UIDevice.current.hasNotch ? 50 : 30)) : (UIDevice.current.hasNotch ? 50 : 30))
+            .opacity(Double((200 - self.cardDrag.height) / 200))
+            .zIndex(2)
+        }.frame(width: Constants.screenWidth, height: Constants.screenHeight, alignment: .bottom)
+        .edgesIgnoringSafeArea(.all)
         .background(BlurView(style: .systemUltraThinMaterial).opacity(Double((300 - self.cardDrag.height) / 300)))
         .onAppear() {
             UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
@@ -349,6 +397,7 @@ struct BubbleDetailView: View {
             })
             
             self.observeInteractions()
+            self.observeReplies()
         
             keyboard.observe { (event) in
                 guard self.viewModel.isDetailOpen else { return }
@@ -370,8 +419,6 @@ struct BubbleDetailView: View {
                     break
                 }
             }
-        }.onDisappear() {
-            //self.viewModel.message = MessageStruct()
         }
     }
     
@@ -391,19 +438,6 @@ struct BubbleDetailView: View {
                 } else if typeLike == "dislikes" {
                     changeMessageRealmData.shared.updateMessageDislikeAdded(messageID: self.viewModel.message.id, userID: Int(childSnap.key) ?? 0)
                     self.hasUserDisliked = self.viewModel.message.dislikedId.contains(profileID)
-                } else if typeLike == "replies" {
-                    guard let dict = childSnap.value as? [String: Any] else { return }
-
-                    if let timeStamp = dict["timestamp"] as? String {
-                        let dateFormatter = DateFormatter()
-                        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZ"
-                        if let timestampDate = dateFormatter.date(from: timeStamp) {
-                            let reply = messageReplyStruct(id: childSnap.key, fromId: dict["fromId"] as? String ?? "", text: dict["text"] as? String ?? "", date: timestampDate)
-                            
-                            self.replies.append(reply)
-                            print("Adding reply!!!! \(reply.fromId) && \(reply.text)")
-                        }
-                    }
                 }
             }
         })
@@ -419,12 +453,34 @@ struct BubbleDetailView: View {
                 } else if typeLike == "dislikes" {
                     changeMessageRealmData.shared.updateMessageDislikeRemoved(messageID: self.viewModel.message.id, userID: Int(childSnap.key) ?? 0)
                     self.hasUserDisliked = self.viewModel.message.dislikedId.contains(profileID)
-                } else if typeLike == "replies" {
-//                    if let removeIndex = self.replies.firstIndex(where: self.replies.filter({ $0.id == childSnap.key }).first? ?? messageReplyStruct()) {
-//                        self.replies.remove(at: removeIndex)
-//                    }
                 }
             }
+        })
+    }
+    
+    func observeReplies() {
+        let msg = Database.database().reference().child("Dialogs").child(self.viewModel.message.dialogID).child(self.viewModel.message.id).child("replies")
+
+        msg.observe(.childAdded, with: { snapAdded in
+            guard let dict = snapAdded.value as? [String: Any] else { return }
+
+            if let timeStamp = dict["timestamp"] as? String {
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZ"
+                if let timestampDate = dateFormatter.date(from: timeStamp) {
+                    let reply = messageReplyStruct(id: snapAdded.key, fromId: dict["fromId"] as? String ?? "", text: dict["text"] as? String ?? "", date: timestampDate)
+
+                    withAnimation(Animation.easeOut(duration: 0.25)) {
+                        self.replies.insert(reply, at: 0)
+                    }
+                }
+            }
+        })
+        
+        msg.observe(.childRemoved, with: { snapRemoved in
+//            if let removeIndex = self.replies.firstIndex(where: self.replies.filter({ $0.id == snapRemoved.key }).first? ?? messageReplyStruct()) {
+//                self.replies.remove(at: removeIndex)
+//            }
         })
     }
 }

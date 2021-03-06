@@ -369,7 +369,7 @@ struct ChatMessagesView: View {
         DispatchQueue.global(qos: .utility).async {
             Request.updateDialog(withID: self.dialogID, update: UpdateChatDialogParameters(), successBlock: { dialog in
                 self.auth.selectedConnectyDialog = dialog
-
+                
                 dialog.onUserIsTyping = { (userID: UInt) in
                     if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
                         changeMessageRealmData.shared.addTypingMessage(userID: String(userID), dialogID: self.dialogID)

@@ -30,33 +30,31 @@ struct LocationBubble: View {
     var namespace: Namespace.ID
 
     var body: some View {
-        ZStack {
-            if self.message.messageState != .deleted {
-                Button(action: {
-                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                    withAnimation {
-                        self.viewModel.message = self.message
-                        self.viewModel.isDetailOpen = true
-                    }
-                }) {
-                    Map(coordinateRegion: $region, interactionModes: MapInteractionModes.all, showsUserLocation: true, userTrackingMode: $userTrackingMode, annotationItems: [MyAnnotationItem(coordinate: CLLocationCoordinate2D(latitude: self.message.latitude, longitude: self.message.longitude))]) { marker in
-                        MapPin(coordinate: marker.coordinate)
-                    }.frame(height: CGFloat(Constants.screenWidth * 0.6))
-                    .transition(.asymmetric(insertion: AnyTransition.scale.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
-                    .cornerRadius(20)
-                    .padding(.leading, self.messagePosition == .right ? 35 : 0)
-                    .padding(.trailing, self.messagePosition == .right ? 0 : 35)
-                    .padding(.bottom, self.hasPrior ? 0 : 4)
-                    .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 10)
-                    .matchedGeometryEffect(id: message.id + "map", in: namespace)
-                    .onAppear() {
-                        self.region.center.latitude = self.message.latitude
-                        self.region.center.longitude = self.message.longitude
-                    }
-                }.buttonStyle(ClickMiniButtonStyle())
-                .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.5) : Color.clear, lineWidth: 5))
+        Button(action: {
+            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+            withAnimation {
+                self.viewModel.message = self.message
+                self.viewModel.isDetailOpen = true
             }
-        }.simultaneousGesture(DragGesture(minimumDistance: self.viewModel.isDetailOpen ? 0 : 500))
+        }) {
+            Map(coordinateRegion: $region, interactionModes: MapInteractionModes.all, showsUserLocation: true, userTrackingMode: $userTrackingMode, annotationItems: [MyAnnotationItem(coordinate: CLLocationCoordinate2D(latitude: self.message.latitude, longitude: self.message.longitude))]) { marker in
+                MapPin(coordinate: marker.coordinate)
+            }
+        }.frame(height: CGFloat(Constants.screenWidth * 0.5))
+        .transition(.asymmetric(insertion: AnyTransition.scale.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
+        .cornerRadius(20)
+        .padding(.leading, self.messagePosition == .right ? CGFloat(Constants.screenHeight * 0.1) : 0)
+        .padding(.trailing, self.messagePosition == .right ? 0 : CGFloat(Constants.screenHeight * 0.1))
+        .padding(.bottom, self.hasPrior ? 0 : 4)
+        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 10)
+        .matchedGeometryEffect(id: message.id + "map", in: namespace)
+        .buttonStyle(ClickMiniButtonStyle())
+        .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.5) : Color.clear, lineWidth: 5))
+        .simultaneousGesture(DragGesture(minimumDistance: self.viewModel.isDetailOpen ? 0 : 500))
+        .onAppear() {
+            self.region.center.latitude = self.message.latitude
+            self.region.center.longitude = self.message.longitude
+        }
     }
     
     func openMapForPlace() {

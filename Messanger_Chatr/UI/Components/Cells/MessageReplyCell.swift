@@ -25,21 +25,46 @@ struct MessageReplyCell: View {
 
     var body: some View {
         HStack(alignment: .top) {
-            ZStack {
-                Circle()
-                    .frame(width: 30, height: 30, alignment: .center)
-                    .foregroundColor(Color("bgColor"))
-                
-                WebImage(url: URL(string: self.avatar))
-                    .resizable()
-                    .placeholder{ Image("empty-profile").resizable().frame(width: 30, height: 30, alignment: .center).scaledToFill() }
-                    .indicator(.activity)
-                    .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
-                    .scaledToFill()
-                    .clipShape(Circle())
-                    .frame(width: 30, height: 30, alignment: .center)
-                    .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 5)
-            }
+            Menu {
+                Text(self.fullName + "   \(reply.date.getElapsedInterval(lastMsg: "just now"))")
+                    .fontWeight(.bold)
+
+                Button(action: {
+                    print("view profile")
+                }) {
+                    Label("Add", systemImage: "plus.circle")
+                }
+
+                Button(action: {
+                    print("delete button")
+                }) {
+                    Label("delete reply", systemImage: "trash")
+                        .foregroundColor(.red)
+                }
+
+                Button(action: {
+                    print("report button")
+                }) {
+                    Label("report reply", systemImage: "exclamationmark.icloud")
+                        .foregroundColor(.red)
+                }
+            } label: {
+                ZStack {
+                    Circle()
+                        .frame(width: 30, height: 30, alignment: .center)
+                        .foregroundColor(Color("bgColor"))
+                    
+                    WebImage(url: URL(string: self.avatar))
+                        .resizable()
+                        .placeholder{ Image("empty-profile").resizable().frame(width: 30, height: 30, alignment: .center).scaledToFill() }
+                        .indicator(.activity)
+                        .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
+                        .scaledToFill()
+                        .clipShape(Circle())
+                        .frame(width: 30, height: 30, alignment: .center)
+                        .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 5)
+                }
+            }.buttonStyle(ClickButtonStyle())
             
             VStack(alignment: .leading, spacing: 2.5) {
                 Text(self.fullName + "   \(reply.date.getElapsedInterval(lastMsg: "just now"))")
@@ -50,7 +75,7 @@ struct MessageReplyCell: View {
 
                 HStack {
                     Capsule()
-                        .frame(width: 2.5, height: .infinity, alignment: .center)
+                        .frame(width: 2.5, alignment: .center)
                         .frame(minHeight: 20)
                         .foregroundColor(.blue)
                     

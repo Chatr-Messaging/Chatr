@@ -46,7 +46,7 @@ struct VisitContactView: View {
     ]
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .center) {
             ScrollView(.vertical, showsIndicators: true) {
                 //MARK: Top Profile
                 topHeaderContactView(viewModel: self.viewModel, contact: self.$contact, quickSnapViewState: self.$quickSnapViewState, isProfileImgOpen: self.$isProfileImgOpen, isProfileBioOpen: self.$isProfileBioOpen, selectedImageUrl: self.$selectedImageUrl)
@@ -527,7 +527,7 @@ struct VisitContactView: View {
 
             //MARK: Other Views
             //See profile image
-            ZStack {
+            ZStack(alignment: .center) {
                 BlurView(style: .systemUltraThinMaterial)
                     .opacity(self.isProfileImgOpen || self.quickSnapViewState == .camera || self.quickSnapViewState == .takenPic ? Double(150 - abs(self.profileViewSize.height)) / 150 : 0)
                     .animation(.linear(duration: 0.15))
@@ -557,45 +557,52 @@ struct VisitContactView: View {
                         .offset(y: self.profileViewSize.height / 3)
                         .offset(y: -50)
                     }
-                                        
-                    WebImage(url: URL(string: self.selectedImageUrl))
-                        .resizable()
-                        .placeholder{ Image("empty-profile").resizable().frame(width: Constants.screenWidth - 40, height: Constants.screenWidth - 40, alignment: .center).scaledToFill() }
-                        .indicator(.activity)
-                        .aspectRatio(contentMode: .fill)
-                        .transition(.fade(duration: 0.25))
-                        .frame(width: Constants.screenWidth - 40, height: Constants.screenWidth - 40, alignment: .center)
-                        .clipShape(RoundedRectangle(cornerRadius: self.isProfileImgOpen ? abs(self.profileViewSize.height) + 25 : 100))
-                        .shadow(color: Color.black.opacity(0.25), radius: 15, x: 0, y: 15)
-                        .opacity(self.isProfileImgOpen ? 1 : 0)
-                        .offset(x: self.profileViewSize.width, y: self.profileViewSize.height)
-                        .offset(y: -50)
-                        .scaleEffect(self.isProfileImgOpen ? 1 - abs(self.profileViewSize.height) / 500 : 0, anchor: .topLeading)
-                        .animation(.spring(response: 0.30, dampingFraction: 0.7, blendDuration: 0))
-                        .gesture(DragGesture(minimumDistance: self.isProfileImgOpen ? 0 : Constants.screenHeight).onChanged { value in
-                            guard value.translation.height < 175 else { return }
-                            guard value.translation.height > -175 else { return }
-                            print("height: \(value.translation.height)")
-                            if self.isProfileImgOpen {
-                                self.profileViewSize = value.translation
-                            }
-                        }.onEnded { value in
-                            if self.profileViewSize.height > 100 {
-                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                self.isProfileImgOpen = false
-                            } else if self.profileViewSize.height < -100 {
-                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                self.isProfileImgOpen = false
-                            }
+                      
+                    if isProfileImgOpen {
+                        WebImage(url: URL(string: self.selectedImageUrl))
+                            .resizable()
+                            .placeholder{ Image("empty-profile").resizable().frame(width: Constants.screenWidth - 40, height: Constants.screenWidth - 40, alignment: .center).scaledToFill() }
+                            .indicator(.activity)
+                            .aspectRatio(contentMode: .fill)
+                            .transition(.fade(duration: 0.25))
+                            .frame(width: Constants.screenWidth - 40, height: Constants.screenWidth - 40, alignment: .center)
+                            .clipShape(RoundedRectangle(cornerRadius: self.isProfileImgOpen ? abs(self.profileViewSize.height) + 25 : 100))
+                            .shadow(color: Color.black.opacity(0.25), radius: 15, x: 0, y: 15)
+                            .opacity(self.isProfileImgOpen ? 1 : 0)
+                            .offset(x: self.profileViewSize.width, y: self.profileViewSize.height)
+                            .offset(y: -50)
+                            .scaleEffect(self.isProfileImgOpen ? 1 - abs(self.profileViewSize.height) / 500 : 0, anchor: .topLeading)
+                            .animation(.spring(response: 0.30, dampingFraction: 0.7, blendDuration: 0))
+                            .pinchToZoom()
+                            .gesture(DragGesture(minimumDistance: self.isProfileImgOpen ? 0 : Constants.screenHeight).onChanged { value in
+                                guard value.translation.height < 175 else { return }
+                                guard value.translation.height > -175 else { return }
+                                print("height: \(value.translation.height)")
+                                if self.isProfileImgOpen {
+                                    self.profileViewSize = value.translation
+                                }
+                            }.onEnded { value in
+                                if self.profileViewSize.height > 100 {
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                    self.isProfileImgOpen = false
+                                } else if self.profileViewSize.height < -100 {
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                    self.isProfileImgOpen = false
+                                }
 
-                        }.sequenced(before: TapGesture().onEnded({
-                            if self.profileViewSize.height == 0 {
-                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                self.isProfileImgOpen = false
-                            } else {
-                                self.profileViewSize = .zero
+                            }.sequenced(before: TapGesture().onEnded({
+                                if self.profileViewSize.height == 0 {
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                    self.isProfileImgOpen = false
+                                } else {
+                                    self.profileViewSize = .zero
+                                }
+                            }))).onAppear(){
+                                self.profileViewSize = CGSize.zero
+                            }.onDisappear() {
+                                self.profileViewSize = CGSize.zero
                             }
-                        })))
+                    }
                 }
             }
             

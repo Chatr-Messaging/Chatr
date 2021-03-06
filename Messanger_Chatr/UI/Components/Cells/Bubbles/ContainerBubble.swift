@@ -24,6 +24,7 @@ struct ContainerBubble: View {
     @State var subText: String = ""
     @State var avatar: String = ""
     @State var fullName: String = ""
+    @State var replyCount: Int = 0
 
     ///Interaction variables:
     @State var showInteractions: Bool = false
@@ -68,8 +69,35 @@ struct ContainerBubble: View {
                                 .scaledToFit()
                                 .frame(width: 22, height: 22, alignment: .center)
                                 .foregroundColor(.red)
-                                .offset(x: messagePosition == .right ? -30 : 30)
+                                .offset(x: messagePosition == .right ? -35 : 35)
                                 .padding(.bottom, 10)
+                        }
+                        
+                        if self.replyCount > 0 {
+                            Button(action: {
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                self.viewModel.message = self.message
+                                self.viewModel.isDetailOpen = true
+                            }, label: {
+                                HStack(spacing: self.replyCount > 1 ? 2 : 0) {
+                                    Image(systemName: "arrowshape.turn.up.left.fill")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .foregroundColor(.white)
+                                        .frame(width: 18, height: 18, alignment: .center)
+
+                                    Text(self.replyCount > 1 ? "\(self.replyCount)" : "")
+                                        .font(.subheadline)
+                                        .fontWeight(.bold)
+                                        .foregroundColor(.white)
+                                        .padding(.horizontal, self.replyCount > 1 ? 5 : 0)
+                                }.padding(.horizontal, self.replyCount > 1 ? 15 : 10)
+                                .padding(.vertical, 5)
+                            })
+                            .background(RoundedRectangle(cornerRadius: 20).foregroundColor(.black).shadow(color: Color.black, radius: 3, x: 0, y: 3).opacity(0.5))
+                            .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.black, lineWidth: 1.5).opacity(0.6))
+                            .offset(x: messagePosition == .right ? -50 : 50)
+                            .padding(.bottom, 10)
                         }
                     }.padding(.bottom, self.hasPrior ? 0 : 10)
                     .padding(.top, (self.message.likedId.count != 0 || self.message.dislikedId.count != 0) && (self.isPriorWider) ? 22 : 0)
@@ -110,7 +138,7 @@ struct ContainerBubble: View {
                     
                     //MARK: Interaction Lables / Buttons
                     HStack(spacing: 5) {
-                        if self.message.dislikedId.count > 0 {
+                        if self.message.dislikedId.count > 0 && !self.viewModel.isDetailOpen {
                             Button(action: {
                                 if self.messagePosition == .left {
                                     UINotificationFeedbackGenerator().notificationOccurred(.success)
@@ -145,7 +173,7 @@ struct ContainerBubble: View {
                             }
                         }
 
-                        if self.message.likedId.count > 0 {
+                        if self.message.likedId.count > 0 && !self.viewModel.isDetailOpen {
                             Button(action: {
                                 if self.messagePosition == .left {
                                     UINotificationFeedbackGenerator().notificationOccurred(.success)
@@ -235,7 +263,6 @@ struct ContainerBubble: View {
                     .animation(.spring())
                     .offset(y: -65)
                     .zIndex(2)
-                    .padding(.horizontal)
             }
         }.onAppear() {
             self.viewModel.getUserAvatar(senderId: self.message.senderID, compleation: { (url, fullName, _) in
@@ -250,6 +277,11 @@ struct ContainerBubble: View {
 
             self.hasUserLiked = self.message.likedId.contains(self.auth.profile.results.first?.id ?? 0)
             self.hasUserDisliked = self.message.dislikedId.contains(self.auth.profile.results.first?.id ?? 0)
+
+            self.viewModel.fetchReplyCount(message: self.message, completion: { count in
+                print("the total reply count is: \(count)")
+                self.replyCount = count
+            })
         }
     }
     
@@ -309,7 +341,6 @@ struct ContainerBubble: View {
             self.copyMessage()
         } else if interactionSelected == "reply" {
             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-            self.viewModel.replyMessage()
         } else if interactionSelected == "edit" {
             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
             self.viewModel.editMessage()
