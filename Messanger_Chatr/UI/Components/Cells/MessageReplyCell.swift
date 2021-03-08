@@ -12,14 +12,14 @@ import ConnectyCube
 import RealmSwift
 
 struct messageReplyStruct {
-    var id: String
-    var fromId: String
-    var text: String
-    var date: Date
+    var id: String = ""
+    var fromId: String = ""
+    var text: String = ""
+    var date: Date = Date()
 }
 
 struct MessageReplyCell: View {
-    var reply: messageReplyStruct
+    @State var reply: messageReplyStruct = messageReplyStruct()
     @State var avatar: String = ""
     @State var fullName: String = ""
 

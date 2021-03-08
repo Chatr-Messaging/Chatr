@@ -98,7 +98,9 @@ class ChatMessageViewModel: ObservableObject {
         }
     }
 
-    func likeMessage(from userId: Int, name: String, completion: @escaping (Bool) -> Void) {
+    func likeMessage(from userId: Int, name: String, message: MessageStruct, completion: @escaping (Bool) -> Void) {
+        guard message.senderID != 0, message.dialogID != "" else { return }
+
         let msg = Database.database().reference().child("Dialogs").child(message.dialogID).child(message.id).child("likes")
 
         msg.observeSingleEvent(of: .value, with: { snapshot in
@@ -108,14 +110,16 @@ class ChatMessageViewModel: ObservableObject {
                 completion(false)
             } else {
                 msg.updateChildValues(["\(userId)" : "\(Date())"])
-                self.sendPushNoti(userIDs: [NSNumber(value: self.message.senderID)], title: "Liked Message", message: "\(name) liked your message \"\(self.message.text)\"")
+                self.sendPushNoti(userIDs: [NSNumber(value: message.senderID)], title: "Liked Message", message: "\(name) liked your message \"\(message.text)\"")
 
                 completion(true)
             }
         })
     }
     
-    func dislikeMessage(from userId: Int, name: String, completion: @escaping (Bool) -> Void) {
+    func dislikeMessage(from userId: Int, name: String, message: MessageStruct, completion: @escaping (Bool) -> Void) {
+        guard message.senderID != 0, message.dialogID != "" else { return }
+
         let msg = Database.database().reference().child("Dialogs").child(message.dialogID).child(message.id).child("dislikes")
 
         msg.observeSingleEvent(of: .value, with: { snapshot in
@@ -125,7 +129,7 @@ class ChatMessageViewModel: ObservableObject {
                 completion(false)
             } else {
                 msg.updateChildValues(["\(userId)" : "\(Date())"])
-                self.sendPushNoti(userIDs: [NSNumber(value: self.message.senderID)], title: "Disliked Message", message: "\(name) disliked your message \"\(self.message.text)\"")
+                self.sendPushNoti(userIDs: [NSNumber(value: message.senderID)], title: "Disliked Message", message: "\(name) disliked your message \"\(message.text)\"")
                 
                 completion(true)
             }
@@ -133,6 +137,8 @@ class ChatMessageViewModel: ObservableObject {
     }
     
     func sendReply(text: String, name: String, completion: @escaping () -> Void) {
+        guard message.senderID != 0, message.dialogID != "" else { return }
+
         let msg = Database.database().reference().child("Dialogs").child(message.dialogID).child(message.id).child("replies")
         let newPostId = msg.childByAutoId().key
         let newPostReference = msg.child(newPostId ?? "no post id")
@@ -151,6 +157,8 @@ class ChatMessageViewModel: ObservableObject {
     }
     
     func deleteReply(messageId: String, completion: @escaping () -> Void) {
+        guard message.senderID != 0, message.dialogID != "" else { return }
+
         let msg = Database.database().reference().child("Dialogs").child(message.dialogID).child(message.id).child("replies")
 
         msg.child("\(messageId)").removeValue()

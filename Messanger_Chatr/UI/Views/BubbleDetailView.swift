@@ -147,7 +147,7 @@ struct BubbleDetailView: View {
                                 Button(action: {
                                     if self.messagePosition == .left {
                                         UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                        self.viewModel.likeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", completion: { like in
+                                        self.viewModel.likeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", message: self.viewModel.message, completion: { like in
                                             self.viewModel.isDetailOpen = true
                                             self.hasUserLiked = like
                                         })
@@ -171,7 +171,7 @@ struct BubbleDetailView: View {
                                 Button(action: {
                                     if self.messagePosition == .left {
                                         UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                        self.viewModel.dislikeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", completion: { dislike in
+                                        self.viewModel.dislikeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", message: self.viewModel.message, completion: { dislike in
                                             self.viewModel.isDetailOpen = true
                                             self.hasUserDisliked = dislike
                                         })
@@ -254,7 +254,7 @@ struct BubbleDetailView: View {
                 }
             }
             .background(RoundedRectangle(cornerRadius: 20).foregroundColor(Color("bgColor")))
-            //.padding(.top, UIDevice.current.hasNotch ? 40 : 20)
+            .padding(.top, UIDevice.current.hasNotch ? 40 : 20)
             .padding(.horizontal, 10)
             .animation(.spring(response: 0.45, dampingFraction: 0.7, blendDuration: 0))
             .offset(y: self.cardDrag.height + 7)
@@ -310,25 +310,24 @@ struct BubbleDetailView: View {
 
             //MARK: Reply Section
             VStack(alignment: .center, spacing: 0) {
-                if self.replies.isEmpty {
-                    Text("no replies")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .padding(.vertical, 40)
-                } else {
-                    ScrollView(.vertical, showsIndicators: false) {
-                        LazyVStack(alignment: .leading) {
-                            ForEach(self.replies.indices) { reply in
-                                MessageReplyCell(reply: self.replies[reply])
-                                    .padding(.top, reply == 0 ? 20 : 0)
-                                    .transition(AnyTransition.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(.easeOut(duration: 0.2)), removal: AnyTransition.move(edge: .bottom).animation(.easeOut(duration: 0.2))))
-                            }.animation(.easeOut(duration: 0.4))
-                        }.padding(.horizontal, 30)
-                    }
-                    .frame(maxHeight: (Constants.screenHeight / 7.5) + (self.cardDrag.height < 0 ? -self.cardDrag.height : 0))
-                    .opacity(Double((300 - self.cardDrag.height) / 300))
-                    .offset(y: -2)
+                Text("no replies")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .padding(.vertical, self.replies.isEmpty ? 40 : 0)
+                    .opacity(self.replies.isEmpty ? 1 : 0)
+
+                ScrollView(.vertical, showsIndicators: false) {
+                    LazyVStack(alignment: .leading) {
+                        ForEach(self.replies.indices, id:\.self) { reply in
+                            MessageReplyCell(reply: self.replies[reply])
+                                .padding(.top, reply == 0 ? 10 : 0)
+                                .transition(AnyTransition.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(.easeOut(duration: 0.2)), removal: AnyTransition.move(edge: .bottom).animation(.easeOut(duration: 0.2))))
+                        }.animation(.easeOut(duration: 0.4))
+                    }.padding(.horizontal, 30)
                 }
+                .frame(maxHeight: (Constants.screenHeight / 7.5) + (self.cardDrag.height < 0 ? -self.cardDrag.height : 10))
+                .opacity(Double((300 - self.cardDrag.height) / 300))
+                .offset(y: -2)
 
                 ResizableTextField(imagePicker: self.imagePicker, height: self.$height, text: self.$mainReplyText, isMessageView: false)
                     .environmentObject(self.auth)

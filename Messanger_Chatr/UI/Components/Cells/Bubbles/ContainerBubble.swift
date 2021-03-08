@@ -79,7 +79,7 @@ struct ContainerBubble: View {
                                 self.viewModel.message = self.message
                                 self.viewModel.isDetailOpen = true
                             }, label: {
-                                HStack(spacing: self.replyCount > 1 ? 2 : 0) {
+                                HStack(spacing: self.replyCount > 1 ? 8 : 0) {
                                     Image(systemName: "arrowshape.turn.up.left.fill")
                                         .resizable()
                                         .scaledToFit()
@@ -90,13 +90,12 @@ struct ContainerBubble: View {
                                         .font(.subheadline)
                                         .fontWeight(.bold)
                                         .foregroundColor(.white)
-                                        .padding(.horizontal, self.replyCount > 1 ? 5 : 0)
-                                }.padding(.horizontal, self.replyCount > 1 ? 15 : 10)
+                                }.padding(.horizontal, 10)
                                 .padding(.vertical, 5)
                             })
                             .background(RoundedRectangle(cornerRadius: 20).foregroundColor(.black).shadow(color: Color.black, radius: 3, x: 0, y: 3).opacity(0.5))
                             .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.black, lineWidth: 1.5).opacity(0.6))
-                            .offset(x: messagePosition == .right ? -50 : 50)
+                            .offset(x: messagePosition == .right ? (self.replyCount > 1 ? -65 : -50) : (self.replyCount > 1 ? 65 : 50))
                             .padding(.bottom, 10)
                         }
                     }.padding(.bottom, self.hasPrior ? 0 : 10)
@@ -114,7 +113,8 @@ struct ContainerBubble: View {
                         if self.messagePosition == .left {
                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                             if self.messagePosition == .left && self.message.messageState != .deleted  {
-                                self.viewModel.likeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", completion: { like in
+                                self.viewModel.message = self.message
+                                self.viewModel.likeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", message: self.message, completion: { like in
                                     self.hasUserLiked = like
                                 })
                             }
@@ -142,7 +142,8 @@ struct ContainerBubble: View {
                             Button(action: {
                                 if self.messagePosition == .left {
                                     UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                    self.viewModel.dislikeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", completion: { dislike in
+                                    self.viewModel.message = self.message
+                                    self.viewModel.dislikeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", message: self.message, completion: { dislike in
                                         self.hasUserDisliked = dislike
                                     })
                                 }
@@ -177,7 +178,8 @@ struct ContainerBubble: View {
                             Button(action: {
                                 if self.messagePosition == .left {
                                     UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                    self.viewModel.likeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", completion: { like in
+                                    self.viewModel.message = self.message
+                                    self.viewModel.likeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", message: self.message, completion: { like in
                                         self.hasUserLiked = like
                                     })
                                 }
@@ -325,14 +327,16 @@ struct ContainerBubble: View {
         
         if interactionSelected == "like" {
             UINotificationFeedbackGenerator().notificationOccurred(.success)
-            self.viewModel.likeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", completion: { like in
+            self.viewModel.message = self.message
+            self.viewModel.likeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", message: self.message, completion: { like in
                 withAnimation(Animation.easeOut(duration: 0.5).delay(0.8)) {
                     self.hasUserLiked = like
                 }
             })
         } else if interactionSelected == "dislike" {
             UINotificationFeedbackGenerator().notificationOccurred(.success)
-            self.viewModel.dislikeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", completion: { dislike in
+            self.viewModel.message = self.message
+            self.viewModel.dislikeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", message: self.message, completion: { dislike in
                 withAnimation(Animation.easeOut(duration: 0.5).delay(0.8)) {
                     self.hasUserDisliked = dislike
                 } 
