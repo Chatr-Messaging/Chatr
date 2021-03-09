@@ -38,21 +38,32 @@ struct ContainerBubble: View {
     var namespace: Namespace.ID
 
     var body: some View {
+        let dragInteractionGesture = DragGesture()
+            .onChanged { value in
+                onChangedInteraction(value: value)
+            }.onEnded { valueEnd in
+                onEndedInteraction(value: valueEnd)
+            }
+
+        // a long press gesture that enables isDragging
+        let pressInteractionGesture = LongPressGesture()
+            .onEnded { value in
+                withAnimation {
+                    self.showInteractions = true
+                }
+            }
+
+        // a combined gesture that forces the user to long press then drag
+        let combined = pressInteractionGesture.sequenced(before: dragInteractionGesture)
+
         ZStack(alignment: self.messagePosition == .right ? .topTrailing : .topLeading) {
             ZStack(alignment: self.messagePosition == .right ? .bottomTrailing : .bottomLeading) {
                //MARK: Main content section:
                 ZStack(alignment: self.messagePosition == .left ? .topTrailing : .topLeading) {
                     ZStack(alignment: self.messagePosition == .left ? .bottomTrailing : .bottomLeading) {
                         if self.message.image != "" {
-                            Button(action: {
-                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                self.viewModel.message = self.message
-                                self.viewModel.isDetailOpen = true
-                            }) {
-                                AttachmentBubble(viewModel: self.viewModel, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior, namespace: self.namespace)
-                                    .environmentObject(self.auth)
-                            }.buttonStyle(ClickMiniButtonStyle())
-
+                            AttachmentBubble(viewModel: self.viewModel, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior, namespace: self.namespace)
+                                .environmentObject(self.auth)
                         } else if self.message.contactID != 0 {
                             ContactBubble(viewModel: self.viewModel, chatContact: self.$newDialogFromSharedContact, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior, namespace: self.namespace)
                                 .environmentObject(self.auth)
@@ -119,7 +130,13 @@ struct ContainerBubble: View {
                                 })
                             }
                         }
-                    }.gesture(DragGesture(minimumDistance: 0).onChanged(onChangedInteraction(value:)).onEnded(onEndedInteraction(value:)))
+                    }
+                    .onTapGesture(count: 1) {
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                        self.viewModel.message = self.message
+                        self.viewModel.isDetailOpen = true
+                    }
+                    .gesture(combined)
                     .onChange(of: self.showInteractions) { _ in
                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                     }.onAppear() {
@@ -159,7 +176,7 @@ struct ContainerBubble: View {
                                     Text(self.message.dislikedId.count > 1 ? "\(self.message.dislikedId.count)" : "")
                                         .font(.subheadline)
                                         .fontWeight(.bold)
-                                        .foregroundColor(.primary)
+                                        .foregroundColor(self.message.dislikedId.contains(UserDefaults.standard.integer(forKey: "currentUserID")) ? .white : .primary)
                                         .padding(.horizontal, self.message.dislikedId.count > 1 ? 3 : 0)
                                 }.padding(.horizontal, 10)
                                 .padding(.vertical, 5)
@@ -195,7 +212,7 @@ struct ContainerBubble: View {
                                     Text(self.message.likedId.count > 1 ? "\(self.message.likedId.count)" : "")
                                         .font(.subheadline)
                                         .fontWeight(.bold)
-                                        .foregroundColor(.primary)
+                                        .foregroundColor(self.message.likedId.contains(UserDefaults.standard.integer(forKey: "currentUserID")) ? .white : .primary)
                                         .padding(.horizontal, self.message.likedId.count > 1 ? 3 : 0)
                                 }.padding(.horizontal, 10)
                                 .padding(.vertical, 5)

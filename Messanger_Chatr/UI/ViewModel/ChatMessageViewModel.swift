@@ -13,8 +13,11 @@ import Firebase
 import SDWebImageSwiftUI
 
 class ChatMessageViewModel: ObservableObject {
+    @ObservedObject var profile = ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self))
     @Published var isDetailOpen: Bool = false
     @Published var message: MessageStruct = MessageStruct()
+    @Published var contact: ContactStruct = ContactStruct()
+    @Published var contactRelationship: visitContactRelationship = .unknown
 
     func loadDialog(auth: AuthModel, dialogId: String) {
         //DispatchQueue.global(qos: .utility).async {
@@ -189,7 +192,7 @@ class ChatMessageViewModel: ObservableObject {
     func editMessage() {
         print("edit message")
     }
-    
+
     func trashMessage(connectyDialog: ChatDialog, messageId: String, completion: @escaping () -> Void) {
         connectyDialog.removeMessage(withID: messageId) { (error) in
             if error != nil {
@@ -201,6 +204,29 @@ class ChatMessageViewModel: ObservableObject {
                 completion()
             }
         }
+    }
+    
+    func sendReplyReport(replyStruct: messageReplyStruct, completion: @escaping () -> Void) {
+        guard message.senderID != 0, message.dialogID != "" else { return }
+
+        let msg = Database.database().reference().child("Dialogs").child(message.dialogID).child(message.id).child("replies").child(replyStruct.id).child("reported")
+        
+        msg.observe(.value, with: { snapshot in
+            //let count = Int(snapshot.childrenCount)
+
+            let date = Date()
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: "en_US_POSIX")
+            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZ"
+            formatter.timeZone = TimeZone(abbreviation: "UTC")
+            let utcTimeZoneStr = formatter.string(from: date)
+
+            msg.updateChildValues(["\(UserDefaults.standard.integer(forKey: "currentUserID"))" : utcTimeZoneStr])
+            
+            self.sendPushNoti(userIDs: [NSNumber(value: Int(replyStruct.fromId) ?? 0)], title: "Reply Reported", message: "Your reply has been reported: \"\(self.message.text)\"")
+        })
+
+        completion()
     }
 
     func fetchMessage(messageId: String) -> MessageStruct {
@@ -216,6 +242,57 @@ class ChatMessageViewModel: ObservableObject {
         } catch {
             print(error.localizedDescription)
             return MessageStruct()
+        }
+    }
+    
+    func fetchUser() {
+        let config = Realm.Configuration(schemaVersion: 1)
+        do {
+            let realm = try Realm(configuration: config)
+            if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: self.message.senderID) {
+                self.contact = foundContact
+                self.contactRelationship = .contact
+            } else {
+                Request.users(withIDs: [NSNumber(value: self.message.senderID)], paginator: Paginator.limit(1, skip: 0), successBlock: { (paginator, users) in
+                    changeContactsRealmData.shared.observeFirebaseContactReturn(contactID: Int(users.first?.id ?? 0), completion: { contact in
+                        if let firstUser = users.first {
+                            let newContact = ContactStruct()
+                            newContact.id = Int(firstUser.id)
+                            newContact.fullName = firstUser.fullName ?? ""
+                            newContact.phoneNumber = firstUser.phone ?? "empty phone number"
+                            newContact.lastOnline = firstUser.lastRequestAt ?? Date()
+                            newContact.createdAccount = firstUser.createdAt ?? Date()
+                            newContact.avatar = PersistenceManager.shared.getCubeProfileImage(usersID: firstUser) ?? ""
+                            newContact.bio = contact.bio
+                            newContact.facebook = contact.facebook
+                            newContact.twitter = contact.twitter
+                            newContact.instagramAccessToken = contact.instagramAccessToken
+                            newContact.instagramId = contact.instagramId
+                            newContact.isPremium = contact.isPremium
+                            newContact.emailAddress = firstUser.email ?? "empty email address"
+                            newContact.website = firstUser.website ?? "empty website"
+
+                            self.contact = newContact
+                            self.contactRelationship = .notContact
+
+                            if ((self.profile.results.first?.contactRequests.contains(self.contact.id)) != nil) {
+                                self.contactRelationship = .pendingRequest
+                            } else if Chat.instance.contactList?.pendingApproval.count ?? 0 > 0 {
+                                for con in Chat.instance.contactList?.pendingApproval ?? [] {
+                                    if con.userID == UInt(self.contact.id) {
+                                        self.contactRelationship = .pendingRequest
+                                        break
+                                    }
+                                }
+                            }
+                        }
+                    })
+                }) { (error) in
+
+                }
+            }
+        } catch {
+            
         }
     }
 

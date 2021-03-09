@@ -226,7 +226,6 @@ struct ChatMessagesView: View {
                                                 .environmentObject(self.auth)
                                                 .contentShape(Rectangle())
                                                 .fixedSize(horizontal: false, vertical: true)
-                                                .animation(.spring(response: 0.58, dampingFraction: 0.6, blendDuration: 0))
                                                 .padding(.horizontal, 25)
                                                 .padding(.bottom, self.hasPrevious(index: message) ? -6 : 10)
                                                 .padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 95 : 0) + 32)

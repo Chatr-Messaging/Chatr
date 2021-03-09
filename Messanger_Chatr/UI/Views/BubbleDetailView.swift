@@ -10,12 +10,16 @@ import SwiftUI
 import SDWebImageSwiftUI
 import MapKit
 import Firebase
+import MobileCoreServices
+import ConnectyCube
+import RealmSwift
 
 struct BubbleDetailView: View {
     @EnvironmentObject var auth: AuthModel
     @ObservedObject var viewModel: ChatMessageViewModel
     @StateObject var imagePicker = KeyboardCardViewModel()
     var namespace: Namespace.ID
+    @Binding var newDialogFromSharedContact: Int
     @State var delayView: Bool = false
     @State var avatar: String = ""
     @State var lastOnline: Date = Date()
@@ -27,6 +31,8 @@ struct BubbleDetailView: View {
     @State var mainReplyText: String = ""
     @State var hasUserLiked: Bool = false
     @State var hasUserDisliked: Bool = false
+    @State var showContact: Bool = false
+    @State var replyScrollOffset: CGFloat = CGFloat.zero
     @State private var userTrackingMode: MapUserTrackingMode = .follow
     @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 25.7617, longitude: 80.1918), span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
     @State var messagePosition: messagePosition = .unknown
@@ -78,7 +84,12 @@ struct BubbleDetailView: View {
                                 .frame(width: 30, height: 30, alignment: .center)
                                 .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 0)
                         }
-                    }.padding(.horizontal).padding(.top, 10)
+                    }
+                    .padding(.horizontal)
+                    .padding(.top, 10)
+                    .onTapGesture {
+                        self.showContact.toggle()
+                    }
 
                     //Message Content View
                     if self.viewModel.message.image != "" {
@@ -194,23 +205,42 @@ struct BubbleDetailView: View {
                                 
                                 Spacer()
                                 Menu {
-                                    Button(action: {
-                                        print("more button")
-                                    }) {
-                                        Label("Add", systemImage: "plus.circle")
-                                    }
+                                    if self.viewModel.message.messageState != .error {
+                                        Button(action: {
+                                            if messagePosition == .right {
+                                                if let dialog = self.auth.selectedConnectyDialog {
+                                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                                    self.viewModel.trashMessage(connectyDialog: dialog, messageId: self.viewModel.message.id , completion: {
+                                                        print("delete button")
+                                                        self.viewModel.isDetailOpen = false
+                                                    })
+                                                }
+                                            } else {
+                                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                                print("report button")
+                                            }
+                                        }) {
+                                            Label(messagePosition == .right ? "Delete Message" : "Report Message", systemImage: messagePosition == .right ? "trash" : "exclamationmark.triangle")
+                                        }
+                                        .foregroundColor(.red)
 
-                                    Button(action: {
-                                        print("more button")
-                                    }) {
-                                        Label("Edit", systemImage: "pencil.circle")
-                                    }
-                                    
-                                    Button(action: {
-                                        print("more button")
-                                    }) {
-                                        Label("Delete", systemImage: "minus.circle")
-                                            .foregroundColor(.red)
+                                        Button(action: {
+                                            print("forward")
+                                        }) {
+                                            Label("Forward", systemImage: "arrowshape.turn.up.right")
+                                        }
+                                        
+                                        if self.viewModel.message.contactID == 0 && self.viewModel.message.longitude == 0 && self.viewModel.message.latitude == 0 && self.viewModel.message.imageType == "" {
+                                            Button(action: {
+                                                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                                UIPasteboard.general.setValue(self.viewModel.message.text, forPasteboardType: kUTTypePlainText as String)
+
+                                                self.auth.notificationtext = "Successfully copied message"
+                                                NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+                                            }) {
+                                                Label("Copy Text", systemImage: "doc.on.doc")
+                                            }
+                                        }
                                     }
                                 } label: {
                                     HStack {
@@ -258,6 +288,7 @@ struct BubbleDetailView: View {
             .padding(.horizontal, 10)
             .animation(.spring(response: 0.45, dampingFraction: 0.7, blendDuration: 0))
             .offset(y: self.cardDrag.height + 7)
+            .offset(y: -self.replyScrollOffset)
             .offset(y: self.height > 175 ? -height : 0)
             .shadow(color: Color.black.opacity(0.2), radius: 15, x: 0, y: 12)
             .zIndex(3)
@@ -319,13 +350,25 @@ struct BubbleDetailView: View {
                 ScrollView(.vertical, showsIndicators: false) {
                     LazyVStack(alignment: .leading) {
                         ForEach(self.replies.indices, id:\.self) { reply in
-                            MessageReplyCell(reply: self.replies[reply])
+                            MessageReplyCell(viewModel: self.viewModel, reply: self.replies[reply])
+                                .environmentObject(self.auth)
                                 .padding(.top, reply == 0 ? 10 : 0)
                                 .transition(AnyTransition.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(.easeOut(duration: 0.2)), removal: AnyTransition.move(edge: .bottom).animation(.easeOut(duration: 0.2))))
                         }.animation(.easeOut(duration: 0.4))
                     }.padding(.horizontal, 30)
-                }
+                    .background(GeometryReader {
+                        Color.clear.preference(key: ViewOffsetKey.self,
+                            value: -$0.frame(in: .named("replyScroll")).origin.y)
+                    })
+                    .onPreferenceChange(ViewOffsetKey.self) {
+                        print("offset >> \($0)")
+                        if $0 > 0 {
+                            self.replyScrollOffset = $0
+                        }
+                    }
+                }.coordinateSpace(name: "replyScroll")
                 .frame(maxHeight: (Constants.screenHeight / 7.5) + (self.cardDrag.height < 0 ? -self.cardDrag.height : 10))
+                .frame(minHeight: self.replyScrollOffset * 2)
                 .opacity(Double((300 - self.cardDrag.height) / 300))
                 .offset(y: -2)
 
@@ -376,6 +419,17 @@ struct BubbleDetailView: View {
         }.frame(width: Constants.screenWidth, height: Constants.screenHeight, alignment: .bottom)
         .edgesIgnoringSafeArea(.all)
         .background(BlurView(style: .systemUltraThinMaterial).opacity(Double((300 - self.cardDrag.height) / 300)))
+        .sheet(isPresented: self.$showContact, onDismiss: {
+            //if self.chatContact != 0 && self.chatContact != self.message.senderID {
+               print("need to open Chat view!!")
+            //}
+        }) {
+            NavigationView {
+                VisitContactView(fromDialogCell: true, newMessage: self.$newDialogFromSharedContact, dismissView: self.$showContact, viewState: .fromRequests, contactRelationship: self.viewModel.contactRelationship, contact: self.viewModel.contact)
+                    .environmentObject(self.auth)
+                    .edgesIgnoringSafeArea(.all)
+            }
+        }
         .onAppear() {
             UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
             self.hasUserLiked = self.viewModel.message.likedId.contains(self.auth.profile.results.first?.id ?? 0)
@@ -394,7 +448,8 @@ struct BubbleDetailView: View {
                 }
                 self.delayView = true
             })
-            
+
+            self.viewModel.fetchUser()
             self.observeInteractions()
             self.observeReplies()
         
@@ -475,11 +530,11 @@ struct BubbleDetailView: View {
                 }
             }
         })
-        
+
         msg.observe(.childRemoved, with: { snapRemoved in
-//            if let removeIndex = self.replies.firstIndex(where: self.replies.filter({ $0.id == snapRemoved.key }).first? ?? messageReplyStruct()) {
-//                self.replies.remove(at: removeIndex)
-//            }
+            if let index: Int = self.replies.firstIndex(where: { $0.id == snapRemoved.key }) {
+                self.replies.remove(at: index)
+            }
         })
     }
 }

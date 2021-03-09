@@ -19,6 +19,8 @@ struct messageReplyStruct {
 }
 
 struct MessageReplyCell: View {
+    @EnvironmentObject var auth: AuthModel
+    @ObservedObject var viewModel: ChatMessageViewModel
     @State var reply: messageReplyStruct = messageReplyStruct()
     @State var avatar: String = ""
     @State var fullName: String = ""
@@ -26,27 +28,31 @@ struct MessageReplyCell: View {
     var body: some View {
         HStack(alignment: .top) {
             Menu {
-                Text(self.fullName + "   \(reply.date.getElapsedInterval(lastMsg: "just now"))")
+                Text("sent \(self.viewModel.dateFormatTimeExtended(date: reply.date))")
                     .fontWeight(.bold)
 
-                Button(action: {
-                    print("view profile")
-                }) {
-                    Label("Add", systemImage: "plus.circle")
-                }
+                if self.reply.fromId == "\(UserDefaults.standard.integer(forKey: "currentUserID"))" {
+                    Button(action: {
+                        self.viewModel.deleteReply(messageId: self.reply.id, completion: {
+                            UINotificationFeedbackGenerator().notificationOccurred(.success)
 
-                Button(action: {
-                    print("delete button")
-                }) {
-                    Label("delete reply", systemImage: "trash")
-                        .foregroundColor(.red)
-                }
+                            self.auth.notificationtext = "Successfully Deleted Reply"
+                            NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+                        })
+                    }) {
+                        Label("Delete Reply", systemImage: "trash")
+                    }
+                } else {
+                    Button(action: {
+                        self.viewModel.sendReplyReport(replyStruct: self.reply, completion: {
+                            UINotificationFeedbackGenerator().notificationOccurred(.success)
 
-                Button(action: {
-                    print("report button")
-                }) {
-                    Label("report reply", systemImage: "exclamationmark.icloud")
-                        .foregroundColor(.red)
+                            self.auth.notificationtext = "Successfully Reported Reply"
+                            NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+                        })
+                    }) {
+                        Label("Report Reply", systemImage: "exclamationmark.icloud")
+                    }
                 }
             } label: {
                 ZStack {

@@ -511,7 +511,7 @@ struct mainHomeList: View {
                 }
 
                 if self.messageViewModel.isDetailOpen {
-                    BubbleDetailView(viewModel: self.messageViewModel, namespace: self.namespace)
+                    BubbleDetailView(viewModel: self.messageViewModel, namespace: self.namespace, newDialogFromSharedContact: self.$newDialogFromSharedContact)
                         .environmentObject(self.auth)
                         .frame(width: Constants.screenWidth, height: Constants.screenHeight, alignment: .center)
                         .zIndex(2)
