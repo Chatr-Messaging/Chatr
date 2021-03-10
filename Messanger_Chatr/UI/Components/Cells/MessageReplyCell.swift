@@ -44,7 +44,7 @@ struct MessageReplyCell: View {
                     }
                 } else {
                     Button(action: {
-                        self.viewModel.sendReplyReport(replyStruct: self.reply, completion: {
+                        self.viewModel.sendReplyReport(replyStruct: self.reply, name: self.auth.profile.results.last?.fullName ?? "A user", completion: {
                             UINotificationFeedbackGenerator().notificationOccurred(.success)
 
                             self.auth.notificationtext = "Successfully Reported Reply"

@@ -154,7 +154,7 @@ class ChatMessageViewModel: ObservableObject {
         let utcTimeZoneStr = formatter.string(from: date)
         
         newPostReference.updateChildValues(["fromId" : "\(UserDefaults.standard.integer(forKey: "currentUserID"))", "text" : text, "timestamp" : utcTimeZoneStr])
-        self.sendPushNoti(userIDs: [NSNumber(value: self.message.senderID)], title: "Reply", message: "\(name) replied to your message \"\(self.message.text)\"")
+        self.sendPushNoti(userIDs: [NSNumber(value: self.message.senderID)], title: "Reply", message: "\(name) replied \"\(text)\" to your message.")
 
         completion()
     }
@@ -206,7 +206,7 @@ class ChatMessageViewModel: ObservableObject {
         }
     }
     
-    func sendReplyReport(replyStruct: messageReplyStruct, completion: @escaping () -> Void) {
+    func sendReplyReport(replyStruct: messageReplyStruct, name: String, completion: @escaping () -> Void) {
         guard message.senderID != 0, message.dialogID != "" else { return }
 
         let msg = Database.database().reference().child("Dialogs").child(message.dialogID).child(message.id).child("replies").child(replyStruct.id).child("reported")
@@ -223,7 +223,7 @@ class ChatMessageViewModel: ObservableObject {
 
             msg.updateChildValues(["\(UserDefaults.standard.integer(forKey: "currentUserID"))" : utcTimeZoneStr])
             
-            self.sendPushNoti(userIDs: [NSNumber(value: Int(replyStruct.fromId) ?? 0)], title: "Reply Reported", message: "Your reply has been reported: \"\(self.message.text)\"")
+            self.sendPushNoti(userIDs: [NSNumber(value: Int(replyStruct.fromId) ?? 0)], title: "Reply Reported", message: "\(name) reported your reply: \"\(self.message.text)\"")
         })
 
         completion()

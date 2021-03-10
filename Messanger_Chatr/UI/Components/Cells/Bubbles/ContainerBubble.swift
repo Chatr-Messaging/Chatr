@@ -340,7 +340,7 @@ struct ContainerBubble: View {
     }
     
     func onEndedInteraction(value: DragGesture.Value) {
-        withAnimation(Animation.linear) { showInteractions = false }
+        withAnimation(Animation.linear) { self.showInteractions = false }
         
         if interactionSelected == "like" {
             UINotificationFeedbackGenerator().notificationOccurred(.success)

@@ -376,6 +376,7 @@ struct BubbleDetailView: View {
                     .environmentObject(self.auth)
                     .frame(height: self.height < 175 ? self.height : 175)
                     .padding(.horizontal, 30)
+                    .padding(.trailing, 22.5)
                     .background(
                         ZStack() {
                             RoundedRectangle(cornerRadius: 20).stroke(Color("lightGray"), lineWidth: 2).padding(.horizontal)
@@ -396,7 +397,7 @@ struct BubbleDetailView: View {
                                 Spacer()
                                 Button(action: {
                                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                    self.viewModel.sendReply(text: self.mainReplyText, name: self.fullName, completion: {
+                                    self.viewModel.sendReply(text: self.mainReplyText, name: self.auth.profile.results.last?.fullName ?? "A user", completion: {
                                         self.mainReplyText = ""
                                         self.height = 0
                                     })
