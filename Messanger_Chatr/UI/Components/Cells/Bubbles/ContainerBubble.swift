@@ -60,7 +60,7 @@ struct ContainerBubble: View {
             ZStack(alignment: self.messagePosition == .right ? .bottomTrailing : .bottomLeading) {
                //MARK: Main content section:
                 ZStack(alignment: self.messagePosition == .left ? .topTrailing : .topLeading) {
-                    ZStack(alignment: self.messagePosition == .left ? .bottomTrailing : .bottomLeading) {
+                    ZStack(alignment: self.messagePosition == .left ? .trailing : .leading) {
                         if self.message.image != "" {
                             AttachmentBubble(viewModel: self.viewModel, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior, namespace: self.namespace)
                                 .environmentObject(self.auth)
@@ -81,7 +81,6 @@ struct ContainerBubble: View {
                                 .frame(width: 22, height: 22, alignment: .center)
                                 .foregroundColor(.red)
                                 .offset(x: messagePosition == .right ? -35 : 35)
-                                .padding(.bottom, 10)
                         }
                         
                         if self.replyCount > 0 {
@@ -90,24 +89,23 @@ struct ContainerBubble: View {
                                 self.viewModel.message = self.message
                                 self.viewModel.isDetailOpen = true
                             }, label: {
-                                HStack(spacing: self.replyCount > 1 ? 8 : 0) {
+                                HStack(spacing: self.replyCount > 1 ? 5 : 0) {
                                     Image(systemName: "arrowshape.turn.up.left.fill")
                                         .resizable()
                                         .scaledToFit()
                                         .foregroundColor(.white)
-                                        .frame(width: 18, height: 18, alignment: .center)
+                                        .frame(width: 14, height: 14, alignment: .center)
 
                                     Text(self.replyCount > 1 ? "\(self.replyCount)" : "")
-                                        .font(.subheadline)
+                                        .font(.caption)
                                         .fontWeight(.bold)
                                         .foregroundColor(.white)
-                                }.padding(.horizontal, 10)
+                                }.padding(.horizontal, 7.5)
                                 .padding(.vertical, 5)
                             })
                             .background(RoundedRectangle(cornerRadius: 20).foregroundColor(.black).shadow(color: Color.black, radius: 3, x: 0, y: 3).opacity(0.5))
-                            .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.black, lineWidth: 1.5).opacity(0.6))
-                            .offset(x: messagePosition == .right ? (self.replyCount > 1 ? -65 : -50) : (self.replyCount > 1 ? 65 : 50))
-                            .padding(.bottom, 10)
+                            .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.black, lineWidth: 1).opacity(0.6))
+                            .offset(x: messagePosition == .right ? (self.replyCount > 1 ? -60 : -45) : (self.replyCount > 1 ? 60 : 45))
                         }
                     }.padding(.bottom, self.hasPrior ? 0 : 10)
                     .padding(.top, (self.message.likedId.count != 0 || self.message.dislikedId.count != 0) && (self.isPriorWider) ? 22 : 0)
@@ -231,7 +229,7 @@ struct ContainerBubble: View {
                 
                 //MARK: Bottomm User Info / Message Status Section
                 HStack(spacing: 4) {
-                    //if messagePosition == .right { Spacer() }
+                    if messagePosition == .right { Spacer() }
 
                     Text(self.subText.messageStatusText(message: self.message, positionRight: messagePosition == .right, isGroup: self.auth.selectedConnectyDialog?.type == .group || self.auth.selectedConnectyDialog?.type == .public, fullName: self.fullName))
                         .foregroundColor(self.message.messageState == .error ? .red : .gray)
@@ -242,7 +240,7 @@ struct ContainerBubble: View {
                         .multilineTextAlignment(messagePosition == .right ? .trailing : .leading)
                         .opacity(self.hasPrior ? 0 : 1)
 
-                    //if messagePosition == .left { Spacer() }
+                    if messagePosition == .left { Spacer() }
                 }
 
                 WebImage(url: URL(string: self.avatar))

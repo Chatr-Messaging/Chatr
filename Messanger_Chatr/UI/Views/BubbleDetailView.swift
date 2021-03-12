@@ -88,6 +88,7 @@ struct BubbleDetailView: View {
                     .padding(.horizontal)
                     .padding(.top, 10)
                     .onTapGesture {
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                         self.showContact.toggle()
                     }
 
@@ -172,8 +173,8 @@ struct BubbleDetailView: View {
 
                                         Text("\(self.viewModel.message.likedId.count)")
                                             .font(.subheadline)
-                                            .fontWeight(.medium)
-                                            .foregroundColor(.primary)
+                                            .fontWeight(.semibold)
+                                            .foregroundColor(self.hasUserLiked ? .white : .primary)
                                             .padding(.horizontal, 3)
                                     }.padding(.horizontal, 10)
                                     .padding(.vertical, 5)
@@ -196,8 +197,8 @@ struct BubbleDetailView: View {
 
                                         Text("\(self.viewModel.message.dislikedId.count)")
                                             .font(.subheadline)
-                                            .fontWeight(.medium)
-                                            .foregroundColor(.primary)
+                                            .fontWeight(.semibold)
+                                            .foregroundColor(self.hasUserDisliked ? .white : .primary)
                                             .padding(.horizontal, 3)
                                     }.padding(.horizontal, 10)
                                     .padding(.vertical, 5)

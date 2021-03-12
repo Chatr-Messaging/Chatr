@@ -102,14 +102,14 @@ class AuthModel: NSObject, ObservableObject {
     
     override init() {
         super.init()
-        anyCancellable = profile.objectWillChange.sink { (_) in
-            self.objectWillChange.send()
+        anyCancellable = profile.objectWillChange.sink { [weak self] (_) in
+            self?.objectWillChange.send()
         }
-        anyCancellable = messages.objectWillChange.sink { (_) in
-            self.objectWillChange.send()
+        anyCancellable = messages.objectWillChange.sink { [weak self] (_) in
+            self?.objectWillChange.send()
         }
-        anyCancellable1 = contacts.objectWillChange.sink { (_) in
-            self.objectWillChange.send()
+        anyCancellable1 = contacts.objectWillChange.sink { [weak self] (_) in
+            self?.objectWillChange.send()
         }
      }
     

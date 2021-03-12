@@ -379,41 +379,41 @@ struct mainHomeList: View {
                         ForEach(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }, id: \.id) { i in
                             GeometryReader { geo in
                                 DialogCell(dialogModel: i,
-                                           isOpen: self.$isLocalOpen,
-                                           activeView: self.$activeView,
-                                           selectedDialogID: self.$selectedDialogID)
-                                    .environmentObject(self.auth)
+                                           isOpen: $isLocalOpen,
+                                           activeView: $activeView,
+                                           selectedDialogID: $selectedDialogID)
+                                    .environmentObject(auth)
                                     .contentShape(Rectangle())
-                                    .position(x: self.isLocalOpen ? UIScreen.main.bounds.size.width / 2 : UIScreen.main.bounds.size.width / 2 - 20, y: i.isOpen ? 40 : 40)
+                                    .position(x: isLocalOpen ? UIScreen.main.bounds.size.width / 2 : UIScreen.main.bounds.size.width / 2 - 20, y: i.isOpen ? 40 : 40)
                                     .fixedSize(horizontal: false, vertical: true)
                                     .zIndex(i.isOpen ? 2 : 0)
-                                    .opacity(self.isLocalOpen ? (i.isOpen ? 1 : 0) : 1)
-                                    .offset(y: i.isOpen && self.isLocalOpen ? -geo.frame(in: .global).minY + (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 50 : 25) : 110) : self.emptyQuickSnaps ? -45 : 50)
-                                    .offset(y: self.isLocalOpen ? self.activeView.height : 0)
-                                    .shadow(color: Color.black.opacity(self.isLocalOpen ? (self.colorScheme == .dark ? 0.25 : 0.15) : 0.15), radius: self.isLocalOpen ? 15 : 8, x: 0, y: self.isLocalOpen ? (self.colorScheme == .dark ? 15 : 5) : 5)
+                                    .opacity(isLocalOpen ? (i.isOpen ? 1 : 0) : 1)
+                                    .offset(y: i.isOpen && isLocalOpen ? -geo.frame(in: .global).minY + (emptyQuickSnaps ? (UIDevice.current.hasNotch ? 50 : 25) : 110) : emptyQuickSnaps ? -45 : 50)
+                                    .offset(y: isLocalOpen ? activeView.height : 0)
+                                    .shadow(color: Color.black.opacity(isLocalOpen ? (colorScheme == .dark ? 0.25 : 0.15) : 0.15), radius: isLocalOpen ? 15 : 8, x: 0, y: self.isLocalOpen ? (colorScheme == .dark ? 15 : 5) : 5)
                                     .animation(.spring(response: 0.45, dampingFraction: 0.95, blendDuration: 0))
                                     .id(i.id)
                                     .onTapGesture {
-                                        self.onCellTapGesture(id: i.id, dialogType: i.dialogType)
+                                        onCellTapGesture(id: i.id, dialogType: i.dialogType)
                                     }.simultaneousGesture(DragGesture(minimumDistance: i.isOpen ? 0 : 500).onChanged { value in
                                         guard value.translation.height < 150 else { return }
                                         guard value.translation.height > 0 else { return }
                                         
-                                        self.activeView = value.translation
+                                        activeView = value.translation
                                     }.onEnded { value in
-                                        if self.activeView.height > 50 {
-                                            self.onCellTapGesture(id: i.id, dialogType: i.dialogType)
+                                        if activeView.height > 50 {
+                                            onCellTapGesture(id: i.id, dialogType: i.dialogType)
                                         }
-                                        self.activeView.height = .zero
+                                        activeView.height = .zero
                                     })
                             }.frame(height: 75, alignment: .center)
-                            .padding(.horizontal, self.isLocalOpen && i.isOpen ? 0 : 20)
+                            .padding(.horizontal, isLocalOpen && i.isOpen ? 0 : 20)
                         }
                         .disabled(self.disableDialog)
                         .onChange(of: UserDefaults.standard.bool(forKey: "localOpen")) { _ in
-                            self.disableDialog = true
+                            disableDialog = true
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                self.disableDialog = false
+                                disableDialog = false
                             }
                         }
                         //.onAppear {

@@ -196,7 +196,7 @@ class changeContactsRealmData {
         })
     }
     
-    func observeFirebaseContactReturn(contactID: Int, completion: @escaping (ContactStruct) -> ()){
+    func observeFirebaseContactReturn(contactID: Int, completion: @escaping (ContactStruct) -> ()) {
         print("starting observe firebase CONTACT! return")
         let user = Database.database().reference().child("Users").child("\(contactID)")
         user.observeSingleEvent(of: .value, with: { (snapshot: DataSnapshot) in

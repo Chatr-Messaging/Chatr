@@ -36,6 +36,7 @@ struct VisitContactView: View {
     @State var profileViewSize = CGSize.zero
     @State var selectedImageUrl = ""
     @State var contactWebsiteUrl: String = ""
+    @State var scrollOffset: CGFloat = CGFloat.zero
     @State var quickSnapViewState: QuickSnapViewingState = .closed
     @State var mailResult: Result<MFMailComposeResult, Error>? = nil
     @State var isShowingMailView = false
@@ -51,6 +52,14 @@ struct VisitContactView: View {
                 //MARK: Top Profile
                 topHeaderContactView(viewModel: self.viewModel, contact: self.$contact, quickSnapViewState: self.$quickSnapViewState, isProfileImgOpen: self.$isProfileImgOpen, isProfileBioOpen: self.$isProfileBioOpen, selectedImageUrl: self.$selectedImageUrl)
                     .padding(.top, 10)
+                    .background(GeometryReader {
+                        Color.clear.preference(key: ViewOffsetKey.self,
+                            value: -$0.frame(in: .named("visitContact-scroll")).origin.y)
+                    })
+                    .onPreferenceChange(ViewOffsetKey.self) {
+                        print("offset >> \($0)")
+                        self.scrollOffset = $0
+                    }
 
                 //MARK: Action Buttons
                 actionButtonView(viewModel: self.viewModel, contact: self.$contact, quickSnapViewState: self.$quickSnapViewState, contactRelationship: self.$contactRelationship, newMessage: self.$newMessage, dismissView: self.$dismissView)
@@ -72,8 +81,8 @@ struct VisitContactView: View {
                             Text(self.contact.phoneNumber.format(phoneNumber: String(self.contact.phoneNumber.dropFirst())))
                                 .font(.none)
                                 .fontWeight(.none)
-                                .background(self.contact.isInfoPrivate ? Color.secondary : Color.clear)
-                                .foregroundColor(self.contact.isInfoPrivate ? .clear : .primary)
+                                .background((self.contact.isInfoPrivate && self.contactRelationship != .contact) || (self.contactRelationship != .pendingRequestForYou && self.contactRelationship != .contact && self.contact.id != UserDefaults.standard.integer(forKey: "currentUserID")) ? Color.secondary : Color.clear)
+                                .foregroundColor((self.contact.isInfoPrivate && self.contactRelationship != .contact) || (self.contactRelationship != .pendingRequestForYou && self.contactRelationship != .contact && self.contact.id != UserDefaults.standard.integer(forKey: "currentUserID")) ? .clear : .primary)
                                 
                             Spacer()
                         }.padding(.horizontal)
@@ -507,12 +516,15 @@ struct VisitContactView: View {
                 //MARK: Footer Section
                 FooterInformation(middleText: "joined \(self.contact.createdAccount.getFullElapsedInterval())")
                     .padding(.bottom, 30)
-            }.background(Color("bgColor"))
+            }
+            .coordinateSpace(name: "visitContact-scroll")
+            .background(Color("bgColor"))
             .popup(isPresented: self.$receivedNotification, type: .floater(), position: .bottom, animation: Animation.spring(), autohideIn: 4, closeOnTap: true) {
                 NotificationSection()
                     .environmentObject(self.auth)
             }
             .navigationBarHidden(self.quickSnapViewState == .camera || self.quickSnapViewState == .takenPic)
+            .navigationTitle(self.scrollOffset > 152 ? self.contact.fullName : "")
             .navigationBarItems(leading:
                 Button(action: {
                     withAnimation {
@@ -848,9 +860,11 @@ struct VisitContactView: View {
                 break
             }
         }
-                
-        if (self.auth.profile.results.first?.contactRequests.contains(self.contact.id) != nil) {
-            self.contactRelationship = .pendingRequestForYou
+          
+        if let result = self.auth.profile.results.first?.contactRequests.contains(self.contact.id) {
+            if result {
+                self.contactRelationship = .pendingRequestForYou
+            }
         }
         
         changeContactsRealmData.shared.observeFirebaseContactReturn(contactID: self.connectyContact.id != 0 ? Int(self.connectyContact.id) : self.contact.id, completion: { firebaseContact in
@@ -955,7 +969,7 @@ struct topHeaderContactView: View {
                                             .frame(width: 22, height: 22, alignment: .center)
                                             .foregroundColor(Color("main_blue"))
                                     }
-                                    
+
                                     Text(self.contact.fullName)
                                         .font(.system(size: 26))
                                         .fontWeight(.semibold)
@@ -964,7 +978,7 @@ struct topHeaderContactView: View {
                                         .multilineTextAlignment(.leading)
                                 }.offset(y: contact.isPremium ? 3 : 0)
                                 
-                                Text(self.contact.isOnline ? "online now" : "last online \(contact.lastOnline.getElapsedInterval(lastMsg: "moments")) ago")
+                                Text(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? "your profile" : (self.contact.isOnline ? "online now" : "last online \(contact.lastOnline.getElapsedInterval(lastMsg: "moments")) ago"))
                                     .font(.subheadline)
                                     .fontWeight(.none)
                                     .background(self.contact.isInfoPrivate ? Color.secondary : Color.clear)

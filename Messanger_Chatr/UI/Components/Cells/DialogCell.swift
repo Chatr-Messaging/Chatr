@@ -162,7 +162,9 @@ struct DialogCell: View {
                     
                     Spacer()
                     HStack {
-                        Text(self.dialogModel.isOpen ? "" : "\(self.dialogModel.lastMessageDate.getElapsedInterval(lastMsg: "now"))")
+                        let timeAgo = self.dialogModel.lastMessageDate.getElapsedInterval(lastMsg: "now")
+
+                        Text(self.dialogModel.isOpen || timeAgo == "20 yrs" ? "" : "\(timeAgo)")
                                 .font(.subheadline)
                                 .fontWeight(.regular)
                                 .foregroundColor(.secondary)
@@ -175,8 +177,7 @@ struct DialogCell: View {
                             .frame(width: self.dialogModel.isOpen ? 0 : 7, height: self.dialogModel.isOpen ? 0 : 10, alignment: .center)
                             .opacity(dialogModel.isOpen ? 0 : 1)
                     }
-                }.frame(height: 25)
-                .offset(x: self.groupOccUserAvatar.count == 2 ? -4 : -2)
+                }.offset(x: self.groupOccUserAvatar.count == 2 ? -4 : -2)
 
                 HStack(spacing: 5) {
                     Text((self.dialogModel.isOpen ? self.dialogModel.dialogType == "private" ? (self.privateDialogContact.isOnline ? "online now" : "last online \(self.privateDialogContact.lastOnline.getElapsedInterval(lastMsg: "moments")) ago") : "\(self.dialogModel.occupentsID.count) members \(self.auth.onlineCount != 0 ? "•" : "")" : dialogModel.lastMessage))

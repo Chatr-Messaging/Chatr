@@ -39,6 +39,7 @@ struct VisitGroupChannelView: View {
     @State var isRemoving: Bool = false
     @State var isAdmin: Bool = false
     @State var isOwner: Bool = false
+    @State var scrollOffset: CGFloat = CGFloat.zero
 
     var body: some View {
         ZStack {
@@ -167,8 +168,17 @@ struct VisitGroupChannelView: View {
                                 .offset(y: 10)
                             }
                         }
-                    }.padding(.top, 40)
+                    }
+                    .padding(.top, 40)
                     .padding(.bottom, 15)
+//                    .background(GeometryReader {
+//                        Color.clear.preference(key: ViewOffsetKey.self,
+//                            value: -$0.frame(in: .named("visitGroup-scroll")).origin.y)
+//                    })
+//                    .onPreferenceChange(ViewOffsetKey.self) {
+//                        print("offset >> \($0)")
+//                        self.scrollOffset = $0
+//                    }
                     
                     //MARK: Action Buttons
                     HStack(alignment: .center, spacing: self.dialogRelationship == .subscribed ? 40 : 20) {
@@ -559,9 +569,10 @@ struct VisitGroupChannelView: View {
                     FooterInformation(middleText: "Created: \(self.dialogModel.createdAt.getFullElapsedInterval())")
                         .padding(.vertical)
 
-                }.navigationBarItems(leading:
+                }//.coordinateSpace(name: "visitGroup-scroll")
+                //.navigationTitle(self.scrollOffset > 152 ? self.dialogModel.fullName : "")
+                .navigationBarItems(leading:
                                     Button(action: {
-                                        print("Done btn tap \(self.fromDialogCell)")
                                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                         withAnimation {
                                             self.presentationMode.wrappedValue.dismiss()
@@ -661,7 +672,7 @@ struct VisitGroupChannelView: View {
             self.isOwner = self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? true : false
             self.isAdmin = self.dialogModel.adminID.contains(UserDefaults.standard.integer(forKey: "currentUserID")) ? true : false
             self.currentUserIsPowerful = self.isOwner || self.isAdmin ? true : false
-            self.dialogModelMemebers = self.dialogModel.occupentsID.filter { $0 != UserDefaults.standard.integer(forKey: "currentUserID") }
+            self.dialogModelMemebers = self.dialogModel.occupentsID.filter { $0 != 0 } //.filter { $0 != UserDefaults.standard.integer(forKey: "currentUserID") }
             self.dialogModelAdmins = self.dialogModel.occupentsID.filter { $0 == self.dialogModel.owner || self.dialogModel.adminID.contains($0)}
         }
     }

@@ -31,7 +31,7 @@ struct MessageReplyCell: View {
                 Text("sent \(self.viewModel.dateFormatTimeExtended(date: reply.date))")
                     .fontWeight(.bold)
 
-                if self.reply.fromId == "\(UserDefaults.standard.integer(forKey: "currentUserID"))" {
+                if self.reply.fromId == "\(UserDefaults.standard.integer(forKey: "currentUserID"))" || self.viewModel.message.senderID == UserDefaults.standard.integer(forKey: "currentUserID") {
                     Button(action: {
                         self.viewModel.deleteReply(messageId: self.reply.id, completion: {
                             UINotificationFeedbackGenerator().notificationOccurred(.success)
@@ -42,7 +42,9 @@ struct MessageReplyCell: View {
                     }) {
                         Label("Delete Reply", systemImage: "trash")
                     }
-                } else {
+                }
+
+                if self.reply.fromId != "\(UserDefaults.standard.integer(forKey: "currentUserID"))" {
                     Button(action: {
                         self.viewModel.sendReplyReport(replyStruct: self.reply, name: self.auth.profile.results.last?.fullName ?? "A user", completion: {
                             UINotificationFeedbackGenerator().notificationOccurred(.success)

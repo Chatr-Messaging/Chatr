@@ -448,17 +448,22 @@ struct addNewContactView: View {
         do {
             let realm = try Realm(configuration: config)
             if let contact = realm.object(ofType: ContactStruct.self, forPrimaryKey: id) {
-                if contact.id != Session.current.currentUserID && contact.isMyContact == false {
-                    for i in Chat.instance.contactList?.pendingApproval ?? [] {
-                        if i.userID == contact.id {
-                            return false
-                        }
-                    }
-                    return true
-                } else {
+                guard contact.id != Session.current.currentUserID && contact.isMyContact == false else {
                     return false
                 }
+                
+                return true
             } else {
+                for i in Chat.instance.contactList?.pendingApproval ?? [] {
+                    if i.userID == id {
+                        return false
+                    }
+                }
+  
+                guard !(self.auth.profile.results.first?.contactRequests.contains(Int(id)) ?? false) else {
+                    return false
+                }
+
                 return true
             }
         } catch {
