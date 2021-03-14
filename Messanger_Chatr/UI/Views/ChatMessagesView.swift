@@ -134,9 +134,8 @@ struct ChatMessagesView: View {
                                 }
                             }.padding(.top, 15)
                             .onAppear {
+                                self.topAvatarUrls.removeAll()
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                    self.topAvatarUrls.removeAll()
-
                                     for occu in changeDialogRealmData.shared.getRealmDialog(dialogId: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").occupentsID {
                                         self.viewModel.getUserAvatar(senderId: occu) { (avatar, _, _) in
                                             guard avatar != "self" else {
@@ -315,37 +314,36 @@ struct ChatMessagesView: View {
             .frame(width: Constants.screenWidth)
             .contentShape(Rectangle())
             .onAppear() {
-                DispatchQueue.global(qos: .utility).async {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        self.loadDialog()
-                        self.delayViewMessages = true
-                    }
-                    
-                    if !Session.current.tokenHasExpired {
-                        Request.countOfMessages(forDialogID: self.dialogID, extendedRequest: ["sort_desc" : "lastMessageDate"], successBlock: { count in
-                            if self.auth.messages.selectedDialog(dialogID: self.dialogID).count != Int(count) {
+                DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + 0.5) {
+                    viewModel.loadDialog(auth: auth, dialogId: dialogID)
+                    delayViewMessages = true
+
+                    guard !Session.current.tokenHasExpired else { return }
+
+                    Request.countOfMessages(forDialogID: dialogID, extendedRequest: ["sort_desc" : "lastMessageDate"], successBlock: { count in
+                        DispatchQueue.main.async {
+                            self.totalMessageCount = Int(count)
+
+                            if self.auth.messages.selectedDialog(dialogID: dialogID).count != Int(count) {
                                 print("local and pulled do not match... pulling delta: \(count) && \(self.auth.messages.selectedDialog(dialogID: self.dialogID).count)")
-                                changeMessageRealmData.shared.getMessageUpdates(dialogID: self.dialogID, limit: pageShowCount * self.scrollPage, skip: 0, completion: { _ in })
-                            }
 
+                                changeMessageRealmData.shared.getMessageUpdates(dialogID: dialogID, limit: pageShowCount * scrollPage, skip: 0, completion: { _ in
+                                })
+                            }
+                        }
+
+                        Request.totalUnreadMessageCountForDialogs(withIDs: Set([dialogID]), successBlock: { (unread, _) in
                             DispatchQueue.main.async {
-                                print("the total count for this dialog: \(count)")
-                                self.totalMessageCount = Int(count)
+                                print("the unread count for this dialog: \(unread)")
+                                unreadMessageCount = Int(unread)
                             }
                         })
-
-                        Request.totalUnreadMessageCountForDialogs(withIDs: Set([self.dialogID]), successBlock: { (count, dialogs) in
-                            DispatchQueue.main.async {
-                                print("the count for this dialog: \(count)")
-                                self.unreadMessageCount = Int(count)
-                            }
-                        })
-                    }
+                    })
                 }
             }
         }
     }
-    
+
     func hasPrevious(index: Int) -> Bool {
         let result = self.auth.messages.selectedDialog(dialogID: self.dialogID)
 
@@ -362,65 +360,5 @@ struct ChatMessagesView: View {
         let result = self.auth.messages.selectedDialog(dialogID: self.dialogID)
 
         return result[index] != result.first ? (result[index].senderID == result[index - 1].senderID && (result[index].date >= result[index - 1].date.addingTimeInterval(86400) ? false : true) && result[index].bubbleWidth > result[index - 1].bubbleWidth ? false : true) : true //- (result[index].dislikedId.count >= 1 && result[index].likedId.count >= 1 ? 48 : 16)
-    }
-    
-    func loadDialog() {
-        DispatchQueue.global(qos: .utility).async {
-            Request.updateDialog(withID: self.dialogID, update: UpdateChatDialogParameters(), successBlock: { dialog in
-                self.auth.selectedConnectyDialog = dialog
-                
-                dialog.onUserIsTyping = { (userID: UInt) in
-                    if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
-                        changeMessageRealmData.shared.addTypingMessage(userID: String(userID), dialogID: self.dialogID)
-                    }
-                }
-
-                dialog.onUserStoppedTyping = { (userID: UInt) in
-                    if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
-                        changeMessageRealmData.shared.removeTypingMessage(userID: String(userID), dialogID: self.dialogID)
-                    }
-                }
-
-                if dialog.type == .group || dialog.type == .public {
-                    dialog.requestOnlineUsers(completionBlock: { (online, error) in
-                        print("The online count is!!: \(String(describing: online?.count))")
-                        self.auth.onlineCount = online?.count ?? 0
-                    })
-
-                    dialog.onUpdateOccupant = { (userID: UInt) in
-                        print("update occupant: \(userID)")
-                        self.auth.setOnlineCount()
-                    }
-
-                    dialog.onJoinOccupant = { (userID: UInt) in
-                        print("on join occupant: \(userID)")
-                        self.auth.setOnlineCount()
-                    }
-
-                    dialog.onLeaveOccupant = { (userID: UInt) in
-                        print("on leave occupant: \(userID)")
-                        self.auth.setOnlineCount()
-                    }
-
-                    if Chat.instance.isConnected || !Chat.instance.isConnecting {
-                        if !dialog.isJoined() {
-                            dialog.join(completionBlock: { error in
-                                print("we have joined the dialog!! \(String(describing: error))")
-                                dialog.sendUserStoppedTyping()
-                            })
-                        }
-                    } else {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                            if !dialog.isJoined() {
-                                dialog.join(completionBlock: { error in
-                                    print("we have joined the dialog after atempt 2!! \(String(describing: error))")
-                                    dialog.sendUserStoppedTyping()
-                                })
-                            }
-                        }
-                    }
-                }
-            })
-        }
     }
 }

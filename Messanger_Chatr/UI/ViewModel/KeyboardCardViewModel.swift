@@ -42,9 +42,15 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
     func openImagePicker(completion: @escaping () -> Void) {
         if fetchedPhotos.isEmpty {
             fetchPhotos(completion: {
-                completion()
+              //  DispatchQueue.main.async {
+                    completion()
+              //  }
             })
-        } else { completion() }
+        } else {
+            //DispatchQueue.main.async {
+                completion()
+            //}
+        }
     }
     
     func fetchPhotos(completion: @escaping () -> Void) {
@@ -63,7 +69,7 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
             completion()
         }
     }
-    
+
     func setUpAuthStatus() {
         PHPhotoLibrary.requestAuthorization(for: .readWrite) { [self] (status) in
             DispatchQueue.main.async {
@@ -75,7 +81,7 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
                 }
             }
         }
-        
+
         // Registering Observer...
         PHPhotoLibrary.shared().register(self)
     }
@@ -147,14 +153,18 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
             getImageFromAsset(asset: asset, size: PHImageManagerMaximumSize) { (image) in
                 DispatchQueue.main.async {
                     guard let imgRemove = self.imageData.firstIndex(of: image) else {
-                        self.imageData.append(image)
-                        completion()
-                        
+                        DispatchQueue.main.async {
+                            self.imageData.append(image)
+                            completion()
+                        }
+
                         return
                     }
-                    
-                    self.videoData.remove(at: imgRemove)
-                    completion()
+
+                    DispatchQueue.main.async {
+                        self.videoData.remove(at: imgRemove)
+                        completion()
+                    }
                 }
             }
         }
@@ -169,13 +179,17 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
                 DispatchQueue.main.async {
                     guard let vidRemove = self.videoData.firstIndex(of: videoUrl) else {
                         self.videoData.append(videoUrl)
-                        completion()
+                        DispatchQueue.main.async {
+                            completion()
+                        }
                         
                         return
                     }
 
                     self.videoData.remove(at: vidRemove)
-                    completion()
+                    DispatchQueue.main.async {
+                        completion()
+                    }
                 }
             }
         }

@@ -165,7 +165,9 @@ class changeProfileRealmDate {
 
                     realm.add(oldData, update: .all)
                     print("Succsessfuly updated Profile to Realm!")
-                    completion()
+                    DispatchQueue.main.async {
+                        completion()
+                    }
                 })
             } else {
                 let newData = ProfileStruct()
@@ -180,12 +182,16 @@ class changeProfileRealmDate {
                 try realm.safeWrite({
                     realm.add(newData, update: .all)
                     print("Succsessfuly added new Profile to Realm!")
-                    completion()
+                    DispatchQueue.main.async {
+                        completion()
+                    }
                 })
             }
         } catch {
             print(error.localizedDescription)
-            completion()
+            DispatchQueue.main.async {
+                completion()
+            }
         }
     }
     

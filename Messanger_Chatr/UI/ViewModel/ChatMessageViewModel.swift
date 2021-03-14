@@ -20,63 +20,51 @@ class ChatMessageViewModel: ObservableObject {
     @Published var contactRelationship: visitContactRelationship = .unknown
 
     func loadDialog(auth: AuthModel, dialogId: String) {
-        //DispatchQueue.global(qos: .utility).async {
-            Request.updateDialog(withID: dialogId, update: UpdateChatDialogParameters(), successBlock: { dialog in
-                auth.selectedConnectyDialog = dialog
-                dialog.sendUserStoppedTyping()
+        Request.updateDialog(withID: dialogId, update: UpdateChatDialogParameters(), successBlock: { dialog in
+            auth.selectedConnectyDialog = dialog
+            dialog.sendUserStoppedTyping()
 
-                dialog.onUserIsTyping = { (userID: UInt) in
-                    if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
-                        changeMessageRealmData.shared.addTypingMessage(userID: String(userID), dialogID: dialogId)
-                    }
+            dialog.onUserIsTyping = { (userID: UInt) in
+                if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
+                    changeMessageRealmData.shared.addTypingMessage(userID: String(userID), dialogID: dialogId)
                 }
+            }
 
-                dialog.onUserStoppedTyping = { (userID: UInt) in
-                    if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
-                        changeMessageRealmData.shared.removeTypingMessage(userID: String(userID), dialogID: dialogId)
-                    }
+            dialog.onUserStoppedTyping = { (userID: UInt) in
+                if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
+                    changeMessageRealmData.shared.removeTypingMessage(userID: String(userID), dialogID: dialogId)
                 }
+            }
 
-                if dialog.type == .group || dialog.type == .public {
-                    dialog.requestOnlineUsers(completionBlock: { (online, error) in
-                        print("The online count is!!: \(String(describing: online?.count))")
-                        auth.onlineCount = online?.count ?? 0
-                    })
-
-                    dialog.onUpdateOccupant = { (userID: UInt) in
-                        print("update occupant: \(userID)")
-                        auth.setOnlineCount()
-                    }
-
-                    dialog.onJoinOccupant = { (userID: UInt) in
-                        print("on join occupant: \(userID)")
-                        auth.setOnlineCount()
-                    }
-
-                    dialog.onLeaveOccupant = { (userID: UInt) in
-                        print("on leave occupant: \(userID)")
-                        auth.setOnlineCount()
-                    }
-
-//                    if Chat.instance.isConnected || !Chat.instance.isConnecting {
-//                        if !dialog.isJoined() {
-//                            dialog.join(completionBlock: { error in
-//                                print("we have joined the dialog!! \(String(describing: error))")
-//                            })
-//                        }
-//                    } else {
-//                        DispatchQueue.main.async {
-//                            ChatrApp.connect()
-//                            if !dialog.isJoined() {
-//                                dialog.join(completionBlock: { error in
-//                                    print("we have joined the dialog after atempt 2!! \(String(describing: error))")
-//                                })
-//                            }
-//                        }
-//                    }
-                }
+            guard dialog.type == .group || dialog.type == .public else { return }
+            
+            dialog.requestOnlineUsers(completionBlock: { (online, error) in
+                print("The online count is!!: \(String(describing: online?.count))")
+                //self.onlineCount = online?.count ?? 0
+                self.setOnlineCount(dialog: dialog)
             })
-        //}
+
+            dialog.onUpdateOccupant = { (userID: UInt) in
+                print("update occupant: \(userID)")
+                self.setOnlineCount(dialog: dialog)
+            }
+
+            dialog.onJoinOccupant = { (userID: UInt) in
+                print("on join occupant: \(userID)")
+                self.setOnlineCount(dialog: dialog)
+            }
+
+            dialog.onLeaveOccupant = { (userID: UInt) in
+                print("on leave occupant: \(userID)")
+                self.setOnlineCount(dialog: dialog)
+            }
+
+            guard !dialog.isJoined(), Chat.instance.isConnected else { return }
+
+            dialog.join(completionBlock: { _ in
+                self.setOnlineCount(dialog: dialog)
+            })
+        })
     }
 
     func getUserAvatar(senderId: Int, compleation: @escaping (String, String, Date) -> Void) {
@@ -156,7 +144,9 @@ class ChatMessageViewModel: ObservableObject {
         newPostReference.updateChildValues(["fromId" : "\(UserDefaults.standard.integer(forKey: "currentUserID"))", "text" : text, "timestamp" : utcTimeZoneStr])
         self.sendPushNoti(userIDs: [NSNumber(value: self.message.senderID)], title: "Reply", message: "\(name) replied \"\(text)\" to your message.")
 
-        completion()
+        DispatchQueue.main.async {
+            completion()
+        }
     }
     
     func deleteReply(messageId: String, completion: @escaping () -> Void) {
@@ -166,18 +156,24 @@ class ChatMessageViewModel: ObservableObject {
 
         msg.child("\(messageId)").removeValue()
 
-        completion()
+        DispatchQueue.main.async {
+            completion()
+        }
     }
     
     func fetchTotalReplyCount(completion: @escaping (Int) -> Void) {
         guard self.message.id.description != "" else {
-            completion(0)
+            DispatchQueue.main.async {
+                completion(0)
+            }
             return
         }
         Database.database().reference().child("Dialogs").child(message.dialogID).child(message.id).child("replies").observe(.value, with: {
             snapshot in
             let count = Int(snapshot.childrenCount)
-            completion(count)
+            DispatchQueue.main.async {
+                completion(count)
+            }
         })
     }
     
@@ -201,7 +197,9 @@ class ChatMessageViewModel: ObservableObject {
             } else {
                 changeMessageRealmData.shared.updateMessageState(messageID: messageId, messageState: .deleted)
 
-                completion()
+                DispatchQueue.main.async {
+                    completion()
+                }
             }
         }
     }
@@ -226,7 +224,9 @@ class ChatMessageViewModel: ObservableObject {
             self.sendPushNoti(userIDs: [NSNumber(value: Int(replyStruct.fromId) ?? 0)], title: "Reply Reported", message: "\(name) reported your reply: \"\(self.message.text)\"")
         })
 
-        completion()
+        DispatchQueue.main.async {
+            completion()
+        }
     }
 
     func fetchMessage(messageId: String) -> MessageStruct {
@@ -294,6 +294,28 @@ class ChatMessageViewModel: ObservableObject {
         } catch {
             
         }
+    }
+    
+    func setOnlineCount(dialog: ChatDialog?) {
+        guard let dialog = dialog, dialog.type == .group || dialog.type == .public else {
+            return
+        }
+
+        dialog.requestOnlineUsers(completionBlock: { (online, error) in
+            print("the online count is: \(online?.count ?? 0)")
+            let config = Realm.Configuration(schemaVersion: 1)
+            do {
+                let realm = try Realm(configuration: config)
+                if let foundContact = realm.object(ofType: DialogStruct.self, forPrimaryKey: dialog.id) {
+                    try realm.safeWrite ({
+                        foundContact.onlineUserCount = online?.count ?? 0
+                        realm.add(foundContact, update: .all)
+                    })
+                }
+            } catch {
+                print(error.localizedDescription)
+            }
+        })
     }
 
     func sendPushNoti(userIDs: [NSNumber], title: String, message: String) {

@@ -89,7 +89,10 @@ class PersistenceManager: ObservableObject {
             }
             self.save()
         })
-        completion()
+        
+        DispatchQueue.main.async {
+            completion()
+        }
     }
 
     func fetchDialogs(dialogID: String? = "", nameText: String? = "") -> [UserDialogs] {
@@ -130,7 +133,9 @@ class PersistenceManager: ObservableObject {
             }
             self.save()
         })
-        completion()
+        DispatchQueue.main.async {
+            completion()
+        }
     }
     
     func fetchMessages(dialogID: String? = "", messageID: String? = "") -> [ChatMessages] {

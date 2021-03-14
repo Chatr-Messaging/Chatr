@@ -87,9 +87,8 @@ class AuthModel: NSObject, ObservableObject {
     @Published public var inPaymentProgress = false
     @Published public var subscriptionStatus: PremiumSubscriptionStatus = UserDefaults.standard.bool(forKey: "premiumSubscriptionStatus") ? .subscribed : .notSubscribed
     @Published public var notificationtext: String = ""
-    
-    @Published var avitarProgress: CGFloat = CGFloat(0.0)
-    @Published var onlineCount: Int = 0
+
+    @Published var avatarProgress: CGFloat = CGFloat(0.0)
     
     @ObservedObject var profile = ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self))
     @ObservedObject var contacts = ContactsRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ContactStruct.self))
@@ -361,7 +360,7 @@ class AuthModel: NSObject, ObservableObject {
         
         Request.uploadFile(with: data!, fileName: "user's_profileImg", contentType: "image/jpeg", isPublic: false, progressBlock: { (progress) in
             print("the upload progress is: \(progress)")
-            self.avitarProgress = CGFloat(progress)
+            self.avatarProgress = CGFloat(progress)
         }, successBlock: { (blob) in
             let parameters = UpdateUserParameters()
             let customData = ["avatar_uid" : blob.uid]
@@ -523,21 +522,8 @@ class AuthModel: NSObject, ObservableObject {
 
         dialog.sendUserStoppedTyping()
         dialog.leave { error in
-            self.onlineCount = 0
             print("just left dialog! error?: \(String(describing: error?.localizedDescription))")
         }
-    }
-    
-    public func setOnlineCount() {
-        guard let dialog = self.selectedConnectyDialog, dialog.type == .group || dialog.type == .public else {
-            return
-        }
-        
-        self.onlineCount = 0
-        dialog.requestOnlineUsers(completionBlock: { (online, error) in
-            self.onlineCount = online?.count ?? 0
-            print("the online count is: \(self.onlineCount)")
-        })
     }
     
     func createTopFloater(alertType: String, message: String) -> some View {
@@ -591,7 +577,6 @@ class AuthModel: NSObject, ObservableObject {
 //                if dialog.id == dialogModel.id {
 //                    self.selectedConnectyDialog = dialog
 //                    
-//                    self.setOnlineCount()
 //                    self.selectedConnectyDialog?.onUserIsTyping = { (userID: UInt) in
 //                        print("this dude is typing!!: \(userID)")
 //                    }
@@ -673,7 +658,6 @@ extension AuthModel: ChatDelegate {
     
     func chatDidReceiveContactItemActivity(_ userID: UInt, isOnline: Bool, status: String?) {
         print("contact list did receive new activity from: \(userID). Is online: \(isOnline). Status: \(String(describing: status))")
-        self.setOnlineCount()
         changeContactsRealmData.shared.updateContactOnlineStatus(userID: userID, isOnline: isOnline)
     }
     
@@ -750,7 +734,6 @@ extension AuthModel: ChatDelegate {
                     changeMessageRealmData.shared.insertMessage(message, completion: { })
                 }
             }
-            self.setOnlineCount()
         } else {
             changeDialogRealmData.shared.fetchDialogs(completion: { _ in })
         }

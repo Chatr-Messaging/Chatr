@@ -22,23 +22,10 @@ import Purchases
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
-        FirebaseApp.configure()
-        Analytics.logEvent(AnalyticsEventAppOpen, parameters: [AnalyticsParameterStartDate: "timestamp: \(Date().timeIntervalSince1970)"])
-
-        Settings.applicationID = 1087
-        Settings.authKey = "dgcX9HyBrJrmfdJ"
-        Settings.authSecret = "ercXbXPpwZ4pJJB"
-        Settings.accountKey = "8bjqGu9RdW9ABQ8DF51h"
-        Settings.disableFileLogging()
-        Settings.disableXMPPLogging()
-        
-        Purchases.debugLogsEnabled = true
-        Purchases.configure(withAPIKey: "vdUKfGbHolBECPkDCNFidOLFlPMykdTm", appUserID: "\(UserDefaults.standard.integer(forKey: "currentUserID"))")
-        
+        // Override point for customization after application launch.        
         UNUserNotificationCenter.current().delegate = self
         UIApplication.shared.registerForRemoteNotifications()
-                        
+
         return true
     }
 
@@ -87,6 +74,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         }) { (error) in
             print("Failed to create push subscription: \(error.localizedDescription)")
         }
+
         Purchases.shared.setPushToken(deviceToken)
     }
     

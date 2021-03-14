@@ -80,7 +80,7 @@ struct ContainerBubble: View {
                                 .scaledToFit()
                                 .frame(width: 22, height: 22, alignment: .center)
                                 .foregroundColor(.red)
-                                .offset(x: messagePosition == .right ? -35 : 35)
+                                .offset(x: messagePosition == .right ? -30 : 30)
                         }
                         
                         if self.replyCount > 0 {
@@ -105,7 +105,7 @@ struct ContainerBubble: View {
                             })
                             .background(RoundedRectangle(cornerRadius: 20).foregroundColor(.black).shadow(color: Color.black, radius: 3, x: 0, y: 3).opacity(0.5))
                             .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.black, lineWidth: 1).opacity(0.6))
-                            .offset(x: messagePosition == .right ? (self.replyCount > 1 ? -60 : -45) : (self.replyCount > 1 ? 60 : 45))
+                            .offset(x: messagePosition == .right ? (self.replyCount > 1 ? -55 : -40) : (self.replyCount > 1 ? 55 : 40))
                         }
                     }.padding(.bottom, self.hasPrior ? 0 : 10)
                     .padding(.top, (self.message.likedId.count != 0 || self.message.dislikedId.count != 0) && (self.isPriorWider) ? 22 : 0)

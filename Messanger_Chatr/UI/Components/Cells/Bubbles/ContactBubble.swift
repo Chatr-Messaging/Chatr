@@ -197,16 +197,20 @@ struct ContactBubble: View {
 
                                         self.contact = newContact
                                         self.contactRelationship = .notContact
-                                        
-                                        if ((self.auth.profile.results.first?.contactRequests.contains(self.contact.id)) != nil) {
-                                            self.contactRelationship = .pendingRequest
-                                        } else if Chat.instance.contactList?.pendingApproval.count ?? 0 > 0 {
-                                            for con in Chat.instance.contactList?.pendingApproval ?? [] {
-                                                if con.userID == UInt(self.contact.id) {
-                                                    self.contactRelationship = .pendingRequest
-                                                    break
-                                                }
+
+                                        for i in Chat.instance.contactList?.pendingApproval ?? [] {
+                                            if i.userID == self.message.contactID {
+                                                self.contactRelationship = .pendingRequest
+                                                break
                                             }
+                                        }
+
+                                        guard let profile = self.auth.profile.results.first else {
+                                            return
+                                        }
+
+                                        if profile.contactRequests.contains(where: { $0 == self.contact.id }) {
+                                            self.contactRelationship = .pendingRequestForYou
                                         }
                                     }
                                 })

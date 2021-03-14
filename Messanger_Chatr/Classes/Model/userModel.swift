@@ -21,7 +21,9 @@ class Users: NSObject {
         Auth.auth().currentUser?.getIDTokenResult(completion: { idToken, error in
             if error != nil {
                 print("the error getting the id token: \(error.debugDescription)")
-                completion()
+                DispatchQueue.main.async {
+                    completion()
+                }
             } else {
                 if let tokenId = idToken {
                     Request.logIn(withFirebaseProjectID: Constants.FirebaseProjectID, accessToken: tokenId.token, successBlock: { (userPulled) in
@@ -31,7 +33,9 @@ class Users: NSObject {
                             ChatrApp.chatInstanceConnect(id: userPulled.id)
                             print("success updating the profile and all... \(String(describing: userPulled.fullName))")
 
-                            completion()
+                            DispatchQueue.main.async {
+                                completion()
+                            }
                         })
                     }, errorBlock: { error in
                         ChatrApp.connect()

@@ -653,7 +653,11 @@ struct VisitContactView: View {
                                 }
                             }
                             
-                            if (self.auth.profile.results.first?.contactRequests.contains(self.contact.id) != nil) {
+                            guard let profile = self.auth.profile.results.first else {
+                                return
+                            }
+
+                            if profile.contactRequests.contains(where: { $0 == self.contact.id }) {
                                 self.contactRelationship = .pendingRequestForYou
                             }
                         }
@@ -737,7 +741,11 @@ struct VisitContactView: View {
                                                 }
                                             }
 
-                                            if (self.auth.profile.results.first?.contactRequests.contains(self.contact.id) != nil) {
+                                            guard let profile = self.auth.profile.results.first else {
+                                                return
+                                            }
+
+                                            if profile.contactRequests.contains(where: { $0 == self.contact.id }) {
                                                 self.contactRelationship = .pendingRequestForYou
                                             }
                                         }
@@ -938,12 +946,12 @@ struct topHeaderContactView: View {
                             .foregroundColor(.clear)
                     }
                     
-                    RoundedRectangle(cornerRadius: 5)
-                        .frame(width: 12, height: 12)
+                    RoundedRectangle(cornerRadius: 8)
+                        .frame(width: 16, height: 16)
                         .foregroundColor(.green)
-                        .overlay(Circle().stroke(Color("bgColor"), lineWidth: 2.5))
+                        .overlay(Circle().stroke(Color("bgColor"), lineWidth: 3))
                         .opacity(self.contact.isOnline ? 1 : 0)
-                        .offset(x: 38, y: 38)
+                        .offset(x: 40, y: 40)
                 }
             }.buttonStyle(ClickButtonStyle())
             .offset(y: 50)

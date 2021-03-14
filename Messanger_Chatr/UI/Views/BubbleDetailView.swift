@@ -20,10 +20,6 @@ struct BubbleDetailView: View {
     @StateObject var imagePicker = KeyboardCardViewModel()
     var namespace: Namespace.ID
     @Binding var newDialogFromSharedContact: Int
-    @State var delayView: Bool = false
-    @State var avatar: String = ""
-    @State var lastOnline: Date = Date()
-    @State var fullName: String = ""
     @State var subText: String = ""
     @State var height: CGFloat = 50
     @State var cardDrag = CGSize.zero
@@ -48,7 +44,7 @@ struct BubbleDetailView: View {
                 VStack() {
                     //Top Header
                     HStack(alignment: .center, spacing: 10) {
-                        WebImage(url: URL(string: self.avatar))
+                        WebImage(url: URL(string: viewModel.contact.avatar))
                             .resizable()
                             .placeholder{ Image("empty-profile").resizable().frame(width: 34, height: 34, alignment: .bottom).scaledToFill() }
                             .indicator(.activity)
@@ -59,13 +55,13 @@ struct BubbleDetailView: View {
                             .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 0)
 
                         VStack(alignment: .leading) {
-                            Text(self.fullName)
+                            Text(viewModel.contact.fullName)
                                 .foregroundColor(.primary)
                                 .font(.none)
                                 .fontWeight(.medium)
                                 .lineLimit(1)
                             
-                            Text("last online \(self.lastOnline.getElapsedInterval(lastMsg: "moments")) ago")
+                            Text("last online \(viewModel.contact.lastOnline.getElapsedInterval(lastMsg: "moments")) ago")
                                 .font(.caption)
                                 .fontWeight(.regular)
                                 .foregroundColor(.secondary)
@@ -433,47 +429,16 @@ struct BubbleDetailView: View {
             }
         }
         .onAppear() {
-            UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
-            self.hasUserLiked = self.viewModel.message.likedId.contains(self.auth.profile.results.first?.id ?? 0)
-            self.hasUserDisliked = self.viewModel.message.dislikedId.contains(self.auth.profile.results.first?.id ?? 0)
-            self.messagePosition = UInt(self.viewModel.message.senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? .right : .left
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+                UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
+                self.hasUserLiked = self.viewModel.message.likedId.contains(self.auth.profile.results.first?.id ?? 0)
+                self.hasUserDisliked = self.viewModel.message.dislikedId.contains(self.auth.profile.results.first?.id ?? 0)
+                self.messagePosition = UInt(self.viewModel.message.senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? .right : .left
 
-            self.viewModel.getUserAvatar(senderId: self.viewModel.message.senderID, compleation: { (url, fullName, lastOnline) in
-                if url == "self" || fullName == "self" || lastOnline == Date() {
-                    self.avatar = self.auth.profile.results.first?.avatar ?? ""
-                    self.lastOnline = self.auth.profile.results.first?.lastOnline ?? Date()
-                    self.fullName = self.auth.profile.results.first?.fullName ?? ""
-                } else {
-                    self.avatar = url
-                    self.lastOnline = lastOnline
-                    self.fullName = fullName
-                }
-                self.delayView = true
-            })
-
-            self.viewModel.fetchUser()
-            self.observeInteractions()
-            self.observeReplies()
-        
-            keyboard.observe { (event) in
-                guard self.viewModel.isDetailOpen else { return }
-
-                let keyboardFrameEnd = event.keyboardFrameEnd
-                
-                switch event.type {
-                case .willShow:
-                    UIView.animate(withDuration: event.duration, delay: 0.0, options: [event.options], animations: {
-                        self.keyboardChange = keyboardFrameEnd.height - 10
-                    }, completion: nil)
-                   
-                case .willHide:
-                    UIView.animate(withDuration: event.duration, delay: 0.0, options: [event.options], animations: {
-                        self.keyboardChange = 0
-                    }, completion: nil)
-
-                default:
-                    break
-                }
+                self.viewModel.fetchUser()
+                self.observeInteractions()
+                self.observeReplies()
+                self.observeKeyboard()
             }
         }
     }
@@ -490,7 +455,6 @@ struct BubbleDetailView: View {
                 if typeLike == "likes" {
                     changeMessageRealmData.shared.updateMessageLikeAdded(messageID: self.viewModel.message.id, userID: Int(childSnap.key) ?? 0)
                     self.hasUserLiked = self.viewModel.message.likedId.contains(profileID)
-                    print("liked added: contain: \(self.viewModel.message.likedId.contains(profileID)) && my id: \(profileID)")
                 } else if typeLike == "dislikes" {
                     changeMessageRealmData.shared.updateMessageDislikeAdded(messageID: self.viewModel.message.id, userID: Int(childSnap.key) ?? 0)
                     self.hasUserDisliked = self.viewModel.message.dislikedId.contains(profileID)
@@ -538,5 +502,28 @@ struct BubbleDetailView: View {
                 self.replies.remove(at: index)
             }
         })
+    }
+    
+    func observeKeyboard() {
+        keyboard.observe { (event) in
+            guard self.viewModel.isDetailOpen else { return }
+
+            let keyboardFrameEnd = event.keyboardFrameEnd
+            
+            switch event.type {
+            case .willShow:
+                UIView.animate(withDuration: event.duration, delay: 0.0, options: [event.options], animations: {
+                    self.keyboardChange = keyboardFrameEnd.height - 10
+                }, completion: nil)
+               
+            case .willHide:
+                UIView.animate(withDuration: event.duration, delay: 0.0, options: [event.options], animations: {
+                    self.keyboardChange = 0
+                }, completion: nil)
+
+            default:
+                break
+            }
+        }
     }
 }

@@ -11,7 +11,6 @@ import SDWebImageSwiftUI
 import RealmSwift
 
 struct QuickSnapCell: View {
-    @EnvironmentObject var auth: AuthModel
     @Binding var viewState: QuickSnapViewingState
     @State var quickSnap: ContactStruct = ContactStruct()
     @Binding var selectedQuickSnapContact: ContactStruct 

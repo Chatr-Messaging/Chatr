@@ -299,9 +299,13 @@ class changeContactsRealmData {
                 }
             }
 
-            completion()
+            DispatchQueue.main.async {
+                completion()
+            }
         } catch {
-            completion()
+            DispatchQueue.main.async {
+                completion()
+            }
             print(error.localizedDescription)
         }
     }

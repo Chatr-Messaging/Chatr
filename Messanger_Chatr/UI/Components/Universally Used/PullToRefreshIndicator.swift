@@ -48,7 +48,6 @@ struct PullToRefreshIndicator: View {
                                 UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
                                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                                 changeDialogRealmData.shared.fetchDialogs(completion: { result in
-                                    print("pull to refresh is done!")
                                     print("pull to refresh is at: \(geometry.frame(in: .global).minY)")
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
                                         self.isLoading = false

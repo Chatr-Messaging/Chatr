@@ -83,7 +83,11 @@ class changeDialogRealmData {
 
         Request.dialogs(with: Paginator.limit(100, skip: 0), extendedRequest: extRequest, successBlock: { (dialogs, usersIDs, paginator) in
             if dialogs.count > 0 {
-                self.insertDialogs(dialogs) { }
+                self.insertDialogs(dialogs) {
+                    DispatchQueue.main.async {
+                        completion(true)
+                    }
+                }
             } else {
                 let config = Realm.Configuration(schemaVersion: 1)
                 do {
@@ -98,15 +102,12 @@ class changeDialogRealmData {
                     }
                 }
             }
-            if dialogs.count < paginator.limit { return }
-            paginator.skip += UInt(dialogs.count)
         }) { (error) in
             print("Error in feteching dialogs... error: \(error.localizedDescription)")
-            //ChatrApp.connect()
-            completion(false)
-       }
-        
-        completion(true)
+            DispatchQueue.main.async {
+                completion(false)
+            }
+        }
     }
     
     func insertDialogs(_ objects: [ChatDialog], completion: @escaping () -> Void) {
@@ -140,22 +141,26 @@ class changeDialogRealmData {
                     newData.avatar = object.photo ?? ""
                     newData.bio = object.dialogDescription ?? ""
                 }
-                
+
                 if newData.id == UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" && UserDefaults.standard.bool(forKey: "localOpen") {
                     newData.isOpen = true
                 }
                 
                 try realm.safeWrite({
                     realm.add(newData, update: .all)
-                    print("Succsessfuly added new Dialog data! \(newData.isDeleted) and the threadis: \(Thread.current)")
+                    print("Successfully added new Dialog data! \(newData.isDeleted) and the threadis: \(Thread.current)")
                 })
             } catch {
                 print(error.localizedDescription)
-                completion()
+                DispatchQueue.main.async {
+                    completion()
+                }
             }
         })
-        
-        completion()
+
+        DispatchQueue.main.async {
+            completion()
+        }
     }
     
     func updateDialogOpen(isOpen: Bool, dialogID: String) {

@@ -414,6 +414,10 @@ struct KeyboardCardView: View {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                                 if let selectedDialog = self.auth.dialogs.results.filter("id == %@", UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").first {
                                     changeMessageRealmData.shared.sendContactMessage(dialog: selectedDialog, contactID: self.selectedContacts, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
+                                    self.selectedContacts.removeAll()
+                                    withAnimation {
+                                        self.isKeyboardActionOpen = false
+                                    }
                                 }
                             }
                         }
@@ -537,7 +541,6 @@ struct KeyboardCardView: View {
             .opacity(showImagePicker ? 1 : 0)
             .onAppear() {
                 self.imagePicker.setUpAuthStatus()
-                self.imagePicker.fetchPhotos(completion: {  })
 
                 keyboard.observe { (event) in
                     switch event.type {

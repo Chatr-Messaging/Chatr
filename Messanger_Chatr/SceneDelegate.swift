@@ -12,6 +12,7 @@ import LocalAuthentication
 import RealmSwift
 import ConnectyCube
 import Firebase
+import Purchases
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -34,9 +35,20 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             self.window = window
             window.makeKeyAndVisible()
         }
+
+        FirebaseApp.configure()
+        Analytics.logEvent(AnalyticsEventAppOpen, parameters: [AnalyticsParameterStartDate: "timestamp: \(Date().timeIntervalSince1970)"])
+
+        Settings.applicationID = 1087
+        Settings.authKey = "dgcX9HyBrJrmfdJ"
+        Settings.authSecret = "ercXbXPpwZ4pJJB"
+        Settings.accountKey = "8bjqGu9RdW9ABQ8DF51h"
         
-        guard let userActivity = connectionOptions.userActivities.first(where: { $0.webpageURL != nil }) else { return }
-        print("dynamic link url topppp: \(userActivity.webpageURL!)")
+        Purchases.debugLogsEnabled = true
+        Purchases.configure(withAPIKey: "vdUKfGbHolBECPkDCNFidOLFlPMykdTm", appUserID: "\(UserDefaults.standard.integer(forKey: "currentUserID"))")
+
+        //guard let userActivity = connectionOptions.userActivities.first(where: { $0.webpageURL != nil }) else { return }
+        //print("dynamic link url topppp: \(userActivity.webpageURL!)")
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -46,7 +58,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Release any resources associated with this scene that can be re-created the next time the scene connects.
         // The scene may re-connect later, as its session was not neccessarily discarded (see `application:didDiscardSceneSessions` instead)
     }
-    
+
     func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
         if let incomingURL = userActivity.webpageURL {
             print("have received incoming link!: \(incomingURL)")
@@ -98,17 +110,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneWillEnterForeground(_ scene: UIScene) {
         // Called as the scene transitions from the background to the foreground.
         // Use this method to undo the changes made on entering the background.
-
-        print("scene will enter foreground \(Thread.isMainThread)")
-        self.environment.configureFirebaseStateDidChange()
-        if self.environment.isUserAuthenticated == .signedIn {
-            ChatrApp.connect()
-            self.sendLocalAuth()
-            UserDefaults.standard.set(Session.current.currentUserID, forKey: "currentUserID")
-        }
-        
-        StoreReviewHelper.incrementAppOpenedCount()
-        StoreReviewHelper.checkAndAskForReview()
+        //DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+            print("scene will enter foreground \(Thread.isMainThread)")
+            self.environment.configureFirebaseStateDidChange()
+            if self.environment.isUserAuthenticated == .signedIn {
+                ChatrApp.connect()
+                self.sendLocalAuth()
+                UserDefaults.standard.set(Session.current.currentUserID, forKey: "currentUserID")
+            }
+            
+            StoreReviewHelper.incrementAppOpenedCount()
+            StoreReviewHelper.checkAndAskForReview()
+        //}
     }
     
     func sceneDidEnterBackground(_ scene: UIScene) {

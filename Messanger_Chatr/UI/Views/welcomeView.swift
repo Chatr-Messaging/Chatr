@@ -1052,10 +1052,10 @@ struct AddProfileImageView: View {
                                 .shadow(color: Color("buttonShadow_Deeper"), radius: 20, x: 0, y: 20)
                             
                             Circle()
-                                .trim(from: 0, to: self.auth.avitarProgress)
+                                .trim(from: 0, to: self.auth.avatarProgress)
                                 .stroke(Color.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                                 .foregroundColor(Color.primary)
-                                .opacity(self.auth.avitarProgress == 0.0 || self.auth.avitarProgress == 1.0 ? 0.0 : 0.75)
+                                .opacity(self.auth.avatarProgress == 0.0 || self.auth.avatarProgress == 1.0 ? 0.0 : 0.75)
                                 .frame(width: 102, height: 102)
 
                             Circle()
@@ -1107,15 +1107,15 @@ struct AddProfileImageView: View {
                             .font(.caption)
                             .underline()
                             .italic()
-                            .disabled(self.auth.avitarProgress == 0.0 ? false : true)
-                            .opacity(self.auth.avitarProgress == 0.0 ? 1 : 0)
+                            .disabled(self.auth.avatarProgress == 0.0 ? false : true)
+                            .opacity(self.auth.avatarProgress == 0.0 ? 1 : 0)
                             .multilineTextAlignment(.center)
                             .foregroundColor(Color.secondary)
                     }
                 }.buttonStyle(ClickButtonStyle())
                 .padding(.all, 15)
                 .frame(height: 25)
-                
+
                 Spacer()
             }
         }

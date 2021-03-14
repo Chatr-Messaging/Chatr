@@ -192,7 +192,9 @@ class changeMessageRealmData {
                     
                     try realm.write({
                         realm.add(newData, update: .all)
-                        completion()
+                        DispatchQueue.main.async {
+                            completion()
+                        }
                     })
                 }
 //                else {
@@ -205,10 +207,14 @@ class changeMessageRealmData {
 //                }
             } catch {
                 print(error.localizedDescription)
-                completion()
+                DispatchQueue.main.async {
+                    completion()
+                }
             }
         })
-        completion()
+        DispatchQueue.main.async {
+            completion()
+        }
     }
     
     func insertMessage<T>(_ object: T, completion: @escaping () -> Void) where T: ChatMessage {
@@ -282,7 +288,9 @@ class changeMessageRealmData {
                     realm.add(newData, update: .all)
 
 
-                    completion()
+                    DispatchQueue.main.async {
+                        completion()
+                    }
                 })
             }
             else {
@@ -295,7 +303,9 @@ class changeMessageRealmData {
             }
         } catch {
             print(error.localizedDescription)
-            completion()
+            DispatchQueue.main.async {
+                completion()
+            }
         }
     }
     
