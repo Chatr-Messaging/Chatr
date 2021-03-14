@@ -741,12 +741,10 @@ struct VisitContactView: View {
                                                 }
                                             }
 
-                                            guard let profile = self.auth.profile.results.first else {
-                                                return
-                                            }
-
-                                            if profile.contactRequests.contains(where: { $0 == self.contact.id }) {
-                                                self.contactRelationship = .pendingRequestForYou
+                                            if let profile = self.auth.profile.results.first {
+                                                if profile.contactRequests.contains(where: { $0 == self.contact.id }) {
+                                                    self.contactRelationship = .pendingRequestForYou
+                                                }
                                             }
                                         }
 
