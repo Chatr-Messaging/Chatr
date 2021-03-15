@@ -51,7 +51,7 @@ struct EarlyAdopterView: View {
                 Image("AppIcon-Original-Dark")
                     .resizable()
                     .frame(width: 80, height: 80)
-                    .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 5)
+                    .shadow(color: Color.black.opacity(0.25), radius: 4, x: 0, y: 2)
                     .cornerRadius(20)
                     .padding(.vertical)
                 
@@ -67,7 +67,7 @@ struct EarlyAdopterView: View {
                     self.auth.changeHomeIconTo(name: "AppIcon-Original-Dark")
                 }) {
                     HStack(spacing: 10) {
-                        Image(systemName: self.hasClaimed ? "checkmark" : "lock.open.fill")
+                        Image(systemName: self.hasClaimed ? "lock.open.fill" : "lock.fill")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 22, height: 22, alignment: .center)

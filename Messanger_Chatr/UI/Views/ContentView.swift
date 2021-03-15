@@ -462,9 +462,7 @@ struct mainHomeList: View {
                     KeyboardCardView(height: self.$textFieldHeight, isOpen: self.$isLocalOpen, mainText: self.$keyboardText, hasAttachments: self.$hasAttachments, showImagePicker: self.$showKeyboardMediaAssets, isKeyboardActionOpen: self.$isKeyboardActionOpen)
                         .environmentObject(self.auth)
                         .frame(width: Constants.screenWidth, height: Constants.screenHeight * 0.75, alignment: .center)
-                        .background(BlurView(style: .systemUltraThinMaterial)) //Color("bgColor")
                         .cornerRadius(20)
-                        .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color("blurBorder"), lineWidth: 2.5).blur(radius: 1))
                         .shadow(color: Color.black.opacity(0.15), radius: 14, x: 0, y: -5)
                         .offset(y: self.isLocalOpen ? geo.frame(in: .global).maxY - 40 -
                             (UIDevice.current.hasNotch ? 0 : -20) - (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) - (self.hasAttachments ? (self.showKeyboardMediaAssets ? 110 : 120) : 0) - (self.showKeyboardMediaAssets ? 220 : 0) - self.keyboardHeight + (self.isKeyboardActionOpen ? -80 : 0) : geo.frame(in: .global).maxY)

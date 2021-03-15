@@ -39,7 +39,7 @@ struct MainButtonStyleDeselected: ButtonStyle {
             .cornerRadius(15)
             .overlay(
                  RoundedRectangle(cornerRadius: 15)
-                     .stroke(Color("disabledButton"), lineWidth: 1)
+                    .stroke(Color("disabledButton").opacity(0.4), lineWidth: 1)
              )
     }
 }

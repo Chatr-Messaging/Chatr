@@ -951,7 +951,7 @@ struct AddInfoView: View {
                     
                     Spacer()
                     
-                    if !self.text.isEmpty && self.loadingSetName == false {
+                    if self.text.count > 3 && self.loadingSetName == false {
                         Button(action: {
                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                             self.loadingSetName = true
@@ -963,9 +963,9 @@ struct AddInfoView: View {
                                 //success
                                 UIApplication.shared.endEditing(true)
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                                    self.loadingSetName = false
                                     self.auth.haveUserFullName = true
                                     self.continuePt4 = true
+                                    self.loadingSetName = false
                                 }
                             })
                         }) {

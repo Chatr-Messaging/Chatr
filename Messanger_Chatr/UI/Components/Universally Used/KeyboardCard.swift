@@ -557,7 +557,9 @@ struct KeyboardCardView: View {
             }
             
             Spacer()
-        }.padding(.vertical, 2.5)
+        }.background(BlurView(style: .systemUltraThinMaterial)) //Color("bgColor")
+        .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color("blurBorder"), lineWidth: 2.5).blur(radius: 1))
+        .padding(.vertical, 2.5)
         .animation(.spring(response: 0.3, dampingFraction: 0.75, blendDuration: 0))
     }
     
