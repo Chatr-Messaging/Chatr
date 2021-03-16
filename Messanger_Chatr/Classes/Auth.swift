@@ -356,7 +356,7 @@ class AuthModel: NSObject, ObservableObject {
     
     func setUserAvatar(image: UIImage, completion: @escaping (Bool) -> Void) {
         let image = image
-        let data = image.jpegData(compressionQuality: 0.25)
+        let data = image.jpegData(compressionQuality: 0.5)
         
         Request.uploadFile(with: data!, fileName: "user's_profileImg", contentType: "image/jpeg", isPublic: false, progressBlock: { (progress) in
             print("the upload progress is: \(progress)")

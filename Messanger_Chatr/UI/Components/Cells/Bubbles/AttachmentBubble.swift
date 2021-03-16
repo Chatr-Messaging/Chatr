@@ -12,12 +12,15 @@ import ConnectyCube
 import RealmSwift
 import AVKit
 
+struct Resultz: Decodable {
+    var encoded: Data
+}
+
 struct AttachmentBubble: View {
     @EnvironmentObject var auth: AuthModel
     @ObservedObject var viewModel: ChatMessageViewModel
     @State var message: MessageStruct
     @State var messagePosition: messagePosition
-    @State var localVideoURL: URL?
     var hasPrior: Bool = false
     @State var player: AVPlayer = AVPlayer()
     @State var isPlaying: Bool = false
@@ -68,12 +71,15 @@ struct AttachmentBubble: View {
                     .offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
                     .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.8) : Color.clear, lineWidth: 3).offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0))
                     .matchedGeometryEffect(id: self.message.id.description + "png", in: namespace)
+                    .onAppear {
+                        print("the found image url: \(self.message.image)")
+                    }
             } else if self.message.imageType == "video/mov" && self.message.messageState != .deleted {
                 ZStack(alignment: .bottomLeading) {
-                    //PlayerContainerView(player: self.$player, gravity: .resize)
-                    VideoPlayer(player: self.player)
+                    FullScreenVideoUI(player1: self.$player, fileId: self.message.image)
                         .transition(.asymmetric(insertion: AnyTransition.scale.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
-                        .aspectRatio(contentMode: .fit)
+                        .aspectRatio(contentMode: .fill)
+                        .background(Color("lightGray"))
                         .clipShape(CustomGIFShape())
                         .frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.55 : 0.65)), alignment: self.messagePosition == .right ? .trailing : .leading)
                         .frame(maxHeight: CGFloat(Constants.screenHeight * 0.65))
@@ -88,30 +94,8 @@ struct AttachmentBubble: View {
                             self.isPlaying ? self.play() : self.pause()
                         }
                         .onAppear {
-                            CacheManager.shared.getFileWith(stringUrl: self.message.image) { result in
-                              switch result {
-                              case .success(let url):
-                                let fileURL = Blob.privateUrl(forFileUID: self.message.image)
-                                print("the found: \(String(describing: fileURL)) saved \(self.message.image) url is: \(url.description)")
-
-                                self.localVideoURL = url
-                                self.player = AVPlayer(playerItem: AVPlayerItem(url: url))
-
-    //                            Request.backgroundDownloadFile(withUID: self.message.image, progressBlock: { (progress) in
-    //                                print("the download progress is: \(progress)")
-    //                            }, successBlock: { (blob) in
-    //                                //let ig = blob
-    //
-    //                            }, errorBlock: { error in
-    //                                print("error somehow downloading...\(error.localizedDescription)")
-    //                            })
-
-                                  break
-                              case .failure(let error):
-                                  print(error, "failure in the Cache of video")
-                                  break
-                              }
-                            }
+                            guard let url = URL(string: self.message.image) else { return }
+                            self.player = AVPlayer(playerItem: AVPlayerItem(url: url))
                         }
                     
                     HStack {
@@ -137,7 +121,7 @@ struct AttachmentBubble: View {
             }
         }
     }
-
+    
     func play() {
         let currentItem = self.player.currentItem
         if currentItem?.currentTime() == currentItem?.duration {

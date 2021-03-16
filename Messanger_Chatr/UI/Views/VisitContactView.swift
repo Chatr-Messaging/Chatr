@@ -320,7 +320,11 @@ struct VisitContactView: View {
                     self.viewModel.styleBuilder(content: {
                         if self.contact.instagramAccessToken != "" {
                             Button(action: {
-                                self.viewModel.openInstagramApp()
+                                if !self.contact.isInfoPrivate || self.contactRelationship == .contact {
+                                    self.viewModel.openInstagramApp()
+                                } else {
+                                    UINotificationFeedbackGenerator().notificationOccurred(.error)
+                                }
                             }) {
                                 VStack(spacing: 0) {
                                 HStack(alignment: .center) {
@@ -333,8 +337,8 @@ struct VisitContactView: View {
                                     Text("@\(self.viewModel.username)")
                                         .font(.none)
                                         .fontWeight(.none)
-                                        .background(self.contact.isInfoPrivate ? Color.secondary : Color.clear)
-                                        .foregroundColor(self.contact.isInfoPrivate ? .clear : self.viewModel.username == "" ? .gray : .primary)
+                                        .background(self.contact.isInfoPrivate || self.contactRelationship != .contact ? Color.secondary : Color.clear)
+                                        .foregroundColor(self.contact.isInfoPrivate || self.contactRelationship != .contact ? .clear : self.viewModel.username == "" ? .gray : .primary)
 
                                     Spacer()
                                     
@@ -364,7 +368,7 @@ struct VisitContactView: View {
                                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 })
 
-                            if !self.contact.isInfoPrivate {
+                            if !self.contact.isInfoPrivate || self.contactRelationship == .contact {
                                 LazyVGrid(columns: self.columns, alignment: .center, spacing: 5) {
                                     ForEach(self.viewModel.igMedia.sorted{ $0.timestamp > $1.timestamp }, id: \.self) { media in
                                         WebImage(url: URL(string: media.media_url))
@@ -389,7 +393,11 @@ struct VisitContactView: View {
                         VStack(alignment: .center, spacing: 0) {
                             if self.contact.facebook != "" {
                                 Button(action: {
-                                    self.viewModel.openFacebookApp(screenName: self.contact.facebook)
+                                    if !self.contact.isInfoPrivate || self.contactRelationship == .contact {
+                                        self.viewModel.openFacebookApp(screenName: self.contact.facebook)
+                                    } else {
+                                        UINotificationFeedbackGenerator().notificationOccurred(.error)
+                                    }
                                 }) {
                                     HStack(alignment: .center) {
                                         Image("facebookIcon_black")
@@ -401,8 +409,8 @@ struct VisitContactView: View {
                                         Text("@\(self.contact.facebook)")
                                             .font(.none)
                                             .fontWeight(.none)
-                                            .background(self.contact.isInfoPrivate ? Color.secondary : Color.clear)
-                                            .foregroundColor(self.contact.isInfoPrivate ? .clear : self.contact.facebook == "" ? .gray : .primary)
+                                            .background(self.contact.isInfoPrivate || self.contactRelationship != .contact ? Color.secondary : Color.clear)
+                                            .foregroundColor(self.contact.isInfoPrivate || self.contactRelationship != .contact ? .clear : self.contact.facebook == "" ? .gray : .primary)
 
                                         Spacer()
                                         Image(systemName: "chevron.right")
@@ -428,7 +436,11 @@ struct VisitContactView: View {
                             
                             if self.contact.twitter != "" {
                                 Button(action: {
-                                    self.viewModel.openTwitterApp(screenName: self.contact.twitter)
+                                    if !self.contact.isInfoPrivate || self.contactRelationship == .contact {
+                                        self.viewModel.openTwitterApp(screenName: self.contact.twitter)
+                                    } else {
+                                        UINotificationFeedbackGenerator().notificationOccurred(.error)
+                                    }
                                 }) {
                                     HStack(alignment: .center) {
                                         Image("twitterIcon_black")
@@ -440,8 +452,8 @@ struct VisitContactView: View {
                                         Text("@\(self.contact.twitter)")
                                             .font(.none)
                                             .fontWeight(.none)
-                                            .background(self.contact.isInfoPrivate ? Color.secondary : Color.clear)
-                                            .foregroundColor(self.contact.isInfoPrivate ? .clear : self.contact.twitter == "" ? .gray : .primary)
+                                            .background(self.contact.isInfoPrivate || self.contactRelationship != .contact ? Color.secondary : Color.clear)
+                                            .foregroundColor(self.contact.isInfoPrivate || self.contactRelationship != .contact ? .clear : self.contact.twitter == "" ? .gray : .primary)
 
                                         Spacer()
                                         Image(systemName: "chevron.right")

@@ -220,6 +220,26 @@ struct mainHomeList: View {
                                 }
                         }.frame(height: Constants.btnSize + 100)
                         
+                        ZStack(alignment: .topTrailing) {
+                            Image("discoverBackground")
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: Constants.screenWidth - 40, height: 145)
+                                .cornerRadius(20)
+                            
+                            Button(action: {
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                            }) {
+                                Image("closeButton")
+                                    .resizable()
+                                    .frame(width: 30, height: 30, alignment: .center)
+                                    .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 0)
+                            }.padding(12.5)
+                        }.padding(.horizontal)
+                        .padding(.bottom)
+                        .background(Color("bgColor"))
+                        
+
                         // MARK: "Message" Title
                         HomeMessagesTitle(isLocalOpen: self.$isLocalOpen, contacts: self.$showContacts, newChat: self.$showNewChat, selectedContacts: self.$selectedContacts)
                             .frame(height: 50)

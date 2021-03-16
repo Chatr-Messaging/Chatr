@@ -187,6 +187,12 @@ class changeMessageRealmData {
                                 newData.latitude = Double("\(latitude)") ?? 0
                                 print("the shared latitude is: \(newData.latitude) && \(latitude)")
                             }
+                            
+                            if let videoUrl = attach.customParameters["videoId"] {
+                                newData.image = "\(videoUrl)"
+                                newData.imageType = attach.type ?? ""
+                                print("the video is: \(newData.image) && \(videoUrl)")
+                            }
                         }
                     }
                     
@@ -281,13 +287,17 @@ class changeMessageRealmData {
                             newData.latitude = Double("\(latitude)") ?? 0
                             print("the shared latitude is: \(newData.latitude) && \(latitude)")
                         }
+
+                        if let videoUrl = attach.customParameters["videoId"] {
+                            newData.image = "\(videoUrl)"
+                            newData.imageType = attach.type ?? ""
+                            print("the video is: \(newData.image) && \(videoUrl)")
+                        }
                     }
                 }
-                
+
                 try realm.write({
                     realm.add(newData, update: .all)
-
-
                     DispatchQueue.main.async {
                         completion()
                     }
@@ -463,53 +473,119 @@ class changeMessageRealmData {
 
     func sendVideoAttachment(dialog: DialogStruct, attachmentVideos: [PHAsset], occupentID: [NSNumber]) {
         for vid in attachmentVideos {
-            
-            let resourceManager = PHAssetResourceManager.default()
             let resource = PHAssetResource.assetResources(for: vid).first!
             let name = resource.originalFilename
             let videoLocalPath = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(name)
-            print("the uploading video url is: \(videoLocalPath)")
-            //Storing the resource to local temporary path
-            resourceManager.writeData(for: resource, toFile: videoLocalPath, options: nil, completionHandler: { error in
-                    if error != nil{
-                        do {
-                            let vidData = try Data(contentsOf: videoLocalPath)
+            let newVideIdString = NSUUID().uuidString
 
-                            Request.uploadFile(with: vidData,
-                                               fileName: "\(UserDefaults.standard.integer(forKey: "currentUserID"))\(dialog.id)\(dialog.fullName)\(Date()).MOV",
-                                               contentType: "video/mov",
-                                               isPublic: occupentID.count > 2 ? true : false,
-                                               progressBlock: { (progress) in
-                                                //Update UI with upload progress
-                                                print("upload video progress is: \(progress)")
-                            }, successBlock: { (blob) in
-                                let attachment = ChatAttachment()
-                                attachment.type = "video/mov"
-                                attachment.id = blob.uid
-                                
-                                let pDialog = ChatDialog(dialogID: dialog.id, type: occupentID.count > 2 ? .group : .private)
-                                pDialog.occupantIDs = occupentID
-                                
-                                let message = ChatMessage()
-                                message.text = "Video Attachment"
-                                message.attachments = [attachment]
-                                
-                                pDialog.send(message) { (error) in
-                                    self.insertMessage(message, completion: {
-                                        if error != nil {
-                                            print("error sending attachment: \(String(describing: error?.localizedDescription))")
-                                            self.updateMessageState(messageID: message.id ?? "", messageState: .error)
-                                        } else {
-                                            print("Success sending attachment to ConnectyCube server!")
-                                        }
-                                    })
-                                }
-                            }) { (error) in
-                                print("there is an error uploading attachment: \(error.localizedDescription)")
-                            }
-                        } catch { }
-                    }
-                })
+            let options = PHVideoRequestOptions()
+            options.isNetworkAccessAllowed = true
+            PHImageManager.default().requestAVAsset(forVideo: vid, options: options) { (asset, mix, args) in
+                if let _ = asset as? AVURLAsset {
+                    //let url = asset.url
+                    // URL OF THE VIDEO IS GOT HERE
+                    self.uploadTOFireBaseVideo(id: newVideIdString, url: videoLocalPath, success: { urlz in
+                        self.sendVideoMessage(id: newVideIdString, dialog: dialog, url: urlz, occupentID: occupentID)
+                    }, failure: { error in
+                        print("failed to upload vodeozzzz to firebase: \(error.localizedDescription)")
+                    })
+                } else {
+                    guard let asset = asset else { return }
+                    //self.startAnimating(message: "Processing.")
+                    self.saveVideoInDocumentsDirectory(withAsset: asset, completion: { (url, error) in
+                        if let error = error {
+                            print(error.localizedDescription)
+                        }
+                        if let url = url {
+                            // SAVED IN DOCUMENTS DIRECTORY AND URL IS GOT HERE
+                            self.uploadTOFireBaseVideo(id: newVideIdString, url: url, success: { urlz in
+                                self.sendVideoMessage(id: newVideIdString, dialog: dialog, url: urlz, occupentID: occupentID)
+                            }, failure: { error in
+                                print("failed to upload video to firebase: \(error.localizedDescription)")
+                            })
+                        }
+                    })
+                }
+            }
+        }
+    }
+    
+    func uploadTOFireBaseVideo(id: String, url: URL, success : @escaping (String) -> Void, failure : @escaping (Error) -> Void) {
+        let storageRef = Storage.storage().reference(forURL: Constants.FirebaseStoragePath).child("messageVideo").child("\(Session.current.currentUser?.fullName ?? "no name")" + id)
+
+        storageRef.putFile(from: url, metadata: nil, completion: { (metadata, error) in
+            if let error = error {
+                print(error.localizedDescription)
+                failure(error)
+            } else {
+                storageRef.downloadURL { url, error in
+                    let strPic: String = url?.absoluteString ?? ""
+                    success(strPic)
+                }
+            }
+        })
+    }
+    
+    func sendVideoMessage(id: String, dialog: DialogStruct, url: String, occupentID: [NSNumber]) {
+        let attachment = ChatAttachment()
+        attachment.type = "video/mov"
+        attachment["videoId"] = "\(Session.current.currentUser?.fullName ?? "no name")" + id
+
+        let pDialog = ChatDialog(dialogID: dialog.id, type: occupentID.count > 2 ? .group : .private)
+        pDialog.occupantIDs = occupentID
+        
+        let message = ChatMessage()
+        message.markable = true
+        message.text = "Video Attachment"
+        message.attachments = [attachment]
+
+        pDialog.send(message) { (error) in
+            self.insertMessage(message, completion: {
+                if error != nil {
+                    print("error sending attachment: \(String(describing: error?.localizedDescription))")
+                    self.updateMessageState(messageID: message.id ?? "", messageState: .error)
+                } else {
+                    print("Success sending video to ConnectyCube server!")
+                }
+            })
+        }
+    }
+    
+    func saveVideoInDocumentsDirectory(withAsset asset: AVAsset, completion: @escaping (_ url: URL?,_ error: Error?) -> Void) {
+        let manager = FileManager.default
+        guard let documentDirectory = try? manager.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true) else { return }
+        var outputURL = documentDirectory.appendingPathComponent("output")
+        
+        do {
+            try manager.createDirectory(at: outputURL, withIntermediateDirectories: true, attributes: nil)
+            let name = NSUUID().uuidString
+            outputURL = outputURL.appendingPathComponent("\(name).mp4")
+        } catch let error {
+            print(error.localizedDescription)
+        }
+        //Remove existing file
+        _ = try? manager.removeItem(at: outputURL)
+        
+        guard let exportSession = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetMediumQuality) else { return }
+        
+        exportSession.outputURL = outputURL
+        exportSession.outputFileType = AVFileType.mp4
+        exportSession.exportAsynchronously {
+            switch exportSession.status {
+            case .completed:
+                print("exported at \(outputURL)")
+                completion(outputURL, exportSession.error)
+                
+            case .failed:
+                print("failed \(exportSession.error?.localizedDescription ?? "")")
+                completion(nil, exportSession.error)
+                
+            case .cancelled:
+                print("cancelled \(exportSession.error?.localizedDescription ?? "")")
+                completion(nil, exportSession.error)
+                
+            default: break
+            }
         }
     }
     

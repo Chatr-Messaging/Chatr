@@ -8,6 +8,7 @@
 
 import Foundation
 import SwiftUI
+import Firebase
 import AVKit
 
 enum PlayerGravity {
@@ -89,3 +90,50 @@ class PlayerView: UIView {
         return AVPlayerLayer.self
     }
 }
+
+
+
+struct FullScreenVideoUI: UIViewControllerRepresentable {
+    let storage = Storage.storage()
+    @Binding var player1: AVPlayer
+    @State var fileId: String = ""
+
+    func makeUIViewController(context: Context) -> UIViewController {
+        let videoReference = storage.reference().child("messageVideo").child(fileId)
+        let view = UIViewController()
+
+        videoReference.getData(maxSize: 50 * 1024 * 1024) { data, error in
+            if error == nil {
+                let tmpFileURL = URL(fileURLWithPath:NSTemporaryDirectory()).appendingPathComponent("video" + fileId).appendingPathExtension("mp4")
+                do {
+                    try data!.write(to: tmpFileURL, options: [.atomic])
+                } catch { }
+
+                let rect = CGRect(origin: CGPoint(x: 0, y: 0), size: UIScreen.main.bounds.size)
+                self.player1 = AVPlayer(url: tmpFileURL)
+                let controller = AVPlayerLayer(player: self.player1)
+                controller.player = self.player1
+                self.player1.isMuted = false
+
+                do {
+                    try AVAudioSession.sharedInstance().setCategory(.playback)
+                } catch  { }
+                
+                controller.videoGravity = AVLayerVideoGravity.resizeAspectFill
+                controller.frame = rect
+                view.view.layer.addSublayer(controller)
+                NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: self.player1.currentItem, queue: .main) { _ in
+                    self.player1.seek(to: CMTime.zero)
+                    self.player1.play()
+                }
+            }
+        }
+        return view
+    }
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
+        
+    }
+}
+
+
+
