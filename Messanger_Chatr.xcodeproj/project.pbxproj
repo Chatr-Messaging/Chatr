@@ -75,10 +75,6 @@
 		058AC52F2599064F0027FD11 /* DiscoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058AC52E2599064F0027FD11 /* DiscoverView.swift */; };
 		058AC5342599158D0027FD11 /* DiscoverCarouselSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058AC5332599158C0027FD11 /* DiscoverCarouselSection.swift */; };
 		05903A3F25925C3400D70A13 /* WKView in Frameworks */ = {isa = PBXBuildFile; productRef = 05903A3E25925C3400D70A13 /* WKView */; };
-		0591F3C225D5079D00C35FA4 /* AppIcon-Colorful.png in Resources */ = {isa = PBXBuildFile; fileRef = 0591F3C125D5079D00C35FA4 /* AppIcon-Colorful.png */; };
-		0591F3C825D507A900C35FA4 /* AppIcon-Colorful-Dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 0591F3C725D507A900C35FA4 /* AppIcon-Colorful-Dark.png */; };
-		0591F3CC25D507B100C35FA4 /* AppIcon-Original.png in Resources */ = {isa = PBXBuildFile; fileRef = 0591F3CB25D507B100C35FA4 /* AppIcon-Original.png */; };
-		0591F3D025D507B500C35FA4 /* AppIcon-Original-Dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 0591F3CF25D507B500C35FA4 /* AppIcon-Original-Dark.png */; };
 		0593C0A223CB2AFE00460AAA /* VerifyCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0593C0A123CB2AFE00460AAA /* VerifyCodeView.swift */; };
 		0596844E25ABED4D0051B707 /* EditProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0596844D25ABED4D0051B707 /* EditProfileViewModel.swift */; };
 		0596845625AC16E80051B707 /* VisitContactViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0596845525AC16E80051B707 /* VisitContactViewModel.swift */; };
@@ -89,6 +85,11 @@
 		059D1C4E25D6028800A7FB96 /* ContainerBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 059D1C4D25D6028800A7FB96 /* ContainerBubble.swift */; };
 		059EF95224C9153A004BA17C /* ChatMessagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 059EF95124C9153A004BA17C /* ChatMessagesView.swift */; };
 		05A1223124AEE6D300EEDD72 /* KeyboardCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A1223024AEE6D300EEDD72 /* KeyboardCard.swift */; };
+		05A623832602F45100A2BF40 /* AppIcon-Original-Dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 05A623822602F45100A2BF40 /* AppIcon-Original-Dark.png */; };
+		05A623872602F45500A2BF40 /* AppIcon-Original.png in Resources */ = {isa = PBXBuildFile; fileRef = 05A623862602F45500A2BF40 /* AppIcon-Original.png */; };
+		05A6238B2602F46600A2BF40 /* AppIcon-Colorful-Dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 05A6238A2602F46600A2BF40 /* AppIcon-Colorful-Dark.png */; };
+		05A6238F2602F46B00A2BF40 /* AppIcon-Colorful.png in Resources */ = {isa = PBXBuildFile; fileRef = 05A6238E2602F46B00A2BF40 /* AppIcon-Colorful.png */; };
+		05A62393260303AB00A2BF40 /* HomeBannerCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A62392260303AB00A2BF40 /* HomeBannerCard.swift */; };
 		05A6D54725B021E400AD66DD /* AdvancedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A6D54625B021E400AD66DD /* AdvancedViewModel.swift */; };
 		05A7633A25060EB2002712FA /* AddNewContactView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A7633925060EB2002712FA /* AddNewContactView.swift */; };
 		05A7633C2506FD42002712FA /* ContactRequestCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A7633B2506FD42002712FA /* ContactRequestCell.swift */; };
@@ -246,10 +247,6 @@
 		058AC52E2599064F0027FD11 /* DiscoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverView.swift; sourceTree = "<group>"; };
 		058AC5332599158C0027FD11 /* DiscoverCarouselSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverCarouselSection.swift; sourceTree = "<group>"; };
 		0591F3BB25D5077200C35FA4 /* AppIcon-Colorful.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-Colorful.png"; sourceTree = "<group>"; };
-		0591F3C125D5079D00C35FA4 /* AppIcon-Colorful.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon-Colorful.png"; path = "../../../../../Chatr Designs/Chatr Icons/Production Icons/AppIcon-Colorful.png"; sourceTree = "<group>"; };
-		0591F3C725D507A900C35FA4 /* AppIcon-Colorful-Dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon-Colorful-Dark.png"; path = "../../../../../Chatr Designs/Chatr Icons/Production Icons/AppIcon-Colorful-Dark.png"; sourceTree = "<group>"; };
-		0591F3CB25D507B100C35FA4 /* AppIcon-Original.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon-Original.png"; path = "../../../../../Chatr Designs/Chatr Icons/Production Icons/AppIcon-Original.png"; sourceTree = "<group>"; };
-		0591F3CF25D507B500C35FA4 /* AppIcon-Original-Dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon-Original-Dark.png"; path = "../../../../../Chatr Designs/Chatr Icons/Production Icons/AppIcon-Original-Dark.png"; sourceTree = "<group>"; };
 		0593C0A123CB2AFE00460AAA /* VerifyCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifyCodeView.swift; sourceTree = "<group>"; };
 		0596844D25ABED4D0051B707 /* EditProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileViewModel.swift; sourceTree = "<group>"; };
 		0596845525AC16E80051B707 /* VisitContactViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitContactViewModel.swift; sourceTree = "<group>"; };
@@ -258,6 +255,11 @@
 		059D1C4D25D6028800A7FB96 /* ContainerBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerBubble.swift; sourceTree = "<group>"; };
 		059EF95124C9153A004BA17C /* ChatMessagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagesView.swift; sourceTree = "<group>"; };
 		05A1223024AEE6D300EEDD72 /* KeyboardCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardCard.swift; sourceTree = "<group>"; };
+		05A623822602F45100A2BF40 /* AppIcon-Original-Dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon-Original-Dark.png"; path = "../../../../../Chatr Designs/Icons/Production Icons/AppIcon-Original-Dark.png"; sourceTree = "<group>"; };
+		05A623862602F45500A2BF40 /* AppIcon-Original.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon-Original.png"; path = "../../../../../Chatr Designs/Icons/Production Icons/AppIcon-Original.png"; sourceTree = "<group>"; };
+		05A6238A2602F46600A2BF40 /* AppIcon-Colorful-Dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon-Colorful-Dark.png"; path = "../../../../../Chatr Designs/Icons/Production Icons/AppIcon-Colorful-Dark.png"; sourceTree = "<group>"; };
+		05A6238E2602F46B00A2BF40 /* AppIcon-Colorful.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon-Colorful.png"; path = "../../../../../Chatr Designs/Icons/Production Icons/AppIcon-Colorful.png"; sourceTree = "<group>"; };
+		05A62392260303AB00A2BF40 /* HomeBannerCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeBannerCard.swift; sourceTree = "<group>"; };
 		05A6D54625B021E400AD66DD /* AdvancedViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedViewModel.swift; sourceTree = "<group>"; };
 		05A7633925060EB2002712FA /* AddNewContactView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddNewContactView.swift; sourceTree = "<group>"; };
 		05A7633B2506FD42002712FA /* ContactRequestCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactRequestCell.swift; sourceTree = "<group>"; };
@@ -412,6 +414,7 @@
 			children = (
 				056B98AC24C90250003F7FBA /* HomeMessagesTitle.swift */,
 				056B989424C8F76B003F7FBA /* HomeUserInfoHeader.swift */,
+				05A62392260303AB00A2BF40 /* HomeBannerCard.swift */,
 				05A7BD5E24FEF3870001BFC9 /* QucickSnapsSection.swift */,
 				057F2B4D250B025E005DFB21 /* ContactCarouselSection.swift */,
 				058AC5332599158C0027FD11 /* DiscoverCarouselSection.swift */,
@@ -576,14 +579,14 @@
 		0583A83123BD34B400F9220B /* AppIcons */ = {
 			isa = PBXGroup;
 			children = (
-				0591F3CF25D507B500C35FA4 /* AppIcon-Original-Dark.png */,
-				0591F3CB25D507B100C35FA4 /* AppIcon-Original.png */,
+				05A623822602F45100A2BF40 /* AppIcon-Original-Dark.png */,
+				05A623862602F45500A2BF40 /* AppIcon-Original.png */,
 				056EAB5E2516D8E500DC72FA /* AppIcon-Flat.png */,
 				056EAB5F2516D8E600DC72FA /* AppIcon-Flat-Dark.png */,
 				056EAB652516D8F300DC72FA /* AppIcon-PaperAirplane.png */,
 				056EAB6A2516D8FD00DC72FA /* AppIcon-PaperAirplane-Dark.png */,
-				0591F3C725D507A900C35FA4 /* AppIcon-Colorful-Dark.png */,
-				0591F3C125D5079D00C35FA4 /* AppIcon-Colorful.png */,
+				05A6238E2602F46B00A2BF40 /* AppIcon-Colorful.png */,
+				05A6238A2602F46600A2BF40 /* AppIcon-Colorful-Dark.png */,
 			);
 			path = AppIcons;
 			sourceTree = "<group>";
@@ -878,16 +881,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				05A6238F2602F46B00A2BF40 /* AppIcon-Colorful.png in Resources */,
 				05DB89BE238B851800D4581F /* LaunchScreen.storyboard in Resources */,
 				05DB89BB238B851800D4581F /* Preview Assets.xcassets in Resources */,
 				05DB89B8238B851800D4581F /* Assets.xcassets in Resources */,
-				0591F3C825D507A900C35FA4 /* AppIcon-Colorful-Dark.png in Resources */,
-				0591F3D025D507B500C35FA4 /* AppIcon-Original-Dark.png in Resources */,
+				05A6238B2602F46600A2BF40 /* AppIcon-Colorful-Dark.png in Resources */,
 				05DB89E2238B854400D4581F /* GoogleService-Info.plist in Resources */,
+				05A623832602F45100A2BF40 /* AppIcon-Original-Dark.png in Resources */,
 				056EAB6B2516D8FD00DC72FA /* AppIcon-PaperAirplane-Dark.png in Resources */,
 				056EAB602516D8E600DC72FA /* AppIcon-Flat.png in Resources */,
-				0591F3C225D5079D00C35FA4 /* AppIcon-Colorful.png in Resources */,
-				0591F3CC25D507B100C35FA4 /* AppIcon-Original.png in Resources */,
+				05A623872602F45500A2BF40 /* AppIcon-Original.png in Resources */,
 				056EAB662516D8F300DC72FA /* AppIcon-PaperAirplane.png in Resources */,
 				056EAB612516D8E600DC72FA /* AppIcon-Flat-Dark.png in Resources */,
 			);
@@ -1065,6 +1068,7 @@
 				0572046E25B3FDB700542CCF /* ImagePickerView.swift in Sources */,
 				05CE07ED2529930300F09754 /* NotificationSection.swift in Sources */,
 				0583073A240E2B840013B93B /* Constants.swift in Sources */,
+				05A62393260303AB00A2BF40 /* HomeBannerCard.swift in Sources */,
 				0583A82D23A72A8700F9220B /* Auth.swift in Sources */,
 				05F8E11523F0DDFF0066954C /* ContactsView.swift in Sources */,
 				058AC5342599158D0027FD11 /* DiscoverCarouselSection.swift in Sources */,

@@ -167,6 +167,7 @@ struct mainHomeList: View {
     @State var selectedContacts: [Int] = []
     @State var counter: Int = 0
     @State var isKeyboardActionOpen: Bool = false
+    @State var isTopCardOpen: Bool = false
     @State var quickSnapViewState: QuickSnapViewingState = .closed
     @State var selectedQuickSnapContact: ContactStruct = ContactStruct()
     @Namespace var namespace
@@ -208,7 +209,8 @@ struct mainHomeList: View {
                                         self.receivedNotification.toggle()
                                     }
                                     
-                                    if self.auth.isFirstTimeUser {
+                                    if self.auth.isFirstTimeUser && UserDefaults.standard.bool(forKey: "isEarlyAdopter") {
+                                        self.isTopCardOpen = true
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                                             self.showWelcomeNewUser.toggle()
                                             UINotificationFeedbackGenerator().notificationOccurred(.success)
@@ -216,29 +218,17 @@ struct mainHomeList: View {
                                                 self.counter += 1
                                             }
                                         }
+                                    } else if !self.auth.isFirstTimeUser {
+                                        self.isTopCardOpen = true
                                     }
                                 }
                         }.frame(height: Constants.btnSize + 100)
                         
-                        ZStack(alignment: .topTrailing) {
-                            Image("discoverBackground")
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: Constants.screenWidth - 40, height: 145)
-                                .cornerRadius(20)
-                            
-                            Button(action: {
-                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                            }) {
-                                Image("closeButton")
-                                    .resizable()
-                                    .frame(width: 30, height: 30, alignment: .center)
-                                    .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 0)
-                            }.padding(12.5)
-                        }.padding(.horizontal)
-                        .padding(.bottom)
-                        .background(Color("bgColor"))
-                        
+                        if self.isTopCardOpen {
+                            HomeBannerCard(isTopCardOpen: self.$isTopCardOpen, counter: self.$counter)
+                                .environmentObject(self.auth)
+                                .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.05)), removal: AnyTransition.identity))
+                        }
 
                         // MARK: "Message" Title
                         HomeMessagesTitle(isLocalOpen: self.$isLocalOpen, contacts: self.$showContacts, newChat: self.$showNewChat, selectedContacts: self.$selectedContacts)

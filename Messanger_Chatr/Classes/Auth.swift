@@ -185,11 +185,6 @@ class AuthModel: NSObject, ObservableObject {
                                     if PersistenceManager.shared.getCubeProfileImage(usersID: user) != nil {
                                         self.haveUserProfileImg = true
                                     }
-//                                    if Chat.instance.isConnected {
-//                                        Chat.instance.disconnect { (error) in
-//                                            print("chat did disconnect. error?: \(String(describing: error?.localizedDescription))")
-//                                        }
-//                                    }
                                 } else {
                                     self.isFirstTimeUser = true
                                     changeAddressBookRealmData.shared.removeAllAddressBook(completion: { _ in
