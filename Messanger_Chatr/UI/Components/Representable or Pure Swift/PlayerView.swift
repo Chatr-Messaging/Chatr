@@ -109,7 +109,7 @@ struct FullScreenVideoUI: UIViewControllerRepresentable {
                     try data!.write(to: tmpFileURL, options: [.atomic])
                 } catch { }
 
-                let rect = CGRect(origin: CGPoint(x: 0, y: 0), size: UIScreen.main.bounds.size)
+                let rect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: UIScreen.main.bounds.width * 0.65, height: UIScreen.main.bounds.height * 0.65))
                 self.player1 = AVPlayer(url: tmpFileURL)
                 let controller = AVPlayerLayer(player: self.player1)
                 controller.player = self.player1
@@ -119,9 +119,10 @@ struct FullScreenVideoUI: UIViewControllerRepresentable {
                     try AVAudioSession.sharedInstance().setCategory(.playback)
                 } catch  { }
                 
-                controller.videoGravity = AVLayerVideoGravity.resizeAspectFill
+                controller.videoGravity = AVLayerVideoGravity.resizeAspect
                 controller.frame = rect
                 view.view.layer.addSublayer(controller)
+                view.preferredContentSize = CGSize(width: UIScreen.main.bounds.width * 0.65, height: UIScreen.main.bounds.height * 0.65)
                 NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: self.player1.currentItem, queue: .main) { _ in
                     self.player1.seek(to: CMTime.zero)
                     self.player1.play()
