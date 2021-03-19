@@ -25,7 +25,7 @@ struct HomeBannerCard: View {
                     .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 6)
             }.buttonStyle(ClickMiniButtonStyle())
             .onAppear {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.75) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                     UINotificationFeedbackGenerator().notificationOccurred(.success)
                     self.counter += 1
                 }

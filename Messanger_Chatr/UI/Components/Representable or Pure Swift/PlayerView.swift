@@ -96,22 +96,35 @@ class PlayerView: UIView {
 struct FullScreenVideoUI: UIViewControllerRepresentable {
     let storage = Storage.storage()
     @Binding var player1: AVPlayer
+    @Binding var size: CGSize
     @State var fileId: String = ""
 
     func makeUIViewController(context: Context) -> UIViewController {
         let videoReference = storage.reference().child("messageVideo").child(fileId)
         let view = UIViewController()
 
-        videoReference.getData(maxSize: 50 * 1024 * 1024) { data, error in
+        videoReference.getData(maxSize: 1 * 1024 * 1024) { data, error in
             if error == nil {
                 let tmpFileURL = URL(fileURLWithPath:NSTemporaryDirectory()).appendingPathComponent("video" + fileId).appendingPathExtension("mp4")
                 do {
                     try data!.write(to: tmpFileURL, options: [.atomic])
                 } catch { }
 
-                let rect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: UIScreen.main.bounds.width * 0.65, height: UIScreen.main.bounds.height * 0.65))
-                self.player1 = AVPlayer(url: tmpFileURL)
+                let videoAsset = AVURLAsset(url: tmpFileURL)
+                let videoAssetTrack = videoAsset.tracks(withMediaType: AVMediaType.video).first
+                let playerItem = AVPlayerItem(asset: videoAsset)
+                self.player1 = AVPlayer(playerItem: playerItem)
                 let controller = AVPlayerLayer(player: self.player1)
+                let naturalSize = videoAssetTrack?.naturalSize
+                let videoRatio = (naturalSize?.height ?? 0) / (naturalSize?.width ?? 0)
+                let width = naturalSize?.width ?? 0 > UIScreen.main.bounds.width * 0.65 ? UIScreen.main.bounds.width * 0.65 : naturalSize?.width ?? 75
+                let widthDelta = width / (naturalSize?.width ?? 0)
+                let height = (naturalSize?.height ?? 0) * widthDelta
+                let rect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: width, height: UIScreen.main.bounds.height * 0.65))
+
+                self.size = rect.size
+                print("the size of the video is: \(naturalSize) && rect: \(rect.size) ratio: \(widthDelta)")
+
                 controller.player = self.player1
                 self.player1.isMuted = false
 
@@ -122,11 +135,13 @@ struct FullScreenVideoUI: UIViewControllerRepresentable {
                 controller.videoGravity = AVLayerVideoGravity.resizeAspect
                 controller.frame = rect
                 view.view.layer.addSublayer(controller)
-                view.preferredContentSize = CGSize(width: UIScreen.main.bounds.width * 0.65, height: UIScreen.main.bounds.height * 0.65)
+                view.preferredContentSize = rect.size
                 NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: self.player1.currentItem, queue: .main) { _ in
                     self.player1.seek(to: CMTime.zero)
                     self.player1.play()
                 }
+            } else {
+                print("the error is: \(error?.localizedDescription)")
             }
         }
         return view
@@ -136,5 +151,21 @@ struct FullScreenVideoUI: UIViewControllerRepresentable {
     }
 }
 
+extension AVAsset {
+    func videoSize() -> CGSize {
+        let tracks = self.tracks(withMediaType: AVMediaType.video)
+        if (tracks.count > 0){
+            let videoTrack = tracks[0]
+            let size = videoTrack.naturalSize
+            let txf = videoTrack.preferredTransform
+            let realVidSize = size.applying(txf)
+            print(videoTrack)
+            print(txf)
+            print(size)
+            print(realVidSize)
+            return realVidSize
+        }
+        return CGSize(width: 0, height: 0)
+    }
 
-
+}

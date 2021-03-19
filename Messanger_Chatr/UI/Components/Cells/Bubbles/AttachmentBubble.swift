@@ -24,6 +24,7 @@ struct AttachmentBubble: View {
     var hasPrior: Bool = false
     @State var player: AVPlayer = AVPlayer()
     @State var isPlaying: Bool = false
+    @State var videoSize: CGSize = CGSize.zero
     var namespace: Namespace.ID
 
     var body: some View {
@@ -76,12 +77,13 @@ struct AttachmentBubble: View {
                     }
             } else if self.message.imageType == "video/mov" && self.message.messageState != .deleted {
                 ZStack(alignment: .bottomLeading) {
-                    FullScreenVideoUI(player1: self.$player, fileId: self.message.image)
+                    FullScreenVideoUI(player1: self.$player, size: $videoSize,fileId: self.message.image)
                         .transition(.asymmetric(insertion: AnyTransition.scale.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                         .aspectRatio(contentMode: .fill)
                         .background(Color("lightGray"))
                         .clipShape(CustomGIFShape())
-                        .frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.55 : 0.65)), alignment: self.messagePosition == .right ? .trailing : .leading)
+                        .frame(width: videoSize.width, height: videoSize.height)
+                        //.frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.55 : 0.65)), alignment: self.messagePosition == .right ? .trailing : .leading)
                         .frame(maxHeight: CGFloat(Constants.screenHeight * 0.65))
                         .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 14)
                         .padding(.bottom, self.hasPrior ? 0 : 4)

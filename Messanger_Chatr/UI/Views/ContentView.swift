@@ -218,7 +218,7 @@ struct mainHomeList: View {
                                                 self.counter += 1
                                             }
                                         }
-                                    } else if !self.auth.isFirstTimeUser {
+                                    } else if self.auth.isFirstTimeUser {
                                         self.isTopCardOpen = true
                                     }
                                 }
