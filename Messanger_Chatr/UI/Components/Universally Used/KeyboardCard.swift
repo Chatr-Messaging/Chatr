@@ -33,6 +33,7 @@ struct KeyboardCardView: View {
     @State var enableLocation: Bool = false
     @State var presentGIF: Bool = false
     @State var shareContact: Bool = false
+    @State var isRecordingAudio: Bool = false
     @State var gifURL: String = ""
     @State private var inputImage: UIImage? = nil
     @State private var userTrackingMode: MapUserTrackingMode = .follow
@@ -224,6 +225,7 @@ struct KeyboardCardView: View {
             
             //MARK: Text Field & Send Btn
             HStack(alignment: .bottom, spacing: 0) {
+                if !self.isRecordingAudio {
                 HStack(alignment: .bottom, spacing: 0) {
                     Button(action: {
                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
@@ -255,6 +257,27 @@ struct KeyboardCardView: View {
                                 UserDefaults.standard.setValue(self.mainText, forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText")
                             }
                         })
+
+                    if self.mainText.count == 0 && !self.enableLocation && self.gifData.isEmpty && self.imagePicker.pastedImages.isEmpty && self.imagePicker.selectedVideos.isEmpty && self.imagePicker.selectedPhotos.isEmpty {
+                        Button(action: {
+                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                            withAnimation {
+                                self.showImagePicker = false
+                                self.isKeyboardActionOpen = false
+                                self.isRecordingAudio = true
+                            }
+                        }) {
+                            Image(systemName: "mic.fill")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 25, height: 22.5, alignment: .center)
+                                .font(Font.title.weight(.regular))
+                                .foregroundColor(.secondary)
+                                .padding(10)
+                        }.padding(.horizontal, 8)
+                        .buttonStyle(changeBGPaperclipButtonStyle())
+                        .cornerRadius(17.5)
+                    }
                 }.background(
                     ZStack(alignment: .topLeading) {
                         RoundedRectangle(cornerRadius: self.height < 160 ? 12.5 : 17.5)
@@ -269,6 +292,10 @@ struct KeyboardCardView: View {
                             .foregroundColor(self.mainText.count == 0 && self.isOpen ? Color("lightGray") : .clear)
                     }
                 )
+                } else {
+                    //Audio Recording Section
+                    KeyboardAudioView(isRecordingAudio: self.$isRecordingAudio)
+                }
                 
                 //MARK: Send Button
                 Button(action: {

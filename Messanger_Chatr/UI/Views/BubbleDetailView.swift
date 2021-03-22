@@ -336,6 +336,12 @@ struct BubbleDetailView: View {
             .rotation3DEffect(.degrees(-Double(self.cardDrag.height > 20 ? ((self.cardDrag.height - 20) / 8 > 8 ? 8 : (self.cardDrag.height - 20) / 8) : 0)), axis: (x: 1, y: 0, z: 0))
             .simultaneousGesture(DragGesture().onChanged { value in
                 if self.viewModel.message.longitude == 0 && self.viewModel.message.latitude == 0 && self.viewModel.isDetailOpen {
+                    if self.playVideo {
+                        withAnimation {
+                            self.playVideo = false
+                        }
+                        self.viewModel.pause()
+                    }
                     self.cardDrag.height = value.translation.height / 2
                     if self.keyboardChange != 0 {
                         UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)

@@ -49,6 +49,8 @@
 		055F37BC2606F45F003EDB1F /* CachingPlayerItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 055F37BB2606F45F003EDB1F /* CachingPlayerItem.swift */; };
 		055F37C02607DAA2003EDB1F /* VideoControlBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 055F37BF2607DAA2003EDB1F /* VideoControlBubble.swift */; };
 		055F37C52607F15F003EDB1F /* Cryptography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 055F37C42607F15F003EDB1F /* Cryptography.swift */; };
+		055F37F62608545C003EDB1F /* KeyboardAudioView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 055F37F52608545B003EDB1F /* KeyboardAudioView.swift */; };
+		055F37FA260854B1003EDB1F /* VoiceViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 055F37F9260854B1003EDB1F /* VoiceViewModel.swift */; };
 		05670318256A3C43004123EB /* CarBode in Frameworks */ = {isa = PBXBuildFile; productRef = 05670317256A3C43004123EB /* CarBode */; };
 		0568B54E25C645790054E934 /* ScanQRView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0568B54D25C645790054E934 /* ScanQRView.swift */; };
 		05693490252312F7001BDFF0 /* LocationBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0569348F252312F7001BDFF0 /* LocationBubble.swift */; };
@@ -224,6 +226,8 @@
 		055F37BB2606F45F003EDB1F /* CachingPlayerItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CachingPlayerItem.swift; sourceTree = "<group>"; };
 		055F37BF2607DAA2003EDB1F /* VideoControlBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoControlBubble.swift; sourceTree = "<group>"; };
 		055F37C42607F15F003EDB1F /* Cryptography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cryptography.swift; sourceTree = "<group>"; };
+		055F37F52608545B003EDB1F /* KeyboardAudioView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardAudioView.swift; sourceTree = "<group>"; };
+		055F37F9260854B1003EDB1F /* VoiceViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceViewModel.swift; sourceTree = "<group>"; };
 		0568B54D25C645790054E934 /* ScanQRView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanQRView.swift; sourceTree = "<group>"; };
 		0569348F252312F7001BDFF0 /* LocationBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationBubble.swift; sourceTree = "<group>"; };
 		056B989424C8F76B003F7FBA /* HomeUserInfoHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeUserInfoHeader.swift; sourceTree = "<group>"; };
@@ -421,6 +425,7 @@
 				056B989424C8F76B003F7FBA /* HomeUserInfoHeader.swift */,
 				05A62392260303AB00A2BF40 /* HomeBannerCard.swift */,
 				05A7BD5E24FEF3870001BFC9 /* QucickSnapsSection.swift */,
+				055F37F52608545B003EDB1F /* KeyboardAudioView.swift */,
 				057F2B4D250B025E005DFB21 /* ContactCarouselSection.swift */,
 				058AC5332599158C0027FD11 /* DiscoverCarouselSection.swift */,
 				05CE07EC2529930300F09754 /* NotificationSection.swift */,
@@ -613,6 +618,7 @@
 				0559B8D225D39AC20069C44A /* KeyboardCardViewModel.swift */,
 				05A6D54625B021E400AD66DD /* AdvancedViewModel.swift */,
 				05F58CEA25BFCF5400839590 /* CameraViewModel.swift */,
+				055F37F9260854B1003EDB1F /* VoiceViewModel.swift */,
 				05EE519225CA5C160063A558 /* WebViewStateModel.swift */,
 			);
 			path = ViewModel;
@@ -1032,6 +1038,7 @@
 				05693490252312F7001BDFF0 /* LocationBubble.swift in Sources */,
 				05196DCA24E9EA4C0026B9A7 /* AnimatedGradientBG.swift in Sources */,
 				05DB89B6238B851400D4581F /* ContentView.swift in Sources */,
+				055F37FA260854B1003EDB1F /* VoiceViewModel.swift in Sources */,
 				0599798824D53C9500969318 /* AlertIndicator.swift in Sources */,
 				05F37C0225DF95B300F92005 /* KeyboardObserver.swift in Sources */,
 				05F8E11823F122490066954C /* userModel.swift in Sources */,
@@ -1047,6 +1054,7 @@
 				05578C362429CE030016B1E5 /* PersistenceManager.swift in Sources */,
 				05A7BD5B24FD6A4F0001BFC9 /* QuickSnapsRealmModel.swift in Sources */,
 				0583A84F251AFB750005B7E1 /* ContactBubble.swift in Sources */,
+				055F37F62608545C003EDB1F /* KeyboardAudioView.swift in Sources */,
 				05E5B3292430747E00354C01 /* UserDialogs+Extensions.swift in Sources */,
 				056B98AD24C90250003F7FBA /* HomeMessagesTitle.swift in Sources */,
 				05A7BD6524FEFA160001BFC9 /* QuickSnapsPostView.swift in Sources */,

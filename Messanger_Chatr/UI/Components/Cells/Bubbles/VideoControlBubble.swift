@@ -47,7 +47,7 @@ struct VideoControlBubble: View {
                 Spacer()
                 if play || self.player.currentTime().seconds > 1 {
                     HStack(spacing: 10) {
-                        Text(self.getTotalDurationString())
+                        Text("0:00")//self.getTotalDurationString()
                             .font(.subheadline)
                             .fontWeight(.semibold)
                             .foregroundColor(.white)
@@ -66,7 +66,7 @@ struct VideoControlBubble: View {
                                 .frame(height: 4)
                         }.frame(height: 4)
                         .onChange(of: self.totalDuration) { newValue in
-                            let progressWidth = Double((Constants.screenWidth * 0.65) - 150)
+                            let progressWidth = Double(150)
                             self.progressBar = CGFloat((newValue / (player.currentItem?.duration.seconds ?? 1)) * progressWidth)
                             //print("the width is: \(geo.size.width) && \(self.progressBar)")
                         }
