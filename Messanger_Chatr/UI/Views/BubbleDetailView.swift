@@ -28,6 +28,7 @@ struct BubbleDetailView: View {
     @State var hasUserLiked: Bool = false
     @State var hasUserDisliked: Bool = false
     @State var showContact: Bool = false
+    @State var playVideo: Bool = true
     @State var replyScrollOffset: CGFloat = CGFloat.zero
     @State private var userTrackingMode: MapUserTrackingMode = .follow
     @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 25.7617, longitude: 80.1918), span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
@@ -83,6 +84,7 @@ struct BubbleDetailView: View {
                     }
                     .padding(.horizontal)
                     .padding(.top, 10)
+                    .transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.spring()), removal: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.easeOut(duration: 0.1))))
                     .onTapGesture {
                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                         self.showContact.toggle()
@@ -128,7 +130,21 @@ struct BubbleDetailView: View {
                                 .matchedGeometryEffect(id: self.viewModel.message.id.description + "png", in: namespace)
                                 .zIndex(4)
                         } else if self.viewModel.message.imageType == "video/mov" && self.viewModel.message.messageState != .deleted {
-
+                            GeometryReader { geo in
+                                DetailVideoPlayer(viewModel: self.viewModel)
+                                    .matchedGeometryEffect(id: self.viewModel.message.id.description + "mov", in: namespace)
+                                    .frame(height: self.viewModel.videoSize.height)
+                                    //.frame(minHeight: 100)
+                                    .pinchToZoom()
+                                    .onTapGesture {
+                                        print("the height is: \(self.viewModel.videoSize.height)")
+                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                        withAnimation {
+                                            self.playVideo.toggle()
+                                        }
+                                        self.playVideo ? self.viewModel.playVideo() : self.viewModel.pause()
+                                    }
+                            }
                         }
                     } else if self.viewModel.message.contactID != 0 {
                         //contact
@@ -149,6 +165,33 @@ struct BubbleDetailView: View {
 
                     //Footer Section
                     VStack() {
+                        //MARK: Video Player Controls
+                        if self.viewModel.message.image != "" && self.viewModel.message.imageType == "video/mov" && self.viewModel.message.messageState != .deleted{
+                            HStack(spacing: 10) {
+                                Button(action: {
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                    withAnimation {
+                                        self.playVideo.toggle()
+                                    }
+                                    self.playVideo ? self.viewModel.playVideo() : self.viewModel.pause()
+                                }, label: {
+                                    Image(systemName: self.playVideo ? "pause.fill" : "play.fill")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 22, height: 22, alignment: .center)
+                                        .foregroundColor(.primary)
+                                        .padding(.vertical, 5)
+                                })
+                            
+                                Text(self.getTotalDurationString())
+                                    .font(.none)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(.primary)
+                                
+                                Spacer()
+                            }.padding(.horizontal)
+                        }
+
                         //MARK: Interaction Btns
                         HStack(spacing: 10) {
                             if self.viewModel.message.messageState != .error {
@@ -276,7 +319,8 @@ struct BubbleDetailView: View {
                             }
                         }.padding(.horizontal, 15)
                     }
-                    .fixedSize(horizontal: false, vertical: true)
+                    .transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.spring()), removal: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.easeOut(duration: 0.1))))
+                    //.fixedSize(horizontal: false, vertical: true)
                     .padding(.bottom, 10)
                 }
             }
@@ -364,7 +408,7 @@ struct BubbleDetailView: View {
                         }
                     }
                 }.coordinateSpace(name: "replyScroll")
-                .frame(maxHeight: (Constants.screenHeight / 7.5) + (self.cardDrag.height < 0 ? -self.cardDrag.height : 10))
+                //.frame(maxHeight: (Constants.screenHeight / 10) + (self.cardDrag.height < 0 ? -self.cardDrag.height : 10))
                 .frame(minHeight: self.replyScrollOffset * 2)
                 .opacity(Double((300 - self.cardDrag.height) / 300))
                 .offset(y: -2)
@@ -412,6 +456,7 @@ struct BubbleDetailView: View {
             }.frame(maxWidth: .infinity)
             .offset(y: self.cardDrag.height > 0 ? self.cardDrag.height / 4 : 0)
             .padding(.bottom, self.keyboardChange != 0 ? (self.keyboardChange - (UIDevice.current.hasNotch ? 50 : 30)) : (UIDevice.current.hasNotch ? 50 : 30))
+            .transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.spring()), removal: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.easeOut(duration: 0.1))))
             .opacity(Double((200 - self.cardDrag.height) / 200))
             .zIndex(2)
         }.frame(width: Constants.screenWidth, height: Constants.screenHeight, alignment: .bottom)
@@ -525,5 +570,11 @@ struct BubbleDetailView: View {
                 break
             }
         }
+    }
+    
+    func getTotalDurationString() -> String {
+        let m = Int(self.viewModel.totalDuration / 60)
+        let s = Int(self.viewModel.totalDuration.truncatingRemainder(dividingBy: 60))
+        return String(format: "%d:%02d", arguments: [m, s])
     }
 }

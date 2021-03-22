@@ -27,6 +27,7 @@ class MessageStruct : Object, Identifiable {
     @objc dynamic var latitude: Double = 0.0
     @objc dynamic var contactID: Int = 0
     @objc dynamic var image: String = ""
+    @objc dynamic var localAttachmentPath: String = ""
     @objc dynamic var imageType: String = ""
     @objc dynamic var hadDelay: Bool = false
     @objc dynamic var status = messageStatus.sending.rawValue
@@ -167,10 +168,18 @@ class changeMessageRealmData {
                         for attach in attachments {
                             //image/video attachment
                             if let uid = attach.id {
+                                let storage = Storage.storage()
                                 let fileURL = Blob.privateUrl(forFileUID: uid)
-                                print("the file attachent private url is: \(String(describing: fileURL)) && the type22: \(attach.type ?? "")")
-                                newData.image = fileURL ?? ""
+
                                 newData.imageType = attach.type ?? ""
+                                if newData.imageType == "video/mov" {
+                                    let videoReference = storage.reference().child("messageVideo").child(fileURL ?? "")
+                                    videoReference.downloadURL { url, error in
+                                        newData.image = url?.absoluteString ?? ""
+                                    }
+                                } else {
+                                    newData.image = fileURL ?? ""
+                                }
                             }
                             
                             if let contactID = attach.customParameters as? [String: String] {
@@ -268,9 +277,18 @@ class changeMessageRealmData {
                     for attach in attachments {
                         //image/video attachment
                         if let uid = attach.id {
+                            let storage = Storage.storage()
                             let fileURL = Blob.privateUrl(forFileUID: uid)
-                            newData.image = fileURL ?? ""
+
                             newData.imageType = attach.type ?? ""
+                            if newData.imageType == "video/mov" {
+                                let videoReference = storage.reference().child("messageVideo").child(fileURL ?? "")
+                                videoReference.downloadURL { url, error in
+                                    newData.image = url?.absoluteString ?? ""
+                                }
+                            } else {
+                                newData.image = fileURL ?? ""
+                            }
                         }
                         
                         if let contactID = attach.customParameters as? [String: String] {

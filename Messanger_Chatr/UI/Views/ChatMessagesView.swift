@@ -174,7 +174,7 @@ struct ChatMessagesView: View {
                     Text(self.totalMessageCount == 0 ? "no messages found" : self.totalMessageCount == -1 ? "loading messages..." : "")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
-                        .frame(width: Constants.screenWidth)
+                        .frame(width: 160)
                         .padding(.all, self.totalMessageCount >= 1 && self.delayViewMessages ? 0 : 20)
                         .offset(y: self.totalMessageCount >= 1 && self.delayViewMessages ? 0 : 40)
                         .opacity(self.totalMessageCount >= 1 && self.delayViewMessages ? 0 : 1)
@@ -221,7 +221,6 @@ struct ChatMessagesView: View {
                                             if messagePosition == .right { Spacer() }
                                             
                                             ContainerBubble(viewModel: self.viewModel, newDialogFromSharedContact: self.$newDialogFromSharedContact, isPriorWider: self.isPriorWider(index: message), message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message), namespace: self.namespace)
-                                                .transition(AnyTransition.scale)
                                                 .environmentObject(self.auth)
                                                 .contentShape(Rectangle())
                                                 .fixedSize(horizontal: false, vertical: true)
@@ -261,7 +260,6 @@ struct ChatMessagesView: View {
                                     value: -$0.frame(in: .named("scroll")).origin.y)
                             })
                             .onPreferenceChange(ViewOffsetKey.self) {
-                                print("offset >> \($0)")
                                 if $0 < 0 && !firstScroll && !self.isLoadingMore && self.maxPagination != 0 {
                                     self.isLoadingMore = true
                                     changeMessageRealmData.shared.getMessageUpdates(dialogID: self.dialogID, limit: pageShowCount * (self.scrollPage + 0), skip: currentMessages.count - self.minPagination, completion: { _ in

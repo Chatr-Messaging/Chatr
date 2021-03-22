@@ -1,5 +1,6 @@
 ${PODS_ROOT}/Target Support Files/Pods-Messanger_Chatr/Pods-Messanger_Chatr-frameworks.sh
 ${BUILT_PRODUCTS_DIR}/BoringSSL-GRPC/openssl_grpc.framework
+${BUILT_PRODUCTS_DIR}/Cache/Cache.framework
 ${PODS_ROOT}/ConnectyCube/ConnectyCube.framework
 ${BUILT_PRODUCTS_DIR}/DeepDiff/DeepDiff.framework
 ${BUILT_PRODUCTS_DIR}/FirebaseAuth/FirebaseAuth.framework

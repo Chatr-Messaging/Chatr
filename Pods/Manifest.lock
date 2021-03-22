@@ -218,6 +218,7 @@ PODS:
   - BoringSSL-GRPC/Implementation (0.0.7):
     - BoringSSL-GRPC/Interface (= 0.0.7)
   - BoringSSL-GRPC/Interface (0.0.7)
+  - Cache (6.0.0)
   - ConnectyCube (1.7.0)
   - DeepDiff (2.3.1)
   - Firebase (7.1.0):
@@ -404,6 +405,7 @@ PODS:
   - SROTPView (2.1.0)
 
 DEPENDENCIES:
+  - Cache
   - ConnectyCube
   - Firebase
   - Firebase/Auth
@@ -425,6 +427,7 @@ SPEC REPOS:
   trunk:
     - abseil
     - BoringSSL-GRPC
+    - Cache
     - ConnectyCube
     - DeepDiff
     - Firebase
@@ -468,6 +471,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   abseil: 6c8eb7892aefa08d929b39f9bb108e5367e3228f
   BoringSSL-GRPC: 8edf627ee524575e2f8d19d56f068b448eea3879
+  Cache: 4ca7e00363fca5455f26534e5607634c820ffc2d
   ConnectyCube: ebca97c0b839cb8283f4abd562f7c1d01356ecae
   DeepDiff: e5ae6c50d0321568e4508cec5930b9f10bb293fc
   Firebase: 78e8dd2e39d653de6270432ad84fe8b59f7bf4e8
@@ -505,6 +509,6 @@ SPEC CHECKSUMS:
   SnapSDK: 222857226700e1373a186da658c619a79dfa40c8
   SROTPView: 81b761c6e72f0a1a0b8c77b0046e13a54d4dcaa9
 
-PODFILE CHECKSUM: 34444f0a4d00a5e91d0e88348fe59e62d78a72bc
+PODFILE CHECKSUM: 1e62abf86d857e5defeb98f17ea1a48e84b75bc3
 
 COCOAPODS: 1.10.1

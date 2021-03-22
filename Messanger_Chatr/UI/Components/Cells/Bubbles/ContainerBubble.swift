@@ -71,9 +71,8 @@ struct ContainerBubble: View {
                             LocationBubble(viewModel: self.viewModel, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior, namespace: self.namespace)
                         } else {
                             TextBubble(message: self.message, messagePosition: messagePosition, namespace: self.namespace)
-                                .transition(.asymmetric(insertion: AnyTransition.scale.animation(.spring()), removal: AnyTransition.identity))
                         }
-                        
+
                         if self.message.messageState == .error {
                             Image(systemName: "exclamationmark.icloud")
                                 .resizable()
@@ -116,7 +115,9 @@ struct ContainerBubble: View {
                                 .preference(key: SizePreferenceKey.self, value: proxy.size)
                         })
                     .onPreferenceChange(SizePreferenceKey.self) { preferences in
-                        changeMessageRealmData.shared.updateBubbleWidth(messageId: self.message.id, width: Int(preferences.width))
+                        if self.message.bubbleWidth != Int(preferences.width) {
+                            changeMessageRealmData.shared.updateBubbleWidth(messageId: self.message.id, width: Int(preferences.width))
+                        }
                     }
                     .onTapGesture(count: 2) {
                         if self.messagePosition == .left {
@@ -247,7 +248,6 @@ struct ContainerBubble: View {
                     .resizable()
                     .placeholder{ Image("empty-profile").resizable().frame(width: self.hasPrior ? 0 : Constants.smallAvitarSize, height: self.hasPrior ? 0 : Constants.smallAvitarSize, alignment: .bottom).scaledToFill() }
                     .indicator(.activity)
-                    .transition(.asymmetric(insertion: AnyTransition.scale.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                     .scaledToFill()
                     .clipShape(Circle())
                     .frame(width: self.hasPrior ? 0 : Constants.smallAvitarSize, height: self.hasPrior ? 0 : Constants.smallAvitarSize, alignment: .bottom)

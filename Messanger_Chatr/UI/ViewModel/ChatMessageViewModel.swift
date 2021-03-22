@@ -6,6 +6,7 @@
 //  Copyright © 2021 Brandon Shaw. All rights reserved.
 //
 
+import AVKit
 import SwiftUI
 import RealmSwift
 import ConnectyCube
@@ -18,6 +19,9 @@ class ChatMessageViewModel: ObservableObject {
     @Published var message: MessageStruct = MessageStruct()
     @Published var contact: ContactStruct = ContactStruct()
     @Published var contactRelationship: visitContactRelationship = .unknown
+    @Published var player: AVPlayer = AVPlayer()
+    @Published var totalDuration: Double = 0.0
+    @Published var videoSize: CGSize = CGSize.zero
 
     func loadDialog(auth: AuthModel, dialogId: String) {
         Request.updateDialog(withID: dialogId, update: UpdateChatDialogParameters(), successBlock: { dialog in
@@ -175,6 +179,19 @@ class ChatMessageViewModel: ObservableObject {
                 completion(count)
             }
         })
+    }
+
+    func playVideo() {
+        let currentItem = player.currentItem
+        if currentItem?.currentTime() == currentItem?.duration {
+            currentItem?.seek(to: .zero, completionHandler: nil)
+        }
+
+        player.play()
+    }
+
+    func pause() {
+        player.pause()
     }
     
     func fetchReplyCount(message: MessageStruct, completion: @escaping (Int) -> Void) {

@@ -11,6 +11,7 @@ import ConnectyCube
 import UserNotifications
 import RealmSwift
 import Purchases
+import CryptoKit
 
 struct ChatrApp {
     ///Users Service
@@ -74,5 +75,29 @@ extension ChatrApp {
             auth.selectedConnectyDialog = dialog
             dialog.join(completionBlock: { _ in })
         })
+    }
+    
+    static func getCryptoKey() -> String {
+        guard let user = self.auth.profile.results.first else { return "" }
+
+        return user.id.description.sha256()
+    }
+}
+
+extension String {
+    func sha1() -> String {
+
+        let data = Data(self.utf8)
+        let hash = Insecure.SHA1.hash(data: data)
+
+        return hash.compactMap { String(format: "%02x", $0) }.joined()
+    }
+
+    func sha256() -> String {
+
+        let data = Data(self.utf8)
+        let hash = SHA256.hash(data: data)
+
+        return hash.compactMap { String(format: "%02x", $0) }.joined()
     }
 }
