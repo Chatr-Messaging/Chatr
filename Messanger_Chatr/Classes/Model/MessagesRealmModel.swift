@@ -502,7 +502,7 @@ class changeMessageRealmData {
                 if let _ = asset as? AVURLAsset {
                     //let url = asset.url
                     // URL OF THE VIDEO IS GOT HERE
-                    self.uploadTOFireBaseVideo(id: newVideIdString, url: videoLocalPath, success: { urlz in
+                    self.uploadToFirebaseVideo(id: newVideIdString, url: videoLocalPath, success: { urlz in
                         self.sendVideoMessage(id: newVideIdString, dialog: dialog, url: urlz, occupentID: occupentID)
                     }, failure: { error in
                         print("failed to upload vodeozzzz to firebase: \(error.localizedDescription)")
@@ -516,7 +516,7 @@ class changeMessageRealmData {
                         }
                         if let url = url {
                             // SAVED IN DOCUMENTS DIRECTORY AND URL IS GOT HERE
-                            self.uploadTOFireBaseVideo(id: newVideIdString, url: url, success: { urlz in
+                            self.uploadToFirebaseVideo(id: newVideIdString, url: url, success: { urlz in
                                 self.sendVideoMessage(id: newVideIdString, dialog: dialog, url: urlz, occupentID: occupentID)
                             }, failure: { error in
                                 print("failed to upload video to firebase: \(error.localizedDescription)")
@@ -528,7 +528,7 @@ class changeMessageRealmData {
         }
     }
     
-    func uploadTOFireBaseVideo(id: String, url: URL, success : @escaping (String) -> Void, failure : @escaping (Error) -> Void) {
+    func uploadToFirebaseVideo(id: String, url: URL, success : @escaping (String) -> Void, failure : @escaping (Error) -> Void) {
         let storageRef = Storage.storage().reference(forURL: Constants.FirebaseStoragePath).child("messageVideo").child("\(Session.current.currentUser?.fullName ?? "no name")" + id)
 
         storageRef.putFile(from: url, metadata: nil, completion: { (metadata, error) in

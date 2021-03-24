@@ -110,34 +110,39 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneWillEnterForeground(_ scene: UIScene) {
         // Called as the scene transitions from the background to the foreground.
         // Use this method to undo the changes made on entering the background.
-        //DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
-            print("scene will enter foreground \(Thread.isMainThread)")
-            self.environment.configureFirebaseStateDidChange()
-            if self.environment.isUserAuthenticated == .signedIn {
-                ChatrApp.connect()
+        print("scene will enter foreground \(Thread.isMainThread)")
+
+        self.environment.configureFirebaseStateDidChange()
+        if self.environment.isUserAuthenticated == .signedIn {
+            ChatrApp.connect()
+            DispatchQueue.main.async {
                 self.sendLocalAuth()
                 UserDefaults.standard.set(Session.current.currentUserID, forKey: "currentUserID")
             }
-            
+        }
+
+        DispatchQueue.main.async {
             StoreReviewHelper.incrementAppOpenedCount()
             StoreReviewHelper.checkAndAskForReview()
-        //}
+        }
     }
     
     func sceneDidEnterBackground(_ scene: UIScene) {
-        print("scene did enter background")
-        if self.environment.isUserAuthenticated == .signedIn {
-            var badgeNum: Int = 0
-            if let dialog = self.environment.selectedConnectyDialog {
-                dialog.sendUserStoppedTyping()
+        DispatchQueue.main.async {
+            print("scene did enter background")
+            if self.environment.isUserAuthenticated == .signedIn {
+                var badgeNum: Int = 0
+                if let dialog = self.environment.selectedConnectyDialog {
+                    dialog.sendUserStoppedTyping()
+                }
+                Chat.instance.disconnect { (error) in
+                    print("chat instance did disconnect \(String(describing: error?.localizedDescription))")
+                }
+                for dia in DialogRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(DialogStruct.self)).results.filter({ $0.isDeleted != true }) {
+                    badgeNum += dia.notificationCount
+                }
+                UIApplication.shared.applicationIconBadgeNumber = badgeNum + (self.environment.profile.results.first?.contactRequests.count ?? 0)
             }
-            Chat.instance.disconnect { (error) in
-                print("chat instance did disconnect \(String(describing: error?.localizedDescription))")
-            }
-            for dia in DialogRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(DialogStruct.self)).results.filter({ $0.isDeleted != true }) {
-                badgeNum += dia.notificationCount
-            }
-            UIApplication.shared.applicationIconBadgeNumber = badgeNum + (self.environment.profile.results.first?.contactRequests.count ?? 0)
         }
         // Called as the scene transitions from the foreground to the background.
         // Use this method to save data, release shared resources, and store enough scene-specific state information

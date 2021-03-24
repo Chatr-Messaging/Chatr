@@ -407,7 +407,7 @@ struct mainHomeList: View {
                                     }.simultaneousGesture(DragGesture(minimumDistance: i.isOpen ? 0 : 500).onChanged { value in
                                         guard value.translation.height < 150 else { return }
                                         guard value.translation.height > 0 else { return }
-                                        
+
                                         activeView = value.translation
                                     }.onEnded { value in
                                         if activeView.height > 50 {
@@ -605,10 +605,10 @@ struct mainHomeList: View {
             changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: id)
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                changeDialogRealmData.shared.fetchDialogs(completion: { _ in })
                 if dialogType == "group" || dialogType == "public" {
                     self.auth.leaveDialog()
                 }
+                changeDialogRealmData.shared.fetchDialogs(completion: { _ in })
             }
         }
     }

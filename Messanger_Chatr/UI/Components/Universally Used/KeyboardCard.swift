@@ -276,7 +276,7 @@ struct KeyboardCardView: View {
                                 .padding(10)
                         }.padding(.horizontal, 8)
                         .buttonStyle(changeBGPaperclipButtonStyle())
-                        .cornerRadius(17.5)
+                        .cornerRadius(20)
                     }
                 }.background(
                     ZStack(alignment: .topLeading) {
@@ -643,8 +643,8 @@ struct ResizableTextField : UIViewRepresentable {
     func updateUIView(_ uiView: UITextView, context: Context) {
         DispatchQueue.main.async {
             self.height = uiView.contentSize.height
-            uiView.text = self.text
         }
+        uiView.text = self.text
     }
     
     class Coordinator: NSObject, UITextViewDelegate {
@@ -656,12 +656,17 @@ struct ResizableTextField : UIViewRepresentable {
         }
         
         func textViewDidBeginEditing(_ textView: UITextView) {
-            self.hasTyped = false
-            if self.parent.text == "" {
-                textView.text = nil
-            }
-            if textView.text.count != 0 {
-                self.parent.auth.selectedConnectyDialog?.sendUserIsTyping()
+            DispatchQueue.main.async {
+                self.hasTyped = false
+                if self.parent.text == "" {
+                    textView.text = nil
+                }
+                
+                if self.parent.isMessageView ?? true {
+                    if textView.text.count != 0 {
+                        self.parent.auth.selectedConnectyDialog?.sendUserIsTyping()
+                    }
+                }
             }
         }
         
@@ -674,17 +679,17 @@ struct ResizableTextField : UIViewRepresentable {
         }
                         
         func textViewDidChange(_ textView: UITextView) {
-            if self.parent.isMessageView ?? true {
-                if textView.text.count == 0 {
-                    self.hasTyped = false
-                    self.parent.auth.selectedConnectyDialog?.sendUserStoppedTyping()
-                } else if !self.hasTyped {
-                    self.hasTyped = true
-                    self.parent.auth.selectedConnectyDialog?.sendUserIsTyping()
-                }
-            }
-            
             DispatchQueue.main.async {
+                if self.parent.isMessageView ?? true {
+                    if textView.text.count == 0 {
+                        self.hasTyped = false
+                        self.parent.auth.selectedConnectyDialog?.sendUserStoppedTyping()
+                    } else if !self.hasTyped {
+                        self.hasTyped = true
+                        self.parent.auth.selectedConnectyDialog?.sendUserIsTyping()
+                    }
+                }
+
                 self.parent.height = textView.contentSize.height
                 self.parent.text = textView.text
                 if self.parent.text == "" {

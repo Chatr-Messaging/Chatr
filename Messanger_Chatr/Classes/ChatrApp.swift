@@ -24,7 +24,7 @@ struct ChatrApp {
 extension ChatrApp {
     /// Connect to chat / Login if needed / Dialogs updates & more...
     static func connect() {
-        guard let user = self.auth.profile.results.first else { return }
+        guard let user = self.auth.profile.results.first, !Chat.instance.isConnected && !Chat.instance.isConnecting else { return }
 
         print("\(Thread.current.isMainThread) logged in with: \(user.fullName)")
         Chat.instance.addDelegate(ChatrApp.auth)

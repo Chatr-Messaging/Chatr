@@ -152,7 +152,7 @@ struct ContainerBubble: View {
                         }
                     }.zIndex(self.showInteractions ? 1 : 0)
                     
-                    //MARK: Interaction Lables / Buttons
+                    //MARK: Interaction Labels / Buttons
                     HStack(spacing: 5) {
                         if self.message.dislikedId.count > 0 && !self.viewModel.isDetailOpen {
                             Button(action: {
@@ -228,7 +228,7 @@ struct ContainerBubble: View {
                     .offset(y: self.isPriorWider ? 0 : -22)
                 }
                 
-                //MARK: Bottomm User Info / Message Status Section
+                //MARK: Bottom User Info / Message Status Section
                 HStack(spacing: 4) {
                     if messagePosition == .right { Spacer() }
 

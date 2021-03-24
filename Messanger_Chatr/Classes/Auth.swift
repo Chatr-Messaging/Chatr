@@ -646,9 +646,7 @@ extension AuthModel: ChatDelegate {
         print("contact list did change: \(contactList.contacts.count)")
         if contactList.contacts.count > 0 {
             changeContactsRealmData().updateContacts(contactList: contactList.contacts, completion: { _ in })
-        } //else {
-//                changeContactsRealmData().removeAllContacts()
-        //}
+        }
     }
     
     func chatDidReceiveContactItemActivity(_ userID: UInt, isOnline: Bool, status: String?) {
@@ -657,7 +655,7 @@ extension AuthModel: ChatDelegate {
     }
     
     func chatDidDeliverMessage(withID messageID: String, dialogID: String, toUserID userID: UInt) {
-        print("messgae delivered is: \(messageID) & to user: \(userID)")
+        print("message delivered is: \(messageID) & to user: \(userID)")
         let config = Realm.Configuration(schemaVersion: 1)
         do {
             let realm = try Realm(configuration: config)
@@ -673,7 +671,7 @@ extension AuthModel: ChatDelegate {
     }
     
     func chatDidReadMessage(withID messageID: String, dialogID: String, readerID: UInt) {
-        print("messgae read: \(messageID) & by user: \(readerID)")
+        print("message read: \(messageID) & by user: \(readerID)")
         if readerID != UserDefaults.standard.integer(forKey: "currentUserID") {
             let config = Realm.Configuration(schemaVersion: 1)
             do {
@@ -694,7 +692,7 @@ extension AuthModel: ChatDelegate {
     }
     
     func chatDidReceive(_ message: ChatMessage) {
-        print("receved new message: \(String(describing: message.text)) from: \(message.senderID)")
+        print("received new message: \(String(describing: message.text)) from: \(message.senderID)")
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         if UserDefaults.standard.bool(forKey: "localOpen") {
             if (!message.removed) {
@@ -718,9 +716,9 @@ extension AuthModel: ChatDelegate {
             changeMessageRealmData.shared.updateMessageDelayState(messageID: message.id ?? "", messageDelayed: true)
         }
     }
-    
+
     func chatRoomDidReceive(_ message: ChatMessage, fromDialogID dialogID: String) {
-        print("receved new GROUP message: \(String(describing: message.text)) for dialogID: \(dialogID)")
+        print("received new GROUP message: \(String(describing: message.text)) for dialogID: \(dialogID)")
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
         if UserDefaults.standard.bool(forKey: "localOpen") {

@@ -13,6 +13,45 @@ import RealmSwift
 import Cache
 import Firebase
 
+struct PlayerView: UIViewRepresentable {
+    @Binding var player: AVPlayer
+    @Binding var totalDuration: Double
+
+    func updateUIView(_ uiView: UIView, context: UIViewRepresentableContext<PlayerView>) {
+        (uiView as? PlayerUIView)?.updatePlayer(player: player)
+    }
+
+    func makeUIView(context: Context) -> UIView {
+        return PlayerUIView(player: player)
+    }
+}
+
+class PlayerUIView: UIView {
+    private let playerLayer = AVPlayerLayer()
+
+    init(player: AVPlayer) {
+        super.init(frame: .zero)
+
+        playerLayer.player = player
+        layer.addSublayer(playerLayer)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        playerLayer.frame = bounds
+    }
+
+    func updatePlayer(player: AVPlayer) {
+        DispatchQueue.main.async {
+            self.playerLayer.player = player
+        }
+    }
+}
+
 struct ChatrVideoPlayer: UIViewControllerRepresentable {
     @Binding var player1: AVPlayer
     @Binding var totalDuration: Double
@@ -116,7 +155,7 @@ struct DetailVideoPlayer: UIViewControllerRepresentable {
             do {
                 try AVAudioSession.sharedInstance().setCategory(.playback)
             } catch  { }
-            
+
             controller.videoGravity = AVLayerVideoGravity.resizeAspect
             controller.frame = rect
             view.view.layer.addSublayer(controller)

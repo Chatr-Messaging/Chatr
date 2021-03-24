@@ -271,10 +271,53 @@ struct advancedView: View {
                                      .background(LinearGradient(gradient: Gradient(colors: !self.viewModel.cameraPermission ? [Color(red: 71 / 255, green: 171 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)] : [Color(red: 195 / 255, green: 195 / 255, blue: 195 / 255, opacity: 1.0), Color(.sRGB, red: 145 / 255, green: 145 / 255, blue: 145 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom))
                                     .foregroundColor(.white)
                                     .cornerRadius(20)
+                                    }.padding(.horizontal)
+                                .onAppear {
+                                    self.viewModel.checkCameraPermission()
+                                }
+                                
+                                Divider()
+                                    .frame(width: Constants.screenWidth - 65)
+                                    .offset(x: 35)
+                            }.padding(.bottom, 5)
+                            
+                            //mic section
+                            VStack {
+                                HStack {
+                                    Image(systemName: "mic.fill")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 20, height: 20, alignment: .center)
+                                        .foregroundColor(self.viewModel.micPermission ? .secondary : .primary)
+                                    
+                                    Text("Microphone")
+                                        .font(.none)
+                                        .fontWeight(.none)
+                                        .padding(.leading, 5)
+                                        .foregroundColor(self.viewModel.micPermission ? .secondary : .primary)
+                                        .multilineTextAlignment(.leading)
+                                    
+                                    Spacer()
+                                    Button(action: {
+                                        if self.viewModel.micPermission == false {
+                                            AVAudioSession.sharedInstance().requestRecordPermission({ granted in
+                                                self.viewModel.micPermission = granted
+                                            })
+                                        }
+                                    }) {
+                                        Text(self.viewModel.micPermission ? "Allowed" : "Allow")
+                                            .padding([.top, .bottom], 10)
+                                            .padding([.leading, .trailing], 20)
+                                            .transition(.identity)
+                                    }.disabled(self.viewModel.micPermission ? true : false)
+                                     .frame(height: 35)
+                                     .background(LinearGradient(gradient: Gradient(colors: !self.viewModel.micPermission ? [Color(red: 71 / 255, green: 171 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)] : [Color(red: 195 / 255, green: 195 / 255, blue: 195 / 255, opacity: 1.0), Color(.sRGB, red: 145 / 255, green: 145 / 255, blue: 145 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom))
+                                    .foregroundColor(.white)
+                                    .cornerRadius(20)
                                     }
                                 }.padding(.horizontal)
                                 .onAppear {
-                                    self.viewModel.checkCameraPermission()
+                                    self.viewModel.checkMicPermission()
                                 }
                         }.padding(.vertical, 15)
                     }.background(Color("buttonColor"))

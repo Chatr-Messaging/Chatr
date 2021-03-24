@@ -42,14 +42,10 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
     func openImagePicker(completion: @escaping () -> Void) {
         if fetchedPhotos.isEmpty {
             fetchPhotos(completion: {
-              //  DispatchQueue.main.async {
-                    completion()
-              //  }
+                completion()
             })
         } else {
-            //DispatchQueue.main.async {
-                completion()
-            //}
+            completion()
         }
     }
     

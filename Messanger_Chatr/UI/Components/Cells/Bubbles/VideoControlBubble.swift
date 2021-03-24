@@ -18,36 +18,30 @@ struct VideoControlBubble: View {
     @State var mute: Bool = true
     @State var progressBar: CGFloat = 200
     var messagePositionRight: Bool
-    
+
     var body: some View {
         ZStack(alignment: .center) {
-            VStack {
-                HStack() {
-                    if play || self.player.currentTime().seconds > 1 {
-                        if messagePositionRight { Spacer() }
-
-                        Button(action: {
-                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                            self.mute.toggle()
-                            self.player.isMuted = self.mute
-                        }, label: {
-                            Image(systemName: self.mute ? "speaker.slash.fill" : "speaker.wave.2.fill")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 20, height: 20, alignment: .center)
-                                .foregroundColor(.white)
-                                .padding(.vertical)
-                                .padding(.horizontal, 20)
-                        }).zIndex(1)
-                        
-                        if !messagePositionRight { Spacer() }
-                    }
+            VStack(alignment: messagePositionRight ? .trailing : .leading) {
+                if play || self.player.currentTime().seconds > 0.1 {
+                    Button(action: {
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                        self.mute.toggle()
+                        self.player.isMuted = self.mute
+                    }, label: {
+                        Image(systemName: self.mute ? "speaker.slash.fill" : "speaker.wave.2.fill")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 20, height: 20, alignment: .center)
+                            .foregroundColor(.white)
+                            .padding(.vertical)
+                            .padding(.horizontal, 20)
+                    }).zIndex(1)
                 }
              
                 Spacer()
-                if play || self.player.currentTime().seconds > 1 {
+                if play || self.player.currentTime().seconds > 0.1 {
                     HStack(spacing: 10) {
-                        Text("0:00")//self.getTotalDurationString()
+                        Text(self.getTotalDurationString())
                             .font(.subheadline)
                             .fontWeight(.semibold)
                             .foregroundColor(.white)
@@ -63,10 +57,11 @@ struct VideoControlBubble: View {
                                 .foregroundColor(.white)
                                 .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 2)
                                 .padding(.trailing, self.progressBar)
+                                //.trim(from: 0, to: self.totalDuration / (player.currentItem?.duration.seconds ?? 1))
                                 .frame(height: 4)
                         }.frame(height: 4)
                         .onChange(of: self.totalDuration) { newValue in
-                            let progressWidth = Double(150)
+                            let progressWidth = Double(165)
                             self.progressBar = CGFloat((newValue / (player.currentItem?.duration.seconds ?? 1)) * progressWidth)
                             //print("the width is: \(geo.size.width) && \(self.progressBar)")
                         }
@@ -89,7 +84,6 @@ struct VideoControlBubble: View {
                                 .padding(.vertical)
                         })
                     }.transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.spring()), removal: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.easeOut(duration: 0.1))))
-                    .padding(.horizontal)
                 }
             }
             

@@ -289,7 +289,7 @@ class changeContactsRealmData {
             let realm = try Realm(configuration: config)
             for i in realm.objects(ContactStruct.self) {
                 if let user = Chat.instance.contactList?.contacts.first(where: { $0.userID == i.id }) {
-                    print("rnning through contact: \(String(describing: user.userID))")
+                    print("running through contact: \(String(describing: user.userID))")
                 } else {
                     print("DELETING contact: \(String(describing: i.id))")
                     try realm.safeWrite ({

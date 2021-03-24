@@ -20,6 +20,7 @@ class AdvancedViewModel: ObservableObject {
     @Published var notificationPermission: Bool = false
     @Published var photoPermission: Bool = false
     @Published var cameraPermission: Bool = false
+    @Published var micPermission: Bool = false
     
     func checkContactsPermission() {
         if CNContactStore.authorizationStatus(for: .contacts) == .notDetermined {
@@ -104,6 +105,22 @@ class AdvancedViewModel: ObservableObject {
             self.cameraPermission = true
         } else {
             self.cameraPermission = false
+        }
+    }
+    
+    func checkMicPermission() {
+        switch AVAudioSession.sharedInstance().recordPermission {
+        case AVAudioSessionRecordPermission.granted:
+            print("Permission granted")
+            self.micPermission = true
+        case AVAudioSessionRecordPermission.denied:
+            print("Pemission denied")
+            self.micPermission = false
+        case AVAudioSessionRecordPermission.undetermined:
+            print("Request permission here")
+            self.micPermission = false
+        @unknown default:
+            self.micPermission = false
         }
     }
 }

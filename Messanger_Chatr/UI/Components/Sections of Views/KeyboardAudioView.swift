@@ -14,37 +14,90 @@ struct KeyboardAudioView: View {
     @State var isFlashingAnimation: Bool = false
 
     var body: some View {
-        HStack {
+        HStack(alignment: .center) {
             Spacer()
-            if self.viewModel.isRecording {
-               Circle()
-                .frame(width: 14, height: 14, alignment: .center)
-                .foregroundColor(.red)
-                .opacity(isFlashingAnimation ? 1 : 0)
-                .animation(Animation.linear(duration: 0.5).repeatForever(autoreverses: true))
-                .onAppear { self.isFlashingAnimation = true }
-                .onDisappear { self.isFlashingAnimation = false }
+            if !self.viewModel.recordingsList.isEmpty {
+                Button(action: {
+                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                     if self.viewModel.isPlayingAudio {
+                        self.viewModel.stopAudioRecording()
+                     } else {
+                        self.viewModel.playAudioRecording()
+                     }
+                }) {
+                    Image(systemName: self.viewModel.isPlayingAudio ? "pause.fill" : "play.fill")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 20, height: 20, alignment: .center)
+                        .font(Font.title.weight(.regular))
+                        .foregroundColor(.blue)
+                        .padding(.horizontal, 10)
+                }
                 
-                Text("0:00")
+                Text(self.viewModel.durationString)
                     .foregroundColor(.secondary)
-            }
-
-            Text(self.viewModel.isRecording ? "tap to stop recording" : "tap to record audio")
-                .padding(.vertical, 12.5)
-                .padding(.horizontal, 30)
-                .background(self.viewModel.isRecording ? Color("alertRed").opacity(0.4) : Color("pendingBtnColor"))
-                .cornerRadius(12.5)
-                .onTapGesture {
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .onAppear() {
+                        self.viewModel.prepAudio()
+                        self.viewModel.getTotalPlaybackDurationString()
+                    }
+                    .onReceive(self.viewModel.timer) { time in
+                        self.viewModel.getTotalPlaybackDurationString()
+                    }
+            } else {
+                Button(action: {
                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                     withAnimation {
                         self.viewModel.isRecording.toggle()
                     }
-                    self.viewModel.isRecording ? self.viewModel.startRecording() : self.viewModel.stopRecording()
-                }
+                    if !self.viewModel.isRecording {
+                        self.viewModel.stopRecording()
+                    } else {
+                        self.viewModel.startRecording()
+                    }
+                }) {
+                    VStack {
+                        if self.viewModel.isRecording {
+                            Text(self.viewModel.getTotalDurationString())
+                                .fontWeight(.semibold)
+                                .onReceive(self.viewModel.timer) { time in
+                                    if self.viewModel.time == 100 {
+                                        self.viewModel.stopRecording()
+                                    }
+                                    self.viewModel.time += 1
+                                }
+                        }
+
+                        Text(self.viewModel.isRecording ? "tap to stop" : "tap to record audio")
+                            .foregroundColor(.secondary)
+                            .font(self.viewModel.isRecording ? .caption : .none)
+                    }.frame(width: Constants.screenWidth * 0.5, height: 40)
+                    .background(self.viewModel.isRecording ? Color("alertRed").opacity(0.4) : Color("pendingBtnColor"))
+                    .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 5)
+                    .cornerRadius(12.5)
+                }.buttonStyle(ClickButtonStyle())
+            }
 
             if !self.viewModel.isRecording {
+                if !self.viewModel.recordingsList.isEmpty {
+                    Button(action: {
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                        self.viewModel.fetchAudioRecording(completion: { recording in
+                            self.viewModel.deleteAudioFile()
+                        })
+                    }) {
+                        Image(systemName: "arrow.counterclockwise")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 20, height: 20, alignment: .center)
+                            .font(Font.title.weight(.regular))
+                            .foregroundColor(.blue)
+                            .padding(.horizontal, 10)
+                    }
+                }
+                
                 Button(action: {
-                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                     withAnimation {
                         self.isRecordingAudio = false
                     }
@@ -55,10 +108,24 @@ struct KeyboardAudioView: View {
                         .frame(width: 24, height: 24, alignment: .center)
                         .font(Font.title.weight(.regular))
                         .foregroundColor(.secondary)
-                        .padding(10)
-                }.padding(.horizontal, 8)
+                        .padding(.trailing, 10)
+                        .padding(.leading, 4)
+                }
+            } else {
+                Circle()
+                    .frame(width: 14, height: 14, alignment: .center)
+                    .padding(.trailing, 15)
+                    .padding(.leading, 9)
+                    .foregroundColor(.red)
+                    .opacity(isFlashingAnimation ? 1 : 0)
+                    .animation(Animation.linear(duration: 0.5).repeatForever(autoreverses: true))
+                    .onAppear { self.isFlashingAnimation = true }
+                    .onDisappear { self.isFlashingAnimation = false }
             }
-        }.onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
+        }.onAppear() {
+            self.viewModel.fetchAudioRecording(completion: { _ in })
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
             self.viewModel.isRecording = false
         }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
