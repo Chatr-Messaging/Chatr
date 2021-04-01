@@ -25,6 +25,7 @@ struct Constants {
     static let maxNumberEarlyAdopters = 1000
     static let screenWidth = UIScreen.main.bounds.width
     static let screenHeight = UIScreen.main.bounds.height
+    static let edges = UIApplication.shared.windows.first?.safeAreaInsets
     static let FirebaseProjectID = "chatr-b849e"
     static let FirebaseStoragePath = "gs://chatr-b849e.appspot.com"
     static let projectVersion = "0.9989"

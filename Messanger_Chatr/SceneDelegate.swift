@@ -111,10 +111,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Called as the scene transitions from the background to the foreground.
         // Use this method to undo the changes made on entering the background.
         print("scene will enter foreground \(Thread.isMainThread)")
+        self.environment.configureFirebaseStateDidChange()
 
         DispatchQueue.main.async {
-            self.environment.configureFirebaseStateDidChange()
-
             if self.environment.isUserAuthenticated == .signedIn {
                 DispatchQueue.main.async {
                     ChatrApp.connect()
@@ -122,9 +121,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                     UserDefaults.standard.set(Session.current.currentUserID, forKey: "currentUserID")
                 }
             }
-        }
-
-        DispatchQueue.main.async {
+            
             StoreReviewHelper.incrementAppOpenedCount()
             StoreReviewHelper.checkAndAskForReview()
         }
