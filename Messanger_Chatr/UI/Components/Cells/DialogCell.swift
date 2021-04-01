@@ -104,7 +104,7 @@ struct DialogCell: View {
                                             .fontWeight(.medium)
                                             .foregroundColor(.white)
                                     }
-                                }.offset(x: self.groupOccUserAvatar.count >= 3 ? (id == 0 ? -0 : (id == 1 ? -12 : (id == 2 ? 12 : 0))) : self.groupOccUserAvatar.count == 1 ? 0 : (id == 0 ? -12 : 10), y: self.groupOccUserAvatar.count >= 3 ? (id == 0 ? -12 : (id == 1 ? 12 : (id == 2 ? 12 : 0))) : self.groupOccUserAvatar.count == 2 ? (id == 0 ? -8 : 8) : 0)
+                                }.offset(x: self.groupOccUserAvatar.count >= 3 ? (id == 0 ? 0 : (id == 1 ? -12 : (id == 2 ? 12 : 0))) : self.groupOccUserAvatar.count == 1 ? 0 : (id == 0 ? -12 : 10), y: self.groupOccUserAvatar.count >= 3 ? (id == 0 ? -12 : (id == 1 ? 12 : (id == 2 ? 12 : 0))) : self.groupOccUserAvatar.count == 2 ? (id == 0 ? -8 : 8) : 0)
                                 .offset(x: self.groupOccUserAvatar.count == 1 ? -5 : 0)
                                 .padding(.trailing, self.groupOccUserAvatar.count == 1 ? 0 : 15)
                                 .padding(.leading, self.groupOccUserAvatar.count == 1 ? 0 : 10)

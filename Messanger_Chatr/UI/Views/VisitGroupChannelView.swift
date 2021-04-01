@@ -554,7 +554,7 @@ struct VisitGroupChannelView: View {
     }
 }
 
-
+//MARK: Top Header View
 struct topGroupHeaderView: View {
     @EnvironmentObject var auth: AuthModel
     @Binding var dialogModel: DialogStruct

@@ -470,7 +470,7 @@ struct BubbleDetailView: View {
         .background(BlurView(style: .systemUltraThinMaterial).opacity(Double((300 - self.cardDrag.height) / 300)))
         .sheet(isPresented: self.$showContact, onDismiss: {
             //if self.chatContact != 0 && self.chatContact != self.message.senderID {
-               print("need to open Chat view!!")
+               print("need to open Chat view!! \(newDialogFromSharedContact)")
             //}
         }) {
             NavigationView {

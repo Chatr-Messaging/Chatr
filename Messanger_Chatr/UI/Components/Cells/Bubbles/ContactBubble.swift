@@ -158,7 +158,7 @@ struct ContactBubble: View {
                     .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.5) : Color.clear, lineWidth: 2.5))
                     .sheet(isPresented: self.$showContact, onDismiss: {
                         if self.chatContact != 0 && self.chatContact != self.message.senderID {
-                           print("need to open Chat view!!")
+                           print("need to open Chat view!! \(chatContact)")
                         }
                     }) {
                         NavigationView {

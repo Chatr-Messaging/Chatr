@@ -251,8 +251,9 @@ struct mainHomeList: View {
                                     .edgesIgnoringSafeArea(.all)
                             }
                             .onChange(of: self.newDialogFromSharedContact) { newValue in
-                                if newValue != 0 {
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
+                                if self.newDialogFromSharedContact != 0 {
+                                    print("the contact id trying to message is: \(newDialogFromSharedContact)")
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
                                         self.loadSelectedDialog()
                                     }
                                 }
@@ -550,12 +551,13 @@ struct mainHomeList: View {
             for dia in dialogs.filterDia(text: self.searchText).filter({ $0.isDeleted != true }) {
                 for occu in dia.occupentsID {
                     if occu == self.newDialogFromContact && dia.dialogType == "private" {
+                        UserDefaults.standard.set(dia.id, forKey: "selectedDialogID")
+                        self.selectedDialogID = dia.id
                         self.newDialogFromContact = 0
                         self.isLocalOpen = true
                         UserDefaults.standard.set(true, forKey: "localOpen")
                         changeDialogRealmData.shared.updateDialogOpen(isOpen: self.isLocalOpen, dialogID: dia.id)
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        UserDefaults.standard.set(dia.id, forKey: "selectedDialogID")
                         
                         break
                     }
@@ -570,12 +572,13 @@ struct mainHomeList: View {
 
                 Request.createDialog(dialog, successBlock: { (dialog) in
                     changeDialogRealmData.shared.fetchDialogs(completion: { _ in
+                        UserDefaults.standard.set(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id, forKey: "selectedDialogID")
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                             print("opening new dialog: \(self.newDialogID) & \(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id ?? "")")
+                            self.selectedDialogID = UserDefaults.standard.string(forKey: "selectedDialogID") ?? ""
                             self.isLocalOpen = true
                             UserDefaults.standard.set(self.isLocalOpen, forKey: "localOpen")
                             changeDialogRealmData.shared.updateDialogOpen(isOpen: self.isLocalOpen, dialogID: self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id ?? "")
-                            UserDefaults.standard.set(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id, forKey: "selectedDialogID")
                             self.newDialogFromContact = 0
                         }
                     })
