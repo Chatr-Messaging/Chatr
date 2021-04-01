@@ -22,6 +22,8 @@ struct DialogCell: View {
     @State private var openContactProfile: Bool = false
     @State private var openGroupProfile: Bool = false
     @State var openNewDialogID: Int = 0
+    @State var isEditGroupOpen: Bool = false
+    @State var canEditGroup: Bool = false
     @Binding var isOpen: Bool
     @Binding var activeView: CGSize
     @Binding var selectedDialogID: String
@@ -127,9 +129,27 @@ struct DialogCell: View {
                                     }
                                 }.sheet(isPresented: self.$openGroupProfile, content: {
                                     NavigationView {
-                                        VisitGroupChannelView(dismissView: self.$openGroupProfile, openNewDialogID: self.$openNewDialogID, groupOccUserAvatar: self.groupOccUserAvatar, fromDialogCell: true, viewState: .fromContacts, dialogRelationship: .subscribed, dialogModel: self.dialogModel)
+                                        VisitGroupChannelView(dismissView: self.$openGroupProfile, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$openNewDialogID, groupOccUserAvatar: self.groupOccUserAvatar, fromDialogCell: true, viewState: .fromContacts, dialogRelationship: .subscribed, dialogModel: self.dialogModel)
                                             .environmentObject(self.auth)
                                             .edgesIgnoringSafeArea(.all)
+                                            .navigationBarItems(leading:
+                                                        Button(action: {
+                                                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                                            withAnimation {
+                                                                self.openGroupProfile.toggle()
+                                                            }
+                                                        }) {
+                                                            Text("Done")
+                                                                .foregroundColor(.primary)
+                                                                .fontWeight(.medium)
+                                                        }, trailing:
+                                                            Button(action: {
+                                                                self.isEditGroupOpen.toggle()
+                                                            }) {
+                                                                Text("Edit")
+                                                                    .foregroundColor(.blue)
+                                                                    .opacity(self.canEditGroup ? 1 : 0)
+                                                            }.disabled(self.canEditGroup ? false : true))
                                     }
                                 })
                             }
@@ -158,6 +178,7 @@ struct DialogCell: View {
                             .font(.headline)
                             .fontWeight(.semibold)
                             .foregroundColor(Color.primary)
+                            .lineLimit(1)
                     }.offset(y: 2)
                     
                     Spacer()
@@ -190,7 +211,7 @@ struct DialogCell: View {
                         .fixedSize(horizontal: false, vertical: true)
 
                     if let dialog = self.auth.selectedConnectyDialog, self.isOpen && (self.dialogModel.dialogType == "group" || self.dialogModel.dialogType == "public") {
-                        Text(!dialog.isJoined() ? "joining convo..." : (self.dialogModel.onlineUserCount > 0 ? "\(self.dialogModel.onlineUserCount) online" : ""))
+                        Text(!dialog.isJoined() ? "joining convo..." : (self.dialogModel.onlineUserCount > 1 ? "\(self.dialogModel.onlineUserCount) online" : ""))
                             .font(.footnote)
                             .fontWeight(.regular)
                             .lineLimit(1)

@@ -408,6 +408,45 @@ class changeMessageRealmData {
         }
     }
     
+    func sendAudioAttachment(dialog: DialogStruct, audioURL: URL, occupentID: [NSNumber]) {
+        do {
+            let attachURL = try Data(contentsOf: audioURL, options: [.alwaysMapped , .uncached])
+            Request.uploadFile(with: attachURL,
+                               fileName: "\(UserDefaults.standard.integer(forKey: "currentUserID"))\(dialog.id)\(dialog.fullName)\(Date()).m4a",
+                               contentType: "audio/m4a",
+                               isPublic: true,
+                               progressBlock: { (progress) in
+                                //Update UI with upload progress
+                                print("upload progress is: \(progress)")
+            }, successBlock: { (blob) in
+                let attachment = ChatAttachment()
+                attachment.type = "audio/m4a"
+                attachment.id = blob.uid
+                
+                let pDialog = ChatDialog(dialogID: dialog.id, type: occupentID.count > 2 ? .group : .private)
+                pDialog.occupantIDs = occupentID
+                
+                let message = ChatMessage()
+                message.text = "Audio Message"
+                message.attachments = [attachment]
+                
+                pDialog.send(message) { (error) in
+                    self.insertMessage(message, completion: {
+                        if error != nil {
+                            self.updateMessageState(messageID: message.id ?? "", messageState: .error)
+                        } else {
+                            print("Success sending attachment to ConnectyCube server!")
+                        }
+                    })
+                }
+            }) { (error) in
+                print("there is an error uploading audio attachment: \(error.localizedDescription)")
+            }
+        } catch {
+            print("error setting url data")
+        }
+    }
+
     func sendGIFAttachment(dialog: DialogStruct, attachmentStrings: [String], occupentID: [NSNumber]) {
         for attachment in attachmentStrings {
             do {

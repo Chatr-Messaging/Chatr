@@ -147,12 +147,15 @@ struct AttachmentBubble: View {
                                 })
                             }
                     } else {
-                        Text("URL Invalid")
+                        Text("loading video...")
                             .onAppear() {
                                 updateMessageVideoURL(messageId: self.message.id, fileId: self.message.image)
                             }
                     }
                 }
+            } else if self.message.imageType == "audio/m4a" && self.message.messageState != .deleted {
+                //AudioBubble(viewModel: self.viewModel, messageRight: self.messagePosition == .right, audioKey: self.message.image)
+                Text("my audio message")
             }
         }
     }

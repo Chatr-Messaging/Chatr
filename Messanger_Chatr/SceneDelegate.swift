@@ -112,12 +112,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Use this method to undo the changes made on entering the background.
         print("scene will enter foreground \(Thread.isMainThread)")
 
-        self.environment.configureFirebaseStateDidChange()
-        if self.environment.isUserAuthenticated == .signedIn {
-            ChatrApp.connect()
-            DispatchQueue.main.async {
-                self.sendLocalAuth()
-                UserDefaults.standard.set(Session.current.currentUserID, forKey: "currentUserID")
+        DispatchQueue.main.async {
+            self.environment.configureFirebaseStateDidChange()
+
+            if self.environment.isUserAuthenticated == .signedIn {
+                DispatchQueue.main.async {
+                    ChatrApp.connect()
+                    self.sendLocalAuth()
+                    UserDefaults.standard.set(Session.current.currentUserID, forKey: "currentUserID")
+                }
             }
         }
 
@@ -151,28 +154,24 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     private func sendLocalAuth() {
         print("Scene AppDelegate Used")
-        if self.environment.profile.results.first?.isLocalAuthOn ?? false {
-            print("Scene AppDelegate - Realm True")
-            self.environment.isLoacalAuth = true
-            let context = LAContext()
-            var error: NSError?
+        guard self.environment.profile.results.first?.isLocalAuthOn == true else {
+            return
+        }
 
-            if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
-                let reason = "Identify yourself!"
-                context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, authenticationError in
-                    
-                    DispatchQueue.main.async {
-                        if success {
-                            self.environment.isLoacalAuth = false
-                        } else {
-                            // error
-                            print("error! logging in")
-                        }
+        print("Scene AppDelegate - Realm True")
+        self.environment.isLoacalAuth = true
+        let context = LAContext()
+        var error: NSError?
+
+        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
+            let reason = "Identify yourself!"
+            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, authenticationError in
+                
+                DispatchQueue.main.async {
+                    if success {
+                        self.environment.isLoacalAuth = false
                     }
                 }
-            } else {
-                // no biometry
-                print("error with biometry!")
             }
         }
     }

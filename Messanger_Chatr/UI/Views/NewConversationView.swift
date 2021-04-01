@@ -386,9 +386,10 @@ struct NewConversationView: View {
                             }
                             Request.createDialog(dialog, successBlock: { (dialog) in
                                 changeDialogRealmData.shared.fetchDialogs(completion: { _ in
-                                    self.auth.sendPushNoti(userIDs: occu, title: "Created New Group", message: "\(self.auth.profile.results.first?.fullName ?? "Chatr User") created a new group chat with you included.")
+                                    self.auth.sendPushNoti(userIDs: occu, title: "Created New Group", message: "\(self.auth.profile.results.first?.fullName ?? "Chatr User") created a new group chat with you included")
                                     self.selectedContact.removeAll()
-                                    self.newDialogID = "\(String(describing: dialog.id))"
+                                    self.newDialogID = dialog.id?.description ?? ""
+                                    UserDefaults.standard.set(self.newDialogID, forKey: "selectedDialogID")
                                     withAnimation {
                                         self.presentationMode.wrappedValue.dismiss()
                                     }

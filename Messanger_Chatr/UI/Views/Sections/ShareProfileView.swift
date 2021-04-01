@@ -35,8 +35,8 @@ struct ShareProfileView: View {
     @State var showingTwitter = false
 
     var body: some View {
-        VStack {
-            ScrollView(.vertical, showsIndicators: false) {
+        ScrollView(.vertical, showsIndicators: false) {
+             VStack {
                 //MARK: QR Code
                 ZStack(alignment: .center) {
                     if !foundUser {
@@ -264,11 +264,11 @@ struct ShareProfileView: View {
                 .frame(width: Constants.screenWidth)
 
                 FooterInformation()
-                    .padding(.top, 50)
-                    .padding(.bottom, 35)
+                    .padding(.top, 80)
+                    .padding(.bottom)
                 
             }.frame(width: Constants.screenWidth)
-        }.navigationBarTitle("Share Profile")
+        }.navigationBarTitle("Share Profile", displayMode: .automatic)
         .animation(.spring(response: 0.35, dampingFraction: 0.60, blendDuration: 0))
         .navigationBarItems(trailing:
             Button(action: {

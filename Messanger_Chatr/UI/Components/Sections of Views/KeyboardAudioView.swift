@@ -9,14 +9,17 @@
 import SwiftUI
 
 struct KeyboardAudioView: View {
-    @ObservedObject var viewModel: VoiceViewModel = VoiceViewModel()
+    @ObservedObject var viewModel: VoiceViewModel
     @Binding var isRecordingAudio: Bool
+    @Binding var hasAudioToSend: Bool
     @State var isFlashingAnimation: Bool = false
+    @State var audioProgress: CGFloat = 0
 
     var body: some View {
         HStack(alignment: .center) {
             Spacer()
             if !self.viewModel.recordingsList.isEmpty {
+                HStack {
                 Button(action: {
                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                      if self.viewModel.isPlayingAudio {
@@ -31,20 +34,55 @@ struct KeyboardAudioView: View {
                         .frame(width: 20, height: 20, alignment: .center)
                         .font(Font.title.weight(.regular))
                         .foregroundColor(.blue)
-                        .padding(.horizontal, 10)
+                        .padding(.leading, 15)
                 }
                 
                 Text(self.viewModel.durationString)
                     .foregroundColor(.secondary)
-                    .font(.caption)
+                    .font(.subheadline)
                     .fontWeight(.semibold)
+                    .frame(width: 40)
                     .onAppear() {
                         self.viewModel.prepAudio()
                         self.viewModel.getTotalPlaybackDurationString()
+                        self.hasAudioToSend = true
                     }
                     .onReceive(self.viewModel.timer) { time in
                         self.viewModel.getTotalPlaybackDurationString()
+                        self.audioProgress = CGFloat(self.viewModel.audioPlayer.currentTime / self.viewModel.audioPlayer.duration) * CGFloat(Constants.screenWidth * 0.25)
                     }
+
+                    //Progress Bar
+                    ZStack(alignment: .leading) {
+                        Capsule()
+                            .foregroundColor(.primary)
+                            .opacity(0.25)
+
+                        Capsule()
+                            .foregroundColor(.primary)
+                            .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
+                            .frame(width: self.audioProgress)
+                    }.frame(width: Constants.screenWidth * 0.25, height: 4)
+                    .padding(.trailing, 2.5)
+
+                    Button(action: {
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                        self.viewModel.fetchAudioRecording(completion: { recording in
+                            self.viewModel.deleteAudioFile()
+                        })
+                    }) {
+                        Image(systemName: "arrow.counterclockwise")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 20, height: 20, alignment: .center)
+                            .font(Font.title.weight(.regular))
+                            .foregroundColor(.blue)
+                            .padding(.trailing, 15)
+                    }
+                }.frame(height: 40)
+                .background(self.viewModel.isRecording ? Color("alertRed").opacity(0.4) : Color("pendingBtnColor"))
+                .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 5)
+                .cornerRadius(12.5)
             } else {
                 Button(action: {
                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
@@ -77,26 +115,12 @@ struct KeyboardAudioView: View {
                     .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 5)
                     .cornerRadius(12.5)
                 }.buttonStyle(ClickButtonStyle())
+                .onAppear() {
+                    self.hasAudioToSend = false
+                }
             }
 
             if !self.viewModel.isRecording {
-                if !self.viewModel.recordingsList.isEmpty {
-                    Button(action: {
-                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                        self.viewModel.fetchAudioRecording(completion: { recording in
-                            self.viewModel.deleteAudioFile()
-                        })
-                    }) {
-                        Image(systemName: "arrow.counterclockwise")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 20, height: 20, alignment: .center)
-                            .font(Font.title.weight(.regular))
-                            .foregroundColor(.blue)
-                            .padding(.horizontal, 10)
-                    }
-                }
-                
                 Button(action: {
                     withAnimation {
                         self.isRecordingAudio = false

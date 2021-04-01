@@ -16,6 +16,8 @@ struct VisitGroupChannelView: View {
     @EnvironmentObject var auth: AuthModel
     @Environment(\.presentationMode) var presentationMode
     @Binding var dismissView: Bool
+    @Binding var isEditGroupOpen: Bool
+    @Binding var canEditGroup: Bool
     @Binding var openNewDialogID: Int
     @State var groupOccUserAvatar: [String] = []
     @State var fromDialogCell: Bool = false
@@ -27,8 +29,7 @@ struct VisitGroupChannelView: View {
     @State var selectedNewMembers: [Int] = []
     @State var addNewMemberID: String = ""
     @State var currentUserIsPowerful: Bool = false
-    @State private var isProfileImgOpen: Bool = false
-    @State private var isProfileBioOpen: Bool = false
+    @State var isProfileImgOpen: Bool = false
     @State private var showingMoreSheet = false
     @State private var notificationsOn = true
     @State private var profileViewSize = CGSize.zero
@@ -46,140 +47,18 @@ struct VisitGroupChannelView: View {
             VStack(spacing: 0) {
                 ScrollView(.vertical, showsIndicators: true) {
                     //MARK: Top Profile
-                    VStack {
-                        ZStack(alignment: .top) {
-                            VStack(alignment: .center) {
-                                if isOwner || isAdmin {
-                                    NavigationLink(destination: EditGroupDialogView(dialogModel: self.$dialogModel).environmentObject(self.auth)) {
-                                        HStack() {
-                                            Spacer()
-
-                                            Text("Edit Group")
-                                                .font(.subheadline)
-                                                .fontWeight(.none)
-                                                .foregroundColor(.blue)
-
-                                            Image(systemName: "chevron.right")
-                                                .resizable()
-                                                .aspectRatio(contentMode: .fit)
-                                                .frame(width: 7, height: 12)
-                                                .foregroundColor(.blue)
-                                        }.padding(.top, 15)
-                                        .padding(.trailing)
-                                    }
-                                }
-
-                                VStack(alignment: .center) {
-                                    VStack(alignment: .center) {
-                                        Text(self.dialogModel.fullName)
-                                            .font(.system(size: 22))
-                                            .fontWeight(.semibold)
-                                            .foregroundColor(.primary)
-                                            .lineLimit(2)
-                                            .multilineTextAlignment(.leading)
-                                        
-                                        Text("\(self.dialogModel.occupentsID.count) total members")
-                                            .font(.subheadline)
-                                            .fontWeight(.none)
-                                            .foregroundColor(.secondary)
-                                            .multilineTextAlignment(.leading)
-                                    }.padding(.top, 10)
-                                    .padding(.bottom, self.dialogModel.bio == "" ? 15 : 0 )
-                                    
-                                    //MARK: Bio Section
-                                    if self.dialogModel.bio != "" {
-                                        HStack(alignment: .top) {
-                                            VStack(alignment: .leading) {
-                                                Text(self.dialogModel.bio)
-                                                    .font(.subheadline)
-                                                    .fontWeight(.none)
-                                                    .multilineTextAlignment(.center)
-                                                    .lineLimit(self.isProfileBioOpen ? 20 : 5)
-                                                    .padding(.top, 3)
-                                                    .padding(.bottom, self.dialogModel.bio.count > 220 ? 10 : 5)
-                                                
-                                                if self.dialogModel.bio.count > 220 {
-                                                    Button(action: {
-                                                        print("more...")
-                                                        self.isProfileBioOpen.toggle()
-                                                    }, label: {
-                                                        Text(self.isProfileBioOpen ? "less..." : "more...")
-                                                            .font(.subheadline)
-                                                            .fontWeight(.none)
-                                                            .foregroundColor(.secondary)
-                                                    }).buttonStyle(ClickButtonStyle())
-                                                    .offset(y: -2)
-                                                    .padding(.bottom, self.dialogModel.bio.count > 220 ? 0 : 8)
-                                                }
-                                            }
-                                        }
-                                    }
-                                }.padding(.horizontal)
-                                .padding(.top, isOwner || isAdmin ? 10 : 45)
-                                .padding(.bottom, 5)
-                            }.frame(width: Constants.screenWidth - 40)
-                            .background(Color("buttonColor"))
-                            .cornerRadius(20)
-                            .shadow(color: Color.black.opacity(0.15), radius: 20, x: 0, y: 5)
-                            .padding(.all)
-                            .padding(.top, 50)
-                            
-                            if self.dialogModel.dialogType == "public" {
-                                Button(action: {
-                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                    self.isProfileImgOpen.toggle()
-                                }) {
-                                    WebImage(url: URL(string: self.dialogModel.avatar))
-                                        .resizable()
-                                        .placeholder{ Image(systemName: "person.fill") }
-                                        .indicator(.activity)
-                                        .transition(.fade(duration: 0.15))
-                                        .scaledToFill()
-                                        .clipShape(RoundedRectangle(cornerRadius: 20))
-                                        .frame(width: 110, height: 110, alignment: .center)
-                                        .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
-                                }.buttonStyle(ClickButtonStyle())
-                            } else if self.dialogModel.dialogType == "group" {
-                                ZStack {
-                                    ForEach(self.groupOccUserAvatar.indices, id: \.self) { id in
-                                        if id < 3 {
-                                            ZStack {
-                                                Circle()
-                                                    .frame(width: self.groupOccUserAvatar.count > 2 ? 54 : self.groupOccUserAvatar.count > 1 ? 74 : 104, height: self.groupOccUserAvatar.count > 2 ? 54 : self.groupOccUserAvatar.count > 1 ? 74 : 104, alignment: .center)
-                                                    .foregroundColor(Color("buttonColor"))
-                                                    .opacity(self.groupOccUserAvatar.count == 1 ? 0 : 1)
-                                                    .shadow(color: Color("buttonShadow"), radius: 8, x: 0, y: 8)
-                                                
-                                                WebImage(url: URL(string: self.groupOccUserAvatar[id]))
-                                                    .resizable()
-                                                    .placeholder{ Image(systemName: "person.fill") }
-                                                    .indicator(.activity)
-                                                    .transition(.fade(duration: 0.15))
-                                                    .scaledToFill()
-                                                    .clipShape(Circle())
-                                                    .frame(width: self.groupOccUserAvatar.count > 2 ? 50 : self.groupOccUserAvatar.count > 1 ? 70 : 100, height: self.groupOccUserAvatar.count > 2 ? 50 : self.groupOccUserAvatar.count > 1 ? 70 : 100, alignment: .center)
-                                                    
-                                            }.offset(x: self.groupOccUserAvatar.count >= 3 ? (id == 0 ? 0 : (id == 1 ? -23 : (id == 2 ? 23 : 0))) : self.groupOccUserAvatar.count == 1 ? 0 : (id == 0 ? -23 : 20), y: self.groupOccUserAvatar.count >= 3 ? (id == 0 ? -15 : (id == 1 ? 23 : (id == 2 ? 23 : 0))) : 0)
-                                            .zIndex(id == 0 ? 1 : 0)
-                                            .padding(.horizontal, self.groupOccUserAvatar.count == 1 ? 0 : 15)
-                                        }
-                                    }
-                                }.padding(.vertical, self.groupOccUserAvatar.count != 1 ? 20 : 0)
-                                .offset(y: 10)
-                            }
+                    topGroupHeaderView(dialogModel: self.$dialogModel, groupOccUserAvatar: self.$groupOccUserAvatar, isProfileImgOpen: self.$isProfileImgOpen, isEditGroupOpen: self.$isEditGroupOpen)
+                        .environmentObject(self.auth)
+                        .padding(.top, 40)
+                        .padding(.bottom, 15)
+                        .background(GeometryReader {
+                            Color.clear.preference(key: ViewOffsetKey.self,
+                                value: -$0.frame(in: .named("visitGroup-scroll")).origin.y)
+                        })
+                        .onPreferenceChange(ViewOffsetKey.self) {
+                            self.scrollOffset = $0
                         }
-                    }
-                    .padding(.top, 40)
-                    .padding(.bottom, 15)
-//                    .background(GeometryReader {
-//                        Color.clear.preference(key: ViewOffsetKey.self,
-//                            value: -$0.frame(in: .named("visitGroup-scroll")).origin.y)
-//                    })
-//                    .onPreferenceChange(ViewOffsetKey.self) {
-//                        print("offset >> \($0)")
-//                        self.scrollOffset = $0
-//                    }
-                    
+
                     //MARK: Action Buttons
                     HStack(alignment: .center, spacing: self.dialogRelationship == .subscribed ? 40 : 20) {
                         if self.dialogRelationship == .notSubscribed && self.dialogModel.dialogType == "public" {
@@ -313,7 +192,6 @@ struct VisitGroupChannelView: View {
                     
                     VStack(alignment: .center, spacing: 0) {
                         ForEach(self.dialogModelAdmins, id: \.self) { id in
-                            
                             DialogContactCell(showAlert: self.$showAlert, notiType: self.$notiType, notiText: self.$notiText, dismissView: self.$dismissView, openNewDialogID: self.$openNewDialogID, contactID: Int(id), isAdmin: self.dialogModel.adminID.contains(Int(id)) ? true : false, isOwner: self.dialogModel.owner == id ? true : false, currentUserIsPowerful: self.$currentUserIsPowerful, isLast: self.dialogModelAdmins.last == id, isRemoving: self.$isRemoving)
                                 .environmentObject(self.auth)
 
@@ -563,27 +441,16 @@ struct VisitGroupChannelView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 15, style: .circular))
                     .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
                     .padding(.horizontal)
-                    .padding(.bottom, 40)
+                    .padding(.bottom, 60)
                                     
                     //MARK: Footer Section
                     FooterInformation(middleText: "Created: \(self.dialogModel.createdAt.getFullElapsedInterval())")
                         .padding(.vertical)
-
-                }//.coordinateSpace(name: "visitGroup-scroll")
-                //.navigationTitle(self.scrollOffset > 152 ? self.dialogModel.fullName : "")
-                .navigationBarItems(leading:
-                                    Button(action: {
-                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                        withAnimation {
-                                            self.presentationMode.wrappedValue.dismiss()
-                                        }
-                                    }) {
-                                        Text(self.fromDialogCell ? "Done" : "")
-                                            .foregroundColor(.primary)
-                                            .fontWeight(.medium)
-                                    }.disabled(self.fromDialogCell ? false : true))
+                        .padding(.bottom)
+                }.coordinateSpace(name: "visitGroup-scroll")
+                .navigationBarTitle(self.scrollOffset > 135 || self.isEditGroupOpen ? self.dialogModel.fullName : "")
             }
-            
+
             //MARK: Other Views - See profile image
             ZStack {
                 BlurView(style: .systemUltraThinMaterial)
@@ -656,7 +523,6 @@ struct VisitGroupChannelView: View {
                         })))
                 }
             }.popup(isPresented: self.$showAlert, type: .floater(), position: .bottom, animation: Animation.spring(), autohideIn: 4, closeOnTap: true) {
-
                 self.auth.createTopFloater(alertType: self.notiType, message: self.notiText)
                     .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 8)
             }
@@ -671,6 +537,7 @@ struct VisitGroupChannelView: View {
             self.dialogModelAdmins.removeAll()
             self.isOwner = self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? true : false
             self.isAdmin = self.dialogModel.adminID.contains(UserDefaults.standard.integer(forKey: "currentUserID")) ? true : false
+            self.canEditGroup = self.isOwner || self.isAdmin
             self.currentUserIsPowerful = self.isOwner || self.isAdmin ? true : false
             self.dialogModelMemebers = self.dialogModel.occupentsID.filter { $0 != 0 } //.filter { $0 != UserDefaults.standard.integer(forKey: "currentUserID") }
             self.dialogModelAdmins = self.dialogModel.occupentsID.filter { $0 == self.dialogModel.owner || self.dialogModel.adminID.contains($0)}
@@ -684,5 +551,123 @@ struct VisitGroupChannelView: View {
                          dialogModel: self.$dialogModel,
                          currentUserIsPowerful: self.$currentUserIsPowerful)
             .environmentObject(self.auth)
+    }
+}
+
+
+struct topGroupHeaderView: View {
+    @EnvironmentObject var auth: AuthModel
+    @Binding var dialogModel: DialogStruct
+    @Binding var groupOccUserAvatar: [String]
+    @Binding var isProfileImgOpen: Bool
+    @Binding var isEditGroupOpen: Bool
+    @State private var isProfileBioOpen: Bool = false
+
+    var body: some View {
+        ZStack(alignment: .top) {
+            VStack(alignment: .center) {
+                NavigationLink(destination: EditGroupDialogView(dialogModel: self.$dialogModel).environmentObject(self.auth), isActive: $isEditGroupOpen) {
+                    EmptyView()
+                }
+
+                VStack(alignment: .center) {
+                    VStack(alignment: .center) {
+                        Text(self.dialogModel.fullName)
+                            .font(.system(size: 22))
+                            .fontWeight(.semibold)
+                            .foregroundColor(.primary)
+                            .lineLimit(2)
+                            .multilineTextAlignment(.leading)
+                        
+                        Text("\(self.dialogModel.occupentsID.count) total members")
+                            .font(.subheadline)
+                            .fontWeight(.none)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.leading)
+                    }.padding(.top, 10)
+                    .padding(.bottom, self.dialogModel.bio == "" ? 15 : 0 )
+                    
+                    //MARK: Bio Section
+                    if self.dialogModel.bio != "" {
+                        HStack(alignment: .top) {
+                            VStack(alignment: .leading) {
+                                Text(self.dialogModel.bio)
+                                    .font(.subheadline)
+                                    .fontWeight(.none)
+                                    .multilineTextAlignment(.center)
+                                    .lineLimit(self.isProfileBioOpen ? 20 : 5)
+                                    .padding(.top, 3)
+                                    .padding(.bottom, self.dialogModel.bio.count > 220 ? 10 : 5)
+                                
+                                if self.dialogModel.bio.count > 220 {
+                                    Button(action: {
+                                        print("more...")
+                                        self.isProfileBioOpen.toggle()
+                                    }, label: {
+                                        Text(self.isProfileBioOpen ? "less..." : "more...")
+                                            .font(.subheadline)
+                                            .fontWeight(.none)
+                                            .foregroundColor(.secondary)
+                                    }).buttonStyle(ClickButtonStyle())
+                                    .offset(y: -2)
+                                    .padding(.bottom, self.dialogModel.bio.count > 220 ? 0 : 8)
+                                }
+                            }
+                        }
+                    }
+                }.padding(.horizontal)
+                .padding(.top, 45)
+                .padding(.bottom, 5)
+            }.frame(width: Constants.screenWidth - 40)
+            .background(Color("buttonColor"))
+            .cornerRadius(20)
+            .shadow(color: Color.black.opacity(0.15), radius: 20, x: 0, y: 5)
+            .padding(.all)
+            .padding(.top, 50)
+            
+            if self.dialogModel.dialogType == "public" {
+                Button(action: {
+                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                    self.isProfileImgOpen.toggle()
+                }) {
+                    WebImage(url: URL(string: self.dialogModel.avatar))
+                        .resizable()
+                        .placeholder{ Image(systemName: "person.fill") }
+                        .indicator(.activity)
+                        .transition(.fade(duration: 0.15))
+                        .scaledToFill()
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                        .frame(width: 110, height: 110, alignment: .center)
+                        .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
+                }.buttonStyle(ClickButtonStyle())
+            } else if self.dialogModel.dialogType == "group" {
+                ZStack {
+                    ForEach(self.groupOccUserAvatar.indices, id: \.self) { id in
+                        if id < 3 {
+                            ZStack {
+                                Circle()
+                                    .frame(width: self.groupOccUserAvatar.count > 2 ? 54 : self.groupOccUserAvatar.count > 1 ? 74 : 104, height: self.groupOccUserAvatar.count > 2 ? 54 : self.groupOccUserAvatar.count > 1 ? 74 : 104, alignment: .center)
+                                    .foregroundColor(Color("buttonColor"))
+                                    .opacity(self.groupOccUserAvatar.count == 1 ? 0 : 1)
+                                    .shadow(color: Color("buttonShadow"), radius: 8, x: 0, y: 8)
+                                
+                                WebImage(url: URL(string: self.groupOccUserAvatar[id]))
+                                    .resizable()
+                                    .placeholder{ Image(systemName: "person.fill") }
+                                    .indicator(.activity)
+                                    .transition(.fade(duration: 0.15))
+                                    .scaledToFill()
+                                    .clipShape(Circle())
+                                    .frame(width: self.groupOccUserAvatar.count > 2 ? 50 : self.groupOccUserAvatar.count > 1 ? 70 : 100, height: self.groupOccUserAvatar.count > 2 ? 50 : self.groupOccUserAvatar.count > 1 ? 70 : 100, alignment: .center)
+                                    
+                            }.offset(x: self.groupOccUserAvatar.count >= 3 ? (id == 0 ? 0 : (id == 1 ? -23 : (id == 2 ? 23 : 0))) : self.groupOccUserAvatar.count == 1 ? 0 : (id == 0 ? -23 : 20), y: self.groupOccUserAvatar.count >= 3 ? (id == 0 ? -15 : (id == 1 ? 23 : (id == 2 ? 23 : 0))) : 0)
+                            .zIndex(id == 0 ? 1 : 0)
+                            .padding(.horizontal, self.groupOccUserAvatar.count == 1 ? 0 : 15)
+                        }
+                    }
+                }.padding(.vertical, self.groupOccUserAvatar.count != 1 ? 20 : 0)
+                .offset(y: 10)
+            }
+        }
     }
 }

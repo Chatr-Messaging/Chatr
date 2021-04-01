@@ -79,6 +79,7 @@
 		0583A84F251AFB750005B7E1 /* ContactBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0583A84E251AFB740005B7E1 /* ContactBubble.swift */; };
 		058AC52F2599064F0027FD11 /* DiscoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058AC52E2599064F0027FD11 /* DiscoverView.swift */; };
 		058AC5342599158D0027FD11 /* DiscoverCarouselSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058AC5332599158C0027FD11 /* DiscoverCarouselSection.swift */; };
+		058E73D926141978008578E3 /* AudioBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058E73D826141978008578E3 /* AudioBubble.swift */; };
 		05903A3F25925C3400D70A13 /* WKView in Frameworks */ = {isa = PBXBuildFile; productRef = 05903A3E25925C3400D70A13 /* WKView */; };
 		0593C0A223CB2AFE00460AAA /* VerifyCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0593C0A123CB2AFE00460AAA /* VerifyCodeView.swift */; };
 		0596844E25ABED4D0051B707 /* EditProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0596844D25ABED4D0051B707 /* EditProfileViewModel.swift */; };
@@ -256,6 +257,7 @@
 		0583A84E251AFB740005B7E1 /* ContactBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactBubble.swift; sourceTree = "<group>"; };
 		058AC52E2599064F0027FD11 /* DiscoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverView.swift; sourceTree = "<group>"; };
 		058AC5332599158C0027FD11 /* DiscoverCarouselSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverCarouselSection.swift; sourceTree = "<group>"; };
+		058E73D826141978008578E3 /* AudioBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioBubble.swift; sourceTree = "<group>"; };
 		0593C0A123CB2AFE00460AAA /* VerifyCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifyCodeView.swift; sourceTree = "<group>"; };
 		0596844D25ABED4D0051B707 /* EditProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileViewModel.swift; sourceTree = "<group>"; };
 		0596845525AC16E80051B707 /* VisitContactViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitContactViewModel.swift; sourceTree = "<group>"; };
@@ -633,6 +635,7 @@
 				053AC4B6251982550036946E /* AttachmentBubble.swift */,
 				055F37BF2607DAA2003EDB1F /* VideoControlBubble.swift */,
 				0583A84E251AFB740005B7E1 /* ContactBubble.swift */,
+				058E73D826141978008578E3 /* AudioBubble.swift */,
 				0569348F252312F7001BDFF0 /* LocationBubble.swift */,
 			);
 			path = Bubbles;
@@ -1095,6 +1098,7 @@
 				05A7633A25060EB2002712FA /* AddNewContactView.swift in Sources */,
 				05A7BD6124FEF5180001BFC9 /* LockedOutView.swift in Sources */,
 				0511CB7125A1911000E5F905 /* StoreReviewHelper.swift in Sources */,
+				058E73D926141978008578E3 /* AudioBubble.swift in Sources */,
 				0572BAB72398998800AE9061 /* PhoneNumberView.swift in Sources */,
 				05578C2C242989A10016B1E5 /* Messanger_Chatr.xcdatamodeld in Sources */,
 				058AC52F2599064F0027FD11 /* DiscoverView.swift in Sources */,

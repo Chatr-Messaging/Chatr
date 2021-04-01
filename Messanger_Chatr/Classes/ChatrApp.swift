@@ -86,7 +86,6 @@ extension ChatrApp {
 
 extension String {
     func sha1() -> String {
-
         let data = Data(self.utf8)
         let hash = Insecure.SHA1.hash(data: data)
 
@@ -94,7 +93,6 @@ extension String {
     }
 
     func sha256() -> String {
-
         let data = Data(self.utf8)
         let hash = SHA256.hash(data: data)
 

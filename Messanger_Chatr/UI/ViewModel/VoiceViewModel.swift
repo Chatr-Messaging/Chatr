@@ -14,15 +14,15 @@ struct Recording {
     let createdAt: Date
 }
 
-class VoiceViewModel : NSObject , ObservableObject , AVAudioPlayerDelegate {
+class VoiceViewModel: NSObject , ObservableObject , AVAudioPlayerDelegate {
     var audioRecorder: AVAudioRecorder = AVAudioRecorder()
     var audioPlayer: AVAudioPlayer = AVAudioPlayer()
 
-    @Published var isRecording : Bool = false
-    @Published var isPlayingAudio : Bool = false
-    @Published var recordingsList = [Recording]()
+    @Published var isRecording: Bool = false
+    @Published var isPlayingAudio: Bool = false
+    @Published var recordingsList: [Recording] = []
     @Published var durationString: String = "0:00"
-    @Published var timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    @Published var timer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
     @Published var time = 0
 
     override init(){
@@ -32,11 +32,14 @@ class VoiceViewModel : NSObject , ObservableObject , AVAudioPlayerDelegate {
     func playAudioRecording() {
         guard let recording = self.recordingsList.first else { return }
 
+        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, policy: .default, options: .defaultToSpeaker)
+
         do {
             self.audioPlayer = try AVAudioPlayer(contentsOf: recording.fileURL)
+            self.timer = Timer.publish(every: 0.2, on: .main, in: .common).autoconnect()
+            self.audioPlayer.delegate = self
             self.audioPlayer.prepareToPlay()
             self.audioPlayer.play()
-            self.audioPlayer.delegate = self
             self.isPlayingAudio = true
          } catch {
             print("Error playing audio")
@@ -77,8 +80,8 @@ class VoiceViewModel : NSObject , ObservableObject , AVAudioPlayerDelegate {
 
         let settings = [
             AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
-            AVSampleRateKey: 12000,
-            AVNumberOfChannelsKey: 1,
+            AVSampleRateKey: 44100,
+            AVNumberOfChannelsKey: 2,
             AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
         ]
 
@@ -96,6 +99,7 @@ class VoiceViewModel : NSObject , ObservableObject , AVAudioPlayerDelegate {
             self.audioRecorder.prepareToRecord()
             self.audioRecorder.record()
             self.isRecording = true
+            self.timer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
         } catch {
             print("Failed to Setup the Recording")
         }
@@ -105,8 +109,7 @@ class VoiceViewModel : NSObject , ObservableObject , AVAudioPlayerDelegate {
         DispatchQueue.main.async {
             self.audioRecorder.stop()
             self.isRecording = false
-            self.time = 0
-            //self.timer.upstream.connect().cancel()
+            self.timer.upstream.connect().cancel()
 
             self.fetchAudioRecording(completion: { _ in })
         }
@@ -150,6 +153,7 @@ class VoiceViewModel : NSObject , ObservableObject , AVAudioPlayerDelegate {
                 try fileManager.removeItem(at: audio.fileURL)
                 if let index = self.recordingsList.firstIndex(where: { $0.fileURL == audio.fileURL }) {
                     self.recordingsList.remove(at: index)
+                    self.time = 0
                 }
                 print("the recording count is nowww: \(recordingsList.count)")
             }
@@ -166,13 +170,13 @@ class VoiceViewModel : NSObject , ObservableObject , AVAudioPlayerDelegate {
             return Date()
         }
     }
-    
+
     func getTotalPlaybackDurationString() {
         let (_, m, s) = secondsToHoursMinutesSeconds(seconds: (Int(self.audioPlayer.duration) - Int(self.audioPlayer.currentTime)))
 
         self.durationString = String(format: "%d:%02d", arguments: [m, s])
     }
-    
+
     func getTotalDurationString() -> String {
         let (_, m, s) = secondsToHoursMinutesSeconds(seconds: self.time)
 
@@ -188,6 +192,7 @@ class VoiceViewModel : NSObject , ObservableObject , AVAudioPlayerDelegate {
         if flag {
             print("Audio player finished playing")
             self.stopAudioRecording()
+            self.time = 0
         }
     }
 }

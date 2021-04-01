@@ -18,6 +18,7 @@ import AVKit
 struct KeyboardCardView: View {
     @EnvironmentObject var auth: AuthModel
     @StateObject var imagePicker = KeyboardCardViewModel()
+    @ObservedObject var audio = VoiceViewModel()
     @Binding var height: CGFloat
     @Binding var isOpen: Bool
     @State var open: Bool = UserDefaults.standard.bool(forKey: "localOpen")
@@ -34,13 +35,14 @@ struct KeyboardCardView: View {
     @State var presentGIF: Bool = false
     @State var shareContact: Bool = false
     @State var isRecordingAudio: Bool = false
+    @State var hasAudioToSend: Bool = false
     @State var gifURL: String = ""
     @State private var inputImage: UIImage? = nil
     @State private var userTrackingMode: MapUserTrackingMode = .follow
     @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 25.7617, longitude: 80.1918), span: MKCoordinateSpan(latitudeDelta: 10, longitudeDelta: 10))
     let keyboard = KeyboardObserver()
     var contentAvailable: Bool {
-        if self.mainText.count > 0 || self.gifData.count > 0 || self.imagePicker.selectedPhotos.count > 0 || self.imagePicker.selectedVideos.count > 0 || self.enableLocation || self.imagePicker.pastedImages.count > 0 {
+        if self.mainText.count > 0 || self.gifData.count > 0 || self.imagePicker.selectedPhotos.count > 0 || self.imagePicker.selectedVideos.count > 0 || self.enableLocation || self.imagePicker.pastedImages.count > 0 || (self.hasAudioToSend && self.isRecordingAudio) {
             return true
         } else {
             return false
@@ -294,7 +296,7 @@ struct KeyboardCardView: View {
                 )
                 } else {
                     //Audio Recording Section
-                    KeyboardAudioView(isRecordingAudio: self.$isRecordingAudio)
+                    KeyboardAudioView(viewModel: self.audio, isRecordingAudio: self.$isRecordingAudio, hasAudioToSend: self.$hasAudioToSend)
                 }
                 
                 //MARK: Send Button
@@ -306,6 +308,13 @@ struct KeyboardCardView: View {
                     if let selectedDialog = self.auth.dialogs.results.filter("id == %@", UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").first {
                         if let connDia = self.auth.selectedConnectyDialog {
                             connDia.sendUserStoppedTyping()
+                        }
+
+                        if !self.audio.recordingsList.isEmpty {
+                            changeMessageRealmData.shared.sendAudioAttachment(dialog: selectedDialog, audioURL: self.audio.recordingsList.first?.fileURL ?? URL(fileURLWithPath: ""), occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
+                            self.audio.deleteAudioFile()
+
+                            return
                         }
 
                         if self.gifData.count > 0 {

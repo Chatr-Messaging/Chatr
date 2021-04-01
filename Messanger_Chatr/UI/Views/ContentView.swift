@@ -291,6 +291,7 @@ struct mainHomeList: View {
                         }.sheet(isPresented: self.$showNewChat, onDismiss: {
                             if self.newDialogID.count > 0 {
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
+                                    self.selectedDialogID = self.newDialogID
                                     self.isLocalOpen = true
                                     UserDefaults.standard.set(self.isLocalOpen, forKey: "localOpen")
                                     changeDialogRealmData.shared.updateDialogOpen(isOpen: self.isLocalOpen, dialogID: self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id ?? "")
