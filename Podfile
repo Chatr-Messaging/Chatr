@@ -23,6 +23,7 @@ target 'Messanger_Chatr' do
   pod 'SnapSDK', '1.4.0', :subspecs => ['SCSDKCreativeKit']
   pod 'netfox'
   pod 'Cache'
-  
+  pod 'Instabug'
+
 end
 

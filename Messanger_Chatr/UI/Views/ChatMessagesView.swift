@@ -255,6 +255,10 @@ struct ChatMessagesView: View {
                                         }
                                     }
                                 }.contentShape(Rectangle())
+                                
+//                                Rectangle()
+//                                    .frame(width: Constants.screenWidth, height: self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 95 : 0) + 32)
+//                                    .foregroundColor(.clear)
                             }.background(GeometryReader {
                                 Color.clear.preference(key: ViewOffsetKey.self,
                                     value: -$0.frame(in: .named("scroll")).origin.y)

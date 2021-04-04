@@ -369,7 +369,7 @@ struct NewConversationView: View {
         }.edgesIgnoringSafeArea(.bottom)
         .background(Color("bgColor"))
     }
-    
+
     func grandSeach(searchText: String) {
         if searchText != "" {
             Request.users(withFullName: searchText, paginator: Paginator.limit(20, skip: 0), successBlock: { (paginator, users) in

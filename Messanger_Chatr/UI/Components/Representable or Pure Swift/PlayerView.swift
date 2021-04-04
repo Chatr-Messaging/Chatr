@@ -22,7 +22,9 @@ struct PlayerView: UIViewRepresentable {
     }
 
     func makeUIView(context: Context) -> UIView {
-        return PlayerUIView(player: player)
+        let playerView = PlayerUIView(player: player)
+
+        return playerView
     }
 }
 

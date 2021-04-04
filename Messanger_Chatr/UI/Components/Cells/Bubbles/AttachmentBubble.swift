@@ -91,13 +91,18 @@ struct AttachmentBubble: View {
                             .transition(.asymmetric(insertion: AnyTransition.scale.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                             .background(Color("bgColor"))
                             .clipShape(CustomGIFShape())
+                            
                             //.frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.55 : 0.65)), alignment: self.messagePosition == .right ? .trailing : .leading)
                             //.frame(minHeight: 100, maxHeight: CGFloat(Constants.screenHeight * 0.45))
                             .frame(width: self.videoSize.width <= 0 ? Constants.screenWidth * 0.65 : self.videoSize.width, height: self.videoSize.height <= 0 ? Constants.screenHeight * 0.5 : self.videoSize.height)
+                            //.frame(width: self.videoSize.width, height: self.videoSize.height)
                             .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 14)
                             .padding(.bottom, self.hasPrior ? 0 : 4)
                             .offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
                             .matchedGeometryEffect(id: self.message.id.description + "mov", in: namespace)
+//                            .onPreferenceChange(SizePreferenceKey.self) { preferences in
+//                                self.videoSize = CGSize(width: Int(preferences.width), height: Int(preferences.height))
+//                            }
                             .overlay(
                                 ZStack {
                                     VideoControlBubble(viewModel: self.viewModel, player: self.$player, play: self.$play, totalDuration: self.$totalDuration, message: self.message, messagePositionRight: messagePosition == .right)
