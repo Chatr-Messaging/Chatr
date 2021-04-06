@@ -51,8 +51,9 @@ struct NewConversationView: View {
                             }, label: {
                                 Text("Private")
                                     .font(.headline)
-                                    .fontWeight(self.navigationPrivate ? .bold : .regular)
+                                    .fontWeight(self.navigationPrivate ? .bold : .medium)
                                     .foregroundColor(self.navigationPrivate ? .blue : .primary)
+                                    .offset(x: self.navigationPrivate ? 0 : 10)
                             })
 
                             Button(action: {
@@ -64,8 +65,9 @@ struct NewConversationView: View {
                             }, label: {
                                 Text("Public")
                                     .font(.headline)
-                                    .fontWeight(!self.navigationPrivate ? .bold : .regular)
+                                    .fontWeight(!self.navigationPrivate ? .bold : .medium)
                                     .foregroundColor(!self.navigationPrivate ? .blue : .primary)
+                                    .offset(x: !self.navigationPrivate ? 0 : -10)
                             })
                         }
                     }.padding(.horizontal)
