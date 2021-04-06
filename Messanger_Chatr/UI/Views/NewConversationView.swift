@@ -51,7 +51,7 @@ struct NewConversationView: View {
                             }, label: {
                                 Text("Private")
                                     .font(.headline)
-                                    .fontWeight(self.navigationPrivate ? .bold : .semibold)
+                                    .fontWeight(self.navigationPrivate ? .bold : .regular)
                                     .foregroundColor(self.navigationPrivate ? .blue : .primary)
                             })
 
@@ -64,7 +64,7 @@ struct NewConversationView: View {
                             }, label: {
                                 Text("Public")
                                     .font(.headline)
-                                    .fontWeight(!self.navigationPrivate ? .bold : .semibold)
+                                    .fontWeight(!self.navigationPrivate ? .bold : .regular)
                                     .foregroundColor(!self.navigationPrivate ? .blue : .primary)
                             })
                         }
