@@ -531,7 +531,7 @@ struct mainHomeList: View {
                 //MARK: LOCKED OUT VIEW
                 LockedOutView()
             }
-            
+
             //MARK: Quick Snap View
             QuickSnapStartView(viewState: self.$quickSnapViewState, selectedQuickSnapContact: self.$selectedQuickSnapContact)
                 .environmentObject(self.auth)

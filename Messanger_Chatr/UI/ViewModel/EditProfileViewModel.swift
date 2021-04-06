@@ -39,7 +39,7 @@ class EditProfileViewModel: ObservableObject {
             completion(user.username)
         }
     }
-    
+
     func styleBuilder<Content: View>(@ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .center) {
             VStack(spacing: 0) {
