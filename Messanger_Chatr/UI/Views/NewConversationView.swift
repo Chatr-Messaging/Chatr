@@ -42,7 +42,7 @@ struct NewConversationView: View {
                             .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
                             .offset(x: self.navigationPrivate ? -22.5 : 22.5)
 
-                        HStack(spacing: 120) {
+                        HStack(spacing: 100) {
                             Button(action: {
                                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 withAnimation(Animation.easeInOut(duration: 0.2)) {
@@ -53,7 +53,6 @@ struct NewConversationView: View {
                                     .font(.headline)
                                     .fontWeight(self.navigationPrivate ? .bold : .medium)
                                     .foregroundColor(self.navigationPrivate ? .blue : .primary)
-                                    .offset(x: self.navigationPrivate ? 0 : 10)
                             })
 
                             Button(action: {
@@ -67,10 +66,10 @@ struct NewConversationView: View {
                                     .font(.headline)
                                     .fontWeight(!self.navigationPrivate ? .bold : .medium)
                                     .foregroundColor(!self.navigationPrivate ? .blue : .primary)
-                                    .offset(x: !self.navigationPrivate ? 0 : -10)
                             })
                         }
-                    }.padding(.horizontal)
+                    }.padding(.leading, !self.navigationPrivate ? 30 : 20)
+                    .padding(.trailing, self.navigationPrivate ? 30 : 20)
                     .background(
                         RoundedRectangle(cornerRadius: 12)
                             .foregroundColor(Color("pendingBtnColor"))
