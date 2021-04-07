@@ -42,7 +42,7 @@ struct NewConversationView: View {
                             .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
                             .offset(x: self.navigationPrivate ? -22.5 : 22.5)
 
-                        HStack(spacing: 100) {
+                        HStack(spacing: 70) {
                             Button(action: {
                                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 withAnimation(Animation.easeInOut(duration: 0.2)) {
@@ -68,8 +68,8 @@ struct NewConversationView: View {
                                     .foregroundColor(!self.navigationPrivate ? .blue : .primary)
                             })
                         }
-                    }.padding(.leading, !self.navigationPrivate ? 30 : 20)
-                    .padding(.trailing, self.navigationPrivate ? 30 : 20)
+                    }.padding(.leading, !self.navigationPrivate ? 25 : 20)
+                    .padding(.trailing, self.navigationPrivate ? 25 : 20)
                     .background(
                         RoundedRectangle(cornerRadius: 12)
                             .foregroundColor(Color("pendingBtnColor"))
@@ -330,7 +330,7 @@ struct NewConversationView: View {
 
                     //MARK: Public Dialog
                     VStack {
-                        NewPublicConversationSection()
+                        NewPublicConversationSection(isNotPresent: self.$navigationPrivate)
                             .environmentObject(self.auth)
                         Spacer()
                     }.frame(width: Constants.screenWidth)
