@@ -14,9 +14,8 @@ struct NewPublicConversationSection: View {
     @ObservedObject var viewModel = EditProfileViewModel()
     @StateObject var imagePicker = KeyboardCardViewModel()
     @State var fullNameText: String = ""
-    @State var bioText: String = "Bio"
+    @State var bioText: String = ""
     @State var bioHeight: CGFloat = 0
-    @State var loadingSave: Bool = false
     @State var didSave: Bool = true
     @State var showImagePicker: Bool = false
     @State private var image: Image? = nil
@@ -26,7 +25,7 @@ struct NewPublicConversationSection: View {
         VStack {
             //MARK: Profile Picture Section
             HStack {
-                Text("PROFILE PICTURE:")
+                Text("GROUP PICTURE:")
                     .font(.caption)
                     .fontWeight(.regular)
                     .foregroundColor(.secondary)
@@ -48,19 +47,25 @@ struct NewPublicConversationSection: View {
                         HStack(alignment: .center) {
                             Spacer()
                             VStack(alignment: .center) {
-                                if let avitarURL = self.auth.profile.results.first?.avatar {
-                                    WebImage(url: URL(string: avitarURL))
-                                        .resizable()
-                                        .placeholder{ Image("empty-profile").resizable().frame(width: 80, height: 80, alignment: .center).scaledToFill() }
-                                        .indicator(.activity)
-                                        .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
-                                        .scaledToFill()
-                                        .clipShape(Circle())
-                                        .frame(width: 80, height: 80, alignment: .center)
-                                        .shadow(color: Color.black.opacity(0.25), radius: 10, x: 0, y: 8)
+                                if (image == nil) {
+                                    ZStack {
+                                        RoundedRectangle(cornerRadius: 20)
+                                            .frame(width: 80, height: 80, alignment: .center)
+                                            .foregroundColor(Color("bgColor"))
+
+                                        Image(systemName: "person.fill")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .foregroundColor(Color.primary)
+                                            .frame(width: 58, height: 58, alignment: .center)
+                                            .clipShape(RoundedRectangle(cornerRadius: 15))
+                                    }.shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 8)
+                                } else {
+                                    image?.resizable().scaledToFill().clipped().frame(width: 80, height: 80).cornerRadius(20)
+                                        .shadow(color: Color("buttonShadow"), radius: 8, x: 0, y: 5)
                                 }
-                                
-                                Text("Change Profile Picture")
+
+                                Text("Change Group Picture")
                                     .font(.none)
                                     .fontWeight(.none)
                                     .foregroundColor(.blue)
@@ -80,7 +85,7 @@ struct NewPublicConversationSection: View {
                         }
                     }.padding(.vertical, 10)
                 }).buttonStyle(changeBGButtonStyle())
-            }.background(Color("buttonColor"))
+            }.background(Color("bgColor"))
             .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
             .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
             .padding(.horizontal)
@@ -91,7 +96,7 @@ struct NewPublicConversationSection: View {
             
             //MARK: Name & Bio Section
             HStack {
-                Text("NAME & BIO:")
+                Text("GROUP DETAILS:")
                     .font(.caption)
                     .fontWeight(.regular)
                     .foregroundColor(.secondary)
@@ -100,7 +105,7 @@ struct NewPublicConversationSection: View {
                     .offset(y: 2)
                 Spacer()
             }.padding(.top, 10)
-            
+
             self.viewModel.styleBuilder(content: {
                 //FullName Section
                 VStack {
@@ -112,8 +117,8 @@ struct NewPublicConversationSection: View {
                             .frame(width: 20, height: 20, alignment: .center)
                             .padding(.trailing, 5)
                         
-                        TextField("Full Name", text: $fullNameText)
-                            //.font(.system(size: 24, weight: .bold, design: .default))
+                        TextField("Name", text: $fullNameText)
+                            //.font(.system(size: 16, weight: .se, design: .default))
                             .foregroundColor(.primary)
                             .onChange(of: self.fullNameText) { _ in
                                 self.didSave = false
@@ -128,8 +133,6 @@ struct NewPublicConversationSection: View {
                     Divider()
                         .frame(width: Constants.screenWidth - 70)
                         .offset(x: 30)
-                }.onAppear() {
-                    self.fullNameText = self.auth.profile.results.first?.fullName ?? ""
                 }
                 
                 //Bio Section
@@ -155,7 +158,7 @@ struct NewPublicConversationSection: View {
                                 .padding(.horizontal, 2.5)
                                 .padding(.trailing, 5)
                                 .font(.none)
-                                .foregroundColor(self.bioText != "Bio" ? .primary : .secondary)
+                                .foregroundColor(self.bioText != "Description" ? .primary : .secondary)
                                 .multilineTextAlignment(.leading)
                                 .lineLimit(5)
                                 .offset(x: -7, y: -10)
@@ -163,21 +166,27 @@ struct NewPublicConversationSection: View {
                                     self.didSave = false
                                 }
                             
-                            Text("Bio")
+                            Text("Description")
                                 .font(.none)
                                 .fontWeight(.none)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(Color("placeholderText"))
                                 .opacity(self.bioText != "" ? 0 : 1)
-                                .padding(.leading, 5)
+                                .offset(x: -5)
                         }
                     }
                 }.padding(.horizontal)
                 .padding(.vertical, 8)
                 .frame(height: 100)
-                .onAppear() {
-                    self.bioText = self.auth.profile.results.first?.bio ?? "Bio"
-                }
             })
+
+            HStack(alignment: .center) {
+                Text("public group chats can have up to 100 occupants (for now) and provides more options to maintain and grow your audience")
+                    .font(.caption)
+                    .fontWeight(.none)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+            }.padding(.horizontal, 20)
+            .padding(.vertical, 30)
         }
     }
 
