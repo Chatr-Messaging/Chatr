@@ -104,7 +104,6 @@
 		05A7BD4D24F851760001BFC9 /* TermsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A7BD4C24F851760001BFC9 /* TermsView.swift */; };
 		05A7BD4F24F9E8D20001BFC9 /* ContactRealmCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A7BD4E24F9E8D20001BFC9 /* ContactRealmCell.swift */; };
 		05A7BD5124FA0F800001BFC9 /* VisitContactView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A7BD5024FA0F800001BFC9 /* VisitContactView.swift */; };
-		05A7BD5424FAED250001BFC9 /* CameraController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A7BD5224FAED230001BFC9 /* CameraController.swift */; };
 		05A7BD5524FAED250001BFC9 /* CameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A7BD5324FAED250001BFC9 /* CameraViewController.swift */; };
 		05A7BD5724FAFC3C0001BFC9 /* CapturePhotoButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A7BD5624FAFC3C0001BFC9 /* CapturePhotoButton.swift */; };
 		05A7BD5924FB36B30001BFC9 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A7BD5824FB36B30001BFC9 /* CameraView.swift */; };
@@ -281,7 +280,6 @@
 		05A7BD4C24F851760001BFC9 /* TermsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermsView.swift; sourceTree = "<group>"; };
 		05A7BD4E24F9E8D20001BFC9 /* ContactRealmCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactRealmCell.swift; sourceTree = "<group>"; };
 		05A7BD5024FA0F800001BFC9 /* VisitContactView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitContactView.swift; sourceTree = "<group>"; };
-		05A7BD5224FAED230001BFC9 /* CameraController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraController.swift; sourceTree = "<group>"; };
 		05A7BD5324FAED250001BFC9 /* CameraViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraViewController.swift; sourceTree = "<group>"; };
 		05A7BD5624FAFC3C0001BFC9 /* CapturePhotoButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturePhotoButton.swift; sourceTree = "<group>"; };
 		05A7BD5824FB36B30001BFC9 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
@@ -740,7 +738,6 @@
 		05F8E11623F0DE150066954C /* Representable or Pure Swift */ = {
 			isa = PBXGroup;
 			children = (
-				05A7BD5224FAED230001BFC9 /* CameraController.swift */,
 				05A7BD5324FAED250001BFC9 /* CameraViewController.swift */,
 				053AC4B125194C080036946E /* GIFController.swift */,
 				05ECD98F25E0FBE600B5783A /* PlayerView.swift */,
@@ -1101,7 +1098,6 @@
 				055F37C52607F15F003EDB1F /* Cryptography.swift in Sources */,
 				058AC5342599158D0027FD11 /* DiscoverCarouselSection.swift in Sources */,
 				052364C32439A37200AF825F /* DialogCell.swift in Sources */,
-				05A7BD5424FAED250001BFC9 /* CameraController.swift in Sources */,
 				05A7BD4D24F851760001BFC9 /* TermsView.swift in Sources */,
 				05A7633A25060EB2002712FA /* AddNewContactView.swift in Sources */,
 				05A7BD6124FEF5180001BFC9 /* LockedOutView.swift in Sources */,

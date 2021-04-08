@@ -138,7 +138,12 @@ class changeDialogRealmData {
                     for admin in object.adminsIDs ?? [] {
                         newData.adminID.append(Int(truncating: admin))
                     }
-                    newData.avatar = object.photo ?? ""
+
+                    if let publicUrl = Blob.publicUrl(forFileUID: object.photo ?? "") {
+                        newData.avatar = publicUrl
+                        print("the public image \(newData.fullName) is: \(Blob.publicUrl(forFileUID: object.photo ?? ""))")
+                    }
+
                     newData.bio = object.dialogDescription ?? ""
                 }
 

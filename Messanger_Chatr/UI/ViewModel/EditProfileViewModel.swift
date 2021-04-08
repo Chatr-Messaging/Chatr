@@ -11,7 +11,8 @@ import RealmSwift
 import ConnectyCube
 
 class EditProfileViewModel: ObservableObject {
-    
+    @Published var inputImage: UIImage? = nil
+
     private let instagramApi = InstagramApi.shared
     
     var testUserData: InstagramTestUser {

@@ -42,14 +42,14 @@ struct DialogCell: View {
 
                 if self.dialogModel.dialogType == "private" || self.dialogModel.dialogType == "public" || self.dialogModel.dialogType == "broadcast" {
                     ZStack {
-                        WebImage(url: URL(string: (self.privateDialogContact.id != 0 ? self.privateDialogContact.avatar : PersistenceManager.shared.getCubeProfileImage(usersID: self.connectyContact)) ?? ""))
+                        WebImage(url: URL(string: self.dialogModel.dialogType == "public" ? (self.dialogModel.avatar) : (self.privateDialogContact.id != 0 ? self.privateDialogContact.avatar : PersistenceManager.shared.getCubeProfileImage(usersID: self.connectyContact)) ?? ""))
                             .resizable()
                             .placeholder{ Image("empty-profile").resizable().frame(width: 55, height: 55, alignment: .center).scaledToFill() }
                             .indicator(.activity)
-                            .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.05)), removal: AnyTransition.identity))
                             .scaledToFill()
-                            .clipShape(Circle())
                             .frame(width: 55, height: 55, alignment: .center)
+                            .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.05)), removal: AnyTransition.identity))
+                            .cornerRadius(self.dialogModel.dialogType == "public" ? 15 : 27.5)
                             .offset(x: -5)
                             .shadow(color: Color.black.opacity(0.23), radius: 7, x: 0, y: 5)
                             .onTapGesture {

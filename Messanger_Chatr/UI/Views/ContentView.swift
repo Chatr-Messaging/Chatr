@@ -295,8 +295,8 @@ struct mainHomeList: View {
                                     self.selectedDialogID = self.newDialogID
                                     self.isLocalOpen = true
                                     UserDefaults.standard.set(self.isLocalOpen, forKey: "localOpen")
-                                    changeDialogRealmData.shared.updateDialogOpen(isOpen: self.isLocalOpen, dialogID: self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id ?? "")
-                                    UserDefaults.standard.set(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id, forKey: "selectedDialogID")
+                                    changeDialogRealmData.shared.updateDialogOpen(isOpen: self.isLocalOpen, dialogID: self.selectedDialogID)
+                                    UserDefaults.standard.set(self.selectedDialogID, forKey: "selectedDialogID")
                                     self.newDialogID = ""
                                 }
                             }

@@ -20,14 +20,16 @@ struct NewPublicConversationSection: View {
     @EnvironmentObject var auth: AuthModel
     @ObservedObject var viewModel = EditProfileViewModel()
     @StateObject var imagePicker = KeyboardCardViewModel()
+    @Binding var creatingDialog: Bool
     @Binding var isNotPresent: Bool
-    @State var groupName: String = ""
-    @State var description: String = ""
+    @Binding var groupName: String
+    @Binding var description: String
+    @Binding var inputImage: UIImage?
     @State var groupImage: Image? = nil
+    @Binding var selectedTags: [publicTag]
     @State var descriptionHeight: CGFloat = 0
     @State var publicTags: [[publicTag]] = []
     @State private var showImagePicker: Bool = false
-    @State private var inputImage: UIImage? = nil
 
     var body: some View {
         VStack {
@@ -77,7 +79,7 @@ struct NewPublicConversationSection: View {
                                     .font(.none)
                                     .fontWeight(.none)
                                     .foregroundColor(.blue)
-                                    .padding(.top, 10)
+                                    .padding(.top, 5)
                             }.padding(.horizontal)
                             .offset(x: 20)
                             .contentShape(Rectangle())
@@ -126,12 +128,14 @@ struct NewPublicConversationSection: View {
                             .padding(.trailing, 5)
                         
                         TextField("Name", text: $groupName)
-                            //.font(.system(size: 16, weight: .se, design: .default))
                             .foregroundColor(.primary)
+                            .autocapitalization(.words)
+                            .disableAutocorrection(true)
+                            .font(.system(size: 20, weight: self.groupName.count > 0 ? .semibold : .regular, design: .default))
 
                         Spacer()
                     }.padding(.horizontal)
-                    .padding(.vertical, 6)
+                    .padding(.vertical, 2)
                     .padding(.top, 2)
                     .contentShape(Rectangle())
 
@@ -166,7 +170,7 @@ struct NewPublicConversationSection: View {
                                 .foregroundColor(self.description != "Description" ? .primary : .secondary)
                                 .multilineTextAlignment(.leading)
                                 .lineLimit(5)
-                                .offset(x: -7, y: -10)
+                                .offset(x: -12.5, y: -10)
                             
                             Text("Description")
                                 .font(.none)
@@ -199,13 +203,14 @@ struct NewPublicConversationSection: View {
                                 ForEach(publicTags.indices, id: \.self) { index in
                                     HStack {
                                         ForEach(self.publicTags[index].indices, id: \.self) { tagIndex in
-                                            Text(self.publicTags[index][tagIndex].title)
+                                            Text("#" + "\(self.publicTags[index][tagIndex].title)")
                                                 .fontWeight(.medium)
                                                 .padding(.vertical, 7.5)
                                                 .padding(.horizontal)
                                                 .foregroundColor(self.publicTags[index][tagIndex].selected ? Color.black : Color.primary)
                                                 .background(RoundedRectangle(cornerRadius: 10).stroke(self.publicTags[index][tagIndex].selected ? Color.blue : Color.black, lineWidth: 1.5).background(self.publicTags[index][tagIndex].selected ? Color("interactions_selected") : Color("SegmentSliderColor")).cornerRadius(10))
                                                 .lineLimit(1)
+                                                .fixedSize()
                                                 .overlay(
                                                     GeometryReader { reader -> Color in
                                                         if self.isNotPresent != true {
@@ -228,20 +233,11 @@ struct NewPublicConversationSection: View {
                                                 .onTapGesture {
                                                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                                     self.publicTags[index][tagIndex].selected.toggle()
-
-//                                                    for i in self.publicTags {
-//                                                        for u: publicTag in i {
-//                                                            if u.selected == true && u.id != self.publicTags[index][tagIndex].id {
-//                                                                print("hi")
-//                                                                //self.publicTags[index][tagIndex].selected.toggle()
-//                                                                //self.publicTags.flatMap({ $0 }).filter({ $0.id == u.id }))[index].selected = false
-////                                                                if let foundIndex = self.publicTags.firstIndex(where: { $0.count >$0[index].selected == true }) {
-////
-////                                                                    self.publicTags[index][foundIndex].selected = false
-////                                                                }
-//                                                            }
-//                                                        }
-//                                                    }
+                                                    if self.selectedTags.contains(where: { $0.id == self.publicTags[index][tagIndex].id }) {
+                                                        self.selectedTags.removeAll(where: { $0.id == self.publicTags[index][tagIndex].id })
+                                                    } else {
+                                                        self.selectedTags.append(self.publicTags[index][tagIndex])
+                                                    }
                                                 }
                                         }
                                     }

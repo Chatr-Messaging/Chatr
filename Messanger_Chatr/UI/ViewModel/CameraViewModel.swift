@@ -28,7 +28,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
             return
         case .notDetermined:
             AVCaptureDevice.requestAccess(for: .video) { (status) in
-                if status{
+                if status {
                     self.setUp()
                 }
             }
