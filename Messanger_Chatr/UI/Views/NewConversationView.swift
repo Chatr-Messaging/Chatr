@@ -37,282 +37,192 @@ struct NewConversationView: View {
 
     var body: some View {
         NavigationView {
-            ZStack {
-                ScrollView(.vertical, showsIndicators: false) {
-                    //MARK: Top Navigation
-                    if self.usedAsNew {
-                        ZStack(alignment: self.navigationPrivate ? .leading : .trailing) {
-                            RoundedRectangle(cornerRadius: 12)
-                                .foregroundColor(Color("SegmentSliderColor"))
-                                .frame(width: 100, height: 40, alignment: .center)
-                                .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
-                                .offset(x: self.navigationPrivate ? -22.5 : 22.5)
+            ScrollView(.vertical, showsIndicators: false) {
+                //MARK: Top Navigation
+                if self.usedAsNew {
+                    ZStack(alignment: self.navigationPrivate ? .leading : .trailing) {
+                        RoundedRectangle(cornerRadius: 12)
+                            .foregroundColor(Color("SegmentSliderColor"))
+                            .frame(width: 100, height: 40, alignment: .center)
+                            .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
+                            .offset(x: self.navigationPrivate ? -22.5 : 22.5)
 
-                            HStack(spacing: 70) {
-                                Button(action: {
-                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                    withAnimation(Animation.easeInOut(duration: 0.2)) {
-                                        self.navigationPrivate = true
-                                    }
-                                }, label: {
-                                    Text("Private")
-                                        .font(.headline)
-                                        .fontWeight(self.navigationPrivate ? .bold : .medium)
-                                        .foregroundColor(self.navigationPrivate ? .blue : .primary)
-                                })
-
-                                Button(action: {
-                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                
-                                    withAnimation(Animation.easeInOut(duration: 0.2)) {
-                                        self.navigationPrivate = false
-                                    }
-                                }, label: {
-                                    Text("Public")
-                                        .font(.headline)
-                                        .fontWeight(!self.navigationPrivate ? .bold : .medium)
-                                        .foregroundColor(!self.navigationPrivate ? .blue : .primary)
-                                })
-                            }
-                        }.padding(.leading, !self.navigationPrivate ? 25 : 20)
-                        .padding(.trailing, self.navigationPrivate ? 25 : 20)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .foregroundColor(Color("pendingBtnColor"))
-                        )
-                        .padding(.top, 95) //don't touch this or switch up the padding... there for a reason
-                    }
-
-                    HStack(spacing: 0) {
-                        //MARK: Private or Group Section
-                        VStack {
-                            //MARK: Search Bar
-                            VStack {
-                                if self.allowOnlineSearch {
-                                    HStack {
-                                        Text("SEARCH NAME OR PHONE NUMBER:")
-                                            .font(.caption)
-                                            .fontWeight(.regular)
-                                            .foregroundColor(.secondary)
-                                            .padding(.horizontal)
-                                        Spacer()
-                                    }.padding(.bottom, 2)
-                                    
-                                    HStack {
-                                        Image(systemName: "magnifyingglass")
-                                            .padding(.leading, 15)
-                                            .foregroundColor(.primary)
-                                        
-                                        TextField("Search", text: $searchText, onCommit: {
-                                            self.outputSearchText = self.searchText
-                                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                                            if allowOnlineSearch {
-                                                self.grandSeach(searchText: self.outputSearchText)
-                                            }
-                                        })
-                                        .padding(EdgeInsets(top: 16, leading: 5, bottom: 16, trailing: 10))
-                                        .foregroundColor(.primary)
-                                        .font(.system(size: 18))
-                                        .lineLimit(1)
-                                        .keyboardType(.webSearch)
-                                        .onChange(of: self.searchText) { value in
-                                            print("the value is: \(value)")
-                                            if self.searchText.count >= 3 && self.allowOnlineSearch {
-                                                self.grandSeach(searchText: self.searchText)
-                                            } else {
-                                                self.grandUsers.removeAll()
-                                            }
-                                        }
-                                        
-                                        if !searchText.isEmpty {
-                                            Button(action: {
-                                                self.searchText = ""
-                                                self.outputSearchText = ""
-                                                self.grandUsers.removeAll()
-                                            }) {
-                                                Image(systemName: "xmark.circle.fill")
-                                                    .foregroundColor(.secondary)
-                                            }.padding(.horizontal, 15)
-                                        }
-                                        
-                                    }.background(Color("buttonColor"))
-                                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .circular))
-                                    .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
+                        HStack(spacing: 70) {
+                            Button(action: {
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                withAnimation(Animation.easeInOut(duration: 0.2)) {
+                                    self.navigationPrivate = true
                                 }
-                            }.padding(.top, self.allowOnlineSearch ? (self.usedAsNew ? 20 : 100) : 60)
-                            .padding(.horizontal)
+                            }, label: {
+                                Text("Private")
+                                    .font(.headline)
+                                    .fontWeight(self.navigationPrivate ? .bold : .medium)
+                                    .foregroundColor(self.navigationPrivate ? .blue : .primary)
+                            })
 
-                            //MARK: Search All Section
-                            if self.grandUsers.count != 0 {
+                            Button(action: {
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                            
+                                withAnimation(Animation.easeInOut(duration: 0.2)) {
+                                    self.navigationPrivate = false
+                                }
+                            }, label: {
+                                Text("Public")
+                                    .font(.headline)
+                                    .fontWeight(!self.navigationPrivate ? .bold : .medium)
+                                    .foregroundColor(!self.navigationPrivate ? .blue : .primary)
+                            })
+                        }
+                    }.padding(.leading, !self.navigationPrivate ? 25 : 20)
+                    .padding(.trailing, self.navigationPrivate ? 25 : 20)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .foregroundColor(Color("pendingBtnColor"))
+                    )
+                    .padding(.top) //don't touch this or switch up the padding... there for a reason
+                }
+
+                HStack(alignment: .top, spacing: 0) {
+                    //MARK: Private or Group Section
+                    VStack {
+                        //MARK: Search Bar
+                        VStack {
+                            if self.allowOnlineSearch {
                                 HStack {
-                                    Text("TOP RESULTS:")
+                                    Text("SEARCH NAME OR PHONE NUMBER:")
                                         .font(.caption)
+                                        .fontWeight(.regular)
                                         .foregroundColor(.secondary)
-                                        .multilineTextAlignment(.leading)
-                                    
+                                        .padding(.horizontal)
                                     Spacer()
-                                }.padding(.horizontal)
-                                .padding(.horizontal)
-                                .padding(.top, 25)
-
-                                LazyVStack(spacing: 0) {
-                                    ForEach(self.grandUsers, id: \.self) { searchedContact in
-                                        if searchedContact.id != Session.current.currentUserID {
-                                            VStack(alignment: .trailing, spacing: 0) {
-                                                ContactCell(user: searchedContact, selectedContact: self.$selectedContact)
-                                                    .animation(.spring(response: 0.15, dampingFraction: 0.60, blendDuration: 0))
-                                                    .padding(.horizontal)
-                                                    .padding(.vertical, 10)
-                                                    .contentShape(Rectangle())
-                                                    .onTapGesture {
-                                                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                                                        if self.selectedContact.contains(Int(searchedContact.id)) {
-                                                            self.selectedContact.removeAll(where: { $0 == searchedContact.id })
-                                                        } else {
-                                                            self.selectedContact.append(Int(searchedContact.id))
-                                                        }
-                                                    }
-
-                                                if self.grandUsers.last != searchedContact {
-                                                    Divider()
-                                                        .frame(width: Constants.screenWidth - 100)
-                                                }
-                                            }
-                                        }
-                                    }
-                                }.background(Color("buttonColor"))
-                                .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
-                                .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 8)
-                                .padding(.horizontal)
-                            }
-
-                            //MARK: Contacts Section
-                            if self.contacts.filterContact(text: self.searchText).filter({ $0.isMyContact == true }).count != 0 {
-                                HStack {
-                                    VStack(alignment: .leading) {
-                                        Text("Contacts:")
-                                            .font(.title)
-                                            .fontWeight(.bold)
-                                            .foregroundColor(.primary)
-                                            .multilineTextAlignment(.leading)
-
-                                        Text(Chat.instance.contactList?.contacts.count == 1 ? "\(Chat.instance.contactList?.contacts.count ?? 0) CONTACT" : "\(self.contacts.filterContact(text: self.searchText).filter({ $0.id != UserDefaults.standard.integer(forKey: "currentUserID") && $0.fullName != "No Name" && $0.isMyContact == true }).count) CONTACTS")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                            .multilineTextAlignment(.leading)
-                                    }
-                                    Spacer()
-                                }.padding(.horizontal)
-                                .padding(.horizontal)
-                                .padding(.top, 25)
-
-                                LazyVStack(spacing: 0) {
-                                    ForEach(self.contacts.filterContact(text: self.searchText).filter({ $0.isMyContact == true }).sorted { $0.fullName < $1.fullName }.filter({ $0.id != UserDefaults.standard.integer(forKey: "currentUserID") && $0.fullName != "No Name" }), id: \.self) { contact in
-                                        VStack(alignment: .trailing, spacing: 0) {
-                                            ContactRealmCell(selectedContact: self.$selectedContact, contact: contact)
-                                                .animation(.spring(response: 0.15, dampingFraction: 0.60, blendDuration: 0))
-                                                .padding(.horizontal)
-                                                .padding(.vertical, 10)
-                                                .contentShape(Rectangle())
-                                                .onTapGesture {
-                                                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                                                    if self.selectedContact.contains(contact.id) {
-                                                        self.selectedContact.removeAll(where: { $0 == contact.id })
-                                                    } else {
-                                                        self.selectedContact.append(contact.id)
-                                                    }
-                                                }
-
-                                            if self.contacts.filterContact(text: self.searchText).sorted { $0.fullName < $1.fullName }.last != contact {
-                                                Divider()
-                                                    .frame(width: Constants.screenWidth - 100)
-                                            }
-                                        }
-                                    }
-                                }.background(Color("buttonColor"))
-                                .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
-                                .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 8)
-                                .padding(.horizontal)
-                            }
-
-                            //MARK: Regristered Section
-                            if self.regristeredAddressBook.count != 0 {
-                                HStack {
-                                    VStack(alignment: .leading) {
-                                        Text("Regristered:")
-                                            .font(.title)
-                                            .fontWeight(.bold)
-                                            .foregroundColor(.primary)
-                                            .multilineTextAlignment(.leading)
-
-                                        Text(self.regristeredAddressBook.count == 1 ? "\(self.regristeredAddressBook.count) REGRISTERED CONTACT" : "\(self.regristeredAddressBook.count) REGRISTERED CONTACTS")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                            .multilineTextAlignment(.leading)
-                                    }
-                                    Spacer()
-                                }.padding(.horizontal)
-                                .padding(.horizontal)
-                                .padding(.top, 25)
+                                }.padding(.bottom, 2)
                                 
-                                LazyVStack(spacing: 0) {
-                                    ForEach(self.regristeredAddressBook, id: \.self) { result in
+                                HStack {
+                                    Image(systemName: "magnifyingglass")
+                                        .padding(.leading, 15)
+                                        .foregroundColor(.primary)
+                                    
+                                    TextField("Search", text: $searchText, onCommit: {
+                                        self.outputSearchText = self.searchText
+                                        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                                        if allowOnlineSearch {
+                                            self.grandSeach(searchText: self.outputSearchText)
+                                        }
+                                    })
+                                    .padding(EdgeInsets(top: 16, leading: 5, bottom: 16, trailing: 10))
+                                    .foregroundColor(.primary)
+                                    .font(.system(size: 18))
+                                    .lineLimit(1)
+                                    .keyboardType(.webSearch)
+                                    .onChange(of: self.searchText) { value in
+                                        print("the value is: \(value)")
+                                        if self.searchText.count >= 3 && self.allowOnlineSearch {
+                                            self.grandSeach(searchText: self.searchText)
+                                        } else {
+                                            self.grandUsers.removeAll()
+                                        }
+                                    }
+                                    
+                                    if !searchText.isEmpty {
+                                        Button(action: {
+                                            self.searchText = ""
+                                            self.outputSearchText = ""
+                                            self.grandUsers.removeAll()
+                                        }) {
+                                            Image(systemName: "xmark.circle.fill")
+                                                .foregroundColor(.secondary)
+                                        }.padding(.horizontal, 15)
+                                    }
+                                    
+                                }.background(Color("buttonColor"))
+                                .clipShape(RoundedRectangle(cornerRadius: 14, style: .circular))
+                                .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
+                            }
+                        }.padding(.top, self.allowOnlineSearch ? (self.usedAsNew ? 20 : 100) : 60)
+                        .padding(.horizontal)
+
+                        //MARK: Search All Section
+                        if self.grandUsers.count != 0 {
+                            HStack {
+                                Text("TOP RESULTS:")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                    .multilineTextAlignment(.leading)
+                                
+                                Spacer()
+                            }.padding(.horizontal)
+                            .padding(.horizontal)
+                            .padding(.top, 25)
+
+                            LazyVStack(spacing: 0) {
+                                ForEach(self.grandUsers, id: \.self) { searchedContact in
+                                    if searchedContact.id != Session.current.currentUserID {
                                         VStack(alignment: .trailing, spacing: 0) {
-                                            ContactCell(user: result, selectedContact: self.$selectedContact)
+                                            ContactCell(user: searchedContact, selectedContact: self.$selectedContact)
                                                 .animation(.spring(response: 0.15, dampingFraction: 0.60, blendDuration: 0))
                                                 .padding(.horizontal)
                                                 .padding(.vertical, 10)
                                                 .contentShape(Rectangle())
                                                 .onTapGesture {
                                                     UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                                                    if self.selectedContact.contains(Int(result.id)) {
-                                                        self.selectedContact.removeAll(where: { $0 == result.id })
+                                                    if self.selectedContact.contains(Int(searchedContact.id)) {
+                                                        self.selectedContact.removeAll(where: { $0 == searchedContact.id })
                                                     } else {
-                                                        self.selectedContact.append(Int(result.id))
+                                                        self.selectedContact.append(Int(searchedContact.id))
                                                     }
                                                 }
 
-                                            if self.regristeredAddressBook.last != result {
+                                            if self.grandUsers.last != searchedContact {
                                                 Divider()
                                                     .frame(width: Constants.screenWidth - 100)
                                             }
                                         }
                                     }
-                                }.background(Color("buttonColor"))
-                                .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
-                                .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 8)
-                                .padding(.horizontal)
-                            }
+                                }
+                            }.background(Color("buttonColor"))
+                            .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
+                            .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 8)
+                            .padding(.horizontal)
+                        }
 
-                            //MARK: Address Book Section
+                        //MARK: Contacts Section
+                        if self.contacts.filterContact(text: self.searchText).filter({ $0.isMyContact == true }).count != 0 {
                             HStack {
                                 VStack(alignment: .leading) {
-                                    Text("Address Book:")
+                                    Text("Contacts:")
                                         .font(.title)
                                         .fontWeight(.bold)
                                         .foregroundColor(.primary)
                                         .multilineTextAlignment(.leading)
 
-                                    Text("\(self.addressBook.filterAddressBook(text: self.searchText).sorted { $0.name < $1.name }.count) CONTACTS")
-                                        .font(.footnote)
+                                    Text(Chat.instance.contactList?.contacts.count == 1 ? "\(Chat.instance.contactList?.contacts.count ?? 0) CONTACT" : "\(self.contacts.filterContact(text: self.searchText).filter({ $0.id != UserDefaults.standard.integer(forKey: "currentUserID") && $0.fullName != "No Name" && $0.isMyContact == true }).count) CONTACTS")
+                                        .font(.caption)
                                         .foregroundColor(.secondary)
                                         .multilineTextAlignment(.leading)
                                 }
                                 Spacer()
                             }.padding(.horizontal)
                             .padding(.horizontal)
-                            .opacity(self.addressBook.filterAddressBook(text: self.searchText).sorted { $0.name < $1.name }.count != 0 ? 1 : 0)
                             .padding(.top, 25)
-                            
+
                             LazyVStack(spacing: 0) {
-                                ForEach(self.addressBook.filterAddressBook(text: self.searchText).sorted { $0.name < $1.name }, id: \.self) { result in
+                                ForEach(self.contacts.filterContact(text: self.searchText).filter({ $0.isMyContact == true }).sorted { $0.fullName < $1.fullName }.filter({ $0.id != UserDefaults.standard.integer(forKey: "currentUserID") && $0.fullName != "No Name" }), id: \.self) { contact in
                                     VStack(alignment: .trailing, spacing: 0) {
-                                        SelectableAddressBookContact(addressBook: result)
+                                        ContactRealmCell(selectedContact: self.$selectedContact, contact: contact)
                                             .animation(.spring(response: 0.15, dampingFraction: 0.60, blendDuration: 0))
                                             .padding(.horizontal)
                                             .padding(.vertical, 10)
+                                            .contentShape(Rectangle())
+                                            .onTapGesture {
+                                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                                                if self.selectedContact.contains(contact.id) {
+                                                    self.selectedContact.removeAll(where: { $0 == contact.id })
+                                                } else {
+                                                    self.selectedContact.append(contact.id)
+                                                }
+                                            }
 
-                                        if self.addressBook.filterAddressBook(text: self.searchText).sorted { $0.name < $1.name }.last != result {
+                                        if self.contacts.filterContact(text: self.searchText).sorted { $0.fullName < $1.fullName }.last != contact {
                                             Divider()
                                                 .frame(width: Constants.screenWidth - 100)
                                         }
@@ -322,66 +232,147 @@ struct NewConversationView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
                             .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 8)
                             .padding(.horizontal)
-
-                            SyncAddressBook()
-                                .opacity(self.addressBook.results.count == 0 ? 1 : 0)
-                                .offset(y: -60)
-                            
-                            Spacer()
-                            
-                            //MARK: FOOTER
-                            FooterInformation(middleText: self.addressBook.results.count + self.regristeredAddressBook.count + self.contacts.results.count == 1 ? "\(self.addressBook.results.count + self.regristeredAddressBook.count + self.contacts.results.count) total contact above" : "\(self.addressBook.results.count + self.regristeredAddressBook.count + self.contacts.results.count) total contacts above")
-                                .padding(.vertical, 35)
-                        }.frame(width: Constants.screenWidth)
-
-                        //MARK: Public Dialog
-                        VStack {
-                            NewPublicConversationSection(creatingDialog: self.$creatingDialog, isNotPresent: self.$navigationPrivate, groupName: self.$groupName, description: self.$description, inputImage: self.$inputImage, selectedTags: self.$selectedTags)
-                                .environmentObject(self.auth)
-                                .resignKeyboardOnDragGesture()
-
-                            Spacer()
-                        }.frame(width: Constants.screenWidth)
-
-                        Spacer()
-                    }.offset(x: self.navigationPrivate ? (Constants.screenWidth / 2) : -(Constants.screenWidth / 2))
-                }
-                .disabled(self.creatingDialog ? true : false)
-                .navigationBarItems(leading:
-                    Button(action: {
-                        self.presentationMode.wrappedValue.dismiss()
-                    }) {
-                        Text("Cancel")
-                            .foregroundColor(.primary)
-                    }, trailing:
-                    Button(action: {
-                        self.createAction()
-                    }) {
-                        Text(self.usedAsNew ? "Create" : "Add")
-                            .foregroundColor(self.canCreate() ? .blue : .secondary)
-                            .fontWeight(self.canCreate() ? .bold : .none)
-                    }.disabled(self.canCreate() ? false : true)
-                )
-                .navigationBarTitle(self.usedAsNew ? (self.navigationPrivate ? (self.selectedContact.count > 0 ? self.selectedContact.count > Constants.maxNumberGroupOccu ? "Max Reached" : "New Chat \(self.selectedContact.count)" : "New Chat") : "New Public Chat") : "Add Contact", displayMode: .inline)
-                .onAppear() {
-                    Request.registeredUsersFromAddressBook(withUdid: UIDevice.current.identifierForVendor?.uuidString, isCompact: false, successBlock: { (users) in
-                        for i in users {
-                            let config = Realm.Configuration(schemaVersion: 1)
-                            do {
-                                let realm = try Realm(configuration: config)
-                                if (realm.object(ofType: ContactStruct.self, forPrimaryKey: i.id) == nil) && i.id != Session.current.currentUserID {
-                                    self.regristeredAddressBook.append(i)
-                                }
-                            } catch {
-                                print(error.localizedDescription)
-                            }
                         }
-                    })
-                }
-            
-                BlurView(style: .systemUltraThinMaterial)
-                    .frame(width: Constants.screenWidth, height: Constants.screenHeight, alignment: .center)
-                    .opacity(self.creatingDialog ? 1 : 0)
+
+                        //MARK: Regristered Section
+                        if self.regristeredAddressBook.count != 0 {
+                            HStack {
+                                VStack(alignment: .leading) {
+                                    Text("Regristered:")
+                                        .font(.title)
+                                        .fontWeight(.bold)
+                                        .foregroundColor(.primary)
+                                        .multilineTextAlignment(.leading)
+
+                                    Text(self.regristeredAddressBook.count == 1 ? "\(self.regristeredAddressBook.count) REGRISTERED CONTACT" : "\(self.regristeredAddressBook.count) REGRISTERED CONTACTS")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                        .multilineTextAlignment(.leading)
+                                }
+                                Spacer()
+                            }.padding(.horizontal)
+                            .padding(.horizontal)
+                            .padding(.top, 25)
+                            
+                            LazyVStack(spacing: 0) {
+                                ForEach(self.regristeredAddressBook, id: \.self) { result in
+                                    VStack(alignment: .trailing, spacing: 0) {
+                                        ContactCell(user: result, selectedContact: self.$selectedContact)
+                                            .animation(.spring(response: 0.15, dampingFraction: 0.60, blendDuration: 0))
+                                            .padding(.horizontal)
+                                            .padding(.vertical, 10)
+                                            .contentShape(Rectangle())
+                                            .onTapGesture {
+                                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                                                if self.selectedContact.contains(Int(result.id)) {
+                                                    self.selectedContact.removeAll(where: { $0 == result.id })
+                                                } else {
+                                                    self.selectedContact.append(Int(result.id))
+                                                }
+                                            }
+
+                                        if self.regristeredAddressBook.last != result {
+                                            Divider()
+                                                .frame(width: Constants.screenWidth - 100)
+                                        }
+                                    }
+                                }
+                            }.background(Color("buttonColor"))
+                            .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
+                            .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 8)
+                            .padding(.horizontal)
+                        }
+
+                        //MARK: Address Book Section
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text("Address Book:")
+                                    .font(.title)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.primary)
+                                    .multilineTextAlignment(.leading)
+
+                                Text("\(self.addressBook.filterAddressBook(text: self.searchText).sorted { $0.name < $1.name }.count) CONTACTS")
+                                    .font(.footnote)
+                                    .foregroundColor(.secondary)
+                                    .multilineTextAlignment(.leading)
+                            }
+                            Spacer()
+                        }.padding(.horizontal)
+                        .padding(.horizontal)
+                        .opacity(self.addressBook.filterAddressBook(text: self.searchText).sorted { $0.name < $1.name }.count != 0 ? 1 : 0)
+                        .padding(.top, 25)
+                        
+                        LazyVStack(spacing: 0) {
+                            ForEach(self.addressBook.filterAddressBook(text: self.searchText).sorted { $0.name < $1.name }, id: \.self) { result in
+                                VStack(alignment: .trailing, spacing: 0) {
+                                    SelectableAddressBookContact(addressBook: result)
+                                        .animation(.spring(response: 0.15, dampingFraction: 0.60, blendDuration: 0))
+                                        .padding(.horizontal)
+                                        .padding(.vertical, 10)
+
+                                    if self.addressBook.filterAddressBook(text: self.searchText).sorted { $0.name < $1.name }.last != result {
+                                        Divider()
+                                            .frame(width: Constants.screenWidth - 100)
+                                    }
+                                }
+                            }
+                        }.background(Color("buttonColor"))
+                        .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
+                        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 8)
+                        .padding(.horizontal)
+
+                        SyncAddressBook()
+                            .opacity(self.addressBook.results.count == 0 ? 1 : 0)
+                            .offset(y: -60)
+                        
+                        //MARK: FOOTER
+                        FooterInformation(middleText: self.addressBook.results.count + self.regristeredAddressBook.count + self.contacts.results.count == 1 ? "\(self.addressBook.results.count + self.regristeredAddressBook.count + self.contacts.results.count) total contact above" : "\(self.addressBook.results.count + self.regristeredAddressBook.count + self.contacts.results.count) total contacts above")
+                            .padding(.vertical, 35)
+                    }.frame(width: Constants.screenWidth)
+
+                    //MARK: Public Dialog
+                    VStack {
+                        NewPublicConversationSection(creatingDialog: self.$creatingDialog, isNotPresent: self.$navigationPrivate, groupName: self.$groupName, description: self.$description, inputImage: self.$inputImage, selectedTags: self.$selectedTags)
+                            .environmentObject(self.auth)
+                            .resignKeyboardOnDragGesture()
+                        
+                        //MARK: FOOTER
+                        FooterInformation()
+                            .padding(.vertical, 35)
+                    }.frame(width: Constants.screenWidth)
+                }.offset(x: self.navigationPrivate ? (Constants.screenWidth / 2) : -(Constants.screenWidth / 2))
+            }.disabled(self.creatingDialog ? true : false)
+            .navigationBarItems(leading:
+                Button(action: {
+                    self.presentationMode.wrappedValue.dismiss()
+                }) {
+                    Text("Cancel")
+                        .foregroundColor(.primary)
+                }, trailing:
+                Button(action: {
+                    self.createAction()
+                }) {
+                    Text(self.usedAsNew ? (self.creatingDialog ? "Creating" : "Create") : "Add")
+                        .foregroundColor(self.canCreate() ? .blue : .secondary)
+                        .fontWeight(self.canCreate() ? .bold : .none)
+                }.disabled(self.canCreate() ? false : true)
+            )
+            .navigationBarTitle(self.usedAsNew ? (self.navigationPrivate ? (self.selectedContact.count > 0 ? self.selectedContact.count > Constants.maxNumberGroupOccu ? "Max Reached" : "New Chat \(self.selectedContact.count)" : "New Chat") : "New Public Chat") : "Add Contact", displayMode: .inline)
+            .onAppear() {
+                Request.registeredUsersFromAddressBook(withUdid: UIDevice.current.identifierForVendor?.uuidString, isCompact: false, successBlock: { (users) in
+                    for i in users {
+                        let config = Realm.Configuration(schemaVersion: 1)
+                        do {
+                            let realm = try Realm(configuration: config)
+                            if (realm.object(ofType: ContactStruct.self, forPrimaryKey: i.id) == nil) && i.id != Session.current.currentUserID {
+                                self.regristeredAddressBook.append(i)
+                            }
+                        } catch {
+                            print(error.localizedDescription)
+                        }
+                    }
+                })
             }
         }.background(Color("bgColor"))
     }

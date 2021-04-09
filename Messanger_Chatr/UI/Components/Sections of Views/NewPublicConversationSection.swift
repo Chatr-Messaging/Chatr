@@ -9,7 +9,7 @@
 import SwiftUI
 import Firebase
 
-struct publicTag: Identifiable {
+struct publicTag: Identifiable, Hashable {
     var id = UUID().uuidString
     var title: String = ""
     var selected: Bool = false
@@ -28,7 +28,7 @@ struct NewPublicConversationSection: View {
     @State var groupImage: Image? = nil
     @Binding var selectedTags: [publicTag]
     @State var descriptionHeight: CGFloat = 0
-    @State var publicTags: [[publicTag]] = []
+    @State var publicTags: [publicTag] = []
     @State private var showImagePicker: Bool = false
 
     var body: some View {
@@ -199,52 +199,34 @@ struct NewPublicConversationSection: View {
                             .offset(x: 20)
 
                         ScrollView {
-                            LazyVStack(alignment: .leading, spacing: 5) {
-                                ForEach(publicTags.indices, id: \.self) { index in
-                                    HStack {
-                                        ForEach(self.publicTags[index].indices, id: \.self) { tagIndex in
-                                            Text("#" + "\(self.publicTags[index][tagIndex].title)")
-                                                .fontWeight(.medium)
-                                                .padding(.vertical, 7.5)
-                                                .padding(.horizontal)
-                                                .foregroundColor(self.publicTags[index][tagIndex].selected ? Color.black : Color.primary)
-                                                .background(RoundedRectangle(cornerRadius: 10).stroke(self.publicTags[index][tagIndex].selected ? Color.blue : Color.black, lineWidth: 1.5).background(self.publicTags[index][tagIndex].selected ? Color("interactions_selected") : Color("SegmentSliderColor")).cornerRadius(10))
-                                                .lineLimit(1)
-                                                .fixedSize()
-                                                .overlay(
-                                                    GeometryReader { reader -> Color in
-                                                        if self.isNotPresent != true {
-                                                            let maxX = reader.frame(in: .global).minX - 275
+                            FlexibleView(data: self.publicTags, spacing: 7.5, alignment: .leading) { item in
+                                Text("#" + "\(item.title)")
+                                    .fontWeight(.medium)
+                                    .padding(.vertical, 7.5)
+                                    .padding(.horizontal)
+                                    .foregroundColor(item.selected ? Color.black : Color.primary)
+                                    .background(RoundedRectangle(cornerRadius: 10).stroke(item.selected ? Color.blue : Color.black, lineWidth: 1.5).background(item.selected ? Color("interactions_selected") : Color("SegmentSliderColor")).cornerRadius(10))
+                                    .lineLimit(1)
+                                    .fixedSize()
+                                    .onTapGesture {
+                                        if self.selectedTags.count <= 1 || self.selectedTags.contains(where: { $0.id == item.id }) {
+                                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                            if let foundIndex = self.publicTags.firstIndex(of: item) {
+                                                self.publicTags[foundIndex].selected.toggle()
+                                            }
 
-                                                            if maxX > Constants.screenWidth && !self.publicTags[index][tagIndex].isExceeded {
-                                                                DispatchQueue.main.async {
-                                                                    self.publicTags[index][tagIndex].isExceeded = true
-
-                                                                    let lastItem = self.publicTags[index][tagIndex]
-                                                                    
-                                                                    self.publicTags.append([lastItem])
-                                                                    self.publicTags[index].remove(at: tagIndex)
-                                                                }
-                                                            }
-                                                        }
-
-                                                        return Color.clear
-                                                    }, alignment: .trailing)
-                                                .onTapGesture {
-                                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                                    self.publicTags[index][tagIndex].selected.toggle()
-                                                    if self.selectedTags.contains(where: { $0.id == self.publicTags[index][tagIndex].id }) {
-                                                        self.selectedTags.removeAll(where: { $0.id == self.publicTags[index][tagIndex].id })
-                                                    } else {
-                                                        self.selectedTags.append(self.publicTags[index][tagIndex])
-                                                    }
-                                                }
+                                            if self.selectedTags.contains(where: { $0.id == item.id }) {
+                                                self.selectedTags.removeAll(where: { $0.id == item.id })
+                                            } else {
+                                                self.selectedTags.append(item)
+                                            }
+                                        } else {
+                                            UINotificationFeedbackGenerator().notificationOccurred(.error)
                                         }
                                     }
-                                }.padding(.top, 2.5)
-                                .padding(.leading, 30)
-                            }
-                        }.frame(height: 175)
+                            }.offset(x: 25)
+                            .padding(.trailing, 20)
+                        }.frame(maxHeight: 175)
                     }
                 }
             })
@@ -270,21 +252,13 @@ struct NewPublicConversationSection: View {
     }
 
     func loadTags(completion: @escaping () -> ()) {
-        self.publicTags.removeAll()
-
         let marketplaceTags = Database.database().reference().child("Marketplace").child("tags")
 
+        self.publicTags.removeAll()
         marketplaceTags.observeSingleEvent(of: .value, with: { (snapshot: DataSnapshot) in
             if let dict = snapshot.value as? [String: Any] {
                 for i in dict {
-                    var newData = publicTag()
-                    newData.title = i.key
-                    
-                    if self.publicTags.isEmpty {
-                        self.publicTags.append([])
-                    }
-
-                    self.publicTags[self.publicTags.count - 1].append(publicTag(title: i.key))
+                    self.publicTags.append(publicTag(title: i.key))
                 }
 
                 completion()
