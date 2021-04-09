@@ -23,7 +23,7 @@ class ChatMessageViewModel: ObservableObject {
     @Published var totalDuration: Double = 0.0
     @Published var videoSize: CGSize = CGSize.zero
 
-    func loadDialog(auth: AuthModel, dialogId: String) {
+    func loadDialog(auth: AuthModel, dialogId: String, completion: @escaping () -> Void) {
         Request.updateDialog(withID: dialogId, update: UpdateChatDialogParameters(), successBlock: { dialog in
             auth.selectedConnectyDialog = dialog
             dialog.sendUserStoppedTyping()
@@ -40,7 +40,11 @@ class ChatMessageViewModel: ObservableObject {
                 }
             }
 
-            guard dialog.type == .group || dialog.type == .public else { return }
+            guard dialog.type == .group || dialog.type == .public else {
+                completion()
+
+                return
+            }
             
             dialog.requestOnlineUsers(completionBlock: { (online, error) in
                 print("The online count is!!: \(String(describing: online?.count))")
@@ -63,12 +67,19 @@ class ChatMessageViewModel: ObservableObject {
                 self.setOnlineCount(dialog: dialog)
             }
 
-            guard !dialog.isJoined(), Chat.instance.isConnected else { return }
+            guard !dialog.isJoined(), Chat.instance.isConnected else {
+                completion()
+                return
+            }
 
             dialog.join(completionBlock: { _ in
                 self.setOnlineCount(dialog: dialog)
+                completion()
             })
-        })
+        }) { (error) in
+            print("error fetching the dialog: \(error.localizedDescription)")
+            completion()
+        }
     }
 
     func getUserAvatar(senderId: Int, compleation: @escaping (String, String, Date) -> Void) {

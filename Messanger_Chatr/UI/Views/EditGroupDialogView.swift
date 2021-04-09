@@ -51,6 +51,8 @@ struct EditGroupDialogView: View {
                                 TextField("Full Name", text: self.$fullNameText)
                                     .foregroundColor(.primary)
                                     .autocapitalization(.words)
+                                    .disableAutocorrection(true)
+                                    .font(.system(size: 20, weight: self.fullNameText.count > 0 ? .semibold : .regular, design: .default))
                                     .onChange(of: self.fullNameText) { _ in
                                         self.didSave = false
                                     }

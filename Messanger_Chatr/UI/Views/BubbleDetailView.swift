@@ -387,12 +387,20 @@ struct BubbleDetailView: View {
 //            }
 
             //MARK: Reply Section
-            VStack(alignment: .center, spacing: 0) {
-                Text("no replies")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .padding(.vertical, self.replies.isEmpty ? 40 : 0)
-                    .opacity(self.replies.isEmpty ? 1 : 0)
+            VStack(alignment: self.replies.count == 0 ? .center : .leading, spacing: 0) {
+                if self.replies.count > 0 {
+                    Text("Replies (\(self.replies.count))")
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                        .padding(.leading, 30)
+                        .padding(.top)
+                } else {
+                    Text("no replies")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .padding(.vertical, self.replies.isEmpty ? 40 : 0)
+                        .opacity(self.replies.isEmpty ? 1 : 0)
+                }
 
                 ScrollView(.vertical, showsIndicators: false) {
                     LazyVStack(alignment: .leading) {

@@ -321,14 +321,14 @@ class changeMessageRealmData {
                     }
                 })
             }
-            else {
+            //else {
                 //                let msg = Database.database().reference().child("Dialogs").child(object.dialogID ?? "").child(object.id ?? "")
                 //                msg.observeSingleEvent(of: .value, with: { (snapshot: DataSnapshot) in
                 //                    updateMessageLike(messageID: object.id ?? "", messageLikeCount: Int(snapshot.childSnapshot(forPath: "likes").childrenCount))
                 //                    updateMessageDislike(messageID: object.id ?? "", messageDislikeCount: Int(snapshot.childSnapshot(forPath: "dislikes").childrenCount))
                 //                    completion()
                 //                })
-            }
+            //}
         } catch {
             print(error.localizedDescription)
             DispatchQueue.main.async {
@@ -341,7 +341,7 @@ class changeMessageRealmData {
         let message = ChatMessage.markable()
         message.markable = true
         message.text = text
-        let pDialog = ChatDialog(dialogID: dialog.id, type: occupentID.count > 2 ? .group : .private)
+        let pDialog = ChatDialog(dialogID: dialog.id, type: dialog.dialogType == "public" ? .public : occupentID.count > 2 ? .group : .private)
         pDialog.occupantIDs = occupentID
         
         pDialog.send(message) { (error) in
@@ -367,7 +367,7 @@ class changeMessageRealmData {
             message.text = "Shared Contact"
             message.attachments = [attachment]
             
-            let pDialog = ChatDialog(dialogID: dialog.id, type: occupentID.count > 2 ? .group : .private)
+            let pDialog = ChatDialog(dialogID: dialog.id, type: dialog.dialogType == "public" ? .public : occupentID.count > 2 ? .group : .private)
             pDialog.occupantIDs = occupentID
             
             pDialog.send(message) { (error) in
@@ -393,7 +393,7 @@ class changeMessageRealmData {
         message.text = "Current Location"
         message.attachments = [attachment]
         
-        let pDialog = ChatDialog(dialogID: dialog.id, type: occupentID.count > 2 ? .group : .private)
+        let pDialog = ChatDialog(dialogID: dialog.id, type: dialog.dialogType == "public" ? .public : occupentID.count > 2 ? .group : .private)
         pDialog.occupantIDs = occupentID
         
         pDialog.send(message) { (error) in
@@ -423,7 +423,7 @@ class changeMessageRealmData {
                 attachment.type = "audio/m4a"
                 attachment.id = blob.uid
                 
-                let pDialog = ChatDialog(dialogID: dialog.id, type: occupentID.count > 2 ? .group : .private)
+                let pDialog = ChatDialog(dialogID: dialog.id, type: dialog.dialogType == "public" ? .public : occupentID.count > 2 ? .group : .private)
                 pDialog.occupantIDs = occupentID
                 
                 let message = ChatMessage()
@@ -464,7 +464,7 @@ class changeMessageRealmData {
                     attachment.type = "image/gif"
                     attachment.id = blob.uid
                     
-                    let pDialog = ChatDialog(dialogID: dialog.id, type: occupentID.count > 2 ? .group : .private)
+                    let pDialog = ChatDialog(dialogID: dialog.id, type: dialog.dialogType == "public" ? .public : occupentID.count > 2 ? .group : .private)
                     pDialog.occupantIDs = occupentID
                     
                     let message = ChatMessage()
@@ -505,7 +505,7 @@ class changeMessageRealmData {
                 attachment.type = "image/png"
                 attachment.id = blob.uid
                 
-                let pDialog = ChatDialog(dialogID: dialog.id, type: occupentID.count > 2 ? .group : .private)
+                let pDialog = ChatDialog(dialogID: dialog.id, type: dialog.dialogType == "public" ? .public : occupentID.count > 2 ? .group : .private)
                 pDialog.occupantIDs = occupentID
                 
                 let message = ChatMessage()
@@ -588,7 +588,7 @@ class changeMessageRealmData {
         attachment.type = "video/mov"
         attachment["videoId"] = "\(Session.current.currentUser?.fullName ?? "no name")" + id
 
-        let pDialog = ChatDialog(dialogID: dialog.id, type: occupentID.count > 2 ? .group : .private)
+        let pDialog = ChatDialog(dialogID: dialog.id, type: dialog.dialogType == "public" ? .public : occupentID.count > 2 ? .group : .private)
         pDialog.occupantIDs = occupentID
         
         let message = ChatMessage()

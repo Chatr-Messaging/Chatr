@@ -136,8 +136,10 @@ struct EditProfileView: View {
                                         .padding(.trailing, 5)
                                     
                                     TextField("Full Name", text: $fullNameText)
-                                        //.font(.system(size: 24, weight: .bold, design: .default))
                                         .foregroundColor(.primary)
+                                        .autocapitalization(.words)
+                                        .disableAutocorrection(true)
+                                        .font(.system(size: 20, weight: self.fullNameText.count > 0 ? .semibold : .regular, design: .default))
                                         .onChange(of: self.fullNameText) { _ in
                                             self.didSave = false
                                         }

@@ -17,7 +17,6 @@ struct publicTag: Identifiable, Hashable {
 }
 
 struct NewPublicConversationSection: View {
-    @EnvironmentObject var auth: AuthModel
     @ObservedObject var viewModel = EditProfileViewModel()
     @StateObject var imagePicker = KeyboardCardViewModel()
     @Binding var creatingDialog: Bool
@@ -63,7 +62,7 @@ struct NewPublicConversationSection: View {
                                             .frame(width: 80, height: 80, alignment: .center)
                                             .foregroundColor(Color("bgColor"))
 
-                                        Image(systemName: "person.fill")
+                                        Image(systemName: "person.3.fill")
                                             .resizable()
                                             .scaledToFit()
                                             .foregroundColor(Color.primary)
@@ -120,7 +119,7 @@ struct NewPublicConversationSection: View {
                 //MARK: FullName Section
                 VStack {
                     HStack {
-                        Image(systemName: "person.fill")
+                        Image(systemName: "rectangle.stack.person.crop")
                             .resizable()
                             .scaledToFit()
                             .foregroundColor(Color.secondary)
@@ -200,30 +199,31 @@ struct NewPublicConversationSection: View {
 
                         ScrollView {
                             FlexibleView(data: self.publicTags, spacing: 7.5, alignment: .leading) { item in
-                                Text("#" + "\(item.title)")
-                                    .fontWeight(.medium)
-                                    .padding(.vertical, 7.5)
-                                    .padding(.horizontal)
-                                    .foregroundColor(item.selected ? Color.black : Color.primary)
-                                    .background(RoundedRectangle(cornerRadius: 10).stroke(item.selected ? Color.blue : Color.black, lineWidth: 1.5).background(item.selected ? Color("interactions_selected") : Color("SegmentSliderColor")).cornerRadius(10))
-                                    .lineLimit(1)
-                                    .fixedSize()
-                                    .onTapGesture {
-                                        if self.selectedTags.count <= 1 || self.selectedTags.contains(where: { $0.id == item.id }) {
-                                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                            if let foundIndex = self.publicTags.firstIndex(of: item) {
-                                                self.publicTags[foundIndex].selected.toggle()
-                                            }
-
-                                            if self.selectedTags.contains(where: { $0.id == item.id }) {
-                                                self.selectedTags.removeAll(where: { $0.id == item.id })
-                                            } else {
-                                                self.selectedTags.append(item)
-                                            }
-                                        } else {
-                                            UINotificationFeedbackGenerator().notificationOccurred(.error)
+                                Button(action: {
+                                    if self.selectedTags.count <= 1 || self.selectedTags.contains(where: { $0.id == item.id }) {
+                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                        if let foundIndex = self.publicTags.firstIndex(of: item) {
+                                            self.publicTags[foundIndex].selected.toggle()
                                         }
+
+                                        if self.selectedTags.contains(where: { $0.id == item.id }) {
+                                            self.selectedTags.removeAll(where: { $0.id == item.id })
+                                        } else {
+                                            self.selectedTags.append(item)
+                                        }
+                                    } else {
+                                        UINotificationFeedbackGenerator().notificationOccurred(.error)
                                     }
+                                }, label: {
+                                    Text("#" + "\(item.title)")
+                                        .fontWeight(.medium)
+                                        .padding(.vertical, 7.5)
+                                        .padding(.horizontal)
+                                        .foregroundColor(item.selected ? Color.black : Color.primary)
+                                        .background(RoundedRectangle(cornerRadius: 10).stroke(item.selected ? Color.blue : Color.black, lineWidth: 1.5).background(item.selected ? Color("interactions_selected") : Color("SegmentSliderColor")).cornerRadius(10))
+                                        .lineLimit(1)
+                                        .fixedSize()
+                                }).buttonStyle(ClickButtonStyle())
                             }.offset(x: 25)
                             .padding(.trailing, 20)
                         }.frame(maxHeight: 175)
@@ -240,7 +240,9 @@ struct NewPublicConversationSection: View {
             }.padding(.horizontal, 20)
             .padding(.vertical, 30)
         }.onAppear() {
-            self.loadTags(completion: {  })
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.75, execute: {
+                self.loadTags(completion: {  })
+            })
         }.onDisappear() {
             self.description = ""
         }
@@ -258,7 +260,9 @@ struct NewPublicConversationSection: View {
         marketplaceTags.observeSingleEvent(of: .value, with: { (snapshot: DataSnapshot) in
             if let dict = snapshot.value as? [String: Any] {
                 for i in dict {
-                    self.publicTags.append(publicTag(title: i.key))
+                    withAnimation {
+                        self.publicTags.append(publicTag(title: i.key))
+                    }
                 }
 
                 completion()

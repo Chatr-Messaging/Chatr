@@ -234,15 +234,17 @@ struct VisitGroupChannelView: View {
                     .padding(.bottom, 15)
 
                     //MARK: Memebrs List Section
-                    HStack(alignment: .bottom) {
-                        Text("\(self.dialogModel.occupentsID.count) TOTAL MEMBERS:")
-                            .font(.caption)
-                            .fontWeight(.regular)
-                            .foregroundColor(.secondary)
-                            .padding(.horizontal)
-                            .padding(.horizontal)
-                            .offset(y: 2)
-                        Spacer()
+                    if self.dialogModel.occupentsID.count > 0 {
+                        HStack(alignment: .bottom) {
+                            Text("\(self.dialogModel.occupentsID.count) TOTAL " + (self.dialogModel.dialogType == "public" ? "SUBSCRIBERS:" : "MEMBERS:"))
+                                .font(.caption)
+                                .fontWeight(.regular)
+                                .foregroundColor(.secondary)
+                                .padding(.horizontal)
+                                .padding(.horizontal)
+                                .offset(y: 2)
+                            Spacer()
+                        }
                     }
                     
                     VStack(alignment: .center, spacing: 0) {
@@ -409,7 +411,7 @@ struct VisitGroupChannelView: View {
                         }.buttonStyle(changeBGButtonStyle())
                         .frame(minWidth: 100, maxWidth: Constants.screenWidth)
                         .actionSheet(isPresented: $showingMoreSheet) {
-                            ActionSheet(title: Text("More..."), message: nil, buttons: [
+                            ActionSheet(title: Text(self.dialogModel.fullName), message: nil, buttons: [
                                             .default(Text(self.notificationsOn ? "Turn Notifications Off" : "Turn Notifications On"), action: {
                                                 self.notificationsOn.toggle()
                                                 Request.updateNotificationsSettings(forDialogID: self.dialogModel.id, enable: self.notificationsOn, successBlock: { result in
@@ -540,7 +542,11 @@ struct VisitGroupChannelView: View {
             self.canEditGroup = self.isOwner || self.isAdmin
             self.currentUserIsPowerful = self.isOwner || self.isAdmin ? true : false
             self.dialogModelMemebers = self.dialogModel.occupentsID.filter { $0 != 0 } //.filter { $0 != UserDefaults.standard.integer(forKey: "currentUserID") }
-            self.dialogModelAdmins = self.dialogModel.occupentsID.filter { $0 == self.dialogModel.owner || self.dialogModel.adminID.contains($0)}
+
+            self.dialogModelAdmins.append(self.dialogModel.owner)
+            for i in self.dialogModel.adminID {
+                self.dialogModelAdmins.append(i)
+            }
         }
     }
     
@@ -573,17 +579,17 @@ struct topGroupHeaderView: View {
                 VStack(alignment: .center) {
                     VStack(alignment: .center) {
                         Text(self.dialogModel.fullName)
-                            .font(.system(size: 22))
-                            .fontWeight(.semibold)
+                            .font(.system(size: 24))
+                            .fontWeight(.bold)
                             .foregroundColor(.primary)
                             .lineLimit(2)
-                            .multilineTextAlignment(.leading)
+                            .multilineTextAlignment(.center)
                         
-                        Text("\(self.dialogModel.occupentsID.count) total members")
+                        Text("\(self.dialogModel.occupentsID.count) total " + (self.dialogModel.dialogType == "public" ? "subscribers" : "members"))
                             .font(.subheadline)
                             .fontWeight(.none)
                             .foregroundColor(.secondary)
-                            .multilineTextAlignment(.leading)
+                            .multilineTextAlignment(.center)
                     }.padding(.top, 10)
                     .padding(.bottom, self.dialogModel.bio == "" ? 15 : 0 )
                     
@@ -597,11 +603,10 @@ struct topGroupHeaderView: View {
                                     .multilineTextAlignment(.center)
                                     .lineLimit(self.isProfileBioOpen ? 20 : 5)
                                     .padding(.top, 3)
-                                    .padding(.bottom, self.dialogModel.bio.count > 220 ? 10 : 5)
+                                    .padding(.bottom, self.dialogModel.bio.count > 220 ? 10 : 10)
                                 
                                 if self.dialogModel.bio.count > 220 {
                                     Button(action: {
-                                        print("more...")
                                         self.isProfileBioOpen.toggle()
                                     }, label: {
                                         Text(self.isProfileBioOpen ? "less..." : "more...")
@@ -636,8 +641,9 @@ struct topGroupHeaderView: View {
                         .indicator(.activity)
                         .transition(.fade(duration: 0.15))
                         .scaledToFill()
-                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                        .clipped()
                         .frame(width: 110, height: 110, alignment: .center)
+                        .cornerRadius(20)
                         .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
                 }.buttonStyle(ClickButtonStyle())
             } else if self.dialogModel.dialogType == "group" {

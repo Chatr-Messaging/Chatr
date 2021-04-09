@@ -141,7 +141,6 @@ class changeDialogRealmData {
 
                     if let publicUrl = Blob.publicUrl(forFileUID: object.photo ?? "") {
                         newData.avatar = publicUrl
-                        print("the public image \(newData.fullName) is: \(Blob.publicUrl(forFileUID: object.photo ?? ""))")
                     }
 
                     newData.bio = object.dialogDescription ?? ""
@@ -176,7 +175,6 @@ class changeDialogRealmData {
                 if let dialogResult = realm.object(ofType: DialogStruct.self, forPrimaryKey: dialogID) {
                     dialogResult.isOpen = isOpen
                     realm.add(dialogResult, update: .all)
-                    print("Succsessfuly added new Dialog data from updateOpen\(Thread.isMainThread)! \(String(describing: dialogResult.isOpen))")
                 }
             })
         } catch {

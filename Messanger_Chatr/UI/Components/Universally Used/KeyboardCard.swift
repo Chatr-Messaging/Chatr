@@ -683,7 +683,9 @@ struct ResizableTextField : UIViewRepresentable {
             if self.parent.isMessageView ?? true {
                 self.parent.auth.selectedConnectyDialog?.sendUserStoppedTyping()
 
-                UserDefaults.standard.setValue(textView.text, forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText")
+                if self.parent.isMessageView ?? false {
+                    UserDefaults.standard.setValue(textView.text, forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText")
+                }
             }
         }
                         

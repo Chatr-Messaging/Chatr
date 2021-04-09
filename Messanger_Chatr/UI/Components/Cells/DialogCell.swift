@@ -127,31 +127,7 @@ struct DialogCell: View {
                                         self.selectedDialogID = self.dialogModel.id
                                         changeDialogRealmData.shared.updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
                                     }
-                                }.sheet(isPresented: self.$openGroupProfile, content: {
-                                    NavigationView {
-                                        VisitGroupChannelView(dismissView: self.$openGroupProfile, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$openNewDialogID, groupOccUserAvatar: self.groupOccUserAvatar, fromDialogCell: true, viewState: .fromContacts, dialogRelationship: .subscribed, dialogModel: self.dialogModel)
-                                            .environmentObject(self.auth)
-                                            .edgesIgnoringSafeArea(.all)
-                                            .navigationBarItems(leading:
-                                                        Button(action: {
-                                                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                                            withAnimation {
-                                                                self.openGroupProfile.toggle()
-                                                            }
-                                                        }) {
-                                                            Text("Done")
-                                                                .foregroundColor(.primary)
-                                                                .fontWeight(.medium)
-                                                        }, trailing:
-                                                            Button(action: {
-                                                                self.isEditGroupOpen.toggle()
-                                                            }) {
-                                                                Text("Edit")
-                                                                    .foregroundColor(.blue)
-                                                                    .opacity(self.canEditGroup ? 1 : 0)
-                                                            }.disabled(self.canEditGroup ? false : true))
-                                    }
-                                })
+                                }
                             }
                         }
 
@@ -201,7 +177,7 @@ struct DialogCell: View {
                 }.offset(x: self.groupOccUserAvatar.count == 2 ? -4 : -2)
 
                 HStack(spacing: 5) {
-                    Text((self.dialogModel.isOpen ? self.dialogModel.dialogType == "private" ? (self.privateDialogContact.isOnline ? "online now" : "last online \(self.privateDialogContact.lastOnline.getElapsedInterval(lastMsg: "moments")) ago") : "\(self.dialogModel.occupentsID.count) members \(self.dialogModel.onlineUserCount != 0 ? " " : "")" : dialogModel.lastMessage))
+                    Text((self.dialogModel.isOpen ? self.dialogModel.dialogType == "private" ? (self.privateDialogContact.isOnline ? "online now" : "last online \(self.privateDialogContact.lastOnline.getElapsedInterval(lastMsg: "moments")) ago") : "\(self.dialogModel.occupentsID.count)" + (self.dialogModel.dialogType == "public" ? " subscribers" : " members") + (self.dialogModel.onlineUserCount != 0 ? " " : "") : dialogModel.lastMessage))
                         .font(self.dialogModel.isOpen ? .footnote : .subheadline)
                         .fontWeight(.regular)
                         .lineLimit(2)
@@ -237,7 +213,31 @@ struct DialogCell: View {
                     UserDefaults.standard.set(true, forKey: "localOpen")
                     UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")
                 }
-            }
+            }.sheet(isPresented: self.$openGroupProfile, content: {
+                NavigationView {
+                    VisitGroupChannelView(dismissView: self.$openGroupProfile, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$openNewDialogID, groupOccUserAvatar: self.groupOccUserAvatar, fromDialogCell: true, viewState: .fromContacts, dialogRelationship: .subscribed, dialogModel: self.dialogModel)
+                        .environmentObject(self.auth)
+                        .edgesIgnoringSafeArea(.all)
+                        .navigationBarItems(leading:
+                                    Button(action: {
+                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                        withAnimation {
+                                            self.openGroupProfile.toggle()
+                                        }
+                                    }) {
+                                        Text("Done")
+                                            .foregroundColor(.primary)
+                                            .fontWeight(.medium)
+                                    }, trailing:
+                                        Button(action: {
+                                            self.isEditGroupOpen.toggle()
+                                        }) {
+                                            Text("Edit")
+                                                .foregroundColor(.blue)
+                                                .opacity(self.canEditGroup ? 1 : 0)
+                                        }.disabled(self.canEditGroup ? false : true))
+                }
+            })
 
             HStack() {
                 Button(action: {

@@ -317,30 +317,41 @@ struct ChatMessagesView: View {
             .contentShape(Rectangle())
             .onAppear() {
                 DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + 0.5) {
-                    viewModel.loadDialog(auth: auth, dialogId: dialogID)
-                    delayViewMessages = true
-
-                    guard !Session.current.tokenHasExpired else { return }
-
-                    Request.countOfMessages(forDialogID: dialogID, extendedRequest: ["sort_desc" : "lastMessageDate"], successBlock: { count in
-                        DispatchQueue.main.async {
-                            self.totalMessageCount = Int(count)
-
-                            if self.auth.messages.selectedDialog(dialogID: dialogID).count != Int(count) {
-                                print("local and pulled do not match... pulling delta: \(count) && \(self.auth.messages.selectedDialog(dialogID: self.dialogID).count)")
-
-                                changeMessageRealmData.shared.getMessageUpdates(dialogID: dialogID, limit: pageShowCount * scrollPage, skip: 0, completion: { _ in
-                                })
-                            }
-                        }
-
-                        Request.totalUnreadMessageCountForDialogs(withIDs: Set([dialogID]), successBlock: { (unread, _) in
+                    print("the dialog id is: \(dialogID)")
+                    viewModel.loadDialog(auth: auth, dialogId: dialogID, completion: {
+                        print("done loading dialogggg: \(dialogID)")
+                        Request.countOfMessages(forDialogID: dialogID, extendedRequest: ["sort_desc" : "lastMessageDate"], successBlock: { count in
                             DispatchQueue.main.async {
-                                print("the unread count for this dialog: \(unread)")
-                                unreadMessageCount = Int(unread)
+                                self.totalMessageCount = Int(count)
+                                print("the total message count is: \(Int(count))")
+                                if self.auth.messages.selectedDialog(dialogID: dialogID).count != Int(count) {
+                                    print("local and pulled do not match... pulling delta: \(count) && \(self.auth.messages.selectedDialog(dialogID: self.dialogID).count)")
+
+                                    changeMessageRealmData.shared.getMessageUpdates(dialogID: dialogID, limit: pageShowCount * scrollPage, skip: 0, completion: { _ in
+                                    })
+                                }
                             }
+
+                            Request.totalUnreadMessageCountForDialogs(withIDs: Set([dialogID]), successBlock: { (unread, _) in
+                                DispatchQueue.main.async {
+                                    print("the unread count for this dialog: \(unread)")
+                                    unreadMessageCount = Int(unread)
+                                }
+                            })
                         })
                     })
+                    delayViewMessages = true
+
+                    //guard !Session.current.tokenHasExpired else { return }
+                    
+//                    Request.updateDialog(withID: dialogID, update: UpdateChatDialogParameters(), successBlock: { dialog in
+//                        auth.selectedConnectyDialog = dialog
+//                        dialog.join(completionBlock: { errors in
+//                            print("error joininggg: \(errors?.localizedDescription)")
+//                        })
+//                    }) { error in
+//                        print("error getting messagese: \(error.localizedDescription)")
+//                    }
                 }
             }
         }

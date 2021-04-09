@@ -49,7 +49,7 @@ struct ContactRequestCell: View {
                         .animation(nil)
                     
                     Text("last online \(self.contact.lastOnline.getElapsedInterval(lastMsg: "moments")) ago")
-                        .font(.subheadline)
+                        .font(.caption)
                         .fontWeight(.regular)
                         .foregroundColor(.secondary)
                         .lineLimit(1)

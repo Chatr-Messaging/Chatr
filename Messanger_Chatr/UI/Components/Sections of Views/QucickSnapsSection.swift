@@ -75,8 +75,10 @@ struct QuickSnapsSection: View {
                             
                             Spacer()
                         }.padding(.leading, self.isLocalOpen ? 0 : 10)
+                        .offset(x: self.isLocalOpen ? -30 : 0)
                         .scaleEffect(self.isLocalOpen ? 0.85 : 1)
-                    }.frame(height: self.emptyQuickSnaps ? geometry.size.height : 0)
+                    }.frame(width: Constants.screenWidth, height: self.emptyQuickSnaps ? geometry.size.height : (self.isLocalOpen ? Constants.quickSnapBtnSize + 20 : (Constants.quickSnapBtnSize + 20) * 0.85))
+                    .fixedSize(horizontal: true, vertical: false)
                 }.onAppear() {
                     self.emptyQuickSnaps = false
                 }

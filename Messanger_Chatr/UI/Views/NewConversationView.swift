@@ -138,7 +138,7 @@ struct NewConversationView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .circular))
                                 .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
                             }
-                        }.padding(.top, self.allowOnlineSearch ? (self.usedAsNew ? 20 : 100) : 60)
+                        }.padding(.top, self.allowOnlineSearch ? 20 : 60)
                         .padding(.horizontal)
 
                         //MARK: Search All Section
@@ -334,7 +334,6 @@ struct NewConversationView: View {
                     //MARK: Public Dialog
                     VStack {
                         NewPublicConversationSection(creatingDialog: self.$creatingDialog, isNotPresent: self.$navigationPrivate, groupName: self.$groupName, description: self.$description, inputImage: self.$inputImage, selectedTags: self.$selectedTags)
-                            .environmentObject(self.auth)
                             .resignKeyboardOnDragGesture()
                         
                         //MARK: FOOTER
@@ -343,6 +342,7 @@ struct NewConversationView: View {
                     }.frame(width: Constants.screenWidth)
                 }.offset(x: self.navigationPrivate ? (Constants.screenWidth / 2) : -(Constants.screenWidth / 2))
             }.disabled(self.creatingDialog ? true : false)
+            .background(Color("bgColor"))
             .navigationBarItems(leading:
                 Button(action: {
                     self.presentationMode.wrappedValue.dismiss()
@@ -374,7 +374,7 @@ struct NewConversationView: View {
                     }
                 })
             }
-        }.background(Color("bgColor"))
+        }
     }
 
     func grandSeach(searchText: String) {

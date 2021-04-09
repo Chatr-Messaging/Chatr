@@ -253,7 +253,7 @@ struct ContainerBubble: View {
                     .frame(width: self.hasPrior ? 0 : Constants.smallAvitarSize, height: self.hasPrior ? 0 : Constants.smallAvitarSize, alignment: .bottom)
                     .offset(x: messagePosition == .right ? (Constants.smallAvitarSize / 2) : -(Constants.smallAvitarSize / 2))
                     .offset(y: 2)
-                    .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 6)
+                    .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 3)
                     .opacity(self.hasPrior && self.message.messageState != .error ? 0 : 1)
             }.actionSheet(isPresented: self.$deleteActionSheet) {
                 ActionSheet(title: Text("Are you sure?"), message: Text("The message will be gone forever."), buttons: [

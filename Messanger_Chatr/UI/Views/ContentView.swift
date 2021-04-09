@@ -234,7 +234,7 @@ struct mainHomeList: View {
                         HomeMessagesTitle(isLocalOpen: self.$isLocalOpen, contacts: self.$showContacts, newChat: self.$showNewChat, selectedContacts: self.$selectedContacts)
                             .frame(height: 50)
                             .environmentObject(self.auth)
-                            .padding(.bottom, 45)
+                            .padding(.bottom)
                             .sheet(isPresented: self.$showContacts, onDismiss: {
                                 if self.auth.isUserAuthenticated != .signedOut {
                                     self.loadSelectedDialog()
@@ -280,11 +280,11 @@ struct mainHomeList: View {
                                     .animation(.spring(response: 0.45, dampingFraction: self.isLocalOpen ? 0.65 : 0.75, blendDuration: 0))
                                     .allowsHitTesting(!UserDefaults.standard.bool(forKey: "localOpen") ? false : true)
                                     .simultaneousGesture(DragGesture(minimumDistance: self.isLocalOpen ? 0 : 500))
-                                
+
                                 QuickSnapsSection(viewState: self.$quickSnapViewState, selectedQuickSnapContact: self.$selectedQuickSnapContact, emptyQuickSnaps: self.$emptyQuickSnaps, isLocalOpen: self.$isLocalOpen)
                                     .environmentObject(self.auth)
                                     .frame(width: Constants.screenWidth)
-                                    .offset(y: self.isLocalOpen ? -geometry.frame(in: .global).minY - (UIDevice.current.hasNotch ? -55 : -10) : 0)
+                                    .offset(y: self.isLocalOpen ? -geometry.frame(in: .global).minY - (UIDevice.current.hasNotch ? -15 : 30) : 0)
                                     .offset(y: self.isLocalOpen ? self.activeView.height / 1.5 : 0)
                                     .animation(.spring(response: 0.45, dampingFraction: self.isLocalOpen ? 0.65 : 0.75, blendDuration: 0))
                                     .padding(.vertical, self.emptyQuickSnaps ? 0 : 20)
@@ -334,7 +334,7 @@ struct mainHomeList: View {
                                 .opacity(self.isLocalOpen ? Double(self.activeView.height / 150) : 1)
                                 .opacity(self.dialogs.results.count != 0 ? 1 : 0)
                                 .offset(y: self.isLocalOpen ? -75 + (self.activeView.height / 3) : 0)
-                                .offset(y: self.emptyQuickSnaps ? -50 : 45)
+                                .offset(y: self.emptyQuickSnaps ? -30 : 65)
                                 .blur(radius: self.isLocalOpen ? ((950 - (self.activeView.height * 3)) / 600) * 2 : 0)
                                 .animation(.spring(response: 0.4, dampingFraction: 0.8, blendDuration: 0))
                                 .resignKeyboardOnDragGesture()
@@ -400,7 +400,7 @@ struct mainHomeList: View {
                                     .fixedSize(horizontal: false, vertical: true)
                                     .zIndex(i.isOpen ? 2 : 0)
                                     .opacity(isLocalOpen ? (i.isOpen ? 1 : 0) : 1)
-                                    .offset(y: i.isOpen && isLocalOpen ? -geo.frame(in: .global).minY + (emptyQuickSnaps ? (UIDevice.current.hasNotch ? 50 : 25) : 110) : emptyQuickSnaps ? -45 : 50)
+                                    .offset(y: i.isOpen && isLocalOpen ? -geo.frame(in: .global).minY + (emptyQuickSnaps ? (UIDevice.current.hasNotch ? 50 : 25) : 110) : emptyQuickSnaps ? -25 : 70)
                                     .shadow(color: Color.black.opacity(isLocalOpen ? (colorScheme == .dark ? 0.25 : 0.15) : 0.15), radius: isLocalOpen ? 15 : 8, x: 0, y: self.isLocalOpen ? (colorScheme == .dark ? 15 : 5) : 5)
                                     .animation(.spring(response: 0.45, dampingFraction: 0.95, blendDuration: 0))
                                     .id(i.id)
