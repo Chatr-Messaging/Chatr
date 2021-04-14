@@ -47,9 +47,11 @@ struct ContainerBubble: View {
 
         // a long press gesture that enables isDragging
         let pressInteractionGesture = LongPressGesture()
-            .onEnded { value in
-                withAnimation {
-                    self.showInteractions = true
+            .onEnded { _ in
+                if self.message.messageState != .isTyping && self.message.messageState != .error {
+                    withAnimation {
+                        self.showInteractions = true
+                    }
                 }
             }
 
@@ -102,7 +104,7 @@ struct ContainerBubble: View {
                                 }.padding(.horizontal, 7.5)
                                 .padding(.vertical, 5)
                             })
-                            .background(RoundedRectangle(cornerRadius: 20).foregroundColor(.black).shadow(color: Color.black, radius: 3, x: 0, y: 3).opacity(0.5))
+                            .background(RoundedRectangle(cornerRadius: 20).foregroundColor(.black).shadow(color: Color.black.opacity(0.75), radius: 5, x: 0, y: 2.5).opacity(0.5))
                             .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.black, lineWidth: 1).opacity(0.6))
                             .offset(x: messagePosition == .right ? (self.replyCount > 1 ? -55 : -40) : (self.replyCount > 1 ? 55 : 40))
                         }
@@ -120,7 +122,7 @@ struct ContainerBubble: View {
                         }
                     }
                     .onTapGesture(count: 2) {
-                        if self.messagePosition == .left {
+                        if self.messagePosition == .left && self.message.messageState != .isTyping && self.message.messageState != .error {
                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                             if self.messagePosition == .left && self.message.messageState != .deleted  {
                                 self.viewModel.message = self.message
@@ -131,9 +133,11 @@ struct ContainerBubble: View {
                         }
                     }
                     .onTapGesture(count: 1) {
-                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                        self.viewModel.message = self.message
-                        self.viewModel.isDetailOpen = true
+                        if self.message.messageState != .isTyping && self.message.messageState != .error {
+                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                            self.viewModel.message = self.message
+                            self.viewModel.isDetailOpen = true
+                        }
                     }
                     .gesture(combined)
                     .onChange(of: self.showInteractions) { _ in
@@ -303,72 +307,77 @@ struct ContainerBubble: View {
     }
     
     func onChangedInteraction(value: DragGesture.Value) {
-        self.showInteractions = true
-        withAnimation(Animation.linear(duration: 0.065)) {
-            let y = value.translation.width
-            let c = value.startLocation.x
+        if self.message.messageState != .isTyping && self.message.messageState != .error {
+            self.showInteractions = true
 
-            print("the y value is: \(y) start location: \(c)")
-            if message.messageState != .error {
-                if c <= Constants.screenWidth / 2 - 50 {
-                    if y > 5 && y < 35 { interactionSelected = reactions[0] }
-                    if y > 35 && y < 65 { interactionSelected = reactions[1] }
-                    if y > 65 && y < 95 { interactionSelected = reactions[2] }
-                    if y > 95 && y < 125 && reactions.count >= 4 { interactionSelected = reactions[3] }
-                    if y < 5 || y > (reactions.count >= 4 ? 125 : 95) { interactionSelected = "" }
-                } else {
-                    if messagePosition == .left {
-                        if y > -125 && y < -95 { interactionSelected = reactions[0] }
-                        if y > -95 && y < -65 { interactionSelected = reactions[1] }
-                        if y > -65 && y < -35 { interactionSelected = reactions[2] }
-                        if y > -35 && y < -5 { interactionSelected = reactions[3] }
-                        if y < -125 || y > -5 { interactionSelected = "" }
+            withAnimation(Animation.linear(duration: 0.065)) {
+                let y = value.translation.width
+                let c = value.startLocation.x
+
+                print("the y value is: \(y) start location: \(c)")
+                if message.messageState != .error {
+                    if c <= Constants.screenWidth / 2 - 50 {
+                        if y > 5 && y < 35 { interactionSelected = reactions[0] }
+                        if y > 35 && y < 65 { interactionSelected = reactions[1] }
+                        if y > 65 && y < 95 { interactionSelected = reactions[2] }
+                        if y > 95 && y < 125 && reactions.count >= 4 { interactionSelected = reactions[3] }
+                        if y < 5 || y > (reactions.count >= 4 ? 125 : 95) { interactionSelected = "" }
                     } else {
-                        if y > -95 && y < -65 { interactionSelected = reactions[0] }
-                        if y > -65 && y < -35 { interactionSelected = reactions[1] }
-                        if y > -35 && y < -5 { interactionSelected = reactions[2] }
-                        if y < -95 || y > -5 { interactionSelected = "" }
+                        if messagePosition == .left {
+                            if y > -125 && y < -95 { interactionSelected = reactions[0] }
+                            if y > -95 && y < -65 { interactionSelected = reactions[1] }
+                            if y > -65 && y < -35 { interactionSelected = reactions[2] }
+                            if y > -35 && y < -5 { interactionSelected = reactions[3] }
+                            if y < -125 || y > -5 { interactionSelected = "" }
+                        } else {
+                            if y > -95 && y < -65 { interactionSelected = reactions[0] }
+                            if y > -65 && y < -35 { interactionSelected = reactions[1] }
+                            if y > -35 && y < -5 { interactionSelected = reactions[2] }
+                            if y < -95 || y > -5 { interactionSelected = "" }
+                        }
                     }
+                } else {
+                    if y > -100 && y < -5 { interactionSelected = "try again" }
+                    if y < -100 || y > -5 { interactionSelected = "" }
                 }
-            } else {
-                if y > -100 && y < -5 { interactionSelected = "try again" }
-                if y < -100 || y > -5 { interactionSelected = "" }
             }
         }
     }
     
     func onEndedInteraction(value: DragGesture.Value) {
-        withAnimation(Animation.linear) { self.showInteractions = false }
-        
-        if interactionSelected == "like" {
-            UINotificationFeedbackGenerator().notificationOccurred(.success)
-            self.viewModel.message = self.message
-            self.viewModel.likeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", message: self.message, completion: { like in
-                withAnimation(Animation.easeOut(duration: 0.5).delay(0.8)) {
-                    self.hasUserLiked = like
-                }
-            })
-        } else if interactionSelected == "dislike" {
-            UINotificationFeedbackGenerator().notificationOccurred(.success)
-            self.viewModel.message = self.message
-            self.viewModel.dislikeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", message: self.message, completion: { dislike in
-                withAnimation(Animation.easeOut(duration: 0.5).delay(0.8)) {
-                    self.hasUserDisliked = dislike
-                } 
-            })
-        } else if interactionSelected == "copy" {
-            self.copyMessage()
-        } else if interactionSelected == "reply" {
-            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-        } else if interactionSelected == "edit" {
-            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-            self.viewModel.editMessage()
-        } else if interactionSelected == "trash" {
-            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-            self.deleteActionSheet.toggle()
-        } else if interactionSelected == "try again" {
-            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-            self.tryAgain()
+        if self.message.messageState != .isTyping && self.message.messageState != .error {
+            withAnimation(Animation.linear) { self.showInteractions = false }
+            
+            if interactionSelected == "like" {
+                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                self.viewModel.message = self.message
+                self.viewModel.likeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", message: self.message, completion: { like in
+                    withAnimation(Animation.easeOut(duration: 0.5).delay(0.8)) {
+                        self.hasUserLiked = like
+                    }
+                })
+            } else if interactionSelected == "dislike" {
+                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                self.viewModel.message = self.message
+                self.viewModel.dislikeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", message: self.message, completion: { dislike in
+                    withAnimation(Animation.easeOut(duration: 0.5).delay(0.8)) {
+                        self.hasUserDisliked = dislike
+                    }
+                })
+            } else if interactionSelected == "copy" {
+                self.copyMessage()
+            } else if interactionSelected == "reply" {
+                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+            } else if interactionSelected == "edit" {
+                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                self.viewModel.editMessage()
+            } else if interactionSelected == "trash" {
+                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                self.deleteActionSheet.toggle()
+            } else if interactionSelected == "try again" {
+                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                self.tryAgain()
+            }
         }
     }
     

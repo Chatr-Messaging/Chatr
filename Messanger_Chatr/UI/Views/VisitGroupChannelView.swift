@@ -21,6 +21,7 @@ struct VisitGroupChannelView: View {
     @Binding var openNewDialogID: Int
     @State var groupOccUserAvatar: [String] = []
     @State var fromDialogCell: Bool = false
+    @State var showMoreMembers: Bool = false
     @State var viewState: visitUserState = .unknown
     @State var dialogRelationship: visitDialogRelationship = .unknown
     @State var dialogModel: DialogStruct = DialogStruct()
@@ -326,7 +327,7 @@ struct VisitGroupChannelView: View {
                                 }
                                 
                                 if self.dialogModelMemebers.count > 4 && id == 3 {
-                                    NavigationLink(destination: self.addMore()) {
+                                    NavigationLink(destination: self.addMore(), isActive: $showMoreMembers) {
                                         VStack(alignment: .trailing, spacing: 0) {
                                             Divider()
                                                 .frame(width: Constants.screenWidth - 80)
@@ -450,7 +451,7 @@ struct VisitGroupChannelView: View {
                         .padding(.vertical)
                         .padding(.bottom)
                 }.coordinateSpace(name: "visitGroup-scroll")
-                .navigationBarTitle(self.scrollOffset > 135 || self.isEditGroupOpen ? self.dialogModel.fullName : "")
+                .navigationBarTitle(self.scrollOffset > 135 || self.isEditGroupOpen || self.showMoreMembers ? self.dialogModel.fullName : "")
             }
 
             //MARK: Other Views - See profile image

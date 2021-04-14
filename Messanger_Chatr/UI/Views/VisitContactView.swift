@@ -190,7 +190,7 @@ struct VisitContactView: View {
                 
                 self.viewModel.styleBuilder(content: {
                     //QR Code button
-                    NavigationLink(destination:ShareProfileView(dimissView: self.$dismissView,
+                    NavigationLink(destination: ShareProfileView(dimissView: self.$dismissView,
                                                                 contactID: self.contact.id,
                                                                 contactFullName: self.contact.fullName,
                                                                 contactAvatar: self.contact.avatar)
