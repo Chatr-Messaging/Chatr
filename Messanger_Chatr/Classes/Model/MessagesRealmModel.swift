@@ -93,7 +93,7 @@ class changeMessageRealmData {
         Request.messages(withDialogID: dialogID, extendedRequest: extRequest, paginator: Paginator.limit(UInt(limit), skip: UInt(skip)), successBlock: { (messages, _) in
             self.insertMessages(messages, completion: { })
         }){ (error) in
-            print("eror getting messages: \(error.localizedDescription)")
+            print("error getting messages: \(error.localizedDescription)")
         }
         completion(true)
     }

@@ -392,6 +392,10 @@ struct KeyboardCardView: View {
                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                         self.imagePicker.openImagePicker(completion: {
                             self.showImagePicker.toggle()
+                            
+                            if !self.showImagePicker {
+                                self.isKeyboardActionOpen = false
+                            }
                         })
                         self.checkAttachments()
                         if self.hasAttachments && self.showImagePicker {
