@@ -40,7 +40,7 @@ struct ChatMessagesView: View {
     @Binding var hasAttachment: Bool
     @Binding var newDialogFromSharedContact: Int
     @State private var delayViewMessages: Bool = false
-    @State private var firstScroll: Bool = true
+    @State private var firstScroll: Bool = false
     @State private var isLoadingMore: Bool = false
     @State private var totalMessageCount: Int = -1
     @State private var unreadMessageCount: Int = 0
@@ -95,98 +95,102 @@ struct ChatMessagesView: View {
         let currentMessages = self.auth.messages.selectedDialog(dialogID: self.dialogID)
 
         if UserDefaults.standard.bool(forKey: "localOpen") {
-            ScrollView(.vertical, showsIndicators: false) {
-                LazyVStack() {
-                    //No Messages found:
-                    if (self.totalMessageCount == 0 || self.maxPagination == 0) && self.delayViewMessages {
-                        VStack {
-                            HStack(spacing: -7) {
-                                ForEach(self.topAvatarUrls.indices, id: \.self) { url in
-                                    if url < 7 {
-                                        ZStack {
-                                            Circle()
-                                                .background(Color.clear)
-                                                .frame(width: 30, height: 30, alignment: .center)
+            ScrollViewReader { reader in
+                ScrollView(.vertical, showsIndicators: false) {
+                    LazyVStack(alignment: .center) {
+                        /*
+                         //Top Beginning section:
+                         if (self.totalMessageCount == 0 || self.maxPagination == 0) && self.delayViewMessages {
+                             VStack {
+                                 HStack(spacing: -7) {
+                                     ForEach(self.topAvatarUrls.indices, id: \.self) { url in
+                                         if url < 7 {
+                                             ZStack {
+                                                 Circle()
+                                                     .background(Color.clear)
+                                                     .frame(width: 30, height: 30, alignment: .center)
 
-                                            WebImage(url: URL(string: self.topAvatarUrls[url]))
-                                                .resizable()
-                                                .placeholder{ Image("empty-profile").resizable().frame(width: 30, height: 30, alignment: .center).scaledToFill() }
-                                                .indicator(.activity)
-                                                .scaledToFill()
-                                                .clipShape(Circle())
-                                                .frame(width: 30, height: 30, alignment: .center)
-                                                .overlay(Circle().stroke(Color.white.opacity(0.85), lineWidth: 2.2))
-                                                .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 5)
-                                            
-                                            if url == 6 && self.topAvatarUrls.count >= 7 {
-                                                Circle()
-                                                    .frame(width: 30, height: 30)
-                                                    .foregroundColor(.black)
-                                                    .opacity(0.4)
-                                                
-                                                Text("+\(self.topAvatarUrls.count - 6)")
-                                                    .font(.caption)
-                                                    .fontWeight(.medium)
-                                                    .foregroundColor(.white)
-                                            }
-                                        }
-                                    }
-                                }
-                            }.padding(.top, 15)
-                            .onAppear {
-                                self.topAvatarUrls.removeAll()
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                    for occu in changeDialogRealmData.shared.getRealmDialog(dialogId: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").occupentsID {
-                                        self.viewModel.getUserAvatar(senderId: occu) { (avatar, _, _) in
-                                            guard avatar != "self" else {
-                                                self.topAvatarUrls.append(self.auth.profile.results.first?.avatar ?? "")
-                                                return
-                                            }
-                                            self.topAvatarUrls.append(avatar)
-                                        }
-                                    }
-                                    self.topAvatarUrls.removeDuplicates()
-                                }
-                            }
-                            
-                            if self.topAvatarUrls.count > 0 {
-                                Text("Beginning of Chat")
-                                    .font(.subheadline)
-                                    .fontWeight(.medium)
-                                    .foregroundColor(.primary)
-                                    .padding(.top, 2.5)
-                                    .padding(.horizontal, 40)
-                                
-                                Text("created \(self.viewModel.dateFormatTime(date: changeDialogRealmData.shared.getRealmDialog(dialogId: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").createdAt))")
-                                    .font(.caption)
-                                    .fontWeight(.regular)
-                                    .foregroundColor(.secondary)
-                                    .multilineTextAlignment(.center)
-                                    .offset(y: 2)
+                                                 WebImage(url: URL(string: self.topAvatarUrls[url]))
+                                                     .resizable()
+                                                     .placeholder{ Image("empty-profile").resizable().frame(width: 30, height: 30, alignment: .center).scaledToFill() }
+                                                     .indicator(.activity)
+                                                     .scaledToFill()
+                                                     .clipShape(Circle())
+                                                     .frame(width: 30, height: 30, alignment: .center)
+                                                     .overlay(Circle().stroke(Color.white.opacity(0.85), lineWidth: 2.2))
+                                                     .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 5)
+                                                 
+                                                 if url == 6 && self.topAvatarUrls.count >= 7 {
+                                                     Circle()
+                                                         .frame(width: 30, height: 30)
+                                                         .foregroundColor(.black)
+                                                         .opacity(0.4)
+                                                     
+                                                     Text("+\(self.topAvatarUrls.count - 6)")
+                                                         .font(.caption)
+                                                         .fontWeight(.medium)
+                                                         .foregroundColor(.white)
+                                                 }
+                                             }
+                                         }
+                                     }
+                                 }.padding(.top, 15)
+                                 .onAppear {
+                                     self.topAvatarUrls.removeAll()
+                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                         for occu in changeDialogRealmData.shared.getRealmDialog(dialogId: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").occupentsID {
+                                             self.viewModel.getUserAvatar(senderId: occu) { (avatar, _, _) in
+                                                 guard avatar != "self" else {
+                                                     self.topAvatarUrls.append(self.auth.profile.results.first?.avatar ?? "")
+                                                     return
+                                                 }
+                                                 self.topAvatarUrls.append(avatar)
+                                             }
+                                         }
+                                         self.topAvatarUrls.removeDuplicates()
+                                     }
+                                 }
+                                 
+                                 if self.topAvatarUrls.count > 0 {
+                                     Text("Beginning of Chat")
+                                         .font(.subheadline)
+                                         .fontWeight(.medium)
+                                         .foregroundColor(.primary)
+                                         .padding(.top, 2.5)
+                                         .padding(.horizontal, 40)
+                                     
+                                     Text("created \(self.viewModel.dateFormatTime(date: changeDialogRealmData.shared.getRealmDialog(dialogId: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").createdAt))")
+                                         .font(.caption)
+                                         .fontWeight(.regular)
+                                         .foregroundColor(.secondary)
+                                         .multilineTextAlignment(.center)
+                                         .offset(y: 2)
 
-                                Divider()
-                                    .padding(.top, 10)
-                                    .padding(.horizontal, 30)
-                            }
-                        }
-                    }
+                                     Divider()
+                                         .padding(.top, 10)
+                                         .padding(.horizontal, 30)
+                                 }
+                             }
+                         }
 
-                    Text(self.totalMessageCount == 0 ? "no messages found" : self.totalMessageCount == -1 ? "loading messages..." : "")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .frame(width: 160)
-                        .padding(.all, self.totalMessageCount >= 1 && self.delayViewMessages ? 0 : 20)
-                        .offset(y: self.totalMessageCount >= 1 && self.delayViewMessages ? 0 : 40)
-                        .opacity(self.totalMessageCount >= 1 && self.delayViewMessages ? 0 : 1)
-                    
-                    //CUSTOM MESSAGE BUBBLE:
-                    if self.delayViewMessages {
-                        ScrollViewReader { reader in
+                         */
+
+                        //No Messages found:
+                        Text(self.totalMessageCount == 0 ? "no messages found" : self.totalMessageCount == -1 ? "loading messages..." : "")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .frame(width: 160)
+                            .padding(.all, self.totalMessageCount >= 1 && self.delayViewMessages ? 0 : 20)
+                            .offset(y: self.totalMessageCount >= 1 && self.delayViewMessages ? 0 : 40)
+                            .opacity(self.totalMessageCount >= 1 && self.delayViewMessages ? 0 : 1)
+
+                        //CUSTOM MESSAGE BUBBLE:
+                        if self.delayViewMessages {
                             VStack(alignment: .center) {
                                 ForEach(tempPagination ..< currentMessages.count, id: \.self) { message in
                                     let messagePosition: messagePosition = UInt(currentMessages[message].senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? .right : .left
-                                    let notLast = currentMessages[message].id != currentMessages.last?.id
-                                    //let topMsg = currentMessages[message].id == currentMessages.first?.id
+                                    let needsAvatar = self.hasPrevious(index: message)
+
                                     if needsTimestamp(index: message) {
                                         Text("\(self.viewModel.dateFormatTime(date: currentMessages[message].date))")
                                             .font(.caption)
@@ -196,7 +200,7 @@ struct ChatMessagesView: View {
                                             .padding(.top, message == 0 ? 0 : 15)
                                             .padding(.bottom, 15)
                                     }
-                                    
+
                                     if message == self.maxPagination {
                                         VStack(alignment: .center) {
                                             if self.isLoadingMore && !firstScroll && self.maxPagination != 0 {
@@ -216,50 +220,26 @@ struct ChatMessagesView: View {
                                         }
                                     }
 
-                                    VStack(spacing: 0) {
-                                        HStack() {
-                                            if messagePosition == .right { Spacer() }
-                                            
-                                            ContainerBubble(viewModel: self.viewModel, newDialogFromSharedContact: self.$newDialogFromSharedContact, isPriorWider: self.isPriorWider(index: message), message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message), namespace: self.namespace)
-                                                .environmentObject(self.auth)
-                                                .contentShape(Rectangle())
-                                                .fixedSize(horizontal: false, vertical: true)
-                                                .padding(.horizontal, 25)
-                                                .padding(.bottom, self.hasPrevious(index: message) ? -6 : 10)
-                                                .padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 95 : 0) + 32)
-                                                .id(currentMessages[message].id)
+                                    HStack() {
+                                        if messagePosition == .right { Spacer() }
 
-                                            if messagePosition == .left { Spacer() }
-                                        }.frame(width: Constants.screenWidth)
-                                        .background(Color.clear)
-                                    }.onAppear {
-                                        //print("the adding mesg id is: \(currentMessages[message].id) but the on i am looking for is: \(currentMessages[(pageShowCount * self.scrollPage) + self.pageShowCount].id) at index: \((pageShowCount * self.scrollPage) - self.pageShowCount)")
-                                        if !notLast {
-                                            print("called on appear: \(message)")
-                                            if self.firstScroll {
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
-                                                    reader.scrollTo(currentMessages[message].id, anchor: .bottom)
-                                                    self.firstScroll = false
-                                                }
-                                            } else {
-                                                withAnimation(Animation.easeOut(duration: 0.6).delay(0.1)) {
-                                                    reader.scrollTo(currentMessages[message].id, anchor: .bottom)
-                                                }
-                                            }
-                                        }
+                                        ContainerBubble(viewModel: self.viewModel, newDialogFromSharedContact: self.$newDialogFromSharedContact, isPriorWider: self.isPriorWider(index: message), message: currentMessages[message], messagePosition: messagePosition, hasPrior: needsAvatar, namespace: self.namespace)
+                                            .environmentObject(self.auth)
+                                            .contentShape(Rectangle())
+                                            .fixedSize(horizontal: false, vertical: true)
+                                            .padding(.horizontal, 25)
+                                            .padding(.bottom, needsAvatar ? -6 : 10)
+                                            .id(currentMessages[message].id)
 
-                                        if self.scrollToId == currentMessages[message].id {
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                                                reader.scrollTo(currentMessages[message].id, anchor: .top)
-                                            }
-                                        }
+                                        if messagePosition == .left { Spacer() }
+                                    }.frame(width: Constants.screenWidth)
+                                    .background(Color.clear)
+                                    .onAppear() {
+                                        reader.scrollTo("messaging_VIEW", anchor: .bottom)
                                     }
                                 }.contentShape(Rectangle())
-                                
-//                                Rectangle()
-//                                    .frame(width: Constants.screenWidth, height: self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 95 : 0) + 32)
-//                                    .foregroundColor(.clear)
-                            }.background(GeometryReader {
+                            }.padding(.bottom, self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 95 : 0) + 32)
+                            .background(GeometryReader {
                                 Color.clear.preference(key: ViewOffsetKey.self,
                                     value: -$0.frame(in: .named("scroll")).origin.y)
                             })
@@ -277,7 +257,7 @@ struct ChatMessagesView: View {
 
                                         //need to make the very last ending of convo scroll to item due to the page not being divisible.
                                         //also need to add the scroll down functions
-                                        print("From Empty view the load limit: \(pageShowCount * (self.scrollPage + 1)) and the skip:\(currentMessages.count - self.minPagination)...... the indexes are \(self.maxPagination).....< \(self.minPagination) anddddd nowww the scroll to index is: \(self.maxPagination + 1)")
+                                        //print("From Empty view the load limit: \(pageShowCount * (self.scrollPage + 1)) and the skip:\(currentMessages.count - self.minPagination)...... the indexes are \(self.maxPagination).....< \(self.minPagination) anddddd nowww the scroll to index is: \(self.maxPagination + 1)")
                                         
                                         if self.auth.messages.selectedDialog(dialogID: self.dialogID).count != self.totalMessageCount {
                                             print("pulling delta from scrolling...\(self.totalMessageCount) && \(self.auth.messages.selectedDialog(dialogID: self.dialogID).count)")
@@ -286,72 +266,60 @@ struct ChatMessagesView: View {
                                     })
                                 }
                             }
-                            .onAppear {
-                                keyboard.observe { (event) in
-                                    guard !self.viewModel.isDetailOpen else { return }
-
-                                    let keyboardFrameEnd = event.keyboardFrameEnd
-                                    
-                                    switch event.type {
-                                    case .willShow:
-                                        UIView.animate(withDuration: event.duration, delay: 0.0, options: [event.options], animations: {
-                                            self.keyboardChange = keyboardFrameEnd.height - 10
-                                            reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
-                                        }, completion: nil)
-                                       
-                                    case .willHide:
-                                        UIView.animate(withDuration: event.duration, delay: 0.0, options: [event.options], animations: {
-                                            self.keyboardChange = 0
-                                        }, completion: nil)
-
-                                    default:
-                                        break
+                        }
+                    }.id("messaging_VIEW")
+                }.coordinateSpace(name: "scroll")
+                .frame(width: Constants.screenWidth)
+                .contentShape(Rectangle())
+                .onAppear() {
+                    DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + 0.5) {
+                        viewModel.loadDialog(auth: auth, dialogId: dialogID, completion: {
+                            Request.countOfMessages(forDialogID: dialogID, extendedRequest: ["sort_desc" : "lastMessageDate"], successBlock: { count in
+                                DispatchQueue.main.async {
+                                    self.totalMessageCount = Int(count)
+                                    print("the total message count is: \(Int(count))")
+                                    if self.auth.messages.selectedDialog(dialogID: dialogID).count != Int(count) {
+                                        print("local and pulled do not match... pulling delta: \(count) && \(self.auth.messages.selectedDialog(dialogID: self.dialogID).count)")
+                                        changeMessageRealmData.shared.getMessageUpdates(dialogID: dialogID, limit: pageShowCount * scrollPage, skip: 0, completion: { _ in })
                                     }
                                 }
-                            }.opacity(self.firstScroll ? 0 : 1)
-                        }
-                    }
-                }
-            }.coordinateSpace(name: "scroll")
-            .frame(width: Constants.screenWidth)
-            .contentShape(Rectangle())
-            .onAppear() {
-                DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + 0.5) {
-                    print("the dialog id is: \(dialogID)")
-                    viewModel.loadDialog(auth: auth, dialogId: dialogID, completion: {
-                        print("done loading dialogggg: \(dialogID)")
-                        Request.countOfMessages(forDialogID: dialogID, extendedRequest: ["sort_desc" : "lastMessageDate"], successBlock: { count in
-                            DispatchQueue.main.async {
-                                self.totalMessageCount = Int(count)
-                                print("the total message count is: \(Int(count))")
-                                if self.auth.messages.selectedDialog(dialogID: dialogID).count != Int(count) {
-                                    print("local and pulled do not match... pulling delta: \(count) && \(self.auth.messages.selectedDialog(dialogID: self.dialogID).count)")
 
-                                    changeMessageRealmData.shared.getMessageUpdates(dialogID: dialogID, limit: pageShowCount * scrollPage, skip: 0, completion: { _ in
-                                    })
-                                }
-                            }
-
-                            Request.totalUnreadMessageCountForDialogs(withIDs: Set([dialogID]), successBlock: { (unread, _) in
-                                DispatchQueue.main.async {
-                                    print("the unread count for this dialog: \(unread)")
-                                    unreadMessageCount = Int(unread)
-                                }
+                                Request.totalUnreadMessageCountForDialogs(withIDs: Set([dialogID]), successBlock: { (unread, _) in
+                                    DispatchQueue.main.async {
+                                        print("the unread count for this dialog: \(unread)")
+                                        unreadMessageCount = Int(unread)
+                                    }
+                                })
                             })
                         })
-                    })
-                    delayViewMessages = true
 
-                    //guard !Session.current.tokenHasExpired else { return }
-                    
-//                    Request.updateDialog(withID: dialogID, update: UpdateChatDialogParameters(), successBlock: { dialog in
-//                        auth.selectedConnectyDialog = dialog
-//                        dialog.join(completionBlock: { errors in
-//                            print("error joininggg: \(errors?.localizedDescription)")
-//                        })
-//                    }) { error in
-//                        print("error getting messagese: \(error.localizedDescription)")
-//                    }
+                        keyboard.observe { (event) in
+                            guard !self.viewModel.isDetailOpen else { return }
+
+                            let keyboardFrameEnd = event.keyboardFrameEnd
+                            
+                            switch event.type {
+                            case .willShow:
+                                UIView.animate(withDuration: event.duration, delay: 0.5, options: [event.options], animations: {
+                                    self.keyboardChange = keyboardFrameEnd.height - 10
+                                    reader.scrollTo("messaging_VIEW", anchor: .bottom)
+                                }, completion: nil)
+                               
+                            case .willHide:
+                                UIView.animate(withDuration: event.duration, delay: 0.0, options: [event.options], animations: {
+                                    self.keyboardChange = 0
+                                }, completion: nil)
+
+                            default:
+                                break
+                            }
+                        }
+
+                        delayViewMessages = true
+                    }
+                }
+                .onDisappear() {
+                    delayViewMessages = false
                 }
             }
         }
@@ -359,8 +327,9 @@ struct ChatMessagesView: View {
 
     func hasPrevious(index: Int) -> Bool {
         let result = self.auth.messages.selectedDialog(dialogID: self.dialogID)
+        let answer = result[index] != result.last ? (result[index + 1].senderID == result[index].senderID && result[index + 1].date <= result[index].date.addingTimeInterval(86400) ? true : false) : false
 
-        return result[index] != result.last ? (result[index + 1].senderID == result[index].senderID && result[index + 1].date <= result[index].date.addingTimeInterval(86400) ? true : false) : false
+        return answer
     }
 
     func needsTimestamp(index: Int) -> Bool {
