@@ -96,7 +96,6 @@ struct ChatMessagesView: View {
 
         if UserDefaults.standard.bool(forKey: "localOpen") {
             ScrollView(.vertical, showsIndicators: false) {
-                                ForEach(self.topAvatarUrls.indices, id: \.self) { url in
                 LazyVStack(alignment: .center) {
                     Text(self.totalMessageCount == 0 ? "no messages found" : self.totalMessageCount == -1 ? "loading messages..." : "")
                         .font(.subheadline)
