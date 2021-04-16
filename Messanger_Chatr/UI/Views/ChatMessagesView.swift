@@ -96,81 +96,8 @@ struct ChatMessagesView: View {
 
         if UserDefaults.standard.bool(forKey: "localOpen") {
             ScrollView(.vertical, showsIndicators: false) {
-                LazyVStack() {
-                    //No Messages found:
-                    if (self.totalMessageCount == 0 || self.maxPagination == 0) && self.delayViewMessages {
-                        VStack {
-                            HStack(spacing: -7) {
                                 ForEach(self.topAvatarUrls.indices, id: \.self) { url in
-                                    if url < 7 {
-                                        ZStack {
-                                            Circle()
-                                                .background(Color.clear)
-                                                .frame(width: 30, height: 30, alignment: .center)
-
-                                            WebImage(url: URL(string: self.topAvatarUrls[url]))
-                                                .resizable()
-                                                .placeholder{ Image("empty-profile").resizable().frame(width: 30, height: 30, alignment: .center).scaledToFill() }
-                                                .indicator(.activity)
-                                                .scaledToFill()
-                                                .clipShape(Circle())
-                                                .frame(width: 30, height: 30, alignment: .center)
-                                                .overlay(Circle().stroke(Color.white.opacity(0.85), lineWidth: 2.2))
-                                                .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 5)
-                                            
-                                            if url == 6 && self.topAvatarUrls.count >= 7 {
-                                                Circle()
-                                                    .frame(width: 30, height: 30)
-                                                    .foregroundColor(.black)
-                                                    .opacity(0.4)
-                                                
-                                                Text("+\(self.topAvatarUrls.count - 6)")
-                                                    .font(.caption)
-                                                    .fontWeight(.medium)
-                                                    .foregroundColor(.white)
-                                            }
-                                        }
-                                    }
-                                }
-                            }.padding(.top, 15)
-                            .onAppear {
-                                self.topAvatarUrls.removeAll()
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                    for occu in changeDialogRealmData.shared.getRealmDialog(dialogId: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").occupentsID {
-                                        self.viewModel.getUserAvatar(senderId: occu) { (avatar, _, _) in
-                                            guard avatar != "self" else {
-                                                self.topAvatarUrls.append(self.auth.profile.results.first?.avatar ?? "")
-                                                return
-                                            }
-                                            self.topAvatarUrls.append(avatar)
-                                        }
-                                    }
-                                    self.topAvatarUrls.removeDuplicates()
-                                }
-                            }
-                            
-                            if self.topAvatarUrls.count > 0 {
-                                Text("Beginning of Chat")
-                                    .font(.subheadline)
-                                    .fontWeight(.medium)
-                                    .foregroundColor(.primary)
-                                    .padding(.top, 2.5)
-                                    .padding(.horizontal, 40)
-                                
-                                Text("created \(self.viewModel.dateFormatTime(date: changeDialogRealmData.shared.getRealmDialog(dialogId: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").createdAt))")
-                                    .font(.caption)
-                                    .fontWeight(.regular)
-                                    .foregroundColor(.secondary)
-                                    .multilineTextAlignment(.center)
-                                    .offset(y: 2)
-
-                                Divider()
-                                    .padding(.top, 10)
-                                    .padding(.horizontal, 30)
-                            }
-                        }
-                    }
-
+                LazyVStack(alignment: .center) {
                     Text(self.totalMessageCount == 0 ? "no messages found" : self.totalMessageCount == -1 ? "loading messages..." : "")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
@@ -183,6 +110,28 @@ struct ChatMessagesView: View {
                     if self.delayViewMessages {
                         ScrollViewReader { reader in
                             VStack(alignment: .center) {
+                                if (self.totalMessageCount == 0 || self.maxPagination == 0) && self.delayViewMessages {
+                                    VStack {
+                                        Text("Beginning of Chat")
+                                            .font(.subheadline)
+                                            .fontWeight(.medium)
+                                            .foregroundColor(.primary)
+                                            .padding(.top, 2.5)
+                                            .padding(.horizontal, 40)
+                                        
+                                        Text("created \(self.viewModel.dateFormatTime(date: changeDialogRealmData.shared.getRealmDialog(dialogId: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").createdAt))")
+                                            .font(.caption)
+                                            .fontWeight(.regular)
+                                            .foregroundColor(.secondary)
+                                            .multilineTextAlignment(.center)
+                                            .offset(y: 2)
+
+                                        Divider()
+                                            .padding(.top, 10)
+                                            .padding(.horizontal, 30)
+                                    }
+                                }
+
                                 ForEach(tempPagination ..< currentMessages.count, id: \.self) { message in
                                     let messagePosition: messagePosition = UInt(currentMessages[message].senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? .right : .left
                                     let notLast = currentMessages[message].id != currentMessages.last?.id
@@ -225,12 +174,14 @@ struct ChatMessagesView: View {
                                                 .contentShape(Rectangle())
                                                 .fixedSize(horizontal: false, vertical: true)
                                                 .padding(.horizontal, 25)
+                                                .padding(.trailing, messagePosition != .right ? 40 : 0)
+                                                .padding(.leading, messagePosition == .right ? 40 : 0)
                                                 .padding(.bottom, self.hasPrevious(index: message) ? -6 : 10)
                                                 .padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 95 : 0) + 32)
                                                 .id(currentMessages[message].id)
 
                                             if messagePosition == .left { Spacer() }
-                                        }.frame(width: Constants.screenWidth)
+                                        }
                                         .background(Color.clear)
                                     }.onAppear {
                                         //print("the adding mesg id is: \(currentMessages[message].id) but the on i am looking for is: \(currentMessages[(pageShowCount * self.scrollPage) + self.pageShowCount].id) at index: \((pageShowCount * self.scrollPage) - self.pageShowCount)")

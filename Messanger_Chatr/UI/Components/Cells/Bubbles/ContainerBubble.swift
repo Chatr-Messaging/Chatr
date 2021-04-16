@@ -12,6 +12,7 @@ import RealmSwift
 import Firebase
 import ConnectyCube
 import MobileCoreServices
+import Photos
 
 struct ContainerBubble: View {
     @EnvironmentObject var auth: AuthModel
@@ -133,11 +134,8 @@ struct ContainerBubble: View {
                         }
                     }
                     .onTapGesture(count: 1) {
-                        if self.message.messageState != .isTyping && self.message.messageState != .error {
-                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                            self.viewModel.message = self.message
-                            self.viewModel.isDetailOpen = true
-                        }
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                        self.openReplyDetailView()
                     }
                     .gesture(combined)
                     .onChange(of: self.showInteractions) { _ in
@@ -145,14 +143,32 @@ struct ContainerBubble: View {
                     }.onAppear() {
                         self.observeInteractions()
                         if self.messagePosition == .right {
-                            self.reactions.append("edit")
-                            self.reactions.append("copy")
-                            self.reactions.append("trash")
+                            if self.message.imageType == "image/gif" || self.message.imageType == "image/png" {
+                                self.reactions.append("save")
+                            } else {
+                                self.reactions.append("edit")
+                            }
+
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
+                                guard let dialog = self.auth.selectedConnectyDialog, let admins = dialog.adminsIDs, (admins.contains(NSNumber(value: self.message.senderID)) || dialog.userID == UserDefaults.standard.integer(forKey: "currentUserID")), (dialog.type == .group || dialog.type == .public) else {
+                                    self.reactions.append("copy")
+                                    self.reactions.append("trash")
+
+                                    return
+                                }
+
+                                self.reactions.append("pin")
+                                self.reactions.append("trash")
+                            }
                         } else {
                             self.reactions.append("like")
                             self.reactions.append("dislike")
                             self.reactions.append("reply")
-                            self.reactions.append("copy")
+                            if self.message.imageType == "image/gif" || self.message.imageType == "image/png" {
+                                self.reactions.append("save")
+                            } else {
+                                self.reactions.append("copy")
+                            }
                         }
                     }.zIndex(self.showInteractions ? 1 : 0)
                     
@@ -368,6 +384,7 @@ struct ContainerBubble: View {
                 self.copyMessage()
             } else if interactionSelected == "reply" {
                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                self.openReplyDetailView()
             } else if interactionSelected == "edit" {
                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                 self.viewModel.editMessage()
@@ -377,14 +394,27 @@ struct ContainerBubble: View {
             } else if interactionSelected == "try again" {
                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                 self.tryAgain()
+            } else if interactionSelected == "pin" {
+                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                self.pinMessage()
+            } else if interactionSelected == "save" {
+                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                self.saveImage()
             }
         }
     }
     
     func copyMessage() {
         UINotificationFeedbackGenerator().notificationOccurred(.success)
-        UIPasteboard.general.setValue(self.message.text, forPasteboardType: kUTTypePlainText as String)
-        
+
+        if self.message.longitude != 0 && self.message.latitude != 0 {
+            let copyText = "longitude: " + "\(self.message.longitude)" + "\n" + "latitude: " + "\(self.message.latitude)"
+
+            UIPasteboard.general.setValue(copyText, forPasteboardType: kUTTypePlainText as String)
+        } else {
+            UIPasteboard.general.setValue(self.message.text, forPasteboardType: kUTTypePlainText as String)
+        }
+
         auth.notificationtext = "Successfully copied message"
         NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
     }
@@ -392,7 +422,47 @@ struct ContainerBubble: View {
     func tryAgain() {
         print("try again action")
     }
+    
+    func openReplyDetailView() {
+        if self.message.messageState != .isTyping && self.message.messageState != .error {
+            self.viewModel.message = self.message
+            self.viewModel.isDetailOpen = true
+        }
+    }
 
+    func pinMessage() {
+        let updateParameters = UpdateChatDialogParameters()
+        updateParameters.pinnedMessagesIDsToAdd = [self.message.id]
+        //updateParameters.pinnedMessagesIDsToRemove = ["5356c64ab35c12bd3b10ba31", "5356c64ab35c12bd3b10wa64"]
+
+        Request.updateDialog(withID: self.message.dialogID, update: updateParameters, successBlock: { (updatedDialog) in
+            auth.notificationtext = "Successfully pined message"
+            NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+        }) { (error) in
+            auth.notificationtext = "Error pining message"
+            NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+        }
+    }
+    
+    func saveImage() {
+        if let imageData = SDImageCache.shared.imageFromMemoryCache(forKey: self.message.image)?.pngData() {
+            //use image
+            PHPhotoLibrary.shared().performChanges({
+                let request = PHAssetCreationRequest.forAsset()
+                request.addResource(with: .photo, data: imageData, options: nil)
+            }) { (success, error) in
+                if let error = error {
+                    print(error.localizedDescription)
+                } else {
+                    DispatchQueue.main.async {
+                        auth.notificationtext = "Successfully saved image"
+                        NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+                    }
+                }
+            }
+        }
+    }
+    
     func observeInteractions() {
         let msg = Database.database().reference().child("Dialogs").child(self.message.dialogID).child(self.message.id)
         let profileID = self.auth.profile.results.first?.id ?? 0

@@ -408,6 +408,7 @@ struct BubbleDetailView: View {
                             MessageReplyCell(viewModel: self.viewModel, reply: self.replies[reply])
                                 .environmentObject(self.auth)
                                 .padding(.top, reply == 0 ? 10 : 0)
+                                .id(self.replies[reply].id)
                                 .transition(AnyTransition.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(.easeOut(duration: 0.2)), removal: AnyTransition.move(edge: .bottom).animation(.easeOut(duration: 0.2))))
                         }.animation(.easeOut(duration: 0.4))
                     }.padding(.horizontal, 30)

@@ -40,11 +40,11 @@ struct LocationBubble: View {
             Map(coordinateRegion: $region, interactionModes: MapInteractionModes.all, showsUserLocation: true, userTrackingMode: $userTrackingMode, annotationItems: [MyAnnotationItem(coordinate: CLLocationCoordinate2D(latitude: self.message.latitude, longitude: self.message.longitude))]) { marker in
                 MapPin(coordinate: marker.coordinate)
             }
-        }.frame(height: CGFloat(Constants.screenWidth * 0.5))
+        }.frame(width: CGFloat(Constants.screenWidth * 0.7), height: CGFloat(Constants.screenWidth * 0.5))
         .transition(.asymmetric(insertion: AnyTransition.scale.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
         .cornerRadius(20)
-        .padding(.leading, self.messagePosition == .right ? CGFloat(Constants.screenHeight * 0.1) : 0)
-        .padding(.trailing, self.messagePosition == .right ? 0 : CGFloat(Constants.screenHeight * 0.1))
+        //.padding(.leading, self.messagePosition == .right ? CGFloat(Constants.screenHeight * 0.1) : 0)
+        //.padding(.trailing, self.messagePosition == .right ? 0 : CGFloat(Constants.screenHeight * 0.1))
         .padding(.bottom, self.hasPrior ? 0 : 4)
         .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 10)
         .matchedGeometryEffect(id: message.id + "map", in: namespace)
