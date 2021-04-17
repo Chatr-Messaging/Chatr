@@ -29,6 +29,8 @@ struct BubbleDetailView: View {
     @State var hasUserDisliked: Bool = false
     @State var showContact: Bool = false
     @State var playVideo: Bool = true
+    @State var showContentActions: Bool = false
+    @State var repliesOpen: Bool = false
     @State var replyScrollOffset: CGFloat = CGFloat.zero
     @State private var userTrackingMode: MapUserTrackingMode = .follow
     @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 25.7617, longitude: 80.1918), span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
@@ -38,8 +40,6 @@ struct BubbleDetailView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            if self.keyboardChange == 0 && self.replies.count == 0 { Spacer() }
-
             //MARK: Content Section
             ZStack() {
                 VStack() {
@@ -49,7 +49,6 @@ struct BubbleDetailView: View {
                             .resizable()
                             .placeholder{ Image("empty-profile").resizable().frame(width: 34, height: 34, alignment: .bottom).scaledToFill() }
                             .indicator(.activity)
-                            .transition(.asymmetric(insertion: AnyTransition.scale.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                             .scaledToFill()
                             .clipShape(Circle())
                             .frame(width: 35, height: 35, alignment: .center)
@@ -73,7 +72,13 @@ struct BubbleDetailView: View {
                         Button(action: {
                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                             withAnimation {
-                                self.viewModel.isDetailOpen = false
+                                self.showContentActions = false
+                            }
+
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                                withAnimation {
+                                    self.viewModel.isDetailOpen = false
+                                }
                             }
                         }) {
                             Image("closeButton")
@@ -84,7 +89,8 @@ struct BubbleDetailView: View {
                     }
                     .padding(.horizontal)
                     .padding(.top, 10)
-                    .transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.spring()), removal: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.easeOut(duration: 0.1))))
+                    .opacity(showContentActions ? (!self.repliesOpen ? Double((200 - self.cardDrag.height) / 200) : 1) : 0)
+                    .offset(y: showContentActions ? (!self.repliesOpen ? (self.cardDrag.height > 0 ? self.cardDrag.height / 4 : 0) : 0) : 60)
                     .onTapGesture {
                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                         self.showContact.toggle()
@@ -105,8 +111,8 @@ struct BubbleDetailView: View {
                                             .foregroundColor(.secondary)
                                     }
                                 }//.frame(maxHeight: Constants.screenHeight * 0.85, alignment: .center)
-                                .transition(.asymmetric(insertion: AnyTransition.scale.animation(.easeOut(duration: 0.35)), removal: AnyTransition.scale.animation(.easeOut(duration: 0.25))))
                                 .aspectRatio(contentMode: .fit)
+                                .cornerRadius(showContentActions ? (!self.repliesOpen ? (self.cardDrag.height > 0 ? self.cardDrag.height / 8 : 0) : 0) : 15)
                                 .pinchToZoom()
                                 .fixedSize(horizontal: false, vertical: true)
                                 .matchedGeometryEffect(id: self.viewModel.message.id.description + "gif", in: namespace)
@@ -123,8 +129,8 @@ struct BubbleDetailView: View {
                                             .foregroundColor(.secondary)
                                     }
                                 }//.frame(maxHeight: Constants.screenHeight * 0.85, alignment: .center)
-                                .transition(.asymmetric(insertion: AnyTransition.scale.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                                 .aspectRatio(contentMode: .fit)
+                                .cornerRadius(showContentActions ? (!self.repliesOpen ? (self.cardDrag.height > 0 ? self.cardDrag.height / 8 : 0) : 0) : 15)
                                 .pinchToZoom()
                                 .fixedSize(horizontal: false, vertical: true)
                                 .matchedGeometryEffect(id: self.viewModel.message.id.description + "png", in: namespace)
@@ -134,7 +140,7 @@ struct BubbleDetailView: View {
                                 DetailVideoPlayer(viewModel: self.viewModel)
                                     .matchedGeometryEffect(id: self.viewModel.message.id.description + "mov", in: namespace)
                                     .frame(height: self.viewModel.videoSize.height)
-                                    //.frame(minHeight: 100)
+                                    .cornerRadius(showContentActions ? (!self.repliesOpen ? (self.cardDrag.height > 0 ? self.cardDrag.height / 8 : 0) : 0) : 15)
                                     .pinchToZoom()
                                     .onTapGesture {
                                         print("the height is: \(self.viewModel.videoSize.height)")
@@ -152,8 +158,8 @@ struct BubbleDetailView: View {
                         //location
                         Map(coordinateRegion: $region, interactionModes: MapInteractionModes.all, showsUserLocation: true, userTrackingMode: $userTrackingMode, annotationItems: [MyAnnotationItem(coordinate: CLLocationCoordinate2D(latitude: self.viewModel.message.latitude, longitude: self.viewModel.message.longitude))]) { marker in
                             MapPin(coordinate: marker.coordinate)
-                        }.frame(minHeight: 200, maxHeight: CGFloat(Constants.screenHeight * 0.6))
-                        .transition(.asymmetric(insertion: AnyTransition.scale.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
+                        }.frame(height: CGFloat(Constants.screenHeight * (self.replies.count == 0 ? 0.58 : self.replies.count == 1 ? 0.53 : 0.43)))
+                        .cornerRadius(showContentActions ? (!self.repliesOpen ? (self.cardDrag.height > 0 ? self.cardDrag.height / 8 : 0) : 0) : 15)
                         .matchedGeometryEffect(id: self.viewModel.message.id.description + "map", in: namespace)
                         .onAppear() {
                             self.region.center.latitude = self.viewModel.message.latitude
@@ -161,6 +167,20 @@ struct BubbleDetailView: View {
                         }
                     } else {
                         //Text
+                        if self.viewModel.message.text.containsEmoji && self.viewModel.message.text.count <= 4 {
+                            Text(self.viewModel.message.text)
+                                .font(.system(size: 66))
+                                .padding(.vertical, 15)
+                                .offset(x: self.messagePosition == .right ? -10 : 10, y: -5)
+                                .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 5)
+                                .matchedGeometryEffect(id: self.viewModel.message.id.description + "text", in: namespace)
+                        } else {
+                            LinkedText(self.viewModel.message.text, messageRight: self.messagePosition == .right, messageState: self.viewModel.message.messageState)
+                                .padding(.vertical, 15)
+                                .padding(.horizontal, 40)
+                                .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.viewModel.message.messageState == .error ? Color.red.opacity(0.8) : Color.clear, lineWidth: 1.5))
+                                .matchedGeometryEffect(id: self.viewModel.message.id.description + "text", in: namespace)
+                        }
                     }
 
                     //Footer Section
@@ -202,6 +222,8 @@ struct BubbleDetailView: View {
                                             self.viewModel.isDetailOpen = true
                                             self.hasUserLiked = like
                                         })
+                                    } else {
+                                        UINotificationFeedbackGenerator().notificationOccurred(.error)
                                     }
                                 }, label: {
                                     HStack {
@@ -226,6 +248,8 @@ struct BubbleDetailView: View {
                                             self.viewModel.isDetailOpen = true
                                             self.hasUserDisliked = dislike
                                         })
+                                    } else {
+                                        UINotificationFeedbackGenerator().notificationOccurred(.error)
                                     }
                                 }, label: {
                                     HStack {
@@ -319,13 +343,19 @@ struct BubbleDetailView: View {
                             }
                         }.padding(.horizontal, 15)
                     }
-                    .transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.spring()), removal: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.easeOut(duration: 0.1))))
-                    //.fixedSize(horizontal: false, vertical: true)
+                    .opacity(showContentActions ? Double((200 - self.cardDrag.height) / 200) : 0)
+                    .offset(y: showContentActions ? (self.cardDrag.height > 0 ? -(self.cardDrag.height / 4) : 0) : -60)
                     .padding(.bottom, 10)
                 }
             }
-            .background(RoundedRectangle(cornerRadius: 20).foregroundColor(Color("bgColor")))
+            .background(
+                RoundedRectangle(cornerRadius: 20)
+                    .foregroundColor(Color("bgColor"))
+                    .opacity(showContentActions ? Double((200 - self.cardDrag.height) / 200) : 0)
+                    .scaleEffect(y: showContentActions ? (self.cardDrag.height > 0 ? 1 - (self.cardDrag.height / 1000) : 1) : 0.8)
+            )
             .padding(.top, UIDevice.current.hasNotch ? 40 : 20)
+            .padding(.top, self.repliesOpen ? -(Constants.screenHeight / 4) : 0)
             .padding(.horizontal, 10)
             .animation(.spring(response: 0.45, dampingFraction: 0.7, blendDuration: 0))
             .offset(y: self.cardDrag.height + 7)
@@ -333,7 +363,7 @@ struct BubbleDetailView: View {
             .offset(y: self.height > 175 ? -height : 0)
             .shadow(color: Color.black.opacity(0.2), radius: 15, x: 0, y: 12)
             .zIndex(3)
-            .rotation3DEffect(.degrees(-Double(self.cardDrag.height > 20 ? ((self.cardDrag.height - 20) / 8 > 8 ? 8 : (self.cardDrag.height - 20) / 8) : 0)), axis: (x: 1, y: 0, z: 0))
+            .rotation3DEffect(.degrees(!self.repliesOpen ? -Double(self.cardDrag.height > 20 ? ((self.cardDrag.height - 20) / 8 > 8 ? 8 : (self.cardDrag.height - 20) / 8) : 0) : 0), axis: (x: 1, y: 0, z: 0))
             .simultaneousGesture(DragGesture().onChanged { value in
                 if self.viewModel.message.longitude == 0 && self.viewModel.message.latitude == 0 && self.viewModel.isDetailOpen {
                     if self.playVideo {
@@ -343,13 +373,23 @@ struct BubbleDetailView: View {
                         self.viewModel.pause()
                     }
                     self.cardDrag.height = value.translation.height / 2
+                    if !self.repliesOpen && self.replies.count > 0 && value.translation.height < -105 {
+                        withAnimation {
+                            self.repliesOpen = true
+                        }
+                    } else if self.repliesOpen && value.translation.height > 80 {
+                        withAnimation {
+                            self.repliesOpen = false
+                        }
+                    }
+
                     if self.keyboardChange != 0 {
                         UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
                     }
                 }
             }.onEnded { valueEnd in
                 if self.viewModel.message.longitude == 0 && self.viewModel.message.latitude == 0 && self.viewModel.isDetailOpen {
-                    if self.cardDrag.height > 60 {
+                    if self.cardDrag.height > 60 && !self.repliesOpen {
                         self.cardDrag = .zero
                         withAnimation {
                             self.viewModel.isDetailOpen = false
@@ -362,48 +402,38 @@ struct BubbleDetailView: View {
                     }
                 }
             })
-//            .actionSheet(isPresented: $openMoreOptions) {
-//                ActionSheet(title: Text("Options:"), message: nil, buttons: [
-//                    .default(Text("Copy")) {
-//                        print("")
-//                    },
-//                    .destructive(Text(self.dialogModel.dialogType == "private" ? "Delete Dialog" : (self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? "Destroy Group" : "Leave Group")), action: {
-//                        changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
-//
-//                        self.isOpen = false
-//                        self.openActionSheet = false
-//                        UserDefaults.standard.set(false, forKey: "localOpen")
-//
-//                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-//                            if self.dialogModel.dialogType == "private" || self.dialogModel.dialogType == "group" {
-//                                changeDialogRealmData.shared.deletePrivateConnectyDialog(dialogID: self.dialogModel.id, isOwner: self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? true : false)
-//                            } else if self.dialogModel.dialogType == "public" {
-//                                changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: self.dialogModel.id)
-//                            }
-//                        }
-//                    }),
-//                    .cancel()
-//                ])
-//            }
 
             //MARK: Reply Section
             VStack(alignment: self.replies.count == 0 ? .center : .leading, spacing: 0) {
-                if self.replies.count > 0 {
-                    Text("Replies (\(self.replies.count))")
-                        .font(.headline)
-                        .foregroundColor(.primary)
-                        .padding(.leading, 30)
-                        .padding(.top)
-                } else {
-                    Text("no replies")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .padding(.vertical, self.replies.isEmpty ? 40 : 0)
-                        .opacity(self.replies.isEmpty ? 1 : 0)
-                }
-
                 ScrollView(.vertical, showsIndicators: false) {
-                    LazyVStack(alignment: .leading) {
+                    LazyVStack(alignment: self.replies.count == 0 ? .center : .leading) {
+                        if self.replies.count > 0 {
+                            HStack(alignment: .bottom) {
+                                Text("Replies (\(self.replies.count))")
+                                    .font(.headline)
+                                    .foregroundColor(.primary)
+                                    .padding(.top, 25)
+                                
+                                Spacer()
+                                Button(action: {
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                    withAnimation {
+                                        self.repliesOpen.toggle()
+                                    }
+                                }) {
+                                    Text(!self.repliesOpen ? "show more" : "show less")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                        } else if self.showContentActions {
+                            Text("no replies")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .padding(.vertical, self.replies.isEmpty ? 40 : 0)
+                                .opacity(self.replies.isEmpty ? 1 : 0)
+                        }
+
                         ForEach(self.replies.indices, id:\.self) { reply in
                             MessageReplyCell(viewModel: self.viewModel, reply: self.replies[reply])
                                 .environmentObject(self.auth)
@@ -417,15 +447,25 @@ struct BubbleDetailView: View {
                             value: -$0.frame(in: .named("replyScroll")).origin.y)
                     })
                     .onPreferenceChange(ViewOffsetKey.self) {
-                        print("offset >> \($0)")
-                        if $0 > 0 {
+                        if $0 < 0 {
                             self.replyScrollOffset = $0
+                            if self.repliesOpen && $0 < -55 {
+                                withAnimation {
+                                    self.repliesOpen = false
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                }
+                            }
+                        } else if !self.repliesOpen && self.replies.count > 0 && $0 > 55 {
+                            withAnimation {
+                                self.repliesOpen = true
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                            }
                         }
                     }
-                }.coordinateSpace(name: "replyScroll")
-                //.frame(maxHeight: (Constants.screenHeight / 10) + (self.cardDrag.height < 0 ? -self.cardDrag.height : 10))
-                .frame(minHeight: self.replyScrollOffset * 2)
-                .opacity(Double((300 - self.cardDrag.height) / 300))
+                }.frame(maxHeight: self.replies.count > 0 ? (self.replies.count > 1 ? Constants.screenHeight : Constants.screenHeight * 0.35) : (self.viewModel.message.imageType != "" ? Constants.screenHeight * 0.2 : Constants.screenHeight * 0.28))
+                .coordinateSpace(name: "replyScroll")
+                .opacity(!self.repliesOpen ? Double((300 - self.cardDrag.height) / 300) : 1)
+                .offset(y: showContentActions ? (self.cardDrag.height > 0 ? self.cardDrag.height / 4 : 0) : 0)
                 .offset(y: -2)
 
                 ResizableTextField(imagePicker: self.imagePicker, height: self.$height, text: self.$mainReplyText, isMessageView: false)
@@ -469,14 +509,12 @@ struct BubbleDetailView: View {
                         }
                     )
             }.frame(maxWidth: .infinity)
-            .offset(y: self.cardDrag.height > 0 ? self.cardDrag.height / 4 : 0)
             .padding(.bottom, self.keyboardChange != 0 ? (self.keyboardChange - (UIDevice.current.hasNotch ? 50 : 30)) : (UIDevice.current.hasNotch ? 50 : 30))
-            .transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.spring()), removal: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.easeOut(duration: 0.1))))
-            .opacity(Double((200 - self.cardDrag.height) / 200))
+            .opacity(!self.repliesOpen ? Double((200 - self.cardDrag.height) / 200) : 1)
             .zIndex(2)
         }.frame(width: Constants.screenWidth, height: Constants.screenHeight, alignment: .bottom)
         .edgesIgnoringSafeArea(.all)
-        .background(BlurView(style: .systemUltraThinMaterial).opacity(Double((300 - self.cardDrag.height) / 300)))
+        .background(BlurView(style: .systemUltraThinMaterial).opacity(!self.repliesOpen ? Double((300 - self.cardDrag.height) / 300) : 1))
         .sheet(isPresented: self.$showContact, onDismiss: {
             //if self.chatContact != 0 && self.chatContact != self.message.senderID {
                print("need to open Chat view!! \(newDialogFromSharedContact)")
@@ -489,7 +527,7 @@ struct BubbleDetailView: View {
             }
         }
         .onAppear() {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.55) {
                 UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
                 self.hasUserLiked = self.viewModel.message.likedId.contains(self.auth.profile.results.first?.id ?? 0)
                 self.hasUserDisliked = self.viewModel.message.dislikedId.contains(self.auth.profile.results.first?.id ?? 0)
@@ -499,6 +537,8 @@ struct BubbleDetailView: View {
                 self.observeInteractions()
                 self.observeReplies()
                 self.observeKeyboard()
+
+                self.showContentActions = true
             }
         }
     }

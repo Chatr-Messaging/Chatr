@@ -58,6 +58,7 @@ struct AttachmentBubble: View {
                     .offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
                     .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.5) : Color.clear, lineWidth: 5).offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0))
                     .matchedGeometryEffect(id: self.message.id.description + "gif", in: namespace)
+                    .animation(.default)
             } else if self.message.imageType == "image/png" && self.message.messageState != .deleted {
                 WebImage(url: URL(string: self.message.image))
                     .resizable()
@@ -69,8 +70,7 @@ struct AttachmentBubble: View {
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
-                    }
-                    .aspectRatio(contentMode: .fit)
+                    }.aspectRatio(contentMode: .fit)
                     .clipShape(CustomGIFShape())
                     .frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.55 : 0.65)), alignment: self.messagePosition == .right ? .trailing : .leading)
                     .frame(maxHeight: CGFloat(Constants.screenHeight * 0.65))
@@ -79,6 +79,7 @@ struct AttachmentBubble: View {
                     .offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
                     .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.8) : Color.clear, lineWidth: 3).offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0))
                     .matchedGeometryEffect(id: self.message.id.description + "png", in: namespace)
+                    .animation(.default)
                     .onAppear {
                         print("the found image url: \(self.message.image)")
                     }

@@ -31,6 +31,8 @@ struct MessageReplyCell: View {
                 Text("sent \(self.viewModel.dateFormatTimeExtended(date: reply.date))")
                     .fontWeight(.bold)
 
+                Divider()
+
                 if self.reply.fromId == "\(UserDefaults.standard.integer(forKey: "currentUserID"))" || self.viewModel.message.senderID == UserDefaults.standard.integer(forKey: "currentUserID") {
                     Button(action: {
                         self.viewModel.deleteReply(messageId: self.reply.id, completion: {

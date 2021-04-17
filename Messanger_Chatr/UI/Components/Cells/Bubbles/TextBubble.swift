@@ -28,9 +28,11 @@ struct TextBubble: View {
                         .font(.system(size: 66))
                         .offset(x: self.messagePosition == .right ? -10 : 10, y: -5)
                         .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 5)
+                        .matchedGeometryEffect(id: self.message.id.description + "text", in: namespace)
                 } else {
                     LinkedText(self.message.text, messageRight: self.messagePosition == .right, messageState: self.message.messageState)
                         .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.8) : Color.clear, lineWidth: 1.5))
+                        .matchedGeometryEffect(id: self.message.id.description + "text", in: namespace)
                 }
             } else if self.message.messageState == .isTyping {
                 ZStack {
