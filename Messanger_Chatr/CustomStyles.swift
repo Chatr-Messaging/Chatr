@@ -125,6 +125,17 @@ struct interactionButtonStyle: ButtonStyle {
     }
 }
 
+struct interactionDefaultButtonStyle: ButtonStyle {
+    public func makeBody(configuration: interactionButtonStyle.Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.9 : 1.0)
+            .opacity(configuration.isPressed ? 0.9 : 1)
+            .background(RoundedRectangle(cornerRadius: 20).shadow(color: Color.black.opacity(0.2), radius: 3, x: 0, y: 3))
+            .foregroundColor(configuration.isPressed ? Color("bgColor").opacity(0.85) : Color("interactionBtnColor").opacity(0.75))
+            .overlay(RoundedRectangle(cornerRadius: 20).stroke(configuration.isPressed ? Color("interactionBtnBorderUnselected").opacity(0.2) : Color("interactionBtnBorderUnselected"), lineWidth: 1.5))
+    }
+}
+
 struct navigationScaleHelpticButtonStyle: PrimitiveButtonStyle {
     func makeBody(configuration: PrimitiveButtonStyle.Configuration) -> some View {
         MyButton(configuration: configuration)

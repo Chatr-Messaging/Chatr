@@ -326,7 +326,6 @@ struct VisitContactView: View {
                                     UINotificationFeedbackGenerator().notificationOccurred(.error)
                                 }
                             }) {
-                                VStack(spacing: 0) {
                                 HStack(alignment: .center) {
                                     Image("instagramIcon_black")
                                         .resizable()
@@ -337,8 +336,8 @@ struct VisitContactView: View {
                                     Text("@\(self.viewModel.username)")
                                         .font(.none)
                                         .fontWeight(.none)
-                                        .background(self.contact.isInfoPrivate || self.contactRelationship != .contact ? Color.secondary : Color.clear)
-                                        .foregroundColor(self.contact.isInfoPrivate || self.contactRelationship != .contact ? .clear : self.viewModel.username == "" ? .gray : .primary)
+                                        .background(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? Color.clear : self.contact.isInfoPrivate || self.contactRelationship != .contact ? Color.secondary : Color.clear)
+                                        .foregroundColor(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? .primary : self.contact.isInfoPrivate || self.contactRelationship != .contact ? .clear : self.viewModel.username == "" ? .gray : .primary)
 
                                     Spacer()
                                     
@@ -356,12 +355,6 @@ struct VisitContactView: View {
                                         .foregroundColor(.secondary)
                                 }.padding(.horizontal)
                                 .padding(.vertical, 12.5)
-                                    if self.contact.twitter != "" || self.contact.facebook != ""{
-                                        Divider()
-                                            .frame(width: Constants.screenWidth - 80)
-                                            .offset(x: 30)
-                                    }
-                                }
                             }.buttonStyle(changeBGButtonStyle())
                             .simultaneousGesture(TapGesture()
                                 .onEnded { _ in
@@ -369,24 +362,31 @@ struct VisitContactView: View {
                                 })
 
                             if !self.contact.isInfoPrivate || self.contactRelationship == .contact {
-                                LazyVGrid(columns: self.columns, alignment: .center, spacing: 5) {
-                                    ForEach(self.viewModel.igMedia.sorted{ $0.timestamp > $1.timestamp }, id: \.self) { media in
-                                        WebImage(url: URL(string: media.media_url))
-                                            .resizable()
-                                            .placeholder{ Image("empty-profile").resizable().scaledToFill() }
-                                            .indicator(.activity)
-                                            .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
-                                            .scaledToFill()
-                                            .frame(minWidth: 0, maxWidth: Constants.screenWidth / 3 - 20, maxHeight: Constants.screenWidth / 3 - 20)
-                                            .clipShape(RoundedRectangle(cornerRadius: 5, style: .circular))
-                                            .onTapGesture {
-                                                self.selectedImageUrl = media.media_url
-                                                self.isProfileImgOpen.toggle()
-                                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                            }
+                                VStack(spacing: 0) {
+                                    LazyVGrid(columns: self.columns, alignment: .center, spacing: 5) {
+                                        ForEach(self.viewModel.igMedia.sorted{ $0.timestamp > $1.timestamp }, id: \.self) { media in
+                                            WebImage(url: URL(string: media.media_url))
+                                                .resizable()
+                                                .placeholder{ Image("empty-profile").resizable().scaledToFill() }
+                                                .indicator(.activity)
+                                                .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
+                                                .scaledToFill()
+                                                .frame(minWidth: 0, maxWidth: Constants.screenWidth / 3 - 20, maxHeight: Constants.screenWidth / 3 - 20)
+                                                .clipShape(RoundedRectangle(cornerRadius: 5, style: .circular))
+                                                .onTapGesture {
+                                                    self.selectedImageUrl = media.media_url
+                                                    self.isProfileImgOpen.toggle()
+                                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                                }
+                                        }
+                                    }.padding(.horizontal)
+                                    .padding(.bottom, 10)
+
+                                    if self.contact.twitter != "" || self.contact.facebook != ""{
+                                        Divider()
+                                            .frame(width: Constants.screenWidth - 80)
                                     }
-                                }.padding(.horizontal)
-                                .padding(.bottom, 10)
+                                }
                             }
                         }
 
@@ -409,8 +409,8 @@ struct VisitContactView: View {
                                         Text("@\(self.contact.facebook)")
                                             .font(.none)
                                             .fontWeight(.none)
-                                            .background(self.contact.isInfoPrivate || self.contactRelationship != .contact ? Color.secondary : Color.clear)
-                                            .foregroundColor(self.contact.isInfoPrivate || self.contactRelationship != .contact ? .clear : self.contact.facebook == "" ? .gray : .primary)
+                                            .background(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? Color.clear : self.contact.isInfoPrivate || self.contactRelationship != .contact ? Color.secondary : Color.clear)
+                                            .foregroundColor(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? .primary : self.contact.isInfoPrivate || self.contactRelationship != .contact ? .clear : self.contact.facebook == "" ? .gray : .primary)
 
                                         Spacer()
                                         Image(systemName: "chevron.right")
@@ -452,8 +452,8 @@ struct VisitContactView: View {
                                         Text("@\(self.contact.twitter)")
                                             .font(.none)
                                             .fontWeight(.none)
-                                            .background(self.contact.isInfoPrivate || self.contactRelationship != .contact ? Color.secondary : Color.clear)
-                                            .foregroundColor(self.contact.isInfoPrivate || self.contactRelationship != .contact ? .clear : self.contact.twitter == "" ? .gray : .primary)
+                                            .background(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? Color.clear : self.contact.isInfoPrivate || self.contactRelationship != .contact ? Color.secondary : Color.clear)
+                                            .foregroundColor(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? .primary : self.contact.isInfoPrivate || self.contactRelationship != .contact ? .clear : self.contact.twitter == "" ? .gray : .primary)
 
                                         Spacer()
                                         Image(systemName: "chevron.right")
@@ -677,9 +677,7 @@ struct VisitContactView: View {
                         //not in realm and not a contact - check if pending
                         self.pullNonContact()
                     }
-                } catch {
-                    
-                }
+                } catch { }
             } else if self.viewState == .fromContacts {
                 self.contactRelationship = .contact
                 changeContactsRealmData.shared.observeFirebaseContact(contactID: self.contact.id)
@@ -926,6 +924,7 @@ struct topHeaderContactView: View {
     @Binding var isProfileImgOpen: Bool
     @Binding var isProfileBioOpen: Bool
     @Binding var selectedImageUrl: String
+    @State private var showMoreAction: Bool = false
 
     var body: some View {
         VStack {
@@ -956,7 +955,7 @@ struct topHeaderContactView: View {
                             .foregroundColor(.clear)
                     }
                     
-                    RoundedRectangle(cornerRadius: 8)
+                    RoundedRectangle(cornerRadius: 20)
                         .frame(width: 16, height: 16)
                         .foregroundColor(.green)
                         .overlay(Circle().stroke(Color("bgColor"), lineWidth: 3))
@@ -1009,25 +1008,31 @@ struct topHeaderContactView: View {
                         
                         //MARK: Bio Section
                         if self.contact.bio != "" {
-                            VStack(alignment: .center) {
+                            VStack(alignment: .leading) {
                                 Text(self.contact.bio)
-                                    .font(.none)
+                                    .font(.subheadline)
                                     .fontWeight(.none)
                                     .multilineTextAlignment(.center)
-                                    .lineLimit(self.isProfileBioOpen ? 20 : 5)
-                                
-                                if self.contact.bio.count > 220 {
+                                    .lineLimit(self.isProfileBioOpen ? 20 : 4)
+                                    .readSize(onChange: { size in
+                                        self.showMoreAction = size.height > 70
+                                    })
+
+                                if self.showMoreAction {
                                     Button(action: {
-                                        self.isProfileBioOpen.toggle()
+                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        withAnimation(.easeOut(duration: 0.25)) {
+                                            self.isProfileBioOpen.toggle()
+                                        }
                                     }, label: {
                                         Text(self.isProfileBioOpen ? "less..." : "more...")
                                             .font(.subheadline)
                                             .fontWeight(.none)
                                             .foregroundColor(.secondary)
                                     }).buttonStyle(ClickButtonStyle())
-                                    .offset(y: -2)
+                                    .offset(y: 2.5)
                                 }
-                            }.padding(.vertical, 3)
+                            }.padding(.top, 2.5)
                             .offset(x: self.contact.isMyContact ? 10 : 0)
                         }
                     }.padding(.top, 40)

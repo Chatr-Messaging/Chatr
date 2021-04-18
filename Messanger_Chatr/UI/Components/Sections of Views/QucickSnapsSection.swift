@@ -75,7 +75,7 @@ struct QuickSnapsSection: View {
                             
                             Spacer()
                         }.padding(.leading, self.isLocalOpen ? 0 : 10)
-                        .offset(x: self.isLocalOpen ? -30 : 0)
+                        .offset(x: self.isLocalOpen ? (self.auth.contacts.results.sorted(by: {$0.quickSnaps.count > $1.quickSnaps.count}).filter({ $0.hasQuickSnaped != false }).count > 2 ? -30 : 0) : 0)
                         .scaleEffect(self.isLocalOpen ? 0.85 : 1)
                     }.frame(width: Constants.screenWidth, height: self.emptyQuickSnaps ? geometry.size.height : (self.isLocalOpen ? Constants.quickSnapBtnSize + 20 : (Constants.quickSnapBtnSize + 20) * 0.85))
                     .fixedSize(horizontal: true, vertical: false)

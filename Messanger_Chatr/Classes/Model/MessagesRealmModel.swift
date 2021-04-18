@@ -530,18 +530,18 @@ class changeMessageRealmData {
 
     func sendVideoAttachment(dialog: DialogStruct, attachmentVideos: [PHAsset], occupentID: [NSNumber]) {
         for vid in attachmentVideos {
-            let resource = PHAssetResource.assetResources(for: vid).first!
-            let name = resource.originalFilename
-            let videoLocalPath = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(name)
+            //let resource = PHAssetResource.assetResources(for: vid).first!
+            //let name = resource.originalFilename
+            //let videoLocalPath = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(name)
             let newVideIdString = NSUUID().uuidString
 
             let options = PHVideoRequestOptions()
             options.isNetworkAccessAllowed = true
-            PHImageManager.default().requestAVAsset(forVideo: vid, options: options) { (asset, mix, args) in
-                if let _ = asset as? AVURLAsset {
-                    //let url = asset.url
+            PHImageManager.default().requestAVAsset(forVideo: vid, options: options) { (asset, mix, args) in                
+                if let assz = asset as? AVURLAsset, let datazz = NSData(contentsOf: assz.url) {
+                    print("the uploading video url si: \(assz.url.absoluteString)")
                     // URL OF THE VIDEO IS GOT HERE
-                    self.uploadToFirebaseVideo(id: newVideIdString, url: videoLocalPath, success: { urlz in
+                    self.uploadToFirebaseVideo(id: newVideIdString, videoData: datazz as Data, success: { urlz in
                         self.sendVideoMessage(id: newVideIdString, dialog: dialog, url: urlz, occupentID: occupentID)
                     }, failure: { error in
                         print("failed to upload vodeozzzz to firebase: \(error.localizedDescription)")
@@ -553,9 +553,9 @@ class changeMessageRealmData {
                         if let error = error {
                             print(error.localizedDescription)
                         }
-                        if let url = url {
+                        if let url = url, let dataa = NSData(contentsOf: url) {
                             // SAVED IN DOCUMENTS DIRECTORY AND URL IS GOT HERE
-                            self.uploadToFirebaseVideo(id: newVideIdString, url: url, success: { urlz in
+                            self.uploadToFirebaseVideo(id: newVideIdString, videoData: dataa as Data, success: { urlz in
                                 self.sendVideoMessage(id: newVideIdString, dialog: dialog, url: urlz, occupentID: occupentID)
                             }, failure: { error in
                                 print("failed to upload video to firebase: \(error.localizedDescription)")
@@ -567,10 +567,10 @@ class changeMessageRealmData {
         }
     }
     
-    func uploadToFirebaseVideo(id: String, url: URL, success : @escaping (String) -> Void, failure : @escaping (Error) -> Void) {
+    func uploadToFirebaseVideo(id: String, videoData: Data, success : @escaping (String) -> Void, failure : @escaping (Error) -> Void) {
         let storageRef = Storage.storage().reference(forURL: Constants.FirebaseStoragePath).child("messageVideo").child("\(Session.current.currentUser?.fullName ?? "no name")" + id)
 
-        storageRef.putFile(from: url, metadata: nil, completion: { (metadata, error) in
+        storageRef.putData(videoData, metadata: nil, completion: { (metadata, error) in
             if let error = error {
                 print(error.localizedDescription)
                 failure(error)

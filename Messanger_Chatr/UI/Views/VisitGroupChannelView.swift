@@ -22,6 +22,8 @@ struct VisitGroupChannelView: View {
     @State var groupOccUserAvatar: [String] = []
     @State var fromDialogCell: Bool = false
     @State var showMoreMembers: Bool = false
+    @State var showMoreAdmins: Bool = false
+    @State var showProfile: Bool = false
     @State var viewState: visitUserState = .unknown
     @State var dialogRelationship: visitDialogRelationship = .unknown
     @State var dialogModel: DialogStruct = DialogStruct()
@@ -193,7 +195,7 @@ struct VisitGroupChannelView: View {
                     
                     VStack(alignment: .center, spacing: 0) {
                         ForEach(self.dialogModelAdmins, id: \.self) { id in
-                            DialogContactCell(showAlert: self.$showAlert, notiType: self.$notiType, notiText: self.$notiText, dismissView: self.$dismissView, openNewDialogID: self.$openNewDialogID, contactID: Int(id), isAdmin: self.dialogModel.adminID.contains(Int(id)) ? true : false, isOwner: self.dialogModel.owner == id ? true : false, currentUserIsPowerful: self.$currentUserIsPowerful, isLast: self.dialogModelAdmins.last == id, isRemoving: self.$isRemoving)
+                            DialogContactCell(showAlert: self.$showAlert, notiType: self.$notiType, notiText: self.$notiText, dismissView: self.$dismissView, openNewDialogID: self.$openNewDialogID, showProfile: self.$showProfile, contactID: Int(id), isAdmin: self.dialogModel.adminID.contains(Int(id)) ? true : false, isOwner: self.dialogModel.owner == id ? true : false, currentUserIsPowerful: self.$currentUserIsPowerful, isLast: self.dialogModelAdmins.last == id, isRemoving: self.$isRemoving)
                                 .environmentObject(self.auth)
 
                             if self.dialogModelAdmins.last != id {
@@ -201,16 +203,23 @@ struct VisitGroupChannelView: View {
                                     .frame(width: Constants.screenWidth - 80)
                                     .offset(x: 40)
                             } else if self.dialogModelAdmins.count > 4 {
-                                NavigationLink(destination: Text("more")) {
+                                NavigationLink(destination: self.moreMembers(), isActive: $showMoreAdmins) {
                                     VStack(alignment: .trailing, spacing: 0) {
                                         Divider()
                                             .frame(width: Constants.screenWidth - 80)
                                             .offset(x: 20)
                                         
                                         HStack {
+                                            Image(systemName: "ellipsis.circle")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 20, height: 20, alignment: .center)
+                                                .foregroundColor(Color("SoftTextColor"))
+                                                .padding(.leading, 10)
+                                            
                                             Text("more admins...")
                                                 .font(.subheadline)
-                                                .foregroundColor(Color.secondary)
+                                                .foregroundColor(.blue)
                                                 .padding(.horizontal)
                                             
                                             Spacer()
@@ -322,7 +331,7 @@ struct VisitGroupChannelView: View {
                                 }
                                 
                                 if id <= 3 {
-                                    DialogContactCell(showAlert: self.$showAlert, notiType: self.$notiType, notiText: self.$notiText, dismissView: self.$dismissView, openNewDialogID: self.$openNewDialogID, contactID: Int(self.dialogModelMemebers[id]), isAdmin: self.dialogModel.adminID.contains(self.dialogModelMemebers[id]), isOwner: self.dialogModel.owner == self.dialogModelMemebers[id], currentUserIsPowerful: self.$currentUserIsPowerful, isLast: id == 3, isRemoving: self.$isRemoving)
+                                    DialogContactCell(showAlert: self.$showAlert, notiType: self.$notiType, notiText: self.$notiText, dismissView: self.$dismissView, openNewDialogID: self.$openNewDialogID, showProfile: self.$showProfile, contactID: Int(self.dialogModelMemebers[id]), isAdmin: self.dialogModel.adminID.contains(self.dialogModelMemebers[id]), isOwner: self.dialogModel.owner == self.dialogModelMemebers[id], currentUserIsPowerful: self.$currentUserIsPowerful, isLast: id == 3, isRemoving: self.$isRemoving)
                                         .environmentObject(self.auth)
                                 }
                                 
@@ -451,7 +460,7 @@ struct VisitGroupChannelView: View {
                         .padding(.vertical)
                         .padding(.bottom)
                 }.coordinateSpace(name: "visitGroup-scroll")
-                .navigationBarTitle(self.scrollOffset > 135 || self.isEditGroupOpen || self.showMoreMembers ? self.dialogModel.fullName : "")
+                .navigationBarTitle(self.scrollOffset > 135 || self.isEditGroupOpen || self.showMoreMembers || self.showMoreAdmins || self.showProfile ? self.dialogModel.fullName : "")
             }
 
             //MARK: Other Views - See profile image
@@ -531,6 +540,7 @@ struct VisitGroupChannelView: View {
             }
         }.background(Color("bgColor"))
         .onAppear() {
+            self.showProfile = false
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 Request.notificationsSettings(forDialogID: self.dialogModel.id, successBlock: { notiResult in
                     self.notificationsOn = notiResult
@@ -556,7 +566,18 @@ struct VisitGroupChannelView: View {
                          dialogModelMemebers: self.$dialogModelMemebers,
                          openNewDialogID: self.$openNewDialogID,
                          dialogModel: self.$dialogModel,
-                         currentUserIsPowerful: self.$currentUserIsPowerful)
+                         currentUserIsPowerful: self.$currentUserIsPowerful,
+                         showProfile: self.$showProfile)
+            .environmentObject(self.auth)
+    }
+    
+    func moreMembers() -> some View {
+        MoreContactsView(dismissView: self.$dismissView,
+                         dialogModelMemebers: self.$dialogModelAdmins,
+                         openNewDialogID: self.$openNewDialogID,
+                         dialogModel: self.$dialogModel,
+                         currentUserIsPowerful: self.$currentUserIsPowerful,
+                         showProfile: self.$showProfile)
             .environmentObject(self.auth)
     }
 }
@@ -569,6 +590,7 @@ struct topGroupHeaderView: View {
     @Binding var isProfileImgOpen: Bool
     @Binding var isEditGroupOpen: Bool
     @State private var isProfileBioOpen: Bool = false
+    @State private var moreBioAction = false
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -593,33 +615,37 @@ struct topGroupHeaderView: View {
                             .multilineTextAlignment(.center)
                     }.padding(.top, 10)
                     .padding(.bottom, self.dialogModel.bio == "" ? 15 : 0 )
-                    
+
                     //MARK: Bio Section
                     if self.dialogModel.bio != "" {
-                        HStack(alignment: .top) {
-                            VStack(alignment: .leading) {
-                                Text(self.dialogModel.bio)
-                                    .font(.subheadline)
-                                    .fontWeight(.none)
-                                    .multilineTextAlignment(.center)
-                                    .lineLimit(self.isProfileBioOpen ? 20 : 5)
-                                    .padding(.top, 3)
-                                    .padding(.bottom, self.dialogModel.bio.count > 220 ? 10 : 10)
-                                
-                                if self.dialogModel.bio.count > 220 {
-                                    Button(action: {
+                        VStack(alignment: .leading) {
+                            Text(self.dialogModel.bio)
+                                .font(.subheadline)
+                                .fontWeight(.none)
+                                .multilineTextAlignment(.center)
+                                .lineLimit(self.isProfileBioOpen ? 20 : 4)
+                                .padding(.bottom, self.moreBioAction ? 0 : 10)
+                                .readSize(onChange: { size in
+                                    self.moreBioAction = size.height > 70
+                                })
+
+                            if self.moreBioAction {
+                                Button(action: {
+                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                    withAnimation(.easeOut(duration: 0.25)) {
                                         self.isProfileBioOpen.toggle()
-                                    }, label: {
-                                        Text(self.isProfileBioOpen ? "less..." : "more...")
-                                            .font(.subheadline)
-                                            .fontWeight(.none)
-                                            .foregroundColor(.secondary)
-                                    }).buttonStyle(ClickButtonStyle())
-                                    .offset(y: -2)
-                                    .padding(.bottom, self.dialogModel.bio.count > 220 ? 0 : 8)
-                                }
+                                    }
+                                }, label: {
+                                    Text(self.isProfileBioOpen ? "less..." : "more...")
+                                        .font(.subheadline)
+                                        .fontWeight(.none)
+                                        .foregroundColor(.secondary)
+                                        .padding(.trailing)
+                                }).buttonStyle(ClickButtonStyle())
+                                .offset(y: 2.5)
+                                .padding(.bottom, 8)
                             }
-                        }
+                        }.padding(.top, 2.5)
                     }
                 }.padding(.horizontal)
                 .padding(.top, 45)

@@ -95,8 +95,8 @@ struct EditGroupDialogView: View {
                                         .font(.none)
                                         .foregroundColor(self.bioText != "Bio" ? .primary : .secondary)
                                         .multilineTextAlignment(.leading)
-                                        .lineLimit(5)
-                                        .offset(x: -7, y: -10)
+                                        .lineLimit(6)
+                                        .offset(x: -7, y: -8)
                                         .onChange(of: self.bioText) { _ in
                                             self.didSave = false
                                         }
@@ -110,7 +110,7 @@ struct EditGroupDialogView: View {
                                 }
                             }
                         }.padding(.horizontal)
-                        .padding(.vertical, 8)
+                        .padding(.top, 8)
                         .frame(height: 100)
                         .onAppear() {
                             self.bioText = self.dialogModel.bio
@@ -134,10 +134,10 @@ struct EditGroupDialogView: View {
                 UIApplication.shared.endEditing(true)
                 self.saveGroupInfo()
             }) {
-                Text((220 - self.bioText.count) > 220 && loadingSave ? "Saving" : self.didSave ? "Saved" : "Save")
-                    .foregroundColor((220 - self.bioText.count) > 220 && loadingSave ? .secondary : self.didSave ? .secondary : .blue)
-                    .fontWeight((220 - self.bioText.count) > 220 && loadingSave ? .none : self.didSave ? .none : .medium)
-            }.disabled((220 - self.bioText.count) > 220 && loadingSave ? true : self.didSave ? true : false)
+                Text(self.bioText.count > 220 ? "error" : loadingSave ? "Saving" : self.didSave ? "Saved" : "Save")
+                    .foregroundColor(self.bioText.count > 220 || loadingSave ? .secondary : self.didSave ? .secondary : .blue)
+                    .fontWeight(self.bioText.count > 220 || loadingSave ? .none : self.didSave ? .none : .medium)
+            }.disabled(self.bioText.count > 220 || loadingSave ? true : self.didSave ? true : false)
         ).onAppear {
             NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { (data) in
                 let height1 = data.userInfo![UIResponder.keyboardFrameEndUserInfoKey] as! NSValue
@@ -151,6 +151,11 @@ struct EditGroupDialogView: View {
     }
     
     func saveGroupInfo() {
+        guard self.bioText.count < 220 else {
+            UINotificationFeedbackGenerator().notificationOccurred(.error)
+
+            return
+        }
         if self.loadingSave == false {
             self.loadingSave = true
             

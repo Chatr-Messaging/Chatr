@@ -48,17 +48,16 @@ struct AttachmentBubble: View {
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
-                    }.matchedGeometryEffect(id: message.id, in: namespace)
-                    .aspectRatio(contentMode: .fit)
+                    }.aspectRatio(contentMode: .fill)
                     .clipShape(CustomGIFShape())
                     .frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.55 : 0.65)), alignment: self.messagePosition == .right ? .trailing : .leading)
                     .frame(maxHeight: CGFloat(Constants.screenHeight * 0.65))
                     .padding(.bottom, self.hasPrior ? 0 : 4)
                     .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 14)
-                    .offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
+                    .padding(.bottom, self.hasPrior ? 0 : 4)
+                    //.offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
                     .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.5) : Color.clear, lineWidth: 5).offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0))
                     .matchedGeometryEffect(id: self.message.id.description + "gif", in: namespace)
-                    .animation(.default)
             } else if self.message.imageType == "image/png" && self.message.messageState != .deleted {
                 WebImage(url: URL(string: self.message.image))
                     .resizable()
@@ -79,10 +78,6 @@ struct AttachmentBubble: View {
                     .offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
                     .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.8) : Color.clear, lineWidth: 3).offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0))
                     .matchedGeometryEffect(id: self.message.id.description + "png", in: namespace)
-                    .animation(.default)
-                    .onAppear {
-                        print("the found image url: \(self.message.image)")
-                    }
             } else if self.message.imageType == "video/mov" && self.message.messageState != .deleted {
                 ZStack() {
                     if let url = URL(string: self.message.localAttachmentPath) {
@@ -92,7 +87,6 @@ struct AttachmentBubble: View {
                             .transition(.asymmetric(insertion: AnyTransition.scale.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                             .background(Color("bgColor"))
                             .clipShape(CustomGIFShape())
-                            
                             //.frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.55 : 0.65)), alignment: self.messagePosition == .right ? .trailing : .leading)
                             //.frame(minHeight: 100, maxHeight: CGFloat(Constants.screenHeight * 0.45))
                             .frame(width: self.videoSize.width <= 0 ? Constants.screenWidth * 0.65 : self.videoSize.width, height: self.videoSize.height <= 0 ? Constants.screenHeight * 0.5 : self.videoSize.height)
@@ -177,18 +171,26 @@ struct AttachmentBubble: View {
                 completion()
             } catch {
                 let videoReference = storageFirebase.reference().child("messageVideo").child(self.message.image)
-                videoReference.getData(maxSize: 10 * 1024 * 1024) { data, error in
-                    if error == nil {
-                        guard let videoData = data else { return }
+                let path = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+                let fileFolder = path.appendingPathComponent("msg_video_" + fileId)
 
-                        let playerItem = CachingPlayerItem(data: videoData, mimeType: "video/mp4", fileExtension: "mp4")
+                videoReference.write(toFile: fileFolder) { url, error in
+                    if error == nil {
+                        guard let videoUrl = url, let videoData = NSData(contentsOf: videoUrl) else {
+                            completion()
+                            
+                            return
+                        }
+
+                        let playerItem = CachingPlayerItem(data: videoData as Data, mimeType: "video/mp4", fileExtension: "mp4")
                         self.player = AVPlayer(playerItem: playerItem)
 
-                        self.storage?.async.setObject(videoData, forKey: url.absoluteString, completion: { _ in })
+                        self.storage?.async.setObject(videoData as Data, forKey: videoUrl.absoluteString, completion: { _ in })
 
                         completion()
                     } else {
                         print("the error is: \(String(describing: error?.localizedDescription))")
+                        completion()
                     }
                 }
             }

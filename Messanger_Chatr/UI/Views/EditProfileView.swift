@@ -73,7 +73,7 @@ struct EditProfileView: View {
                                                     .scaledToFill()
                                                     .clipShape(Circle())
                                                     .frame(width: 80, height: 80, alignment: .center)
-                                                    .shadow(color: Color.black.opacity(0.25), radius: 10, x: 0, y: 8)
+                                                    .shadow(color: Color.black.opacity(0.20), radius: 12, x: 0, y: 8)
                                             }
                                             
                                             Text("Change Profile Picture")
@@ -182,8 +182,8 @@ struct EditProfileView: View {
                                             .font(.none)
                                             .foregroundColor(self.bioText != "Bio" ? .primary : .secondary)
                                             .multilineTextAlignment(.leading)
-                                            .lineLimit(5)
-                                            .offset(x: -7, y: -10)
+                                            .lineLimit(6)
+                                            .offset(x: -7, y: -8)
                                             .onChange(of: self.bioText) { _ in
                                                 self.didSave = false
                                             }
@@ -197,7 +197,7 @@ struct EditProfileView: View {
                                     }
                                 }
                             }.padding(.horizontal)
-                            .padding(.vertical, 8)
+                            .padding(.top, 8)
                             .frame(height: 100)
                             .onAppear() {
                                 self.bioText = self.auth.profile.results.first?.bio ?? "Bio"
@@ -334,7 +334,7 @@ struct EditProfileView: View {
                                         Text(self.viewModel.testUserData.user_id == 0 ? "Link Instagram Account" : " @\(self.username)")
                                             .font(.none)
                                             .foregroundColor(self.viewModel.testUserData.user_id == 0 ? .blue : .primary)
-                                    }
+                                    }.offset(x: -2.5)
                                     
                                     Spacer()
                                 }.padding(.horizontal)
@@ -360,10 +360,17 @@ struct EditProfileView: View {
                                         .frame(width: 20, height: 20, alignment: .center)
                                         .padding(.trailing, 5)
                                     
+                                    Text("@")
+                                        .fontWeight(.regular)
+                                        .foregroundColor(twitterText.count > 0 ? .primary : .secondary)
+
                                     TextField("Twitter", text: $twitterText)
                                         .font(.none)
                                         .foregroundColor(.primary)
                                         .textCase(.lowercase)
+                                        .autocapitalization(.none)
+                                        .keyboardType(.emailAddress)
+                                        .offset(x: twitterText.count > 0 ? -8 : -4)
                                         .onChange(of: self.twitterText) { _ in
                                             self.didSave = false
                                         }
@@ -390,11 +397,18 @@ struct EditProfileView: View {
                                         .foregroundColor(Color.secondary)
                                         .frame(width: 20, height: 20, alignment: .center)
                                         .padding(.trailing, 5)
-                                    
+
+                                    Text("@")
+                                        .fontWeight(.regular)
+                                        .foregroundColor(facebookText.count > 0 ? .primary : .secondary)
+
                                     TextField("Facebook", text: $facebookText)
                                         .font(.none)
                                         .foregroundColor(.primary)
                                         .textCase(.lowercase)
+                                        .autocapitalization(.none)
+                                        .keyboardType(.emailAddress)
+                                        .offset(x: facebookText.count > 0 ? -8 : -4)
                                         .onChange(of: self.facebookText) { _ in
                                             self.didSave = false
                                         }
@@ -423,6 +437,12 @@ struct EditProfileView: View {
                 .navigationBarItems(trailing:
                     Button(action: {
                         UIApplication.shared.endEditing(true)
+                        guard self.bioText.count < 220 else {
+                            UINotificationFeedbackGenerator().notificationOccurred(.error)
+
+                            return
+                        }
+
                         if self.loadingSave == false {
                             self.loadingSave = true
                             let updateParameters = UpdateUserParameters()
@@ -449,10 +469,10 @@ struct EditProfileView: View {
                         }
                         
                     }) {
-                        Text((220 - self.bioText.count) > 220 && loadingSave ? "Saving" : self.didSave ? "Saved" : "Save")
-                            .foregroundColor((220 - self.bioText.count) > 220 && loadingSave ? .secondary : self.didSave ? .secondary : .blue)
-                            .fontWeight((220 - self.bioText.count) > 220 && loadingSave ? .none : self.didSave ? .none : .medium)
-                    }.disabled((220 - self.bioText.count) > 220 && loadingSave ? true : self.didSave ? true : false)
+                        Text(self.bioText.count > 220 ? "error" : loadingSave ? "Saving" : self.didSave ? "Saved" : "Save")
+                            .foregroundColor(self.bioText.count > 220 || loadingSave ? .secondary : self.didSave ? .secondary : .blue)
+                            .fontWeight(self.bioText.count > 220 || loadingSave ? .none : self.didSave ? .none : .medium)
+                    }.disabled(self.bioText.count > 220 || loadingSave ? true : self.didSave ? true : false)
                 ).background(Color("bgColor"))
                 .edgesIgnoringSafeArea(.all)
                 .onAppear {

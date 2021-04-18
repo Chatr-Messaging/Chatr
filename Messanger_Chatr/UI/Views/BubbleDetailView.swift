@@ -6,6 +6,7 @@
 //  Copyright © 2021 Brandon Shaw. All rights reserved.
 //
 
+import UIKit
 import SwiftUI
 import SDWebImageSwiftUI
 import MapKit
@@ -13,6 +14,8 @@ import Firebase
 import MobileCoreServices
 import ConnectyCube
 import RealmSwift
+import Photos
+import MapKit
 
 struct BubbleDetailView: View {
     @EnvironmentObject var auth: AuthModel
@@ -268,6 +271,21 @@ struct BubbleDetailView: View {
                                 }).buttonStyle(interactionButtonStyle(isHighlighted: self.$hasUserDisliked, messagePosition: self.$messagePosition))
                                 
                                 Spacer()
+                                
+                                //openMapForPlace button
+                                if self.viewModel.message.longitude != 0 && self.viewModel.message.latitude != 0 {
+                                    Button(action: {
+                                        self.openMapForPlace(longitude: self.viewModel.message.longitude, latitude: self.viewModel.message.latitude)
+                                    }, label: {
+                                        Text("open  maps")
+                                            .font(.subheadline)
+                                            .fontWeight(.semibold)
+                                            .foregroundColor(.primary)
+                                            .padding(.horizontal, 15)
+                                            .padding(.vertical, 5)
+                                    }).buttonStyle(interactionDefaultButtonStyle())
+                                }
+
                                 Menu {
                                     if self.viewModel.message.messageState != .error {
                                         Button(action: {
@@ -288,12 +306,22 @@ struct BubbleDetailView: View {
                                         }
                                         .foregroundColor(.red)
 
-                                        Button(action: {
-                                            print("forward")
-                                        }) {
-                                            Label("Forward", systemImage: "arrowshape.turn.up.right")
+                                        if self.viewModel.message.imageType == "image/gif" || self.viewModel.message.imageType == "image/png" {
+                                            Button(action: {
+                                                self.saveImage()
+                                            }) {
+                                                Label(self.viewModel.message.imageType == "image/gif" ? "Save GIF" : "Save Image", systemImage: "square.and.arrow.down")
+                                            }
                                         }
-                                        
+
+                                        if let dialog = self.auth.selectedConnectyDialog, let admins = dialog.adminsIDs, (admins.contains(NSNumber(value: self.viewModel.message.senderID)) || dialog.userID == UserDefaults.standard.integer(forKey: "currentUserID")), (dialog.type == .group || dialog.type == .public) {
+                                            Button(action: {
+                                                self.pinMessage()
+                                            }) {
+                                                Label("Pin", systemImage: "pin")
+                                            }
+                                        }
+
                                         if self.viewModel.message.contactID == 0 && self.viewModel.message.longitude == 0 && self.viewModel.message.latitude == 0 && self.viewModel.message.imageType == "" {
                                             Button(action: {
                                                 UINotificationFeedbackGenerator().notificationOccurred(.success)
@@ -303,6 +331,20 @@ struct BubbleDetailView: View {
                                                 NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
                                             }) {
                                                 Label("Copy Text", systemImage: "doc.on.doc")
+                                            }
+                                        }
+
+                                        if self.viewModel.message.longitude != 0 && self.viewModel.message.latitude != 0 {
+                                            Button(action: {
+                                                let copyText = "longitude: " + "\(self.viewModel.message.longitude)" + "\n" + "latitude: " + "\(self.viewModel.message.latitude)"
+
+                                                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                                UIPasteboard.general.setValue(copyText, forPasteboardType: kUTTypePlainText as String)
+
+                                                self.auth.notificationtext = "Successfully copied message"
+                                                NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+                                            }) {
+                                                Label("Copy Location", systemImage: "doc.on.doc")
                                             }
                                         }
                                     }
@@ -437,7 +479,7 @@ struct BubbleDetailView: View {
                         ForEach(self.replies.indices, id:\.self) { reply in
                             MessageReplyCell(viewModel: self.viewModel, reply: self.replies[reply])
                                 .environmentObject(self.auth)
-                                .padding(.top, reply == 0 ? 10 : 0)
+                                .padding(.top, reply == 0 ? 5 : 0)
                                 .id(self.replies[reply].id)
                                 .transition(AnyTransition.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(.easeOut(duration: 0.2)), removal: AnyTransition.move(edge: .bottom).animation(.easeOut(duration: 0.2))))
                         }.animation(.easeOut(duration: 0.4))
@@ -626,7 +668,56 @@ struct BubbleDetailView: View {
             }
         }
     }
+
+    func pinMessage() {
+        let updateParameters = UpdateChatDialogParameters()
+        updateParameters.pinnedMessagesIDsToAdd = [self.viewModel.message.id]
+        //updateParameters.pinnedMessagesIDsToRemove = ["5356c64ab35c12bd3b10ba31", "5356c64ab35c12bd3b10wa64"]
+
+        Request.updateDialog(withID: self.viewModel.message.dialogID, update: updateParameters, successBlock: { (updatedDialog) in
+            auth.notificationtext = "Successfully pined message"
+            NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+        }) { (error) in
+            auth.notificationtext = "Error pining message"
+            NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+        }
+    }
     
+    func saveImage() {
+        if let imageData = SDImageCache.shared.imageFromMemoryCache(forKey: self.viewModel.message.image)?.pngData() {
+            //use image
+            PHPhotoLibrary.shared().performChanges({
+                let request = PHAssetCreationRequest.forAsset()
+                request.addResource(with: .photo, data: imageData, options: nil)
+            }) { (success, error) in
+                if let error = error {
+                    print(error.localizedDescription)
+                } else {
+                    DispatchQueue.main.async {
+                        auth.notificationtext = "Successfully saved image"
+                        NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+                    }
+                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                }
+            }
+        }
+    }
+
+    func openMapForPlace(longitude: Double, latitude: Double) {
+        let regionDistance: CLLocationDistance = 10000
+        let coordinates = CLLocationCoordinate2DMake(latitude, longitude)
+        let regionSpan = MKCoordinateRegion(center: coordinates, latitudinalMeters: regionDistance, longitudinalMeters: regionDistance)
+        let options = [
+            MKLaunchOptionsMapCenterKey: NSValue(mkCoordinate: regionSpan.center),
+            MKLaunchOptionsMapSpanKey: NSValue(mkCoordinateSpan: regionSpan.span)
+        ]
+        let placemark = MKPlacemark(coordinate: coordinates, addressDictionary: nil)
+        let mapItem = MKMapItem(placemark: placemark)
+
+        mapItem.name = self.viewModel.contact.fullName + "'s Chatr Location"
+        mapItem.openInMaps(launchOptions: options)
+    }
+
     func getTotalDurationString() -> String {
         let m = Int(self.viewModel.totalDuration / 60)
         let s = Int(self.viewModel.totalDuration.truncatingRemainder(dividingBy: 60))

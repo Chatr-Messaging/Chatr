@@ -109,32 +109,33 @@ struct ChatMessagesView: View {
                     if self.delayViewMessages {
                         ScrollViewReader { reader in
                             VStack(alignment: .center) {
-                                if (self.totalMessageCount == 0 || self.maxPagination == 0) && self.delayViewMessages {
-                                    VStack {
-                                        Text("Beginning of Chat")
-                                            .font(.subheadline)
-                                            .fontWeight(.medium)
-                                            .foregroundColor(.primary)
-                                            .padding(.top, 2.5)
-                                            .padding(.horizontal, 40)
-                                        
-                                        Text("created \(self.viewModel.dateFormatTime(date: changeDialogRealmData.shared.getRealmDialog(dialogId: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").createdAt))")
-                                            .font(.caption)
-                                            .fontWeight(.regular)
-                                            .foregroundColor(.secondary)
-                                            .multilineTextAlignment(.center)
-                                            .offset(y: 2)
-
-                                        Divider()
-                                            .padding(.top, 10)
-                                            .padding(.horizontal, 30)
-                                    }
-                                }
-
                                 ForEach(tempPagination ..< currentMessages.count, id: \.self) { message in
                                     let messagePosition: messagePosition = UInt(currentMessages[message].senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? .right : .left
                                     let notLast = currentMessages[message].id != currentMessages.last?.id
-                                    //let topMsg = currentMessages[message].id == currentMessages.first?.id
+                                    let topMsg = currentMessages[message].id == currentMessages.first?.id
+
+                                    if topMsg {
+                                        VStack {
+                                            Text("Beginning of Chat")
+                                                .font(.subheadline)
+                                                .fontWeight(.medium)
+                                                .foregroundColor(.primary)
+                                                .padding(.top, 2.5)
+                                                .padding(.horizontal, 40)
+                                            
+                                            Text("created \(self.viewModel.dateFormatTime(date: changeDialogRealmData.shared.getRealmDialog(dialogId: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").createdAt))")
+                                                .font(.caption)
+                                                .fontWeight(.regular)
+                                                .foregroundColor(.secondary)
+                                                .multilineTextAlignment(.center)
+                                                .offset(y: 2)
+
+                                            Divider()
+                                                .padding(.top, 10)
+                                                .padding(.horizontal, 30)
+                                        }
+                                    }
+                                    
                                     if needsTimestamp(index: message) {
                                         Text("\(self.viewModel.dateFormatTime(date: currentMessages[message].date))")
                                             .font(.caption)

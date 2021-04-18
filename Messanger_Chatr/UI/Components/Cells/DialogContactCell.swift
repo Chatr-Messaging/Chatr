@@ -19,6 +19,7 @@ struct DialogContactCell: View {
     @Binding var notiText: String
     @Binding var dismissView: Bool
     @Binding var openNewDialogID: Int
+    @Binding var showProfile: Bool
     @State var contactID: Int
     @State private var actionState: Int? = 0
     @State private var openActionSheet: Bool = false
@@ -41,6 +42,7 @@ struct DialogContactCell: View {
                     self.openActionSheet.toggle()
                 } else {
                     self.actionState = 1
+                    self.showProfile = true
                 }
             }) {
                 VStack(alignment: .center, spacing: 0) {
@@ -136,6 +138,7 @@ struct DialogContactCell: View {
                 ActionSheet(title: Text("\(self.contact.fullName)'s options:"), message: nil, buttons: [
                     .default(Text("View Profile")) {
                         self.actionState = 1
+                        self.showProfile = true
                     },
                     .default(Text(self.isAdmin ? "Remove Admin" : "Add Admin")) {
                         if !self.isAdmin {

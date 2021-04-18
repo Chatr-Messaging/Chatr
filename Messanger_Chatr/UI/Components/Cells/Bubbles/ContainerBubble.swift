@@ -458,6 +458,7 @@ struct ContainerBubble: View {
                         auth.notificationtext = "Successfully saved image"
                         NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
                     }
+                    UINotificationFeedbackGenerator().notificationOccurred(.success)
                 }
             }
         }

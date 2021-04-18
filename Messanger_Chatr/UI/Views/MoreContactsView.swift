@@ -19,6 +19,7 @@ struct MoreContactsView: View {
     @Binding var openNewDialogID: Int
     @Binding var dialogModel: DialogStruct
     @Binding var currentUserIsPowerful: Bool
+    @Binding var showProfile: Bool
     @State var showAlert = false
     @State var notiText: String = ""
     @State var notiType: String = ""
@@ -43,7 +44,7 @@ struct MoreContactsView: View {
                     LazyVStack(alignment: .center, spacing: 0) {
                         ForEach(self.dialogModelMemebers.indices, id: \.self) { id in
                             VStack(alignment: .trailing, spacing: 0) {
-                                DialogContactCell(showAlert: self.$showAlert, notiType: self.$notiType, notiText: self.$notiText, dismissView: self.$dismissView, openNewDialogID: self.$openNewDialogID, contactID: Int(self.dialogModelMemebers[id]), isAdmin: self.dialogModel.adminID.contains(self.dialogModelMemebers[id]), isOwner: self.dialogModel.owner == self.dialogModelMemebers[id], currentUserIsPowerful: self.$currentUserIsPowerful, isLast: self.dialogModelMemebers[id] == self.dialogModelMemebers.last, isRemoving: self.$isRemoving)
+                                DialogContactCell(showAlert: self.$showAlert, notiType: self.$notiType, notiText: self.$notiText, dismissView: self.$dismissView, openNewDialogID: self.$openNewDialogID, showProfile: self.$showProfile, contactID: Int(self.dialogModelMemebers[id]), isAdmin: self.dialogModel.adminID.contains(self.dialogModelMemebers[id]), isOwner: self.dialogModel.owner == self.dialogModelMemebers[id], currentUserIsPowerful: self.$currentUserIsPowerful, isLast: self.dialogModelMemebers[id] == self.dialogModelMemebers.last, isRemoving: self.$isRemoving)
                                     .environmentObject(self.auth)
                             }
                         }
@@ -66,5 +67,8 @@ struct MoreContactsView: View {
 //            }
         }.background(Color("bgColor"))
         .edgesIgnoringSafeArea(.all)
+        .onAppear() {
+            self.showProfile = false
+        }
     }
 }
