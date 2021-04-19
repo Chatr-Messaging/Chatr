@@ -58,7 +58,7 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
         allPhotos = fetchResults
         
         fetchResults.enumerateObjects { [self] (asset, index, _) in
-            getImageFromAsset(asset: asset, size: CGSize(width: 200, height: 200)) { (image) in
+            getImageFromAsset(asset: asset, size: CGSize(width: asset.pixelWidth, height: asset.pixelHeight)) { (image) in
                 fetchedPhotos.append(KeyboardMediaAsset(asset: asset, image: image))
             }
             

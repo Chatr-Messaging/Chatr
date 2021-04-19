@@ -413,7 +413,7 @@ struct KeyboardCardView: View {
                     }).frame(width: Constants.screenWidth / 5.5, height: 65)
                     .padding(.leading)
                     .buttonStyle(keyboardButtonStyle())
-                    
+
                     Button(action: {
                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                         self.presentGIF.toggle()
