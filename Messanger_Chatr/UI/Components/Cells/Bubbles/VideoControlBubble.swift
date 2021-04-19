@@ -83,7 +83,9 @@ struct VideoControlBubble: View {
                                 .foregroundColor(.white)
                                 .padding(.vertical)
                         })
-                    }.transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.spring()), removal: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.easeOut(duration: 0.1))))
+                    }
+                    .padding(.horizontal)
+                    .transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.spring()), removal: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.easeOut(duration: 0.1))))
                 }
             }
             

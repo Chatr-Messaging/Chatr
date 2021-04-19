@@ -314,42 +314,44 @@ struct DialogCell: View {
         .background(Color("buttonColor"))
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
         .onAppear() {
-            if self.dialogModel.dialogType == "private" {
-                for occ in self.dialogModel.occupentsID {
-                    if occ != UserDefaults.standard.integer(forKey: "currentUserID") {
-                        self.privateDialogContact.id = occ
-                        break
-                    }
-                }
-                
-                do {
-                    let realm = try Realm(configuration: Realm.Configuration(schemaVersion: 1))
-                    if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: self.privateDialogContact.id) {
-                        self.privateDialogContact = foundContact
-                        self.connectyContact.id = UInt(foundContact.id)
-                        if self.privateDialogContact.avatar == "" || self.privateDialogContact.id == 0 && !Session.current.tokenHasExpired {
-                            self.pullPrivateAvatatr()
-                        } else if Session.current.tokenHasExpired {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                                self.pullPrivateAvatatr()
-                            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                if self.dialogModel.dialogType == "private" {
+                    for occ in self.dialogModel.occupentsID {
+                        if occ != UserDefaults.standard.integer(forKey: "currentUserID") {
+                            self.privateDialogContact.id = occ
+                            break
                         }
-                    } else {
-                        if !Session.current.tokenHasExpired {
-                            self.pullPrivateAvatatr()
+                    }
+
+                    do {
+                        let realm = try Realm(configuration: Realm.Configuration(schemaVersion: 1))
+                        if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: self.privateDialogContact.id) {
+                            self.privateDialogContact = foundContact
+                            self.connectyContact.id = UInt(foundContact.id)
+                            if self.privateDialogContact.avatar == "" || self.privateDialogContact.id == 0 && !Session.current.tokenHasExpired {
+                                self.pullPrivateAvatatr()
+                            } else if Session.current.tokenHasExpired {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                    self.pullPrivateAvatatr()
+                                }
+                            }
                         } else {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                            if !Session.current.tokenHasExpired {
                                 self.pullPrivateAvatatr()
+                            } else {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                    self.pullPrivateAvatatr()
+                                }
                             }
                         }
-                    }
-                } catch { }
-            } else if self.dialogModel.dialogType == "group" && !Session.current.tokenHasExpired {
-                self.pullGroupAvatar()
-            } else {
-                if self.dialogModel.dialogType == "group" {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                        self.pullGroupAvatar()
+                    } catch { }
+                } else if self.dialogModel.dialogType == "group" && !Session.current.tokenHasExpired {
+                    self.pullGroupAvatar()
+                } else {
+                    if self.dialogModel.dialogType == "group" {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                            self.pullGroupAvatar()
+                        }
                     }
                 }
             }

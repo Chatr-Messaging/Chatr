@@ -113,7 +113,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         print("scene will enter foreground \(Thread.isMainThread)")
         self.environment.configureFirebaseStateDidChange()
 
-        DispatchQueue.main.async {
+        DispatchQueue.global(qos: .background).async {
             if self.environment.isUserAuthenticated == .signedIn {
                 DispatchQueue.main.async {
                     ChatrApp.connect()

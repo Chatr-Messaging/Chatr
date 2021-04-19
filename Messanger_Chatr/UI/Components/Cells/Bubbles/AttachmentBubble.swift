@@ -95,9 +95,6 @@ struct AttachmentBubble: View {
                             .padding(.bottom, self.hasPrior ? 0 : 4)
                             .offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
                             .matchedGeometryEffect(id: self.message.id.description + "mov", in: namespace)
-//                            .onPreferenceChange(SizePreferenceKey.self) { preferences in
-//                                self.videoSize = CGSize(width: Int(preferences.width), height: Int(preferences.height))
-//                            }
                             .overlay(
                                 ZStack {
                                     VideoControlBubble(viewModel: self.viewModel, player: self.$player, play: self.$play, totalDuration: self.$totalDuration, message: self.message, messagePositionRight: messagePosition == .right)
@@ -132,15 +129,14 @@ struct AttachmentBubble: View {
                                         self.totalDuration = item.duration.seconds - item.currentTime().seconds
                                     }
 
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.25) {
                                         if let videoAssetTrack = self.player.currentItem?.asset.tracks(withMediaType: AVMediaType.video).first {
                                             let naturalSize = videoAssetTrack.naturalSize.applying(videoAssetTrack.preferredTransform)
                                             let videoRatio = naturalSize.height / naturalSize.width
                                             let width = naturalSize.width > UIScreen.main.bounds.width * 0.65 ? UIScreen.main.bounds.width * 0.65 : naturalSize.width
                                             let heightRatio = naturalSize.height / videoRatio
-                                            let height = heightRatio > UIScreen.main.bounds.height * 0.5 ? UIScreen.main.bounds.height * 0.5 : heightRatio
+                                            let height = heightRatio > UIScreen.main.bounds.height * 0.4 ? UIScreen.main.bounds.height * 0.4 : heightRatio
                                             let rect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: width, height: height))
-                                            print("the video size: \(rect.size) && \(naturalSize.height) && \(videoRatio)")
                                             self.videoSize = rect.size
                                         }
                                     }

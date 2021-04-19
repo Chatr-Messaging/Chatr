@@ -35,6 +35,7 @@ class PlayerUIView: UIView {
         super.init(frame: .zero)
 
         playerLayer.player = player
+        playerLayer.videoGravity = .resizeAspectFill
         layer.addSublayer(playerLayer)
     }
 
