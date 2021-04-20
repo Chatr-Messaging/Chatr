@@ -168,18 +168,14 @@ class changeMessageRealmData {
                         for attach in attachments {
                             //image/video attachment
                             if let uid = attach.id {
-                                let storage = Storage.storage()
-                                let fileURL = Blob.privateUrl(forFileUID: uid)
+                                //let storage = Storage.storage()
+                                if let fileURL = Blob.privateUrl(forFileUID: uid) {
+                                    newData.image = fileURL
+                                } else if let fileURLPub = Blob.publicUrl(forFileUID: uid) {
+                                    newData.image = fileURLPub
+                                }
 
                                 newData.imageType = attach.type ?? ""
-                                if newData.imageType == "video/mov" {
-                                    let videoReference = storage.reference().child("messageVideo").child(fileURL ?? "")
-                                    videoReference.downloadURL { url, error in
-                                        newData.image = url?.absoluteString ?? ""
-                                    }
-                                } else {
-                                    newData.image = fileURL ?? ""
-                                }
                             }
                             
                             if let contactID = attach.customParameters as? [String: String] {
@@ -200,7 +196,7 @@ class changeMessageRealmData {
                             if let videoUrl = attach.customParameters["videoId"] {
                                 newData.image = "\(videoUrl)"
                                 newData.imageType = attach.type ?? ""
-                                print("the video is: \(newData.image) && \(videoUrl)")
+                                print("the video is: \(attach.type) && \(videoUrl)")
                             }
                         }
                     }
@@ -277,18 +273,14 @@ class changeMessageRealmData {
                     for attach in attachments {
                         //image/video attachment
                         if let uid = attach.id {
-                            let storage = Storage.storage()
-                            let fileURL = Blob.privateUrl(forFileUID: uid)
+                            //let storage = Storage.storage()
+                            if let fileURL = Blob.privateUrl(forFileUID: uid) {
+                                newData.image = fileURL
+                            } else if let fileURLPub = Blob.publicUrl(forFileUID: uid) {
+                                newData.image = fileURLPub
+                            }
 
                             newData.imageType = attach.type ?? ""
-                            if newData.imageType == "video/mov" {
-                                let videoReference = storage.reference().child("messageVideo").child(fileURL ?? "")
-                                videoReference.downloadURL { url, error in
-                                    newData.image = url?.absoluteString ?? ""
-                                }
-                            } else {
-                                newData.image = fileURL ?? ""
-                            }
                         }
                         
                         if let contactID = attach.customParameters as? [String: String] {
@@ -530,63 +522,35 @@ class changeMessageRealmData {
 
     func sendVideoAttachment(dialog: DialogStruct, attachmentVideos: [PHAsset], occupentID: [NSNumber]) {
         for vid in attachmentVideos {
-            //let resource = PHAssetResource.assetResources(for: vid).first!
-            //let name = resource.originalFilename
-            //let videoLocalPath = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(name)
             let newVideIdString = NSUUID().uuidString
-
             let options = PHVideoRequestOptions()
+
             options.isNetworkAccessAllowed = true
-            PHImageManager.default().requestAVAsset(forVideo: vid, options: options) { (asset, mix, args) in                
-                if let assz = asset as? AVURLAsset, let datazz = NSData(contentsOf: assz.url) {
-                    print("the uploading video url si: \(assz.url.absoluteString)")
+            PHImageManager.default().requestAVAsset(forVideo: vid, options: options) { (asset, mix, args) in
+                if let assz = asset as? AVURLAsset {
                     // URL OF THE VIDEO IS GOT HERE
-                    self.uploadToFirebaseVideo(id: newVideIdString, videoData: datazz as Data, success: { urlz in
-                        self.sendVideoMessage(id: newVideIdString, dialog: dialog, url: urlz, occupentID: occupentID)
-                    }, failure: { error in
-                        print("failed to upload vodeozzzz to firebase: \(error.localizedDescription)")
-                    })
-                } else {
-                    guard let asset = asset else { return }
-                    //self.startAnimating(message: "Processing.")
-                    self.saveVideoInDocumentsDirectory(withAsset: asset, completion: { (url, error) in
-                        if let error = error {
-                            print(error.localizedDescription)
+                    DispatchQueue.main.async {
+                        Request.uploadFile(with: assz.url,
+                                           fileName: "\(UserDefaults.standard.integer(forKey: "currentUserID"))\(dialog.id)\(dialog.fullName)\(Date()).mov",
+                                           contentType: "video/mov",
+                                           isPublic: true,
+                                           progressBlock: { (progress) in
+                                            print("the upload progress is: \(progress)")
+                        }, successBlock: { (blob) in
+                            self.sendVideoMessage(id: newVideIdString, dialog: dialog, blobId: blob.uid ?? "", occupentID: occupentID)
+                        }) { (error) in
+
                         }
-                        if let url = url, let dataa = NSData(contentsOf: url) {
-                            // SAVED IN DOCUMENTS DIRECTORY AND URL IS GOT HERE
-                            self.uploadToFirebaseVideo(id: newVideIdString, videoData: dataa as Data, success: { urlz in
-                                self.sendVideoMessage(id: newVideIdString, dialog: dialog, url: urlz, occupentID: occupentID)
-                            }, failure: { error in
-                                print("failed to upload video to firebase: \(error.localizedDescription)")
-                            })
-                        }
-                    })
+                    }
                 }
             }
         }
     }
     
-    func uploadToFirebaseVideo(id: String, videoData: Data, success : @escaping (String) -> Void, failure : @escaping (Error) -> Void) {
-        let storageRef = Storage.storage().reference(forURL: Constants.FirebaseStoragePath).child("messageVideo").child("\(Session.current.currentUser?.fullName ?? "no name")" + id)
-
-        storageRef.putData(videoData, metadata: nil, completion: { (metadata, error) in
-            if let error = error {
-                print(error.localizedDescription)
-                failure(error)
-            } else {
-                storageRef.downloadURL { url, error in
-                    let strPic: String = url?.absoluteString ?? ""
-                    success(strPic)
-                }
-            }
-        })
-    }
-    
-    func sendVideoMessage(id: String, dialog: DialogStruct, url: String, occupentID: [NSNumber]) {
+    func sendVideoMessage(id: String, dialog: DialogStruct, blobId: String, occupentID: [NSNumber]) {
         let attachment = ChatAttachment()
         attachment.type = "video/mov"
-        attachment["videoId"] = "\(Session.current.currentUser?.fullName ?? "no name")" + id
+        attachment["videoId"] = blobId
 
         let pDialog = ChatDialog(dialogID: dialog.id, type: dialog.dialogType == "public" ? .public : occupentID.count > 2 ? .group : .private)
         pDialog.occupantIDs = occupentID

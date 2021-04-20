@@ -139,21 +139,19 @@ struct BubbleDetailView: View {
                                 .matchedGeometryEffect(id: self.viewModel.message.id.description + "png", in: namespace)
                                 .zIndex(4)
                         } else if self.viewModel.message.imageType == "video/mov" && self.viewModel.message.messageState != .deleted {
-                            GeometryReader { geo in
-                                DetailVideoPlayer(viewModel: self.viewModel)
-                                    .matchedGeometryEffect(id: self.viewModel.message.id.description + "mov", in: namespace)
-                                    .frame(height: self.viewModel.videoSize.height)
-                                    .cornerRadius(showContentActions ? (!self.repliesOpen ? (self.cardDrag.height > 0 ? self.cardDrag.height / 8 : 0) : 0) : 15)
-                                    .pinchToZoom()
-                                    .onTapGesture {
-                                        print("the height is: \(self.viewModel.videoSize.height)")
-                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                        withAnimation {
-                                            self.playVideo.toggle()
-                                        }
-                                        self.playVideo ? self.viewModel.playVideo() : self.viewModel.pause()
+                            DetailVideoPlayer(viewModel: self.viewModel)
+                                .matchedGeometryEffect(id: self.viewModel.message.id.description + "mov", in: namespace)
+                                .frame(width: self.viewModel.videoSize.width, height: self.viewModel.videoSize.height)
+                                .frame(maxWidth: Constants.screenWidth - 20, alignment: .center)
+                                .cornerRadius(showContentActions ? (!self.repliesOpen ? (self.cardDrag.height > 0 ? self.cardDrag.height / 8 : 0) : 0) : 15)
+                                .pinchToZoom()
+                                .onTapGesture {
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                    withAnimation {
+                                        self.playVideo.toggle()
                                     }
-                            }
+                                    self.playVideo ? self.viewModel.playVideo() : self.viewModel.pause()
+                                }
                         }
                     } else if self.viewModel.message.contactID != 0 {
                         //contact
@@ -390,6 +388,7 @@ struct BubbleDetailView: View {
                     .padding(.bottom, 10)
                 }
             }
+            .frame(maxWidth: Constants.screenWidth - 20, alignment: .center)
             .background(
                 RoundedRectangle(cornerRadius: 20)
                     .foregroundColor(Color("bgColor"))

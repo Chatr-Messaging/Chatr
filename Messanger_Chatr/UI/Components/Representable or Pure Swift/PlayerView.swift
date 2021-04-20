@@ -6,12 +6,11 @@
 //  Copyright © 2021 Brandon Shaw. All rights reserved.
 //
 
-import Foundation
 import AVKit
 import SwiftUI
 import RealmSwift
 import Cache
-import Firebase
+import ConnectyCube
 
 struct PlayerView: UIViewRepresentable {
     @Binding var player: AVPlayer
@@ -35,7 +34,7 @@ class PlayerUIView: UIView {
         super.init(frame: .zero)
 
         playerLayer.player = player
-        playerLayer.videoGravity = .resizeAspectFill
+        playerLayer.videoGravity = .resizeAspect
         layer.addSublayer(playerLayer)
     }
 
@@ -55,87 +54,6 @@ class PlayerUIView: UIView {
     }
 }
 
-struct ChatrVideoPlayer: UIViewControllerRepresentable {
-    @Binding var player1: AVPlayer
-    @Binding var totalDuration: Double
-    @State var fileId: String = ""
-    @State var videoUrl: URL?
-    let storageFirebase = Storage.storage()
-
-    var storage: Cache.Storage<String, Data>? = {
-        return try? Cache.Storage(diskConfig: DiskConfig(name: "DiskCache"), memoryConfig: MemoryConfig(expiry: .date(Calendar.current.date(byAdding: .day, value: 4, to: Date()) ?? Date()), countLimit: 10, totalCostLimit: 10), transformer: TransformerFactory.forData())
-    }()
-    
-    func makeUIViewController(context: Context) -> UIViewController {
-        let view = UIViewController()
-        let controller = AVPlayerLayer()
-
-        DispatchQueue.main.async {
-            do {
-                let result = try storage?.entry(forKey: videoUrl?.absoluteString ?? "")
-                // The video is cached.
-                print("this video is saved so pulling from local")
-                let playerItem = CachingPlayerItem(data: result?.object ?? Data(), mimeType: "video/mp4", fileExtension: "mp4")
-                self.player1 = AVPlayer(playerItem: playerItem)
-            } catch {
-                let videoReference = storageFirebase.reference().child("messageVideo").child(fileId)
-                videoReference.getData(maxSize: 10 * 1024 * 1024) { data, error in
-                    if error == nil {
-                        guard let videoData = data else { return }
-
-                        print("video done downloading... now saving video to cache!")
-                        let playerItem = CachingPlayerItem(data: videoData, mimeType: "video/mp4", fileExtension: "mp4")
-                        self.player1 = AVPlayer(playerItem: playerItem)
-
-                        self.storage?.async.setObject(videoData, forKey: videoUrl?.absoluteString ?? "", completion: { _ in })
-                        
-//                        let tmpFileURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("video" + fileId).appendingPathExtension("mp4")
-//                        do {
-//                            try videoData.write(to: tmpFileURL, options: [.atomic])
-//                        } catch { }
-//
-//                        let videoAsset = AVURLAsset(url: tmpFileURL)
-//                        let playerItem = AVPlayerItem(asset: videoAsset)
-//                        self.player1 = AVPlayer(playerItem: playerItem)
-                    } else {
-                        print("the error is: \(String(describing: error?.localizedDescription))")
-                    }
-                }
-            }
-
-            let rect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: UIScreen.main.bounds.width * 0.65, height: UIScreen.main.bounds.height * 0.55))
-
-            controller.player = self.player1
-            self.player1.isMuted = true
-
-            do {
-                try AVAudioSession.sharedInstance().setCategory(.playback)
-            } catch  { }
-            
-            controller.videoGravity = AVLayerVideoGravity.resizeAspect
-            controller.frame = rect
-            view.view.layer.addSublayer(controller)
-            view.preferredContentSize = controller.frame.size
-
-            NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: self.player1.currentItem, queue: .main) { _ in
-                self.player1.seek(to: CMTime.zero)
-                self.player1.play()
-            }
-
-            self.player1.addPeriodicTimeObserver(forInterval: CMTime(seconds: 0.1, preferredTimescale: 600), queue: nil) { time in
-                guard let item = self.player1.currentItem else { return }
-
-                self.totalDuration = item.duration.seconds - item.currentTime().seconds
-            }
-        }
-        
-        return view
-    }
-
-    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
-    }
-}
-
 struct DetailVideoPlayer: UIViewControllerRepresentable {
     @ObservedObject var viewModel: ChatMessageViewModel
     
@@ -144,30 +62,30 @@ struct DetailVideoPlayer: UIViewControllerRepresentable {
         let controller = AVPlayerLayer(player: self.viewModel.player)
 
         DispatchQueue.main.async {
-            let videoAssetTrack = self.viewModel.player.currentItem?.asset.tracks(withMediaType: AVMediaType.video).first
-            let naturalSize = videoAssetTrack?.naturalSize
-            let videoRatio = (naturalSize?.height ?? 0) / (naturalSize?.width ?? 0)
-            let width = naturalSize?.width ?? 0 > UIScreen.main.bounds.width - 20 ? UIScreen.main.bounds.width - 20 : naturalSize?.width ?? 75
-            let heightRatio = (naturalSize?.height ?? 0) / videoRatio
-            let height = heightRatio > UIScreen.main.bounds.height * 0.65 ? UIScreen.main.bounds.height * 0.65 : heightRatio
-            let rect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: width, height: height))
+            if let videoAssetTrack = self.viewModel.player.currentItem?.asset.tracks(withMediaType: AVMediaType.video).first {
+                let naturalSize = videoAssetTrack.naturalSize.applying(videoAssetTrack.preferredTransform)
+                let height3 = abs(naturalSize.width) > UIScreen.main.bounds.width ? UIScreen.main.bounds.width : abs(naturalSize.width)
+                let width3 = (height3 * abs(naturalSize.width) / abs(naturalSize.height))
+                let mainRect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: width3, height: height3))
 
-            self.viewModel.player.isMuted = false
-            self.viewModel.player.play()
-            self.viewModel.videoSize = rect.size
-            do {
-                try AVAudioSession.sharedInstance().setCategory(.playback)
-            } catch  { }
+                self.viewModel.player.isMuted = false
+                self.viewModel.player.play()
+                self.viewModel.videoSize = mainRect.size
 
-            controller.videoGravity = AVLayerVideoGravity.resizeAspect
-            controller.frame = rect
-            view.view.layer.addSublayer(controller)
-            view.preferredContentSize = rect.size
+                do {
+                    try AVAudioSession.sharedInstance().setCategory(.playback)
+                } catch  { }
 
-            self.viewModel.player.addPeriodicTimeObserver(forInterval: CMTime(seconds: 0.1, preferredTimescale: 600), queue: nil) { time in
-                guard let item = self.viewModel.player.currentItem else { return }
+                controller.videoGravity = AVLayerVideoGravity.resizeAspect
+                controller.frame = mainRect
+                view.view.layer.addSublayer(controller)
+                view.preferredContentSize = mainRect.size
 
-                self.viewModel.totalDuration = item.duration.seconds - item.currentTime().seconds
+                self.viewModel.player.addPeriodicTimeObserver(forInterval: CMTime(seconds: 0.1, preferredTimescale: 600), queue: nil) { time in
+                    guard let item = self.viewModel.player.currentItem else { return }
+
+                    self.viewModel.totalDuration = item.duration.seconds - item.currentTime().seconds
+                }
             }
         }
         
@@ -225,23 +143,4 @@ struct CustomProgressBar : UIViewRepresentable {
             }
         }
     }
-}
-
-extension AVAsset {
-    func videoSize() -> CGSize {
-        let tracks = self.tracks(withMediaType: AVMediaType.video)
-        if (tracks.count > 0){
-            let videoTrack = tracks[0]
-            let size = videoTrack.naturalSize
-            let txf = videoTrack.preferredTransform
-            let realVidSize = size.applying(txf)
-            print(videoTrack)
-            print(txf)
-            print(size)
-            print(realVidSize)
-            return realVidSize
-        }
-        return CGSize(width: 0, height: 0)
-    }
-
 }
