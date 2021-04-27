@@ -110,13 +110,13 @@ class AdvancedViewModel: ObservableObject {
     
     func checkMicPermission() {
         switch AVAudioSession.sharedInstance().recordPermission {
-        case AVAudioSessionRecordPermission.granted:
+        case AVAudioSession.RecordPermission.granted:
             print("Permission granted")
             self.micPermission = true
-        case AVAudioSessionRecordPermission.denied:
+        case AVAudioSession.RecordPermission.denied:
             print("Pemission denied")
             self.micPermission = false
-        case AVAudioSessionRecordPermission.undetermined:
+        case AVAudioSession.RecordPermission.undetermined:
             print("Request permission here")
             self.micPermission = false
         @unknown default:
