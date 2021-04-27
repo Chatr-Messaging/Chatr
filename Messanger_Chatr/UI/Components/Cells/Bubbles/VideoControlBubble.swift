@@ -112,14 +112,15 @@ struct VideoControlBubble: View {
                             .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 2)
                             .padding(.all)
                     }
-                }.transition(.asymmetric(insertion: AnyTransition.scale.animation(.spring(response: 0.2, dampingFraction: 0.65, blendDuration: 0)), removal: AnyTransition.scale.animation(.easeOut(duration: 0.14))))
+                }.padding(.vertical, 100)
+                .transition(.asymmetric(insertion: AnyTransition.scale.animation(.spring(response: 0.2, dampingFraction: 0.65, blendDuration: 0)), removal: AnyTransition.scale.animation(.easeOut(duration: 0.14))))
                 .zIndex(1)
             }
         }
     }
     
     func getTotalDurationString() -> String {
-        let m = Int(totalDuration / 60)
+        let m = Int(abs(totalDuration) / 60)
         let s = Int(totalDuration.truncatingRemainder(dividingBy: 60))
         return String(format: "%d:%02d", arguments: [m, s])
     }

@@ -82,7 +82,7 @@ struct securityView: View {
                     .padding(.bottom, 5)
                     
                     HStack(alignment: .center) {
-                        Text("• Private Info: hides your phone, email, & website from public users \n• Private Messaging: denies public users messaging you")
+                        Text("• Private Info: hides your phone, email, & website from public users \n• Private Messaging: denies public users from messaging you")
                             .font(.caption)
                             .fontWeight(.none)
                             .foregroundColor(.secondary)

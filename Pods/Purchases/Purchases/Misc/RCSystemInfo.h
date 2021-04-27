@@ -21,12 +21,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property(class, nonatomic, assign) BOOL forceUniversalAppStore;
 
 - (void)isApplicationBackgroundedWithCompletion:(void(^)(BOOL))completion; // calls completion on the main thread
+- (BOOL)isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion)version;
 
 + (BOOL)isSandbox;
 + (NSString *)frameworkVersion;
 + (NSString *)systemVersion;
 + (NSString *)appVersion;
++ (NSString *)buildVersion;
 + (NSString *)platformHeader;
++ (nullable NSString *)identifierForVendor;
 
 + (NSURL *)serverHostURL;
 + (nullable NSURL *)proxyURL;

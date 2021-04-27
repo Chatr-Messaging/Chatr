@@ -618,13 +618,20 @@ struct topGroupHeaderView: View {
 
                     //MARK: Bio Section
                     if self.dialogModel.bio != "" {
-                        VStack(alignment: .leading) {
+                        VStack(alignment: .trailing) {
                             Text(self.dialogModel.bio)
                                 .font(.subheadline)
                                 .fontWeight(.none)
                                 .multilineTextAlignment(.center)
                                 .lineLimit(self.isProfileBioOpen ? 20 : 4)
                                 .padding(.bottom, self.moreBioAction ? 0 : 10)
+                                .padding(.horizontal)
+                                .onTapGesture {
+                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                    withAnimation(.easeOut(duration: 0.25)) {
+                                        self.isProfileBioOpen.toggle()
+                                    }
+                                }
                                 .readSize(onChange: { size in
                                     self.moreBioAction = size.height > 70
                                 })
@@ -647,8 +654,7 @@ struct topGroupHeaderView: View {
                             }
                         }.padding(.top, 2.5)
                     }
-                }.padding(.horizontal)
-                .padding(.top, 45)
+                }.padding(.top, 45)
                 .padding(.bottom, 5)
             }.frame(width: Constants.screenWidth - 40)
             .background(Color("buttonColor"))

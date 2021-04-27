@@ -49,11 +49,11 @@ struct ChatMessagesView: View {
     @State var topAvatarUrls: [String] = []
     var namespace: Namespace.ID
     let keyboard = KeyboardObserver()
-    let pageShowCount = 15
+    let pageShowCount = 7
     var tempPagination: Int {
         let count = self.auth.messages.selectedDialog(dialogID: self.dialogID).count
-        if count > 15 {
-            return count - 15
+        if count > pageShowCount {
+            return count - pageShowCount
         } else {
             return 0
         }
@@ -188,12 +188,12 @@ struct ChatMessagesView: View {
                                         if !notLast {
                                             print("called on appear: \(message)")
                                             if self.firstScroll {
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.55) {
                                                     reader.scrollTo(currentMessages[message].id, anchor: .bottom)
                                                     self.firstScroll = false
                                                 }
                                             } else {
-                                                withAnimation(Animation.easeOut(duration: 0.6).delay(0.1)) {
+                                                withAnimation(Animation.easeOut(duration: 0.6).delay(0.15)) {
                                                     reader.scrollTo(currentMessages[message].id, anchor: .bottom)
                                                 }
                                             }

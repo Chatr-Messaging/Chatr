@@ -68,7 +68,7 @@ struct AttachmentBubble: View {
                             Text("loading image...")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                        }
+                        }.padding(.vertical, 50)
                     }.aspectRatio(contentMode: .fit)
                     .clipShape(CustomGIFShape())
                     .frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.55 : 0.65)), alignment: self.messagePosition == .right ? .trailing : .leading)
@@ -87,7 +87,7 @@ struct AttachmentBubble: View {
                         .clipShape(CustomGIFShape())
                         .frame(width: self.videoSize.width, height: self.videoSize.height)
                         .frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.55 : 0.65)), alignment: self.messagePosition == .right ? .trailing : .leading)
-                        .frame(minHeight: 100, maxHeight: CGFloat(Constants.screenHeight * 0.65))
+                        .frame(minHeight: 180, maxHeight: CGFloat(Constants.screenHeight * 0.65))
                         .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 14)
                         .padding(.bottom, self.hasPrior ? 0 : 4)
                         .offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
@@ -138,8 +138,8 @@ struct AttachmentBubble: View {
                         }
                 }
             } else if self.message.imageType == "audio/m4a" && self.message.messageState != .deleted {
-                //AudioBubble(viewModel: self.viewModel, messageRight: self.messagePosition == .right, audioKey: self.message.image)
-                Text("my audio message")
+                AudioBubble(viewModel: self.viewModel, message: self.message, messageRight: self.messagePosition == .right, audioKey: self.message.image)
+                //Text("my audio message")
             }
         }
     }
@@ -182,32 +182,5 @@ struct AttachmentBubble: View {
 
     func pause() {
         player.pause()
-    }
-
-    func updateMessageVideoURL(messageId: String, localUrl: String) {
-        let config = Realm.Configuration(schemaVersion: 1)
-        //let storage = Storage.storage()
-
-        do {
-            let realm = try Realm(configuration: config)
-            if let realmContact = realm.object(ofType: MessageStruct.self, forPrimaryKey: messageId) {
-                if realmContact.localAttachmentPath == "" {
-                    do {
-                        try realm.safeWrite {
-                            realmContact.localAttachmentPath = localUrl
-                            realm.add(realmContact, update: .all)
-                        }
-                    } catch {
-                        print(error.localizedDescription)
-                    }
-//                    let videoReference = storage.reference().child("messageVideo").child(fileId)
-//                    videoReference.downloadURL { url, error in
-//
-//                    }
-                }
-            }
-        } catch {
-            print(error.localizedDescription)
-        }
     }
 }

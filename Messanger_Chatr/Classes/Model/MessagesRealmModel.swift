@@ -413,7 +413,7 @@ class changeMessageRealmData {
             }, successBlock: { (blob) in
                 let attachment = ChatAttachment()
                 attachment.type = "audio/m4a"
-                attachment.id = blob.uid
+                attachment["videoId"] = blob.uid
                 
                 let pDialog = ChatDialog(dialogID: dialog.id, type: dialog.dialogType == "public" ? .public : occupentID.count > 2 ? .group : .private)
                 pDialog.occupantIDs = occupentID

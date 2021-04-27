@@ -20,12 +20,15 @@
     RCSystemInfo,
     RCOperationDispatcher,
     RCIntroEligibilityCalculator,
-    RCReceiptParser;
+    RCReceiptParser,
+    RCPurchaserInfoManager;
+
+#import "RCStoreKitWrapper.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 
-@interface RCPurchases (Protected)
+@interface RCPurchases (Protected) <RCStoreKitWrapperDelegate>
 
 - (instancetype)initWithAppUserID:(nullable NSString *)appUserID
                    requestFetcher:(RCStoreKitRequestFetcher *)requestFetcher
@@ -41,7 +44,8 @@ NS_ASSUME_NONNULL_BEGIN
       subscriberAttributesManager:(RCSubscriberAttributesManager *)subscriberAttributesManager
               operationDispatcher:(RCOperationDispatcher *)operationDispatcher
        introEligibilityCalculator:(RCIntroEligibilityCalculator *)introEligibilityCalculator
-                    receiptParser:(RCReceiptParser *)receiptParser;
+                    receiptParser:(RCReceiptParser *)receiptParser
+             purchaserInfoManager:(RCPurchaserInfoManager *)purchaserInfoManager;
 
 + (void)setDefaultInstance:(nullable RCPurchases *)instance;
 

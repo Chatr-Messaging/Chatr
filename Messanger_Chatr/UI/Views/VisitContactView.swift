@@ -1008,12 +1008,18 @@ struct topHeaderContactView: View {
                         
                         //MARK: Bio Section
                         if self.contact.bio != "" {
-                            VStack(alignment: .leading) {
+                            VStack(alignment: .trailing) {
                                 Text(self.contact.bio)
                                     .font(.subheadline)
                                     .fontWeight(.none)
                                     .multilineTextAlignment(.center)
                                     .lineLimit(self.isProfileBioOpen ? 20 : 4)
+                                    .onTapGesture {
+                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        withAnimation(.easeOut(duration: 0.25)) {
+                                            self.isProfileBioOpen.toggle()
+                                        }
+                                    }
                                     .readSize(onChange: { size in
                                         self.showMoreAction = size.height > 70
                                     })

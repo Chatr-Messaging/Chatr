@@ -10,6 +10,7 @@
 #import "RCPurchasesErrors.h"
 #import "RCPurchasesErrorUtils.h"
 #import "RCLogUtils.h"
+@import PurchasesCoreSwift;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -60,8 +61,11 @@ static NSString *RCPurchasesErrorDescription(RCPurchasesErrorCode code) {
             return @"The operation is already in progress.";
         case RCUnknownBackendError:
             return @"There was an unknown backend error.";
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
         case RCReceiptInUseByOtherSubscriberError:
             return @"The receipt is in use by other subscriber.";
+#pragma GCC diagnostic pop
         case RCInvalidAppleSubscriptionKeyError:
             return @"Apple Subscription Key is invalid or not present. In order to provide subscription offers, you must first generate a subscription key. Please see https://docs.revenuecat.com/docs/ios-subscription-offers for more info.";
         case RCIneligibleError:
@@ -72,6 +76,10 @@ static NSString *RCPurchasesErrorDescription(RCPurchasesErrorCode code) {
             return @"The payment is pending.";
         case RCInvalidSubscriberAttributesError:
             return @"One or more of the attributes sent could not be saved.";
+        case RCLogOutAnonymousUserError:
+            return @"LogOut was called but the current user is anonymous.";
+        case RCConfigurationError:
+            return @"There is an issue with your configuration. Check the underlying error for more details.";
     }
     return @"Something went wrong.";
 }
@@ -115,8 +123,11 @@ static NSString *const RCPurchasesErrorCodeString(RCPurchasesErrorCode code) {
             return @"OPERATION_ALREADY_IN_PROGRESS";
         case RCUnknownBackendError:
             return @"UNKNOWN_BACKEND_ERROR";
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
         case RCReceiptInUseByOtherSubscriberError:
             return @"RECEIPT_IN_USE_BY_OTHER_SUBSCRIBER";
+#pragma GCC diagnostic pop
         case RCInvalidAppleSubscriptionKeyError:
             return @"INVALID_APPLE_SUBSCRIPTION_KEY";
         case RCIneligibleError:
@@ -127,6 +138,10 @@ static NSString *const RCPurchasesErrorCodeString(RCPurchasesErrorCode code) {
             return @"PAYMENT_PENDING_ERROR";
         case RCInvalidSubscriberAttributesError:
             return @"INVALID_SUBSCRIBER_ATTRIBUTES";
+        case RCLogOutAnonymousUserError:
+            return @"LOGOUT_CALLED_WITH_ANONYMOUS_USER";
+        case RCConfigurationError:
+            return @"CONFIGURATION_ERROR";
     }
     return @"UNRECOGNIZED_ERROR";
 }
@@ -134,18 +149,14 @@ static NSString *const RCPurchasesErrorCodeString(RCPurchasesErrorCode code) {
 static RCPurchasesErrorCode RCPurchasesErrorCodeFromRCBackendErrorCode(RCBackendErrorCode code) {
     switch (code) {
         case RCBackendInvalidPlatform:
-            return RCUnknownError;
+            return RCConfigurationError;
         case RCBackendStoreProblem:
-        case RCBackendPlayStoreQuotaExceeded:
-        case RCBackendPlayStoreInvalidPackageName:
-        case RCBackendPlayStoreGenericError:
             return RCStoreProblemError;
         case RCBackendCannotTransferPurchase:
             return RCReceiptAlreadyInUseError;
         case RCBackendInvalidReceiptToken:
             return RCInvalidReceiptError;
         case RCBackendInvalidAppStoreSharedSecret:
-        case RCBackendInvalidPlayStoreCredentials:
         case RCBackendInvalidAuthToken:
         case RCBackendInvalidAPIKey:
             return RCInvalidCredentialsError;
@@ -161,6 +172,13 @@ static RCPurchasesErrorCode RCPurchasesErrorCodeFromRCBackendErrorCode(RCBackend
         case RCBackendInvalidSubscriberAttributes:
         case RCBackendInvalidSubscriberAttributesBody:
             return RCInvalidSubscriberAttributesError;
+        case RCBackendPlayStoreInvalidPackageName:
+        case RCBackendPlayStoreQuotaExceeded:
+        case RCBackendPlayStoreGenericError:
+        case RCBackendInvalidPlayStoreCredentials:
+        case RCBackendBadRequest:
+        case RCBackendInternalServerError:
+            return RCUnknownBackendError;
     }
     return RCUnknownError;
 }
@@ -250,7 +268,36 @@ static RCPurchasesErrorCode RCPurchasesErrorCodeFromSKError(NSError *skError) {
 
 + (NSError *)errorWithCode:(RCPurchasesErrorCode)code
                   userInfo:(NSDictionary *)userInfo {
-    RCErrorLog(@"%@", RCPurchasesErrorDescription(code));
+    switch (code) {
+        case RCNetworkError:
+        case RCUnknownError:
+        case RCReceiptAlreadyInUseError:
+        case RCUnexpectedBackendResponseError:
+        case RCInvalidReceiptError:
+        case RCInvalidAppUserIdError:
+        case RCOperationAlreadyInProgressError:
+        case RCUnknownBackendError:
+        case RCInvalidSubscriberAttributesError:
+        case RCLogOutAnonymousUserError:
+            RCErrorLog(@"%@", RCPurchasesErrorDescription(code));
+            break;
+        case RCPurchaseCancelledError:
+        case RCStoreProblemError:
+        case RCPurchaseNotAllowedError:
+        case RCPurchaseInvalidError:
+        case RCProductNotAvailableForPurchaseError:
+        case RCProductAlreadyPurchasedError:
+        case RCMissingReceiptFileError:
+        case RCInvalidCredentialsError:
+        case RCInvalidAppleSubscriptionKeyError:
+        case RCIneligibleError:
+        case RCInsufficientPermissionsError:
+        case RCPaymentPendingError:
+            RCAppleErrorLog(@"%@", RCPurchasesErrorDescription(code));
+            break;
+        default:
+            break;
+    }
     return [NSError errorWithDomain:RCPurchasesErrorDomain code:code userInfo:userInfo];
 }
 
@@ -319,6 +366,10 @@ static RCPurchasesErrorCode RCPurchasesErrorCodeFromSKError(NSError *skError) {
 
 + (NSError *)unknownError {
     return [self errorWithCode:RCUnknownError];
+}
+
++ (NSError *)logOutAnonymousUserError {
+    return [self errorWithCode:RCLogOutAnonymousUserError];
 }
 
 + (NSError *)purchasesErrorWithSKError:(NSError *)skError {

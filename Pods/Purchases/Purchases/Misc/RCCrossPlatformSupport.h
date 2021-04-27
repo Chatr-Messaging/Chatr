@@ -47,6 +47,15 @@
 #endif
 
 // Should match available platforms in
+// https://developer.apple.com/documentation/watchkit/wkinterfacedevice?language=objc
+#if TARGET_OS_WATCH
+#define WKINTERFACE_DEVICE_AVAILABLE 1
+#else
+#define WKINTERFACE_DEVICE_AVAILABLE 0
+#endif
+
+
+// Should match available platforms in
 // https://developer.apple.com/documentation/iad/adclient?language=objc
 #if TARGET_OS_IOS
 #define AD_CLIENT_AVAILABLE 1
@@ -60,4 +69,13 @@
 #define PURCHASES_INITIATED_FROM_APP_STORE_AVAILABLE 1
 #else
 #define PURCHASES_INITIATED_FROM_APP_STORE_AVAILABLE 0
+#endif
+
+
+// Should match platforms that require permissions detailed in
+// https://developer.apple.com/app-store/user-privacy-and-data-use/
+#if TARGET_OS_WATCH || TARGET_OS_OSX || TARGET_OS_MACCATALYST
+#define APP_TRACKING_TRANSPARENCY_REQUIRED 0
+#else
+#define APP_TRACKING_TRANSPARENCY_REQUIRED 1
 #endif
