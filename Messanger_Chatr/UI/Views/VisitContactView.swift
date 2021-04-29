@@ -1015,9 +1015,11 @@ struct topHeaderContactView: View {
                                     .multilineTextAlignment(.center)
                                     .lineLimit(self.isProfileBioOpen ? 20 : 4)
                                     .onTapGesture {
-                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                        withAnimation(.easeOut(duration: 0.25)) {
-                                            self.isProfileBioOpen.toggle()
+                                        if showMoreAction {
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                            withAnimation(.easeOut(duration: 0.25)) {
+                                                self.isProfileBioOpen.toggle()
+                                            }
                                         }
                                     }
                                     .readSize(onChange: { size in

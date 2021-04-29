@@ -627,9 +627,11 @@ struct topGroupHeaderView: View {
                                 .padding(.bottom, self.moreBioAction ? 0 : 10)
                                 .padding(.horizontal)
                                 .onTapGesture {
-                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                    withAnimation(.easeOut(duration: 0.25)) {
-                                        self.isProfileBioOpen.toggle()
+                                    if moreBioAction {
+                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        withAnimation(.easeOut(duration: 0.25)) {
+                                            self.isProfileBioOpen.toggle()
+                                        }
                                     }
                                 }
                                 .readSize(onChange: { size in
