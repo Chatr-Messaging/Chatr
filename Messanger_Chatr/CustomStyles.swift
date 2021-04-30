@@ -136,6 +136,17 @@ struct interactionDefaultButtonStyle: ButtonStyle {
     }
 }
 
+struct interactionSendButtonStyle: ButtonStyle {
+    @State var contentAvailable: Bool = false
+
+    public func makeBody(configuration: interactionSendButtonStyle.Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.9 : 1.0)
+            .opacity(configuration.isPressed ? 0.9 : 1)
+            .overlay(Circle().strokeBorder(Color("interactionBtnBorderUnselected").opacity(0.4), lineWidth: 1).blur(radius: 1.8))
+    }
+}
+
 struct navigationScaleHelpticButtonStyle: PrimitiveButtonStyle {
     func makeBody(configuration: PrimitiveButtonStyle.Configuration) -> some View {
         MyButton(configuration: configuration)

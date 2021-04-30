@@ -228,72 +228,71 @@ struct KeyboardCardView: View {
             //MARK: Text Field & Send Btn
             HStack(alignment: .bottom, spacing: 0) {
                 if !self.isRecordingAudio {
-                HStack(alignment: .bottom, spacing: 0) {
-                    Button(action: {
-                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                        withAnimation(Animation.linear(duration: 0.2), {
-                            self.isKeyboardActionOpen.toggle()
-                            if self.showImagePicker == true { self.showImagePicker = false }
-                        })
-                    }) {
-                        Image(systemName: self.isKeyboardActionOpen ? "xmark" : "paperclip")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: self.isKeyboardActionOpen ? 16 : 25, height: self.isKeyboardActionOpen ? 18 : 25, alignment: .center)
-                            .font(Font.title.weight(.regular))
-                            .foregroundColor(.secondary)
-                            .padding(self.isKeyboardActionOpen ? 12.5 : 8)
-                    }.buttonStyle(changeBGPaperclipButtonStyle())
-                    .cornerRadius(self.height < 160 ? 12.5 : 17.5)
-
-                    ResizableTextField(imagePicker: self.imagePicker, height: self.$height, text: self.$mainText)
-                        .environmentObject(self.auth)
-                        .frame(height: self.height < 175 ? self.height : 175)
-                        .offset(x: -5)
-                        .onChange(of: self.isOpen, perform: { value in
-                            if value {
-                                if let typedText = UserDefaults.standard.string(forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText") {
-                                    self.mainText = typedText
-                                } else { self.mainText = "" }
-                            } else {
-                                UserDefaults.standard.setValue(self.mainText, forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText")
-                            }
-                        })
-
-                    if self.mainText.count == 0 && !self.enableLocation && self.gifData.isEmpty && self.imagePicker.pastedImages.isEmpty && self.imagePicker.selectedVideos.isEmpty && self.imagePicker.selectedPhotos.isEmpty {
+                    HStack(alignment: .bottom, spacing: 0) {
                         Button(action: {
                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                            withAnimation {
-                                self.showImagePicker = false
-                                self.isKeyboardActionOpen = false
-                                self.isRecordingAudio = true
-                            }
+                            withAnimation(Animation.linear(duration: 0.2), {
+                                self.isKeyboardActionOpen.toggle()
+                                if self.showImagePicker == true { self.showImagePicker = false }
+                            })
                         }) {
-                            Image(systemName: "mic.fill")
+                            Image(systemName: self.isKeyboardActionOpen ? "xmark" : "paperclip")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(width: 25, height: 22.5, alignment: .center)
+                                .frame(width: self.isKeyboardActionOpen ? 16 : 25, height: self.isKeyboardActionOpen ? 18 : 25, alignment: .center)
                                 .font(Font.title.weight(.regular))
                                 .foregroundColor(.secondary)
-                                .padding(10)
-                        }.padding(.horizontal, 8)
-                        .buttonStyle(changeBGPaperclipButtonStyle())
-                        .cornerRadius(20)
-                    }
-                }.background(
-                    ZStack(alignment: .topLeading) {
-                        RoundedRectangle(cornerRadius: self.height < 160 ? 12.5 : 17.5)
-                            .foregroundColor(Color("buttonColor"))
-                            .padding(.trailing, 8)
-                            .shadow(color: Color.black.opacity(self.mainText.count != 0 ? 0.1 : 0.15), radius: self.mainText.count != 0 ? 6 : 4, x: 0, y: self.mainText.count != 0 ? 6 : 2.5)
+                                .padding(self.isKeyboardActionOpen ? 12.5 : 8)
+                        }.buttonStyle(changeBGPaperclipButtonStyle())
+                        .cornerRadius(self.height < 160 ? 12.5 : 17.5)
 
-                        Text("type message")
-                            .font(.system(size: 18))
-                            .padding(.vertical, 10)
-                            .padding(.leading, 42)
-                            .foregroundColor(self.mainText.count == 0 && self.isOpen ? Color("lightGray") : .clear)
-                    }
-                )
+                        ResizableTextField(imagePicker: self.imagePicker, height: self.$height, text: self.$mainText)
+                            .environmentObject(self.auth)
+                            .frame(height: self.height < 175 ? self.height : 175)
+                            .onChange(of: self.isOpen, perform: { value in
+                                if value {
+                                    if let typedText = UserDefaults.standard.string(forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText") {
+                                        self.mainText = typedText
+                                    } else { self.mainText = "" }
+                                } else {
+                                    UserDefaults.standard.setValue(self.mainText, forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText")
+                                }
+                            })
+
+                        if self.mainText.count == 0 && !self.enableLocation && self.gifData.isEmpty && self.imagePicker.pastedImages.isEmpty && self.imagePicker.selectedVideos.isEmpty && self.imagePicker.selectedPhotos.isEmpty {
+                            Button(action: {
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                withAnimation {
+                                    self.showImagePicker = false
+                                    self.isKeyboardActionOpen = false
+                                    self.isRecordingAudio = true
+                                }
+                            }) {
+                                Image(systemName: "mic.fill")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 25, height: 22.5, alignment: .center)
+                                    .font(Font.title.weight(.regular))
+                                    .foregroundColor(.secondary)
+                                    .padding(10)
+                            }.padding(.horizontal, 8)
+                            .buttonStyle(changeBGPaperclipButtonStyle())
+                            .cornerRadius(20)
+                        }
+                    }.background(
+                        ZStack(alignment: .topLeading) {
+                            RoundedRectangle(cornerRadius: self.height < 160 ? 12.5 : 17.5)
+                                .foregroundColor(Color("buttonColor"))
+                                .padding(.trailing, 7.5)
+                                .shadow(color: Color.black.opacity(self.mainText.count != 0 ? 0.1 : 0.15), radius: self.mainText.count != 0 ? 6 : 4, x: 0, y: self.mainText.count != 0 ? 6 : 2.5)
+
+                            Text("type message")
+                                .font(.system(size: 18))
+                                .padding(.vertical, 10)
+                                .padding(.leading, 45)
+                                .foregroundColor(self.mainText.count == 0 && self.isOpen ? Color("lightGray") : .clear)
+                        }
+                    )
                 } else {
                     //Audio Recording Section
                     KeyboardAudioView(viewModel: self.audio, isRecordingAudio: self.$isRecordingAudio, hasAudioToSend: self.$hasAudioToSend)
@@ -375,14 +374,15 @@ struct KeyboardCardView: View {
                         .frame(width: 22, height: 22)
                         .foregroundColor(self.contentAvailable ? .white : .secondary)
                         .padding(10)
-                }).background(self.contentAvailable ? LinearGradient(gradient: Gradient(colors: [Color(red: 46 / 255, green: 168 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom) : LinearGradient(gradient: Gradient(colors: [Color("buttonColor"), Color("buttonColor")]), startPoint: .top, endPoint: .bottom))
-                .overlay(Circle().strokeBorder(Color("interactionBtnBorderUnselected").opacity(0.4), lineWidth: 1).blur(radius: 1.8))
-                .clipShape(Circle())
-                .shadow(color: Color.black.opacity(self.contentAvailable  ? 0.15 : 0.1), radius: 4, x: 0, y: 3)
-                .shadow(color: Color.blue.opacity(self.contentAvailable ? 0.25 : 0.0), radius: 10, x: 0, y: 6)
-                .scaleEffect(self.contentAvailable ? 1.04 : 1.0)
-                .disabled(self.contentAvailable ? false : true)
-            }.padding(.horizontal)
+                        .background(self.contentAvailable ? LinearGradient(gradient: Gradient(colors: [Color(red: 46 / 255, green: 168 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom) : LinearGradient(gradient: Gradient(colors: [Color("buttonColor"), Color("buttonColor")]), startPoint: .top, endPoint: .bottom))
+                        .clipShape(Circle())
+                        .shadow(color: Color.black.opacity(self.contentAvailable ? 0.15 : 0.1), radius: 4, x: 0, y: 3)
+                        .shadow(color: Color.blue.opacity(self.contentAvailable ? 0.25 : 0.0), radius: 10, x: 0, y: 6)
+                        .scaleEffect(self.contentAvailable ? 1.04 : 1.0)
+                }).disabled(self.contentAvailable ? false : true)
+                .buttonStyle(interactionSendButtonStyle(contentAvailable: self.contentAvailable))
+            }
+            .padding(.horizontal, 12.5)
             .padding(.top, 10)
 
             //MARK: Action Buttons
@@ -595,12 +595,13 @@ struct KeyboardCardView: View {
                     }
                 }
             }
-            
+
             Spacer()
         }.background(BlurView(style: .systemUltraThinMaterial)) //Color("bgColor")
+        .cornerRadius(20)
         .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color("blurBorder"), lineWidth: 2.5).blur(radius: 1))
         .padding(.vertical, 2.5)
-        .animation(.spring(response: 0.3, dampingFraction: 0.75, blendDuration: 0))
+        //.animation(.spring(response: 0.3, dampingFraction: 0.75, blendDuration: 0))
     }
     
     func loadImage() {

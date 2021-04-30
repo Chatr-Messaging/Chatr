@@ -345,6 +345,7 @@ struct NewConversationView: View {
             .background(Color("bgColor"))
             .navigationBarItems(leading:
                 Button(action: {
+                    self.selectedContact.removeAll()
                     self.presentationMode.wrappedValue.dismiss()
                 }) {
                     Text("Cancel")
