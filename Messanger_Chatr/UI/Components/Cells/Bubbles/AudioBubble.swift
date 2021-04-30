@@ -14,6 +14,7 @@ import Cache
 
 struct AudioBubble: View {
     @ObservedObject var viewModel: ChatMessageViewModel
+    @ObservedObject var audio = VoiceViewModel()
     @State var message: MessageStruct
     @State var messageRight: Bool = false
     @State var audioKey: String = ""
@@ -25,7 +26,8 @@ struct AudioBubble: View {
     @State var time = 0
 
     @State var audioPlayer: AVAudioPlayer = AVAudioPlayer()
-
+    @State var player: AVPlayer = AVPlayer()
+    
     var storage: Cache.Storage<String, Data>? = {
         return try? Cache.Storage(diskConfig: DiskConfig(name: "DiskCache"), memoryConfig: MemoryConfig(expiry: .date(Calendar.current.date(byAdding: .day, value: 4, to: Date()) ?? Date()), countLimit: 10, totalCostLimit: 10), transformer: TransformerFactory.forData())
     }()
@@ -34,24 +36,24 @@ struct AudioBubble: View {
         HStack(spacing: 5) {
             Button(action: {
                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                 if self.isPlayingAudio {
-                    self.stopAudio()
+                if self.audio.isPlayingAudio {
+                    self.audio.stopAudioRecording()
                     print("stop playing")
                  } else {
                     self.playAudio()
                     print("stop??? lolll playing")
                  }
             }) {
-                Image(systemName: self.isPlayingAudio ? "pause.fill" : "play.fill")
+                Image(systemName: self.audio.isPlayingAudio ? "pause.fill" : "play.fill")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 20, height: 20, alignment: .center)
                     .font(Font.title.weight(.regular))
-                    .foregroundColor(.blue)
+                    .foregroundColor(self.messageRight ? .white : .blue)
                     .padding(.leading, 15)
             }
             
-            Text(self.durationString)
+            Text(self.audio.durationString)
                 .foregroundColor(.secondary)
                 .font(.subheadline)
                 .fontWeight(.semibold)
@@ -70,7 +72,7 @@ struct AudioBubble: View {
                     Capsule()
                         .foregroundColor(.primary)
                         .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
-                        .frame(width: self.audioProgress)
+                        //.frame(width: self.audioProgress)
                 }.frame(width: Constants.screenWidth * 0.25, height: 4)
                 .padding(.trailing, 2.5)
         }.padding(.horizontal, 15)
@@ -150,55 +152,51 @@ struct AudioBubble: View {
     }
     
     func fetchAudioRecording(completion: @escaping () -> (Void)) {
-        self.recordingsList.removeAll()
+        self.audio.recordingsList.removeAll()
         
-        let fileManager = FileManager.default
-        let documentDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        let folderURL = documentDirectory.appendingPathComponent("dialog_audioMsg/\(self.audioKey)")
+        let documentDirectory = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)[0]
 
-        do {
-            print("fetching contents: \(folderURL.absoluteString)")
-            let directoryContents = try fileManager.contentsOfDirectory(at: folderURL.absoluteURL, includingPropertiesForKeys: nil)
+        let folderString = documentDirectory.appending("/dialog_audioMsg/\(self.audioKey)/\(self.audioKey).m4a")
+        let folderUrl = URL(fileURLWithPath: folderString)
 
-            for audio in directoryContents {
-                let recording = Recording(fileURL: audio, createdAt: self.getCreationDate(for: audio.absoluteURL))
-                print("contents: \(audio)")
-                self.recordingsList.append(recording)
-            }
-        } catch { }
+        let recording = Recording(fileURL: folderUrl, createdAt: self.getCreationDate(for: folderUrl))
+        print("contents: \(folderString)")
+        self.audio.recordingsList.append(recording)
 
-        print("the recording count is: \(self.recordingsList.count)")
+        print("the recording count is: \(self.audio.recordingsList.count)")
 
         completion()
     }
-    
+
     func stopAudio() {
         DispatchQueue.main.async {
-            self.isPlayingAudio = false
+            self.audio.isPlayingAudio = false
 
-            guard self.audioPlayer.isPlaying else { return }
+            guard self.audio.audioPlayer.isPlaying else { return }
 
-            self.audioPlayer.pause()
+            self.audio.audioPlayer.pause()
         }
     }
     
     func playAudio() {
-        DispatchQueue.main.async {
-            guard let recording = self.recordingsList.first else { return }
+        //DispatchQueue.main.async {
+            if let recording = self.audio.recordingsList.first {
+                try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, policy: .default, options: .defaultToSpeaker)
 
-            try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, policy: .default, options: .defaultToSpeaker)
-
-            do {
-                self.audioPlayer = try AVAudioPlayer(contentsOf: recording.fileURL)
-                //self.timer = Timer.publish(every: 0.2, on: .main, in: .common).autoconnect()
-                //self.audioPlayer.delegate = self
-                //self.audioPlayer.prepareToPlay()
-                self.audioPlayer.play()
-                self.isPlayingAudio = true
-             } catch {
-                print("Error playing audio")
-             }
-        }
+                do {
+                    print("trying to play from url: \(recording.fileURL)")
+                    self.audio.audioPlayer = try AVAudioPlayer(contentsOf: recording.fileURL)
+                    //self.timer = Timer.publish(every: 0.2, on: .main, in: .common).autoconnect()
+                    //self.audioPlayer.delegate = self
+                    //self.audioPlayer.prepareToPlay()
+                    self.audio.audioPlayer.play()
+                    self.audio.isPlayingAudio = true
+                 } catch {
+                    print("Error playing audio")
+                    self.audio.isPlayingAudio = false
+                 }
+            }
+        //}
     }
     
     func prepAudio() {
@@ -213,11 +211,11 @@ struct AudioBubble: View {
     }
     
     func getCreationDate(for file: URL) -> Date {
-        if let attributes = try? FileManager.default.attributesOfItem(atPath: file.path) as [FileAttributeKey: Any],
-            let creationDate = attributes[FileAttributeKey.creationDate] as? Date {
-            return creationDate
-        } else {
+//        if let attributes = try? FileManager.default.attributesOfItem(atPath: file.path) as [FileAttributeKey: Any],
+//            let creationDate = attributes[FileAttributeKey.creationDate] as? Date {
+//            return creationDate
+//        } else {
             return Date()
-        }
+        //}
     }
 }

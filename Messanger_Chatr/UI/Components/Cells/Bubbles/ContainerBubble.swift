@@ -13,6 +13,7 @@ import Firebase
 import ConnectyCube
 import MobileCoreServices
 import Photos
+import Cache
 
 struct ContainerBubble: View {
     @EnvironmentObject var auth: AuthModel
@@ -36,7 +37,13 @@ struct ContainerBubble: View {
     @State var hasUserLiked: Bool = false
     @State var hasUserDisliked: Bool = false
     @State private var deleteActionSheet: Bool = false
+    @State var player: AVPlayer = AVPlayer()
+    @State var totalDuration: Double = 0
     var namespace: Namespace.ID
+
+    var storage: Cache.Storage<String, Data>? = {
+        return try? Cache.Storage(diskConfig: DiskConfig(name: "DiskCache"), memoryConfig: MemoryConfig(expiry: .date(Calendar.current.date(byAdding: .day, value: 4, to: Date()) ?? Date()), countLimit: 10, totalCostLimit: 10), transformer: TransformerFactory.forData())
+    }()
 
     var body: some View {
         let dragInteractionGesture = DragGesture()
@@ -65,7 +72,7 @@ struct ContainerBubble: View {
                 ZStack(alignment: self.messagePosition == .left ? .topTrailing : .topLeading) {
                     ZStack(alignment: self.messagePosition == .left ? .trailing : .leading) {
                         if self.message.image != "" {
-                            AttachmentBubble(viewModel: self.viewModel, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior, namespace: self.namespace)
+                            AttachmentBubble(viewModel: self.viewModel, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior, player: self.$player, totalDuration: self.$totalDuration, namespace: self.namespace)
                                 .environmentObject(self.auth)
                         } else if self.message.contactID != 0 {
                             ContactBubble(viewModel: self.viewModel, chatContact: self.$newDialogFromSharedContact, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior, namespace: self.namespace)
@@ -143,7 +150,7 @@ struct ContainerBubble: View {
                     }.onAppear() {
                         self.observeInteractions()
                         if self.messagePosition == .right {
-                            if self.message.imageType == "image/gif" || self.message.imageType == "image/png" {
+                            if self.message.imageType == "image/gif" || self.message.imageType == "image/png" || self.message.imageType == "video/mov" {
                                 self.reactions.append("save")
                             } else {
                                 self.reactions.append("edit")
@@ -164,7 +171,7 @@ struct ContainerBubble: View {
                             self.reactions.append("like")
                             self.reactions.append("dislike")
                             self.reactions.append("reply")
-                            if self.message.imageType == "image/gif" || self.message.imageType == "image/png" {
+                            if self.message.imageType == "image/gif" || self.message.imageType == "image/png" || self.message.imageType == "video/mov" {
                                 self.reactions.append("save")
                             } else {
                                 self.reactions.append("copy")
@@ -425,8 +432,15 @@ struct ContainerBubble: View {
     
     func openReplyDetailView() {
         if self.message.messageState != .isTyping && self.message.messageState != .error {
+            if self.message.imageType == "video/mov" {
+                self.player.pause()
+                self.viewModel.player = self.player
+            }
+
             self.viewModel.message = self.message
-            self.viewModel.isDetailOpen = true
+            withAnimation {
+                self.viewModel.isDetailOpen = true
+            }
         }
     }
 
@@ -445,20 +459,57 @@ struct ContainerBubble: View {
     }
     
     func saveImage() {
-        if let imageData = SDImageCache.shared.imageFromMemoryCache(forKey: self.message.image)?.pngData() {
-            //use image
-            PHPhotoLibrary.shared().performChanges({
-                let request = PHAssetCreationRequest.forAsset()
-                request.addResource(with: .photo, data: imageData, options: nil)
-            }) { (success, error) in
-                if let error = error {
-                    print(error.localizedDescription)
-                } else {
-                    DispatchQueue.main.async {
-                        auth.notificationtext = "Successfully saved image"
-                        NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+        if self.message.imageType == "video/mov" {
+            do {
+                let result = try storage?.entry(forKey: self.message.image)
+                //let videoUrl = URL(string: result?.filePath ?? "")
+
+                if let videoData = result?.object {
+                    let paths = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)[0]
+
+                    let dataPath = paths.appending("/saveCameraRoll/saveChatrVideoToCameraRoll.mp4")
+
+                    try videoData.write(to: URL(fileURLWithPath: dataPath))
+
+                    PHPhotoLibrary.shared().performChanges({
+                        PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: URL(fileURLWithPath: dataPath))
+                    }) { (success, error) in
+                        if error != nil {
+                            DispatchQueue.main.async {
+                                auth.notificationtext = "Error saving video"
+                                NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+                            }
+                            UINotificationFeedbackGenerator().notificationOccurred(.error)
+                        } else {
+                            DispatchQueue.main.async {
+                                auth.notificationtext = "Successfully saved video"
+                                NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+                            }
+                            UINotificationFeedbackGenerator().notificationOccurred(.success)
+                        }
                     }
-                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                }
+            } catch { }
+        } else {
+            if let imageData = SDImageCache.shared.imageFromMemoryCache(forKey: self.message.image)?.pngData() {
+                PHPhotoLibrary.shared().performChanges({
+                    let request = PHAssetCreationRequest.forAsset()
+                    request.addResource(with: .photo, data: imageData, options: nil)
+                }) { (success, error) in
+                    if let error = error {
+                        print(error.localizedDescription)
+                        DispatchQueue.main.async {
+                            auth.notificationtext = "Error saving image"
+                            NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+                        }
+                        UINotificationFeedbackGenerator().notificationOccurred(.error)
+                    } else {
+                        DispatchQueue.main.async {
+                            auth.notificationtext = "Successfully saved image"
+                            NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+                        }
+                        UINotificationFeedbackGenerator().notificationOccurred(.success)
+                    }
                 }
             }
         }

@@ -24,9 +24,9 @@ struct AttachmentBubble: View {
     @State var message: MessageStruct
     @State var messagePosition: messagePosition
     var hasPrior: Bool = false
-    @State var player: AVPlayer = AVPlayer()
+    @Binding var player: AVPlayer
     @State var play: Bool = false
-    @State var totalDuration: Double = 0
+    @Binding var totalDuration: Double
     @State var videoSize: CGSize = CGSize.zero
     var namespace: Namespace.ID
     let storageFirebase = Storage.storage()

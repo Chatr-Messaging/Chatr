@@ -45,6 +45,7 @@ class PlayerUIView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         playerLayer.frame = bounds
+        playerLayer.removeAllAnimations()
     }
 
     func updatePlayer(player: AVPlayer) {
