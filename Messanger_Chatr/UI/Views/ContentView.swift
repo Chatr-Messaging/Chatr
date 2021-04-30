@@ -163,7 +163,7 @@ struct mainHomeList: View {
     @State var activeView = CGSize.zero
     @State var keyboardDragState = CGSize.zero
     @State var keyboardHeight: CGFloat = 0
-    @State var textFieldHeight: CGFloat = 0
+    @State var textFieldHeight: CGFloat = 38
     @State var selectedContacts: [Int] = []
     @State var counter: Int = 0
     @State var isKeyboardActionOpen: Bool = false

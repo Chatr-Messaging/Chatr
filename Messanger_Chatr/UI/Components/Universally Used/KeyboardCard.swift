@@ -243,12 +243,15 @@ struct KeyboardCardView: View {
                                 .font(Font.title.weight(.regular))
                                 .foregroundColor(.secondary)
                                 .padding(self.isKeyboardActionOpen ? 12.5 : 8)
+                                .padding(.horizontal, 2)
                         }.buttonStyle(changeBGPaperclipButtonStyle())
                         .cornerRadius(self.height < 160 ? 12.5 : 17.5)
 
                         ResizableTextField(imagePicker: self.imagePicker, height: self.$height, text: self.$mainText)
                             .environmentObject(self.auth)
                             .frame(height: self.height < 175 ? self.height : 175)
+                            .padding(.trailing, 7.5)
+                            .offset(x: -5, y: -1)
                             .onChange(of: self.isOpen, perform: { value in
                                 if value {
                                     if let typedText = UserDefaults.standard.string(forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText") {
@@ -262,7 +265,7 @@ struct KeyboardCardView: View {
                         if self.mainText.count == 0 && !self.enableLocation && self.gifData.isEmpty && self.imagePicker.pastedImages.isEmpty && self.imagePicker.selectedVideos.isEmpty && self.imagePicker.selectedPhotos.isEmpty {
                             Button(action: {
                                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                withAnimation {
+                                withAnimation(Animation.easeInOut(duration: 0.25)) {
                                     self.showImagePicker = false
                                     self.isKeyboardActionOpen = false
                                     self.isRecordingAudio = true
@@ -275,9 +278,11 @@ struct KeyboardCardView: View {
                                     .font(Font.title.weight(.regular))
                                     .foregroundColor(.secondary)
                                     .padding(10)
-                            }.padding(.horizontal, 8)
+                                    .padding(.horizontal, 2.5)
+                            }
                             .buttonStyle(changeBGPaperclipButtonStyle())
-                            .cornerRadius(20)
+                            .cornerRadius(12.5)
+                            .padding(.trailing, 6.5)
                         }
                     }.background(
                         ZStack(alignment: .topLeading) {
@@ -371,7 +376,7 @@ struct KeyboardCardView: View {
                     }
 
                     self.mainText = ""
-                    self.height = 0
+                    self.height = 38
                     UserDefaults.standard.setValue(self.mainText, forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText")
                 }, label: {
                     Image(systemName: "paperplane.fill")
@@ -383,11 +388,11 @@ struct KeyboardCardView: View {
                         .clipShape(Circle())
                         .shadow(color: Color.black.opacity(self.contentAvailable ? 0.15 : 0.1), radius: 4, x: 0, y: 3)
                         .shadow(color: Color.blue.opacity(self.contentAvailable ? 0.25 : 0.0), radius: 10, x: 0, y: 6)
-                        .scaleEffect(self.contentAvailable ? 1.04 : 1.0)
-                        .animation(.easeOut(duration: 0.225))
+                        .scaleEffect(self.contentAvailable ? 1.06 : 1.0)
+                        .animation(Animation.interactiveSpring())
                 }).buttonStyle(interactionSendButtonStyle())
             }
-            .padding(.horizontal, 12.5)
+            .padding(.horizontal, 10)
             .padding(.top, 10)
 
             //MARK: Action Buttons
@@ -603,10 +608,9 @@ struct KeyboardCardView: View {
 
             Spacer()
         }.background(BlurView(style: .systemUltraThinMaterial)) //Color("bgColor")
-        .cornerRadius(20)
-        .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color("blurBorder"), lineWidth: 2.5).blur(radius: 1))
+        .cornerRadius(22)
+        .overlay(RoundedRectangle(cornerRadius: 22).stroke(Color("blurBorder"), lineWidth: 2.5).blur(radius: 1))
         .padding(.vertical, 2.5)
-        //.animation(.spring(response: 0.3, dampingFraction: 0.75, blendDuration: 0))
     }
     
     func loadImage() {
