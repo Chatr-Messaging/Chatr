@@ -289,7 +289,7 @@ struct KeyboardCardView: View {
                             Text("type message")
                                 .font(.system(size: 18))
                                 .padding(.vertical, 10)
-                                .padding(.leading, 45)
+                                .padding(.leading, 47.5)
                                 .foregroundColor(self.mainText.count == 0 && self.isOpen ? Color("lightGray") : .clear)
                         }
                     )
@@ -300,6 +300,11 @@ struct KeyboardCardView: View {
                 
                 //MARK: Send Button
                 Button(action: {
+                    guard self.contentAvailable else {
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        return
+                    }
+
                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                     self.isKeyboardActionOpen = false
                     self.showImagePicker = false
@@ -379,8 +384,7 @@ struct KeyboardCardView: View {
                         .shadow(color: Color.black.opacity(self.contentAvailable ? 0.15 : 0.1), radius: 4, x: 0, y: 3)
                         .shadow(color: Color.blue.opacity(self.contentAvailable ? 0.25 : 0.0), radius: 10, x: 0, y: 6)
                         .scaleEffect(self.contentAvailable ? 1.04 : 1.0)
-                }).disabled(self.contentAvailable ? false : true)
-                .buttonStyle(interactionSendButtonStyle(contentAvailable: self.contentAvailable))
+                }).buttonStyle(interactionSendButtonStyle())
             }
             .padding(.horizontal, 12.5)
             .padding(.top, 10)

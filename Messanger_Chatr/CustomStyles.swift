@@ -137,8 +137,6 @@ struct interactionDefaultButtonStyle: ButtonStyle {
 }
 
 struct interactionSendButtonStyle: ButtonStyle {
-    @State var contentAvailable: Bool = false
-
     public func makeBody(configuration: interactionSendButtonStyle.Configuration) -> some View {
         configuration.label
             .scaleEffect(configuration.isPressed ? 0.9 : 1.0)
