@@ -321,6 +321,7 @@ struct VisitContactView: View {
                         if self.contact.instagramAccessToken != "" {
                             Button(action: {
                                 if !self.contact.isInfoPrivate || self.contactRelationship == .contact {
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                     self.viewModel.openInstagramApp()
                                 } else {
                                     UINotificationFeedbackGenerator().notificationOccurred(.error)
@@ -336,8 +337,9 @@ struct VisitContactView: View {
                                     Text("@\(self.viewModel.username)")
                                         .font(.none)
                                         .fontWeight(.none)
-                                        .background(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? Color.clear : self.contact.isInfoPrivate || self.contactRelationship != .contact ? Color.secondary : Color.clear)
-                                        .foregroundColor(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? .primary : self.contact.isInfoPrivate || self.contactRelationship != .contact ? .clear : self.viewModel.username == "" ? .gray : .primary)
+                                        .background(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? Color.clear : !self.contact.isInfoPrivate || self.contactRelationship == .contact ? Color.clear : Color.secondary)
+                                        .foregroundColor(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? .primary : !self.contact.isInfoPrivate || self.contactRelationship == .contact ? self.viewModel.username == "" ? .gray : .primary : .clear)
+
 
                                     Spacer()
                                     
@@ -394,6 +396,7 @@ struct VisitContactView: View {
                             if self.contact.facebook != "" {
                                 Button(action: {
                                     if !self.contact.isInfoPrivate || self.contactRelationship == .contact {
+                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                         self.viewModel.openFacebookApp(screenName: self.contact.facebook)
                                     } else {
                                         UINotificationFeedbackGenerator().notificationOccurred(.error)
@@ -409,8 +412,8 @@ struct VisitContactView: View {
                                         Text("@\(self.contact.facebook)")
                                             .font(.none)
                                             .fontWeight(.none)
-                                            .background(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? Color.clear : self.contact.isInfoPrivate || self.contactRelationship != .contact ? Color.secondary : Color.clear)
-                                            .foregroundColor(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? .primary : self.contact.isInfoPrivate || self.contactRelationship != .contact ? .clear : self.contact.facebook == "" ? .gray : .primary)
+                                            .background(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? Color.clear : !self.contact.isInfoPrivate || self.contactRelationship == .contact ? Color.clear : Color.secondary)
+                                            .foregroundColor(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? .primary : !self.contact.isInfoPrivate || self.contactRelationship == .contact ? self.contact.facebook == "" ? .gray : .primary : .clear)
 
                                         Spacer()
                                         Image(systemName: "chevron.right")
@@ -437,6 +440,7 @@ struct VisitContactView: View {
                             if self.contact.twitter != "" {
                                 Button(action: {
                                     if !self.contact.isInfoPrivate || self.contactRelationship == .contact {
+                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                         self.viewModel.openTwitterApp(screenName: self.contact.twitter)
                                     } else {
                                         UINotificationFeedbackGenerator().notificationOccurred(.error)
@@ -452,8 +456,8 @@ struct VisitContactView: View {
                                         Text("@\(self.contact.twitter)")
                                             .font(.none)
                                             .fontWeight(.none)
-                                            .background(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? Color.clear : self.contact.isInfoPrivate || self.contactRelationship != .contact ? Color.secondary : Color.clear)
-                                            .foregroundColor(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? .primary : self.contact.isInfoPrivate || self.contactRelationship != .contact ? .clear : self.contact.twitter == "" ? .gray : .primary)
+                                            .background(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? Color.clear : !self.contact.isInfoPrivate || self.contactRelationship == .contact ? Color.clear : Color.secondary)
+                                            .foregroundColor(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? .primary : !self.contact.isInfoPrivate || self.contactRelationship == .contact ? self.contact.twitter == "" ? .gray : .primary : .clear)
 
                                         Spacer()
                                         Image(systemName: "chevron.right")
