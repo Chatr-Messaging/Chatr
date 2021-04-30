@@ -116,7 +116,7 @@ class ChatMessageViewModel: ObservableObject {
                 completion(false)
             } else {
                 msg.updateChildValues(["\(userId)" : "\(Date())"])
-                self.sendPushNoti(userIDs: [NSNumber(value: message.senderID)], title: "Liked Message", message: "\(name) liked your message \"\(message.text)\"")
+                self.sendPushNoti(userIDs: [NSNumber(value: message.senderID)], title: "Liked Message", message: "👍 \(name) liked your message \"\(message.text)\"")
 
                 completion(true)
             }
@@ -135,7 +135,7 @@ class ChatMessageViewModel: ObservableObject {
                 completion(false)
             } else {
                 msg.updateChildValues(["\(userId)" : "\(Date())"])
-                self.sendPushNoti(userIDs: [NSNumber(value: message.senderID)], title: "Disliked Message", message: "\(name) disliked your message \"\(message.text)\"")
+                self.sendPushNoti(userIDs: [NSNumber(value: message.senderID)], title: "Disliked Message", message: "👎 \(name) disliked your message \"\(message.text)\"")
                 
                 completion(true)
             }

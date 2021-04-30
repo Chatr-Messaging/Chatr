@@ -77,6 +77,10 @@ struct BubbleDetailView: View {
                             withAnimation {
                                 self.showContentActions = false
                             }
+                            
+                            if self.viewModel.message.imageType == "video/mov" {
+                                self.viewModel.player.pause()
+                            }
 
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                                 withAnimation {

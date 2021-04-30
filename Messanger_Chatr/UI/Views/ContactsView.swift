@@ -637,37 +637,8 @@ struct ContactsView: View {
                                 }.padding(.horizontal)
                                 .padding(.bottom, 40)
                             }
-//                                    GeometryReader { geo in
-//                                        HStack {
-//                                            Spacer()
-//                                            VStack {
-//                                                VStack(alignment: .center, spacing: 4) {
-//                                                    ForEach(alphabet, id: \.self) { idx in
-//                                                        let contact = self.auth.contacts.results.filter({ $0.isMyContact == true && $0.fullName.hasPrefix(idx) })
-//                                                        if contact.count != 0 {
-//                                                            Button(action: {
-//                                                                print("the geo is: \(geo.frame(in: .local).height) and the heigth is: \(geo.size.height)")
-//                                                                withAnimation {
-//                                                                    value.scrollTo(idx, anchor: .center)
-//                                                                }
-//                                                            }, label: {
-//                                                                Text(idx)
-//                                                                    .font(.system(size: 16, weight: .semibold, design: .default))
-//                                                                    .foregroundColor(.primary)
-//                                                                    .padding(.horizontal)
-//                                                            })
-//                                                        }
-//                                                    }
-//                                                }.padding(.vertical, 10)
-//                                            }.background(BlurView(style: .systemThinMaterial))
-//                                            .clipShape(Capsule())
-//                                        }.offset(y: (geo.frame(in: .global).minY / 2) - (geo.size.height / 4) < (Constants.screenHeight - (geo.size.height / 8)) ? -(geo.frame(in: .global).minY) + (Constants.screenHeight - (geo.size.height / 4)) : 0)
-//                                    }
-//                                }.padding(.horizontal)
-//                                .padding(.bottom, 40)
-                            //}
                         }
-                        
+
                         Spacer()
                         //MARK: FOOTER
                         FooterInformation()

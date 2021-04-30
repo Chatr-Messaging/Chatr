@@ -144,9 +144,10 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
     
     // Opening Image Or Video....
     func extractPreviewData(asset: PHAsset, completion: @escaping () -> Void) {
+        DispatchQueue.global(qos: .utility).async {
         let manager = PHCachingImageManager()
         if asset.mediaType == .image {
-            getImageFromAsset(asset: asset, size: PHImageManagerMaximumSize) { (image) in
+            self.getImageFromAsset(asset: asset, size: PHImageManagerMaximumSize) { (image) in
                 DispatchQueue.main.async {
                     guard let imgRemove = self.imageData.firstIndex(of: image) else {
                         DispatchQueue.main.async {
@@ -188,6 +189,7 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
                     }
                 }
             }
+        }
         }
     }
 

@@ -7,15 +7,18 @@
 //
 
 import UIKit
+import MobileCoreServices
+import PhotosUI
 import SwiftUI
 
 struct ImagePicker: UIViewControllerRepresentable {
     @Environment(\.presentationMode)
     var presentationMode
+    var imageOnly: Bool = true
 
     @Binding var image: UIImage?
 
-    class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
+    class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate, PHPickerViewControllerDelegate {
 
         @Binding var presentationMode: PresentationMode
         @Binding var image: UIImage?
@@ -25,9 +28,30 @@ struct ImagePicker: UIViewControllerRepresentable {
             _image = image
         }
 
+        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+            let identifiers = results.compactMap(\.assetIdentifier)
+            let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: identifiers, options: nil)
+            print("the fetchedresult is now: \(fetchResult.count)")
+        }
+
         func imagePickerController(_ picker: UIImagePickerController,
                                    didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-            image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage
+            let mediaType = info[UIImagePickerController.InfoKey.mediaType] as! CFString
+            //let mediaType2 = info[UIImagePickerController.InfoKey.phAsset] as! 
+
+            switch mediaType {
+            case kUTTypeImage:
+                print("Selected media is image")
+                image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage
+
+            case kUTTypeMovie:
+                // Handle video selection result
+                let videoUrl = info[UIImagePickerController.InfoKey.mediaURL] as! URL
+                print("Selected media is video: \(videoUrl.absoluteString)")
+
+            default:
+                print("unknown/unusable type")
+            }
             presentationMode.dismiss()
         }
 
@@ -42,12 +66,15 @@ struct ImagePicker: UIViewControllerRepresentable {
 
     func makeUIViewController(context: UIViewControllerRepresentableContext<ImagePicker>) -> UIImagePickerController {
         let picker = UIImagePickerController()
+        if !self.imageOnly {
+            picker.sourceType = .photoLibrary
+            picker.mediaTypes = UIImagePickerController.availableMediaTypes(for: .photoLibrary) ?? []
+        }
+        picker.allowsEditing = imageOnly
         picker.delegate = context.coordinator
         return picker
     }
 
     func updateUIViewController(_ uiViewController: UIImagePickerController,
-                                context: UIViewControllerRepresentableContext<ImagePicker>) {
-
-    }
+                                context: UIViewControllerRepresentableContext<ImagePicker>) {  }
 }
