@@ -31,7 +31,6 @@ struct BubbleDetailView: View {
     @State var hasUserLiked: Bool = false
     @State var hasUserDisliked: Bool = false
     @State var showContact: Bool = false
-    @State var playVideo: Bool = true
     @State var showContentActions: Bool = false
     @State var repliesOpen: Bool = false
     @State var replyScrollOffset: CGFloat = CGFloat.zero
@@ -143,19 +142,49 @@ struct BubbleDetailView: View {
                                 .matchedGeometryEffect(id: self.viewModel.message.id.description + "png", in: namespace)
                                 .zIndex(4)
                         } else if self.viewModel.message.imageType == "video/mov" && self.viewModel.message.messageState != .deleted {
-                            DetailVideoPlayer(viewModel: self.viewModel)
-                                .matchedGeometryEffect(id: self.viewModel.message.id.description + "mov", in: namespace)
-                                .frame(width: self.viewModel.videoSize.width, height: self.viewModel.videoSize.height)
-                                .frame(maxWidth: Constants.screenWidth - 20, alignment: .center)
-                                .cornerRadius(showContentActions ? (!self.repliesOpen ? (self.cardDrag.height > 0 ? self.cardDrag.height / 8 : 0) : 0) : 15)
-                                .pinchToZoom()
-                                .onTapGesture {
-                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                    withAnimation {
-                                        self.playVideo.toggle()
+                            ZStack(alignment: .center) {
+                                DetailVideoPlayer(viewModel: self.viewModel)
+                                    .matchedGeometryEffect(id: self.viewModel.message.id.description + "mov", in: namespace)
+                                    .frame(width: self.viewModel.videoSize.width, height: self.viewModel.videoSize.height)
+                                    .frame(maxWidth: Constants.screenWidth - 20, alignment: .center)
+                                    .cornerRadius(showContentActions ? (!self.repliesOpen ? (self.cardDrag.height > 0 ? self.cardDrag.height / 8 : 0) : 0) : 15)
+                                    .pinchToZoom()
+                                    .onTapGesture {
+                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                        withAnimation {
+                                            self.viewModel.playVideoo.toggle()
+                                        }
+                                        self.viewModel.playVideoo ? self.viewModel.playVideo() : self.viewModel.pause()
                                     }
-                                    self.playVideo ? self.viewModel.playVideo() : self.viewModel.pause()
+                                
+                                //Big Play Button
+                                if !self.viewModel.playVideoo {
+                                    Button(action: {
+                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                        withAnimation {
+                                            self.viewModel.playVideoo.toggle()
+                                        }
+                                        self.viewModel.playVideoo ? self.viewModel.playVideo() : self.viewModel.pause()
+                                    }) {
+                                        ZStack {
+                                            BlurView(style: .systemUltraThinMaterial)
+                                                .frame(width: 60, height: 60)
+                                                .clipShape(Circle())
+
+                                            Image(systemName: self.viewModel.playVideoo ? "pause.fill" : "play.fill")
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fit)
+                                                .frame(width: 25, height: 25, alignment: .center)
+                                                .offset(x: 2.5)
+                                                .foregroundColor(.white)
+                                                .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 2)
+                                                .padding(.all)
+                                        }
+                                    }.padding(.vertical, 35)
+                                    .transition(.asymmetric(insertion: AnyTransition.scale.animation(.spring(response: 0.2, dampingFraction: 0.65, blendDuration: 0)), removal: AnyTransition.scale.animation(.easeOut(duration: 0.14))))
+                                    .zIndex(1)
                                 }
+                            }
                         }
                     } else if self.viewModel.message.contactID != 0 {
                         //contact
@@ -196,24 +225,24 @@ struct BubbleDetailView: View {
                                 Button(action: {
                                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                     withAnimation {
-                                        self.playVideo.toggle()
+                                        self.viewModel.playVideoo.toggle()
                                     }
-                                    self.playVideo ? self.viewModel.playVideo() : self.viewModel.pause()
+                                    self.viewModel.playVideoo ? self.viewModel.playVideo() : self.viewModel.pause()
                                 }, label: {
-                                    Image(systemName: self.playVideo ? "pause.fill" : "play.fill")
+                                    Image(systemName: self.viewModel.playVideoo ? "pause.fill" : "play.fill")
                                         .resizable()
                                         .aspectRatio(contentMode: .fit)
                                         .frame(width: 22, height: 22, alignment: .center)
                                         .foregroundColor(.primary)
-                                        .padding(.vertical, 5)
+                                        .padding(.vertical, 2.5)
                                 })
                             
-                                Text(self.getTotalDurationString())
+                                Text(self.viewModel.videoTimeText)
                                     .font(.none)
                                     .fontWeight(.medium)
                                     .foregroundColor(.primary)
                                 
-                                Spacer()
+                                CustomProgressBar(viewModel: self.viewModel)
                             }.padding(.horizontal)
                         }
 
@@ -411,9 +440,9 @@ struct BubbleDetailView: View {
             .rotation3DEffect(.degrees(!self.repliesOpen ? -Double(self.cardDrag.height > 20 ? ((self.cardDrag.height - 20) / 8 > 8 ? 8 : (self.cardDrag.height - 20) / 8) : 0) : 0), axis: (x: 1, y: 0, z: 0))
             .simultaneousGesture(DragGesture().onChanged { value in
                 if self.viewModel.message.longitude == 0 && self.viewModel.message.latitude == 0 && self.viewModel.isDetailOpen {
-                    if self.playVideo {
+                    if self.viewModel.playVideoo {
                         withAnimation {
-                            self.playVideo = false
+                            self.viewModel.playVideoo = false
                         }
                         self.viewModel.pause()
                     }
@@ -724,6 +753,12 @@ struct BubbleDetailView: View {
     func getTotalDurationString() -> String {
         let m = Int(self.viewModel.totalDuration / 60)
         let s = Int(self.viewModel.totalDuration.truncatingRemainder(dividingBy: 60))
+
         return String(format: "%d:%02d", arguments: [m, s])
+    }
+
+    func getSliderValue() -> Float {
+        
+        return Float(self.viewModel.player.currentTime().seconds / (self.viewModel.player.currentItem?.duration.seconds)!)
     }
 }

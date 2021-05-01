@@ -67,29 +67,27 @@ struct VideoControlBubble: View {
                 .padding(.horizontal, 10)
              
                 Spacer()
-                if play || self.player.currentTime().seconds > 0.1 {
-                    Button(action: {
-                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                        self.player.pause()
-                        self.play = false
-                        self.viewModel.message = self.message
-                        self.viewModel.player = self.player
-                        self.viewModel.totalDuration = self.totalDuration
-                        withAnimation {
-                            self.viewModel.isDetailOpen.toggle()
-                        }
-                    }, label: {
-                        Image(systemName: self.viewModel.isDetailOpen ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 20, height: 20, alignment: .center)
-                            .foregroundColor(.white)
-                            .padding(.vertical)
-                            .padding(.horizontal)
-                            .padding(.bottom, 5)
-                    })
-                    .transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.spring()), removal: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.easeOut(duration: 0.1))))
-                }
+                Button(action: {
+                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                    self.player.pause()
+                    self.play = false
+                    self.viewModel.message = self.message
+                    self.viewModel.player = self.player
+                    self.viewModel.playVideoo = true
+                    withAnimation {
+                        self.viewModel.isDetailOpen.toggle()
+                    }
+                }, label: {
+                    Image(systemName: self.viewModel.isDetailOpen ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 20, height: 20, alignment: .center)
+                        .foregroundColor(.white)
+                        .padding(.vertical)
+                        .padding(.horizontal)
+                        .padding(.bottom, 5)
+                })
+                .transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.spring()), removal: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.easeOut(duration: 0.1))))
             }
             
             //Big Play Button

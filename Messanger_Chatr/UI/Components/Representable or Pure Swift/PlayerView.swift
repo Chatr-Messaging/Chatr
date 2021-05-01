@@ -85,7 +85,13 @@ struct DetailVideoPlayer: UIViewControllerRepresentable {
                 self.viewModel.player.addPeriodicTimeObserver(forInterval: CMTime(seconds: 0.1, preferredTimescale: 600), queue: nil) { time in
                     guard let item = self.viewModel.player.currentItem else { return }
 
-                    self.viewModel.totalDuration = item.duration.seconds - item.currentTime().seconds
+                    self.viewModel.totalDuration = Float(item.currentTime().seconds / item.duration.seconds)
+
+                    let timeRemain = item.duration.seconds - item.currentTime().seconds
+                    let m = Int(timeRemain / 60)
+                    let s = Int(timeRemain.truncatingRemainder(dividingBy: 60))
+                    self.viewModel.videoTimeText = String(format: "%d:%02d", arguments: [m, s])
+                    print("the total duration is: \(self.viewModel.videoTimeText)")
                 }
             }
         }
@@ -98,9 +104,7 @@ struct DetailVideoPlayer: UIViewControllerRepresentable {
 }
 
 struct CustomProgressBar : UIViewRepresentable {
-    @Binding var value : Float
-    @Binding var player : AVPlayer
-    @Binding var isPlaying : Bool
+    @ObservedObject var viewModel: ChatMessageViewModel
 
     func makeCoordinator() -> CustomProgressBar.Coordinator {
         return CustomProgressBar.Coordinator(parent1: self)
@@ -108,18 +112,18 @@ struct CustomProgressBar : UIViewRepresentable {
     
     func makeUIView(context: UIViewRepresentableContext<CustomProgressBar>) -> UISlider {
         let slider = UISlider()
-        slider.minimumTrackTintColor = .white
-        slider.maximumTrackTintColor = UIColor(named: "blurBorder")
-        slider.thumbTintColor = .white
-        slider.setThumbImage(UIImage(named: "thumb"), for: .normal)
-        slider.value = value
+        slider.minimumTrackTintColor = UIColor(named: "bgColor_opposite")
+        slider.maximumTrackTintColor = UIColor(named: "progressSlider")
+        slider.thumbTintColor = UIColor(named: "buttonColor")
+        //slider.setThumbImage(UIImage(named: "closeButton"), for: .normal)
+        slider.value = viewModel.totalDuration
         slider.addTarget(context.coordinator, action: #selector(context.coordinator.changed(slider:)), for: .valueChanged)
 
         return slider
     }
     
     func updateUIView(_ uiView: UISlider, context: UIViewRepresentableContext<CustomProgressBar>) {
-        uiView.value = value
+        uiView.value = viewModel.totalDuration
     }
     
     class Coordinator : NSObject{
@@ -131,15 +135,15 @@ struct CustomProgressBar : UIViewRepresentable {
 
         @objc func changed(slider : UISlider){
             if slider.isTracking{
-                parent.player.pause()
-                let sec = Double(slider.value * Float((parent.player.currentItem?.duration.seconds)!))
-                parent.player.seek(to: CMTime(seconds: sec, preferredTimescale: 1))
+                parent.viewModel.player.pause()
+                let sec = Double(slider.value * Float((parent.viewModel.player.currentItem?.duration.seconds)!))
+                parent.viewModel.player.seek(to: CMTime(seconds: sec, preferredTimescale: 1))
             } else {
-                let sec = Double(slider.value * Float((parent.player.currentItem?.duration.seconds)!))
+                let sec = Double(slider.value * Float((parent.viewModel.player.currentItem?.duration.seconds)!))
 
-                parent.player.seek(to: CMTime(seconds: sec, preferredTimescale: 1))
-                if parent.isPlaying {
-                    parent.player.play()
+                parent.viewModel.player.seek(to: CMTime(seconds: sec, preferredTimescale: 1))
+                if parent.viewModel.playVideoo {
+                    parent.viewModel.player.play()
                 }
             }
         }

@@ -9,8 +9,8 @@
 import SwiftUI
 
 struct ProgressBar: View {
-    @Binding var value: Int
-     
+    @ObservedObject var viewModel: ChatMessageViewModel
+
      var body: some View {
          GeometryReader { geometry in
              VStack(alignment: .trailing) {
@@ -36,7 +36,7 @@ struct ProgressBar: View {
      
      func getProgressBarWidth(geometry:GeometryProxy) -> CGFloat {
         let frame = geometry.frame(in: .global)
-        return frame.size.width * CGFloat(value) * 0.33
+        return frame.size.width * CGFloat(self.viewModel.totalDuration) * 0.33
      }
      
      func getPercentage(_ value:CGFloat) -> String {

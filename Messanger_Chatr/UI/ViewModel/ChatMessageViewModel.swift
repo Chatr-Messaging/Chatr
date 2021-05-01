@@ -20,8 +20,10 @@ class ChatMessageViewModel: ObservableObject {
     @Published var contact: ContactStruct = ContactStruct()
     @Published var contactRelationship: visitContactRelationship = .unknown
     @Published var player: AVPlayer = AVPlayer()
-    @Published var totalDuration: Double = 0.0
+    @Published var totalDuration: Float = 0.0
+    @Published var videoTimeText: String = "0:00"
     @Published var videoSize: CGSize = CGSize.zero
+    @Published var playVideoo: Bool = true
 
     func loadDialog(auth: AuthModel, dialogId: String, completion: @escaping () -> Void) {
         Request.updateDialog(withID: dialogId, update: UpdateChatDialogParameters(), successBlock: { dialog in
@@ -199,10 +201,12 @@ class ChatMessageViewModel: ObservableObject {
         }
 
         player.play()
+        playVideoo = true
     }
 
     func pause() {
         player.pause()
+        playVideoo = false
     }
     
     func fetchReplyCount(message: MessageStruct, completion: @escaping (Int) -> Void) {
