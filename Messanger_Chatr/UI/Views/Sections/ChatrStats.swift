@@ -76,6 +76,7 @@ struct ChatrStats: View {
                             self.auth.fetchTotalUserCount(completion: { count in
                                 self.userCount = count
                             })
+                            UserDefaults.standard.set(true, forKey: "isEarlyAdopter")
                         }.onDisappear() {
                             if self.userCount != UserDefaults.standard.integer(forKey: "chatrUserStats") || self.quickSnapCount != UserDefaults.standard.integer(forKey: "chatrQuickSnapsStats") {
                                 UserDefaults.standard.set(self.userCount, forKey: "chatrUserStats")

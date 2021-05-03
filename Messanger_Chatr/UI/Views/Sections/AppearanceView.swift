@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import Grid
 
 struct AppIconData: Identifiable {
     var id = UUID()
@@ -29,7 +30,8 @@ struct appearanceView: View {
     @State var openMenbership: Bool = false
     @State var selectedIcon: AppIconData? = nil
     @State var selectedWallpaper: WallpaperData? = nil
-    
+    @State var style = StaggeredGridStyle(.vertical, tracks: .count(2), spacing: 2.5)
+
     var AppIconDataArray : [AppIconData] = [
         AppIconData(title: "Original", image: "AppIcon-Original", selected: false),
         AppIconData(title: "Original Dark", image: "AppIcon-Original-Dark", selected: false),
@@ -73,6 +75,78 @@ struct appearanceView: View {
                     }.padding(.top, 10)
                     
                     VStack(alignment: .center) {
+                        Grid(self.AppIconDataArray) { item in
+                            Button(action: {
+                                if self.auth.subscriptionStatus == .subscribed || item.title == self.AppIconDataArray.first?.title || (item.title == "Original Dark" && UserDefaults.standard.bool(forKey: "isEarlyAdopter")) {
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                    self.selectedIcon = item
+                                    UserDefaults.standard.set(item.title, forKey: "selectedAppIcon")
+                                    self.auth.changeHomeIconTo(name: self.selectedIcon?.image == "AppIcon-Original" ? nil : self.selectedIcon?.image)
+                                } else {
+                                    UINotificationFeedbackGenerator().notificationOccurred(.error)
+                                    self.openMenbership.toggle()
+                                }
+                            }, label: {
+                                VStack(alignment: .center) {
+                                    Image("\(item.image)")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 55, height: 55, alignment: .center)
+                                        .cornerRadius(15)
+                                        .padding(.bottom, 5)
+                                        .shadow(color: Color("buttonShadow"), radius: 5, x: 0, y: 5)
+
+                                    if self.auth.subscriptionStatus == .subscribed || item.title == "Original" || (item.title == "Original Dark" && UserDefaults.standard.bool(forKey: "isEarlyAdopter")) {
+                                        if self.selectedIcon?.title == item.title {
+                                            Image(systemName: "checkmark.circle.fill" )
+                                                .resizable()
+                                                .scaledToFill()
+                                                .foregroundColor(.blue)
+                                                .frame(width: 20, height: 20)
+                                        } else {
+                                            Image(systemName: "circle")
+                                                .resizable()
+                                                .scaledToFill()
+                                                .foregroundColor(.secondary)
+                                                .frame(width: 20, height: 20)
+                                        }
+                                    } else {
+                                        Image(systemName: "lock.fill")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .foregroundColor(.secondary)
+                                            .frame(width: 16, height: 16)
+                                    }
+
+                                    Text(item.title)
+                                        .font(.subheadline)
+                                        .fontWeight(.none)
+                                        .foregroundColor(.secondary)
+                                        .multilineTextAlignment(.leading)
+                                }
+                                .padding(.vertical, 10)
+                                .padding(.horizontal, 25)
+                            })
+                            .background(RoundedRectangle(cornerRadius: 15).fill(self.selectedIcon?.title == item.title ? Color("bgColor_light") : Color.clear).animation(.none))
+                            .buttonStyle(ClickMiniButtonStyleBG())
+
+                        }.frame(minHeight: 520, maxHeight: 620, alignment: .center)
+                        .padding(.vertical, 15)
+                        .gridStyle(self.style)
+                        .onAppear {
+                            if self.auth.subscriptionStatus == .subscribed || UserDefaults.standard.bool(forKey: "isEarlyAdopter") {
+                                self.selectedIcon = self.AppIconDataArray.filter({ $0.title == UserDefaults.standard.string(forKey: "selectedAppIcon") }).first ?? self.AppIconDataArray[0]
+                            } else {
+                                self.selectedIcon = self.AppIconDataArray[0]
+                            }
+                        }.sheet(isPresented: self.$openMenbership, content: {
+                            MembershipView()
+                                .environmentObject(self.auth)
+                                .edgesIgnoringSafeArea(.all)
+                                .navigationBarTitle("")
+                        })
+
+                        /*
                         VStack {
                             ForEach(self.AppIconDataArray.indices, id:\.self) { results in
                                 VStack {
@@ -148,6 +222,7 @@ struct appearanceView: View {
                                 }
                             }
                         }.padding(.vertical, 15)
+                        */
                     }.background(Color("buttonColor"))
                     .clipShape(RoundedRectangle(cornerRadius: 15, style: .circular))
                     .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)

@@ -63,7 +63,7 @@ struct EarlyAdopterView: View {
                     }
                     self.counter += 1
                     self.hasClaimed = true
-                    UserDefaults.standard.set(1, forKey: "selectedWallpaper")
+                    UserDefaults.standard.set("AppIcon-Original-Dark", forKey: "selectedAppIcon")
                     self.auth.changeHomeIconTo(name: "AppIcon-Original-Dark")
                 }) {
                     HStack(spacing: 10) {

@@ -180,6 +180,9 @@ struct VisitGroupChannelView: View {
 //                    .padding(.horizontal)
 //                    .padding(.bottom, 10)
                     
+                    //MARK: Pinned Section
+                    PinnedSectionView(dialog: self.$dialogModel)
+
                     //MARK: Admin List Section
                     HStack(alignment: .bottom) {
                         Text("ADMINS:")

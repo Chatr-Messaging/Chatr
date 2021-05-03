@@ -130,6 +130,8 @@
 		05C93BDB25145EF10059D1AA /* VisitGroupChannelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C93BDA25145EF10059D1AA /* VisitGroupChannelView.swift */; };
 		05C93BDD251578100059D1AA /* DialogContactCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C93BDC251578100059D1AA /* DialogContactCell.swift */; };
 		05CE07ED2529930300F09754 /* NotificationSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05CE07EC2529930300F09754 /* NotificationSection.swift */; };
+		05D466D6263F7B050015B61D /* Grid in Frameworks */ = {isa = PBXBuildFile; productRef = 05D466D5263F7B050015B61D /* Grid */; };
+		05D466D8263F7CE20015B61D /* PinnedSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05D466D7263F7CE20015B61D /* PinnedSectionView.swift */; };
 		05D8A8DC2502CB3A00D53BE2 /* MailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05D8A8DB2502CB3A00D53BE2 /* MailView.swift */; };
 		05D8A8DE250318FA00D53BE2 /* AddressBookRealmModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05D8A8DD250318FA00D53BE2 /* AddressBookRealmModel.swift */; };
 		05DB89B2238B851400D4581F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05DB89B1238B851400D4581F /* AppDelegate.swift */; };
@@ -307,6 +309,7 @@
 		05C93BDA25145EF10059D1AA /* VisitGroupChannelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitGroupChannelView.swift; sourceTree = "<group>"; };
 		05C93BDC251578100059D1AA /* DialogContactCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogContactCell.swift; sourceTree = "<group>"; };
 		05CE07EC2529930300F09754 /* NotificationSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSection.swift; sourceTree = "<group>"; };
+		05D466D7263F7CE20015B61D /* PinnedSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedSectionView.swift; sourceTree = "<group>"; };
 		05D8A8DB2502CB3A00D53BE2 /* MailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailView.swift; sourceTree = "<group>"; };
 		05D8A8DD250318FA00D53BE2 /* AddressBookRealmModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBookRealmModel.swift; sourceTree = "<group>"; };
 		05DB89AE238B851400D4581F /* Messanger_Chatr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Messanger_Chatr.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -359,6 +362,7 @@
 				05903A3F25925C3400D70A13 /* WKView in Frameworks */,
 				05670318256A3C43004123EB /* CarBode in Frameworks */,
 				059B18122522C32000988201 /* Realm in Frameworks */,
+				05D466D6263F7B050015B61D /* Grid in Frameworks */,
 				054E9B8225D246C800365CE0 /* ConfettiSwiftUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -501,6 +505,7 @@
 				056B98A624C8FAC9003F7FBA /* SecurityView.swift */,
 				0554281625AFE7AD00B6D106 /* ChatrStats.swift */,
 				054E9B7B25D242BB00365CE0 /* EarlyAdopterView.swift */,
+				05D466D7263F7CE20015B61D /* PinnedSectionView.swift */,
 			);
 			path = Sections;
 			sourceTree = "<group>";
@@ -816,6 +821,7 @@
 				055E516525ACDC0B003BE668 /* WKView */,
 				054E9B7625D22CF600365CE0 /* SlideOverCard */,
 				054E9B8125D246C800365CE0 /* ConfettiSwiftUI */,
+				05D466D5263F7B050015B61D /* Grid */,
 			);
 			productName = Messanger_Chatr;
 			productReference = 05DB89AE238B851400D4581F /* Messanger_Chatr.app */;
@@ -897,6 +903,7 @@
 				055E516425ACDC0B003BE668 /* XCRemoteSwiftPackageReference "WKView" */,
 				054E9B7525D22CF600365CE0 /* XCRemoteSwiftPackageReference "SlideOverCard" */,
 				054E9B8025D246C800365CE0 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */,
+				05D466D4263F7B050015B61D /* XCRemoteSwiftPackageReference "swiftui-grid" */,
 			);
 			productRefGroup = 05DB89AF238B851400D4581F /* Products */;
 			projectDirPath = "";
@@ -1037,6 +1044,7 @@
 				05EA572724148BA100372F1A /* Profile.swift in Sources */,
 				0568B54E25C645790054E934 /* ScanQRView.swift in Sources */,
 				05196DD924EE25FD0026B9A7 /* SyncAddressBook.swift in Sources */,
+				05D466D8263F7CE20015B61D /* PinnedSectionView.swift in Sources */,
 				0599798A24D5468E00969318 /* TextBubble.swift in Sources */,
 				05196DD624ED90510026B9A7 /* NewConversationView.swift in Sources */,
 				05AACE6123A625D0006307EB /* ProfileImage.swift in Sources */,
@@ -1668,6 +1676,14 @@
 				minimumVersion = 0.0.7;
 			};
 		};
+		05D466D4263F7B050015B61D /* XCRemoteSwiftPackageReference "swiftui-grid" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/spacenation/swiftui-grid.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1714,6 +1730,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 05C36C15252D62B90031CB3F /* XCRemoteSwiftPackageReference "PopupView" */;
 			productName = PopupView;
+		};
+		05D466D5263F7B050015B61D /* Grid */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 05D466D4263F7B050015B61D /* XCRemoteSwiftPackageReference "swiftui-grid" */;
+			productName = Grid;
 		};
 /* End XCSwiftPackageProductDependency section */
 

@@ -70,6 +70,15 @@ struct ClickMiniButtonStyle: ButtonStyle {
     }
 }
 
+struct ClickMiniButtonStyleBG: ButtonStyle {
+    public func makeBody(configuration: ClickMiniButtonStyleBG.Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.975 : 1.0)
+            .background(configuration.isPressed ? Color("bgColor_light") : Color.clear)
+            .cornerRadius(20)
+    }
+}
+
 struct keyboardButtonStyle: ButtonStyle {
     public func makeBody(configuration: keyboardButtonStyle.Configuration) -> some View {
         configuration.label
