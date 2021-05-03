@@ -383,7 +383,6 @@ PODS:
     - gRPC-Core/Interface (= 1.28.2)
   - gRPC-Core/Interface (1.28.2)
   - GTMSessionFetcher/Core (1.5.0)
-  - Instabug (10.4.4)
   - leveldb-library (1.22.1)
   - libwebp (1.2.0):
     - libwebp/demux (= 1.2.0)
@@ -438,7 +437,6 @@ DEPENDENCIES:
   - FirebaseFirestore
   - FirebaseStorage
   - Giphy (from `https://s3.amazonaws.com/sdk.mobile.giphy.com/SDK/2.0.3/Giphy.podspec`)
-  - Instabug
   - netfox
   - PhoneNumberKit
   - Purchases
@@ -472,7 +470,6 @@ SPEC REPOS:
     - "gRPC-C++"
     - gRPC-Core
     - GTMSessionFetcher
-    - Instabug
     - leveldb-library
     - libwebp
     - nanopb
@@ -518,7 +515,6 @@ SPEC CHECKSUMS:
   "gRPC-C++": 13d8ccef97d5c3c441b7e3c529ef28ebee86fad2
   gRPC-Core: 4afa11bfbedf7cdecd04de535a9e046893404ed5
   GTMSessionFetcher: b3503b20a988c4e20cc189aa798fd18220133f52
-  Instabug: 80e7196ce05bbc9fda230e903c16929fc2b64de0
   leveldb-library: 50c7b45cbd7bf543c81a468fe557a16ae3db8729
   libwebp: e90b9c01d99205d03b6bb8f2c8c415e5a4ef66f0
   nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96
@@ -534,6 +530,6 @@ SPEC CHECKSUMS:
   SnapSDK: 222857226700e1373a186da658c619a79dfa40c8
   SROTPView: 81b761c6e72f0a1a0b8c77b0046e13a54d4dcaa9
 
-PODFILE CHECKSUM: 2744b0b561c59daf2d887fa61bf4804c2596de3a
+PODFILE CHECKSUM: 8b7dd1003ede758cdc19adf924e10a69a5d4bae0
 
 COCOAPODS: 1.10.1
