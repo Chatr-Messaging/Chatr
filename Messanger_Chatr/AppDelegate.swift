@@ -18,7 +18,6 @@ import CoreData
 import PushKit
 import Purchases
 import netfox
-import Instabug
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
@@ -28,9 +27,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
         #if DEBUG
         //Debugging tools
-        //NFX.sharedInstance().start()
+        NFX.sharedInstance().start()
 
-        Instabug.start(withToken: "5daf5c4a01a53accc66d4b5b71fe981d", invocationEvents: [.shake, .screenshot])
         #endif
 
         UNUserNotificationCenter.current().delegate = self
