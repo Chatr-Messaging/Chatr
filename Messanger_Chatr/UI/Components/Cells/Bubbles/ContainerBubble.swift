@@ -165,8 +165,13 @@ struct ContainerBubble: View {
                                     return
                                 }
 
-                                self.reactions.append("pin")
-                                self.reactions.append("trash")
+                                if !self.auth.dialogs.results.contains(where: { $0.id == self.message.dialogID && $0.pinMessages.contains(where: { $0 == self.message.id }) }) {
+                                    self.reactions.append("pin")
+                                    self.reactions.append("trash")
+                                } else {
+                                    self.reactions.append("unpin")
+                                    self.reactions.append("trash")
+                                }
                             }
                         } else {
                             self.reactions.append("like")
@@ -402,7 +407,7 @@ struct ContainerBubble: View {
             } else if interactionSelected == "try again" {
                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                 self.tryAgain()
-            } else if interactionSelected == "pin" {
+            } else if interactionSelected == "pin" || interactionSelected == "unpin" {
                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                 self.pinMessage()
             } else if interactionSelected == "save" {
@@ -446,17 +451,17 @@ struct ContainerBubble: View {
     }
 
     func pinMessage() {
-        let updateParameters = UpdateChatDialogParameters()
-        updateParameters.pinnedMessagesIDsToAdd = [self.message.id]
-        //updateParameters.pinnedMessagesIDsToRemove = ["5356c64ab35c12bd3b10ba31", "5356c64ab35c12bd3b10wa64"]
-
-        Request.updateDialog(withID: self.message.dialogID, update: updateParameters, successBlock: { (updatedDialog) in
-            auth.notificationtext = "Successfully pined message"
-            NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
-        }) { (error) in
-            auth.notificationtext = "Error pining message"
-            NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
-        }
+        self.viewModel.pinMessage(message: self.message, completion: { added in
+            if !added {
+                changeDialogRealmData.shared.removeDialogPin(messageId: self.message.id, dialogID: self.message.dialogID)
+                auth.notificationtext = "Removed pined message"
+                NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+            } else {
+                changeDialogRealmData.shared.addDialogPin(messageId: self.message.id, dialogID: self.message.dialogID)
+                auth.notificationtext = "Successfully pined message"
+                NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+            }
+        })
     }
     
     func saveImage() {

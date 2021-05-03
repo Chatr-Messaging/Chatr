@@ -11,8 +11,8 @@ import SDWebImageSwiftUI
 import MessageUI
 import ConnectyCube
 import RealmSwift
-import ImageViewerRemote
 import PopupView
+import Grid
 
 struct VisitContactView: View {
     @EnvironmentObject var auth: AuthModel
@@ -25,6 +25,7 @@ struct VisitContactView: View {
     @State var contactRelationship: visitContactRelationship = .unknown
     @State var contact: ContactStruct = ContactStruct()
     @State var connectyContact: User = User()
+    @State var igImageStyle = StaggeredGridStyle(.horizontal, tracks: .count(2), spacing: 2.5)
     @State var isProfileImgOpen: Bool = false
     @State var isProfileBioOpen: Bool = false
     @State var isUrlOpen: Bool = false
@@ -363,26 +364,30 @@ struct VisitContactView: View {
                                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 })
 
-                            if !self.contact.isInfoPrivate || self.contactRelationship == .contact {
+                            if (!self.contact.isInfoPrivate || self.contactRelationship == .contact) {
                                 VStack(spacing: 0) {
-                                    LazyVGrid(columns: self.columns, alignment: .center, spacing: 5) {
-                                        ForEach(self.viewModel.igMedia.sorted{ $0.timestamp > $1.timestamp }, id: \.self) { media in
-                                            WebImage(url: URL(string: media.media_url))
-                                                .resizable()
-                                                .placeholder{ Image("empty-profile").resizable().scaledToFill() }
-                                                .indicator(.activity)
-                                                .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
-                                                .scaledToFill()
-                                                .frame(minWidth: 0, maxWidth: Constants.screenWidth / 3 - 20, maxHeight: Constants.screenWidth / 3 - 20)
-                                                .clipShape(RoundedRectangle(cornerRadius: 5, style: .circular))
-                                                .onTapGesture {
-                                                    self.selectedImageUrl = media.media_url
-                                                    self.isProfileImgOpen.toggle()
-                                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                                }
-                                        }
-                                    }.padding(.horizontal)
+                                    ScrollView(igImageStyle.axes) {
+                                        Grid(self.viewModel.igMedia.sorted{ $0.timestamp > $1.timestamp }, id: \.self) { index in
+                                            Button(action: {
+                                                self.selectedImageUrl = index.media_url
+                                                self.isProfileImgOpen.toggle()
+                                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                            }, label: {
+                                                WebImage(url: URL(string: index.media_url))
+                                                    .resizable()
+                                                    .placeholder{ Image("empty-profile").resizable().scaledToFill() }
+                                                    .indicator(.activity)
+                                                    .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
+                                                    .scaledToFit()
+                                            }).buttonStyle(ClickMiniButtonStyle())
+                                        }.gridStyle(self.igImageStyle)
+                                        .cornerRadius(10)
+                                        .frame(minHeight: 250, maxHeight: 265, alignment: .center)
+                                        .padding(.leading)
+                                        .animation(.easeInOut)
+                                    }.padding(.trailing)
                                     .padding(.bottom, 10)
+                                    .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 2)
 
                                     if self.contact.twitter != "" || self.contact.facebook != ""{
                                         Divider()
@@ -560,9 +565,8 @@ struct VisitContactView: View {
                     .opacity(self.isProfileImgOpen || self.quickSnapViewState == .camera || self.quickSnapViewState == .takenPic ? Double(150 - abs(self.profileViewSize.height)) / 150 : 0)
                     .animation(.linear(duration: 0.15))
                 
-                VStack {
-                    HStack {
-                        Spacer()
+                VStack(alignment: .trailing, spacing: 15) {
+                    if isProfileImgOpen {
                         Button(action: {
                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                             self.isProfileImgOpen = false
@@ -580,26 +584,24 @@ struct VisitContactView: View {
                                     .foregroundColor(.primary)
                             }
                         }.buttonStyle(ClickButtonStyle())
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal)
                         .opacity(self.isProfileImgOpen ? Double(150 - self.profileViewSize.height) / 150 : 0)
                         .offset(y: self.profileViewSize.height / 3)
-                        .offset(y: -50)
-                    }
-                      
-                    if isProfileImgOpen {
+
                         WebImage(url: URL(string: self.selectedImageUrl))
                             .resizable()
                             .placeholder{ Image("empty-profile").resizable().frame(width: Constants.screenWidth - 40, height: Constants.screenWidth - 40, alignment: .center).scaledToFill() }
                             .indicator(.activity)
-                            .aspectRatio(contentMode: .fill)
+                            .cornerRadius(self.isProfileImgOpen ? abs(self.profileViewSize.height) + 15 : 100)
+                            .aspectRatio(contentMode: .fit)
                             .transition(.fade(duration: 0.25))
-                            .frame(width: Constants.screenWidth - 40, height: Constants.screenWidth - 40, alignment: .center)
-                            .clipShape(RoundedRectangle(cornerRadius: self.isProfileImgOpen ? abs(self.profileViewSize.height) + 25 : 100))
+                            .frame(width: Constants.screenWidth - 40, alignment: .center)
+                            .frame(minHeight: 150)
                             .shadow(color: Color.black.opacity(0.25), radius: 15, x: 0, y: 15)
-                            .opacity(self.isProfileImgOpen ? 1 : 0)
+                            .opacity(self.isProfileImgOpen ? Double(225 - self.profileViewSize.height) / 225 : 0)
                             .offset(x: self.profileViewSize.width, y: self.profileViewSize.height)
-                            .offset(y: -50)
                             .scaleEffect(self.isProfileImgOpen ? 1 - abs(self.profileViewSize.height) / 500 : 0, anchor: .topLeading)
+                            .transition(.asymmetric(insertion: AnyTransition.scale.animation(.spring(response: 0.2, dampingFraction: 0.65, blendDuration: 0)), removal: AnyTransition.scale.animation(.easeOut(duration: 0.14))))
                             .animation(.spring(response: 0.30, dampingFraction: 0.7, blendDuration: 0))
                             .pinchToZoom()
                             .gesture(DragGesture(minimumDistance: self.isProfileImgOpen ? 0 : Constants.screenHeight).onChanged { value in

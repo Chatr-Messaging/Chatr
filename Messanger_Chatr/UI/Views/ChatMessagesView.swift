@@ -49,7 +49,7 @@ struct ChatMessagesView: View {
     @State var topAvatarUrls: [String] = []
     var namespace: Namespace.ID
     let keyboard = KeyboardObserver()
-    let pageShowCount = 7
+    let pageShowCount = 12
     var tempPagination: Int {
         let count = self.auth.messages.selectedDialog(dialogID: self.dialogID).count
         if count > pageShowCount {

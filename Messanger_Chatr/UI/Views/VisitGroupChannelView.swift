@@ -10,7 +10,14 @@ import SwiftUI
 import SDWebImageSwiftUI
 import ConnectyCube
 import RealmSwift
+import Firebase
 import PopupView
+
+struct messagePinStruct: Identifiable, RealmSwift.RealmCollectionValue {
+    var id = UUID()
+    var messageId: String = ""
+    var date: Date = Date()
+}
 
 struct VisitGroupChannelView: View {
     @EnvironmentObject var auth: AuthModel
@@ -181,7 +188,9 @@ struct VisitGroupChannelView: View {
 //                    .padding(.bottom, 10)
                     
                     //MARK: Pinned Section
-                    PinnedSectionView(dialog: self.$dialogModel)
+                    if self.dialogModel.pinMessages.count > 0 {
+                        PinnedSectionView(dialog: self.$dialogModel)
+                    }
 
                     //MARK: Admin List Section
                     HStack(alignment: .bottom) {
@@ -544,10 +553,11 @@ struct VisitGroupChannelView: View {
         }.background(Color("bgColor"))
         .onAppear() {
             self.showProfile = false
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 Request.notificationsSettings(forDialogID: self.dialogModel.id, successBlock: { notiResult in
                     self.notificationsOn = notiResult
                 })
+                self.observePinnedMessages()
             }
             self.dialogModelMemebers.removeAll()
             self.dialogModelAdmins.removeAll()
@@ -582,6 +592,24 @@ struct VisitGroupChannelView: View {
                          currentUserIsPowerful: self.$currentUserIsPowerful,
                          showProfile: self.$showProfile)
             .environmentObject(self.auth)
+    }
+
+    func observePinnedMessages() {
+        let msg = Database.database().reference().child("Dialogs").child(self.dialogModel.id).child("pined")
+
+        msg.observe(.childAdded, with: { snapAdded in
+            withAnimation(Animation.easeOut(duration: 0.25)) {
+                changeDialogRealmData.shared.addDialogPin(messageId: snapAdded.key, dialogID: self.dialogModel.id)
+            }
+        })
+
+        msg.observe(.childRemoved, with: { snapRemoved in
+            withAnimation(Animation.easeOut(duration: 0.25)) {
+                changeDialogRealmData.shared.removeDialogPin(messageId: snapRemoved.key, dialogID: self.dialogModel.id)
+            }
+        })
+
+        print("the count of pinned messages are: \(self.dialogModel.pinMessages.count)")
     }
 }
 

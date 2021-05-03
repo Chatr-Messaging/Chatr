@@ -28,6 +28,7 @@ class DialogStruct : Object {
     @objc dynamic var createdAt: Date = Date()
     let occupentsID = List<Int>()
     let adminID = List<Int>()
+    let pinMessages = List<String>()
 
     var messages: Results<MessageStruct> {
         if let realm = self.realm {
@@ -181,7 +182,39 @@ class changeDialogRealmData {
             print(error.localizedDescription)
         }
     }
-    
+
+    func addDialogPin(messageId: String, dialogID: String) {
+        let config = Realm.Configuration(schemaVersion: 1)
+        do {
+            let realm = try Realm(configuration: config)
+            try? realm.safeWrite({
+                if let dialogResult = realm.object(ofType: DialogStruct.self, forPrimaryKey: dialogID) {
+                    dialogResult.pinMessages.append(messageId)
+                    realm.add(dialogResult, update: .all)
+                }
+            })
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+
+    func removeDialogPin(messageId: String, dialogID: String) {
+        let config = Realm.Configuration(schemaVersion: 1)
+        do {
+            let realm = try Realm(configuration: config)
+            try? realm.safeWrite({
+                if let dialogResult = realm.object(ofType: DialogStruct.self, forPrimaryKey: dialogID) {
+                    if let index = dialogResult.pinMessages.firstIndex(where: { $0 == messageId }) {
+                        dialogResult.pinMessages.remove(at: index)
+                    }
+                    realm.add(dialogResult, update: .all)
+                }
+            })
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+
     func updateDialogDelete(isDelete: Bool, dialogID: String) {
         let config = Realm.Configuration(schemaVersion: 1)
         do {

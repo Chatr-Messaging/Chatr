@@ -193,6 +193,24 @@ class ChatMessageViewModel: ObservableObject {
             }
         })
     }
+    
+    func pinMessage(message: MessageStruct, completion: @escaping (Bool) -> Void) {
+        guard message.dialogID != "" else { return }
+
+        let msg = Database.database().reference().child("Dialogs").child(message.dialogID).child("pined")
+
+        msg.observeSingleEvent(of: .value, with: { snapshot in
+            if snapshot.childSnapshot(forPath: "\(message.id)").exists() {
+                msg.child("\(message.id)").removeValue()
+
+                completion(false)
+            } else {
+                msg.updateChildValues(["\(message.id)" : "\(Date())"])
+
+                completion(true)
+            }
+        })
+    }
 
     func playVideo() {
         let currentItem = player.currentItem
