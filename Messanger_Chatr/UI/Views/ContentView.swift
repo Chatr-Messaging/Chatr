@@ -476,7 +476,7 @@ struct mainHomeList: View {
                         .frame(width: Constants.screenWidth, height: Constants.screenHeight * 0.75, alignment: .center)
                         .shadow(color: Color.black.opacity(0.15), radius: 14, x: 0, y: -5)
                         .offset(y: self.isLocalOpen ? geo.frame(in: .global).maxY - 40 -
-                            (UIDevice.current.hasNotch ? 0 : -20) - (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) - (self.hasAttachments ? (self.showKeyboardMediaAssets ? 110 : 120) : 0) - (self.showKeyboardMediaAssets ? 220 : 0) - self.keyboardHeight + (self.isKeyboardActionOpen ? -80 : 0) : geo.frame(in: .global).maxY)
+                            (UIDevice.current.hasNotch ? 0 : -20) - (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) - (self.hasAttachments ? 120 : 0) - self.keyboardHeight + (self.isKeyboardActionOpen ? -80 : 0) : geo.frame(in: .global).maxY)
                         .zIndex(2)
                         .onChange(of: self.auth.visitContactProfile) { newValue in
                             if newValue {

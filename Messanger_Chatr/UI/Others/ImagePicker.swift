@@ -37,7 +37,6 @@ struct ImagePicker: UIViewControllerRepresentable {
         func imagePickerController(_ picker: UIImagePickerController,
                                    didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
             let mediaType = info[UIImagePickerController.InfoKey.mediaType] as! CFString
-            //let mediaType2 = info[UIImagePickerController.InfoKey.phAsset] as! 
 
             switch mediaType {
             case kUTTypeImage:
@@ -45,7 +44,6 @@ struct ImagePicker: UIViewControllerRepresentable {
                 image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage
 
             case kUTTypeMovie:
-                // Handle video selection result
                 let videoUrl = info[UIImagePickerController.InfoKey.mediaURL] as! URL
                 print("Selected media is video: \(videoUrl.absoluteString)")
 

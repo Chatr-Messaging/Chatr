@@ -131,6 +131,7 @@
 		05CE07ED2529930300F09754 /* NotificationSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05CE07EC2529930300F09754 /* NotificationSection.swift */; };
 		05D466D6263F7B050015B61D /* Grid in Frameworks */ = {isa = PBXBuildFile; productRef = 05D466D5263F7B050015B61D /* Grid */; };
 		05D466D8263F7CE20015B61D /* PinnedSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05D466D7263F7CE20015B61D /* PinnedSectionView.swift */; };
+		05D466E02640919B0015B61D /* PHAssetPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05D466DF2640919B0015B61D /* PHAssetPicker.swift */; };
 		05D8A8DC2502CB3A00D53BE2 /* MailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05D8A8DB2502CB3A00D53BE2 /* MailView.swift */; };
 		05D8A8DE250318FA00D53BE2 /* AddressBookRealmModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05D8A8DD250318FA00D53BE2 /* AddressBookRealmModel.swift */; };
 		05DB89B2238B851400D4581F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05DB89B1238B851400D4581F /* AppDelegate.swift */; };
@@ -309,6 +310,7 @@
 		05C93BDC251578100059D1AA /* DialogContactCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogContactCell.swift; sourceTree = "<group>"; };
 		05CE07EC2529930300F09754 /* NotificationSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSection.swift; sourceTree = "<group>"; };
 		05D466D7263F7CE20015B61D /* PinnedSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedSectionView.swift; sourceTree = "<group>"; };
+		05D466DF2640919B0015B61D /* PHAssetPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PHAssetPicker.swift; sourceTree = "<group>"; };
 		05D8A8DB2502CB3A00D53BE2 /* MailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailView.swift; sourceTree = "<group>"; };
 		05D8A8DD250318FA00D53BE2 /* AddressBookRealmModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBookRealmModel.swift; sourceTree = "<group>"; };
 		05DB89AE238B851400D4581F /* Messanger_Chatr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Messanger_Chatr.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -565,6 +567,7 @@
 			children = (
 				053D33F12393C97B00CEE03E /* DismissGuardian.swift */,
 				05AACE5E23A60AB6006307EB /* ImagePicker.swift */,
+				05D466DF2640919B0015B61D /* PHAssetPicker.swift */,
 				0572046D25B3FDB700542CCF /* ImagePickerView.swift */,
 				0525E4C025EC98A90086EB54 /* PinchZoomView.swift */,
 			);
@@ -1091,6 +1094,7 @@
 				056B98A724C8FAC9003F7FBA /* SecurityView.swift in Sources */,
 				056B98A524C8FAA8003F7FBA /* AdvancedView.swift in Sources */,
 				05ECD98C25E0FA6800B5783A /* CacheManager.swift in Sources */,
+				05D466E02640919B0015B61D /* PHAssetPicker.swift in Sources */,
 				0511CB8C25CF66940048F4DE /* ChatMessageViewModel.swift in Sources */,
 				05C6951624F5A29F00EEF819 /* ContactCell.swift in Sources */,
 				053D33F42394511400CEE03E /* BlurView.swift in Sources */,

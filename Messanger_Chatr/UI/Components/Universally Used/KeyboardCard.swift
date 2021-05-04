@@ -61,8 +61,10 @@ struct KeyboardCardView: View {
                         ZStack(alignment: .topLeading) {
                             Button(action: {
                                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                self.enableLocation = false
-                                self.checkAttachments()
+                                withAnimation {
+                                    self.enableLocation = false
+                                    self.checkAttachments()
+                                }
                             }, label: {
                                 Map(coordinateRegion: $region, interactionModes: MapInteractionModes.all, showsUserLocation: true, userTrackingMode: $userTrackingMode)
                                     .aspectRatio(contentMode: .fill)
@@ -94,8 +96,10 @@ struct KeyboardCardView: View {
                                     
                                     Button(action: {
                                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                        self.gifData.remove(at: url)
-                                        self.checkAttachments()
+                                        withAnimation {
+                                            self.gifData.remove(at: url)
+                                            self.checkAttachments()
+                                        }
                                     }, label: {
                                         Image(systemName: "xmark.circle.fill")
                                             .resizable()
@@ -104,7 +108,7 @@ struct KeyboardCardView: View {
                                             .foregroundColor(.primary)
                                     }).background(Color.clear)
                                 }.transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(.spring()), removal: AnyTransition.move(edge: .bottom).animation(.easeOut(duration: 0.2))))
-                            }
+                            }.animation(.spring(response: 0.3, dampingFraction: 0.75, blendDuration: 0))
                         }
                     }
 
@@ -128,8 +132,10 @@ struct KeyboardCardView: View {
 
                                     Button(action: {
                                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                        self.imagePicker.pastedImages.remove(at: index)
-                                        self.checkAttachments()
+                                        withAnimation {
+                                            self.imagePicker.pastedImages.remove(at: index)
+                                            self.checkAttachments()
+                                        }
                                     }, label: {
                                         Image(systemName: "xmark.circle.fill")
                                             .resizable()
@@ -138,9 +144,10 @@ struct KeyboardCardView: View {
                                             .foregroundColor(.primary)
                                     }).background(Color.clear)
                                 }.transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(.spring()), removal: AnyTransition.move(edge: .bottom).animation(.easeOut(duration: 0.2))))
-                            }
+                            }.animation(.spring(response: 0.3, dampingFraction: 0.75, blendDuration: 0))
                         }
                     }
+
                     //MARK: Photo Section
                     if !self.imagePicker.selectedPhotos.isEmpty {
                         HStack {
@@ -160,8 +167,10 @@ struct KeyboardCardView: View {
                                         if let deselectIndex = self.imagePicker.fetchedPhotos.firstIndex(where: { $0.asset == self.imagePicker.selectedPhotos[img].asset }) {
                                             self.imagePicker.fetchedPhotos[deselectIndex].selected = false
                                         }
-                                        self.imagePicker.selectedPhotos.remove(at: img)
-                                        self.checkAttachments()
+                                        withAnimation {
+                                            self.imagePicker.selectedPhotos.remove(at: img)
+                                            self.checkAttachments()
+                                        }
                                     }, label: {
                                         Image(systemName: "xmark.circle.fill")
                                             .resizable()
@@ -169,10 +178,11 @@ struct KeyboardCardView: View {
                                             .frame(width: 24, height: 24, alignment: .center)
                                             .foregroundColor(.primary)
                                     }).background(Color.clear)
-                                }.transition(transition)
-                            }
+                                }.transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(.spring()), removal: AnyTransition.move(edge: .bottom).animation(.easeOut(duration: 0.2))))
+                            }.animation(.spring(response: 0.3, dampingFraction: 0.75, blendDuration: 0))
                         }
                     }
+
                     //MARK: Video Section
                     if !self.imagePicker.selectedVideos.isEmpty {
                         HStack {
@@ -206,8 +216,10 @@ struct KeyboardCardView: View {
                                         if let deselectIndex = self.imagePicker.fetchedPhotos.firstIndex(where: { $0.asset == self.imagePicker.selectedVideos[vid].asset }) {
                                             self.imagePicker.fetchedPhotos[deselectIndex].selected = false
                                         }
-                                        self.imagePicker.selectedVideos.remove(at: vid)
-                                        self.checkAttachments()
+                                        withAnimation {
+                                            self.imagePicker.selectedVideos.remove(at: vid)
+                                            self.checkAttachments()
+                                        }
                                     }, label: {
                                         Image(systemName: "xmark.circle.fill")
                                             .resizable()
@@ -216,12 +228,11 @@ struct KeyboardCardView: View {
                                             .foregroundColor(.primary)
                                     }).background(Color.clear)
                                 }.transition(transition)
-                            }
+                            }.animation(.spring(response: 0.3, dampingFraction: 0.75, blendDuration: 0))
                         }
                     }
                 }.padding(.vertical, self.hasAttachments ? 5 : 0)
                 .padding(.horizontal)
-                .animation(.spring(response: 0.3, dampingFraction: 0.75, blendDuration: 0))
             }).shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 8)
             .transition(transition)
             
@@ -328,8 +339,10 @@ struct KeyboardCardView: View {
 
                         if self.gifData.count > 0 {
                             changeMessageRealmData.shared.sendGIFAttachment(dialog: selectedDialog, attachmentStrings: self.gifData.reversed(), occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
-                        
-                            self.gifData.removeAll()
+
+                            withAnimation {
+                                self.gifData.removeAll()
+                            }
                         }
                         
                         if self.imagePicker.selectedPhotos.count > 0 || self.imagePicker.pastedImages.count > 0 {
@@ -346,8 +359,10 @@ struct KeyboardCardView: View {
                             changeMessageRealmData.shared.sendPhotoAttachment(dialog: selectedDialog, attachmentImages: uploadImg, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                         
                             uploadImg.removeAll()
-                            self.imagePicker.selectedPhotos.removeAll()
-                            self.imagePicker.pastedImages.removeAll()
+                            withAnimation {
+                                self.imagePicker.selectedPhotos.removeAll()
+                                self.imagePicker.pastedImages.removeAll()
+                            }
                         }
 
                         if self.imagePicker.selectedVideos.count > 0 {
@@ -360,7 +375,9 @@ struct KeyboardCardView: View {
                             changeMessageRealmData.shared.sendVideoAttachment(dialog: selectedDialog, attachmentVideos: uploadVid, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                             
                             uploadVid.removeAll()
-                            self.imagePicker.selectedVideos.removeAll()
+                            withAnimation {
+                                self.imagePicker.selectedVideos.removeAll()
+                            }
                         }
                         
                         if self.enableLocation {
@@ -372,7 +389,9 @@ struct KeyboardCardView: View {
                             changeMessageRealmData.shared.sendMessage(dialog: selectedDialog, text: self.mainText, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                         }
 
-                        self.checkAttachments()
+                        withAnimation {
+                            self.checkAttachments()
+                        }
                     }
 
                     self.mainText = ""
@@ -400,17 +419,7 @@ struct KeyboardCardView: View {
                 HStack(alignment: .center, spacing: 25) {
                     Button(action: {
                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                        self.imagePicker.openImagePicker(completion: {
-                            self.showImagePicker.toggle()
-                            
-                            if !self.showImagePicker {
-                                self.isKeyboardActionOpen = false
-                            }
-                        })
-                        self.checkAttachments()
-                        if self.hasAttachments && self.showImagePicker {
-                            UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
-                        }
+                        self.showImagePicker.toggle()
                     }, label: {
                         Image(systemName: "photo.on.rectangle")
                             .resizable()
@@ -423,6 +432,14 @@ struct KeyboardCardView: View {
                     }).frame(width: Constants.screenWidth / 5.5, height: 65)
                     .padding(.leading)
                     .buttonStyle(keyboardButtonStyle())
+                    .sheet(isPresented: self.$showImagePicker, onDismiss: {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.33) {
+                            self.checkAttachments()
+                            self.isKeyboardActionOpen = !self.hasAttachments
+                        }
+                    }) {
+                        PHAssetPickerSheet(isPresented: self.$showImagePicker, imagePicker: self.imagePicker)
+                    }
 
                     Button(action: {
                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
@@ -441,6 +458,7 @@ struct KeyboardCardView: View {
 
                         self.gifData.append(gifURL)
                         self.checkAttachments()
+                        self.isKeyboardActionOpen = !self.hasAttachments
                     }) {
                         GIFController(url: self.$gifURL, present: self.$presentGIF)
                     }
@@ -503,6 +521,7 @@ struct KeyboardCardView: View {
                 }.padding(.vertical, 15)
             }.shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 8)
             
+            /*
             //MARK: Image & Video Asset Picker
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHStack(spacing: 5) {
@@ -589,28 +608,29 @@ struct KeyboardCardView: View {
             }.frame(height: showImagePicker ? 200 : 0)
             .background(Color.clear)
             .opacity(showImagePicker ? 1 : 0)
-            .onAppear() {
-                self.imagePicker.setUpAuthStatus()
-
-                keyboard.observe { (event) in
-                    switch event.type {
-                    case .willShow:
-                        if self.hasAttachments && self.showImagePicker {
-                            UIView.animate(withDuration: event.duration, delay: 0.0, options: [event.options], animations: {
-                                self.showImagePicker = false
-                            }, completion: nil)
-                        }
-                    default:
-                        break
-                    }
-                }
-            }
-
+            */
+            
             Spacer()
         }.background(BlurView(style: .systemUltraThinMaterial)) //Color("bgColor")
         .cornerRadius(22)
         .overlay(RoundedRectangle(cornerRadius: 22).stroke(Color("blurBorder"), lineWidth: 2.5).blur(radius: 1))
         .padding(.vertical, 2.5)
+        .onAppear() {
+            //self.imagePicker.setUpAuthStatus()
+
+            keyboard.observe { (event) in
+                switch event.type {
+                case .willShow:
+                    if self.hasAttachments && self.showImagePicker {
+                        UIView.animate(withDuration: event.duration, delay: 0.0, options: [event.options], animations: {
+                            self.showImagePicker = false
+                        }, completion: nil)
+                    }
+                default:
+                    break
+                }
+            }
+        }
     }
     
     func loadImage() {
@@ -620,11 +640,7 @@ struct KeyboardCardView: View {
     }
     
     func checkAttachments() {
-        if self.imagePicker.selectedPhotos.count > 0 || self.gifData.count > 0 || self.imagePicker.selectedVideos.count > 0 || self.enableLocation || self.imagePicker.pastedImages.count > 0 {
-            self.hasAttachments = true
-        } else {
-            self.hasAttachments = false
-        }
+        self.hasAttachments = self.imagePicker.selectedPhotos.count > 0 || self.gifData.count > 0 || self.imagePicker.selectedVideos.count > 0 || self.enableLocation || self.imagePicker.pastedImages.count > 0
     }
     
     func formatVideoDuration(second: TimeInterval) -> String {

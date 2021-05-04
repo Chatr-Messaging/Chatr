@@ -52,13 +52,12 @@ struct VisitContactView: View {
             ScrollView(.vertical, showsIndicators: true) {
                 //MARK: Top Profile
                 topHeaderContactView(viewModel: self.viewModel, contact: self.$contact, quickSnapViewState: self.$quickSnapViewState, isProfileImgOpen: self.$isProfileImgOpen, isProfileBioOpen: self.$isProfileBioOpen, selectedImageUrl: self.$selectedImageUrl)
-                    .padding(.top, 10)
+                    .padding(.top)
                     .background(GeometryReader {
                         Color.clear.preference(key: ViewOffsetKey.self,
                             value: -$0.frame(in: .named("visitContact-scroll")).origin.y)
                     })
                     .onPreferenceChange(ViewOffsetKey.self) {
-                        print("offset >> \($0)")
                         self.scrollOffset = $0
                     }
 
