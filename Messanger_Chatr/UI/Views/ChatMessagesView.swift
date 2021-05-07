@@ -212,6 +212,7 @@ struct ChatMessagesView: View {
                                     value: -$0.frame(in: .named("scroll")).origin.y)
                             })
                             .onPreferenceChange(ViewOffsetKey.self) {
+                                print("the offset is: \($0)")
                                 if $0 < 0 && !firstScroll && !self.isLoadingMore && self.maxPagination != 0 {
                                     self.isLoadingMore = true
                                     changeMessageRealmData.shared.getMessageUpdates(dialogID: self.dialogID, limit: pageShowCount * (self.scrollPage + 0), skip: currentMessages.count - self.minPagination, completion: { _ in
@@ -263,6 +264,7 @@ struct ChatMessagesView: View {
             }.coordinateSpace(name: "scroll")
             .frame(width: Constants.screenWidth)
             .contentShape(Rectangle())
+            .resignKeyboardOnDragGesture()
             .onAppear() {
                 DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + 0.5) {
                     print("the dialog id is: \(dialogID)")

@@ -244,7 +244,6 @@ struct KeyboardCardView: View {
                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                             withAnimation(Animation.interactiveSpring(), {
                                 self.isKeyboardActionOpen.toggle()
-                                if self.showImagePicker == true { self.showImagePicker = false }
                             })
                         }) {
                             Image(systemName: self.isKeyboardActionOpen ? "xmark" : "paperclip")
@@ -277,7 +276,6 @@ struct KeyboardCardView: View {
                             Button(action: {
                                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 withAnimation(Animation.easeInOut(duration: 0.25)) {
-                                    self.showImagePicker = false
                                     self.isKeyboardActionOpen = false
                                     self.isRecordingAudio = true
                                 }
@@ -453,7 +451,7 @@ struct KeyboardCardView: View {
                     }).frame(width: Constants.screenWidth / 5.5, height: 65)
                     .buttonStyle(keyboardButtonStyle())
                     .sheet(isPresented: self.$presentGIF, onDismiss: {
-                        guard !self.gifData.contains(self.gifURL) else { return }
+                        guard gifURL != "", !self.gifData.contains(self.gifURL) else { return }
 
                         self.gifData.append(gifURL)
                         self.checkAttachments()
@@ -613,11 +611,9 @@ struct KeyboardCardView: View {
             Spacer()
         }.background(BlurView(style: .systemUltraThinMaterial)) //Color("bgColor")
         .cornerRadius(22)
-        .overlay(RoundedRectangle(cornerRadius: 22).stroke(Color("blurBorder"), lineWidth: 2.5).blur(radius: 1))
+        .overlay(RoundedRectangle(cornerRadius: 22).stroke(Color("blurBorder"), lineWidth: 2.5))
         .padding(.vertical, 2.5)
         .onAppear() {
-            //self.imagePicker.setUpAuthStatus()
-
             keyboard.observe { (event) in
                 switch event.type {
                 case .willShow:
@@ -626,17 +622,16 @@ struct KeyboardCardView: View {
                             self.showImagePicker = false
                         }, completion: nil)
                     }
+                    
+                case .willHide:
+                    guard presentGIF, showImagePicker else { return }
+                    self.isKeyboardActionOpen = false
+
                 default:
                     break
                 }
             }
         }
-    }
-    
-    func loadImage() {
-        guard let inputImage = inputImage else { return }
-        self.photoData.append(inputImage)
-        self.checkAttachments()
     }
     
     func checkAttachments() {

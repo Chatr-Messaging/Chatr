@@ -28,6 +28,7 @@ struct AttachmentBubble: View {
     @State var play: Bool = false
     @Binding var totalDuration: Double
     @State var videoSize: CGSize = CGSize.zero
+    @State var videoDownloadProgress: CGFloat = 0.0
     var namespace: Namespace.ID
     let storageFirebase = Storage.storage()
 
@@ -94,6 +95,24 @@ struct AttachmentBubble: View {
                         .matchedGeometryEffect(id: self.message.id.description + "mov", in: namespace)
                         .overlay(
                             ZStack {
+                                if self.videoDownloadProgress != 0 || self.videoDownloadProgress != 100 {
+                                    ZStack {
+                                        Circle()
+                                            .stroke(Color.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                                            .frame(width: 20, height: 20)
+                                            .opacity(0.35)
+
+                                        Circle()
+                                            .trim(from: self.videoDownloadProgress, to: 1.0)
+                                            .stroke(Color.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                                            .frame(width: 20, height: 20)
+                                            .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 0)
+                                            .rotationEffect(.init(degrees: -90))
+                                            .animation(Animation.linear(duration: 0.1))
+                                    }
+                                    .padding(30)
+                                }
+
                                 VideoControlBubble(viewModel: self.viewModel, player: self.$player, play: self.$play, totalDuration: self.$totalDuration, message: self.message, messagePositionRight: messagePosition == .right)
 
                                 if self.message.messageState == .error {
@@ -128,7 +147,7 @@ struct AttachmentBubble: View {
                                     if let videoAssetTrack = self.player.currentItem?.asset.tracks(withMediaType: AVMediaType.video).first {
                                         let naturalSize = videoAssetTrack.naturalSize.applying(videoAssetTrack.preferredTransform)
                                         let width = abs(naturalSize.width) > UIScreen.main.bounds.width * 0.65 ? UIScreen.main.bounds.width * 0.65 : abs(naturalSize.width)
-                                        let heightRatio = abs(naturalSize.height) * (abs(naturalSize.height) / width)
+                                        //let heightRatio = abs(naturalSize.height) * (abs(naturalSize.height) / width)
                                         let height = width * (abs(naturalSize.height) / abs(naturalSize.width))
                                         let rect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: width, height: height))
                                         self.videoSize = rect.size
@@ -156,6 +175,7 @@ struct AttachmentBubble: View {
             } catch {
                 Request.downloadFile(withUID: fileId, progressBlock: { (progress) in
                     print("the progress of the download is: \(progress)")
+                    self.videoDownloadProgress = CGFloat(progress)
                 }, successBlock: { data in
                     let playerItem = CachingPlayerItem(data: data as Data, mimeType: "video/mp4", fileExtension: "mp4")
                     self.player = AVPlayer(playerItem: playerItem)

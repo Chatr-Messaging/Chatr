@@ -290,10 +290,8 @@ struct ContainerBubble: View {
                     .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 3)
                     .opacity(self.hasPrior && self.message.messageState != .error ? 0 : 1)
             }.actionSheet(isPresented: self.$deleteActionSheet) {
-                ActionSheet(title: Text("Are you sure?"), message: Text("The message will be gone forever."), buttons: [
-                    .default(Text("Select More")) {
-                        print("select more btn...")
-                    }, .destructive(Text("Delete Message"), action: {
+                ActionSheet(title: Text("Are you sure?"), message: Text("This message will be gone forever"), buttons: [
+                    .destructive(Text("Delete Message"), action: {
                         guard let dialog = self.auth.selectedConnectyDialog else { return }
 
                         self.viewModel.trashMessage(connectyDialog: dialog, messageId: self.message.id, completion: {
@@ -346,13 +344,13 @@ struct ContainerBubble: View {
 
                 print("the y value is: \(y) start location: \(c)")
                 if message.messageState != .error {
-                    if c <= Constants.screenWidth / 2 - 50 {
-                        if y > 5 && y < 35 { interactionSelected = reactions[0] }
-                        if y > 35 && y < 65 { interactionSelected = reactions[1] }
-                        if y > 65 && y < 95 { interactionSelected = reactions[2] }
-                        if y > 95 && y < 125 && reactions.count >= 4 { interactionSelected = reactions[3] }
-                        if y < 5 || y > (reactions.count >= 4 ? 125 : 95) { interactionSelected = "" }
-                    } else {
+//                    if c <= Constants.screenWidth / 2 - 50 {
+//                        if y > 5 && y < 35 { interactionSelected = reactions[0] }
+//                        if y > 35 && y < 65 { interactionSelected = reactions[1] }
+//                        if y > 65 && y < 95 { interactionSelected = reactions[2] }
+//                        if y > 95 && y < 125 && reactions.count >= 4 { interactionSelected = reactions[3] }
+//                        if y < 5 || y > (reactions.count >= 4 ? 125 : 95) { interactionSelected = "" }
+//                    } else {
                         if messagePosition == .left {
                             if y > -125 && y < -95 { interactionSelected = reactions[0] }
                             if y > -95 && y < -65 { interactionSelected = reactions[1] }
@@ -365,7 +363,7 @@ struct ContainerBubble: View {
                             if y > -35 && y < -5 { interactionSelected = reactions[2] }
                             if y < -95 || y > -5 { interactionSelected = "" }
                         }
-                    }
+                    //}
                 } else {
                     if y > -100 && y < -5 { interactionSelected = "try again" }
                     if y < -100 || y > -5 { interactionSelected = "" }

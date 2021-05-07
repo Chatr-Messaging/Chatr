@@ -77,10 +77,10 @@ struct NewConversationView: View {
                     .background(
                         RoundedRectangle(cornerRadius: 12)
                             .padding(.vertical, -5)
-                            .padding(.horizontal, -10)
+                            .padding(.horizontal, -12.5)
                             .foregroundColor(Color("pendingBtnColor"))
                     )
-                    .padding(.top) //don't touch this or switch up the padding... there for a reason
+                    .padding(.top, 25) //don't touch this or switch up the padding... there for a reason
                 }
 
                 HStack(alignment: .top, spacing: 0) {

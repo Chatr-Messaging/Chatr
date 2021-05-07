@@ -291,7 +291,6 @@ extension UIApplication {
 
 struct ResignKeyboardOnDragGesture: ViewModifier {
     var gesture = DragGesture().onChanged{ value in
-        print("drage kayboard \(value.translation.height)")
         guard value.translation.height < 1 else { UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil); return }
     }
