@@ -42,11 +42,8 @@ struct ChatMessagesView: View {
     @State private var delayViewMessages: Bool = false
     @State private var firstScroll: Bool = true
     @State private var isLoadingMore: Bool = false
-    @State private var totalMessageCount: Int = -1
-    @State private var unreadMessageCount: Int = 0
     @State private var scrollPage: Int = 1
     @State private var scrollToId: String = ""
-    @State var topAvatarUrls: [String] = []
     var namespace: Namespace.ID
     let keyboard = KeyboardObserver()
     let pageShowCount = 12
@@ -97,13 +94,13 @@ struct ChatMessagesView: View {
         if UserDefaults.standard.bool(forKey: "localOpen") {
             ScrollView(.vertical, showsIndicators: false) {
                 LazyVStack(alignment: .center) {
-                    Text(self.totalMessageCount == 0 ? "no messages found" : self.totalMessageCount == -1 ? "loading messages..." : "")
+                    Text(self.viewModel.totalMessageCount == 0 ? "no messages found" : self.viewModel.totalMessageCount == -1 ? "loading messages..." : "")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .frame(width: 160)
-                        .padding(.all, self.totalMessageCount >= 1 && self.delayViewMessages ? 0 : 20)
-                        .offset(y: self.totalMessageCount >= 1 && self.delayViewMessages ? 0 : 40)
-                        .opacity(self.totalMessageCount >= 1 && self.delayViewMessages ? 0 : 1)
+                        .padding(.all, self.viewModel.totalMessageCount >= 1 && self.delayViewMessages ? 0 : 20)
+                        .offset(y: self.viewModel.totalMessageCount >= 1 && self.delayViewMessages ? 0 : 40)
+                        .opacity(self.viewModel.totalMessageCount >= 1 && self.delayViewMessages ? 0 : 1)
                     
                     //CUSTOM MESSAGE BUBBLE:
                     if self.delayViewMessages {
@@ -177,7 +174,7 @@ struct ChatMessagesView: View {
                                                 .padding(.trailing, messagePosition != .right ? 40 : 0)
                                                 .padding(.leading, messagePosition == .right ? 40 : 0)
                                                 .padding(.bottom, self.hasPrevious(index: message) ? -6 : 10)
-                                                .padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 95 : 0) + 32)
+                                                .padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 110 : 0) + 32)
                                                 .id(currentMessages[message].id)
 
                                             if messagePosition == .left { Spacer() }
@@ -228,10 +225,10 @@ struct ChatMessagesView: View {
 
                                         //need to make the very last ending of convo scroll to item due to the page not being divisible.
                                         //also need to add the scroll down functions
-                                        print("From Empty view the load limit: \(pageShowCount * (self.scrollPage + 1)) and the skip:\(currentMessages.count - self.minPagination)...... the indexes are \(self.maxPagination).....< \(self.minPagination) anddddd nowww the scroll to index is: \(self.maxPagination + 1)")
+                                        //print("From Empty view the load limit: \(pageShowCount * (self.scrollPage + 1)) and the skip:\(currentMessages.count - self.minPagination)...... the indexes are \(self.maxPagination).....< \(self.minPagination) anddddd nowww the scroll to index is: \(self.maxPagination + 1)")
                                         
-                                        if self.auth.messages.selectedDialog(dialogID: self.dialogID).count != self.totalMessageCount {
-                                            print("pulling delta from scrolling...\(self.totalMessageCount) && \(self.auth.messages.selectedDialog(dialogID: self.dialogID).count)")
+                                        if self.auth.messages.selectedDialog(dialogID: self.dialogID).count != self.viewModel.totalMessageCount {
+                                            print("pulling delta from scrolling...\(self.viewModel.totalMessageCount) && \(self.auth.messages.selectedDialog(dialogID: self.dialogID).count)")
                                             changeMessageRealmData.shared.getMessageUpdates(dialogID: self.dialogID, limit: (pageShowCount * self.scrollPage + 50), skip: currentMessages.count - self.minPagination, completion: { _ in })
                                         }
                                     })
@@ -271,25 +268,13 @@ struct ChatMessagesView: View {
                     print("the dialog id is: \(dialogID)")
                     viewModel.loadDialog(auth: auth, dialogId: dialogID, completion: {
                         print("done loading dialogggg: \(dialogID)")
-                        Request.countOfMessages(forDialogID: dialogID, extendedRequest: ["sort_desc" : "lastMessageDate"], successBlock: { count in
-                            DispatchQueue.main.async {
-                                self.totalMessageCount = Int(count)
-                                print("the total message count is: \(Int(count))")
-                                if self.auth.messages.selectedDialog(dialogID: dialogID).count != Int(count) {
-                                    print("local and pulled do not match... pulling delta: \(count) && \(self.auth.messages.selectedDialog(dialogID: self.dialogID).count)")
+                        if self.auth.messages.selectedDialog(dialogID: dialogID).count != self.viewModel.totalMessageCount {
+                            print("local and pulled do not match... pulling delta: \(self.viewModel.totalMessageCount) && \(self.auth.messages.selectedDialog(dialogID: self.dialogID).count)")
 
-                                    changeMessageRealmData.shared.getMessageUpdates(dialogID: dialogID, limit: pageShowCount * scrollPage, skip: 0, completion: { _ in
-                                    })
-                                }
-                            }
-
-                            Request.totalUnreadMessageCountForDialogs(withIDs: Set([dialogID]), successBlock: { (unread, _) in
-                                DispatchQueue.main.async {
-                                    print("the unread count for this dialog: \(unread)")
-                                    unreadMessageCount = Int(unread)
-                                }
+                            changeMessageRealmData.shared.getMessageUpdates(dialogID: dialogID, limit: pageShowCount * scrollPage, skip: 0, completion: { _ in
                             })
-                        })
+                        }
+
                     })
                     delayViewMessages = true
 

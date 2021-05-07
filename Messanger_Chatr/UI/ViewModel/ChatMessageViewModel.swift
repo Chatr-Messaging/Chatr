@@ -24,6 +24,8 @@ class ChatMessageViewModel: ObservableObject {
     @Published var videoTimeText: String = "0:00"
     @Published var videoSize: CGSize = CGSize.zero
     @Published var playVideoo: Bool = true
+    @Published var totalMessageCount: Int = -1
+    @Published var unreadMessageCount: Int = 0
 
     func loadDialog(auth: AuthModel, dialogId: String, completion: @escaping () -> Void) {
         Request.updateDialog(withID: dialogId, update: UpdateChatDialogParameters(), successBlock: { dialog in
@@ -70,11 +72,13 @@ class ChatMessageViewModel: ObservableObject {
             }
 
             guard !dialog.isJoined(), Chat.instance.isConnected else {
+                //self.updateDialogMessageCount(dialogId: dialogId)
                 completion()
                 return
             }
 
             dialog.join(completionBlock: { _ in
+                //self.updateDialogMessageCount(dialogId: dialogId)
                 self.setOnlineCount(dialog: dialog)
                 completion()
             })
@@ -82,6 +86,18 @@ class ChatMessageViewModel: ObservableObject {
             print("error fetching the dialog: \(error.localizedDescription)")
             completion()
         }
+    }
+    
+    func updateDialogMessageCount(dialogId: String) {
+        Request.countOfMessages(forDialogID: dialogId, extendedRequest: ["sort_desc" : "lastMessageDate"], successBlock: { count in
+            self.totalMessageCount = Int(count)
+            print("the total message count is: \(Int(count))")
+        })
+        
+        Request.totalUnreadMessageCountForDialogs(withIDs: Set([dialogId]), successBlock: { (unread, _) in
+            print("the unread count for this dialog: \(unread)")
+            self.unreadMessageCount = Int(unread)
+        })
     }
 
     func getUserAvatar(senderId: Int, compleation: @escaping (String, String, Date) -> Void) {

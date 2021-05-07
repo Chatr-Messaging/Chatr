@@ -153,7 +153,9 @@ struct ContactBubble: View {
                         .padding(.horizontal)
                         //.clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
                         //.contentShape(RoundedRectangle(cornerRadius: 20, style: .circular))
-                    }).buttonStyle(highlightedButtonStyle())
+                    })
+                    .padding(.bottom, self.hasPrior ? 0 : 4)
+                    .buttonStyle(highlightedButtonStyle())
                     .shadow(color: Color.black.opacity(0.15), radius: 12, x: 0, y: 14)
                     .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.5) : Color.clear, lineWidth: 2.5))
                     .sheet(isPresented: self.$showContact, onDismiss: {
@@ -167,7 +169,7 @@ struct ContactBubble: View {
                                 .edgesIgnoringSafeArea(.all)
                         }
                     }
-                }.padding(.bottom, self.hasPrior ? 0 : 4)
+                }
                 .onAppear() {
                     let config = Realm.Configuration(schemaVersion: 1)
                     do {

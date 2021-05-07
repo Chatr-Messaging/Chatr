@@ -242,7 +242,7 @@ struct KeyboardCardView: View {
                     HStack(alignment: .bottom, spacing: 0) {
                         Button(action: {
                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                            withAnimation(Animation.linear(duration: 0.2), {
+                            withAnimation(Animation.interactiveSpring(), {
                                 self.isKeyboardActionOpen.toggle()
                                 if self.showImagePicker == true { self.showImagePicker = false }
                             })
