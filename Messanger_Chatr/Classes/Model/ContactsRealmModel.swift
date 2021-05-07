@@ -239,7 +239,9 @@ class changeContactsRealmData {
                                     foundContact.phoneNumber = user.phone ?? "empty phone number"
                                     foundContact.emailAddress = user.email ?? "empty email address"
                                     foundContact.website = user.website ?? "empty website"
-                                    foundContact.lastOnline = user.lastRequestAt ?? Date()
+                                    if let lastRequest = user.lastRequestAt {
+                                        foundContact.lastOnline = lastRequest
+                                    }
                                     foundContact.avatar = PersistenceManager.shared.getCubeProfileImage(usersID: user) ?? ""
                                     foundContact.isMyContact = true
                                     foundContact.isInfoPrivate = false
@@ -260,7 +262,9 @@ class changeContactsRealmData {
                                 newData.isInfoPrivate = false
                                 newData.isMessagingPrivate = false
                                 newData.isMyContact = true
-                                newData.lastOnline = user.lastRequestAt ?? Date()
+                                if let lastRequest = user.lastRequestAt {
+                                    newData.lastOnline = lastRequest
+                                }
                                 newData.avatar = PersistenceManager.shared.getCubeProfileImage(usersID: user) ?? ""
                                 newData.createdAccount = user.createdAt ?? Date()
                                     
@@ -352,7 +356,9 @@ class changeContactsRealmData {
                             foundContact.phoneNumber = user.phone ?? "empty phone number"
                             foundContact.emailAddress = user.email ?? "empty email address"
                             foundContact.website = user.website ?? "empty website"
-                            foundContact.lastOnline = user.lastRequestAt ?? Date()
+                            if let lastRequest = user.lastRequestAt {
+                                foundContact.lastOnline = lastRequest
+                            }
                             foundContact.avatar = PersistenceManager.shared.getCubeProfileImage(usersID: user) ?? ""
                             foundContact.isMyContact = true
                             
@@ -368,7 +374,9 @@ class changeContactsRealmData {
                         newData.website = user.website ?? "empty website"
                         newData.isFavourite = false
                         newData.isMyContact = true
-                        newData.lastOnline = user.lastRequestAt ?? Date()
+                        if let lastRequest = user.lastRequestAt {
+                            newData.lastOnline = lastRequest
+                        }
                         newData.avatar = PersistenceManager.shared.getCubeProfileImage(usersID: user) ?? ""
                         newData.createdAccount = user.createdAt ?? Date()
                             

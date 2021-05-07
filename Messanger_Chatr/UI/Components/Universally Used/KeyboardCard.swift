@@ -430,12 +430,11 @@ struct KeyboardCardView: View {
                             .padding(.horizontal, 25)
                             .padding(.vertical)
                     }).frame(width: Constants.screenWidth / 5.5, height: 65)
-                    .padding(.leading)
                     .buttonStyle(keyboardButtonStyle())
+                    .padding(.leading)
                     .sheet(isPresented: self.$showImagePicker, onDismiss: {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.33) {
                             self.checkAttachments()
-                            self.isKeyboardActionOpen = !self.hasAttachments
                         }
                     }) {
                         PHAssetPickerSheet(isPresented: self.$showImagePicker, imagePicker: self.imagePicker)
@@ -458,7 +457,6 @@ struct KeyboardCardView: View {
 
                         self.gifData.append(gifURL)
                         self.checkAttachments()
-                        self.isKeyboardActionOpen = !self.hasAttachments
                     }) {
                         GIFController(url: self.$gifURL, present: self.$presentGIF)
                     }
@@ -495,9 +493,11 @@ struct KeyboardCardView: View {
 
                     Button(action: {
                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                        self.hasAttachments.toggle()
-                        self.enableLocation.toggle()
-                        self.checkAttachments()
+                        withAnimation {
+                            self.hasAttachments.toggle()
+                            self.enableLocation.toggle()
+                            self.checkAttachments()
+                        }
 
                         self.imagePicker.checkLocationPermission()
                         if self.imagePicker.locationPermission {

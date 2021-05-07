@@ -82,9 +82,9 @@ struct ClickMiniButtonStyleBG: ButtonStyle {
 struct keyboardButtonStyle: ButtonStyle {
     public func makeBody(configuration: keyboardButtonStyle.Configuration) -> some View {
         configuration.label
-            .scaleEffect(configuration.isPressed ? 0.90 : 1.0)
-            .background(RoundedRectangle(cornerRadius: 15))
-            .foregroundColor(configuration.isPressed ? Color("interactionBtnColor") : Color("interactionBtnBorderUnselected"))
+            .background(configuration.isPressed ? Color("bgColor_light") : Color("buttonColor"))
+            .cornerRadius(15)
+            .scaleEffect(configuration.isPressed ? 0.925 : 1.0)
     }
 }
 
