@@ -174,6 +174,10 @@ struct mainHomeList: View {
     @ObservedObject var dialogs = DialogRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(DialogStruct.self))
     let wallpaperNames = ["", "SoftChatBubbles_DarkWallpaper", "SoftPaperAirplane-Wallpaper", "oldHouseWallpaper", "nycWallpaper", "michaelAngelWallpaper"]
     
+    init() {
+        UIScrollView.appearance().keyboardDismissMode = .interactive
+    }
+    
     var body: some View {
         ZStack {
             if !self.auth.isLoacalAuth && self.auth.isUserAuthenticated != .signedOut {
@@ -202,8 +206,6 @@ struct mainHomeList: View {
                                         }
                                     }
                                 }.onAppear {
-                                    UIScrollView.appearance().keyboardDismissMode = .interactive
-
                                     NotificationCenter.default.addObserver(forName: NSNotification.Name("NotificationAlert"), object: nil, queue: .main) { (_) in
                                         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                                         self.receivedNotification.toggle()

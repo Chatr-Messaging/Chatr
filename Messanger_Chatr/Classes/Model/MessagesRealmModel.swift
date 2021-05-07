@@ -485,6 +485,7 @@ class changeMessageRealmData {
     func sendPhotoAttachment(dialog: DialogStruct, attachmentImages: [UIImage], occupentID: [NSNumber]) {
         for attachment in attachmentImages {
             let data = attachment.jpegData(compressionQuality: 1.0)
+            print("about to upload image... && \(data?.count)")
             Request.uploadFile(with: data!,
                                fileName: "\(UserDefaults.standard.integer(forKey: "currentUserID"))\(dialog.id)\(dialog.fullName)\(Date()).png",
                                contentType: "image/png",
@@ -493,6 +494,7 @@ class changeMessageRealmData {
                                 //Update UI with upload progress
                                 print("upload progress is: \(progress)")
             }, successBlock: { (blob) in
+                print("DONE upload image...")
                 let attachment = ChatAttachment()
                 attachment.type = "image/png"
                 attachment.id = blob.uid
@@ -505,6 +507,7 @@ class changeMessageRealmData {
                 message.attachments = [attachment]
                 
                 pDialog.send(message) { (error) in
+                    print("SENT image...")
                     self.insertMessage(message, completion: {
                         if error != nil {
                             print("error sending attachment: \(String(describing: error?.localizedDescription))")

@@ -47,7 +47,7 @@ struct NewConversationView: View {
                             .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
                             .offset(x: self.navigationPrivate ? -22.5 : 22.5)
 
-                        HStack(spacing: 70) {
+                        HStack(spacing: 50) {
                             Button(action: {
                                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 withAnimation(Animation.easeInOut(duration: 0.2)) {
@@ -73,10 +73,11 @@ struct NewConversationView: View {
                                     .foregroundColor(!self.navigationPrivate ? .blue : .primary)
                             })
                         }
-                    }.padding(.leading, !self.navigationPrivate ? 25 : 20)
-                    .padding(.trailing, self.navigationPrivate ? 25 : 20)
+                    }.padding(.horizontal)
                     .background(
                         RoundedRectangle(cornerRadius: 12)
+                            .padding(.vertical, -5)
+                            .padding(.horizontal, -10)
                             .foregroundColor(Color("pendingBtnColor"))
                     )
                     .padding(.top) //don't touch this or switch up the padding... there for a reason
