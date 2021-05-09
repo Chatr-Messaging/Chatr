@@ -342,28 +342,23 @@ struct ContainerBubble: View {
                 let y = value.translation.width
                 let c = value.startLocation.x
 
-                print("the y value is: \(y) start location: \(c)")
+                print("the y value is: \(y) start location: \(c) &&7 noww")
                 if message.messageState != .error {
-//                    if c <= Constants.screenWidth / 2 - 50 {
-//                        if y > 5 && y < 35 { interactionSelected = reactions[0] }
-//                        if y > 35 && y < 65 { interactionSelected = reactions[1] }
-//                        if y > 65 && y < 95 { interactionSelected = reactions[2] }
-//                        if y > 95 && y < 125 && reactions.count >= 4 { interactionSelected = reactions[3] }
-//                        if y < 5 || y > (reactions.count >= 4 ? 125 : 95) { interactionSelected = "" }
-//                    } else {
-                        if messagePosition == .left {
-                            if y > -125 && y < -95 { interactionSelected = reactions[0] }
-                            if y > -95 && y < -65 { interactionSelected = reactions[1] }
-                            if y > -65 && y < -35 { interactionSelected = reactions[2] }
-                            if y > -35 && y < -5 { interactionSelected = reactions[3] }
-                            if y < -125 || y > -5 { interactionSelected = "" }
+                    if messagePosition == .right && (Int(Constants.screenWidth) / 2 - 50 > self.message.bubbleWidth || c > Constants.screenWidth / 2 - 75) {
+                        self.dragLeftInteraction(y: y)
+                    } else {
+                        if c <= Constants.screenWidth / 2 - 50 {
+                            //drag right
+                            //left & right bubble
+                            if y > 5 && y < 35 { interactionSelected = reactions[0] }
+                            if y > 35 && y < 65 { interactionSelected = reactions[1] }
+                            if y > 65 && y < 95 { interactionSelected = reactions[2] }
+                            if y > 95 && y < 125 && reactions.count >= 4 { interactionSelected = reactions[3] }
+                            if y < 5 || y > (reactions.count >= 4 ? 125 : 95) { interactionSelected = "" }
                         } else {
-                            if y > -95 && y < -65 { interactionSelected = reactions[0] }
-                            if y > -65 && y < -35 { interactionSelected = reactions[1] }
-                            if y > -35 && y < -5 { interactionSelected = reactions[2] }
-                            if y < -95 || y > -5 { interactionSelected = "" }
+                            self.dragLeftInteraction(y: y)
                         }
-                    //}
+                    }
                 } else {
                     if y > -100 && y < -5 { interactionSelected = "try again" }
                     if y < -100 || y > -5 { interactionSelected = "" }
@@ -413,6 +408,24 @@ struct ContainerBubble: View {
                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                 self.saveImage()
             }
+        }
+    }
+    
+    func dragLeftInteraction(y: CGFloat) {
+        //drag left
+        if messagePosition == .left {
+            //left bubble
+            if y > -125 && y < -95 { interactionSelected = reactions[0] }
+            if y > -95 && y < -65 { interactionSelected = reactions[1] }
+            if y > -65 && y < -35 { interactionSelected = reactions[2] }
+            if y > -35 && y < -5 { interactionSelected = reactions[3] }
+            if y < -125 || y > -5 { interactionSelected = "" }
+        } else {
+            //right bubble
+            if y > -95 && y < -65 { interactionSelected = reactions[0] }
+            if y > -65 && y < -35 { interactionSelected = reactions[1] }
+            if y > -35 && y < -5 { interactionSelected = reactions[2] }
+            if y < -95 || y > -5 { interactionSelected = "" }
         }
     }
     

@@ -95,23 +95,21 @@ struct AttachmentBubble: View {
                         .matchedGeometryEffect(id: self.message.id.description + "mov", in: namespace)
                         .overlay(
                             ZStack {
-                                if self.videoDownloadProgress != 0 || self.videoDownloadProgress != 100 {
-                                    ZStack {
-                                        Circle()
-                                            .stroke(Color.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
-                                            .frame(width: 20, height: 20)
-                                            .opacity(0.35)
+                                ZStack {
+                                    Circle()
+                                        .stroke(Color.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                                        .frame(width: 20, height: 20)
+                                        .opacity(0.35)
 
-                                        Circle()
-                                            .trim(from: self.videoDownloadProgress, to: 1.0)
-                                            .stroke(Color.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
-                                            .frame(width: 20, height: 20)
-                                            .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 0)
-                                            .rotationEffect(.init(degrees: -90))
-                                            .animation(Animation.linear(duration: 0.1))
-                                    }
-                                    .padding(30)
-                                }
+                                    Circle()
+                                        .trim(from: self.videoDownloadProgress, to: 1.0)
+                                        .stroke(Color.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                                        .frame(width: 20, height: 20)
+                                        .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 0)
+                                        .rotationEffect(.init(degrees: -90))
+                                        .animation(Animation.linear(duration: 0.1))
+                                }.opacity(self.videoDownloadProgress == 0.0 || self.videoDownloadProgress == 1.0 ? 0 : 1)
+                                .padding(30)
 
                                 VideoControlBubble(viewModel: self.viewModel, player: self.$player, play: self.$play, totalDuration: self.$totalDuration, message: self.message, messagePositionRight: messagePosition == .right)
 
