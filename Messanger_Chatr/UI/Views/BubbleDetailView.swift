@@ -705,17 +705,17 @@ struct BubbleDetailView: View {
     }
 
     func pinMessage() {
-        let updateParameters = UpdateChatDialogParameters()
-        updateParameters.pinnedMessagesIDsToAdd = [self.viewModel.message.id]
-        //updateParameters.pinnedMessagesIDsToRemove = ["5356c64ab35c12bd3b10ba31", "5356c64ab35c12bd3b10wa64"]
-
-        Request.updateDialog(withID: self.viewModel.message.dialogID, update: updateParameters, successBlock: { (updatedDialog) in
-            auth.notificationtext = "Successfully pined message"
-            NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
-        }) { (error) in
-            auth.notificationtext = "Error pining message"
-            NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
-        }
+        self.viewModel.pinMessage(message: self.viewModel.message, completion: { added in
+            if !added {
+                changeDialogRealmData.shared.removeDialogPin(messageId: self.viewModel.message.id, dialogID: self.viewModel.message.dialogID)
+                auth.notificationtext = "Removed pined message"
+                NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+            } else {
+                changeDialogRealmData.shared.addDialogPin(messageId: self.viewModel.message.id, dialogID: self.viewModel.message.dialogID)
+                auth.notificationtext = "Successfully pined message"
+                NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+            }
+        })
     }
     
     func saveImage() {

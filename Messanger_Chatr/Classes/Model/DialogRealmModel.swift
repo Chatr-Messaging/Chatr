@@ -192,6 +192,11 @@ class changeDialogRealmData {
                     dialogResult.pinMessages.append(messageId)
                     realm.add(dialogResult, update: .all)
                 }
+                
+                if let messageResult = realm.object(ofType: MessageStruct.self, forPrimaryKey: messageId) {
+                    messageResult.isPinned = true
+                    realm.add(messageResult, update: .all)
+                }
             })
         } catch {
             print(error.localizedDescription)
@@ -206,8 +211,13 @@ class changeDialogRealmData {
                 if let dialogResult = realm.object(ofType: DialogStruct.self, forPrimaryKey: dialogID) {
                     if let index = dialogResult.pinMessages.firstIndex(where: { $0 == messageId }) {
                         dialogResult.pinMessages.remove(at: index)
+                        realm.add(dialogResult, update: .all)
                     }
-                    realm.add(dialogResult, update: .all)
+                    
+                    if let messageResult = realm.object(ofType: MessageStruct.self, forPrimaryKey: messageId) {
+                        messageResult.isPinned = false
+                        realm.add(messageResult, update: .all)
+                    }
                 }
             })
         } catch {

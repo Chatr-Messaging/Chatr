@@ -15,16 +15,19 @@ struct PHAssetPickerSheet: UIViewControllerRepresentable {
     @Environment(\.presentationMode)
     var presentationMode
     @Binding var isPresented: Bool
+    @Binding var hasAttachments: Bool
     @State var imagePicker: KeyboardCardViewModel
 
     class Coordinator: NSObject, UINavigationControllerDelegate, PHPickerViewControllerDelegate {
         @Binding var presentationMode: PresentationMode
         @Binding var isPresented: Bool
+        @Binding var hasAttachments: Bool
         @Binding var imagePicker: KeyboardCardViewModel
 
-        init(presentationMode: Binding<PresentationMode>, isPresented: Binding<Bool>, imagePicker: Binding<KeyboardCardViewModel>) {
+        init(presentationMode: Binding<PresentationMode>, isPresented: Binding<Bool>, hasAttachments: Binding<Bool>, imagePicker: Binding<KeyboardCardViewModel>) {
             _presentationMode = presentationMode
             _isPresented = isPresented
+            _hasAttachments = hasAttachments
             _imagePicker = imagePicker
         }
 
@@ -37,10 +40,12 @@ struct PHAssetPickerSheet: UIViewControllerRepresentable {
                     if asset.mediaType == .video {
                         self.imagePicker.getImageFromAsset(asset: asset, size: CGSize(width: asset.pixelWidth, height: asset.pixelHeight)) { (image) in
                             self.imagePicker.selectedVideos.append(KeyboardMediaAsset(asset: asset, image: image))
+                            self.hasAttachments = true
                         }
                     } else if asset.mediaType == .image {
                         self.imagePicker.getImageFromAsset(asset: asset, size: CGSize(width: asset.pixelWidth, height: asset.pixelHeight)) { (image) in
                             self.imagePicker.selectedPhotos.append(KeyboardMediaAsset(asset: asset, image: image))
+                            self.hasAttachments = true
                         }
                     }
                 })
@@ -51,7 +56,7 @@ struct PHAssetPickerSheet: UIViewControllerRepresentable {
     }
 
     func makeCoordinator() -> Coordinator {
-        return Coordinator(presentationMode: presentationMode, isPresented: $isPresented, imagePicker: $imagePicker)
+        return Coordinator(presentationMode: presentationMode, isPresented: $isPresented, hasAttachments: $hasAttachments, imagePicker: $imagePicker)
     }
 
     func makeUIViewController(context: UIViewControllerRepresentableContext<PHAssetPickerSheet>) -> PHPickerViewController {

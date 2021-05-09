@@ -10,6 +10,7 @@ import SwiftUI
 import RealmSwift
 import SDWebImageSwiftUI
 import ConnectyCube
+import Firebase
 
 struct ViewOffsetKey: PreferenceKey {
     typealias Value = CGFloat
@@ -260,11 +261,10 @@ struct ChatMessagesView: View {
                             }.opacity(self.firstScroll ? 0 : 1)
                         }
                     }
-                }
+                }.resignKeyboardOnDragGesture()
             }.coordinateSpace(name: "scroll")
             .frame(width: Constants.screenWidth)
             .contentShape(Rectangle())
-            .resignKeyboardOnDragGesture()
             .onAppear() {
                 DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + 0.5) {
                     print("the dialog id is: \(dialogID)")
@@ -278,6 +278,7 @@ struct ChatMessagesView: View {
                         }
 
                     })
+                    self.observePinnedMessages()
                     delayViewMessages = true
 
                     //guard !Session.current.tokenHasExpired else { return }
@@ -311,5 +312,17 @@ struct ChatMessagesView: View {
         let result = self.auth.messages.selectedDialog(dialogID: self.dialogID)
 
         return result[index] != result.first ? (result[index].senderID == result[index - 1].senderID && (result[index].date >= result[index - 1].date.addingTimeInterval(86400) ? false : true) && result[index].bubbleWidth > result[index - 1].bubbleWidth ? false : true) : true //- (result[index].dislikedId.count >= 1 && result[index].likedId.count >= 1 ? 48 : 16)
+    }
+    
+    func observePinnedMessages() {
+        let msg = Database.database().reference().child("Dialogs").child(self.dialogID).child("pined")
+
+        msg.observe(.childAdded, with: { snapAdded in
+            changeDialogRealmData.shared.addDialogPin(messageId: snapAdded.key, dialogID: self.dialogID)
+        })
+
+        msg.observe(.childRemoved, with: { snapRemoved in
+            changeDialogRealmData.shared.removeDialogPin(messageId: snapRemoved.key, dialogID: self.dialogID)
+        })
     }
 }

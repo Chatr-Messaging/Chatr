@@ -14,9 +14,10 @@ struct VideoControlBubble: View {
     @Binding var player: AVPlayer
     @Binding var play: Bool
     @Binding var totalDuration: Double
+    @Binding var videoDownload: CGFloat
     @State var message: MessageStruct
     @State var mute: Bool = true
-    @State var progressBar: CGFloat = 200
+    @State var progressBar: CGFloat = 1.0
     var messagePositionRight: Bool
 
     var body: some View {
@@ -113,7 +114,8 @@ struct VideoControlBubble: View {
                             .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 2)
                             .padding(.all)
                     }
-                }.padding(.vertical, self.progressBar != 0 || self.progressBar != 1.0 ? 20 : 125)
+                }.padding(.vertical, self.videoDownload != 0 || self.videoDownload != 1.0 ? 20 : 125)
+                .opacity(self.videoDownload == 0.0 || self.videoDownload == 1.0 ? 1 : 0)
                 .transition(.asymmetric(insertion: AnyTransition.scale.animation(.spring(response: 0.2, dampingFraction: 0.65, blendDuration: 0)), removal: AnyTransition.scale.animation(.easeOut(duration: 0.14))))
                 .zIndex(1)
             }
@@ -121,8 +123,11 @@ struct VideoControlBubble: View {
     }
     
     func getTotalDurationString() -> String {
+        guard !(self.totalDuration.isNaN || self.totalDuration.isInfinite) else { return "" }
+
         let m = Int(abs(self.totalDuration) / 60)
         let s = Int(self.totalDuration.truncatingRemainder(dividingBy: 60))
+
         return String(format: "%d:%02d", arguments: [m, s])
     }
     

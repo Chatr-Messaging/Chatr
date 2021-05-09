@@ -45,6 +45,7 @@ struct AttachmentBubble: View {
                         VStack {
                             Image(systemName: "photo.on.rectangle.angled")
                                 .padding(.bottom, 5)
+
                             Text("loading GIF...")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
@@ -102,7 +103,7 @@ struct AttachmentBubble: View {
                                         .opacity(0.35)
 
                                     Circle()
-                                        .trim(from: self.videoDownloadProgress, to: 1.0)
+                                        .trim(from: 1.0 - self.videoDownloadProgress, to: 1.0)
                                         .stroke(Color.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
                                         .frame(width: 20, height: 20)
                                         .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 0)
@@ -111,7 +112,7 @@ struct AttachmentBubble: View {
                                 }.opacity(self.videoDownloadProgress == 0.0 || self.videoDownloadProgress == 1.0 ? 0 : 1)
                                 .padding(30)
 
-                                VideoControlBubble(viewModel: self.viewModel, player: self.$player, play: self.$play, totalDuration: self.$totalDuration, message: self.message, messagePositionRight: messagePosition == .right)
+                                VideoControlBubble(viewModel: self.viewModel, player: self.$player, play: self.$play, totalDuration: self.$totalDuration, videoDownload: self.$videoDownloadProgress, message: self.message, messagePositionRight: messagePosition == .right)
 
                                 if self.message.messageState == .error {
                                     RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.5) : Color.clear, lineWidth: 5)
@@ -141,7 +142,7 @@ struct AttachmentBubble: View {
                                     self.totalDuration = item.duration.seconds - item.currentTime().seconds
                                 }
 
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.25) {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
                                     if let videoAssetTrack = self.player.currentItem?.asset.tracks(withMediaType: AVMediaType.video).first {
                                         let naturalSize = videoAssetTrack.naturalSize.applying(videoAssetTrack.preferredTransform)
                                         let width = abs(naturalSize.width) > UIScreen.main.bounds.width * 0.65 ? UIScreen.main.bounds.width * 0.65 : abs(naturalSize.width)

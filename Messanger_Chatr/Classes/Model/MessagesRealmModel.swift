@@ -30,6 +30,7 @@ class MessageStruct : Object, Identifiable {
     @objc dynamic var localAttachmentPath: String = ""
     @objc dynamic var imageType: String = ""
     @objc dynamic var hadDelay: Bool = false
+    @objc dynamic var isPinned: Bool = false
     @objc dynamic var status = messageStatus.sending.rawValue
     var messageState: messageStatus {
         get { return messageStatus(rawValue: status) ?? .delivered }

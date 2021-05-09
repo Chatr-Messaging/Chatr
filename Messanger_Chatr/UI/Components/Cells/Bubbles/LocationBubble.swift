@@ -30,17 +30,14 @@ struct LocationBubble: View {
     var namespace: Namespace.ID
 
     var body: some View {
-        Button(action: {
-            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-            withAnimation {
-                self.viewModel.message = self.message
-                self.viewModel.isDetailOpen = true
-            }
-        }) {
-            Map(coordinateRegion: $region, interactionModes: MapInteractionModes.all, showsUserLocation: true, userTrackingMode: $userTrackingMode, annotationItems: [MyAnnotationItem(coordinate: CLLocationCoordinate2D(latitude: self.message.latitude, longitude: self.message.longitude))]) { marker in
-                MapPin(coordinate: marker.coordinate)
-            }
-        }.frame(width: CGFloat(Constants.screenWidth * 0.7), height: CGFloat(Constants.screenWidth * 0.5))
+        //Button(action: {
+            
+        //}) {
+        Map(coordinateRegion: $region, interactionModes: MapInteractionModes.zoom, showsUserLocation: true, userTrackingMode: $userTrackingMode, annotationItems: [MyAnnotationItem(coordinate: CLLocationCoordinate2D(latitude: self.message.latitude, longitude: self.message.longitude))]) { marker in
+            MapPin(coordinate: marker.coordinate)
+        }
+        //}
+        .frame(width: CGFloat(Constants.screenWidth * 0.7), height: CGFloat(Constants.screenWidth * 0.5))
         .transition(.asymmetric(insertion: AnyTransition.scale.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
         .cornerRadius(20)
         //.padding(.leading, self.messagePosition == .right ? CGFloat(Constants.screenHeight * 0.1) : 0)
@@ -50,7 +47,14 @@ struct LocationBubble: View {
         .matchedGeometryEffect(id: message.id + "map", in: namespace)
         .buttonStyle(ClickMiniButtonStyle())
         .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.5) : Color.clear, lineWidth: 5))
-        .simultaneousGesture(DragGesture(minimumDistance: self.viewModel.isDetailOpen ? 0 : 500))
+        //.simultaneousGesture(DragGesture(minimumDistance: self.viewModel.isDetailOpen ? 0 : 500))
+        .onTapGesture {
+            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+            withAnimation {
+                self.viewModel.message = self.message
+                self.viewModel.isDetailOpen = true
+            }
+        }
         .onAppear() {
             self.region.center.latitude = self.message.latitude
             self.region.center.longitude = self.message.longitude

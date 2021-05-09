@@ -19,13 +19,14 @@ struct TextBubble: View {
     @State var messagePosition: messagePosition
     @State private var typingOpacity: CGFloat = 1.0
     var namespace: Namespace.ID
+    var isPinned: Bool = false
 
     var body: some View {
         ZStack {
             if self.message.messageState != .isTyping {
                 if self.message.text.containsEmoji && self.message.text.count <= 4 {
                     Text(self.message.text)
-                        .font(.system(size: 66))
+                        .font(.system(size: self.isPinned ? 32 : 66))
                         .offset(x: self.messagePosition == .right ? -10 : 10, y: -5)
                         .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 5)
                         .matchedGeometryEffect(id: self.message.id.description + "text", in: namespace)

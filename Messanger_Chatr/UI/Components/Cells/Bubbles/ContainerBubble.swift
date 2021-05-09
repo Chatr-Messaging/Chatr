@@ -166,7 +166,7 @@ struct ContainerBubble: View {
                                     return
                                 }
 
-                                if !self.auth.dialogs.results.contains(where: { $0.id == self.message.dialogID && $0.pinMessages.contains(where: { $0 == self.message.id }) }) {
+                                if !self.message.isPinned {
                                     self.reactions.append("pin")
                                     self.reactions.append("trash")
                                 } else {
@@ -337,6 +337,9 @@ struct ContainerBubble: View {
     func onChangedInteraction(value: DragGesture.Value) {
         if self.message.messageState != .isTyping && self.message.messageState != .error {
             self.showInteractions = true
+            if self.messagePosition == .right && self.reactions.contains(where: { $0 == "pin" || $0 == "unpin" }) {
+                self.reactions[1] = self.message.isPinned ? "unpin" : "pin"
+            }
 
             withAnimation(Animation.linear(duration: 0.065)) {
                 let y = value.translation.width
@@ -408,6 +411,8 @@ struct ContainerBubble: View {
                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                 self.saveImage()
             }
+            
+            self.interactionSelected = ""
         }
     }
     
@@ -463,13 +468,16 @@ struct ContainerBubble: View {
     }
 
     func pinMessage() {
+        print("the pinning message id is: \(self.message.id.description)")
         self.viewModel.pinMessage(message: self.message, completion: { added in
             if !added {
                 changeDialogRealmData.shared.removeDialogPin(messageId: self.message.id, dialogID: self.message.dialogID)
+                self.reactions[1] = "pin"
                 auth.notificationtext = "Removed pined message"
                 NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
             } else {
                 changeDialogRealmData.shared.addDialogPin(messageId: self.message.id, dialogID: self.message.dialogID)
+                self.reactions[1] = "unpin"
                 auth.notificationtext = "Successfully pined message"
                 NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
             }

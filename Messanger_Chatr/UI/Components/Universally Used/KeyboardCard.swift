@@ -435,7 +435,7 @@ struct KeyboardCardView: View {
                             self.checkAttachments()
                         }
                     }) {
-                        PHAssetPickerSheet(isPresented: self.$showImagePicker, imagePicker: self.imagePicker)
+                        PHAssetPickerSheet(isPresented: self.$showImagePicker, hasAttachments: self.$hasAttachments, imagePicker: self.imagePicker)
                     }
 
                     Button(action: {

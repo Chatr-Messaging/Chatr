@@ -493,6 +493,7 @@
 		056B98A324C8FA8B003F7FBA /* Sections */ = {
 			isa = PBXGroup;
 			children = (
+				05D466D7263F7CE20015B61D /* PinnedSectionView.swift */,
 				056B989F24C8FA41003F7FBA /* AppearanceView.swift */,
 				05A7BD4C24F851760001BFC9 /* TermsView.swift */,
 				05C6951324F1EC5400EEF819 /* StorageView.swift */,
@@ -505,7 +506,6 @@
 				056B98A624C8FAC9003F7FBA /* SecurityView.swift */,
 				0554281625AFE7AD00B6D106 /* ChatrStats.swift */,
 				054E9B7B25D242BB00365CE0 /* EarlyAdopterView.swift */,
-				05D466D7263F7CE20015B61D /* PinnedSectionView.swift */,
 			);
 			path = Sections;
 			sourceTree = "<group>";
