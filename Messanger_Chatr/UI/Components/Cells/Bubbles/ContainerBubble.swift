@@ -155,7 +155,7 @@ struct ContainerBubble: View {
                             if self.message.imageType == "image/gif" || self.message.imageType == "image/png" || self.message.imageType == "video/mov" {
                                 self.reactions.append("save")
                             } else {
-                                self.reactions.append("edit")
+                                self.reactions.append("reply")
                             }
 
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {

@@ -435,6 +435,7 @@ struct BubbleDetailView: View {
             .offset(y: self.cardDrag.height + 7)
             .offset(y: -self.replyScrollOffset)
             .offset(y: self.height > 175 ? -height : 0)
+            .offset(y: -self.keyboardChange)
             .shadow(color: Color.black.opacity(0.2), radius: 15, x: 0, y: 12)
             .zIndex(3)
             .rotation3DEffect(.degrees(!self.repliesOpen ? -Double(self.cardDrag.height > 20 ? ((self.cardDrag.height - 20) / 8 > 8 ? 8 : (self.cardDrag.height - 20) / 8) : 0) : 0), axis: (x: 1, y: 0, z: 0))
@@ -583,7 +584,9 @@ struct BubbleDetailView: View {
                         }
                     )
             }.frame(maxWidth: .infinity)
-            .padding(.bottom, self.keyboardChange != 0 ? (self.keyboardChange - (UIDevice.current.hasNotch ? 50 : 30)) : (UIDevice.current.hasNotch ? 50 : 30))
+            .offset(y: -self.keyboardChange)
+            .padding(.bottom, UIDevice.current.hasNotch ? 50 : 30)
+            //.padding(.bottom, self.keyboardChange != 0 ? (self.keyboardChange - (UIDevice.current.hasNotch ? 50 : 30)) : (UIDevice.current.hasNotch ? 50 : 30))
             .opacity(!self.repliesOpen ? Double((200 - self.cardDrag.height) / 200) : 1)
             .zIndex(2)
         }.frame(width: Constants.screenWidth, height: Constants.screenHeight, alignment: .bottom)
@@ -687,7 +690,7 @@ struct BubbleDetailView: View {
             switch event.type {
             case .willShow:
                 UIView.animate(withDuration: event.duration, delay: 0.0, options: [event.options], animations: {
-                    self.keyboardChange = keyboardFrameEnd.height - 10
+                    self.keyboardChange = keyboardFrameEnd.height * 0.70 - 10
                 }, completion: nil)
                
             case .willHide:
