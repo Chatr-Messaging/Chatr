@@ -6,6 +6,7 @@
 //  Copyright © 2019 Brandon Shaw. All rights reserved.
 //
 
+import AVKit
 import SwiftUI
 
 struct MainButtonStyle: ButtonStyle {
@@ -372,5 +373,22 @@ extension Date {
     var midnight:Date{
         let cal = Calendar(identifier: .gregorian)
         return cal.startOfDay(for: self)
+    }
+}
+
+extension AVAsset {
+    func generateThumbnail(completion: @escaping (UIImage?) -> Void) {
+        DispatchQueue.global().async {
+            let imageGenerator = AVAssetImageGenerator(asset: self)
+            let time = CMTime(seconds: 0.0, preferredTimescale: 600)
+            let times = [NSValue(time: time)]
+            imageGenerator.generateCGImagesAsynchronously(forTimes: times, completionHandler: { _, image, _, _, _ in
+                if let image = image {
+                    completion(UIImage(cgImage: image))
+                } else {
+                    completion(nil)
+                }
+            })
+        }
     }
 }

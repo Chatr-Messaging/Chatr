@@ -48,13 +48,13 @@ struct VideoControlBubble: View {
 
                     ZStack {
                         Circle()
-                            .stroke(Color.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                            .stroke(Color.primary, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
                             .frame(width: 20, height: 20)
                             .opacity(0.35)
 
                         Circle()
                             .trim(from: self.progressBar, to: 1.0)
-                            .stroke(Color.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                            .stroke(Color.primary, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
                             .frame(width: 20, height: 20)
                             .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 0)
                             .rotationEffect(.init(degrees: -90))

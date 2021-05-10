@@ -66,6 +66,8 @@ struct PinnedSectionView: View {
                                             }.padding(.vertical)
                                         }.aspectRatio(contentMode: .fit)
                                         .frame(maxHeight: 98)
+                                } else if messagez.imageType == "video/mov" {
+                                    PinnedVideoCell(videoUrl: messagez.image)
                                 }
                             } else if messagez.contactID != 0 {
                                 //Contact

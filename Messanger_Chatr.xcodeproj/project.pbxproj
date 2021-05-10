@@ -71,6 +71,7 @@
 		0572BAB72398998800AE9061 /* PhoneNumberView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0572BAB62398998700AE9061 /* PhoneNumberView.swift */; };
 		0572BAB923989A5100AE9061 /* VerifyNumberView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0572BAB823989A5100AE9061 /* VerifyNumberView.swift */; };
 		0572BABB239B348800AE9061 /* CustomStyles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0572BABA239B348700AE9061 /* CustomStyles.swift */; };
+		05786B5826499F83001554CA /* PinnedVideoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05786B5726499F83001554CA /* PinnedVideoCell.swift */; };
 		057F2B4E250B026F005DFB21 /* ContactCarouselSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057F2B4D250B025E005DFB21 /* ContactCarouselSection.swift */; };
 		0583073A240E2B840013B93B /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05830739240E2B840013B93B /* Constants.swift */; };
 		0583073E240E2F120013B93B /* ChatrApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0583073D240E2F120013B93B /* ChatrApp.swift */; };
@@ -255,6 +256,7 @@
 		0572BAB62398998700AE9061 /* PhoneNumberView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneNumberView.swift; sourceTree = "<group>"; };
 		0572BAB823989A5100AE9061 /* VerifyNumberView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifyNumberView.swift; sourceTree = "<group>"; };
 		0572BABA239B348700AE9061 /* CustomStyles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomStyles.swift; sourceTree = "<group>"; };
+		05786B5726499F83001554CA /* PinnedVideoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedVideoCell.swift; sourceTree = "<group>"; };
 		057F2B4D250B025E005DFB21 /* ContactCarouselSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactCarouselSection.swift; sourceTree = "<group>"; };
 		05830739240E2B840013B93B /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		0583073D240E2F120013B93B /* ChatrApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatrApp.swift; sourceTree = "<group>"; };
@@ -484,6 +486,7 @@
 				05A7633B2506FD42002712FA /* ContactRequestCell.swift */,
 				05C93BDC251578100059D1AA /* DialogContactCell.swift */,
 				0525E4C425ECC4440086EB54 /* MessageReplyCell.swift */,
+				05786B5726499F83001554CA /* PinnedVideoCell.swift */,
 				059D1C5325D63A7600A7FB96 /* Bubbles */,
 				05DD2D4125C9D44900B1ACB7 /* LinkedText.swift */,
 			);
@@ -1140,6 +1143,7 @@
 				05A7BD6324FEF6AC0001BFC9 /* QuickSnapStartView.swift in Sources */,
 				0559B8B325D3682A0069C44A /* InstagramStories.swift in Sources */,
 				055F37C02607DAA2003EDB1F /* VideoControlBubble.swift in Sources */,
+				05786B5826499F83001554CA /* PinnedVideoCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
