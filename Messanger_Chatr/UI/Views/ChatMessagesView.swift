@@ -276,7 +276,6 @@ struct ChatMessagesView: View {
                             changeMessageRealmData.shared.getMessageUpdates(dialogID: dialogID, limit: pageShowCount * scrollPage, skip: 0, completion: { _ in
                             })
                         }
-
                     })
 
                     DispatchQueue.main.async {
