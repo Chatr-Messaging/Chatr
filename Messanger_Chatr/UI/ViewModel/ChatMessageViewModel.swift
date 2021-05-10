@@ -12,6 +12,7 @@ import RealmSwift
 import ConnectyCube
 import Firebase
 import SDWebImageSwiftUI
+import Cache
 
 class ChatMessageViewModel: ObservableObject {
     @ObservedObject var profile = ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self))
@@ -26,6 +27,10 @@ class ChatMessageViewModel: ObservableObject {
     @Published var playVideoo: Bool = true
     @Published var totalMessageCount: Int = -1
     @Published var unreadMessageCount: Int = 0
+
+    var storage: Cache.Storage<String, Data>? = {
+        return try? Cache.Storage(diskConfig: DiskConfig(name: "DiskCache"), memoryConfig: MemoryConfig(expiry: .date(Calendar.current.date(byAdding: .day, value: 4, to: Date()) ?? Date()), countLimit: 10, totalCostLimit: 10), transformer: TransformerFactory.forData())
+    }()
 
     func loadDialog(auth: AuthModel, dialogId: String, completion: @escaping () -> Void) {
         Request.updateDialog(withID: dialogId, update: UpdateChatDialogParameters(), successBlock: { dialog in
@@ -241,6 +246,33 @@ class ChatMessageViewModel: ObservableObject {
     func pause() {
         player.pause()
         playVideoo = false
+    }
+    
+    func loadVideo(fileId: String, completion: @escaping () -> Void) {
+        DispatchQueue.main.async {
+            do {
+                let result = try self.storage?.entry(forKey: fileId)
+                let playerItem = CachingPlayerItem(data: result?.object ?? Data(), mimeType: "video/mp4", fileExtension: "mp4")
+
+                self.player = AVPlayer(playerItem: playerItem)
+
+                completion()
+            } catch {
+                Request.downloadFile(withUID: fileId, progressBlock: { (progress) in
+                    print("the progress of the download is: \(progress)")
+                }, successBlock: { data in
+                    let playerItem = CachingPlayerItem(data: data as Data, mimeType: "video/mp4", fileExtension: "mp4")
+                    self.player = AVPlayer(playerItem: playerItem)
+
+                    self.storage?.async.setObject(data, forKey: fileId, completion: { _ in })
+
+                    completion()
+                }, errorBlock: { error in
+                    print("the error videoo is: \(String(describing: error.localizedDescription))")
+                    completion()
+                })
+            }
+        }
     }
     
     func fetchReplyCount(message: MessageStruct, completion: @escaping (Int) -> Void) {

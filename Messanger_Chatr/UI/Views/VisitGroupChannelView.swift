@@ -26,6 +26,7 @@ struct VisitGroupChannelView: View {
     @Binding var isEditGroupOpen: Bool
     @Binding var canEditGroup: Bool
     @Binding var openNewDialogID: Int
+    @Binding var showPinDetails: String
     @State var groupOccUserAvatar: [String] = []
     @State var fromDialogCell: Bool = false
     @State var showMoreMembers: Bool = false
@@ -189,7 +190,7 @@ struct VisitGroupChannelView: View {
                     
                     //MARK: Pinned Section
                     if self.dialogModel.pinMessages.count > 0 {
-                        PinnedSectionView(dialog: self.dialogModel)
+                        PinnedSectionView(showPinDetails: self.$showPinDetails, dialog: self.dialogModel)
                             .environmentObject(self.auth)
                     }
 

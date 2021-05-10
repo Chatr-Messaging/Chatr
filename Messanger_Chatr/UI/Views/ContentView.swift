@@ -149,6 +149,7 @@ struct mainHomeList: View {
     @State var keyboardText: String = String()
     @State var selectedDialogID: String = String()
     @State var newDialogID: String = ""
+    @State var showPinDetails: String = ""
     @State var newDialogFromContact: Int = 0
     @State var newDialogFromSharedContact: Int = 0
     @State var showFullKeyboard = false
@@ -221,6 +222,18 @@ struct mainHomeList: View {
                                     }
                                 }
                         }.frame(height: Constants.btnSize + 100)
+                        .onChange(of: self.showPinDetails) { msgId in
+                            if self.showPinDetails != "" {
+                                self.showPinDetails = ""
+                                if let msg = self.auth.messages.selectedDialog(dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").filter({ $0.id == msgId }).first {
+                                    self.messageViewModel.message = msg
+                                    self.messageViewModel.isDetailOpen = true
+//                                    if msg.imageType == "video/mov" {
+//                                        self.messageViewModel.loadVideo(fileId: msg.image, completion: { })
+//                                    }
+                                }
+                            }
+                        }
                         
                         if self.isTopCardOpen {
                             HomeBannerCard(isTopCardOpen: self.$isTopCardOpen, counter: self.$counter)
@@ -391,7 +404,8 @@ struct mainHomeList: View {
                                 DialogCell(dialogModel: i,
                                            isOpen: $isLocalOpen,
                                            activeView: $activeView,
-                                           selectedDialogID: $selectedDialogID)
+                                           selectedDialogID: $selectedDialogID,
+                                           showPinDetails: $showPinDetails)
                                     .environmentObject(auth)
                                     .contentShape(Rectangle())
                                     .position(x: i.isOpen && isLocalOpen ? UIScreen.main.bounds.size.width / 2 : UIScreen.main.bounds.size.width / 2 - 20, y: i.isOpen && isLocalOpen ? activeView.height + 40 : 40)

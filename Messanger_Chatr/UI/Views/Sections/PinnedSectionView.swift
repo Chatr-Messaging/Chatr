@@ -15,6 +15,8 @@ import Firebase
 
 struct PinnedSectionView: View {
     @EnvironmentObject var auth: AuthModel
+    @Environment(\.presentationMode) var presentationMode
+    @Binding var showPinDetails: String
     @State var dialog: DialogStruct = DialogStruct()
     @State var style = StaggeredGridStyle(.horizontal, tracks: .fixed(98), spacing: 2.5)
     @Namespace var namespace
@@ -102,7 +104,8 @@ struct PinnedSectionView: View {
                                 }
 
                                 Button(action: {
-                                    print("view Details")
+                                    self.showPinDetails = messagez.id
+                                    self.presentationMode.wrappedValue.dismiss()
                                 }) {
                                     Label("View Details", systemImage: "magnifyingglass")
                                 }
