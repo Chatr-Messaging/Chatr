@@ -190,6 +190,7 @@ struct VisitGroupChannelView: View {
                     //MARK: Pinned Section
                     if self.dialogModel.pinMessages.count > 0 {
                         PinnedSectionView(dialog: self.dialogModel)
+                            .environmentObject(self.auth)
                     }
 
                     //MARK: Admin List Section

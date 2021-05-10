@@ -278,8 +278,11 @@ struct ChatMessagesView: View {
                         }
 
                     })
-                    self.observePinnedMessages()
-                    delayViewMessages = true
+
+                    DispatchQueue.main.async {
+                        self.observePinnedMessages()
+                        delayViewMessages = true
+                    }
 
                     //guard !Session.current.tokenHasExpired else { return }
                     

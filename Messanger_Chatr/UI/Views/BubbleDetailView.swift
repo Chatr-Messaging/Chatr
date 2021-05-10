@@ -345,11 +345,11 @@ struct BubbleDetailView: View {
                                             }
                                         }
 
-                                        if let dialog = self.auth.selectedConnectyDialog, let admins = dialog.adminsIDs, (admins.contains(NSNumber(value: self.viewModel.message.senderID)) || dialog.userID == UserDefaults.standard.integer(forKey: "currentUserID")), (dialog.type == .group || dialog.type == .public) {
+                                        if let dialog = self.auth.selectedConnectyDialog, let admins = dialog.adminsIDs, (admins.contains(NSNumber(value: UserDefaults.standard.integer(forKey: "currentUserID"))) || dialog.userID == UserDefaults.standard.integer(forKey: "currentUserID")), (dialog.type == .group || dialog.type == .public) {
                                             Button(action: {
                                                 self.pinMessage()
                                             }) {
-                                                Label("Pin", systemImage: "pin")
+                                                Label(!self.viewModel.message.isPinned ? "Pin" : "Unpin", systemImage: "pin")
                                             }
                                         }
 
@@ -404,6 +404,16 @@ struct BubbleDetailView: View {
                         }.padding(.horizontal, 10)
 
                         HStack {
+                            if self.viewModel.message.isPinned {
+                                Image(systemName: "pin.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .rotationEffect(.degrees(-45))
+                                    .frame(width: 14, height: 14, alignment: .center)
+                                    .offset(y: 2)
+                                    .foregroundColor(.secondary)
+                            }
+
                             Text("sent " + self.viewModel.dateFormatTimeExtended(date: self.viewModel.message.date))
                                 .font(.caption)
                                 .foregroundColor(.secondary)
@@ -517,6 +527,7 @@ struct BubbleDetailView: View {
                                 .transition(AnyTransition.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(.easeOut(duration: 0.2)), removal: AnyTransition.move(edge: .bottom).animation(.easeOut(duration: 0.2))))
                         }.animation(.easeOut(duration: 0.4))
                     }.padding(.horizontal, 30)
+                    .resignKeyboardOnDragGesture()
                     .background(GeometryReader {
                         Color.clear.preference(key: ViewOffsetKey.self,
                             value: -$0.frame(in: .named("replyScroll")).origin.y)

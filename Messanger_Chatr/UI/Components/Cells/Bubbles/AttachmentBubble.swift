@@ -89,7 +89,7 @@ struct AttachmentBubble: View {
                         .clipShape(CustomGIFShape())
                         .frame(width: self.videoSize.width, height: self.videoSize.height)
                         .frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.55 : 0.65)), alignment: self.messagePosition == .right ? .trailing : .leading)
-                        .frame(minHeight: 180, maxHeight: CGFloat(Constants.screenHeight * 0.65))
+                        .frame(minHeight: self.videoSize.height == 0 ? CGFloat(Constants.screenHeight * 0.65) : 180, maxHeight: CGFloat(Constants.screenHeight * 0.65))
                         .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 14)
                         .padding(.bottom, self.hasPrior ? 0 : 4)
                         .offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)

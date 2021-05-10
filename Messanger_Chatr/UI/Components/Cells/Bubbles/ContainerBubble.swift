@@ -159,7 +159,7 @@ struct ContainerBubble: View {
                             }
 
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
-                                guard let dialog = self.auth.selectedConnectyDialog, let admins = dialog.adminsIDs, (admins.contains(NSNumber(value: self.message.senderID)) || dialog.userID == UserDefaults.standard.integer(forKey: "currentUserID")), (dialog.type == .group || dialog.type == .public) else {
+                                guard let dialog = self.auth.selectedConnectyDialog, let admins = dialog.adminsIDs, (admins.contains(NSNumber(value: UserDefaults.standard.integer(forKey: "currentUserID"))) || dialog.userID == UserDefaults.standard.integer(forKey: "currentUserID")), (dialog.type == .group || dialog.type == .public) else {
                                     self.reactions.append("copy")
                                     self.reactions.append("trash")
 
@@ -264,18 +264,45 @@ struct ContainerBubble: View {
                 
                 //MARK: Bottom User Info / Message Status Section
                 HStack(spacing: 4) {
-                    if messagePosition == .right { Spacer() }
+                    if messagePosition == .right {
+                        Spacer()
+                        
+                        if self.message.isPinned {
+                            Image(systemName: "pin.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .rotationEffect(.degrees(45))
+                                .frame(width: 14, height: 12, alignment: .center)
+                                .offset(y: 5)
+                                .foregroundColor(.gray)
+                                .opacity(self.hasPrior ? 0 : 1)
+                        }
+                    }
 
                     Text(self.subText.messageStatusText(message: self.message, positionRight: messagePosition == .right, isGroup: self.auth.selectedConnectyDialog?.type == .group || self.auth.selectedConnectyDialog?.type == .public, fullName: self.fullName))
                         .foregroundColor(self.message.messageState == .error ? .red : .gray)
                         .font(.caption)
                         .lineLimit(1)
-                        .padding(.horizontal, 18)
+                        .padding(.leading, messagePosition == .right ? 0 : 20)
+                        .padding(.trailing, messagePosition == .right ? 20 : 2)
                         .offset(y: 4)
                         .multilineTextAlignment(messagePosition == .right ? .trailing : .leading)
                         .opacity(self.hasPrior ? 0 : 1)
 
-                    if messagePosition == .left { Spacer() }
+                    if messagePosition == .left {
+                        if self.message.isPinned {
+                            Image(systemName: "pin.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .rotationEffect(.degrees(-45))
+                                .frame(width: 14, height: 12, alignment: .center)
+                                .offset(y: 5)
+                                .foregroundColor(.gray)
+                                .opacity(self.hasPrior ? 0 : 1)
+                        }
+
+                        Spacer()
+                    }
                 }
 
                 WebImage(url: URL(string: self.avatar))
