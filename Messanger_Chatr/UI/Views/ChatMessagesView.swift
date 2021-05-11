@@ -212,7 +212,7 @@ struct ChatMessagesView: View {
                             })
                             .onPreferenceChange(ViewOffsetKey.self) {
                                 print("the offset is: \($0)")
-                                if $0 < -150 && !firstScroll && !self.isLoadingMore && self.permissionLoadMore && self.maxPagination != 0 {
+                                if $0 < -60 && !firstScroll && !self.isLoadingMore && self.permissionLoadMore && self.maxPagination != 0 {
                                     self.isLoadingMore = true
                                     self.permissionLoadMore = false
                                     changeMessageRealmData.shared.getMessageUpdates(dialogID: self.dialogID, limit: pageShowCount * (self.scrollPage + 0), skip: currentMessages.count - self.minPagination, completion: { _ in
@@ -222,7 +222,7 @@ struct ChatMessagesView: View {
                                             }
                                             //self.scrollToId = currentMessages[self.maxPagination + pageShowCount].id
                                             
-                                            print("From Empty view the load limit: \(pageShowCount * (self.scrollPage)) and the skip:\(currentMessages.count - self.minPagination)...... the indexes are \(self.maxPagination).....< \(self.minPagination) anddddd nowww the scroll to index is: \(self.maxPagination + pageShowCount - 1)")
+                                            //print("From Empty view the load limit: \(pageShowCount * (self.scrollPage)) and the skip:\(currentMessages.count - self.minPagination)...... the indexes are \(self.maxPagination).....< \(self.minPagination) anddddd nowww the scroll to index is: \(self.maxPagination + pageShowCount - 1)")
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                                                 reader.scrollTo(currentMessages[self.maxPagination + pageShowCount - 1].id, anchor: .top)
                                                 self.isLoadingMore = false
@@ -236,10 +236,10 @@ struct ChatMessagesView: View {
                                         //need to make the very last ending of convo scroll to item due to the page not being divisible.
                                         //also need to add the scroll down functions
                                         
-                                        if currentMessages.count != self.viewModel.totalMessageCount {
-                                            print("pulling delta from scrolling...\(self.viewModel.totalMessageCount) && \(self.auth.messages.selectedDialog(dialogID: self.dialogID).count)")
-                                            changeMessageRealmData.shared.getMessageUpdates(dialogID: self.dialogID, limit: (pageShowCount * self.scrollPage + 50), skip: currentMessages.count - self.minPagination, completion: { _ in })
-                                        }
+//                                        if currentMessages.count != self.viewModel.totalMessageCount {
+//                                            print("pulling delta from scrolling...\(self.viewModel.totalMessageCount) && \(self.auth.messages.selectedDialog(dialogID: self.dialogID).count)")
+//                                            changeMessageRealmData.shared.getMessageUpdates(dialogID: self.dialogID, limit: (pageShowCount * self.scrollPage + 50), skip: currentMessages.count - self.minPagination, completion: { _ in })
+//                                        }
                                     })
                                 }
                             }
@@ -285,12 +285,12 @@ struct ChatMessagesView: View {
                             print("STARTTT From Empty view the load limit: \(pageShowCount * (self.scrollPage + 1)) and the skip:\(currentMessages.count - self.minPagination)...... the indexes are \(self.maxPagination).....< \(self.minPagination) anddddd nowww the scroll to index is: \(self.maxPagination + 1)")
                         }
 
-                        if self.auth.messages.selectedDialog(dialogID: dialogID).count != self.viewModel.totalMessageCount {
-                            print("local and pulled do not match... pulling delta: \(self.viewModel.totalMessageCount) && \(self.auth.messages.selectedDialog(dialogID: self.dialogID).count)")
-
-                            changeMessageRealmData.shared.getMessageUpdates(dialogID: dialogID, limit: pageShowCount * scrollPage, skip: 0, completion: { _ in
-                            })
-                        }
+//                        if self.auth.messages.selectedDialog(dialogID: dialogID).count != self.viewModel.totalMessageCount {
+//                            print("local and pulled do not match... pulling delta: \(self.viewModel.totalMessageCount) && \(self.auth.messages.selectedDialog(dialogID: self.dialogID).count)")
+//
+//                            changeMessageRealmData.shared.getMessageUpdates(dialogID: dialogID, limit: pageShowCount * scrollPage, skip: 0, completion: { _ in
+//                            })
+//                        }
                     })
                 }
             }.onDisappear() {
