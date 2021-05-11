@@ -70,7 +70,7 @@ struct AttachmentBubble: View {
                             Text("loading image...")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                        }.padding(.vertical, 50)
+                        }.padding(.vertical, 100)
                     }.aspectRatio(contentMode: .fit)
                     .clipShape(CustomGIFShape())
                     .frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.55 : 0.65)), alignment: self.messagePosition == .right ? .trailing : .leading)

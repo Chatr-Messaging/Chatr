@@ -77,13 +77,13 @@ class ChatMessageViewModel: ObservableObject {
             }
 
             guard !dialog.isJoined(), Chat.instance.isConnected else {
-                //self.updateDialogMessageCount(dialogId: dialogId)
+                self.updateDialogMessageCount(dialogId: dialogId)
                 completion()
                 return
             }
 
             dialog.join(completionBlock: { _ in
-                //self.updateDialogMessageCount(dialogId: dialogId)
+                self.updateDialogMessageCount(dialogId: dialogId)
                 self.setOnlineCount(dialog: dialog)
                 completion()
             })
@@ -94,11 +94,11 @@ class ChatMessageViewModel: ObservableObject {
     }
     
     func updateDialogMessageCount(dialogId: String) {
-        Request.countOfMessages(forDialogID: dialogId, extendedRequest: ["sort_desc" : "lastMessageDate"], successBlock: { count in
-            self.totalMessageCount = Int(count)
-            print("the total message count is: \(Int(count))")
-        })
-        
+//        Request.countOfMessages(forDialogID: dialogId, extendedRequest: ["sort_desc" : "lastMessageDate"], successBlock: { count in
+//            self.totalMessageCount = Int(count)
+//            print("the total message count is: \(Int(count))")
+//        })
+
         Request.totalUnreadMessageCountForDialogs(withIDs: Set([dialogId]), successBlock: { (unread, _) in
             print("the unread count for this dialog: \(unread)")
             self.unreadMessageCount = Int(unread)
