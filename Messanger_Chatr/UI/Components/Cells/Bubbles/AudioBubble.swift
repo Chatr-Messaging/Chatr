@@ -77,7 +77,7 @@ struct AudioBubble: View {
                 .padding(.trailing, 2.5)
         }.padding(.horizontal, 15)
         .padding(.vertical, 10)
-        .transition(AnyTransition.scale)
+        //.transition(AnyTransition.scale)
         .background(self.messageRight ? LinearGradient(
         gradient: Gradient(colors: [Color(red: 46 / 255, green: 168 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)]),
         startPoint: .top, endPoint: .bottom) : LinearGradient(

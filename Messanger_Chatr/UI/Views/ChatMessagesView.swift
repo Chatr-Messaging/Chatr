@@ -50,7 +50,7 @@ struct ChatMessagesView: View {
     @State private var scrollViewHeight: CGFloat = 0
     var namespace: Namespace.ID
     let keyboard = KeyboardObserver()
-    let pageShowCount = 12
+    let pageShowCount = 10
     //let count = self.auth.messages.selectedDialog(dialogID: self.dialogID).count
     var tempPagination: Int {
         if maxMessageCount > pageShowCount {
@@ -137,7 +137,8 @@ struct ChatMessagesView: View {
                                                 .offset(y: 2)
 
                                             Divider()
-                                                .padding(.vertical, 10)
+                                                .padding(.top, 5)
+                                                .padding(.bottom)
                                                 .padding(.horizontal, 30)
                                         }
                                     }
@@ -198,7 +199,7 @@ struct ChatMessagesView: View {
                                                     reader.scrollTo(currentMessages[message].id, anchor: .bottom)
                                                     self.firstScroll = false
                                                 }
-                                            } else {
+                                            } else if self.scrollViewHeight > Constants.screenHeight * 0.8 {
                                                 withAnimation(Animation.easeOut(duration: 0.6).delay(0.15)) {
                                                     reader.scrollTo(currentMessages[message].id, anchor: .bottom)
                                                 }
@@ -208,6 +209,7 @@ struct ChatMessagesView: View {
                                         if self.scrollToId == currentMessages[message].id {
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                                                 reader.scrollTo(currentMessages[message].id, anchor: .top)
+                                                self.scrollToId = ""
                                             }
                                         }
                                     }
@@ -215,20 +217,17 @@ struct ChatMessagesView: View {
                             }.background(GeometryReader { fullView in
                                 Color.clear.preference(key: ViewOffsetKey.self,
                                     value: -fullView.frame(in: .named("scroll")).origin.y)
-                                    .onChange(of: fullView.size.height) { value in
-                                        print("the view height is: \(value * 0.55)")
-                                        self.scrollViewHeight = value * 0.55
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                            if self.maxPagination != 0 {
-                                                reader.scrollTo(currentMessages[self.maxPagination + pageShowCount - 1].id, anchor: .top)
-                                            } else {
-                                                let divisor = currentMessages.count / pageShowCount
-                                                let remainder = currentMessages.count - divisor * pageShowCount
-                                                let scrollToIndex = remainder == 0 ? 0 : remainder - 1
-                                                print("the scroll to max is at 0: \(divisor) && \(remainder) && \(scrollToIndex)")
-                                                reader.scrollTo(currentMessages[scrollToIndex].id, anchor: .top)
-                                            }
+                                    .onAppear {
+                                        //If the 10 to show is not enough then show another page
+                                        self.scrollViewHeight = fullView.size.height
+                                        print("the view height on aprear: \(self.scrollViewHeight) ** \(Constants.screenHeight * 0.8)")
+                                        if fullView.size.height < Constants.screenHeight * 0.8 && self.maxPagination != 0 {
+                                            self.scrollPage += 1
                                         }
+                                    }
+                                    .onChange(of: fullView.size.height) { value in
+                                        print("the view height is: \(value)")
+                                        self.scrollViewHeight = value
                                     }
                             })
                             .onPreferenceChange(ViewOffsetKey.self) {
@@ -238,32 +237,34 @@ struct ChatMessagesView: View {
                                     self.permissionLoadMore = false
                                     //$0 > self.scrollViewHeight && self.minPagination != currentMessages.count {
 
-                                    changeMessageRealmData.shared.getMessageUpdates(dialogID: self.dialogID, limit: pageShowCount * (self.scrollPage + 0), skip: currentMessages.count - self.minPagination, completion: { _ in
+                                    changeMessageRealmData.shared.getMessageUpdates(dialogID: self.dialogID, limit: pageShowCount * (self.scrollPage + 1), skip: 0, completion: { _ in
                                         DispatchQueue.main.async {
-                                            //self.scrollToId = currentMessages[self.maxPagination + pageShowCount].id
                                             //withAnimation {
-                                            self.scrollPage += 1
+                                                self.scrollPage += 1
                                             //}
                                             //print("From Empty view the load limit: \(pageShowCount * (self.scrollPage)) and the skip:\(currentMessages.count - self.minPagination)...... the indexes are \(self.maxPagination).....< \(self.minPagination) anddddd nowww the scroll to index is: \(self.maxPagination + pageShowCount - 1)")
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-//                                                if self.maxPagination != 0 {
-//                                                    //reader.scrollTo(currentMessages[self.maxPagination + pageShowCount - 1].id, anchor: .top)
-//                                                } else {
-//                                                    let divisor = currentMessages.count / pageShowCount
-//                                                    let remainder = currentMessages.count - divisor * pageShowCount
-//                                                    let scrollToIndex = remainder == 0 ? 0 : remainder - 1
-//                                                    print("the scroll to max is at 0: \(divisor) && \(remainder) && \(scrollToIndex)")
-//                                                    reader.scrollTo(currentMessages[scrollToIndex].id, anchor: .top)
-//                                                }
+                                            //DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                            print("found the unread??: \(self.viewModel.unreadMessageCount)")
+                                                if self.maxPagination != 0 {
+                                                    self.scrollToId = currentMessages[self.maxPagination + pageShowCount - 1].id
+                                                    //reader.scrollTo(currentMessages[self.maxPagination + pageShowCount - 1].id, anchor: .top)
+                                                } else {
+                                                    let divisor = currentMessages.count / pageShowCount
+                                                    let remainder = currentMessages.count - divisor * pageShowCount
+                                                    let scrollToIndex = remainder == 0 ? pageShowCount - 1 : remainder - 1
+                                                    print("the scroll to max is at 0: \(divisor) && \(remainder) && \(scrollToIndex)")
+                                                    self.scrollToId = currentMessages[scrollToIndex].id
+                                                    //reader.scrollTo(currentMessages[scrollToIndex].id, anchor: .top)
+                                                }
+                                                self.maxMessageCount = currentMessages.count
                                                 self.isLoadingMore = false
                                                 
                                                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                                     self.permissionLoadMore = true
                                                 }
-                                            }
+                                            //}
                                         }
 
-                                        //need to make the very last ending of convo scroll to item due to the page not being divisible.
                                         //also need to add the scroll down functions
                                         
 //                                        if currentMessages.count != self.viewModel.totalMessageCount {
@@ -311,6 +312,7 @@ struct ChatMessagesView: View {
                     viewModel.loadDialog(auth: auth, dialogId: dialogID, completion: {
                         print("done loading dialogggg: \(dialogID)")
                         DispatchQueue.main.async {
+                            self.loadUnreadMessages()
                             self.observePinnedMessages()
                             delayViewMessages = true
                             //self.viewModel.totalMessageCount = count
@@ -319,11 +321,8 @@ struct ChatMessagesView: View {
                         }
 
                         //if currentMessages.count != self.maxMessageCount {
-                            print("local and pulled do not match... pulling delta: \(self.maxMessageCount) && \(currentMessages.count)")
+                        print("local and pulled do not match... pulling delta: \(self.maxMessageCount) && \(currentMessages.count) && \(self.viewModel.unreadMessageCount)")
 
-                            changeMessageRealmData.shared.getMessageUpdates(dialogID: dialogID, limit: pageShowCount * scrollPage, skip: 0, completion: { _ in
-                                self.maxMessageCount = currentMessages.count
-                            })
                         //}
                     })
                 }
@@ -343,13 +342,31 @@ struct ChatMessagesView: View {
     func needsTimestamp(index: Int) -> Bool {
         let result = self.auth.messages.selectedDialog(dialogID: self.dialogID)
 
-        return result[index] != result.first ? (result[index].date >= result[index - 1].date.addingTimeInterval(86400) ? true : false) : false
+        return result[index] != result.first ? (result[index].messageState != .isTyping && result[index].date >= result[index - 1].date.addingTimeInterval(86400) ? true : false) : false
     }
     
     func isPriorWider(index: Int) -> Bool {
         let result = self.auth.messages.selectedDialog(dialogID: self.dialogID)
 
         return result[index] != result.first ? (result[index].senderID == result[index - 1].senderID && (result[index].date >= result[index - 1].date.addingTimeInterval(86400) ? false : true) && result[index].bubbleWidth > result[index - 1].bubbleWidth ? false : true) : true //- (result[index].dislikedId.count >= 1 && result[index].likedId.count >= 1 ? 48 : 16)
+    }
+    
+    func loadUnreadMessages() {
+        //Need to come back when the total count request works
+        Request.totalUnreadMessageCountForDialogs(withIDs: Set([self.dialogID]), successBlock: { (unread, directory) in
+            print("the unread count for this dialog: \(unread) && \(directory)")
+            self.maxMessageCount = currentMessages.count
+            self.viewModel.unreadMessageCount = Int(unread)
+            if unread != 0 {
+                changeMessageRealmData.shared.getMessageUpdates(dialogID: self.dialogID, limit: currentMessages.count + Int(unread > 40 ? 40 : unread), skip: currentMessages.count - self.minPagination, completion: { _ in
+                    self.maxMessageCount = currentMessages.count
+                })
+            }
+        })
+    }
+    
+    func loadMoreMessages() {
+        
     }
     
     func observePinnedMessages() {

@@ -36,6 +36,7 @@ class ChatMessageViewModel: ObservableObject {
         Request.updateDialog(withID: dialogId, update: UpdateChatDialogParameters(), successBlock: { dialog in
             auth.selectedConnectyDialog = dialog
             dialog.sendUserStoppedTyping()
+            self.updateDialogMessageCount(dialogId: dialogId)
 
             dialog.onUserIsTyping = { (userID: UInt) in
                 if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
@@ -77,13 +78,11 @@ class ChatMessageViewModel: ObservableObject {
             }
 
             guard !dialog.isJoined(), Chat.instance.isConnected else {
-                self.updateDialogMessageCount(dialogId: dialogId)
                 completion()
                 return
             }
 
             dialog.join(completionBlock: { _ in
-                self.updateDialogMessageCount(dialogId: dialogId)
                 self.setOnlineCount(dialog: dialog)
                 completion()
             })
@@ -99,8 +98,11 @@ class ChatMessageViewModel: ObservableObject {
 //            print("the total message count is: \(Int(count))")
 //        })
 
-        Request.totalUnreadMessageCountForDialogs(withIDs: Set([dialogId]), successBlock: { (unread, _) in
-            print("the unread count for this dialog: \(unread)")
+        Request.totalUnreadMessageCountForDialogs(withIDs: Set([dialogId]), successBlock: { (unread, directory) in
+            print("the unread count for this dialog: \(unread) && \(directory)")
+            if unread != 0 {
+                //changeMessageRealmData.shared.getMessageUpdates(dialogID: dialogId, limit: (pageShowCount * self.scrollPage + 50), skip: currentMessages.count - self.minPagination, completion: { _ in })
+            }
             self.unreadMessageCount = Int(unread)
         })
     }

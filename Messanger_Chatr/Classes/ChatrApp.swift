@@ -56,7 +56,8 @@ extension ChatrApp {
                 })
             } else {
                 //print("\(Thread.current.isMainThread) Success joining session! the current user: \(String(describing: Session.current.currentUser?.fullName)) && expirationSate: \(String(describing: Session.current.sessionDetails?.createdAt))")
-
+                print("Success joining session! the created at: \(String(describing: Session.current.sessionDetails))")
+                
                 changeDialogRealmData.shared.fetchDialogs(completion: { _ in })
                 changeContactsRealmData.shared.observeQuickSnaps()
                 changeProfileRealmDate.shared.observeFirebaseUser(with: Int(id))

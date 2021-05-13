@@ -51,8 +51,10 @@ struct TextBubble: View {
                                 .opacity(Double(self.typingOpacity))
                                 .animation(Animation.easeInOut(duration: 0.66).repeatForever(autoreverses: true).delay(Double(type + 1) * 0.22))
                                 .onAppear() {
-                                    withAnimation(Animation.easeInOut(duration: 0.66).repeatForever(autoreverses: true)) {
-                                        self.typingOpacity = 0.20
+                                    DispatchQueue.main.async {
+                                        withAnimation(Animation.easeInOut(duration: 0.66).repeatForever(autoreverses: true)) {
+                                            self.typingOpacity = 0.20
+                                        }
                                     }
                                 }
                         }

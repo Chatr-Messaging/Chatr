@@ -38,7 +38,7 @@ struct LocationBubble: View {
         }
         //}
         .frame(width: CGFloat(Constants.screenWidth * 0.7), height: CGFloat(Constants.screenWidth * 0.5))
-        .transition(.asymmetric(insertion: AnyTransition.scale.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
+        //.transition(.asymmetric(insertion: AnyTransition.scale.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
         .cornerRadius(20)
         //.padding(.leading, self.messagePosition == .right ? CGFloat(Constants.screenHeight * 0.1) : 0)
         //.padding(.trailing, self.messagePosition == .right ? 0 : CGFloat(Constants.screenHeight * 0.1))

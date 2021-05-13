@@ -638,7 +638,7 @@ struct topGroupHeaderView: View {
                             .lineLimit(2)
                             .multilineTextAlignment(.center)
                         
-                        Text("\(self.dialogModel.occupentsID.count) total " + (self.dialogModel.dialogType == "public" ? "subscribers" : "members"))
+                        Text("\(self.dialogModel.occupentsID.count) " + (self.dialogModel.dialogType == "public" ? "subscribers" : "members"))
                             .font(.subheadline)
                             .fontWeight(.none)
                             .foregroundColor(.secondary)

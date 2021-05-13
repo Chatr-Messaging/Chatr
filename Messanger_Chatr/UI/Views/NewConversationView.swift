@@ -76,8 +76,8 @@ struct NewConversationView: View {
                     }.padding(.horizontal)
                     .background(
                         RoundedRectangle(cornerRadius: 12)
-                            .padding(.vertical, -5)
-                            .padding(.horizontal, -12.5)
+                            .padding(.vertical, -3.5)
+                            .padding(.horizontal, -11)
                             .foregroundColor(Color("pendingBtnColor"))
                     )
                     .padding(.top, 25) //don't touch this or switch up the padding... there for a reason

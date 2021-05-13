@@ -84,7 +84,7 @@ struct AttachmentBubble: View {
                 ZStack() {
                     PlayerView(player: self.$player, totalDuration: self.$totalDuration)
                         .edgesIgnoringSafeArea(.all)
-                        .transition(.asymmetric(insertion: AnyTransition.scale.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
+                        //.transition(.asymmetric(insertion: AnyTransition.scale.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                         .background(Color("bgColor"))
                         .clipShape(CustomGIFShape())
                         .frame(width: self.videoSize.width, height: self.videoSize.height)

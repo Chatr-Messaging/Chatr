@@ -50,8 +50,8 @@ struct DialogCell: View {
                             .scaledToFill()
                             .frame(width: 55, height: 55, alignment: .center)
                             .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.05)), removal: AnyTransition.identity))
-                            .cornerRadius(self.dialogModel.dialogType == "public" ? 15 : 27.5)
-                            .offset(x: -5)
+                            .cornerRadius(self.dialogModel.dialogType == "public" ? 12.5 : 27.5)
+                            .offset(x: self.dialogModel.dialogType == "public" ? -7.5 : -5)
                             .shadow(color: Color.black.opacity(0.23), radius: 7, x: 0, y: 5)
                             .onTapGesture {
                                 if isOpen {

@@ -241,10 +241,10 @@ struct KeyboardCardView: View {
                 if !self.isRecordingAudio {
                     HStack(alignment: .bottom, spacing: 0) {
                         Button(action: {
-                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                             withAnimation(Animation.interactiveSpring(), {
                                 self.isKeyboardActionOpen.toggle()
                             })
+                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                         }) {
                             Image(systemName: self.isKeyboardActionOpen ? "xmark" : "paperclip")
                                 .resizable()

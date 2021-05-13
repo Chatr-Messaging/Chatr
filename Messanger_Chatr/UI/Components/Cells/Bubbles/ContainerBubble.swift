@@ -82,7 +82,7 @@ struct ContainerBubble: View {
                             LocationBubble(viewModel: self.viewModel, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior, namespace: self.namespace)
                         } else {
                             TextBubble(message: self.message, messagePosition: messagePosition, namespace: self.namespace)
-                                .transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(Animation.spring().delay(0.4)), removal: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.easeOut(duration: 0.25))))
+                                .transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(Animation.spring().delay(0.4)), removal: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(Animation.easeOut(duration: 0.25).delay(0.4))))
                         }
 
                         if self.message.messageState == .error {

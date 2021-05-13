@@ -52,8 +52,9 @@ struct PinnedSectionView: View {
                                                     .font(.caption)
                                                     .foregroundColor(.secondary)
                                             }
-                                        }.aspectRatio(contentMode: .fit)
-                                        .frame(maxHeight: 98)
+                                        }
+                                        .frame(width: 125, height: 98)
+                                        .aspectRatio(contentMode: .fit)
                                 } else if messagez.imageType == "image/png" {
                                     //Image
                                     WebImage(url: URL(string: messagez.image))
