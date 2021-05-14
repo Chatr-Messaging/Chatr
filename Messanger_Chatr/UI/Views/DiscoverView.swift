@@ -21,7 +21,8 @@ struct DiscoverView: View {
     
     var body: some View {
         ScrollView(.vertical, showsIndicators: true) {
-            VStack(alignment: .leading) {
+            VStack(alignment: .center) {
+                /*
                 Text("Under Construction")
                     .font(.largeTitle)
                     .fontWeight(.bold)
@@ -41,8 +42,8 @@ struct DiscoverView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: Constants.screenWidth)
-
-                /*
+*/
+                
                 //SEARCH BAR
                 VStack {
                     HStack {
@@ -99,9 +100,9 @@ struct DiscoverView: View {
                     .padding(.all)
                 
                 if self.bannerDataArray.count > 0 {
-                    DiscoverCarousel(width: Constants.screenWidth, page: self.$pageIndex, dataArray: self.$bannerDataArray, dataArrayCount: self.$bannerCount, height: self.bannerDataArray.count > 0 ? 190 : 0)
+                    DiscoverCarousel(width: 300, page: self.$pageIndex, dataArray: self.$bannerDataArray, dataArrayCount: self.$bannerCount, height: self.bannerDataArray.count > 0 ? 300 : 0)
                         .environmentObject(self.auth)
-                        .frame(width: Constants.screenWidth, height: self.bannerDataArray.count > 0 ? 205 : 0)
+                        .frame(width: Constants.screenWidth, height: self.bannerDataArray.count > 0 ? 320 : 0)
                         .animation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0))
                         .resignKeyboardOnDragGesture()
                     
@@ -111,17 +112,17 @@ struct DiscoverView: View {
                             .offset(y: -30)
                     }
                 }
-                 */
+                 Spacer()
             }.frame(height: Constants.screenHeight * 0.75)
-            //.onAppear {
-                //self.bannerDataArray.append(DiscoverBannerData(groupName: "Apple Fanboy", memberCount: 18, catagory: "Technology", groupImg: "proPic", backgroundImg: "michaelAngelWallpaper", catagoryImg: "iphone.homebutton"))
+            .onAppear {
+                self.bannerDataArray.append(DiscoverBannerData(groupName: "Apple Fanboy", memberCount: 18, catagory: "Technology", groupImg: "proPic", backgroundImg: "michaelAngelWallpaper", catagoryImg: "iphone.homebutton"))
                 
-                //DiscoverBannerData(titleBold: "Discover", title: "Channels", subtitleImage: "magnifyingglass", subtitle: "Join your favorite public groups", imageMain: "contactsBanner", gradientBG: "discoverBackground")
+                //self.bannerDataArray.append(DiscoverBannerData(titleBold: "Discover", title: "Channels", subtitleImage: "magnifyingglass", subtitle: "Join your favorite public groups", imageMain: "contactsBanner", gradientBG: "discoverBackground"))
                 
-                //self.bannerDataArray.append(DiscoverBannerData(groupName: "Retro World", memberCount: 129, catagory: "Technology", groupImg: "proPic", backgroundImg: "syncAddressBackground", catagoryImg: "iphone.homebutton"))
+                self.bannerDataArray.append(DiscoverBannerData(groupName: "Retro World", memberCount: 129, catagory: "Technology", groupImg: "proPic", backgroundImg: "syncAddressBackground", catagoryImg: "iphone.homebutton"))
                 
-                //self.bannerCount = self.bannerDataArray.count
-            //}
+                self.bannerCount = self.bannerDataArray.count
+            }
         }.resignKeyboardOnDragGesture()
         .navigationBarItems(leading:
             Button(action: {

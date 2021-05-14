@@ -60,23 +60,23 @@ struct HomeView: View {
             case .signedIn:
                 if !self.auth.preventDismissal {
                     Text("")
-//                        .onAppear(perform: {
-//                            if self.auth.profile.results.first?.isLocalAuthOn ?? false {
-//                                self.auth.isLoacalAuth = true
-//                                let context = LAContext()
-//                                var error: NSError?
-//
-//                                if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
-//                                    let reason = "Identify yourself!"
-//
-//                                    context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, authenticationError in
-//                                        if success {
-//                                            self.auth.isLoacalAuth = false
-//                                        }
-//                                    }
-//                                }
-//                            } else { self.auth.isLoacalAuth = false }
-//                        })
+                        .onAppear(perform: {
+                            if self.auth.profile.results.first?.isLocalAuthOn ?? false {
+                                self.auth.isLoacalAuth = true
+                                let context = LAContext()
+                                var error: NSError?
+
+                                if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
+                                    let reason = "Identify yourself!"
+
+                                    context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, authenticationError in
+                                        if success {
+                                            self.auth.isLoacalAuth = false
+                                        }
+                                    }
+                                }
+                            } else { self.auth.isLoacalAuth = false }
+                        })
                         .onDisappear(perform: {
                             self.auth.haveUserFullName = false
                             self.auth.haveUserProfileImg = false

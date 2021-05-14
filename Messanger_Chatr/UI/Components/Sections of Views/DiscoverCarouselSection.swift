@@ -68,7 +68,7 @@ struct DiscoverCarousel : UIViewRepresentable {
         func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
             // Using This Function For Getting Currnet Page
         
-            let page = Int(scrollView.contentOffset.x / UIScreen.main.bounds.width)
+            let page = Int(scrollView.contentOffset.x / (Constants.screenWidth * 0.65))
             self.parent.page = page
         }
         
@@ -91,7 +91,7 @@ struct DiscoverListView : View {
         HStack(spacing: 0) {
             ForEach(self.dataArray, id: \.self) { data in
                 DiscoverBannerCell(groupName: data.groupName, memberCount: data.memberCount, catagory: data.catagory, groupImg: data.groupImg, backgroundImg: data.backgroundImg, catagoryImg: data.catagoryImg)
-                    .frame(width: Constants.screenWidth)
+                    .frame(width: Constants.screenWidth * 0.65)
                     .onTapGesture {
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     }
@@ -117,8 +117,8 @@ struct DiscoverBannerCell: View, Identifiable {
                     Image(self.groupImg)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 55, height: 55)
-                        .cornerRadius(55 / 4)
+                        .frame(width: 60, height: 60)
+                        .cornerRadius(60 / 4)
                     
                     VStack(alignment: .leading, spacing: 2.5) {
                         Text(self.groupName)
