@@ -29,6 +29,7 @@ struct NewConversationView: View {
     @State var groupName: String = ""
     @State var description: String = ""
     @State var inputImage: UIImage? = nil
+    @State var inputCoverImage: UIImage? = nil
     @State var selectedTags: [publicTag] = []
     @ObservedObject var contacts = ContactsRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ContactStruct.self))
     @ObservedObject var profile = ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self))
@@ -334,7 +335,7 @@ struct NewConversationView: View {
 
                     //MARK: Public Dialog
                     VStack {
-                        NewPublicConversationSection(creatingDialog: self.$creatingDialog, isNotPresent: self.$navigationPrivate, groupName: self.$groupName, description: self.$description, inputImage: self.$inputImage, selectedTags: self.$selectedTags)
+                        NewPublicConversationSection(creatingDialog: self.$creatingDialog, isNotPresent: self.$navigationPrivate, groupName: self.$groupName, description: self.$description, inputImage: self.$inputImage, inputCoverImage: self.$inputCoverImage, selectedTags: self.$selectedTags)
                             .resignKeyboardOnDragGesture()
                         
                         //MARK: FOOTER
@@ -452,11 +453,10 @@ struct NewConversationView: View {
                 dialog.name = self.groupName
                 dialog.dialogDescription = self.description
 
-                let data = inputImage?.jpegData(compressionQuality: 0.5)
+                let data = inputImage?.jpegData(compressionQuality: 1.0)
+                let coverData = inputCoverImage?.jpegData(compressionQuality: 1.0)
+                let databaseRef = Database.database().reference().child("Marketplace")
 
-                self.description = ""
-                self.groupName = ""
-                self.inputImage = nil
                 Request.uploadFile(with: data!, fileName: "publicDialog_profileImg", contentType: "image/jpeg", isPublic: true, progressBlock: { (progress) in
                     print("uploading image: \(progress)")
                 }, successBlock: { (blob) in
@@ -466,15 +466,27 @@ struct NewConversationView: View {
                         changeDialogRealmData.shared.fetchDialogs(completion: { _ in
                             for i in self.selectedTags {
                                 print("the selected tags is: \(i.title)")
-                                Database.database().reference().child("Marketplace").child("tags").child(i.title).child("dialogs").setValue([dialog.id : true])
+                                databaseRef.child("tags").child(i.title).child("dialogs").setValue([dialog.id : true])
                             }
+                            
+                            Request.uploadFile(with: coverData!, fileName: "publicDialog_coverImg", contentType: "image/jpeg", isPublic: true, progressBlock: { (progress) in
+                                print("uploading cover image: \(progress)")
+                            }, successBlock: { (blobCover) in
+                                databaseRef.child(dialog.id?.description ?? "").setValue(["name" : self.groupName, "subscribers" : "0", "date_created" : Date().description, "cover_photo" : blobCover.id.description])
 
-                            self.selectedTags.removeAll()
-                            self.newDialogID = dialog.id?.description ?? ""
-                            UserDefaults.standard.set(self.newDialogID, forKey: "selectedDialogID")
-                            self.creatingDialog = false
-                            withAnimation {
-                                self.presentationMode.wrappedValue.dismiss()
+                                self.description = ""
+                                self.groupName = ""
+                                self.inputImage = nil
+                                self.selectedTags.removeAll()
+                                self.newDialogID = dialog.id?.description ?? ""
+                                UserDefaults.standard.set(self.newDialogID, forKey: "selectedDialogID")
+                                self.creatingDialog = false
+                                withAnimation {
+                                    self.presentationMode.wrappedValue.dismiss()
+                                }
+                            }) { (error) in
+                                print("error uploading cover image...\(error.localizedDescription)")
+                                self.creatingDialog = false
                             }
                         })
                     }) { (error) in
@@ -485,6 +497,7 @@ struct NewConversationView: View {
 
                 }) { (error) in
                     print("error uploading profile image...\(error.localizedDescription)")
+                    self.creatingDialog = false
                 }
             }
         } else {

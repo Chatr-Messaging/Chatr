@@ -21,11 +21,163 @@ struct EditGroupDialogView: View {
     @State var keyboardHeight: CGFloat = 0
     @State var didSave: Bool = true
     @State var username: String = ""
-    
+    @State var inputImage: UIImage? = nil
+    @State var inputCoverImage: UIImage? = nil
+    @State var groupImage: Image? = nil
+    @State var coverImage: Image? = nil
+    @State private var showImagePicker: Bool = false
+    @State private var showCoverImagePicker: Bool = false
+
     var body: some View {
         ZStack {
             ScrollView(.vertical, showsIndicators: true) {
                 VStack() {
+                    //MARK: Public Avatar and Cover Photo
+                    if self.dialogModel.dialogType == "public" {
+                        HStack {
+                            Text("AVATAR & COVER PHOTO:")
+                                .font(.caption)
+                                .fontWeight(.regular)
+                                .foregroundColor(.secondary)
+                                .padding(.horizontal)
+                                .padding(.horizontal)
+                                .offset(y: 2)
+                            Spacer()
+                        }.padding(.top)
+                        .sheet(isPresented: self.$showCoverImagePicker, onDismiss: self.loadCoverImage) {
+                            ImagePicker(image: self.$inputCoverImage)
+                        }
+                        
+                        //Profile Image
+                        VStack(alignment: .center, spacing: 0) {
+                            ZStack(alignment: .bottom) {
+                                Button(action: {
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                    withAnimation {
+                                        self.showCoverImagePicker.toggle()
+                                    }
+                                }, label: {
+                                    if (coverImage == nil) {
+                                        ZStack {
+                                            RoundedRectangle(cornerRadius: 0)
+                                                .frame(width: Constants.screenWidth - 32, height: 160, alignment: .center)
+                                                .overlay(
+                                                        RoundedRectangle(cornerRadius: 16)
+                                                            .stroke(Color.gray, style: StrokeStyle(lineWidth: 2.5, dash: [20, 5]))
+                                                            .padding(10)
+                                                    )
+                                                .foregroundColor(Color("buttonColor"))
+
+                                            VStack(spacing: 2.5) {
+                                                Image(systemName: "photo.on.rectangle.angled")
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .foregroundColor(Color.secondary)
+                                                    .frame(width: 36, height: 34, alignment: .center)
+
+                                                Text("cover photo")
+                                                    .font(.caption)
+                                                    .fontWeight(.regular)
+                                                    .foregroundColor(.secondary)
+                                            }.offset(y: -22)
+                                        }
+                                    } else {
+                                        coverImage?.resizable().aspectRatio(contentMode: .fill).frame(width: Constants.screenWidth - 30, height: 160).clipped()
+                                    }
+                                }).padding(.bottom, 30)
+                                
+                                Button(action: {
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                    withAnimation {
+                                        self.showImagePicker.toggle()
+                                    }
+                                }, label: {
+                                    if (groupImage == nil) {
+                                        ZStack {
+                                            RoundedRectangle(cornerRadius: 20)
+                                                .frame(width: 80, height: 80, alignment: .center)
+                                                .foregroundColor(Color("buttonColor"))
+
+                                            Image(systemName: "person.crop.circle.badge.plus")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .foregroundColor(Color.secondary)
+                                                .frame(width: 45, height: 45, alignment: .center)
+                                                .offset(x: -3)
+                                        }.shadow(color: Color("buttonShadow"), radius: 12, x: 0, y: 5)
+                                    } else {
+                                        groupImage?.resizable().aspectRatio(contentMode: .fill).frame(width: 80, height: 80).cornerRadius(16)
+                                            .shadow(color: Color("buttonShadow"), radius: 12, x: 0, y: 5)
+                                    }
+                                }).offset(y: -12)
+                            }
+                            Divider()
+                                .frame(width: Constants.screenWidth - 70)
+                                .offset(x: 10)
+                        
+                            Button(action: {
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                withAnimation {
+                                    self.showImagePicker.toggle()
+                                }
+                            }, label: {
+                                VStack(alignment: .trailing, spacing: 0) {
+                                    HStack {
+                                        Text("Select Avatar")
+                                            .font(.none)
+                                            .fontWeight(.none)
+                                            .foregroundColor(.blue)
+                                            .padding(.leading)
+                                        Spacer()
+                                        
+                                        Image(systemName: "chevron.right")
+                                            .resizable()
+                                            .font(Font.title.weight(.bold))
+                                            .scaledToFit()
+                                            .frame(width: 7, height: 15, alignment: .center)
+                                            .foregroundColor(.secondary)
+                                    }
+                                }.padding(.horizontal)
+                                .padding(.vertical, 14)
+
+                                Divider()
+                                    .frame(width: Constants.screenWidth - 70)
+                                    .offset(x: 10)
+                            }).buttonStyle(changeBGButtonStyle())
+                            
+                            Button(action: {
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                withAnimation {
+                                    self.showImagePicker.toggle()
+                                }
+                            }, label: {
+                                HStack {
+                                    Text("Upload Cover Photo")
+                                        .font(.none)
+                                        .fontWeight(.none)
+                                        .foregroundColor(.blue)
+                                        .padding(.leading)
+
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .resizable()
+                                        .font(Font.title.weight(.bold))
+                                        .scaledToFit()
+                                        .frame(width: 7, height: 15, alignment: .center)
+                                        .foregroundColor(.secondary)
+                                }.padding(.horizontal)
+                                .padding(.vertical, 14)
+                            }).buttonStyle(changeBGButtonStyle())
+                        }.background(Color("buttonColor"))
+                        .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
+                        .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
+                        .padding(.horizontal)
+                        .padding(.bottom, 5)
+                        .sheet(isPresented: self.$showImagePicker, onDismiss: self.loadImage) {
+                            ImagePicker(image: self.$inputImage)
+                        }
+                    }
+                    
                     //MARK: Name & Bio Section
                     HStack {
                         Text("NAME & DESCRIPTION:")
@@ -148,6 +300,16 @@ struct EditGroupDialogView: View {
                 self.keyboardHeight = 0
             }
         }
+    }
+    
+    func loadImage() {
+        guard let inputImage = inputImage else { return }
+        groupImage = Image(uiImage: inputImage)
+    }
+    
+    func loadCoverImage() {
+        guard let inputImage = inputCoverImage else { return }
+        coverImage = Image(uiImage: inputImage)
     }
     
     func saveGroupInfo() {

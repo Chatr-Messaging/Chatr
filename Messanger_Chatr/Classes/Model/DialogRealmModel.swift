@@ -104,7 +104,7 @@ class changeDialogRealmData {
                 }
             }
         }) { (error) in
-            print("Error in feteching dialogs... error: \(error.localizedDescription)")
+            print("Error in fetching dialogs... error: \(error.localizedDescription)")
             DispatchQueue.main.async {
                 completion(false)
             }
