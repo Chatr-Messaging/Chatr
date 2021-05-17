@@ -92,11 +92,13 @@ class changeMessageRealmData {
     func getMessageUpdates(dialogID: String, limit: Int, skip: Int, completion: @escaping (Bool) -> ()) {
         let extRequest : [String: String] = ["sort_desc" : "date_sent", "mark_as_read" : "0"]
         Request.messages(withDialogID: dialogID, extendedRequest: extRequest, paginator: Paginator.limit(UInt(limit), skip: UInt(skip)), successBlock: { (messages, _) in
-            self.insertMessages(messages, completion: { })
+            self.insertMessages(messages, completion: {
+                completion(true)
+            })
         }){ (error) in
             print("error getting messages: \(error.localizedDescription)")
+            completion(false)
         }
-        completion(true)
     }
     
     func loadMoreMessages(dialogID: String, currentCount: Int, completion: @escaping (Bool) -> ()) {
@@ -204,9 +206,6 @@ class changeMessageRealmData {
                     
                     try realm.write({
                         realm.add(newData, update: .all)
-                        DispatchQueue.main.async {
-                            completion()
-                        }
                     })
                 }
 //                else {
@@ -219,9 +218,6 @@ class changeMessageRealmData {
 //                }
             } catch {
                 print(error.localizedDescription)
-                DispatchQueue.main.async {
-                    completion()
-                }
             }
         })
         DispatchQueue.main.async {

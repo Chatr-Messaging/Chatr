@@ -160,7 +160,7 @@ class changeContactsRealmData {
                 do {
                     let realm = try Realm(configuration: config)
                     if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: contactID) {
-                        print("Contact FOUND in Realm: \(snapshot.key) anddd contacts faceID? : \(String(describing: dict["faceID"] as? Bool))")
+                        //print("Contact FOUND in Realm: \(snapshot.key) anddd contacts faceID? : \(String(describing: dict["faceID"] as? Bool))")
                         try realm.safeWrite ({
                             foundContact.bio = dict["bio"] as? String ?? ""
                             foundContact.facebook = dict["facebook"] as? String ?? ""
@@ -229,7 +229,7 @@ class changeContactsRealmData {
             if contactUsers.count != 0 {
                 Request.users(withIDs: contactUsers, paginator: Paginator.limit(300, skip: 0), successBlock: { (paginator, users) in
                     for user in users {
-                        print("users pulled from Connecty Cube: \(String(describing: user.fullName)) & \(String(describing: user.phone))")
+                        //print("users pulled from Connecty Cube: \(String(describing: user.fullName)) & \(String(describing: user.phone))")
                         let config = Realm.Configuration(schemaVersion: 1)
                         do {
                             let realm = try Realm(configuration: config)

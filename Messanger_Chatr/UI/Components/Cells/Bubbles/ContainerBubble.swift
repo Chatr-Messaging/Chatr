@@ -17,7 +17,7 @@ import Cache
 
 struct ContainerBubble: View {
     @EnvironmentObject var auth: AuthModel
-    @ObservedObject var viewModel: ChatMessageViewModel
+    @StateObject var viewModel: ChatMessageViewModel
     @Binding var newDialogFromSharedContact: Int
     var isPriorWider: Bool
     @State var message: MessageStruct

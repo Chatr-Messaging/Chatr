@@ -30,6 +30,10 @@ enum PhoneNumberStatus {
     case undefined, success, loading, error
 }
 
+enum connectionState {
+    case connected, disconnected, loading, error
+}
+
 enum messageKind: String {
     case text, image, gif, contact, attachment, location, removed
 }
@@ -77,6 +81,7 @@ class AuthModel: NSObject, ObservableObject {
     @Published var verifyPhoneStatusKeyboard = false
     
     @Published var isLoacalAuth = false
+    @Published var connectionState: connectionState = .loading
     @Published var visitContactProfile: Bool = false
     @Published var dynamicLinkContactID: Int = 0
     @Published var selectedConnectyDialog: ChatDialog?
@@ -622,18 +627,22 @@ extension AuthModel: ChatDelegate {
     
     func chatDidConnect() {
         print("Chat did Connect!!! \(String(describing: Session.current.sessionDetails?.userID))")
+        self.connectionState = .connected
     }
 
     func chatDidReconnect() {
         print("Chat did Reconnect")
+        self.connectionState = .connected
     }
 
     func chatDidDisconnectWithError(_ error: Error) {
-        print("Chat did Disconnect:")
+        print("Chat did Disconnect: \(error.localizedDescription)")
+        self.connectionState = .disconnected
     }
 
     func chatDidNotConnectWithError(_ error: Error) {
-        print("Chat did not connect:")
+        print("Chat did not connect: \(error.localizedDescription)")
+        self.connectionState = .disconnected
     }
 
     func chatDidReceiveContactAddRequest(fromUser userID: UInt) {

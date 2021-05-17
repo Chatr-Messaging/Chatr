@@ -36,55 +36,55 @@ class ChatMessageViewModel: ObservableObject {
         Request.updateDialog(withID: dialogId, update: UpdateChatDialogParameters(), successBlock: { dialog in
             auth.selectedConnectyDialog = dialog
             dialog.sendUserStoppedTyping()
-            self.updateDialogMessageCount(dialogId: dialogId)
-
-            dialog.onUserIsTyping = { (userID: UInt) in
-                if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
-                    changeMessageRealmData.shared.addTypingMessage(userID: String(userID), dialogID: dialogId)
+            self.updateDialogMessageCount(dialogId: dialogId, completion: {
+                dialog.onUserIsTyping = { (userID: UInt) in
+                    if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
+                        changeMessageRealmData.shared.addTypingMessage(userID: String(userID), dialogID: dialogId)
+                    }
                 }
-            }
 
-            dialog.onUserStoppedTyping = { (userID: UInt) in
-                if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
-                    changeMessageRealmData.shared.removeTypingMessage(userID: String(userID), dialogID: dialogId)
+                dialog.onUserStoppedTyping = { (userID: UInt) in
+                    if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
+                        changeMessageRealmData.shared.removeTypingMessage(userID: String(userID), dialogID: dialogId)
+                    }
                 }
-            }
 
-            guard dialog.type == .group || dialog.type == .public else {
-                completion()
+                guard dialog.type == .group || dialog.type == .public else {
+                    completion()
 
-                return
-            }
-            
-            dialog.requestOnlineUsers(completionBlock: { (online, error) in
-                print("The online count is!!: \(String(describing: online?.count))")
-                //self.onlineCount = online?.count ?? 0
-                self.setOnlineCount(dialog: dialog)
-            })
+                    return
+                }
+                
+                dialog.requestOnlineUsers(completionBlock: { (online, error) in
+                    print("The online count is!!: \(String(describing: online?.count))")
+                    //self.onlineCount = online?.count ?? 0
+                    self.setOnlineCount(dialog: dialog)
+                })
 
-            dialog.onUpdateOccupant = { (userID: UInt) in
-                print("update occupant: \(userID)")
-                self.setOnlineCount(dialog: dialog)
-            }
+                dialog.onUpdateOccupant = { (userID: UInt) in
+                    print("update occupant: \(userID)")
+                    self.setOnlineCount(dialog: dialog)
+                }
 
-            dialog.onJoinOccupant = { (userID: UInt) in
-                print("on join occupant: \(userID)")
-                self.setOnlineCount(dialog: dialog)
-            }
+                dialog.onJoinOccupant = { (userID: UInt) in
+                    print("on join occupant: \(userID)")
+                    self.setOnlineCount(dialog: dialog)
+                }
 
-            dialog.onLeaveOccupant = { (userID: UInt) in
-                print("on leave occupant: \(userID)")
-                self.setOnlineCount(dialog: dialog)
-            }
+                dialog.onLeaveOccupant = { (userID: UInt) in
+                    print("on leave occupant: \(userID)")
+                    self.setOnlineCount(dialog: dialog)
+                }
 
-            guard !dialog.isJoined(), Chat.instance.isConnected else {
-                completion()
-                return
-            }
+                guard !dialog.isJoined(), Chat.instance.isConnected else {
+                    completion()
+                    return
+                }
 
-            dialog.join(completionBlock: { _ in
-                self.setOnlineCount(dialog: dialog)
-                completion()
+                dialog.join(completionBlock: { _ in
+                    self.setOnlineCount(dialog: dialog)
+                    completion()
+                })
             })
         }) { (error) in
             print("error fetching the dialog: \(error.localizedDescription)")
@@ -92,18 +92,15 @@ class ChatMessageViewModel: ObservableObject {
         }
     }
     
-    func updateDialogMessageCount(dialogId: String) {
-        Request.countOfMessages(forDialogID: dialogId, extendedRequest: ["sort_desc" : "lastMessageDate"], successBlock: { count in
+    func updateDialogMessageCount(dialogId: String, completion: @escaping () -> Void) {
+        Request.countOfMessages(forDialogID: dialogId, extendedRequest: ["" : ""], successBlock: { count in
             self.totalMessageCount = Int(count)
             print("the total message count is: \(Int(count))")
-        })
-
-        Request.totalUnreadMessageCountForDialogs(withIDs: Set([dialogId]), successBlock: { (unread, directory) in
-            print("the unread count for this dialog: \(unread) && \(directory)")
-            if unread != 0 {
-                //changeMessageRealmData.shared.getMessageUpdates(dialogID: dialogId, limit: (pageShowCount * self.scrollPage + 50), skip: currentMessages.count - self.minPagination, completion: { _ in })
-            }
-            self.unreadMessageCount = Int(unread)
+            Request.totalUnreadMessageCountForDialogs(withIDs: Set([dialogId]), successBlock: { (unread, directory) in
+                print("the unread count for this dialog: \(unread) && \(directory)")
+                self.unreadMessageCount = Int(unread)
+                completion()
+            })
         })
     }
 

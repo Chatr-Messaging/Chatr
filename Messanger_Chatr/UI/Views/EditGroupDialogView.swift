@@ -9,6 +9,7 @@
 import SwiftUI
 import ConnectyCube
 import FirebaseDatabase
+import SDWebImageSwiftUI
 
 struct EditGroupDialogView: View {
     @EnvironmentObject var auth: AuthModel
@@ -25,6 +26,8 @@ struct EditGroupDialogView: View {
     @State var inputCoverImage: UIImage? = nil
     @State var groupImage: Image? = nil
     @State var coverImage: Image? = nil
+    @State var avatarDownload: CGFloat = 0.0
+    @State var coverPhotoDownload: CGFloat = 0.0
     @State private var showImagePicker: Bool = false
     @State private var showCoverImagePicker: Bool = false
 
@@ -48,7 +51,7 @@ struct EditGroupDialogView: View {
                             ImagePicker(image: self.$inputCoverImage)
                         }
                         
-                        //Profile Image
+                        //Cover Image
                         VStack(alignment: .center, spacing: 0) {
                             ZStack(alignment: .bottom) {
                                 Button(action: {
@@ -57,32 +60,56 @@ struct EditGroupDialogView: View {
                                         self.showCoverImagePicker.toggle()
                                     }
                                 }, label: {
-                                    if (coverImage == nil) {
-                                        ZStack {
-                                            RoundedRectangle(cornerRadius: 0)
+                                    ZStack {
+                                        if (coverImage != nil) {
+                                            coverImage?.resizable().aspectRatio(contentMode: .fill).frame(width: Constants.screenWidth - 30, height: 160).clipped()
+                                        } else if dialogModel.coverPhoto != "" {
+                                            WebImage(url: URL(string: dialogModel.coverPhoto))
+                                                .resizable()
+                                                .placeholder{ Image("empty-profile").resizable().frame(width: 80, height: 80, alignment: .center).scaledToFill() }
+                                                .indicator(.activity)
+                                                .scaledToFill()
                                                 .frame(width: Constants.screenWidth - 32, height: 160, alignment: .center)
-                                                .overlay(
-                                                        RoundedRectangle(cornerRadius: 16)
-                                                            .stroke(Color.gray, style: StrokeStyle(lineWidth: 2.5, dash: [20, 5]))
-                                                            .padding(10)
-                                                    )
-                                                .foregroundColor(Color("buttonColor"))
+                                        } else {
+                                            ZStack {
+                                                RoundedRectangle(cornerRadius: 0)
+                                                    .frame(width: Constants.screenWidth - 32, height: 160, alignment: .center)
+                                                    .overlay(
+                                                            RoundedRectangle(cornerRadius: 16)
+                                                                .stroke(Color.gray, style: StrokeStyle(lineWidth: 2.5, dash: [20, 5]))
+                                                                .padding(10)
+                                                        )
+                                                    .foregroundColor(Color("buttonColor"))
 
-                                            VStack(spacing: 2.5) {
-                                                Image(systemName: "photo.on.rectangle.angled")
-                                                    .resizable()
-                                                    .scaledToFit()
-                                                    .foregroundColor(Color.secondary)
-                                                    .frame(width: 36, height: 34, alignment: .center)
+                                                VStack(spacing: 2.5) {
+                                                    Image(systemName: "photo.on.rectangle.angled")
+                                                        .resizable()
+                                                        .scaledToFit()
+                                                        .foregroundColor(Color.secondary)
+                                                        .frame(width: 36, height: 34, alignment: .center)
 
-                                                Text("cover photo")
-                                                    .font(.caption)
-                                                    .fontWeight(.regular)
-                                                    .foregroundColor(.secondary)
-                                            }.offset(y: -22)
+                                                    Text("cover photo")
+                                                        .font(.caption)
+                                                        .fontWeight(.regular)
+                                                        .foregroundColor(.secondary)
+                                                }.offset(y: -22)
+                                            }
                                         }
-                                    } else {
-                                        coverImage?.resizable().aspectRatio(contentMode: .fill).frame(width: Constants.screenWidth - 30, height: 160).clipped()
+                                        
+                                        ZStack {
+                                            Circle()
+                                                .stroke(Color.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                                                .frame(width: 20, height: 20)
+                                                .opacity(0.35)
+
+                                            Circle()
+                                                .trim(from: 1.0 - self.coverPhotoDownload, to: 1.0)
+                                                .stroke(Color.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                                                .frame(width: 20, height: 20)
+                                                .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 0)
+                                                .rotationEffect(.init(degrees: -90))
+                                                .animation(Animation.linear(duration: 0.1))
+                                        }.opacity(self.coverPhotoDownload == 0.0 || self.coverPhotoDownload == 1.0 ? 0 : 1)
                                     }
                                 }).padding(.bottom, 30)
                                 
@@ -92,22 +119,49 @@ struct EditGroupDialogView: View {
                                         self.showImagePicker.toggle()
                                     }
                                 }, label: {
-                                    if (groupImage == nil) {
-                                        ZStack {
-                                            RoundedRectangle(cornerRadius: 20)
-                                                .frame(width: 80, height: 80, alignment: .center)
-                                                .foregroundColor(Color("buttonColor"))
-
-                                            Image(systemName: "person.crop.circle.badge.plus")
+                                    ZStack {
+                                        if (groupImage != nil) {
+                                            groupImage?.resizable().aspectRatio(contentMode: .fill).frame(width: 80, height: 80).cornerRadius(16)
+                                                .shadow(color: Color("buttonShadow"), radius: 12, x: 0, y: 5)
+                                        } else if dialogModel.avatar != "" {
+                                            WebImage(url: URL(string: dialogModel.coverPhoto))
                                                 .resizable()
-                                                .scaledToFit()
-                                                .foregroundColor(Color.secondary)
-                                                .frame(width: 45, height: 45, alignment: .center)
-                                                .offset(x: -3)
-                                        }.shadow(color: Color("buttonShadow"), radius: 12, x: 0, y: 5)
-                                    } else {
-                                        groupImage?.resizable().aspectRatio(contentMode: .fill).frame(width: 80, height: 80).cornerRadius(16)
-                                            .shadow(color: Color("buttonShadow"), radius: 12, x: 0, y: 5)
+                                                .placeholder{ Image("empty-profile").resizable().frame(width: 80, height: 80, alignment: .center).scaledToFill() }
+                                                .indicator(.activity)
+                                                .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
+                                                .scaledToFill()
+                                                .clipShape(RoundedRectangle(cornerRadius: 20))
+                                                .frame(width: 80, height: 80, alignment: .center)
+                                                .shadow(color: Color("buttonShadow"), radius: 12, x: 0, y: 5)
+                                        } else {
+                                            ZStack {
+                                                RoundedRectangle(cornerRadius: 20)
+                                                    .frame(width: 80, height: 80, alignment: .center)
+                                                    .foregroundColor(Color("buttonColor"))
+
+                                                Image(systemName: "person.crop.circle.badge.plus")
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .foregroundColor(Color.secondary)
+                                                    .frame(width: 45, height: 45, alignment: .center)
+                                                    .offset(x: -3)
+                                            }.shadow(color: Color("buttonShadow"), radius: 12, x: 0, y: 5)
+                                        }
+
+                                        ZStack {
+                                            Circle()
+                                                .stroke(Color.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                                                .frame(width: 20, height: 20)
+                                                .opacity(0.35)
+
+                                            Circle()
+                                                .trim(from: 1.0 - self.avatarDownload, to: 1.0)
+                                                .stroke(Color.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                                                .frame(width: 20, height: 20)
+                                                .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 0)
+                                                .rotationEffect(.init(degrees: -90))
+                                                .animation(Animation.linear(duration: 0.1))
+                                        }.opacity(self.avatarDownload == 0.0 || self.avatarDownload == 1.0 ? 0 : 1)
                                     }
                                 }).offset(y: -12)
                             }
@@ -305,13 +359,15 @@ struct EditGroupDialogView: View {
     func loadImage() {
         guard let inputImage = inputImage else { return }
         groupImage = Image(uiImage: inputImage)
+        setGroupAvatar(image: inputImage, completion: { _ in })
     }
     
     func loadCoverImage() {
         guard let inputImage = inputCoverImage else { return }
         coverImage = Image(uiImage: inputImage)
+        setGroupCoverImage(image: inputImage, completion: { _ in })
     }
-    
+
     func saveGroupInfo() {
         guard self.bioText.count < 220 else {
             UINotificationFeedbackGenerator().notificationOccurred(.error)
@@ -336,6 +392,50 @@ struct EditGroupDialogView: View {
                 self.loadingSave = false
                 self.didSave = false
             }
+        }
+    }
+    
+    func setGroupAvatar(image: UIImage, completion: @escaping (Bool) -> Void) {
+        let image = image
+        let data = image.jpegData(compressionQuality: 0.5)
+        
+        Request.uploadFile(with: data!, fileName: "\(self.dialogModel.fullName)s_avatarImg", contentType: "image/jpeg", isPublic: true, progressBlock: { (progress) in
+            print("the upload progress is: \(progress)")
+            self.avatarDownload = CGFloat(progress)
+        }, successBlock: { (blob) in
+            let parameters = UpdateChatDialogParameters()
+            parameters.photo = blob.uid
+            
+            Request.updateDialog(withID: self.dialogModel.id, update: parameters, successBlock: { (updatedDialog) in
+                changeDialogRealmData.shared.updateDialogAvatar(avatar: updatedDialog.photo ?? "", dialogID: self.dialogModel.id)
+                completion(true)
+            }, errorBlock: { (error) in
+                completion(false)
+            })
+        }) { (error) in
+            print("error somehow uploading...\(error.localizedDescription)")
+            completion(false)
+        }
+    }
+    
+    func setGroupCoverImage(image: UIImage, completion: @escaping (Bool) -> Void) {
+        let image = image
+        let data = image.jpegData(compressionQuality: 0.5)
+        
+        Request.uploadFile(with: data!, fileName: "\(self.dialogModel.fullName)s_coverImg", contentType: "image/jpeg", isPublic: true, progressBlock: { (progress) in
+            print("the upload progress is: \(progress)")
+            self.coverPhotoDownload = CGFloat(progress)
+        }, successBlock: { (blob) in
+            let parameters = UpdateChatDialogParameters()
+            parameters.photo = blob.uid
+            let databaseRef = Database.database().reference().child("Marketplace").child(self.dialogModel.id)
+
+            databaseRef.setValue(["cover_photo" : blob.uid])
+            changeDialogRealmData.shared.updateDialogCoverPhoto(coverPhoto: blob.uid ?? "", dialogID: self.dialogModel.id)
+            completion(true)
+        }) { (error) in
+            print("error somehow uploading...\(error.localizedDescription)")
+            completion(false)
         }
     }
     

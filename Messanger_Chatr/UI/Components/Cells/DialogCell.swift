@@ -178,7 +178,7 @@ struct DialogCell: View {
                 }.offset(x: self.groupOccUserAvatar.count == 2 ? -4 : -2)
 
                 HStack(spacing: 5) {
-                    Text((self.dialogModel.isOpen ? self.dialogModel.dialogType == "private" ? (self.privateDialogContact.isOnline ? "online now" : "last online \(self.privateDialogContact.lastOnline.getElapsedInterval(lastMsg: "moments")) ago") : "\(self.dialogModel.occupentsID.count)" + (self.dialogModel.dialogType == "public" ? " subscribers" : " members") + (self.dialogModel.onlineUserCount != 0 ? " " : "") : dialogModel.lastMessage))
+                    Text((self.dialogModel.isOpen ? (self.dialogModel.dialogType == "private" ? (self.privateDialogContact.isOnline ? "online now" : "last online \(self.privateDialogContact.lastOnline.getElapsedInterval(lastMsg: "moments")) ago") : "\(self.dialogModel.occupentsID.count)" + (self.dialogModel.dialogType == "public" ? " subscribers" : " members") + (self.dialogModel.onlineUserCount != 0 ? " " : "")) : dialogModel.lastMessage))
                         .font(self.dialogModel.isOpen ? .footnote : .subheadline)
                         .fontWeight(.regular)
                         .lineLimit(2)
@@ -188,13 +188,13 @@ struct DialogCell: View {
                         .fixedSize(horizontal: false, vertical: true)
 
                     if let dialog = self.auth.selectedConnectyDialog, self.isOpen && (self.dialogModel.dialogType == "group" || self.dialogModel.dialogType == "public") {
-                        Text(!dialog.isJoined() ? "joining convo..." : (self.dialogModel.onlineUserCount > 1 ? "\(self.dialogModel.onlineUserCount) online" : ""))
+                        Text(self.auth.connectionState == .disconnected ? "disconnected..." : !dialog.isJoined() ? "joining convo..." : (self.dialogModel.onlineUserCount > 1 ? "\(self.dialogModel.onlineUserCount) online" : ""))
                             .font(.footnote)
                             .fontWeight(.regular)
                             .lineLimit(1)
                             .multilineTextAlignment(.leading)
                             .offset(x: -4, y: -4)
-                            .foregroundColor(dialog.isJoined() && self.dialogModel.onlineUserCount > 0 ? .green : .gray)
+                            .foregroundColor(self.auth.connectionState == .disconnected && self.dialogModel.isOpen ? .red : dialog.isJoined() && self.dialogModel.onlineUserCount > 0 ? .green : .gray)
                     }
                 }
             }.onTapGesture {

@@ -82,7 +82,8 @@ struct AttachmentBubble: View {
                     .matchedGeometryEffect(id: self.message.id.description + "png", in: namespace)
             } else if self.message.imageType == "video/mov" && self.message.messageState != .deleted {
                 ZStack() {
-                    PlayerView(player: self.$player, totalDuration: self.$totalDuration)
+                    //PlayerView(player: self.$player, totalDuration: self.$totalDuration)
+                    VideoPlayer(player: self.player)
                         .edgesIgnoringSafeArea(.all)
                         //.transition(.asymmetric(insertion: AnyTransition.scale.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                         .background(Color("bgColor"))
@@ -179,8 +180,10 @@ struct AttachmentBubble: View {
                     let playerItem = CachingPlayerItem(data: data as Data, mimeType: "video/mp4", fileExtension: "mp4")
                     self.player = AVPlayer(playerItem: playerItem)
 
-                    self.storage?.async.setObject(data, forKey: fileId, completion: { _ in })
-
+                    self.storage?.async.setObject(data, forKey: fileId, completion: { test in
+                        print("the testtt data is: \(test)")
+                    })
+                    //self.storage?
                     completion()
                 }, errorBlock: { error in
                     print("the error videoo is: \(String(describing: error.localizedDescription))")

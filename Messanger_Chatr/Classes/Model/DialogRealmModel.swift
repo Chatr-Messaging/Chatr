@@ -23,6 +23,7 @@ class DialogStruct : Object {
     @objc dynamic var typedText: String = ""
     @objc dynamic var dialogType: String = ""
     @objc dynamic var avatar: String = ""
+    @objc dynamic var coverPhoto: String = ""
     @objc dynamic var bio: String = ""
     @objc dynamic var isDeleted: Bool = false
     @objc dynamic var createdAt: Date = Date()
@@ -153,7 +154,7 @@ class changeDialogRealmData {
                 
                 try realm.safeWrite({
                     realm.add(newData, update: .all)
-                    print("Successfully added new Dialog data! \(newData.isDeleted) and the threadis: \(Thread.current)")
+                    //print("Successfully added new Dialog data! \(newData.isDeleted) and the threadis: \(Thread.current)")
                 })
             } catch {
                 print(error.localizedDescription)
@@ -265,6 +266,36 @@ class changeDialogRealmData {
             try? realm.safeWrite({
                 dialogResult?.fullName = name
                 dialogResult?.bio = description
+                realm.add(dialogResult!, update: .all)
+            })
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+
+    func updateDialogAvatar(avatar: String, dialogID: String) {
+        let config = Realm.Configuration(schemaVersion: 1)
+        do {
+            let realm = try Realm(configuration: config)
+            let dialogResult = realm.object(ofType: DialogStruct.self, forPrimaryKey: dialogID)
+
+            try? realm.safeWrite({
+                dialogResult?.avatar = avatar
+                realm.add(dialogResult!, update: .all)
+            })
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+
+    func updateDialogCoverPhoto(coverPhoto: String, dialogID: String) {
+        let config = Realm.Configuration(schemaVersion: 1)
+        do {
+            let realm = try Realm(configuration: config)
+            let dialogResult = realm.object(ofType: DialogStruct.self, forPrimaryKey: dialogID)
+
+            try? realm.safeWrite({
+                dialogResult?.coverPhoto = coverPhoto
                 realm.add(dialogResult!, update: .all)
             })
         } catch {

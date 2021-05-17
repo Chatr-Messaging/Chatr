@@ -108,7 +108,7 @@ class changeProfileRealmDate {
                     do {
                         let realm = try Realm(configuration: config)
                         if let foundContact = realm.object(ofType: ProfileStruct.self, forPrimaryKey: id) {
-                            print("Contact FOUND in Realm: \(snapshot.key) anddd faceID? : \(String(describing: dict["faceID"] as? Bool))")
+                            //print("Contact FOUND in Realm: \(snapshot.key) anddd faceID? : \(String(describing: dict["faceID"] as? Bool))")
                             try realm.safeWrite({
                                 foundContact.bio = dict["bio"] as? String ?? ""
                                 foundContact.facebook = dict["facebook"] as? String ?? ""

@@ -21,7 +21,7 @@ struct messagePinStruct: Identifiable, RealmSwift.RealmCollectionValue {
 
 struct VisitGroupChannelView: View {
     @EnvironmentObject var auth: AuthModel
-    @Environment(\.presentationMode) var presentationMode
+    //@Environment(\.presentationMode) var presentationMode
     @Binding var dismissView: Bool
     @Binding var isEditGroupOpen: Bool
     @Binding var canEditGroup: Bool
@@ -624,6 +624,9 @@ struct topGroupHeaderView: View {
 
     var body: some View {
         ZStack(alignment: .top) {
+            NavigationLink(destination: EmptyView()) {
+                EmptyView()
+            }
             VStack(alignment: .center) {
                 NavigationLink(destination: EditGroupDialogView(dialogModel: self.$dialogModel).environmentObject(self.auth), isActive: $isEditGroupOpen) {
                     EmptyView()
