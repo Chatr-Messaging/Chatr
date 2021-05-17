@@ -163,7 +163,6 @@ struct ChatMessagesView: View {
                                                 .animation(Animation.linear(duration: 0.55).repeatForever(autoreverses: false))
                                                 .rotation3DEffect(Angle(degrees: 180), axis: (x: 1, y: 0, z: 0))
                                                 .rotationEffect(.degrees(self.isLoadingMore ? 360 : 0))
-                                                .padding(.bottom, 10)
 
                                             Text("loading more...")
                                                 .font(.caption)
@@ -200,7 +199,7 @@ struct ChatMessagesView: View {
                                                     print("scrolllling2222 is nowwww \(message)")
                                                     self.firstScroll = false
                                                 }
-                                            } else if self.scrollViewHeight > Constants.screenHeight * 0.8 {
+                                            } else if self.scrollViewHeight > Constants.screenHeight * 0.8 && self.permissionLoadMore {
                                                 print("scrolllling is nowwww \(self.scrollViewHeight) ** \(Constants.screenHeight * 0.8)")
                                                 withAnimation(Animation.easeOut(duration: 0.6).delay(0.15)) {
                                                     reader.scrollTo(currentMessages[message].id, anchor: .bottom)
@@ -224,20 +223,20 @@ struct ChatMessagesView: View {
                                         //If the 10 to show is not enough then show another page
                                             self.scrollViewHeight = fullView.size.height
                                             print("the view height on aprear: \(self.scrollViewHeight) ** \(Constants.screenHeight * 0.8)")
-                                            if self.scrollViewHeight < Constants.screenHeight * 0.8 && self.maxPagination != 0 && self.scrollPage == 1 {
+                                            if self.scrollViewHeight < Constants.screenHeight * 0.8 && self.maxPagination != 0 && self.scrollPage <= 1 {
                                                 print("added another scroll pageee")
                                                 //self.scrollToId = currentMessages.last?.id ?? ""
-                                                self.scrollPage = 2
+                                                self.scrollPage += 1
                                             }
                                         }
                                     }
                                     .onChange(of: fullView.size.height) { value in
                                         print("the view height isss: \(value)")
                                         self.scrollViewHeight = value
-                                        if self.scrollViewHeight < Constants.screenHeight * 0.8 && self.maxPagination != 0 && self.scrollPage == 1 {
+                                        if self.scrollViewHeight < Constants.screenHeight * 0.8 && self.maxPagination != 0 && self.scrollPage <= 1 {
                                             print("added another scroll page")
                                             //self.scrollToId = currentMessages.last?.id ?? ""
-                                            self.scrollPage = 2
+                                            self.scrollPage += 2
                                         }
                                     }
                             })
@@ -250,29 +249,31 @@ struct ChatMessagesView: View {
                                     if self.maxPagination != 0 {
                                         //have more local data to load
                                         print("has more needs to just increase the local page \(self.maxMessageCount) && \(self.maxPagination) && \(currentMessages.count)")
-                                        self.scrollPage = 1
-                                        if self.maxPagination != 0 {
-                                            print("scrolling tooo: \(self.maxPagination + pageShowCount - 1)")
-                                            self.scrollToId = self.currentMessages[self.maxPagination + pageShowCount - 1].id
-                                        } else {
-                                            let divisor = currentMessages.count / pageShowCount
-                                            let remainder = currentMessages.count - divisor * pageShowCount
-                                            let scrollToIndex = remainder == 0 ? pageShowCount - 1 : remainder - 1
-                                            print("the scroll to max is attt 0: \(divisor) && \(remainder) && \(scrollToIndex)")
-                                            self.scrollToId = currentMessages[scrollToIndex].id
-                                        }
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
+                                            self.scrollPage += 1
+                                            if self.maxPagination != 0 {
+                                                print("scrolling tooo: \(self.maxPagination + pageShowCount - 1)")
+                                                self.scrollToId = self.currentMessages[self.maxPagination + pageShowCount - 1].id
+                                            } else {
+                                                let divisor = currentMessages.count / pageShowCount
+                                                let remainder = currentMessages.count - divisor * pageShowCount
+                                                let scrollToIndex = remainder == 0 ? pageShowCount - 1 : remainder - 1
+                                                print("the scroll to max is attt 0: \(divisor) && \(remainder) && \(scrollToIndex)")
+                                                self.scrollToId = currentMessages[scrollToIndex].id
+                                            }
 
-                                        self.isLoadingMore = false
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                                            self.permissionLoadMore = true
+                                            self.isLoadingMore = false
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                                                self.permissionLoadMore = true
+                                            }
                                         }
                                     } else if self.maxMessageCount > currentMessages.count {
                                         //loading more from server
                                         print("local has more to fetch \(self.maxMessageCount) && \(self.viewModel.unreadMessageCount) && \(currentMessages.count) limit: \(pageShowCount * (self.scrollPage + 1)) skip: \(currentMessages.count)")
 
                                         changeMessageRealmData.shared.getMessageUpdates(dialogID: self.dialogID, limit: pageShowCount * (self.scrollPage + 1), skip: currentMessages.count, completion: { _ in
-                                            DispatchQueue.main.async {
-                                                self.scrollPage = 1
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
+                                                self.scrollPage += 1
 
                                                 if self.maxMessageCount >= currentMessages.count {
                                                     print("scrolling to: \(pageShowCount - 1)")
@@ -358,9 +359,7 @@ struct ChatMessagesView: View {
                             })
                         } else {
                             DispatchQueue.main.async {
-                                if self.maxPagination != 0 {
-                                    self.scrollPage += 1
-                                }
+                                self.scrollPage += 1
                                 self.delayViewMessages = true
                                 
                                 print("STARTTT From Empty view the load limit: \(pageShowCount * (self.scrollPage + 1)) and the skip:\(currentMessages.count - self.minPagination).....\(self.maxMessageCount). the indexes are \(self.maxPagination).....< \(self.minPagination) anddddd nowww the scroll to index is: \(self.maxPagination + 1)")
