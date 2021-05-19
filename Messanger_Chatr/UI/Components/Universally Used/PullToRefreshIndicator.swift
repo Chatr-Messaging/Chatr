@@ -26,10 +26,10 @@ struct PullToRefreshIndicator: View {
                         .frame(maxWidth: Constants.screenWidth, alignment: .center)
                         .rotationEffect(.degrees(self.isLoading ? 360 : 0))
                         .animation(Animation.linear(duration: 0.55).repeatForever(autoreverses: false))
-                        .opacity(self.preLoading ? self.isLoading && !self.localOpen ? 1 : Double((geometry.frame(in: .global).minY - self.startLocation) / 15) : 0)
+                        .opacity(self.preLoading ? self.isLoading && !self.localOpen ? 1 : Double((geometry.frame(in: .global).minY - self.startLocation) / 5) : 0)
                         .scaleEffect(self.isLoading ? 1 : geometry.frame(in: .global).minY / self.startLocation + 50)
                         .padding(.bottom, 75)
-                        //.offset(y: -geometry.frame(in: .global).minY + 230)
+                        //.offset(y: -geometry.frame(in: .global).minY + 158)
                         .onAppear {
                             //print("opacity: \(Double((geometry.frame(in: .global).minY - self.startLocation) / 15))")
                             //self.preLoading = true
@@ -40,27 +40,27 @@ struct PullToRefreshIndicator: View {
                             UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
                         }
                 }
-                if geometry.frame(in: .global).minY > self.startLocation + 50 && !self.localOpen && self.startLocation != .zero {
-                    Text("")
-                        .onAppear {
-                            if self.isLoading != true {
-                                self.isLoading = true
-                                UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
-                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                                changeDialogRealmData.shared.fetchDialogs(completion: { result in
-                                    print("pull to refresh is at: \(geometry.frame(in: .global).minY)")
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
-                                        self.isLoading = false
-                                    }
-                                })
-                            }
-                        }
-                }
+//                if geometry.frame(in: .global).minY > self.startLocation + 50 && !self.localOpen && self.startLocation != .zero {
+//                    Text("")
+//                        .onAppear {
+//                            if self.isLoading != true {
+//                                self.isLoading = true
+//                                UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
+//                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+//                                changeDialogRealmData.shared.fetchDialogs(completion: { result in
+//                                    print("pull to refresh is at: \(geometry.frame(in: .global).minY)")
+//                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
+//                                        self.isLoading = false
+//                                    }
+//                                })
+//                            }
+//                        }
+//                }
             }.onAppear {
-                print("opacity: \(Double((geometry.frame(in: .global).minY - self.startLocation) / 15))")
+                print("opacity: \(Double((geometry.frame(in: .global).minY - self.startLocation) / 5))")
                 if self.startLocation == .zero {
                     self.startLocation = geometry.frame(in: .global).minY
-                    //self.preLoading = true
+                    self.preLoading = true
                     print("pull to refresh222 is: \(geometry.frame(in: .global).minY) && \(self.startLocation)")
                 }
             }

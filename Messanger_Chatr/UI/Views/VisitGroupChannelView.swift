@@ -38,6 +38,7 @@ struct VisitGroupChannelView: View {
     @State var dialogModelMemebers: [Int] = []
     @State var dialogModelAdmins: [Int] = []
     @State var selectedNewMembers: [Int] = []
+    @State var publicTags: [String] = []
     @State var addNewMemberID: String = ""
     @State var currentUserIsPowerful: Bool = false
     @State var isProfileImgOpen: Bool = false
@@ -47,6 +48,7 @@ struct VisitGroupChannelView: View {
     @State var showAlert = false
     @State var notiText: String = ""
     @State var notiType: String = ""
+    @State var coverPhotoUrl: String = ""
     @State var showAddMembers: Bool = false
     @State var isRemoving: Bool = false
     @State var isAdmin: Bool = false
@@ -58,10 +60,10 @@ struct VisitGroupChannelView: View {
             VStack(spacing: 0) {
                 ScrollView(.vertical, showsIndicators: true) {
                     //MARK: Top Profile
-                    topGroupHeaderView(dialogModel: self.$dialogModel, groupOccUserAvatar: self.$groupOccUserAvatar, isProfileImgOpen: self.$isProfileImgOpen, isEditGroupOpen: self.$isEditGroupOpen)
+                    topGroupHeaderView(dialogModel: self.$dialogModel, groupOccUserAvatar: self.$groupOccUserAvatar, isProfileImgOpen: self.$isProfileImgOpen, isEditGroupOpen: self.$isEditGroupOpen, publicTags: self.$publicTags, coverPhoto: self.$coverPhotoUrl)
                         .environmentObject(self.auth)
                         .padding(.top, 40)
-                        .padding(.bottom, 15)
+                        .padding(.bottom, self.dialogModel.dialogType == "public" ? 5 : 15)
                         .background(GeometryReader {
                             Color.clear.preference(key: ViewOffsetKey.self,
                                 value: -$0.frame(in: .named("visitGroup-scroll")).origin.y)
@@ -71,122 +73,10 @@ struct VisitGroupChannelView: View {
                         }
 
                     //MARK: Action Buttons
-                    HStack(alignment: .center, spacing: self.dialogRelationship == .subscribed ? 40 : 20) {
-                        if self.dialogRelationship == .notSubscribed && self.dialogModel.dialogType == "public" {
-                            Button(action: {
-                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                            }) {
-                                ZStack {
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .frame(width: 160, height: 45, alignment: .center)
-                                        .foregroundColor(.clear)
-                                        .background(Constants.blueGradient)
-                                        .cornerRadius(10)
-                                        .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 5)
-                                    
-                                    HStack(alignment: .center) {
-                                        Image(systemName: "person.crop.circle.badge.plus")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 28, height: 24, alignment: .center)
-                                            .foregroundColor(.white)
-                                            .shadow(color: Color.black.opacity(0.15), radius: 2, x: 0, y: 2)
-                                            .padding(5)
-                                        
-                                        Text("Join")
-                                            .font(.none)
-                                            .fontWeight(.semibold)
-                                            .foregroundColor(.white)
-                                            .padding(.trailing, 5)
-                                    }
-                                }
-                            }.buttonStyle(ClickButtonStyle())
-                        }
+                    if self.dialogModel.dialogType == "public" {
+                        PublicActionSection(dialogRelationship: self.$dialogRelationship, dialogModel: self.$dialogModel, currentUserIsPowerful: self.$currentUserIsPowerful, dismissView: self.$dismissView)
+                            .environmentObject(self.auth)
                     }
-                    
-                    //MARK: Action Section
-//                    HStack {
-//                        Text("ACTIONS:")
-//                            .font(.caption)
-//                            .fontWeight(.regular)
-//                            .foregroundColor(.secondary)
-//                            .padding(.horizontal)
-//                            .padding(.horizontal)
-//                            .offset(y: 2)
-//                        Spacer()
-//                    }
-                    
-//                    VStack(alignment: .center) {
-//                        VStack(spacing: 0) {
-//                            Text("hello")
-//                            //QR Code button
-//                            NavigationLink(destination:
-//                                            ShareProfileView(dimissView: self.$dismissView,
-//                                                             contactID: self.dialogModel.id,
-//                                                             contactFullName: self.dialogModel.fullName,
-//                                                             contactAvatar: self.dialogModel.avatar)
-//                                            .environmentObject(self.auth)) {
-//                                VStack(alignment: .trailing, spacing: 0) {
-//                                    HStack {
-//                                        Image(systemName: "qrcode")
-//                                            .resizable()
-//                                            .scaledToFit()
-//                                            .foregroundColor(Color.primary)
-//                                            .frame(width: 20, height: 20, alignment: .center)
-//                                            .padding(.trailing, 5)
-//
-//                                        Text("Share Profile")
-//                                            .font(.none)
-//                                            .fontWeight(.none)
-//                                            .foregroundColor(.primary)
-//
-//                                        Spacer()
-//                                        Image(systemName: "chevron.right")
-//                                            .resizable()
-//                                            .font(Font.title.weight(.bold))
-//                                            .scaledToFit()
-//                                            .frame(width: 7, height: 15, alignment: .center)
-//                                            .foregroundColor(.secondary)
-//                                    }.padding(.horizontal)
-//                                    .padding(.vertical, 12.5)
-//
-//                                    Divider()
-//                                        .frame(width: Constants.screenWidth - 80)
-//                                }
-//                            }.buttonStyle(changeBGButtonStyle())
-                            
-//                            Button(action: {
-//                                print("Forward Group Chat")
-//                            }) {
-//                                HStack {
-//                                    Image(systemName: "arrowshape.turn.up.left")
-//                                        .resizable()
-//                                        .scaledToFit()
-//                                        .foregroundColor(.primary)
-//                                        .frame(width: 20, height: 20, alignment: .center)
-//                                        .padding(.trailing, 5)
-//
-//                                    Text("Forward Contact")
-//                                        .font(.none)
-//                                        .fontWeight(.none)
-//                                        .foregroundColor(.primary)
-//
-//                                    Spacer()
-//                                    Image(systemName: "chevron.right")
-//                                        .resizable()
-//                                        .font(Font.title.weight(.bold))
-//                                        .scaledToFit()
-//                                        .frame(width: 7, height: 15, alignment: .center)
-//                                        .foregroundColor(.secondary)
-//                                }.padding(.horizontal)
-//                                .padding(.vertical, 12.5)
-//                            }.buttonStyle(changeBGButtonStyle())
-//                        }
-//                    }.background(Color("buttonColor"))
-//                    .clipShape(RoundedRectangle(cornerRadius: 15, style: .circular))
-//                    .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
-//                    .padding(.horizontal)
-//                    .padding(.bottom, 10)
                     
                     //MARK: Pinned Section
                     if self.dialogModel.pinMessages.count > 0 {
@@ -260,7 +150,7 @@ struct VisitGroupChannelView: View {
                     //MARK: Memebrs List Section
                     if self.dialogModel.occupentsID.count > 0 {
                         HStack(alignment: .bottom) {
-                            Text("\(self.dialogModel.occupentsID.count) TOTAL " + (self.dialogModel.dialogType == "public" ? "SUBSCRIBERS:" : "MEMBERS:"))
+                            Text("\(self.dialogModel.occupentsID.count) TOTAL " + (self.dialogModel.dialogType == "public" ? "MEMBERS:" : "GROUP:"))
                                 .font(.caption)
                                 .fontWeight(.regular)
                                 .foregroundColor(.secondary)
@@ -574,6 +464,14 @@ struct VisitGroupChannelView: View {
             for i in self.dialogModel.adminID {
                 self.dialogModelAdmins.append(i)
             }
+            
+            if self.dialogModel.dialogType == "public" {
+                self.observePublicDetails()
+            }
+
+            NotificationCenter.default.addObserver(forName: NSNotification.Name("NotificationAlert"), object: nil, queue: .main) { (_) in
+                self.showAlert.toggle()
+            }
         }
     }
     
@@ -610,6 +508,83 @@ struct VisitGroupChannelView: View {
 
         print("the count of pinned messages are: \(self.dialogModel.pinMessages.count)")
     }
+    
+    func observePublicDetails() {
+        changeDialogRealmData.shared.observeFirebaseDialogReturn(dialogId: self.dialogModel.id, completion: { (dialog, tags, coverPhotoUrlz) in
+            if let dia = dialog {
+                print("the returned dialog is nowww: \(dia.fullName) the dialog is pulled in and had the right data: \(dia)")
+                self.dialogModel.id = dia.id
+                self.dialogModel.coverPhoto = dia.coverPhoto
+                self.dialogModel.canMembersType = dia.canMembersType
+                self.dialogModel.publicTags.removeAll()
+                for tag in dia.publicTags {
+                    self.dialogModel.publicTags.append(tag)
+                }
+
+                if dia.dialogType == "group" {
+                    self.dialogRelationship = .group
+                } else {
+                    self.dialogRelationship = .notSubscribed
+                }
+                
+                Request.updateDialog(withID: self.dialogModel.id, update: UpdateChatDialogParameters(), successBlock: { dialog in
+                    print("fetched remote dialog")
+                    self.dialogModel.fullName = dialog.name ?? "No Dialog Name"
+                    self.dialogModel.lastMessage = dialog.lastMessageText ?? "no messages sent"
+                    self.dialogModel.lastMessageDate = dialog.lastMessageDate ?? Date.init(timeIntervalSinceReferenceDate: 86400)
+                    self.dialogModel.notificationCount = Int(dialog.unreadMessagesCount)
+                    self.dialogModel.createdAt = dialog.createdAt ?? Date()
+                    self.dialogModel.owner = Int(dialog.userID)
+                    
+                    for occu in dialog.occupantIDs ?? [] {
+                        self.dialogModel.occupentsID.append(Int(truncating: occu))
+                    }
+
+                    if dialog.type == .private { self.dialogModel.dialogType = "private" }
+                    else if dialog.type == .group {
+                        self.dialogModel.dialogType = "group"
+                        self.dialogRelationship = .group
+                    }
+                    else if dialog.type == .broadcast { self.dialogModel.dialogType = "broadcast" }
+                    else if dialog.type == .public { self.dialogModel.dialogType = "public" }
+
+                    if dialog.type == .group || dialog.type == .public {
+                        for admin in dialog.adminsIDs ?? [] {
+                            self.dialogModel.adminID.append(Int(truncating: admin))
+                        }
+
+                        if let publicUrl = Blob.publicUrl(forFileUID: dialog.photo ?? "") {
+                            self.dialogModel.avatar = publicUrl
+                        }
+
+                        self.dialogModel.bio = dialog.dialogDescription ?? ""
+                    }
+
+                    if self.dialogModel.id == UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" && UserDefaults.standard.bool(forKey: "localOpen") {
+                        self.dialogModel.isOpen = true
+                    }
+                })
+            } else {
+                print("the dialog is already saved and just updated it...should refresh")
+                if self.currentUserIsPowerful || self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") {
+                    self.dialogRelationship = .subscribed
+                } else {
+                    self.dialogRelationship = .subscribed
+                }
+                
+                self.coverPhotoUrl = coverPhotoUrlz ?? ""
+                guard let tagz = tags else {
+                    return
+                }
+
+                for tag in tagz {
+                    if !self.publicTags.contains(tag) {
+                        self.publicTags.append(tag)
+                    }
+                }
+            }
+        })
+    }
 }
 
 //MARK: Top Header View
@@ -619,21 +594,29 @@ struct topGroupHeaderView: View {
     @Binding var groupOccUserAvatar: [String]
     @Binding var isProfileImgOpen: Bool
     @Binding var isEditGroupOpen: Bool
+    @Binding var publicTags: [String]
+    @Binding var coverPhoto: String
     @State private var isProfileBioOpen: Bool = false
     @State private var moreBioAction = false
-
+    
     var body: some View {
         ZStack(alignment: .top) {
             NavigationLink(destination: EmptyView()) {
                 EmptyView()
             }
+            
+            //MARK: Sticky Header
+            if self.dialogModel.dialogType == "public" {
+                stickyHeaderSection(dialogModel: self.$dialogModel)
+            }
+
             VStack(alignment: .center) {
                 NavigationLink(destination: EditGroupDialogView(dialogModel: self.$dialogModel).environmentObject(self.auth), isActive: $isEditGroupOpen) {
                     EmptyView()
                 }
 
                 VStack(alignment: .center) {
-                    VStack(alignment: .center) {
+                    VStack(alignment: .center, spacing: 2.5) {
                         Text(self.dialogModel.fullName)
                             .font(.system(size: 24))
                             .fontWeight(.bold)
@@ -641,11 +624,30 @@ struct topGroupHeaderView: View {
                             .lineLimit(2)
                             .multilineTextAlignment(.center)
                         
-                        Text("\(self.dialogModel.occupentsID.count) " + (self.dialogModel.dialogType == "public" ? "subscribers" : "members"))
+                        Text("\(self.dialogModel.occupentsID.count) " + (self.dialogModel.dialogType == "public" ? "members" : "people"))
                             .font(.subheadline)
                             .fontWeight(.none)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
+                            .offset(y: -5)
+
+                        HStack(alignment: .center, spacing: 10) {
+                            ForEach(self.publicTags, id: \.self) { tag in
+                                Button(action: {
+                                    UINotificationFeedbackGenerator().notificationOccurred(.error)
+                                }, label: {
+                                    Text("#" + "\(tag)")
+                                        .font(.caption)
+                                        .fontWeight(.medium)
+                                        .padding(.vertical, 3)
+                                        .padding(.horizontal, 10)
+                                        .foregroundColor(Color("disabledButton"))
+                                        .background(RoundedRectangle(cornerRadius: 7).stroke(Color("interactions_selected"), lineWidth: 2.5).background(Color("interactions_selected").opacity(0.3)).cornerRadius(7))
+                                        .lineLimit(1)
+                                        .fixedSize()
+                                }).buttonStyle(ClickButtonStyle())
+                            }
+                        }.opacity(self.dialogModel.dialogType == "public" ? 1 : 0)
                     }.padding(.top, 10)
                     .padding(.bottom, self.dialogModel.bio == "" ? 15 : 0 )
 
@@ -692,11 +694,19 @@ struct topGroupHeaderView: View {
                 }.padding(.top, 45)
                 .padding(.bottom, 5)
             }.frame(width: Constants.screenWidth - 40)
-            .background(Color("buttonColor"))
+            .background(
+                ZStack {
+                    if self.dialogModel.dialogType == "public" {
+                        BlurView(style: .systemUltraThinMaterial)
+                    } else {
+                        Color("buttonColor")
+                    }
+                }
+            )
             .cornerRadius(20)
             .shadow(color: Color.black.opacity(0.15), radius: 20, x: 0, y: 5)
             .padding(.all)
-            .padding(.top, 50)
+            .padding(.top, self.dialogModel.dialogType == "public" ? 120 : 50)
             
             if self.dialogModel.dialogType == "public" {
                 Button(action: {
@@ -714,6 +724,7 @@ struct topGroupHeaderView: View {
                         .cornerRadius(20)
                         .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
                 }.buttonStyle(ClickButtonStyle())
+                .offset(y: 75)
             } else if self.dialogModel.dialogType == "group" {
                 ZStack {
                     ForEach(self.groupOccUserAvatar.indices, id: \.self) { id in

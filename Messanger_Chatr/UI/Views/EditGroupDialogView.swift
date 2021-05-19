@@ -28,6 +28,7 @@ struct EditGroupDialogView: View {
     @State var coverImage: Image? = nil
     @State var avatarDownload: CGFloat = 0.0
     @State var coverPhotoDownload: CGFloat = 0.0
+    @State var canMembersType: Bool = false
     @State private var showImagePicker: Bool = false
     @State private var showCoverImagePicker: Bool = false
 
@@ -46,7 +47,7 @@ struct EditGroupDialogView: View {
                                 .padding(.horizontal)
                                 .offset(y: 2)
                             Spacer()
-                        }.padding(.top)
+                        }.padding(.top, 5)
                         .sheet(isPresented: self.$showCoverImagePicker, onDismiss: self.loadCoverImage) {
                             ImagePicker(image: self.$inputCoverImage)
                         }
@@ -66,7 +67,7 @@ struct EditGroupDialogView: View {
                                         } else if dialogModel.coverPhoto != "" {
                                             WebImage(url: URL(string: dialogModel.coverPhoto))
                                                 .resizable()
-                                                .placeholder{ Image("empty-profile").resizable().frame(width: 80, height: 80, alignment: .center).scaledToFill() }
+                                                .placeholder{ Image(systemName: "photo.on.rectangle.angled").resizable().frame(width: 35, height: 32, alignment: .center).scaledToFill().offset(y: -20) }
                                                 .indicator(.activity)
                                                 .scaledToFill()
                                                 .frame(width: Constants.screenWidth - 32, height: 160, alignment: .center)
@@ -124,14 +125,15 @@ struct EditGroupDialogView: View {
                                             groupImage?.resizable().aspectRatio(contentMode: .fill).frame(width: 80, height: 80).cornerRadius(16)
                                                 .shadow(color: Color("buttonShadow"), radius: 12, x: 0, y: 5)
                                         } else if dialogModel.avatar != "" {
-                                            WebImage(url: URL(string: dialogModel.coverPhoto))
+                                            WebImage(url: URL(string: dialogModel.avatar))
                                                 .resizable()
                                                 .placeholder{ Image("empty-profile").resizable().frame(width: 80, height: 80, alignment: .center).scaledToFill() }
                                                 .indicator(.activity)
                                                 .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                                                 .scaledToFill()
-                                                .clipShape(RoundedRectangle(cornerRadius: 20))
+                                                .clipped()
                                                 .frame(width: 80, height: 80, alignment: .center)
+                                                .clipShape(RoundedRectangle(cornerRadius: 20))
                                                 .shadow(color: Color("buttonShadow"), radius: 12, x: 0, y: 5)
                                         } else {
                                             ZStack {
@@ -322,6 +324,41 @@ struct EditGroupDialogView: View {
                             self.bioText = self.dialogModel.bio
                         }
                     })
+                    
+                    //MARK: Settings Section
+                    if self.dialogModel.dialogType == "public" {
+                        HStack {
+                            Text("SETTINGS:")
+                                .font(.caption)
+                                .fontWeight(.regular)
+                                .foregroundColor(.secondary)
+                                .padding(.horizontal)
+                                .padding(.horizontal)
+                                .offset(y: 2)
+                            Spacer()
+                        }.padding(.top, 10)
+                        
+                        self.styleBuilder(content: {
+                            HStack {
+                                Image(systemName: "pencil")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 20, height: 20, alignment: .center)
+                                    .foregroundColor(.primary)
+
+                                Toggle("Members Typing", isOn: self.$canMembersType)
+                                    .padding(.leading, 5)
+                                    .onReceive([self.canMembersType].publisher.first()) { (value) in
+                                        Database.database().reference().child("Marketplace").child("public_dialogs").child("\(self.dialogModel.id)").updateChildValues(["canMembersType" : value])
+                                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                                    }
+                            }.padding(.horizontal)
+                            .padding(.vertical, 2.5)
+                            .onAppear() {
+                                self.canMembersType = self.dialogModel.canMembersType
+                            }
+                        })
+                    }
                     
                     //MARK: Footer Section
                     FooterInformation()

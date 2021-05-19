@@ -9,6 +9,7 @@
 import Foundation
 import ConnectyCube
 import RealmSwift
+import Firebase
 
 class DialogStruct : Object {
     @objc dynamic var id: String = ""
@@ -26,10 +27,12 @@ class DialogStruct : Object {
     @objc dynamic var coverPhoto: String = ""
     @objc dynamic var bio: String = ""
     @objc dynamic var isDeleted: Bool = false
+    @objc dynamic var canMembersType: Bool = false
     @objc dynamic var createdAt: Date = Date()
     let occupentsID = List<Int>()
     let adminID = List<Int>()
     let pinMessages = List<String>()
+    let publicTags = List<String>()
 
     var messages: Results<MessageStruct> {
         if let realm = self.realm {
@@ -167,6 +170,55 @@ class changeDialogRealmData {
         DispatchQueue.main.async {
             completion()
         }
+    }
+
+    func observeFirebaseDialogReturn(dialogId: String, completion: @escaping (DialogStruct?, [String]?, String?) -> ()) {
+        //Request.occupants(forPublicDialogID: , paginator: , successBlock: , errorBlock: )
+        print("starting observe firebase DIALOG! return")
+        let user = Database.database().reference().child("Marketplace").child("public_dialogs").child("\(dialogId)")
+        user.observeSingleEvent(of: .value, with: { (snapshot: DataSnapshot) in
+            if let dict = snapshot.value as? [String: Any] {
+                var tags: [String] = []
+                let newData = DialogStruct()
+                newData.id = dialogId
+                newData.coverPhoto = dict["cover_photo"] as? String ?? ""
+                newData.canMembersType = dict["canMembersType"] as? Bool ?? false
+                for childSnapshot in snapshot.children {
+                    let childSnap = childSnapshot as! DataSnapshot
+                    if let dict2 = childSnap.value as? [String: Any] {
+                        for tag in dict2 {
+                            newData.publicTags.append(tag.key)
+                            tags.append(tag.key)
+                        }
+                    }
+                }
+                
+                let config = Realm.Configuration(schemaVersion: 1)
+                do {
+                    let realm = try Realm(configuration: config)
+                    try? realm.safeWrite({
+                    if let foundDialog = realm.object(ofType: DialogStruct.self, forPrimaryKey: dialogId) {
+                        foundDialog.coverPhoto = newData.coverPhoto
+                        foundDialog.canMembersType = newData.canMembersType
+                        for i in newData.publicTags {
+                            if !foundDialog.publicTags.contains(i) {
+                                foundDialog.publicTags.append(i)
+                                print("the taggg iss: \(i)")
+                            }
+                        }
+                        print("found dialogg trying to write..")
+                        realm.add(foundDialog, update: .all)
+   
+                        completion(nil, tags, newData.coverPhoto)
+                    } else {
+                        completion(newData, tags, newData.coverPhoto)
+                    }
+                    })
+                } catch { completion(nil, nil, nil) }
+            } else {
+                completion(nil, nil, nil)
+            }
+        })
     }
     
     func updateDialogOpen(isOpen: Bool, dialogID: String) {

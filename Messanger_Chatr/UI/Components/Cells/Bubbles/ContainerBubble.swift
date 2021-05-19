@@ -97,8 +97,7 @@ struct ContainerBubble: View {
                         if self.replyCount > 0 {
                             Button(action: {
                                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                self.viewModel.message = self.message
-                                self.viewModel.isDetailOpen = true
+                                self.openReplyDetailView()
                             }, label: {
                                 HStack(spacing: self.replyCount > 1 ? 5 : 0) {
                                     Image(systemName: "arrowshape.turn.up.left.fill")

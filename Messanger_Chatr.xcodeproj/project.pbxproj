@@ -63,6 +63,8 @@
 		056B98A924C8FD1D003F7FBA /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056B98A824C8FD1D003F7FBA /* SearchBar.swift */; };
 		056B98AB24C900D7003F7FBA /* PullToRefreshIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056B98AA24C900D7003F7FBA /* PullToRefreshIndicator.swift */; };
 		056B98AD24C90250003F7FBA /* HomeMessagesTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056B98AC24C90250003F7FBA /* HomeMessagesTitle.swift */; };
+		056BCC622654B6FC006DD302 /* PublicActionSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056BCC612654B6FC006DD302 /* PublicActionSection.swift */; };
+		056BCC6426550562006DD302 /* stickyHeaderSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056BCC6326550562006DD302 /* stickyHeaderSection.swift */; };
 		056EAB602516D8E600DC72FA /* AppIcon-Flat.png in Resources */ = {isa = PBXBuildFile; fileRef = 056EAB5E2516D8E500DC72FA /* AppIcon-Flat.png */; };
 		056EAB612516D8E600DC72FA /* AppIcon-Flat-Dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 056EAB5F2516D8E600DC72FA /* AppIcon-Flat-Dark.png */; };
 		056EAB662516D8F300DC72FA /* AppIcon-PaperAirplane.png in Resources */ = {isa = PBXBuildFile; fileRef = 056EAB652516D8F300DC72FA /* AppIcon-PaperAirplane.png */; };
@@ -247,6 +249,8 @@
 		056B98A824C8FD1D003F7FBA /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
 		056B98AA24C900D7003F7FBA /* PullToRefreshIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PullToRefreshIndicator.swift; sourceTree = "<group>"; };
 		056B98AC24C90250003F7FBA /* HomeMessagesTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeMessagesTitle.swift; sourceTree = "<group>"; };
+		056BCC612654B6FC006DD302 /* PublicActionSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicActionSection.swift; sourceTree = "<group>"; };
+		056BCC6326550562006DD302 /* stickyHeaderSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = stickyHeaderSection.swift; sourceTree = "<group>"; };
 		056EAB5E2516D8E500DC72FA /* AppIcon-Flat.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-Flat.png"; sourceTree = "<group>"; };
 		056EAB5F2516D8E600DC72FA /* AppIcon-Flat-Dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-Flat-Dark.png"; sourceTree = "<group>"; };
 		056EAB652516D8F300DC72FA /* AppIcon-PaperAirplane.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-PaperAirplane.png"; sourceTree = "<group>"; };
@@ -439,6 +443,8 @@
 				056B989424C8F76B003F7FBA /* HomeUserInfoHeader.swift */,
 				05A62392260303AB00A2BF40 /* HomeBannerCard.swift */,
 				058E760B261C2518008578E3 /* NewPublicConversationSection.swift */,
+				056BCC612654B6FC006DD302 /* PublicActionSection.swift */,
+				056BCC6326550562006DD302 /* stickyHeaderSection.swift */,
 				05A7BD5E24FEF3870001BFC9 /* QucickSnapsSection.swift */,
 				055F37F52608545B003EDB1F /* KeyboardAudioView.swift */,
 				057F2B4D250B025E005DFB21 /* ContactCarouselSection.swift */,
@@ -1029,6 +1035,7 @@
 				05EE519325CA5C160063A558 /* WebViewStateModel.swift in Sources */,
 				05DB89B4238B851400D4581F /* SceneDelegate.swift in Sources */,
 				05A7BD4F24F9E8D20001BFC9 /* ContactRealmCell.swift in Sources */,
+				056BCC622654B6FC006DD302 /* PublicActionSection.swift in Sources */,
 				0559B8D325D39AC20069C44A /* KeyboardCardViewModel.swift in Sources */,
 				05196DDB24EE3BD20026B9A7 /* ContactsRealmModel.swift in Sources */,
 				056B989524C8F76B003F7FBA /* HomeUserInfoHeader.swift in Sources */,
@@ -1058,6 +1065,7 @@
 				0596845625AC16E80051B707 /* VisitContactViewModel.swift in Sources */,
 				0525E4C525ECC4440086EB54 /* MessageReplyCell.swift in Sources */,
 				0596844E25ABED4D0051B707 /* EditProfileViewModel.swift in Sources */,
+				056BCC6426550562006DD302 /* stickyHeaderSection.swift in Sources */,
 				05C93BDB25145EF10059D1AA /* VisitGroupChannelView.swift in Sources */,
 				05BCE40D250B4EA400E29F39 /* HighlightedContactCell.swift in Sources */,
 				05D8A8DC2502CB3A00D53BE2 /* MailView.swift in Sources */,

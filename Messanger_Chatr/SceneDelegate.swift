@@ -138,9 +138,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 Chat.instance.disconnect { (error) in
                     print("chat instance did disconnect \(String(describing: error?.localizedDescription))")
                 }
-                for dia in DialogRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(DialogStruct.self)).results.filter({ $0.isDeleted != true }) {
-                    badgeNum += dia.notificationCount
-                }
+                
+                do {
+                    for dia in DialogRealmModel(results: try Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(DialogStruct.self)).results.filter({ $0.isDeleted != true }) {
+                        badgeNum += dia.notificationCount
+                    }
+                } catch { }
                 UIApplication.shared.applicationIconBadgeNumber = badgeNum + (self.environment.profile.results.first?.contactRequests.count ?? 0)
             }
         }

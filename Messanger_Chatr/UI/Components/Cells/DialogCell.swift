@@ -178,7 +178,7 @@ struct DialogCell: View {
                 }.offset(x: self.groupOccUserAvatar.count == 2 ? -4 : -2)
 
                 HStack(spacing: 5) {
-                    Text((self.dialogModel.isOpen ? (self.dialogModel.dialogType == "private" ? (self.privateDialogContact.isOnline ? "online now" : "last online \(self.privateDialogContact.lastOnline.getElapsedInterval(lastMsg: "moments")) ago") : "\(self.dialogModel.occupentsID.count)" + (self.dialogModel.dialogType == "public" ? " subscribers" : " members") + (self.dialogModel.onlineUserCount != 0 ? " " : "")) : dialogModel.lastMessage))
+                    Text((self.dialogModel.isOpen ? (self.dialogModel.dialogType == "private" ? (self.privateDialogContact.isOnline ? "online now" : "last online \(self.privateDialogContact.lastOnline.getElapsedInterval(lastMsg: "moments")) ago") : "\(self.dialogModel.occupentsID.count)" + (self.dialogModel.dialogType == "public" ? " members" : " people") + (self.dialogModel.onlineUserCount != 0 ? " " : "")) : dialogModel.lastMessage))
                         .font(self.dialogModel.isOpen ? .footnote : .subheadline)
                         .fontWeight(.regular)
                         .lineLimit(2)

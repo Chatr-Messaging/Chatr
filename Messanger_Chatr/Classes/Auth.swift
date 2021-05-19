@@ -55,7 +55,7 @@ enum visitContactRelationship {
 }
 
 enum visitDialogRelationship {
-    case unknown, subscribed, notSubscribed
+    case unknown, subscribed, notSubscribed, admin, group, error
 }
 
 enum StorageType {

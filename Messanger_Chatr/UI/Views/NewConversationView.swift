@@ -472,7 +472,7 @@ struct NewConversationView: View {
                             Request.uploadFile(with: coverData!, fileName: "publicDialog_coverImg", contentType: "image/jpeg", isPublic: true, progressBlock: { (progress) in
                                 print("uploading cover image: \(progress)")
                             }, successBlock: { (blobCover) in
-                                databaseRef.child(dialog.id?.description ?? "").setValue(["name" : self.groupName, "subscribers" : "0", "date_created" : Date().description, "cover_photo" : blobCover.id.description])
+                                databaseRef.child(dialog.id?.description ?? "").setValue(["name" : self.groupName, "members" : "0", "date_created" : Date().description, "cover_photo" : blobCover.id.description])
 
                                 self.description = ""
                                 self.groupName = ""
