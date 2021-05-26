@@ -71,6 +71,7 @@ struct EditGroupDialogView: View {
                                                 .indicator(.activity)
                                                 .scaledToFill()
                                                 .frame(width: Constants.screenWidth - 32, height: 160, alignment: .center)
+                                                .offset(y: -20)
                                         } else {
                                             ZStack {
                                                 RoundedRectangle(cornerRadius: 0)

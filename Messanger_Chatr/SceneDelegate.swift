@@ -18,6 +18,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
     var environment = AuthModel()
+    var badgeNum: Int = 0
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
@@ -37,7 +38,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         }
 
         FirebaseApp.configure()
-        Analytics.logEvent(AnalyticsEventAppOpen, parameters: [AnalyticsParameterStartDate: "timestamp: \(Date().timeIntervalSince1970)"])
+        //Analytics.logEvent(AnalyticsEventAppOpen, parameters: [AnalyticsParameterStartDate: "timestamp: \(Date().timeIntervalSince1970)"])
 
         Settings.applicationID = 1087
         Settings.authKey = "dgcX9HyBrJrmfdJ"
@@ -128,25 +129,25 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     
     func sceneDidEnterBackground(_ scene: UIScene) {
-        DispatchQueue.main.async {
+        //DispatchQueue.main.async {
             print("scene did enter background")
             if self.environment.isUserAuthenticated == .signedIn {
-                var badgeNum: Int = 0
                 if let dialog = self.environment.selectedConnectyDialog {
                     dialog.sendUserStoppedTyping()
                 }
+
+                self.badgeNum = 0
+                for dia in self.environment.dialogs.results.filter({ $0.isDeleted != true }) {
+                    badgeNum += dia.notificationCount
+                }
+                UIApplication.shared.applicationIconBadgeNumber = badgeNum + (self.environment.profile.results.first?.contactRequests.count ?? 0)
+                
+                //This causes a crash for some reason...
                 Chat.instance.disconnect { (error) in
                     print("chat instance did disconnect \(String(describing: error?.localizedDescription))")
                 }
-                
-                do {
-                    for dia in DialogRealmModel(results: try Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(DialogStruct.self)).results.filter({ $0.isDeleted != true }) {
-                        badgeNum += dia.notificationCount
-                    }
-                } catch { }
-                UIApplication.shared.applicationIconBadgeNumber = badgeNum + (self.environment.profile.results.first?.contactRequests.count ?? 0)
             }
-        }
+        //}
         // Called as the scene transitions from the foreground to the background.
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.

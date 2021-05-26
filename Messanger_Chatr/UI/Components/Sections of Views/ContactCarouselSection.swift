@@ -90,28 +90,25 @@ struct ContactListView : View {
     @Binding var page : Int
     @Binding var dataArray: [ContactBannerData]
     @Binding var quickSnapViewState: QuickSnapViewingState
-    @State var openDiscoverContent: Bool = false
     @State var openPremiumContent: Bool = false
     @State var openAddressBookContent: Bool = false
+    @State private var openDiscoverContent: Int? = 0
     @ObservedObject var addressBook = AddressBookRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(AddressBookStruct.self))
     
     var body: some View {
         HStack(spacing: 0) {
             
-            //Discover Channels
+            //MARK: Discover Channels
+            NavigationLink(destination: self.discoverViewFunc(), tag: 1, selection: self.$openDiscoverContent) {
+                EmptyView()
+            }
+
             ContactBannerCell(titleBold: self.dataArray[0].titleBold, title: self.dataArray[0].title, subtitleImage: self.dataArray[0].subtitleImage, subtitle: self.dataArray[0].subtitle, imageMain: self.dataArray[0].imageMain, gradientBG: self.dataArray[0].gradientBG)
                 .frame(width: Constants.screenWidth)
                 .onTapGesture {
-                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                    self.openDiscoverContent.toggle()
-                }.sheet(isPresented: self.$openDiscoverContent, content: {
-                    NavigationView {
-                        DiscoverView()
-                            .environmentObject(self.auth)
-                            .navigationBarTitle("Discover", displayMode: .large)
-                            .background(Color("bgColor").edgesIgnoringSafeArea(.all))
-                    }
-                })
+                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                    self.openDiscoverContent = 1
+                }
             
             //premium
             if self.auth.subscriptionStatus == .notSubscribed {
@@ -151,6 +148,16 @@ struct ContactListView : View {
                     self.quickSnapViewState = .camera
                 }
         }.padding(.vertical)
+    }
+    
+    func discoverViewFunc() -> some View {
+        //NavigationView {
+            DiscoverView()
+                .environmentObject(self.auth)
+                .navigationBarTitle("Discover", displayMode: .automatic)
+                .background(Color("bgColor")
+                .edgesIgnoringSafeArea(.all))
+        //}
     }
 }
 

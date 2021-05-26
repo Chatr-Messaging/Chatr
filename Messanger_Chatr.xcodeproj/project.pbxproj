@@ -79,6 +79,7 @@
 		0583073E240E2F120013B93B /* ChatrApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0583073D240E2F120013B93B /* ChatrApp.swift */; };
 		0583A82D23A72A8700F9220B /* Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0583A82C23A72A8700F9220B /* Auth.swift */; };
 		0583A84F251AFB750005B7E1 /* ContactBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0583A84E251AFB740005B7E1 /* ContactBubble.swift */; };
+		058966BE265DF50700303F1E /* PublicDialogDiscoverCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058966BD265DF50700303F1E /* PublicDialogDiscoverCell.swift */; };
 		058AC52F2599064F0027FD11 /* DiscoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058AC52E2599064F0027FD11 /* DiscoverView.swift */; };
 		058AC5342599158D0027FD11 /* DiscoverCarouselSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058AC5332599158C0027FD11 /* DiscoverCarouselSection.swift */; };
 		058E73D926141978008578E3 /* AudioBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058E73D826141978008578E3 /* AudioBubble.swift */; };
@@ -266,6 +267,7 @@
 		0583073D240E2F120013B93B /* ChatrApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatrApp.swift; sourceTree = "<group>"; };
 		0583A82C23A72A8700F9220B /* Auth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Auth.swift; sourceTree = "<group>"; };
 		0583A84E251AFB740005B7E1 /* ContactBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactBubble.swift; sourceTree = "<group>"; };
+		058966BD265DF50700303F1E /* PublicDialogDiscoverCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicDialogDiscoverCell.swift; sourceTree = "<group>"; };
 		058AC52E2599064F0027FD11 /* DiscoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverView.swift; sourceTree = "<group>"; };
 		058AC5332599158C0027FD11 /* DiscoverCarouselSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverCarouselSection.swift; sourceTree = "<group>"; };
 		058E73D826141978008578E3 /* AudioBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioBubble.swift; sourceTree = "<group>"; };
@@ -491,6 +493,7 @@
 				05A7BD4E24F9E8D20001BFC9 /* ContactRealmCell.swift */,
 				05A7633B2506FD42002712FA /* ContactRequestCell.swift */,
 				05C93BDC251578100059D1AA /* DialogContactCell.swift */,
+				058966BD265DF50700303F1E /* PublicDialogDiscoverCell.swift */,
 				0525E4C425ECC4440086EB54 /* MessageReplyCell.swift */,
 				05786B5726499F83001554CA /* PinnedVideoCell.swift */,
 				059D1C5325D63A7600A7FB96 /* Bubbles */,
@@ -1083,6 +1086,7 @@
 				0599798824D53C9500969318 /* AlertIndicator.swift in Sources */,
 				05F37C0225DF95B300F92005 /* KeyboardObserver.swift in Sources */,
 				05F8E11823F122490066954C /* userModel.swift in Sources */,
+				058966BE265DF50700303F1E /* PublicDialogDiscoverCell.swift in Sources */,
 				056B98AB24C900D7003F7FBA /* PullToRefreshIndicator.swift in Sources */,
 				05196DD424EB208C0026B9A7 /* ProfileRealmModel.swift in Sources */,
 				05196DDD24EE5D000026B9A7 /* SelectableAddressBookContact.swift in Sources */,

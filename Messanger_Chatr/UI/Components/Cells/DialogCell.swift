@@ -188,13 +188,13 @@ struct DialogCell: View {
                         .fixedSize(horizontal: false, vertical: true)
 
                     if let dialog = self.auth.selectedConnectyDialog, self.isOpen && (self.dialogModel.dialogType == "group" || self.dialogModel.dialogType == "public") {
-                        Text(self.auth.connectionState == .disconnected ? "disconnected..." : !dialog.isJoined() ? "joining convo..." : (self.dialogModel.onlineUserCount > 1 ? "\(self.dialogModel.onlineUserCount) online" : ""))
+                        Text(!dialog.isJoined() ? "joining convo..." : (self.dialogModel.onlineUserCount > 1 ? "\(self.dialogModel.onlineUserCount) online" : ""))
                             .font(.footnote)
                             .fontWeight(.regular)
                             .lineLimit(1)
                             .multilineTextAlignment(.leading)
                             .offset(x: -4, y: -4)
-                            .foregroundColor(self.auth.connectionState == .disconnected && self.dialogModel.isOpen ? .red : dialog.isJoined() && self.dialogModel.onlineUserCount > 0 ? .green : .gray)
+                            .foregroundColor(self.dialogModel.isOpen ? .gray : dialog.isJoined() && self.dialogModel.onlineUserCount > 0 ? .green : .gray)
                     }
                 }
             }.onTapGesture {

@@ -13,7 +13,7 @@ struct DiscoverBannerData: Identifiable, Hashable {
     var id = UUID()
     var groupName: String
     var memberCount: Int
-    var catagory: String
+    var description: String
     var groupImg: String
     var backgroundImg: String
     var catagoryImg: String
@@ -68,7 +68,7 @@ struct DiscoverCarousel : UIViewRepresentable {
         func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
             // Using This Function For Getting Currnet Page
         
-            let page = Int(scrollView.contentOffset.x / (Constants.screenWidth * 0.65))
+            let page = Int(scrollView.contentOffset.x / (Constants.screenWidth * 0.55))
             self.parent.page = page
         }
         
@@ -83,20 +83,14 @@ struct DiscoverListView : View {
     @EnvironmentObject var auth: AuthModel
     @Binding var page : Int
     @Binding var dataArray: [DiscoverBannerData]
-    @State var openDiscoverContent: Bool = false
-    @State var openPremiumContent: Bool = false
-    @State var openAddressBookContent: Bool = false
     
     var body: some View {
         HStack(spacing: 0) {
             ForEach(self.dataArray, id: \.self) { data in
-                DiscoverBannerCell(groupName: data.groupName, memberCount: data.memberCount, catagory: data.catagory, groupImg: data.groupImg, backgroundImg: data.backgroundImg, catagoryImg: data.catagoryImg)
-                    .frame(width: Constants.screenWidth * 0.65)
-                    .onTapGesture {
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                    }
+                DiscoverBannerCell(groupName: data.groupName, memberCount: data.memberCount, description: data.description, groupImg: data.groupImg, backgroundImg: data.backgroundImg, catagoryImg: data.catagoryImg)
+                    .frame(width: Constants.screenWidth * 0.55)
             }
-        }.padding(.vertical)
+        }
     }
 }
 
@@ -105,87 +99,108 @@ struct DiscoverBannerCell: View, Identifiable {
     let id = UUID()
     @State var groupName: String
     @State var memberCount: Int
-    @State var catagory: String
+    @State var description: String
     @State var groupImg: String
     @State var backgroundImg: String
     @State var catagoryImg: String
+    @State private var actionState: Int? = 0
 
     var body: some View {
-        GeometryReader { geo in
-            VStack() {
-                HStack(alignment: .center) {
-                    Image(self.groupImg)
+        ZStack {
+            NavigationLink(destination: self.dialogDetail().edgesIgnoringSafeArea(.all), tag: 1, selection: self.$actionState) {
+                EmptyView()
+            }
+
+            Button(action: {
+                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                self.actionState = 1
+            }) {
+                ZStack(alignment: .top) {
+                    Image(self.backgroundImg)
                         .resizable()
-                        .scaledToFit()
-                        .frame(width: 60, height: 60)
-                        .cornerRadius(60 / 4)
-                    
-                    VStack(alignment: .leading, spacing: 2.5) {
-                        Text(self.groupName)
-                            .font(.system(size: 28))
-                            .fontWeight(.bold)
-                            .foregroundColor(Color.white)
-                            .multilineTextAlignment(.center)
-                            .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
+                        .scaledToFill()
+                        .frame(height: 120)
+                        .cornerRadius(10)
+                        .clipped()
+
+                    VStack(alignment: .center, spacing: 0) {
+                        Image(self.groupImg)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 70, height: 70)
+                            .cornerRadius(55 / 4)
+                            .padding(.bottom, 5)
+                            .shadow(color: Color.black.opacity(0.3), radius: 12, x: 0, y: 8)
                         
-                        Text(self.memberCount > 1 ? "\(self.memberCount) members" : "be one of the first to join this group!")
-                            .font(.subheadline)
-                            .fontWeight(.regular)
-                            .foregroundColor(Color.white)
-                            .multilineTextAlignment(.center)
-                            .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
-                    }.padding(.leading, 5)
-                    
-                    Spacer()
-                }.padding()
-                
-                Spacer()
-                HStack {
-                    HStack {
-                        HStack {
-                            Image(systemName: self.catagoryImg)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 16, height: 18, alignment: .center)
-                                .foregroundColor(.black)
-                                .shadow(color: Color.black.opacity(0.3), radius: 3, x: 0, y: 0)
+                        VStack(alignment: .center, spacing: 2) {
+                            Text(self.groupName)
+                                .font(.system(size: 22))
+                                .fontWeight(.semibold)
+                                .lineLimit(2)
+                                .foregroundColor(Color.primary)
+                                .multilineTextAlignment(.center)
                             
-                            Text(self.catagory)
+                            Text(self.memberCount > 1 ? "\(self.memberCount) members" : "be one of the first to join this group!")
+                                .font(.caption)
+                                .fontWeight(.regular)
+                                .foregroundColor(Color.secondary)
+                                .multilineTextAlignment(.center)
+                                .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
+
+        //                        Text("#" + self.catagory)
+        //                            .font(.caption)
+        //                            .fontWeight(.regular)
+        //                            .multilineTextAlignment(.center)
+        //                            .foregroundColor(Color.primary)
+        //                            .shadow(color: Color.black.opacity(0.3), radius: 3, x: 0, y: 0)
+        //                            .padding(2.5).background(Color.primary.opacity(0.05)).cornerRadius(4)
+        //                            .background(RoundedRectangle(cornerRadius: 4).stroke(Color.secondary, lineWidth: 1.5).background( Color.primary.opacity(0.05)).cornerRadius(4))
+                            
+                            Text(self.description)
                                 .font(.subheadline)
                                 .fontWeight(.regular)
+                                .foregroundColor(Color.primary)
                                 .multilineTextAlignment(.center)
-                                .foregroundColor(Color.black)
-                                .shadow(color: Color.black.opacity(0.3), radius: 3, x: 0, y: 0)
-                        }.padding(2.5).cornerRadius(2).background(Color.white.opacity(0.5))
-                        
-                        Spacer()
-                        
-                        Button(action: {
-                            print("join: \(self.groupName)")
-                        }) {
-                            HStack {
-                                Image(systemName: "plus")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 18, height: 18, alignment: .center)
-                                    .foregroundColor(.white)
-                                    .shadow(color: Color.black.opacity(0.3), radius: 3, x: 0, y: 0)
-                                
-                                Text("Join Group")
-                                    .font(.subheadline)
-                                    .fontWeight(.medium)
-                                    .multilineTextAlignment(.center)
-                                    .foregroundColor(Color.white)
-                                    .shadow(color: Color.black.opacity(0.3), radius: 3, x: 0, y: 0)
-                            }.padding(2.5).cornerRadius(2).background(Color.blue)
+                                .lineLimit(2)
+                                .frame(height: 40)
+                            
+                            Spacer()
+                            Button(action: {
+                                print("join: \(self.groupName)")
+                            }) {
+                                HStack {
+                                    Image(systemName: "person.crop.circle.badge.plus")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 18, height: 16, alignment: .center)
+                                        .foregroundColor(.white)
+                                        .shadow(color: Color.black.opacity(0.3), radius: 3, x: 0, y: 0)
+                                    
+                                    Text("Join Group")
+                                        .font(.subheadline)
+                                        .fontWeight(.bold)
+                                        .multilineTextAlignment(.center)
+                                        .foregroundColor(Color.white)
+                                }.frame(width: Constants.screenWidth * 0.50 - 50, height: 36, alignment: .center)
+                                .background(Color.blue)
+                                .cornerRadius(8)
+                            }.buttonStyle(ClickMiniButtonStyle())
+                            .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 2.5)
+                            .padding(.bottom, 5)
                         }
-                    }
-                }.padding()
-            }.background(Image(self.backgroundImg).resizable().scaledToFill())
-            .cornerRadius(25)
-            .padding(.horizontal)
-            .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
+                    }.padding(.top, 60)
+                    .padding()
+                }
+                .background(Color("buttonColor"))
+                .frame(minHeight: 280, maxHeight: 360)
+                .cornerRadius(20)
+                .padding(.horizontal, 15)
+            }.buttonStyle(ClickMiniButtonStyle())
         }
+    }
+    
+    func dialogDetail() -> some View {
+        Text("more dialog detail here lol...")
     }
 }
 
