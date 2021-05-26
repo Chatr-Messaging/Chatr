@@ -8,22 +8,42 @@
 
 import SwiftUI
 import RealmSwift
+import SDWebImageSwiftUI
 
-struct DiscoverBannerData: Identifiable, Hashable {
-    var id = UUID()
-    var groupName: String
-    var memberCount: Int
-    var description: String
-    var groupImg: String
-    var backgroundImg: String
-    var catagoryImg: String
+class PublicDialogModel {
+    var id: String?
+    var name: String?
+    var memberCount: Int?
+    var dateCreated: String?
+    var coverPhoto: String?
+    var avatar: String?
+    var description: String?
+    var canMembersType: Bool?
 }
 
+extension PublicDialogModel {
+    static func transformDialog(_ dict: [String: Any], key: String) -> PublicDialogModel {
+        let dialog = PublicDialogModel()
+        
+        dialog.id = key
+        dialog.name = dict["name"] as? String
+        dialog.memberCount = dict["members"] as? Int
+        dialog.dateCreated = dict["date_created"] as? String
+        dialog.coverPhoto = dict["cover_photo"] as? String
+        dialog.avatar = dict["avatar"] as? String
+        dialog.description = dict["description"] as? String
+        dialog.canMembersType = dict["canMembersType"] as? Bool
+
+        return dialog
+    }
+}
+
+/*
 //MARK: Carousel View
 struct DiscoverCarousel : UIViewRepresentable {
     var width : CGFloat
     @Binding var page : Int
-    @Binding var dataArray: [DiscoverBannerData]
+    @Binding var dataArray: [PublicDialogModel]
     @Binding var dataArrayCount: Int
     @State var scrollOffset: CGFloat = CGFloat()
     var height : CGFloat
@@ -79,21 +99,22 @@ struct DiscoverCarousel : UIViewRepresentable {
 }
 
 //MARK: Discover List View
-struct DiscoverListView : View {
-    @EnvironmentObject var auth: AuthModel
-    @Binding var page : Int
-    @Binding var dataArray: [DiscoverBannerData]
-    
-    var body: some View {
-        HStack(spacing: 0) {
-            ForEach(self.dataArray, id: \.self) { data in
-                DiscoverBannerCell(groupName: data.groupName, memberCount: data.memberCount, description: data.description, groupImg: data.groupImg, backgroundImg: data.backgroundImg, catagoryImg: data.catagoryImg)
-                    .frame(width: Constants.screenWidth * 0.55)
-            }
-        }
-    }
-}
-
+//struct DiscoverListView : View {
+//    @EnvironmentObject var auth: AuthModel
+//    @Binding var page : Int
+//    @Binding var dataArray: [PublicDialogModel]
+//
+//    var body: some View {
+//        HStack(spacing: 0) {
+//            ForEach(self.dataArray, id: \.self) { data in
+//                DiscoverBannerCell(groupName: data.name ?? "no name", memberCount: data.memberCount ?? 0, description: data.description ?? "", avatar: data.groupImg ?? "", backgroundImg: data.backgroundImg, catagoryImg: data.catagoryImg)
+//                    .frame(width: Constants.screenWidth * 0.55)
+//            }
+//        }
+//    }
+//}
+*/
+ 
 // MARK: Discover Cell
 struct DiscoverBannerCell: View, Identifiable {
     let id = UUID()
@@ -102,7 +123,6 @@ struct DiscoverBannerCell: View, Identifiable {
     @State var description: String
     @State var groupImg: String
     @State var backgroundImg: String
-    @State var catagoryImg: String
     @State private var actionState: Int? = 0
 
     var body: some View {
@@ -116,16 +136,22 @@ struct DiscoverBannerCell: View, Identifiable {
                 self.actionState = 1
             }) {
                 ZStack(alignment: .top) {
-                    Image(self.backgroundImg)
+                    WebImage(url: URL(string: self.backgroundImg))
                         .resizable()
+                        .placeholder{ Image("empty-profile").resizable().frame(width: 40, height: 40, alignment: .center).scaledToFill() }
+                        .indicator(.activity)
+                        .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                         .scaledToFill()
-                        .frame(height: 120)
+                        .frame(width: Constants.screenWidth * 0.55 - 35, height: 120)
                         .cornerRadius(10)
                         .clipped()
+                        .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 4)
 
                     VStack(alignment: .center, spacing: 0) {
-                        Image(self.groupImg)
+                        WebImage(url: URL(string: self.groupImg))
                             .resizable()
+                            .placeholder{ Image("empty-profile").resizable().frame(width: 70, height: 70, alignment: .center).scaledToFill() }
+                            .indicator(.activity)
                             .scaledToFit()
                             .frame(width: 70, height: 70)
                             .cornerRadius(55 / 4)
@@ -134,13 +160,13 @@ struct DiscoverBannerCell: View, Identifiable {
                         
                         VStack(alignment: .center, spacing: 2) {
                             Text(self.groupName)
-                                .font(.system(size: 22))
+                                .font(.system(size: 20))
                                 .fontWeight(.semibold)
                                 .lineLimit(2)
                                 .foregroundColor(Color.primary)
                                 .multilineTextAlignment(.center)
                             
-                            Text(self.memberCount > 1 ? "\(self.memberCount) members" : "be one of the first to join this group!")
+                            Text(self.memberCount > 1 ? "\(self.memberCount) members" : "become the first member!")
                                 .font(.caption)
                                 .fontWeight(.regular)
                                 .foregroundColor(Color.secondary)

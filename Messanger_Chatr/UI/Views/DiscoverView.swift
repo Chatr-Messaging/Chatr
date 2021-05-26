@@ -14,16 +14,19 @@ struct DiscoverView: View {
     @EnvironmentObject var auth: AuthModel
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.colorScheme) var colorScheme
+    @ObservedObject var viewModel: DiscoverViewModel = DiscoverViewModel()
     @State var searchText: String = ""
     @State var outputSearchText: String = ""
-    @State var bannerDataArray: [DiscoverBannerData] = []
-    @State var topDialogsData: [DiscoverBannerData] = []
+    @State var bannerDataArray: [PublicDialogModel] = []
+    @State var topDialogsData: [PublicDialogModel] = []
+    @State var recentDialogsData: [PublicDialogModel] = []
     @State var dialogTags: [publicTag] = []
     @State var bannerCount: Int = 0
     @State var topDialogsCount: Int = 0
     @State var pageIndex: Int = 0
     @State var openNewPublicDialog: Bool = false
     @State var showMoreTopDialogs: Bool = false
+    @State var showMoreRecentDialogs: Bool = false
     @State var style = StaggeredGridStyle(.horizontal, tracks: .fixed(35), spacing: 8)
 
     var body: some View {
@@ -139,9 +142,12 @@ struct DiscoverView: View {
                         .padding(.bottom, 2)
 
                         ScrollView(.horizontal, showsIndicators: false) {
-                            DiscoverListView(page: self.$pageIndex, dataArray: self.$bannerDataArray)
-                                .environmentObject(self.auth)
-                                .animation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0))
+                            HStack(spacing: 0) {
+                                ForEach(self.bannerDataArray.indices, id: \.self) { index in
+                                    DiscoverBannerCell(groupName: self.bannerDataArray[index].name ?? "no name", memberCount: self.bannerDataArray[index].memberCount ?? 0, description: self.bannerDataArray[index].description ?? "", groupImg: self.bannerDataArray[index].avatar ?? "", backgroundImg: self.bannerDataArray[index].coverPhoto ?? "")
+                                        .frame(width: Constants.screenWidth * 0.55)
+                                }
+                            }.animation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0))
                         }.frame(height: 280)
                         .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
                     }
@@ -209,31 +215,86 @@ struct DiscoverView: View {
                         })
                     }
                 }
+                
+                //MARK: Recent Section
+                if self.recentDialogsData.count > 0 {
+                    VStack {
+                        HStack {
+                            Text("RECENTLY ADDED:")
+                                .font(.caption)
+                                .fontWeight(.regular)
+                                .foregroundColor(.secondary)
+                                .padding(.horizontal, 40)
+                            Spacer()
+                        }
+                        .padding(.top, 30)
+                        .padding(.bottom, 5)
+
+                        self.styleBuilder(content: {
+                            ForEach(self.recentDialogsData.indices, id: \.self) { id in
+                                VStack(alignment: .trailing, spacing: 0) {
+                                    if id <= 4 {
+                                     //Public dialog cell
+                                        PublicDialogDiscoverCell(dialogData: self.recentDialogsData[id], isLast: id == 4)
+                                            .environmentObject(self.auth)
+                                    }
+                                    
+                                    if self.recentDialogsData.count > 5 && id == 4 {
+                                        NavigationLink(destination: self.recentDialogs(), isActive: $showMoreRecentDialogs) {
+                                            VStack(alignment: .trailing, spacing: 0) {
+                                                Divider()
+                                                    .frame(width: Constants.screenWidth - 80)
+                                                    .offset(x: 20)
+                                                
+                                                HStack {
+                                                    Image(systemName: "ellipsis.circle")
+                                                        .resizable()
+                                                        .scaledToFit()
+                                                        .frame(width: 20, height: 20, alignment: .center)
+                                                        .foregroundColor(Color("SoftTextColor"))
+                                                        .padding(.leading, 10)
+                                                    
+                                                    Text("more...")
+                                                        .font(.subheadline)
+                                                        .foregroundColor(Color("SoftTextColor"))
+                                                        .padding(.horizontal)
+                                                    
+                                                    Spacer()
+                                                    Image(systemName: "chevron.right")
+                                                        .resizable()
+                                                        .font(Font.title.weight(.bold))
+                                                        .scaledToFit()
+                                                        .frame(width: 7, height: 15, alignment: .center)
+                                                        .foregroundColor(.secondary)
+                                                }.padding(.horizontal)
+                                                .padding(.top, 10)
+                                                .padding(.bottom, 15)
+                                                .contentShape(Rectangle())
+                                            }
+                                        }.buttonStyle(changeBGButtonStyle())
+                                    }
+                                }
+                            }
+                        })
+                    }
+                }
             }
             .onAppear {
-                self.bannerDataArray.append(DiscoverBannerData(groupName: "Apple Fanboy", memberCount: 18, description: "Technology group that is full of fun people!", groupImg: "proPic", backgroundImg: "michaelAngelWallpaper", catagoryImg: "iphone.homebutton"))
-                
-                self.bannerDataArray.append(DiscoverBannerData(groupName: "Retro World", memberCount: 129, description: "When in Rome they say eh?! lolll", groupImg: "proPic", backgroundImg: "syncAddressBackground", catagoryImg: "iphone.homebutton"))
-                
-                self.bannerDataArray.append(DiscoverBannerData(groupName: "Retro World", memberCount: 129, description: "Howedy dooo to my peopleee", groupImg: "proPic", backgroundImg: "syncAddressBackground", catagoryImg: "iphone.homebutton"))
-                
-                self.bannerDataArray.append(DiscoverBannerData(groupName: "Retro World", memberCount: 129, description: "Sounds of music is an old movieeee", groupImg: "proPic", backgroundImg: "syncAddressBackground", catagoryImg: "iphone.homebutton"))
-                
-                self.topDialogsData.append(DiscoverBannerData(groupName: "Retro World", memberCount: 129, description: "Sounds of music is an old movieeee", groupImg: "proPic", backgroundImg: "syncAddressBackground", catagoryImg: "iphone.homebutton"))
-                
-                self.topDialogsData.append(DiscoverBannerData(groupName: "Apple Fanboy", memberCount: 18, description: "Technology group that is full of fun people!", groupImg: "proPic", backgroundImg: "michaelAngelWallpaper", catagoryImg: "iphone.homebutton"))
-                
-                self.topDialogsData.append(DiscoverBannerData(groupName: "Retro World", memberCount: 129, description: "When in Rome they say eh?! lolll", groupImg: "proPic", backgroundImg: "syncAddressBackground", catagoryImg: "iphone.homebutton"))
-                
-                self.topDialogsData.append(DiscoverBannerData(groupName: "Retro World", memberCount: 129, description: "Howedy dooo to my peopleee", groupImg: "proPic", backgroundImg: "syncAddressBackground", catagoryImg: "iphone.homebutton"))
-                
-                self.topDialogsData.append(DiscoverBannerData(groupName: "Retro World", memberCount: 129, description: "Howedy dooo to my peopleee", groupImg: "proPic", backgroundImg: "syncAddressBackground", catagoryImg: "iphone.homebutton"))
-                
-                self.topDialogsData.append(DiscoverBannerData(groupName: "Retro World", memberCount: 129, description: "Howedy dooo to my peopleee", groupImg: "proPic", backgroundImg: "syncAddressBackground", catagoryImg: "iphone.homebutton"))
-
                 self.bannerCount = self.bannerDataArray.count
                 self.topDialogsCount = self.topDialogsData.count
-                self.loadTags(completion: { })
+                
+                self.bannerDataArray.removeAll()
+                self.viewModel.observeFeaturedDialogs({ dialog in
+                    self.bannerDataArray.append(dialog)
+                    print("the found banner array: \(dialog.name ?? "no name")")
+                }, isHiddenIndicator: { hide in
+                    print("the loading indicator is done? \(hide ?? false)")
+                })
+
+                self.dialogTags.removeAll()
+                self.viewModel.loadTags(completion: { tags in
+                    self.dialogTags = tags
+                })
             }
         }.resignKeyboardOnDragGesture()
 //        .navigationBarItems(leading:
@@ -244,28 +305,20 @@ struct DiscoverView: View {
 //                    .foregroundColor(.primary)
 //            })
     }
-    
-    func loadTags(completion: @escaping () -> ()) {
-        let marketplaceTags = Database.database().reference().child("Marketplace").child("tags")
-
-        self.dialogTags.removeAll()
-        marketplaceTags.observeSingleEvent(of: .value, with: { (snapshot: DataSnapshot) in
-            if let dict = snapshot.value as? [String: Any] {
-                for i in dict {
-                    withAnimation {
-                        self.dialogTags.append(publicTag(title: i.key))
-                    }
-                }
-
-                completion()
-            } else {
-                completion()
-            }
-        })
-    }
-
+        
     func topDialogs() -> some View {
         Text("more top dialogs here lol...")
+//        MoreContactsView(dismissView: self.$dismissView,
+//                         dialogModelMemebers: self.$dialogModelMemebers,
+//                         openNewDialogID: self.$openNewDialogID,
+//                         dialogModel: self.$dialogModel,
+//                         currentUserIsPowerful: self.$currentUserIsPowerful,
+//                         showProfile: self.$showProfile)
+//            .environmentObject(self.auth)
+    }
+    
+    func recentDialogs() -> some View {
+        Text("more recent dialogs here lol...")
 //        MoreContactsView(dismissView: self.$dismissView,
 //                         dialogModelMemebers: self.$dialogModelMemebers,
 //                         openNewDialogID: self.$openNewDialogID,

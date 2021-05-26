@@ -10,7 +10,7 @@ import SwiftUI
 
 struct PublicDialogDiscoverCell: View {
     @EnvironmentObject var auth: AuthModel
-    @State var dialogData: DiscoverBannerData
+    @State var dialogData: PublicDialogModel
     @State var isLast: Bool = false
     @State private var actionState: Int? = 0
 
@@ -25,7 +25,7 @@ struct PublicDialogDiscoverCell: View {
             }) {
                 VStack(alignment: .leading, spacing: 0) {
                     HStack(alignment: .top) {
-                        Image(self.dialogData.groupImg)
+                        Image(self.dialogData.avatar ?? "")
                             .resizable()
                             .scaledToFit()
                             .frame(width: 54, height: 54)
@@ -33,21 +33,21 @@ struct PublicDialogDiscoverCell: View {
                             .shadow(color: Color.black.opacity(0.3), radius: 12, x: 0, y: 8)
                         
                         VStack(alignment: .leading, spacing: 0) {
-                            Text(self.dialogData.groupName)
+                            Text(self.dialogData.name ?? "no name")
                                 .font(.system(size: 20))
                                 .fontWeight(.semibold)
                                 .lineLimit(1)
                                 .foregroundColor(Color.primary)
                                 .multilineTextAlignment(.leading)
                             
-                            Text("\(self.dialogData.memberCount) members")
+                            Text("\(self.dialogData.memberCount ?? 0) members")
                                 .font(.caption)
                                 .fontWeight(.regular)
                                 .foregroundColor(Color.secondary)
                                 .multilineTextAlignment(.leading)
                                 .lineLimit(3)
                             
-                            Text(self.dialogData.description)
+                            Text(self.dialogData.description ?? "")
                                 .font(.subheadline)
                                 .fontWeight(.regular)
                                 .foregroundColor(Color.primary)
