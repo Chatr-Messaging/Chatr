@@ -20,6 +20,7 @@
 		05196DDD24EE5D000026B9A7 /* SelectableAddressBookContact.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05196DDC24EE5CF80026B9A7 /* SelectableAddressBookContact.swift */; };
 		0521234C24C8E338008123CF /* ProfileSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0521234B24C8E338008123CF /* ProfileSettingsView.swift */; };
 		05224111265EA720007E3D72 /* DiscoverViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05224110265EA720007E3D72 /* DiscoverViewModel.swift */; };
+		05224113265F627C007E3D72 /* MoreTagDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05224112265F627C007E3D72 /* MoreTagDetailView.swift */; };
 		052347B623E55C8A00EF9CEB /* FullNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052347B523E55C8A00EF9CEB /* FullNameView.swift */; };
 		052364C32439A37200AF825F /* DialogCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052364C22439A37200AF825F /* DialogCell.swift */; };
 		0525E4C125EC98A90086EB54 /* PinchZoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0525E4C025EC98A90086EB54 /* PinchZoomView.swift */; };
@@ -211,6 +212,7 @@
 		05196DDC24EE5CF80026B9A7 /* SelectableAddressBookContact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectableAddressBookContact.swift; sourceTree = "<group>"; };
 		0521234B24C8E338008123CF /* ProfileSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSettingsView.swift; sourceTree = "<group>"; };
 		05224110265EA720007E3D72 /* DiscoverViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverViewModel.swift; sourceTree = "<group>"; };
+		05224112265F627C007E3D72 /* MoreTagDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreTagDetailView.swift; sourceTree = "<group>"; };
 		052347B523E55C8A00EF9CEB /* FullNameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullNameView.swift; sourceTree = "<group>"; };
 		052364C22439A37200AF825F /* DialogCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogCell.swift; sourceTree = "<group>"; };
 		0525E4C025EC98A90086EB54 /* PinchZoomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinchZoomView.swift; sourceTree = "<group>"; };
@@ -554,6 +556,7 @@
 				055AEE372512EC9500F35B8F /* EditProfileView.swift */,
 				05F5829725C12FC30043221D /* EditGroupDialogView.swift */,
 				05F08B5D252DAD1A005222FA /* MoreContactsView.swift */,
+				05224112265F627C007E3D72 /* MoreTagDetailView.swift */,
 				05A7BD6024FEF5180001BFC9 /* LockedOutView.swift */,
 				050BF7CA23939777002B91BC /* welcomeView.swift */,
 				056B98A324C8FA8B003F7FBA /* Sections */,
@@ -1074,6 +1077,7 @@
 				056BCC6426550562006DD302 /* stickyHeaderSection.swift in Sources */,
 				05C93BDB25145EF10059D1AA /* VisitGroupChannelView.swift in Sources */,
 				05BCE40D250B4EA400E29F39 /* HighlightedContactCell.swift in Sources */,
+				05224113265F627C007E3D72 /* MoreTagDetailView.swift in Sources */,
 				05D8A8DC2502CB3A00D53BE2 /* MailView.swift in Sources */,
 				055AEE382512EC9500F35B8F /* EditProfileView.swift in Sources */,
 				050582FF24DA5F9600CBD4AC /* MessagesRealmModel.swift in Sources */,

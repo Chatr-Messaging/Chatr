@@ -256,7 +256,7 @@ struct mainHomeList: View {
                                     }
                                 }
                             }) {
-                                ContactsView(newDialogID: self.$newDialogFromContact, dismissView: self.$showContacts)
+                                ContactsView(newDialogID: self.$newDialogFromContact, dismissView: self.$showContacts, showPinDetails: self.$showPinDetails)
                                     .environmentObject(self.auth)
                                     .background(Color("bgColor"))
                                     .edgesIgnoringSafeArea(.all)

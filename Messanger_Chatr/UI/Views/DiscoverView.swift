@@ -15,6 +15,9 @@ struct DiscoverView: View {
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.colorScheme) var colorScheme
     @ObservedObject var viewModel: DiscoverViewModel = DiscoverViewModel()
+    var removeDoneBtn: Bool = true
+    @Binding var dismissView: Bool
+    @Binding var showPinDetails: String
     @State var searchText: String = ""
     @State var outputSearchText: String = ""
     @State var bannerDataArray: [PublicDialogModel] = []
@@ -23,7 +26,7 @@ struct DiscoverView: View {
     @State var dialogTags: [publicTag] = []
     @State var bannerCount: Int = 0
     @State var topDialogsCount: Int = 0
-    @State var pageIndex: Int = 0
+    @State var tagSelection: Int? = -1
     @State var openNewPublicDialog: Bool = false
     @State var showMoreTopDialogs: Bool = false
     @State var showMoreRecentDialogs: Bool = false
@@ -31,7 +34,7 @@ struct DiscoverView: View {
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: true) {
-            VStack(alignment: .center) {
+            LazyVStack(alignment: .center) {
                 /*
                 Text("Under Construction")
                     .font(.largeTitle)
@@ -113,19 +116,26 @@ struct DiscoverView: View {
                 
                 //MARK: Tag Section
                 ScrollView(.horizontal, showsIndicators: false) {
-                    Grid(self.dialogTags, id: \.self) { item in
-                        Button(action: {
-                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                        }, label: {
-                            Text("#" + "\(item.title)")
-                                .fontWeight(.medium)
-                                .padding(.vertical, 7.5)
-                                .padding(.horizontal)
-                                .foregroundColor(item.selected ? Color.black : Color.primary)
-                                .background(RoundedRectangle(cornerRadius: 10).stroke(Color.primary.opacity(0.75), lineWidth: 1.5).background(Color("buttonColor")).cornerRadius(10))
-                                .lineLimit(1)
-                                .fixedSize()
-                        }).buttonStyle(ClickButtonStyle())
+                    Grid(self.dialogTags.sorted(by: { $0.title < $1.title }).indices, id: \.self) { item in
+                        ZStack {
+                            NavigationLink(destination: self.tagDetails(tagId: self.dialogTags[item].title).edgesIgnoringSafeArea(.all), tag: Int(item), selection: self.$tagSelection) {
+                                EmptyView()
+                            }
+
+                            Button(action: {
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                self.tagSelection = Int(item)
+                            }, label: {
+                                Text("#" + "\(self.dialogTags[item].title)")
+                                    .fontWeight(.medium)
+                                    .padding(.vertical, 7.5)
+                                    .padding(.horizontal)
+                                    .foregroundColor(self.dialogTags[item].selected ? Color.black : Color.primary)
+                                    .background(RoundedRectangle(cornerRadius: 10).stroke(Color.primary.opacity(0.75), lineWidth: 1.5).background(Color("buttonColor")).cornerRadius(10))
+                                    .lineLimit(1)
+                                    .fixedSize()
+                            }).buttonStyle(ClickButtonStyle())
+                        }
                     }.padding(.leading, 20)
                     .frame(height: 85)
                 }.gridStyle(self.style)
@@ -175,7 +185,7 @@ struct DiscoverView: View {
                                 VStack(alignment: .trailing, spacing: 0) {
                                     if id <= 4 {
                                      //Public dialog cell
-                                        PublicDialogDiscoverCell(dialogData: self.topDialogsData[id], isLast: id == 4)
+                                        PublicDialogDiscoverCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, dialogData: self.topDialogsData[id], isLast: id == 4)
                                             .environmentObject(self.auth)
                                     }
                                     
@@ -238,7 +248,7 @@ struct DiscoverView: View {
                                 VStack(alignment: .trailing, spacing: 0) {
                                     if id <= 4 {
                                      //Public dialog cell
-                                        PublicDialogDiscoverCell(dialogData: self.recentDialogsData[id], isLast: id == 4)
+                                        PublicDialogDiscoverCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, dialogData: self.recentDialogsData[id], isLast: id == 4)
                                             .environmentObject(self.auth)
                                     }
                                     
@@ -316,13 +326,13 @@ struct DiscoverView: View {
                 })
             }
         }.resignKeyboardOnDragGesture()
-//        .navigationBarItems(leading:
-//            Button(action: {
-//                self.presentationMode.wrappedValue.dismiss()
-//            }) {
-//                Text("Done")
-//                    .foregroundColor(.primary)
-//            })
+        .navigationBarItems(leading:
+            Button(action: {
+                self.presentationMode.wrappedValue.dismiss()
+            }) {
+                Text("Done")
+                    .foregroundColor(.primary)
+            }.opacity(self.removeDoneBtn ? 0 : 1))
     }
         
     func topDialogs() -> some View {
@@ -334,6 +344,11 @@ struct DiscoverView: View {
 //                         currentUserIsPowerful: self.$currentUserIsPowerful,
 //                         showProfile: self.$showProfile)
 //            .environmentObject(self.auth)
+    }
+    
+    func tagDetails(tagId: String) -> some View {
+        MoreTagDetailView(viewModel: self.viewModel, dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, tagsCount: 0, tagId: tagId)
+            .environmentObject(self.auth)
     }
     
     func recentDialogs() -> some View {

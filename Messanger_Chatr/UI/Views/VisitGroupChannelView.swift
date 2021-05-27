@@ -510,7 +510,7 @@ struct VisitGroupChannelView: View {
     }
     
     func observePublicDetails() {
-        changeDialogRealmData.shared.observeFirebaseDialogReturn(dialogId: self.dialogModel.id, completion: { (dialog, tags, coverPhotoUrlz) in
+        changeDialogRealmData.shared.observeFirebaseDialogReturn(dialogModel: self.dialogModel, completion: { (dialog, tags, coverPhotoUrlz) in
             if let dia = dialog {
                 print("the returned dialog is nowww: \(dia.fullName) the dialog is pulled in and had the right data: \(dia)")
                 self.dialogModel.id = dia.id

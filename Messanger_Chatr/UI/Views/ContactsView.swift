@@ -17,6 +17,7 @@ struct ContactsView: View {
     @Environment(\.colorScheme) var colorScheme
     @Binding var newDialogID: Int
     @Binding var dismissView: Bool
+    @Binding var showPinDetails: String
     @State var userPhoneNumber: String = ""
     @State var searchContact: String = ""
     @State var showUserProfile: Bool = false
@@ -138,7 +139,7 @@ struct ContactsView: View {
                             //ContactsRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ContactStruct.self))
                             ZStack(alignment: .bottom) {
                                 if self.contactBannerDataArray.count > 0 {
-                                    ContactCarousel(width: Constants.screenWidth, page: self.$pageIndex, scrollOffset: self.$scrollOffset, dataArray: self.$contactBannerDataArray, dataArrayCount: self.$bannerCount, quickSnapViewState: self.$quickSnapViewState, height: self.contactBannerDataArray.count > 0 ? 160 : 0)
+                                    ContactCarousel(width: Constants.screenWidth, page: self.$pageIndex, scrollOffset: self.$scrollOffset, dataArray: self.$contactBannerDataArray, dataArrayCount: self.$bannerCount, quickSnapViewState: self.$quickSnapViewState, dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, height: self.contactBannerDataArray.count > 0 ? 160 : 0)
                                         .environmentObject(self.auth)
                                         .frame(width: Constants.screenWidth, height: self.contactBannerDataArray.count > 0 ? 175 : 0)
                                         .animation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0))

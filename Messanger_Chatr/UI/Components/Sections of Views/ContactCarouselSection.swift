@@ -27,6 +27,8 @@ struct ContactCarousel : UIViewRepresentable {
     @Binding var dataArray: [ContactBannerData]
     @Binding var dataArrayCount: Int
     @Binding var quickSnapViewState: QuickSnapViewingState
+    @Binding var dismissView: Bool
+    @Binding var showPinDetails: String
     var height : CGFloat
     
     func makeCoordinator() -> Coordinator {
@@ -46,7 +48,7 @@ struct ContactCarousel : UIViewRepresentable {
         view.delegate = context.coordinator
         
         // Now Going to  embed swiftUI View Into UIView...
-        let view1 = UIHostingController(rootView: ContactListView(page: self.$page, dataArray: self.$dataArray, quickSnapViewState: self.$quickSnapViewState))
+        let view1 = UIHostingController(rootView: ContactListView(page: self.$page, dataArray: self.$dataArray, quickSnapViewState: self.$quickSnapViewState, dismissView: self.$dismissView, showPinDetails: self.$showPinDetails))
         view1.view.frame = CGRect(x: 0, y: 0, width: total, height: self.height)
         view1.view.backgroundColor = .clear
         view.addSubview(view1.view)
@@ -90,6 +92,8 @@ struct ContactListView : View {
     @Binding var page : Int
     @Binding var dataArray: [ContactBannerData]
     @Binding var quickSnapViewState: QuickSnapViewingState
+    @Binding var dismissView: Bool
+    @Binding var showPinDetails: String
     @State var openPremiumContent: Bool = false
     @State var openAddressBookContent: Bool = false
     @State private var openDiscoverContent: Int? = 0
@@ -151,13 +155,11 @@ struct ContactListView : View {
     }
     
     func discoverViewFunc() -> some View {
-        //NavigationView {
-            DiscoverView()
-                .environmentObject(self.auth)
-                .navigationBarTitle("Discover", displayMode: .automatic)
-                .background(Color("bgColor")
-                .edgesIgnoringSafeArea(.all))
-        //}
+        DiscoverView(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails)
+            .environmentObject(self.auth)
+            .navigationBarTitle("Discover", displayMode: .automatic)
+            .background(Color("bgColor")
+            .edgesIgnoringSafeArea(.all))
     }
 }
 

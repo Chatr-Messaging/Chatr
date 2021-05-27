@@ -11,9 +11,15 @@ import SDWebImageSwiftUI
 
 struct PublicDialogDiscoverCell: View {
     @EnvironmentObject var auth: AuthModel
+    @Binding var dismissView: Bool
+    @Binding var showPinDetails: String
     @State var dialogData: PublicDialogModel
     @State var isLast: Bool = false
     @State private var actionState: Int? = 0
+    @State var isEditGroupOpen: Bool = false
+    @State var canEditGroup: Bool = false
+    @State var openNewDialogID: Int = 0
+    var sendDia: DialogStruct = DialogStruct()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -97,7 +103,14 @@ struct PublicDialogDiscoverCell: View {
                         .opacity(!self.isLast ? 1 : 0)
                 }
             }.buttonStyle(changeBGButtonStyle())
-            
+            .onAppear() {
+                self.sendDia.id = dialogData.id ?? ""
+                self.sendDia.dialogType = "public"
+                self.sendDia.fullName = self.dialogData.name ?? ""
+                self.sendDia.bio = self.dialogData.description ?? ""
+                self.sendDia.avatar = self.dialogData.avatar ?? ""
+                self.sendDia.coverPhoto = self.dialogData.coverPhoto ?? ""
+            }
         }.simultaneousGesture(TapGesture()
                                 .onEnded { _ in
                                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
@@ -105,13 +118,16 @@ struct PublicDialogDiscoverCell: View {
     }
     
     func dialogDetails() -> some View {
-        Text("more top dialogs here lol...")
-//        MoreContactsView(dismissView: self.$dismissView,
-//                         dialogModelMemebers: self.$dialogModelMemebers,
-//                         openNewDialogID: self.$openNewDialogID,
-//                         dialogModel: self.$dialogModel,
-//                         currentUserIsPowerful: self.$currentUserIsPowerful,
-//                         showProfile: self.$showProfile)
-//            .environmentObject(self.auth)
+        VisitGroupChannelView(dismissView: self.$dismissView, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$openNewDialogID, showPinDetails: self.$showPinDetails, fromDialogCell: false, viewState: .fromDynamicLink, dialogRelationship: .subscribed, dialogModel: self.sendDia)
+            .environmentObject(self.auth)
+            .edgesIgnoringSafeArea(.all)
+            .navigationBarItems(trailing:
+                            Button(action: {
+                                self.isEditGroupOpen.toggle()
+                            }) {
+                                Text("Edit")
+                                    .foregroundColor(.blue)
+                                    .opacity(self.canEditGroup ? 1 : 0)
+                            }.disabled(self.canEditGroup ? false : true))
     }
 }

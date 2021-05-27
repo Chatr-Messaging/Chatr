@@ -34,15 +34,11 @@ struct stickyHeaderSection: View {
                             .indicator(.activity)
                             .aspectRatio(contentMode: .fill)
                             .frame(width: Constants.screenWidth, height: minY > 0 ? headerHeight + minY : headerHeight, alignment: .center)
-                            .cornerRadius(0)
+                            .cornerRadius(10)
                             .animation(.easeOut)
-                            .onAppear() {
-                                print("the cover photo iss: \(self.dialogModel.coverPhoto)")
-                            }
+                            .clipped()
+                            .offset(y: minY > 0 ? -minY : -minY < scrollBackHeight ? 0 : -minY - scrollBackHeight)
                     }
-                    .clipped()
-                    .frame(height: minY > 0 ? headerHeight + minY : nil)
-                    .offset(y: minY > 0 ? -minY : -minY < scrollBackHeight ? 0 : -minY - scrollBackHeight)
                 )
             }
             .frame(height: headerHeight)

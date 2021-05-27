@@ -57,6 +57,47 @@ class DiscoverViewModel: ObservableObject {
             }
         })
     }
+    
+    func observeTopTagDialogs(tagId: String, kPagination: Int, loadMore: Bool, postCount: Int? = 0, completion: @escaping (PublicDialogModel) -> Void, isHiddenIndicator:  @escaping (_ isHiddenIndicator: Bool?) -> Void) {
+        
+        let query = Database.database().reference().child("Marketplace/tags").child(tagId).child("dialogs").queryOrdered(byChild: "members").queryLimited(toLast: UInt(kPagination))
+        query.observeSingleEvent(of: .value, with: {
+            snapshot in
+            var items = snapshot.children.allObjects
+            print(items)
+            if loadMore {
+                print("contzzzz tagggsss \(String(describing: postCount)) and \(items.count)")
+                if items.count <= postCount! {
+                    isHiddenIndicator(true)
+                    return
+                }
+                items.removeLast(postCount!)
+            }
+            let myGroup = DispatchGroup()
+            var results = Array(repeating: (PublicDialogModel()), count: items.count)
+            for (index, item) in (items as! [DataSnapshot]).enumerated() {
+                myGroup.enter()
+                self.observeDialog(withId: item.key, completion: { dia in
+                    results[index] = (dia)
+                    myGroup.leave()
+                })
+            }
+            myGroup.notify(queue: .main) {
+                for result in results {
+                    completion(result)
+                }
+                isHiddenIndicator(true)
+            }
+        })
+    }
+    
+    func fetchTagsDialogCount(_ tagId: String, completion: @escaping (Int) -> Void) {
+        Database.database().reference().child("Marketplace/tags").child(tagId).child("dialogs").observeSingleEvent(of: .value, with: {
+            snapshot in
+            let count = Int(snapshot.childrenCount)
+            completion(count)
+        })
+    }
 
     func observeRecentDialogs(kPagination: Int, loadMore: Bool, postCount: Int? = 0, completion: @escaping (PublicDialogModel) -> Void, isHiddenIndicator:  @escaping (_ isHiddenIndicator: Bool?) -> Void) {
         
@@ -120,7 +161,7 @@ class DiscoverViewModel: ObservableObject {
 
         marketplaceTags.observeSingleEvent(of: .value, with: { (snapshot: DataSnapshot) in
             if let dict = snapshot.value as? [String: Any] {
-                for i in dict {
+                for i in dict.sorted(by: { $0.key < $1.key }) {
                     tag.append(publicTag(title: i.key))
                 }
 
