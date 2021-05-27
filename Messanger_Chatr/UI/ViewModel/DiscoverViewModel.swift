@@ -12,6 +12,85 @@ import Firebase
 
 class DiscoverViewModel: ObservableObject {
 
+    func searchPublicDialog(withText text: String, completion: @escaping (PublicDialogModel) -> Void) {
+        Database.database().reference().child("Marketplace").child("public_dialogs").queryOrdered(byChild: "name").queryStarting(atValue: text).queryEnding(atValue: text+"\u{f8ff}").queryLimited(toFirst: 12).observeSingleEvent(of: .value, with: {
+            snapshot in
+            snapshot.children.forEach({ (s) in
+                let child = s as! DataSnapshot
+                if let dict = child.value as? [String: Any] {
+                    let post = PublicDialogModel.transformDialog(dict, key: child.key)
+                    completion(post)
+                }
+            })
+        })
+    }
+    
+    func observeTopDialogs(kPagination: Int, loadMore: Bool, postCount: Int? = 0, completion: @escaping (PublicDialogModel) -> Void, isHiddenIndicator:  @escaping (_ isHiddenIndicator: Bool?) -> Void) {
+        
+        let query = Database.database().reference().child("Marketplace").child("public_dialogs").queryOrdered(byChild: "members").queryLimited(toLast: UInt(kPagination))
+        query.observeSingleEvent(of: .value, with: {
+            snapshot in
+            var items = snapshot.children.allObjects
+            print(items)
+            if loadMore {
+                print("cont Post \(String(describing: postCount)) and \(items.count)")
+                if items.count <= postCount! {
+                    isHiddenIndicator(true)
+                    return
+                }
+                items.removeLast(postCount!)
+            }
+            let myGroup = DispatchGroup()
+            var results = Array(repeating: (PublicDialogModel()), count: items.count)
+            for (index, item) in (items as! [DataSnapshot]).enumerated() {
+                myGroup.enter()
+                self.observeDialog(withId: item.key, completion: { dia in
+                    results[index] = (dia)
+                    myGroup.leave()
+                })
+            }
+            myGroup.notify(queue: .main) {
+                for result in results {
+                    completion(result)
+                }
+                isHiddenIndicator(true)
+            }
+        })
+    }
+
+    func observeRecentDialogs(kPagination: Int, loadMore: Bool, postCount: Int? = 0, completion: @escaping (PublicDialogModel) -> Void, isHiddenIndicator:  @escaping (_ isHiddenIndicator: Bool?) -> Void) {
+        
+        let query = Database.database().reference().child("Marketplace").child("public_dialogs").queryOrdered(byChild: "date_created").queryLimited(toLast: UInt(kPagination))
+        query.observeSingleEvent(of: .value, with: {
+            snapshot in
+            var items = snapshot.children.allObjects
+            print(items)
+            if loadMore {
+                print("cont Post \(String(describing: postCount)) and \(items.count)")
+                if items.count <= postCount! {
+                    isHiddenIndicator(true)
+                    return
+                }
+                items.removeLast(postCount!)
+            }
+            let myGroup = DispatchGroup()
+            var results = Array(repeating: (PublicDialogModel()), count: items.count)
+            for (index, item) in (items as! [DataSnapshot]).enumerated() {
+                myGroup.enter()
+                self.observeDialog(withId: item.key, completion: { dia in
+                    results[index] = (dia)
+                    myGroup.leave()
+                })
+            }
+            myGroup.notify(queue: .main) {
+                for result in results {
+                    completion(result)
+                }
+                isHiddenIndicator(true)
+            }
+        })
+    }
+
     func observeFeaturedDialogs(_ completion: @escaping (PublicDialogModel) -> Void, isHiddenIndicator:  @escaping (_ isHiddenIndicator: Bool?) -> Void) {
                 
         Database.database().reference().child("Marketplace/featured").queryLimited(toFirst: 10).observeSingleEvent(of: .value, with: { snapshot in

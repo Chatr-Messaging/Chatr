@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import SDWebImageSwiftUI
 
 struct PublicDialogDiscoverCell: View {
     @EnvironmentObject var auth: AuthModel
@@ -25,12 +26,17 @@ struct PublicDialogDiscoverCell: View {
             }) {
                 VStack(alignment: .leading, spacing: 0) {
                     HStack(alignment: .top) {
-                        Image(self.dialogData.avatar ?? "")
+                        
+                        WebImage(url: URL(string: self.dialogData.avatar ?? ""))
                             .resizable()
-                            .scaledToFit()
+                            .placeholder{ Image("empty-profile").resizable().frame(width: 54, height: 54, alignment: .center).scaledToFill() }
+                            .indicator(.activity)
+                            .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
+                            .scaledToFill()
                             .frame(width: 54, height: 54)
                             .cornerRadius(50 / 4)
-                            .shadow(color: Color.black.opacity(0.3), radius: 12, x: 0, y: 8)
+                            .clipped()
+                            .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 8)
                         
                         VStack(alignment: .leading, spacing: 0) {
                             Text(self.dialogData.name ?? "no name")

@@ -85,11 +85,14 @@ struct DiscoverView: View {
                         .keyboardType(.webSearch)
                         .onChange(of: self.searchText) { value in
                             print("the value is: \(value)")
-//                            if self.searchText.count >= 3 && self.allowOnlineSearch {
-//                                self.grandSeach(searchText: self.searchText)
-//                            } else {
-//                                self.grandUsers.removeAll()
-//                            }
+                            if self.searchText.count >= 2 {
+                                //self.grandSeach(searchText: self.searchText)
+                                self.viewModel.searchPublicDialog(withText: self.searchText, completion: { dia in
+                                    print("found dialog isss: \(String(describing: dia.name))")
+                                })
+                            } else {
+                                //self.grandUsers.removeAll()
+                            }
                         }
                         
                         if !searchText.isEmpty {
@@ -287,6 +290,22 @@ struct DiscoverView: View {
                 self.viewModel.observeFeaturedDialogs({ dialog in
                     self.bannerDataArray.append(dialog)
                     print("the found banner array: \(dialog.name ?? "no name")")
+                }, isHiddenIndicator: { hide in
+                    print("the loading indicator is done? \(hide ?? false)")
+                })
+                
+                self.topDialogsData.removeAll()
+                self.viewModel.observeTopDialogs(kPagination: 5, loadMore: false, completion: { dia in
+                    print("the found top dialog array: \(dia.name ?? "no name")")
+                    self.topDialogsData.append(dia)
+                }, isHiddenIndicator: { hide in
+                    print("the loading indicator is done? \(hide ?? false)")
+                })
+                
+                self.recentDialogsData.removeAll()
+                self.viewModel.observeRecentDialogs(kPagination: 5, loadMore: false, completion: { dia in
+                    print("the found recent dialog array: \(dia.name ?? "no name")")
+                    self.recentDialogsData.append(dia)
                 }, isHiddenIndicator: { hide in
                     print("the loading indicator is done? \(hide ?? false)")
                 })
