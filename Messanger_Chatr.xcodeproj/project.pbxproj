@@ -123,6 +123,8 @@
 		05AACE1F239CE951006307EB /* BackgroundUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05AACE1E239CE951006307EB /* BackgroundUI.swift */; };
 		05AACE5F23A60AB6006307EB /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05AACE5E23A60AB6006307EB /* ImagePicker.swift */; };
 		05AACE6123A625D0006307EB /* ProfileImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05AACE6023A625D0006307EB /* ProfileImage.swift */; };
+		05B463B9266164F4007EDCEA /* RemoteImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05B463B8266164F4007EDCEA /* RemoteImageView.swift */; };
+		05B463BB2661656B007EDCEA /* ImageNetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05B463BA2661656B007EDCEA /* ImageNetworkManager.swift */; };
 		05BB401625008A3200B8DD37 /* FooterInformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BB401525008A3200B8DD37 /* FooterInformation.swift */; };
 		05BCE40D250B4EA400E29F39 /* HighlightedContactCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BCE40C250B4EA400E29F39 /* HighlightedContactCell.swift */; };
 		05BCE40F250C55E100E29F39 /* ShareProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BCE40E250C55E100E29F39 /* ShareProfileView.swift */; };
@@ -311,6 +313,8 @@
 		05AACE5E23A60AB6006307EB /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		05AACE6023A625D0006307EB /* ProfileImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileImage.swift; sourceTree = "<group>"; };
 		05AACE6223A6DC0D006307EB /* Messanger_Chatr.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Messanger_Chatr.entitlements; sourceTree = "<group>"; };
+		05B463B8266164F4007EDCEA /* RemoteImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteImageView.swift; sourceTree = "<group>"; };
+		05B463BA2661656B007EDCEA /* ImageNetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageNetworkManager.swift; sourceTree = "<group>"; };
 		05BB401525008A3200B8DD37 /* FooterInformation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FooterInformation.swift; sourceTree = "<group>"; };
 		05BCE40C250B4EA400E29F39 /* HighlightedContactCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightedContactCell.swift; sourceTree = "<group>"; };
 		05BCE40E250C55E100E29F39 /* ShareProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareProfileView.swift; sourceTree = "<group>"; };
@@ -613,8 +617,6 @@
 				05196DDA24EE3BD20026B9A7 /* ContactsRealmModel.swift */,
 				05A7BD5A24FD6A4F0001BFC9 /* QuickSnapsRealmModel.swift */,
 				05D8A8DD250318FA00D53BE2 /* AddressBookRealmModel.swift */,
-				0549FA5B25AE8AF700EC1339 /* CoreData */,
-				054CAB7225AA6DDF00DD3F7C /* Instagram */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -682,10 +684,22 @@
 			path = Bubbles;
 			sourceTree = "<group>";
 		};
+		05B463B7266164A6007EDCEA /* RemoteImage */ = {
+			isa = PBXGroup;
+			children = (
+				05B463B8266164F4007EDCEA /* RemoteImageView.swift */,
+				05B463BA2661656B007EDCEA /* ImageNetworkManager.swift */,
+			);
+			path = RemoteImage;
+			sourceTree = "<group>";
+		};
 		05D77A5025A190BA00776B93 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				054CAB7225AA6DDF00DD3F7C /* Instagram */,
+				0549FA5B25AE8AF700EC1339 /* CoreData */,
 				0511CB7025A1911000E5F905 /* StoreReviewHelper.swift */,
+				05B463B7266164A6007EDCEA /* RemoteImage */,
 				05F37C0125DF95B300F92005 /* KeyboardObserver.swift */,
 				055F37BB2606F45F003EDB1F /* CachingPlayerItem.swift */,
 				05ECD98B25E0FA6800B5783A /* CacheManager.swift */,
@@ -1063,6 +1077,7 @@
 				0568B54E25C645790054E934 /* ScanQRView.swift in Sources */,
 				05196DD924EE25FD0026B9A7 /* SyncAddressBook.swift in Sources */,
 				05D466D8263F7CE20015B61D /* PinnedSectionView.swift in Sources */,
+				05B463BB2661656B007EDCEA /* ImageNetworkManager.swift in Sources */,
 				0599798A24D5468E00969318 /* TextBubble.swift in Sources */,
 				05196DD624ED90510026B9A7 /* NewConversationView.swift in Sources */,
 				05AACE6123A625D0006307EB /* ProfileImage.swift in Sources */,
@@ -1115,6 +1130,7 @@
 				053AC4B7251982560036946E /* AttachmentBubble.swift in Sources */,
 				05AACE1F239CE951006307EB /* BackgroundUI.swift in Sources */,
 				056B98A724C8FAC9003F7FBA /* SecurityView.swift in Sources */,
+				05B463B9266164F4007EDCEA /* RemoteImageView.swift in Sources */,
 				056B98A524C8FAA8003F7FBA /* AdvancedView.swift in Sources */,
 				05ECD98C25E0FA6800B5783A /* CacheManager.swift in Sources */,
 				05D466E02640919B0015B61D /* PHAssetPicker.swift in Sources */,

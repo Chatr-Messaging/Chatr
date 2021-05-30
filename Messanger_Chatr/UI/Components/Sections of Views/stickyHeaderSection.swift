@@ -34,9 +34,9 @@ struct stickyHeaderSection: View {
                             .indicator(.activity)
                             .aspectRatio(contentMode: .fill)
                             .frame(width: Constants.screenWidth, height: minY > 0 ? headerHeight + minY : headerHeight, alignment: .center)
-                            .cornerRadius(10)
                             .animation(.easeOut)
                             .clipped()
+                            .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 8)
                             .offset(y: minY > 0 ? -minY : -minY < scrollBackHeight ? 0 : -minY - scrollBackHeight)
                     }
                 )

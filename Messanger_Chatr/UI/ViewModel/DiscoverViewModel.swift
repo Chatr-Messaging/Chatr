@@ -134,7 +134,7 @@ class DiscoverViewModel: ObservableObject {
 
     func observeFeaturedDialogs(_ completion: @escaping (PublicDialogModel) -> Void, isHiddenIndicator:  @escaping (_ isHiddenIndicator: Bool?) -> Void) {
                 
-        Database.database().reference().child("Marketplace/featured").queryLimited(toFirst: 10).observeSingleEvent(of: .value, with: { snapshot in
+        Database.database().reference().child("Marketplace/featured").queryLimited(toFirst: 6).observeSingleEvent(of: .value, with: { snapshot in
             let arraySnapshot = (snapshot.children.allObjects as! [DataSnapshot]).reversed()
             arraySnapshot.forEach({ (child) in
                 self.observeDialog(withId: child.key, completion: { dia in

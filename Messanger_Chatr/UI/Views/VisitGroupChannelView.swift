@@ -450,8 +450,8 @@ struct VisitGroupChannelView: View {
                     self.notificationsOn = notiResult
                 })
             }
-            self.observePinnedMessages()
 
+            print("welcomeee...: \(self.dialogModel.fullName) && \(self.dialogModel.id)")
             self.dialogModelMemebers.removeAll()
             self.dialogModelAdmins.removeAll()
             self.isOwner = self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? true : false
@@ -465,10 +465,12 @@ struct VisitGroupChannelView: View {
                 self.dialogModelAdmins.append(i)
             }
             
+            self.observePinnedMessages()
+
             if self.dialogModel.dialogType == "public" {
                 self.observePublicDetails()
             }
-
+            
             NotificationCenter.default.addObserver(forName: NSNotification.Name("NotificationAlert"), object: nil, queue: .main) { (_) in
                 self.showAlert.toggle()
             }

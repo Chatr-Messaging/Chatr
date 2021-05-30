@@ -23,6 +23,7 @@ struct DiscoverView: View {
     @State var bannerDataArray: [PublicDialogModel] = []
     @State var topDialogsData: [PublicDialogModel] = []
     @State var recentDialogsData: [PublicDialogModel] = []
+    @State var grandSearchData: [PublicDialogModel] = []
     @State var dialogTags: [publicTag] = []
     @State var bannerCount: Int = 0
     @State var topDialogsCount: Int = 0
@@ -34,7 +35,7 @@ struct DiscoverView: View {
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: true) {
-            LazyVStack(alignment: .center) {
+            VStack(alignment: .center) {
                 /*
                 Text("Under Construction")
                     .font(.largeTitle)
@@ -77,9 +78,6 @@ struct DiscoverView: View {
                         TextField("Search", text: $searchText, onCommit: {
                             self.outputSearchText = self.searchText
                             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-//                            if allowOnlineSearch {
-//                                self.grandSeach(searchText: self.outputSearchText)
-//                            }
                         })
                         .padding(EdgeInsets(top: 16, leading: 5, bottom: 16, trailing: 10))
                         .foregroundColor(.primary)
@@ -92,17 +90,26 @@ struct DiscoverView: View {
                                 //self.grandSeach(searchText: self.searchText)
                                 self.viewModel.searchPublicDialog(withText: self.searchText, completion: { dia in
                                     print("found dialog isss: \(String(describing: dia.name))")
+                                    if !self.grandSearchData.contains(where: { $0.id == dia.id }) {
+                                        withAnimation {
+                                            self.grandSearchData.append(dia)
+                                        }
+                                    }
                                 })
                             } else {
-                                //self.grandUsers.removeAll()
+                                withAnimation {
+                                    self.grandSearchData.removeAll()
+                                }
                             }
                         }
                         
                         if !searchText.isEmpty {
                             Button(action: {
-                                self.searchText = ""
-                                self.outputSearchText = ""
-                                //self.grandUsers.removeAll()
+                                withAnimation {
+                                    self.searchText = ""
+                                    self.outputSearchText = ""
+                                    self.grandSearchData.removeAll()
+                                }
                             }) {
                                 Image(systemName: "xmark.circle.fill")
                                     .foregroundColor(.secondary)
@@ -114,6 +121,44 @@ struct DiscoverView: View {
                     .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
                 }.padding(.all)
                 
+                //MARK: Grand Search Section
+                if !self.grandSearchData.isEmpty {
+                    VStack {
+                        HStack {
+                            Text("SEARCH RESULTS:")
+                                .font(.caption)
+                                .fontWeight(.regular)
+                                .foregroundColor(.secondary)
+                                .padding(.horizontal, 40)
+                            Spacer()
+                        }.padding(.bottom, 5)
+
+                        self.styleBuilder(content: {
+                            ForEach(self.grandSearchData.indices, id: \.self) { id in
+                                VStack(alignment: .trailing, spacing: 0) {
+                                    if id <= 14 {
+                                        PublicDialogDiscoverCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, dialogData: self.topDialogsData[id], isLast: id == 4)
+                                            .environmentObject(self.auth)
+                                    }
+                                }
+                            }
+                        })
+                    }.padding(.vertical, 25)
+                    .animation(.interactiveSpring())
+                }
+                
+                if self.searchText.count >= 2 && self.grandSearchData.isEmpty {
+                    VStack {
+                        Text("no dialogs found with your search")
+                            .font(.caption)
+                            .fontWeight(.none)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+                    }.animation(.interactiveSpring())
+                    .padding(.vertical, 40)
+                }
+
                 //MARK: Tag Section
                 ScrollView(.horizontal, showsIndicators: false) {
                     Grid(self.dialogTags.sorted(by: { $0.title < $1.title }).indices, id: \.self) { item in
@@ -159,6 +204,8 @@ struct DiscoverView: View {
                                 ForEach(self.bannerDataArray.indices, id: \.self) { index in
                                     DiscoverBannerCell(groupName: self.bannerDataArray[index].name ?? "no name", memberCount: self.bannerDataArray[index].memberCount ?? 0, description: self.bannerDataArray[index].description ?? "", groupImg: self.bannerDataArray[index].avatar ?? "", backgroundImg: self.bannerDataArray[index].coverPhoto ?? "")
                                         .frame(width: Constants.screenWidth * 0.55)
+                                        .id(self.bannerDataArray[index].id)
+                                        .animation(.interactiveSpring())
                                 }
                             }.animation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0))
                         }.frame(height: 280)
@@ -184,9 +231,9 @@ struct DiscoverView: View {
                             ForEach(self.topDialogsData.indices, id: \.self) { id in
                                 VStack(alignment: .trailing, spacing: 0) {
                                     if id <= 4 {
-                                     //Public dialog cell
                                         PublicDialogDiscoverCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, dialogData: self.topDialogsData[id], isLast: id == 4)
                                             .environmentObject(self.auth)
+                                            .id(self.topDialogsData[id].id)
                                     }
                                     
                                     if self.topDialogsData.count > 5 && id == 4 {
@@ -248,8 +295,9 @@ struct DiscoverView: View {
                                 VStack(alignment: .trailing, spacing: 0) {
                                     if id <= 4 {
                                      //Public dialog cell
-                                        PublicDialogDiscoverCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, dialogData: self.recentDialogsData[id], isLast: id == 4)
+                                        PublicDialogDiscoverCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, dialogData: self.recentDialogsData[id], isLast: id == 4 || self.recentDialogsData[id].id == self.recentDialogsData.last?.id)
                                             .environmentObject(self.auth)
+                                            .id(self.recentDialogsData[id].id)
                                     }
                                     
                                     if self.recentDialogsData.count > 5 && id == 4 {
@@ -291,39 +339,58 @@ struct DiscoverView: View {
                         })
                     }
                 }
+                
+                FooterInformation()
+                    .padding(.top, self.searchText.count < 2 ? 80 : 140)
+                    .padding(.bottom, 25)
+                    .opacity(!self.grandSearchData.isEmpty ? 0 : 1)
             }
             .onAppear {
-                self.bannerCount = self.bannerDataArray.count
-                self.topDialogsCount = self.topDialogsData.count
+                //self.bannerCount = self.bannerDataArray.count
+                //self.topDialogsCount = self.topDialogsData.count
                 
-                self.bannerDataArray.removeAll()
-                self.viewModel.observeFeaturedDialogs({ dialog in
-                    self.bannerDataArray.append(dialog)
-                    print("the found banner array: \(dialog.name ?? "no name")")
-                }, isHiddenIndicator: { hide in
-                    print("the loading indicator is done? \(hide ?? false)")
-                })
+                if self.bannerDataArray.isEmpty {
+                    self.viewModel.observeFeaturedDialogs({ dialog in
+                        if !self.bannerDataArray.contains(where: { $0.id == dialog.id }) {
+                            self.bannerDataArray.append(dialog)
+                        }
+                        print("the found banner array: \(dialog.name ?? "no name")")
+                    }, isHiddenIndicator: { hide in
+                        print("the loading indicator is done? \(hide ?? false)")
+                    })
+                }
                 
-                self.topDialogsData.removeAll()
-                self.viewModel.observeTopDialogs(kPagination: 5, loadMore: false, completion: { dia in
-                    print("the found top dialog array: \(dia.name ?? "no name")")
-                    self.topDialogsData.append(dia)
-                }, isHiddenIndicator: { hide in
-                    print("the loading indicator is done? \(hide ?? false)")
-                })
-                
-                self.recentDialogsData.removeAll()
-                self.viewModel.observeRecentDialogs(kPagination: 5, loadMore: false, completion: { dia in
-                    print("the found recent dialog array: \(dia.name ?? "no name")")
-                    self.recentDialogsData.append(dia)
-                }, isHiddenIndicator: { hide in
-                    print("the loading indicator is done? \(hide ?? false)")
-                })
+                if self.topDialogsData.isEmpty {
+                    self.viewModel.observeTopDialogs(kPagination: 6, loadMore: false, completion: { dia in
+                        print("the found top dialog array: \(dia.name ?? "no name")")
+                        if !self.topDialogsData.contains(where: { $0.id == dia.id }) {
+                            self.topDialogsData.append(dia)
+                        }
+                    }, isHiddenIndicator: { hide in
+                        print("the loading indicator is done? \(hide ?? false)")
+                    })
+                }
 
-                self.dialogTags.removeAll()
-                self.viewModel.loadTags(completion: { tags in
-                    self.dialogTags = tags
-                })
+                if self.recentDialogsData.isEmpty {
+                    self.viewModel.observeRecentDialogs(kPagination: 6, loadMore: false, completion: { dia in
+                        print("the found recent dialog array: \(dia.name ?? "no name")")
+                        if !self.recentDialogsData.contains(where: { $0.id == dia.id }) {
+                            self.recentDialogsData.append(dia)
+                        }
+                    }, isHiddenIndicator: { hide in
+                        print("the loading indicator is done? \(hide ?? false)")
+                    })
+                }
+
+                if self.dialogTags.isEmpty {
+                    self.viewModel.loadTags(completion: { tags in
+                        for tag in tags {
+                            if !self.dialogTags.contains(where: { $0.title == tag.title }) {
+                                self.dialogTags = tags
+                            }
+                        }
+                    })
+                }
             }
         }.resignKeyboardOnDragGesture()
         .navigationBarItems(leading:

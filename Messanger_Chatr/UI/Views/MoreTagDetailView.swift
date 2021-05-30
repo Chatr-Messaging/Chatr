@@ -23,21 +23,20 @@ struct MoreTagDetailView: View {
                 if !self.tagsData.isEmpty {
                     VStack(spacing: 5) {
                         HStack(alignment: .bottom) {
-                            Text("\(self.tagsCount) TOTAL " + (self.tagsCount <= 1 ? "TAG:" : "TAGS:"))
+                            Text("\(self.tagsCount) TOTAL " + (self.tagsCount <= 1 ? "DIALOG:" : "DIALOGS:"))
                                 .font(.caption)
                                 .fontWeight(.regular)
                                 .foregroundColor(.secondary)
                                 .padding(.horizontal)
                                 .padding(.horizontal)
                                 .padding(.top, 90)
-                                .offset(y: 2)
                             Spacer()
                         }
                         
                         self.styleBuilder(content: {
                             ForEach(self.tagsData.indices, id: \.self) { id in
                                 VStack(alignment: .trailing, spacing: 0) {
-                                    PublicDialogDiscoverCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, dialogData: self.tagsData[id], isLast: id == self.tagsData.count)
+                                    PublicDialogDiscoverCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, dialogData: self.tagsData[id], isLast: self.tagsData[id].id == self.tagsData.last?.id)
                                         .environmentObject(self.auth)
                                 }
                             }
@@ -65,18 +64,25 @@ struct MoreTagDetailView: View {
                             .padding(.horizontal)
                     }
                 }
+                
+                FooterInformation()
+                    .padding(.top, 100)
+                    .padding(.bottom, 25)
             }
         }.frame(width: Constants.screenWidth)
         .navigationBarTitle("#" + self.tagId, displayMode: .inline)
         .edgesIgnoringSafeArea(.all)
         .background(Color("bgColor"))
         .onAppear() {
-            self.tagsData.removeAll()
-            self.viewModel.observeTopTagDialogs(tagId: self.tagId, kPagination: 20, loadMore: false, completion: { dia in
-                self.tagsData.append(dia)
-            }, isHiddenIndicator: { hide in
-                print("the loading for more tags is hidden: \(String(describing: hide))")
-            })
+            if self.tagsData.isEmpty {
+                self.viewModel.observeTopTagDialogs(tagId: self.tagId, kPagination: 20, loadMore: false, completion: { dia in
+                    if !self.tagsData.contains(where: { $0.id == dia.id }) {
+                        self.tagsData.append(dia)
+                    }
+                }, isHiddenIndicator: { hide in
+                    print("the loading for more tags is hidden: \(String(describing: hide))")
+                })
+            }
             
             self.viewModel.fetchTagsDialogCount(tagId, completion: { count in
                 self.tagsCount = count

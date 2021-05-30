@@ -42,7 +42,7 @@ struct PublicActionSection: View {
 
             if self.dialogRelationship == .notSubscribed {
                 Button(action: {
-                    Request.subscribeToPublicDialog(withID: "\(UserDefaults.standard.integer(forKey: "currentUserID"))", successBlock: { dialogz in
+                    Request.subscribeToPublicDialog(withID: self.dialogModel.id, successBlock: { dialogz in
                         UINotificationFeedbackGenerator().notificationOccurred(.success)
                         self.dialogRelationship = .subscribed
                         changeDialogRealmData.shared.insertDialogs([dialogz], completion: {

@@ -123,17 +123,21 @@ struct DiscoverBannerCell: View, Identifiable {
     @State var description: String
     @State var groupImg: String
     @State var backgroundImg: String
-    @State private var actionState: Int? = 0
+    @State private var actionState: Bool = false
 
     var body: some View {
         ZStack {
-            NavigationLink(destination: self.dialogDetail().edgesIgnoringSafeArea(.all), tag: 1, selection: self.$actionState) {
+//            NavigationLink(destination: , tag: 1, selection: self.$actionState) {
+//                EmptyView()
+//            }
+
+            NavigationLink(destination: self.dialogDetail().edgesIgnoringSafeArea(.all), isActive: self.$actionState, label: {
                 EmptyView()
-            }
+            })
 
             Button(action: {
                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                self.actionState = 1
+                self.actionState.toggle()
             }) {
                 ZStack(alignment: .top) {
                     WebImage(url: URL(string: self.backgroundImg))

@@ -15,7 +15,7 @@ struct PublicDialogDiscoverCell: View {
     @Binding var showPinDetails: String
     @State var dialogData: PublicDialogModel
     @State var isLast: Bool = false
-    @State private var actionState: Int? = 0
+    @State private var actionState: Bool = false
     @State var isEditGroupOpen: Bool = false
     @State var canEditGroup: Bool = false
     @State var openNewDialogID: Int = 0
@@ -23,12 +23,17 @@ struct PublicDialogDiscoverCell: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            NavigationLink(destination: self.dialogDetails().edgesIgnoringSafeArea(.all).environmentObject(self.auth), tag: 1, selection: self.$actionState) {
+//            NavigationLink(destination: self.dialogDetails().edgesIgnoringSafeArea(.all).environmentObject(self.auth), tag: 200, selection: self.$actionState) {
+//                EmptyView()
+//            }
+
+            NavigationLink(destination: self.dialogDetails().edgesIgnoringSafeArea(.all), isActive: self.$actionState, label: {
                 EmptyView()
-            }
+            })
 
             Button(action: {
-                self.actionState = 1
+                print("pushing to the next: \(String(describing: self.dialogData.name)) && \(String(describing: self.dialogData.id))")
+                self.actionState.toggle()
             }) {
                 VStack(alignment: .leading, spacing: 0) {
                     HStack(alignment: .top) {
@@ -104,12 +109,13 @@ struct PublicDialogDiscoverCell: View {
                 }
             }.buttonStyle(changeBGButtonStyle())
             .onAppear() {
-                self.sendDia.id = dialogData.id ?? ""
+                self.sendDia.id = self.dialogData.id ?? ""
                 self.sendDia.dialogType = "public"
                 self.sendDia.fullName = self.dialogData.name ?? ""
                 self.sendDia.bio = self.dialogData.description ?? ""
                 self.sendDia.avatar = self.dialogData.avatar ?? ""
                 self.sendDia.coverPhoto = self.dialogData.coverPhoto ?? ""
+                print("found the diaaaaa :\(self.sendDia.id)")
             }
         }.simultaneousGesture(TapGesture()
                                 .onEnded { _ in
