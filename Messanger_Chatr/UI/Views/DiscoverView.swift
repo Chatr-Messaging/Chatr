@@ -31,6 +31,7 @@ struct DiscoverView: View {
     @State var openNewPublicDialog: Bool = false
     @State var showMoreTopDialogs: Bool = false
     @State var showMoreRecentDialogs: Bool = false
+    @State var isDataLoading: Bool = true
     @State var style = StaggeredGridStyle(.horizontal, tracks: .fixed(35), spacing: 8)
 
     var body: some View {
@@ -357,6 +358,7 @@ struct DiscoverView: View {
                         print("the found banner array: \(dialog.name ?? "no name")")
                     }, isHiddenIndicator: { hide in
                         print("the loading indicator is done? \(hide ?? false)")
+                        self.isDataLoading = hide ?? false
                     })
                 }
                 
@@ -368,6 +370,7 @@ struct DiscoverView: View {
                         }
                     }, isHiddenIndicator: { hide in
                         print("the loading indicator is done? \(hide ?? false)")
+                        self.isDataLoading = hide ?? false
                     })
                 }
 
@@ -379,6 +382,7 @@ struct DiscoverView: View {
                         }
                     }, isHiddenIndicator: { hide in
                         print("the loading indicator is done? \(hide ?? false)")
+                        self.isDataLoading = hide ?? false
                     })
                 }
 
@@ -387,6 +391,7 @@ struct DiscoverView: View {
                         for tag in tags {
                             if !self.dialogTags.contains(where: { $0.title == tag.title }) {
                                 self.dialogTags = tags
+                                self.isDataLoading = false
                             }
                         }
                     })

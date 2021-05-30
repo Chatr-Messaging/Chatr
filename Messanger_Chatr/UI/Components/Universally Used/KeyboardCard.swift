@@ -486,7 +486,7 @@ struct KeyboardCardView: View {
                             }
                         }
                     }) {
-                        NewConversationView(usedAsNew: false, selectedContact: self.$selectedContacts, newDialogID: self.$newDialogID)
+                        NewConversationView(usedAsNew: false, forwardContact: true, selectedContact: self.$selectedContacts, newDialogID: self.$newDialogID)
                     }
 
                     Button(action: {

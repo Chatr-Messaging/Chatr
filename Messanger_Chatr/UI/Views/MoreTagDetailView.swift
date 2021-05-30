@@ -16,6 +16,7 @@ struct MoreTagDetailView: View {
     @State var tagsCount: Int = 0
     @State var tagId: String = "tagName"
     @State var tagsData: [PublicDialogModel] = []
+    @State var isHiddenIndicator: Bool = false
 
     var body: some View {
         VStack {
@@ -42,7 +43,7 @@ struct MoreTagDetailView: View {
                             }
                         })
                     }
-                } else {
+                } else if self.isHiddenIndicator {
                     VStack(spacing: 5) {
                         Image("EmptyDialog")
                             .resizable()
@@ -56,18 +57,26 @@ struct MoreTagDetailView: View {
                             .fontWeight(.bold)
                             .foregroundColor(.primary)
                         
-                        Text("No found public dialogs for this tag. 🤔\nPlease explore other tags.")
+                        Text("No found public dialogs for this tag. 🤔\nPlease explore other tags or check your connection.")
                             .font(.subheadline)
                             .fontWeight(.none)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal)
                     }
+                } else if !self.isHiddenIndicator {
+                    Text("loading \("#" + self.tagId)...")
+                        .font(.subheadline)
+                        .fontWeight(.none)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.top, 140)
                 }
                 
                 FooterInformation()
                     .padding(.top, 100)
                     .padding(.bottom, 25)
+                    .opacity(self.isHiddenIndicator ? 1 : 0)
             }
         }.frame(width: Constants.screenWidth)
         .navigationBarTitle("#" + self.tagId, displayMode: .inline)
@@ -81,6 +90,7 @@ struct MoreTagDetailView: View {
                     }
                 }, isHiddenIndicator: { hide in
                     print("the loading for more tags is hidden: \(String(describing: hide))")
+                    self.isHiddenIndicator = hide ?? false
                 })
             }
             

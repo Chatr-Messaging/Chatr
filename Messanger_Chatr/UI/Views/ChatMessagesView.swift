@@ -342,10 +342,9 @@ struct ChatMessagesView: View {
             .frame(width: Constants.screenWidth)
             .contentShape(Rectangle())
             .onAppear() {
-                self.delayViewMessages = true
                 DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + 0.6) {
                     print("the dialog id is: \(dialogID)")
-                    
+                    self.delayViewMessages = true
                     viewModel.loadDialog(auth: auth, dialogId: dialogID, completion: {
                         print("done loading dialogggg: \(dialogID) && \(self.viewModel.totalMessageCount) && \(currentMessages.count)")
                         self.maxMessageCount = self.viewModel.totalMessageCount

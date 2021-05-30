@@ -296,7 +296,9 @@ struct DialogCell: View {
                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                     UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
                     changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
-                    changeDialogRealmData.shared.fetchDialogs(completion: { _ in })
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
+                        changeDialogRealmData.shared.fetchDialogs(completion: { _ in })
+                    }
                 }, label: {
                     Image(systemName: "chevron.down.circle")
                         .resizable()

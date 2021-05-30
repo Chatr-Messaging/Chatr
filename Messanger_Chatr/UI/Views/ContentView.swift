@@ -619,11 +619,11 @@ struct mainHomeList: View {
             UserDefaults.standard.set(false, forKey: "localOpen")
             changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: id)
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
+                changeDialogRealmData.shared.fetchDialogs(completion: { _ in })
                 if dialogType == "group" || dialogType == "public" {
                     self.auth.leaveDialog()
                 }
-                changeDialogRealmData.shared.fetchDialogs(completion: { _ in })
             }
         }
     }
@@ -643,7 +643,7 @@ struct mainHomeList: View {
             self.isLocalOpen = false
             changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: id)
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
                 changeDialogRealmData.shared.fetchDialogs(completion: { _ in })
                 if dialogType == "group" || dialogType == "public" {
                     self.auth.leaveDialog()

@@ -309,7 +309,7 @@ struct VisitContactView: View {
                         }
                     }
                 }) {
-                    NewConversationView(usedAsNew: false, selectedContact: self.$selectedContact, newDialogID: self.$newDialogID)
+                    NewConversationView(usedAsNew: false, forwardContact: true, selectedContact: self.$selectedContact, newDialogID: self.$newDialogID)
                         .environmentObject(self.auth)
                 }
                 
