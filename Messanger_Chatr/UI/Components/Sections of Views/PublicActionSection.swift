@@ -75,10 +75,26 @@ struct PublicActionSection: View {
                 }.buttonStyle(ClickButtonStyle())
             }
             
-            Button(action: {
-                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                self.dismissView.toggle()
-            }) {
+            Menu {
+                Button(action: {
+                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                }) {
+                    Label("Noti is ON", systemImage: "square.and.arrow.down")
+                }
+                
+                Button(action: {
+                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                }) {
+                    Label("Share Group", systemImage: "square.and.arrow.down")
+                }
+                
+                Button(action: {
+                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                }) {
+                    Label("Report Group", systemImage: "square.and.arrow.down")
+                        .foregroundColor(.red)
+                }
+            } label: {
                 Image(systemName: "ellipsis.circle")
                     .resizable()
                     .scaledToFit()

@@ -334,8 +334,8 @@ struct BubbleDetailView: View {
                                             }
                                         }) {
                                             Label(messagePosition == .right ? "Delete Message" : "Report Message", systemImage: messagePosition == .right ? "trash" : "exclamationmark.triangle")
+                                                .foregroundColor(.red)
                                         }
-                                        .foregroundColor(.red)
 
                                         if self.viewModel.message.imageType == "image/gif" || self.viewModel.message.imageType == "image/png" {
                                             Button(action: {
