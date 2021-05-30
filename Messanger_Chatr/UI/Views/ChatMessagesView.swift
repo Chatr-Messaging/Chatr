@@ -101,7 +101,7 @@ struct ChatMessagesView: View {
         //let currentMessages = self.auth.messages.selectedDialog(dialogID: self.dialogID)
 
         if UserDefaults.standard.bool(forKey: "localOpen") {
-            ScrollView(.vertical, showsIndicators: true) {
+            ScrollView(.vertical, showsIndicators: false) {
                 LazyVStack(alignment: .center) {
                     Text(self.maxMessageCount == 0 ? "no messages found" : maxMessageCount == -1 ? "loading messages..." : "")
                         .font(.subheadline)
