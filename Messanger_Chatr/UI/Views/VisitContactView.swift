@@ -65,7 +65,175 @@ struct VisitContactView: View {
                 actionButtonView(viewModel: self.viewModel, contact: self.$contact, quickSnapViewState: self.$quickSnapViewState, contactRelationship: self.$contactRelationship, newMessage: self.$newMessage, dismissView: self.$dismissView)
                     .padding(.vertical, 5)
 
-                //MARK: Phone Number Section
+                //MARK: Social Section
+                if self.contact.facebook != "" || self.contact.twitter != "" || self.contact.instagramAccessToken != "" {
+                    self.viewModel.drawMiniHeader(text: "SOCIAL:")
+                    
+                    self.viewModel.styleBuilder(content: {
+                        if self.contact.instagramAccessToken != "" && (!self.contact.isInfoPrivate || self.contactRelationship == .contact) {
+                            VStack(spacing: 0) {
+                                ScrollView(igImageStyle.axes) {
+                                    Grid(self.viewModel.igMedia.sorted{ $0.timestamp > $1.timestamp }, id: \.self) { index in
+                                        Button(action: {
+                                            self.selectedImageUrl = index.media_url
+                                            self.isProfileImgOpen.toggle()
+                                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                        }, label: {
+                                            WebImage(url: URL(string: index.media_url))
+                                                .resizable()
+                                                .placeholder{ Image("empty-profile").resizable().scaledToFill() }
+                                                .indicator(.activity)
+                                                .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
+                                                .scaledToFit()
+                                        }).buttonStyle(ClickMiniButtonStyle())
+                                    }.gridStyle(self.igImageStyle)
+                                    .cornerRadius(10)
+                                    .frame(minHeight: 250, maxHeight: 265, alignment: .center)
+                                    .padding(.leading)
+                                    .animation(.easeInOut)
+                                }.padding(.trailing)
+                                .padding(.vertical, 10)
+                                .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 2)
+
+                                if self.contact.twitter != "" || self.contact.facebook != ""{
+                                    Divider()
+                                        .frame(width: Constants.screenWidth - 80)
+                                        .offset(x: 30)
+                                }
+                            }
+                            
+                            Button(action: {
+                                if !self.contact.isInfoPrivate || self.contactRelationship == .contact {
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                    self.viewModel.openInstagramApp()
+                                } else {
+                                    UINotificationFeedbackGenerator().notificationOccurred(.error)
+                                }
+                            }) {
+                                VStack(alignment: .center, spacing: 0) {
+                                    HStack(alignment: .center) {
+                                        Image("instagramIcon_black")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 20, height: 20, alignment: .center)
+                                            .padding(.trailing, 5)
+
+                                        Text("@\(self.viewModel.username)")
+                                            .font(.none)
+                                            .fontWeight(.none)
+                                            .background(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? Color.clear : !self.contact.isInfoPrivate || self.contactRelationship == .contact ? Color.clear : Color.secondary)
+                                            .foregroundColor(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? .primary : !self.contact.isInfoPrivate || self.contactRelationship == .contact ? self.viewModel.username == "" ? .gray : .primary : .clear)
+
+                                        Spacer()
+                                        Image(systemName: "chevron.right")
+                                            .resizable()
+                                            .font(Font.title.weight(.bold))
+                                            .scaledToFit()
+                                            .frame(width: 7, height: 15, alignment: .center)
+                                            .foregroundColor(.secondary)
+                                    }.padding(.horizontal)
+                                    .padding(.vertical, 12.5)
+                                    
+                                    if self.contact.twitter != "" || self.contact.facebook != ""{
+                                        Divider()
+                                            .frame(width: Constants.screenWidth - 80)
+                                            .offset(x: 30)
+                                    }
+                                }
+                            }.buttonStyle(changeBGButtonStyle())
+                            .simultaneousGesture(TapGesture()
+                                .onEnded { _ in
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                })
+                        }
+
+                        VStack(alignment: .center, spacing: 0) {
+                            if self.contact.facebook != "" {
+                                Button(action: {
+                                    if !self.contact.isInfoPrivate || self.contactRelationship == .contact {
+                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                        self.viewModel.openFacebookApp(screenName: self.contact.facebook)
+                                    } else {
+                                        UINotificationFeedbackGenerator().notificationOccurred(.error)
+                                    }
+                                }) {
+                                    HStack(alignment: .center) {
+                                        Image("facebookIcon_black")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 20, height: 20, alignment: .center)
+                                            .padding(.trailing, 5)
+
+                                        Text("@\(self.contact.facebook)")
+                                            .font(.none)
+                                            .fontWeight(.none)
+                                            .background(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? Color.clear : !self.contact.isInfoPrivate || self.contactRelationship == .contact ? Color.clear : Color.secondary)
+                                            .foregroundColor(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? .primary : !self.contact.isInfoPrivate || self.contactRelationship == .contact ? self.contact.facebook == "" ? .gray : .primary : .clear)
+
+                                        Spacer()
+                                        Image(systemName: "chevron.right")
+                                            .resizable()
+                                            .font(Font.title.weight(.bold))
+                                            .scaledToFit()
+                                            .frame(width: 7, height: 15, alignment: .center)
+                                            .foregroundColor(.secondary)
+                                    }.padding(.horizontal)
+                                    .padding(.vertical, 12.5)
+                                    
+                                    if self.contact.twitter != "" {
+                                        Divider()
+                                            .frame(width: Constants.screenWidth - 80)
+                                            .offset(x: 30)
+                                    }
+                                }.buttonStyle(changeBGButtonStyle())
+                                .simultaneousGesture(TapGesture()
+                                    .onEnded { _ in
+                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                    })
+                            }
+                            
+                            if self.contact.twitter != "" {
+                                Button(action: {
+                                    if !self.contact.isInfoPrivate || self.contactRelationship == .contact {
+                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                        self.viewModel.openTwitterApp(screenName: self.contact.twitter)
+                                    } else {
+                                        UINotificationFeedbackGenerator().notificationOccurred(.error)
+                                    }
+                                }) {
+                                    HStack(alignment: .center) {
+                                        Image("twitterIcon_black")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 20, height: 20, alignment: .center)
+                                            .padding(.trailing, 5)
+
+                                        Text("@\(self.contact.twitter)")
+                                            .font(.none)
+                                            .fontWeight(.none)
+                                            .background(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? Color.clear : !self.contact.isInfoPrivate || self.contactRelationship == .contact ? Color.clear : Color.secondary)
+                                            .foregroundColor(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? .primary : !self.contact.isInfoPrivate || self.contactRelationship == .contact ? self.contact.twitter == "" ? .gray : .primary : .clear)
+
+                                        Spacer()
+                                        Image(systemName: "chevron.right")
+                                            .resizable()
+                                            .font(Font.title.weight(.bold))
+                                            .scaledToFit()
+                                            .frame(width: 7, height: 15, alignment: .center)
+                                            .foregroundColor(.secondary)
+                                    }.padding(.horizontal)
+                                    .padding(.vertical, 12.5)
+                                }.buttonStyle(changeBGButtonStyle())
+                                .simultaneousGesture(TapGesture()
+                                    .onEnded { _ in
+                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                    })
+                            }
+                        }
+                    }).padding(.bottom, 10)
+                }
+
+                //MARK: Info Section
                 self.viewModel.drawMiniHeader(text: "INFO:")
                 
                 self.viewModel.styleBuilder(content: {
@@ -313,175 +481,6 @@ struct VisitContactView: View {
                         .environmentObject(self.auth)
                 }
                 
-                //MARK: Social Section
-                if self.contact.facebook != "" || self.contact.twitter != "" || self.contact.instagramAccessToken != "" {
-                    self.viewModel.drawMiniHeader(text: "SOCIAL:")
-                    
-                    self.viewModel.styleBuilder(content: {
-                        if self.contact.instagramAccessToken != "" {
-                            Button(action: {
-                                if !self.contact.isInfoPrivate || self.contactRelationship == .contact {
-                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                    self.viewModel.openInstagramApp()
-                                } else {
-                                    UINotificationFeedbackGenerator().notificationOccurred(.error)
-                                }
-                            }) {
-                                HStack(alignment: .center) {
-                                    Image("instagramIcon_black")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 20, height: 20, alignment: .center)
-                                        .padding(.trailing, 5)
-
-                                    Text("@\(self.viewModel.username)")
-                                        .font(.none)
-                                        .fontWeight(.none)
-                                        .background(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? Color.clear : !self.contact.isInfoPrivate || self.contactRelationship == .contact ? Color.clear : Color.secondary)
-                                        .foregroundColor(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? .primary : !self.contact.isInfoPrivate || self.contactRelationship == .contact ? self.viewModel.username == "" ? .gray : .primary : .clear)
-
-
-                                    Spacer()
-                                    
-                                    Text("view profile")
-                                        .font(.caption)
-                                        .fontWeight(.medium)
-                                        .foregroundColor(.secondary)
-                                        .padding(.leading, 2.5)
-                                    
-                                    Image(systemName: "chevron.right")
-                                        .resizable()
-                                        .font(Font.title.weight(.bold))
-                                        .scaledToFit()
-                                        .frame(width: 7, height: 15, alignment: .center)
-                                        .foregroundColor(.secondary)
-                                }.padding(.horizontal)
-                                .padding(.vertical, 12.5)
-                            }.buttonStyle(changeBGButtonStyle())
-                            .simultaneousGesture(TapGesture()
-                                .onEnded { _ in
-                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                })
-
-                            if (!self.contact.isInfoPrivate || self.contactRelationship == .contact) {
-                                VStack(spacing: 0) {
-                                    ScrollView(igImageStyle.axes) {
-                                        Grid(self.viewModel.igMedia.sorted{ $0.timestamp > $1.timestamp }, id: \.self) { index in
-                                            Button(action: {
-                                                self.selectedImageUrl = index.media_url
-                                                self.isProfileImgOpen.toggle()
-                                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                            }, label: {
-                                                WebImage(url: URL(string: index.media_url))
-                                                    .resizable()
-                                                    .placeholder{ Image("empty-profile").resizable().scaledToFill() }
-                                                    .indicator(.activity)
-                                                    .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
-                                                    .scaledToFit()
-                                            }).buttonStyle(ClickMiniButtonStyle())
-                                        }.gridStyle(self.igImageStyle)
-                                        .cornerRadius(10)
-                                        .frame(minHeight: 250, maxHeight: 265, alignment: .center)
-                                        .padding(.leading)
-                                        .animation(.easeInOut)
-                                    }.padding(.trailing)
-                                    .padding(.bottom, 10)
-                                    .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 2)
-
-                                    if self.contact.twitter != "" || self.contact.facebook != ""{
-                                        Divider()
-                                            .frame(width: Constants.screenWidth - 80)
-                                    }
-                                }
-                            }
-                        }
-
-                        VStack(alignment: .center, spacing: 0) {
-                            if self.contact.facebook != "" {
-                                Button(action: {
-                                    if !self.contact.isInfoPrivate || self.contactRelationship == .contact {
-                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                        self.viewModel.openFacebookApp(screenName: self.contact.facebook)
-                                    } else {
-                                        UINotificationFeedbackGenerator().notificationOccurred(.error)
-                                    }
-                                }) {
-                                    HStack(alignment: .center) {
-                                        Image("facebookIcon_black")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 20, height: 20, alignment: .center)
-                                            .padding(.trailing, 5)
-
-                                        Text("@\(self.contact.facebook)")
-                                            .font(.none)
-                                            .fontWeight(.none)
-                                            .background(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? Color.clear : !self.contact.isInfoPrivate || self.contactRelationship == .contact ? Color.clear : Color.secondary)
-                                            .foregroundColor(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? .primary : !self.contact.isInfoPrivate || self.contactRelationship == .contact ? self.contact.facebook == "" ? .gray : .primary : .clear)
-
-                                        Spacer()
-                                        Image(systemName: "chevron.right")
-                                            .resizable()
-                                            .font(Font.title.weight(.bold))
-                                            .scaledToFit()
-                                            .frame(width: 7, height: 15, alignment: .center)
-                                            .foregroundColor(.secondary)
-                                    }.padding(.horizontal)
-                                    .padding(.vertical, 12.5)
-                                    
-                                    if self.contact.twitter != "" {
-                                        Divider()
-                                            .frame(width: Constants.screenWidth - 80)
-                                            .offset(x: 30)
-                                    }
-                                }.buttonStyle(changeBGButtonStyle())
-                                .simultaneousGesture(TapGesture()
-                                    .onEnded { _ in
-                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                    })
-                            }
-                            
-                            if self.contact.twitter != "" {
-                                Button(action: {
-                                    if !self.contact.isInfoPrivate || self.contactRelationship == .contact {
-                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                        self.viewModel.openTwitterApp(screenName: self.contact.twitter)
-                                    } else {
-                                        UINotificationFeedbackGenerator().notificationOccurred(.error)
-                                    }
-                                }) {
-                                    HStack(alignment: .center) {
-                                        Image("twitterIcon_black")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 20, height: 20, alignment: .center)
-                                            .padding(.trailing, 5)
-
-                                        Text("@\(self.contact.twitter)")
-                                            .font(.none)
-                                            .fontWeight(.none)
-                                            .background(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? Color.clear : !self.contact.isInfoPrivate || self.contactRelationship == .contact ? Color.clear : Color.secondary)
-                                            .foregroundColor(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? .primary : !self.contact.isInfoPrivate || self.contactRelationship == .contact ? self.contact.twitter == "" ? .gray : .primary : .clear)
-
-                                        Spacer()
-                                        Image(systemName: "chevron.right")
-                                            .resizable()
-                                            .font(Font.title.weight(.bold))
-                                            .scaledToFit()
-                                            .frame(width: 7, height: 15, alignment: .center)
-                                            .foregroundColor(.secondary)
-                                    }.padding(.horizontal)
-                                    .padding(.vertical, 12.5)
-                                }.buttonStyle(changeBGButtonStyle())
-                                .simultaneousGesture(TapGesture()
-                                    .onEnded { _ in
-                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                    })
-                            }
-                        }
-                    }).padding(.bottom, 10)
-                }
-                
                 //MARK: More Section
                 self.viewModel.drawMiniHeader(text: "MORE:")
                 
@@ -497,7 +496,7 @@ struct VisitContactView: View {
                                 .frame(width: 20, height: 20, alignment: .center)
                                 .padding(.trailing, 5)
                             
-                            Text("More...")
+                            Text("more...")
                                 .font(.none)
                                 .fontWeight(.none)
                                 .foregroundColor(.primary)

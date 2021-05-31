@@ -131,6 +131,8 @@ struct ContactRequestCell: View {
                                 newContact.isPremium = contact.isPremium
                                 newContact.emailAddress = firstUser.email ?? "empty email address"
                                 newContact.website = firstUser.website ?? "empty website"
+                                newContact.isInfoPrivate = contact.isInfoPrivate
+                                newContact.isMessagingPrivate = contact.isMessagingPrivate
 
                                 self.contact = newContact
                             }

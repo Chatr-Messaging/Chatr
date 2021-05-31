@@ -169,6 +169,7 @@ struct mainHomeList: View {
     @State var counter: Int = 0
     @State var isKeyboardActionOpen: Bool = false
     @State var isTopCardOpen: Bool = false
+    @State var isDiscoverOpen: Bool = false
     @State var quickSnapViewState: QuickSnapViewingState = .closed
     @State var selectedQuickSnapContact: ContactStruct = ContactStruct()
     @Namespace var namespace
@@ -366,16 +367,18 @@ struct mainHomeList: View {
                                 
                                 Text("No Messages Found")
                                     .foregroundColor(.primary)
-                                    .font(.system(size: 28))
+                                    .font(.title)
                                     .fontWeight(.semibold)
                                     .frame(alignment: .center)
                                     .padding(.top, 15)
-                                    .padding(.bottom, 5)
                                 
-                                Text("Start a new conversation!")
-                                    .font(.system(size: 18))
+                                Text("Start a new conversation \nor discover an existing group!")
+                                    .font(.subheadline)
                                     .foregroundColor(.secondary)
+                                    .lineLimit(3)
+                                    .multilineTextAlignment(.center)
                                     .padding(.bottom, 25)
+                                    .frame(height: 80)
                                 
                                 Button(action: {
                                     self.showNewChat.toggle()
@@ -395,7 +398,42 @@ struct mainHomeList: View {
                                 }.buttonStyle(MainButtonStyle())
                                 .frame(maxWidth: 230)
                                 .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 8)
-                            }.offset(y: Constants.screenWidth < 375 ? 60 : -30)
+                                
+                                Button(action: {
+                                    print("the screen is: \(Constants.screenWidth)")
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                    self.isDiscoverOpen.toggle()
+                                }) {
+                                    HStack(alignment: .center, spacing: 15) {
+                                        Text("Discover Channels")
+                                            .font(.headline)
+                                            .foregroundColor(.primary)
+                                        
+                                        Image(systemName: "magnifyingglass")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 22, height: 22, alignment: .center)
+                                            .offset(x: -2, y: -2)
+                                    }.padding(.horizontal, 15)
+                                    .frame(minWidth: 40, maxWidth: Constants.screenWidth, minHeight: 55, maxHeight: 55)
+                                    .background(Color("buttonColor"))
+                                    .cornerRadius(15)
+                                    .frame(maxWidth: 230)
+                                    .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 8)
+                                }
+                                .buttonStyle(ClickButtonStyle())
+                                .sheet(isPresented: self.$isDiscoverOpen, onDismiss: {
+                                    print("dismiss discover vieww")
+                                }) {
+                                    NavigationView {
+                                        DiscoverView(removeDoneBtn: false, dismissView: self.$isDiscoverOpen, showPinDetails: self.$showPinDetails)
+                                            .environmentObject(self.auth)
+                                            .navigationBarTitle("Discover", displayMode: .automatic)
+                                            .background(Color("bgColor")
+                                            .edgesIgnoringSafeArea(.all))
+                                    }
+                                }
+                            }.offset(y: Constants.screenWidth < 375 ? 60 : 10)
                         }
                         
                         //MARK: Main Dialog Cells
