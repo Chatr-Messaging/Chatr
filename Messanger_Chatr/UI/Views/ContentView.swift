@@ -355,17 +355,17 @@ struct mainHomeList: View {
                         //MARK: Dialogs Section
                         if self.dialogs.results.filter { $0.isDeleted != true }.count == 0 {
                             VStack {
-                                Image("NoChats")
+                                Image("EmptyDialog")
                                     .resizable()
                                     .scaledToFit()
                                     .frame(minWidth: Constants.screenWidth - 20, maxWidth: Constants.screenWidth)
-                                    .frame(height: Constants.screenWidth < 375 ? 250 : 200)
+                                    .frame(height: Constants.screenWidth < 375 ? 200 : 150)
                                     .padding(.horizontal, 10)
                                     .onAppear() {
                                         changeDialogRealmData.shared.fetchDialogs(completion: { _ in })
                                     }
                                 
-                                Text("No Messages Found")
+                                Text(self.auth.isFirstTimeUser ? "Lets Get Started!" : "No Messages Found")
                                     .foregroundColor(.primary)
                                     .font(.title)
                                     .fontWeight(.semibold)
