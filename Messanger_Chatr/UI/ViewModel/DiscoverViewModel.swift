@@ -13,7 +13,7 @@ import Firebase
 class DiscoverViewModel: ObservableObject {
 
     func searchPublicDialog(withText text: String, completion: @escaping (PublicDialogModel) -> Void) {
-        Database.database().reference().child("Marketplace").child("public_dialogs").queryOrdered(byChild: "name").queryStarting(atValue: text).queryEnding(atValue: text+"\u{f8ff}").queryLimited(toFirst: 12).observeSingleEvent(of: .value, with: {
+        Database.database().reference().child("Marketplace/public_dialogs").queryOrdered(byChild: "name").queryStarting(atValue: text, childKey: "name").queryEnding(atValue: text+"\u{f8ff}", childKey: "name").observeSingleEvent(of: .value, with: {
             snapshot in
             snapshot.children.forEach({ (s) in
                 let child = s as! DataSnapshot

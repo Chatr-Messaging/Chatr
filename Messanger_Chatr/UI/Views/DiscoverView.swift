@@ -138,7 +138,7 @@ struct DiscoverView: View {
                             ForEach(self.grandSearchData.indices, id: \.self) { id in
                                 VStack(alignment: .trailing, spacing: 0) {
                                     if id <= 14 {
-                                        PublicDialogDiscoverCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, dialogData: self.topDialogsData[id], isLast: id == 4)
+                                        PublicDialogDiscoverCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, dialogData: self.grandSearchData[id], isLast: id == 4)
                                             .environmentObject(self.auth)
                                     }
                                 }

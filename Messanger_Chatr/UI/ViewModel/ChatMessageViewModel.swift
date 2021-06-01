@@ -99,7 +99,19 @@ class ChatMessageViewModel: ObservableObject {
             Request.totalUnreadMessageCountForDialogs(withIDs: Set([dialogId]), successBlock: { (unread, directory) in
                 print("the unread count for this dialog: \(unread) && \(directory)")
                 self.unreadMessageCount = Int(unread)
-                completion()
+                
+                if self.unreadMessageCount == 0 {
+                    let config = Realm.Configuration(schemaVersion: 1)
+                    do {
+                        let realm = try Realm(configuration: config)
+                        if let foundDialog = realm.object(ofType: DialogStruct.self, forPrimaryKey: dialogId) {
+                            self.unreadMessageCount = foundDialog.notificationCount
+                            completion()
+                        }
+                    } catch { completion() }
+                } else {
+                    completion()
+                }
             })
         })
     }

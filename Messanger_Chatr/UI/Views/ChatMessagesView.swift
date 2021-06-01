@@ -346,9 +346,9 @@ struct ChatMessagesView: View {
                     print("the dialog id is: \(dialogID)")
                     self.delayViewMessages = true
                     viewModel.loadDialog(auth: auth, dialogId: dialogID, completion: {
-                        print("done loading dialogggg: \(dialogID) && \(self.viewModel.totalMessageCount) && \(currentMessages.count)")
+                        print("done loading dialogggg: \(dialogID) && \(self.viewModel.totalMessageCount) && \(currentMessages.count) &&& \(self.viewModel.unreadMessageCount)")
                         self.maxMessageCount = self.viewModel.totalMessageCount
-                        if (self.viewModel.totalMessageCount > self.currentMessages.count && self.maxPagination > self.currentMessages.count) || self.currentMessages.count == 0 {
+                        if (self.viewModel.totalMessageCount > self.currentMessages.count && self.viewModel.unreadMessageCount != 0) || self.currentMessages.count == 0 {
                             print("local and pulled do not match... pulling delta: \(self.viewModel.totalMessageCount) && \(self.currentMessages.count)")
                             changeMessageRealmData.shared.getMessageUpdates(dialogID: dialogID, limit: pageShowCount * (self.scrollPage + 1), skip: currentMessages.count - self.minPagination, completion: { done in
                                 DispatchQueue.main.async {
