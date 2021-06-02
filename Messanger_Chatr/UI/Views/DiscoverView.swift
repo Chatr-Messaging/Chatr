@@ -203,7 +203,8 @@ struct DiscoverView: View {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 0) {
                                 ForEach(self.bannerDataArray.indices, id: \.self) { index in
-                                    DiscoverBannerCell(groupName: self.bannerDataArray[index].name ?? "no name", memberCount: self.bannerDataArray[index].memberCount ?? 0, description: self.bannerDataArray[index].description ?? "", groupImg: self.bannerDataArray[index].avatar ?? "", backgroundImg: self.bannerDataArray[index].coverPhoto ?? "")
+                                    DiscoverFeaturedCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, groupName: self.bannerDataArray[index].name ?? "no name", memberCount: self.bannerDataArray[index].memberCount ?? 0, description: self.bannerDataArray[index].description ?? "", groupImg: self.bannerDataArray[index].avatar ?? "", backgroundImg: self.bannerDataArray[index].coverPhoto ?? "")
+                                        .environmentObject(self.auth)
                                         .frame(width: Constants.screenWidth * 0.55)
                                         .id(self.bannerDataArray[index].id)
                                         .animation(.interactiveSpring())

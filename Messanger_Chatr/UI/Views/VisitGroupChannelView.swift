@@ -364,7 +364,7 @@ struct VisitGroupChannelView: View {
                         .padding(.vertical)
                         .padding(.bottom)
                 }.coordinateSpace(name: "visitGroup-scroll")
-                .navigationBarTitle(self.scrollOffset > 135 || self.isEditGroupOpen || self.showMoreMembers || self.showMoreAdmins || self.showProfile ? self.dialogModel.fullName : "")
+                .navigationBarTitle(self.scrollOffset > (self.dialogModel.dialogType == "public" ? 190 : 135) || self.isEditGroupOpen || self.showMoreMembers || self.showMoreAdmins || self.showProfile ? self.dialogModel.fullName : "")
             }
 
             //MARK: Other Views - See profile image
@@ -444,36 +444,101 @@ struct VisitGroupChannelView: View {
             }
         }.background(Color("bgColor"))
         .onAppear() {
-            self.showProfile = false
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                Request.notificationsSettings(forDialogID: self.dialogModel.id, successBlock: { notiResult in
-                    self.notificationsOn = notiResult
-                })
+            NotificationCenter.default.addObserver(forName: NSNotification.Name("NotificationAlert"), object: nil, queue: .main) { (_) in
+                self.showAlert.toggle()
             }
 
+            let config = Realm.Configuration(schemaVersion: 1)
+            do {
+                let realm = try Realm(configuration: config)
+                if let foundDialog = realm.object(ofType: DialogStruct.self, forPrimaryKey: self.dialogModel.id) {
+                    //self.dialogRelationship = .subscribed
+                    //changeDialogRealmData.shared.observeFirebaseDialogReturn(dialogModel: foundDialog, completion: { _,_,_ in })
+                    self.dialogModel = foundDialog
+//                    changeDialogRealmData.shared.observeFirebaseDialogReturn(dialogModel: self.dialogModel, completion: { (dialog, coverPhotoUrlz) in
+//                        if let dia = dialog {
+//                            self.coverPhotoUrl = coverPhotoUrlz ?? ""
+//                            self.dialogModel = dia
+//                        }
+//                    })
+                    self.observePinnedMessages()
+                    if self.dialogModel.dialogType == "public" {
+                        self.observeFirebase()
+                    }
+                    print("Foundd thisss: \(self.dialogModel.fullName)")
+                } else {
+                    print("did not find shitttt")
+                    self.observePinnedMessages()
+    
+                    if self.dialogModel.dialogType == "public" {
+                        self.observeFirebase()
+                    }
+//                    changeDialogRealmData.shared.observeFirebaseDialogReturn(dialogModel: self.dialogModel, completion: { dialogz, _, _ in
+//                        if let dia = dialogz {
+//                            self.dialogModel = dia
+//                        }
+//
+//                    })
+                }
+            } catch { }
+
             print("welcomeee...: \(self.dialogModel.fullName) && \(self.dialogModel.id)")
-            self.dialogModelMemebers.removeAll()
-            self.dialogModelAdmins.removeAll()
             self.isOwner = self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? true : false
             self.isAdmin = self.dialogModel.adminID.contains(UserDefaults.standard.integer(forKey: "currentUserID")) ? true : false
             self.canEditGroup = self.isOwner || self.isAdmin
             self.currentUserIsPowerful = self.isOwner || self.isAdmin ? true : false
-            self.dialogModelMemebers = self.dialogModel.occupentsID.filter { $0 != 0 } //.filter { $0 != UserDefaults.standard.integer(forKey: "currentUserID") }
+            self.dialogModelMemebers = self.dialogModel.occupentsID.filter { $0 != 0 }
 
-            self.dialogModelAdmins.append(self.dialogModel.owner)
-            for i in self.dialogModel.adminID {
-                self.dialogModelAdmins.append(i)
+            if !self.dialogModelAdmins.contains(where: { $0 == self.dialogModel.owner }) && self.dialogModel.owner != 0 {
+                self.dialogModelAdmins.append(self.dialogModel.owner)
+                print("the damn owner is: \(self.dialogModel.owner)")
             }
+//            for i in self.dialogModel.adminID {
+//                if !self.dialogModelAdmins.contains(where: { $0 == i }) {
+//                    self.dialogModelAdmins.append(i)
+//                }
+//            }
             
-            self.observePinnedMessages()
-
-            if self.dialogModel.dialogType == "public" {
-                self.observePublicDetails()
+            if self.dialogRelationship != .notSubscribed || self.dialogRelationship != .unknown {
+                self.loadNotifications()
             }
-            
-            NotificationCenter.default.addObserver(forName: NSNotification.Name("NotificationAlert"), object: nil, queue: .main) { (_) in
-                self.showAlert.toggle()
+//            self.observePinnedMessages()
+//
+//            if self.dialogModel.dialogType == "public" {
+//                self.observePublicDetails()
+//            }
+        }
+    }
+    
+    func observeFirebase() {
+        let user = Database.database().reference().child("Marketplace").child("public_dialogs").child("\(dialogModel.id)")
+        user.observeSingleEvent(of: .value, with: { (snapshot: DataSnapshot) in
+            if let dict = snapshot.value as? [String: Any] {
+                self.coverPhotoUrl = dict["cover_photo"] as? String ?? ""
+                
+                if let owner = dict["owner"] as? Int {
+                    self.dialogModelAdmins.append(owner)
+                }
+                //self.dialogModel.canMembersType = dict["canMembersType"] as? Bool ?? false
+                for childSnapshot in snapshot.children {
+                    let childSnap = childSnapshot as! DataSnapshot
+                    if let dict2 = childSnap.value as? [String: Any] {
+                        for tag in dict2 {
+                            if !self.publicTags.contains(tag.key) {
+                                self.publicTags.append(tag.key)
+                            }
+                        }
+                    }
+                }
             }
+        })
+    }
+    
+    func loadNotifications() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            Request.notificationsSettings(forDialogID: self.dialogModel.id, successBlock: { notiResult in
+                self.notificationsOn = notiResult
+            })
         }
     }
     
@@ -498,6 +563,8 @@ struct VisitGroupChannelView: View {
     }
 
     func observePinnedMessages() {
+        guard self.dialogModel.id != "" else { return }
+
         let msg = Database.database().reference().child("Dialogs").child(self.dialogModel.id).child("pined")
 
         msg.observe(.childAdded, with: { snapAdded in
@@ -512,15 +579,22 @@ struct VisitGroupChannelView: View {
     }
     
     func observePublicDetails() {
-        changeDialogRealmData.shared.observeFirebaseDialogReturn(dialogModel: self.dialogModel, completion: { (dialog, tags, coverPhotoUrlz) in
+        changeDialogRealmData.shared.observeFirebaseDialogReturn(dialogModel: self.dialogModel, completion: { (dialog, coverPhotoUrlz) in
             if let dia = dialog {
                 print("the returned dialog is nowww: \(dia.fullName) the dialog is pulled in and had the right data: \(dia)")
-                self.dialogModel.id = dia.id
-                self.dialogModel.coverPhoto = dia.coverPhoto
-                self.dialogModel.canMembersType = dia.canMembersType
-                self.dialogModel.publicTags.removeAll()
+                self.dialogModel = dia
+//                self.dialogModel.id = dia.id
+//                self.dialogModel.coverPhoto = dia.coverPhoto
+//                self.dialogModel.canMembersType = dia.canMembersType
+//                self.dialogModel.publicTags.removeAll()
+//                for tag in dia.publicTags {
+//                    self.dialogModel.publicTags.append(tag)
+//                }
+
                 for tag in dia.publicTags {
-                    self.dialogModel.publicTags.append(tag)
+                    if !self.publicTags.contains(tag) {
+                        self.publicTags.append(tag)
+                    }
                 }
 
                 if dia.dialogType == "group" {
@@ -575,15 +649,6 @@ struct VisitGroupChannelView: View {
                 }
                 
                 self.coverPhotoUrl = coverPhotoUrlz ?? ""
-                guard let tagz = tags else {
-                    return
-                }
-
-                for tag in tagz {
-                    if !self.publicTags.contains(tag) {
-                        self.publicTags.append(tag)
-                    }
-                }
             }
         })
     }

@@ -23,7 +23,6 @@ struct ContactsView: View {
     @State var showUserProfile: Bool = false
     @State var showAddChat: Bool = false
     @State var showAddNewContact: Bool = false
-    @State var openDiscoverContent: Bool = false
     @State var toggleContactState: Bool = UserDefaults.standard.bool(forKey: "headerStyle")
     @State var profileImgSize = CGFloat(45)
     @State var alertNum: Int = 0

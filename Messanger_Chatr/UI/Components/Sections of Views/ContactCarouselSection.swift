@@ -96,24 +96,22 @@ struct ContactListView : View {
     @Binding var showPinDetails: String
     @State var openPremiumContent: Bool = false
     @State var openAddressBookContent: Bool = false
-    @State private var openDiscoverContent: Int? = 0
+    @State var openDiscoverContent: Bool = false
     @ObservedObject var addressBook = AddressBookRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(AddressBookStruct.self))
-    
+
     var body: some View {
         HStack(spacing: 0) {
             
             //MARK: Discover Channels
-            NavigationLink(destination: self.discoverViewFunc(), tag: 1, selection: self.$openDiscoverContent) {
-                EmptyView()
-            }
+            NavigationLink(destination: self.discoverViewFunc(), isActive: self.$openDiscoverContent) {
+                ContactBannerCell(titleBold: self.dataArray[0].titleBold, title: self.dataArray[0].title, subtitleImage: self.dataArray[0].subtitleImage, subtitle: self.dataArray[0].subtitle, imageMain: self.dataArray[0].imageMain, gradientBG: self.dataArray[0].gradientBG)
+                    .frame(width: Constants.screenWidth)
+//                    .onTapGesture {
+//                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+//                        self.openDiscoverContent.toggle()
+//                    }
+            }.buttonStyle(ClickMiniButtonStyle())
 
-            ContactBannerCell(titleBold: self.dataArray[0].titleBold, title: self.dataArray[0].title, subtitleImage: self.dataArray[0].subtitleImage, subtitle: self.dataArray[0].subtitle, imageMain: self.dataArray[0].imageMain, gradientBG: self.dataArray[0].gradientBG)
-                .frame(width: Constants.screenWidth)
-                .onTapGesture {
-                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                    self.openDiscoverContent = 1
-                }
-            
             //premium
             if self.auth.subscriptionStatus == .notSubscribed {
                 ContactBannerCell(titleBold: self.dataArray[1].titleBold, title: self.dataArray[1].title, subtitleImage: self.dataArray[1].subtitleImage, subtitle: self.dataArray[1].subtitle, imageMain: self.dataArray[1].imageMain, gradientBG: self.dataArray[1].gradientBG)

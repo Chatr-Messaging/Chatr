@@ -125,6 +125,7 @@
 		05AACE6123A625D0006307EB /* ProfileImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05AACE6023A625D0006307EB /* ProfileImage.swift */; };
 		05B463B9266164F4007EDCEA /* RemoteImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05B463B8266164F4007EDCEA /* RemoteImageView.swift */; };
 		05B463BB2661656B007EDCEA /* ImageNetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05B463BA2661656B007EDCEA /* ImageNetworkManager.swift */; };
+		05B463BD2667257D007EDCEA /* DiscoverFeaturedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05B463BC2667257D007EDCEA /* DiscoverFeaturedCell.swift */; };
 		05BB401625008A3200B8DD37 /* FooterInformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BB401525008A3200B8DD37 /* FooterInformation.swift */; };
 		05BCE40D250B4EA400E29F39 /* HighlightedContactCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BCE40C250B4EA400E29F39 /* HighlightedContactCell.swift */; };
 		05BCE40F250C55E100E29F39 /* ShareProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BCE40E250C55E100E29F39 /* ShareProfileView.swift */; };
@@ -315,6 +316,7 @@
 		05AACE6223A6DC0D006307EB /* Messanger_Chatr.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Messanger_Chatr.entitlements; sourceTree = "<group>"; };
 		05B463B8266164F4007EDCEA /* RemoteImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteImageView.swift; sourceTree = "<group>"; };
 		05B463BA2661656B007EDCEA /* ImageNetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageNetworkManager.swift; sourceTree = "<group>"; };
+		05B463BC2667257D007EDCEA /* DiscoverFeaturedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverFeaturedCell.swift; sourceTree = "<group>"; };
 		05BB401525008A3200B8DD37 /* FooterInformation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FooterInformation.swift; sourceTree = "<group>"; };
 		05BCE40C250B4EA400E29F39 /* HighlightedContactCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightedContactCell.swift; sourceTree = "<group>"; };
 		05BCE40E250C55E100E29F39 /* ShareProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareProfileView.swift; sourceTree = "<group>"; };
@@ -502,6 +504,7 @@
 				05A7633B2506FD42002712FA /* ContactRequestCell.swift */,
 				05C93BDC251578100059D1AA /* DialogContactCell.swift */,
 				058966BD265DF50700303F1E /* PublicDialogDiscoverCell.swift */,
+				05B463BC2667257D007EDCEA /* DiscoverFeaturedCell.swift */,
 				0525E4C425ECC4440086EB54 /* MessageReplyCell.swift */,
 				05786B5726499F83001554CA /* PinnedVideoCell.swift */,
 				059D1C5325D63A7600A7FB96 /* Bubbles */,
@@ -1169,6 +1172,7 @@
 				0572BAB72398998800AE9061 /* PhoneNumberView.swift in Sources */,
 				05578C2C242989A10016B1E5 /* Messanger_Chatr.xcdatamodeld in Sources */,
 				058AC52F2599064F0027FD11 /* DiscoverView.swift in Sources */,
+				05B463BD2667257D007EDCEA /* DiscoverFeaturedCell.swift in Sources */,
 				05C93BDD251578100059D1AA /* DialogContactCell.swift in Sources */,
 				05A1223124AEE6D300EEDD72 /* KeyboardCard.swift in Sources */,
 				05FD085B2394784600575727 /* ProgressBar.swift in Sources */,

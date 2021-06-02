@@ -271,7 +271,7 @@ struct DialogCell: View {
                                 self.openGroupProfile.toggle()
                             }
                         },
-                        .destructive(Text(self.dialogModel.dialogType == "private" ? "Delete Dialog" : (self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? "Destroy Group" : "Leave Group")), action: {
+                        .destructive(Text(self.dialogModel.dialogType == "private" ? "Delete Dialog" : (self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? (self.dialogModel.dialogType == "public" ? "Destroy Channel" : "Destroy Group") : (self.dialogModel.dialogType == "public" ? "Leave Channel" : "Leave Group"))), action: {
                             changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
 
                             self.isOpen = false

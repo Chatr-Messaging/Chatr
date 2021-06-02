@@ -642,6 +642,7 @@ extension AuthModel: ChatDelegate {
     func chatDidNotConnectWithError(_ error: Error) {
         print("Chat did not connect: \(error.localizedDescription)")
         //self.connectionState = .disconnected
+        self.configureFirebaseStateDidChange()
     }
 
     func chatDidReceiveContactAddRequest(fromUser userID: UInt) {

@@ -172,13 +172,12 @@ class changeDialogRealmData {
         }
     }
 
-    func observeFirebaseDialogReturn(dialogModel: DialogStruct, completion: @escaping (DialogStruct?, [String]?, String?) -> ()) {
+    func observeFirebaseDialogReturn(dialogModel: DialogStruct, completion: @escaping (DialogStruct?, String?) -> ()) {
         //Request.occupants(forPublicDialogID: , paginator: , successBlock: , errorBlock: )
-        print("starting observe firebase DIALOG! return")
+        print("starting observe firebase DIALOG! return \(dialogModel.id)")
         let user = Database.database().reference().child("Marketplace").child("public_dialogs").child("\(dialogModel.id)")
         user.observeSingleEvent(of: .value, with: { (snapshot: DataSnapshot) in
             if let dict = snapshot.value as? [String: Any] {
-                var tags: [String] = []
                 //let newData = DialogStruct()
                 //dialogModel.id = dic
                 dialogModel.coverPhoto = dict["cover_photo"] as? String ?? ""
@@ -187,36 +186,32 @@ class changeDialogRealmData {
                     let childSnap = childSnapshot as! DataSnapshot
                     if let dict2 = childSnap.value as? [String: Any] {
                         for tag in dict2 {
-                            dialogModel.publicTags.append(tag.key)
-                            tags.append(tag.key)
+                            if !dialogModel.publicTags.contains(tag.key) {
+                                dialogModel.publicTags.append(tag.key)
+                            }
                         }
                     }
                 }
-                
-                let config = Realm.Configuration(schemaVersion: 1)
-                do {
-                    let realm = try Realm(configuration: config)
-                    try? realm.safeWrite({
-                        if let foundDialog = realm.object(ofType: DialogStruct.self, forPrimaryKey: dialogModel.id) {
-                        foundDialog.coverPhoto = dialogModel.coverPhoto
-                        foundDialog.canMembersType = dialogModel.canMembersType
-                        for i in dialogModel.publicTags {
-                            if !foundDialog.publicTags.contains(i) {
-                                foundDialog.publicTags.append(i)
-                                print("the taggg iss: \(i)")
-                            }
-                        }
-                        print("found dialogg trying to write..")
-                        realm.add(foundDialog, update: .all)
-   
-                        completion(nil, tags, dialogModel.coverPhoto)
-                    } else {
-                        completion(dialogModel, tags, dialogModel.coverPhoto)
-                    }
-                    })
-                } catch { completion(nil, nil, nil) }
+                completion(dialogModel, dialogModel.coverPhoto)
+//                let config = Realm.Configuration(schemaVersion: 1)
+//                do {
+//                    let realm = try Realm(configuration: config)
+//                    if let foundDialog = realm.object(ofType: DialogStruct.self, forPrimaryKey: dialogModel.id) {
+//                        foundDialog.coverPhoto = dialogModel.coverPhoto
+//                        foundDialog.canMembersType = dialogModel.canMembersType
+//
+//                        print("found dialogg trying to write..")
+//                        try? realm.safeWrite({
+//                            realm.add(foundDialog, update: .all)
+//                        })
+//
+//                        completion(nil, dialogModel.coverPhoto)
+//                    } else {
+//                        completion(dialogModel, dialogModel.coverPhoto)
+//                    }
+//                } catch { completion(nil, nil) }
             } else {
-                completion(nil, nil, nil)
+                completion(nil, nil)
             }
         })
     }

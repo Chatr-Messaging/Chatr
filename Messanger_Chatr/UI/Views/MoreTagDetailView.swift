@@ -52,7 +52,7 @@ struct MoreTagDetailView: View {
                             .padding(.top, 180)
                             .padding(.bottom, 10)
                         
-                        Text("Empty Dialogs")
+                        Text("Empty Chats")
                             .font(.title)
                             .fontWeight(.bold)
                             .foregroundColor(.primary)

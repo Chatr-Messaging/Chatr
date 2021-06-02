@@ -46,7 +46,7 @@ struct PublicActionSection: View {
                         UINotificationFeedbackGenerator().notificationOccurred(.success)
                         self.dialogRelationship = .subscribed
                         changeDialogRealmData.shared.insertDialogs([dialogz], completion: {
-                            changeDialogRealmData.shared.observeFirebaseDialogReturn(dialogModel: self.dialogModel, completion: { _,_,_   in
+                            changeDialogRealmData.shared.observeFirebaseDialogReturn(dialogModel: self.dialogModel, completion: { _,_   in
                                 self.auth.sendPushNoti(userIDs: [NSNumber(value: self.dialogModel.owner)], title: "\(self.dialogModel.fullName) Joined", message: "\(self.auth.profile.results.first?.fullName ?? "No Name") joined your public chat \(self.dialogModel.fullName)")
                             })
                         })

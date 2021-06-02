@@ -8,6 +8,8 @@
 
 import SwiftUI
 import SDWebImageSwiftUI
+import ConnectyCube
+import RealmSwift
 
 struct PublicDialogDiscoverCell: View {
     @EnvironmentObject var auth: AuthModel
@@ -19,6 +21,8 @@ struct PublicDialogDiscoverCell: View {
     @State var isEditGroupOpen: Bool = false
     @State var canEditGroup: Bool = false
     @State var openNewDialogID: Int = 0
+    @State var isJoined: Bool = false
+    @State var isMember: Bool = false
     var sendDia: DialogStruct = DialogStruct()
 
     var body: some View {
@@ -75,19 +79,28 @@ struct PublicDialogDiscoverCell: View {
 
                         Spacer()
                         
-                        
-                        Button(action: {
-                            print("join group")
-                        }) {
-                            Text("JOIN")
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                                .multilineTextAlignment(.center)
-                                .foregroundColor(Color.blue)
-                                .frame(width: 55, height: 30, alignment: .center)
-                                .background(Color("buttonColor_darker"))
-                        }.cornerRadius(8)
-                        //.shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 2)
+                        if !self.isMember {
+                            Button(action: {
+                                print("join group")
+                                Request.subscribeToPublicDialog(withID: self.dialogData.id ?? "", successBlock: { dialogz in
+                                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                    self.isJoined = true
+                                    changeDialogRealmData.shared.insertDialogs([dialogz], completion: {
+                                        self.auth.sendPushNoti(userIDs: [NSNumber(value: dialogz.userID)], title: "\(dialogz.name ?? "no name") Joined", message: "\(self.auth.profile.results.first?.fullName ?? "No Name") joined your public chat \(dialogz.name ?? "no name")")
+                                    })
+                                }) { (error) in
+                                    UINotificationFeedbackGenerator().notificationOccurred(.error)
+                                }
+                            }) {
+                                Text(self.isJoined ? "JOINED" : "JOIN")
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                                    .multilineTextAlignment(.center)
+                                    .foregroundColor(self.isJoined ? Color.secondary : Color.blue)
+                                    .frame(width: 55, height: 30, alignment: .center)
+                                    .background(Color("buttonColor_darker"))
+                            }.cornerRadius(8)
+                        }
 
                         Image(systemName: "chevron.right")
                             .resizable()
@@ -116,6 +129,14 @@ struct PublicDialogDiscoverCell: View {
                 self.sendDia.avatar = self.dialogData.avatar ?? ""
                 self.sendDia.coverPhoto = self.dialogData.coverPhoto ?? ""
                 print("found the diaaaaa :\(self.sendDia.id)")
+                
+                let config = Realm.Configuration(schemaVersion: 1)
+                do {
+                    let realm = try Realm(configuration: config)
+                    if let foundDialog = realm.object(ofType: DialogStruct.self, forPrimaryKey: dialogData.id ?? ""), !foundDialog.isDeleted {
+                        self.isMember = true
+                    }
+                } catch { }
             }
         }.simultaneousGesture(TapGesture()
                                 .onEnded { _ in
@@ -124,7 +145,7 @@ struct PublicDialogDiscoverCell: View {
     }
     
     func dialogDetails() -> some View {
-        VisitGroupChannelView(dismissView: self.$dismissView, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$openNewDialogID, showPinDetails: self.$showPinDetails, fromDialogCell: false, viewState: .fromDynamicLink, dialogRelationship: .subscribed, dialogModel: self.sendDia)
+        VisitGroupChannelView(dismissView: self.$dismissView, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$openNewDialogID, showPinDetails: self.$showPinDetails, fromDialogCell: false, viewState: .fromDynamicLink, dialogRelationship: self.isMember || self.isJoined ? .subscribed : .notSubscribed, dialogModel: self.sendDia)
             .environmentObject(self.auth)
             .edgesIgnoringSafeArea(.all)
             .navigationBarItems(trailing:
