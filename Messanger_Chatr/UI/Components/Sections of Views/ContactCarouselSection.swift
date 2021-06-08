@@ -104,51 +104,64 @@ struct ContactListView : View {
             
             //MARK: Discover Channels
             NavigationLink(destination: self.discoverViewFunc(), isActive: self.$openDiscoverContent) {
+                EmptyView()
+            }
+            Button(action: {
+                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+            }, label: {
                 ContactBannerCell(titleBold: self.dataArray[0].titleBold, title: self.dataArray[0].title, subtitleImage: self.dataArray[0].subtitleImage, subtitle: self.dataArray[0].subtitle, imageMain: self.dataArray[0].imageMain, gradientBG: self.dataArray[0].gradientBG)
                     .frame(width: Constants.screenWidth)
-//                    .onTapGesture {
-//                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-//                        self.openDiscoverContent.toggle()
-//                    }
-            }.buttonStyle(ClickMiniButtonStyle())
+                    .onTapGesture {
+                        self.openDiscoverContent.toggle()
+                    }
+            }).buttonStyle(ClickMiniButtonStyle())
 
             //premium
             if self.auth.subscriptionStatus == .notSubscribed {
-                ContactBannerCell(titleBold: self.dataArray[1].titleBold, title: self.dataArray[1].title, subtitleImage: self.dataArray[1].subtitleImage, subtitle: self.dataArray[1].subtitle, imageMain: self.dataArray[1].imageMain, gradientBG: self.dataArray[1].gradientBG)
-                    .frame(width: Constants.screenWidth)
-                    .onTapGesture {
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        self.openPremiumContent.toggle()
-                    }.sheet(isPresented: self.$openPremiumContent, content: {
-                        MembershipView()
-                            .environmentObject(self.auth)
-                            .edgesIgnoringSafeArea(.all)
-                            .navigationBarTitle("")
-                    })
+                Button(action: {
+                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                }, label: {
+                    ContactBannerCell(titleBold: self.dataArray[1].titleBold, title: self.dataArray[1].title, subtitleImage: self.dataArray[1].subtitleImage, subtitle: self.dataArray[1].subtitle, imageMain: self.dataArray[1].imageMain, gradientBG: self.dataArray[1].gradientBG)
+                        .frame(width: Constants.screenWidth)
+                        .onTapGesture {
+                            self.openPremiumContent.toggle()
+                        }.sheet(isPresented: self.$openPremiumContent, content: {
+                            MembershipView()
+                                .environmentObject(self.auth)
+                                .edgesIgnoringSafeArea(.all)
+                                .navigationBarTitle("")
+                        })
+                }).buttonStyle(ClickMiniButtonStyle())
             }
             
             //address book
             if self.addressBook.results.count == 0 {
-                ContactBannerCell(titleBold: self.dataArray[2].titleBold, title: self.dataArray[2].title, subtitleImage: self.dataArray[2].subtitleImage, subtitle: self.dataArray[2].subtitle, imageMain: self.dataArray[2].imageMain, gradientBG: self.dataArray[2].gradientBG)
-                    .frame(width: Constants.screenWidth)
-                    .onTapGesture {
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        self.openAddressBookContent.toggle()
-                    }.sheet(isPresented: self.$openAddressBookContent, content: {
-                        NavigationView {
-                            SyncAddressBook()
-                        }.navigationBarTitle("Sync Address Book", displayMode: .inline)
-                        .background(Color("bgColor"))
-                        .frame(height: Constants.screenHeight)
-                    })
+                Button(action: {
+                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                }, label: {
+                    ContactBannerCell(titleBold: self.dataArray[2].titleBold, title: self.dataArray[2].title, subtitleImage: self.dataArray[2].subtitleImage, subtitle: self.dataArray[2].subtitle, imageMain: self.dataArray[2].imageMain, gradientBG: self.dataArray[2].gradientBG)
+                        .frame(width: Constants.screenWidth)
+                        .onTapGesture {
+                            self.openAddressBookContent.toggle()
+                        }.sheet(isPresented: self.$openAddressBookContent, content: {
+                            NavigationView {
+                                SyncAddressBook()
+                            }.navigationBarTitle("Sync Address Book", displayMode: .inline)
+                            .background(Color("bgColor"))
+                            .frame(height: Constants.screenHeight)
+                        })
+                }).buttonStyle(ClickMiniButtonStyle())
             }
             
-            ContactBannerCell(titleBold: self.dataArray[3].titleBold, title: self.dataArray[3].title, subtitleImage: self.dataArray[3].subtitleImage, subtitle: self.dataArray[3].subtitle, imageMain: self.dataArray[3].imageMain, gradientBG: self.dataArray[3].gradientBG)
-                .frame(width: Constants.screenWidth)
-                .onTapGesture {
-                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                    self.quickSnapViewState = .camera
-                }
+            Button(action: {
+                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+            }, label: {
+                ContactBannerCell(titleBold: self.dataArray[3].titleBold, title: self.dataArray[3].title, subtitleImage: self.dataArray[3].subtitleImage, subtitle: self.dataArray[3].subtitle, imageMain: self.dataArray[3].imageMain, gradientBG: self.dataArray[3].gradientBG)
+                    .frame(width: Constants.screenWidth)
+                    .onTapGesture {
+                        self.quickSnapViewState = .camera
+                    }
+            }).buttonStyle(ClickMiniButtonStyle())
         }.padding(.vertical)
     }
     
