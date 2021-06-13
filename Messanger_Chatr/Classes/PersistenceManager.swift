@@ -44,6 +44,7 @@ class PersistenceManager: ObservableObject {
         }
     }
 
+    /*
     func insertDialogs<T>(_ objects: [T], completion: @escaping () -> Void) where T: ChatDialog {
         print("all the sent dialogs fetch count: \(objects.count)")
         //self.deleteAll(object: self.fetch(UserDialogs.self))
@@ -137,7 +138,8 @@ class PersistenceManager: ObservableObject {
             completion()
         }
     }
-    
+     */
+    /*
     func fetchMessages(dialogID: String? = "", messageID: String? = "") -> [ChatMessages] {
         let entityName = String(describing: ChatMessages.self)
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
@@ -155,7 +157,7 @@ class PersistenceManager: ObservableObject {
             return [ChatMessages]()
         }
     }
-    
+    */
 //    func fetchSelectedMessages() -> [ChatMessages] {
 //        let entityName = String(describing: ChatMessages.self)
 //        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
@@ -218,6 +220,7 @@ class PersistenceManager: ObservableObject {
         }
     }
     
+    /*
     func getCubeProfile() -> User? {
         if self.fetch(UserProfile.self).count > 0 {
             let user = User()
@@ -260,6 +263,7 @@ class PersistenceManager: ObservableObject {
         
         self.save()
     }
+    */
     
     func getCubeProfileImage(usersID: ConnectyCube.User) -> String? {
         if let data = usersID.customData?.data(using: .utf8) {

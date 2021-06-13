@@ -140,7 +140,7 @@ struct PinnedSectionView: View {
     func pinMessage(message: MessageStruct, completion: @escaping (Bool) -> Void) {
         guard message.dialogID != "" else { return }
 
-        let msg = Database.database().reference().child("Dialogs").child(message.dialogID).child("pined")
+        let msg = Database.database().reference().child("Dialogs").child(message.dialogID).child("pinned")
 
         msg.observeSingleEvent(of: .value, with: { snapshot in
             if snapshot.childSnapshot(forPath: "\(message.id)").exists() {

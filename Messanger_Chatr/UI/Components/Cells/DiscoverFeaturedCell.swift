@@ -43,11 +43,11 @@ struct DiscoverFeaturedCell: View, Identifiable {
                         .resizable()
                         .placeholder{ Image(systemName: "photo.on.rectangle.angled").resizable().frame(width: 30, height: 27, alignment: .center).scaledToFill().offset(y: -18) }
                         .indicator(.activity)
+                        .frame(width: Constants.screenWidth * 0.68 - 30, height: 180)
+                        .fixedSize(horizontal: true, vertical: false)
                         .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
-                        .scaledToFill()
-                        .frame(width: Constants.screenWidth * 0.55 - 35, height: 120)
+                        .aspectRatio(contentMode: .fit)
                         .cornerRadius(10)
-                        .clipped()
                         .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 4)
 
                     VStack(alignment: .center, spacing: 0) {
@@ -57,13 +57,14 @@ struct DiscoverFeaturedCell: View, Identifiable {
                             .indicator(.activity)
                             .scaledToFit()
                             .frame(width: 70, height: 70)
+                            .background(Color("buttonColor"))
                             .cornerRadius(55 / 4)
                             .padding(.bottom, 5)
                             .shadow(color: Color.black.opacity(0.3), radius: 12, x: 0, y: 8)
                         
                         VStack(alignment: .center, spacing: 2) {
                             Text(self.groupName)
-                                .font(.system(size: 20))
+                                .font(.headline)
                                 .fontWeight(.semibold)
                                 .lineLimit(2)
                                 .foregroundColor(Color.primary)
@@ -110,18 +111,19 @@ struct DiscoverFeaturedCell: View, Identifiable {
                                         .fontWeight(.bold)
                                         .multilineTextAlignment(.center)
                                         .foregroundColor(Color.white)
-                                }.frame(width: Constants.screenWidth * 0.50 - 50, height: 36, alignment: .center)
+                                }.frame(width: Constants.screenWidth * 0.60 - 50, height: 36, alignment: .center)
                                 .background(Color.blue)
                                 .cornerRadius(8)
                             }.buttonStyle(ClickMiniButtonStyle())
                             .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 2.5)
-                            .padding(.bottom, 5)
+                            .padding(.bottom, 4)
                         }
-                    }.padding(.top, 60)
+                    }
+                    .padding(.top, 120)
                     .padding()
                 }
                 .background(Color("buttonColor"))
-                .frame(minHeight: 280, maxHeight: 360)
+                .frame(minHeight: 340, maxHeight: 360)
                 .cornerRadius(20)
                 .padding(.horizontal, 15)
             }.buttonStyle(ClickMiniButtonStyle())

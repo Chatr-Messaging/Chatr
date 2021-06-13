@@ -653,7 +653,6 @@ struct ContactsView: View {
                         Text("Done")
                             .foregroundColor(.primary)
                     })
-                
             }.navigationViewStyle(StackNavigationViewStyle())
             .onAppear {
                 self.userPhoneNumber = UserDefaults.standard.string(forKey: "phoneNumber")?.format(phoneNumber: String(UserDefaults.standard.string(forKey: "phoneNumber")?.dropFirst().dropFirst() ?? "+1 (123) 456-6789")) ?? "+1 (123) 456-6789"

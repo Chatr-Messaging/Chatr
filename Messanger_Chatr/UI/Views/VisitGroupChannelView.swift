@@ -491,7 +491,6 @@ struct VisitGroupChannelView: View {
 
             if !self.dialogModelAdmins.contains(where: { $0 == self.dialogModel.owner }) && self.dialogModel.owner != 0 {
                 self.dialogModelAdmins.append(self.dialogModel.owner)
-                print("the damn owner is: \(self.dialogModel.owner)")
             }
 //            for i in self.dialogModel.adminID {
 //                if !self.dialogModelAdmins.contains(where: { $0 == i }) {
@@ -502,11 +501,11 @@ struct VisitGroupChannelView: View {
             if self.dialogRelationship != .notSubscribed || self.dialogRelationship != .unknown {
                 self.loadNotifications()
             }
-//            self.observePinnedMessages()
+            self.observePinnedMessages()
 //
-//            if self.dialogModel.dialogType == "public" {
-//                self.observePublicDetails()
-//            }
+            if self.dialogModel.dialogType == "public" {
+                self.observePublicDetails()
+            }
         }
     }
     
@@ -516,7 +515,7 @@ struct VisitGroupChannelView: View {
             if let dict = snapshot.value as? [String: Any] {
                 self.coverPhotoUrl = dict["cover_photo"] as? String ?? ""
                 
-                if let owner = dict["owner"] as? Int {
+                if let owner = dict["owner"] as? Int, !self.dialogModelAdmins.contains(where: { $0 == owner }) && owner != 0 {
                     self.dialogModelAdmins.append(owner)
                 }
                 //self.dialogModel.canMembersType = dict["canMembersType"] as? Bool ?? false
@@ -565,7 +564,7 @@ struct VisitGroupChannelView: View {
     func observePinnedMessages() {
         guard self.dialogModel.id != "" else { return }
 
-        let msg = Database.database().reference().child("Dialogs").child(self.dialogModel.id).child("pined")
+        let msg = Database.database().reference().child("Dialogs").child(self.dialogModel.id).child("pinned")
 
         msg.observe(.childAdded, with: { snapAdded in
             changeDialogRealmData.shared.addDialogPin(messageId: snapAdded.key, dialogID: self.dialogModel.id)
@@ -782,11 +781,12 @@ struct topGroupHeaderView: View {
                 }) {
                     WebImage(url: URL(string: self.dialogModel.avatar))
                         .resizable()
-                        .placeholder{ Image(systemName: "person.fill") }
+                        .placeholder{ Image("empty-profile").resizable().frame(width: 110, height: 110, alignment: .center).scaledToFill().cornerRadius(20) }
                         .indicator(.activity)
                         .transition(.fade(duration: 0.15))
                         .scaledToFill()
                         .clipped()
+                        .background(Color("buttonColor"))
                         .frame(width: 110, height: 110, alignment: .center)
                         .cornerRadius(20)
                         .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)

@@ -103,27 +103,33 @@ struct ContactListView : View {
         HStack(spacing: 0) {
             
             //MARK: Discover Channels
-            NavigationLink(destination: self.discoverViewFunc(), isActive: self.$openDiscoverContent) {
-                EmptyView()
-            }
+//            NavigationLink(destination: self.discoverViewFunc(), isActive: self.$openDiscoverContent) {
+//                EmptyView()
+//            }
+
             Button(action: {
-                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
             }, label: {
                 ContactBannerCell(titleBold: self.dataArray[0].titleBold, title: self.dataArray[0].title, subtitleImage: self.dataArray[0].subtitleImage, subtitle: self.dataArray[0].subtitle, imageMain: self.dataArray[0].imageMain, gradientBG: self.dataArray[0].gradientBG)
                     .frame(width: Constants.screenWidth)
                     .onTapGesture {
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                         self.openDiscoverContent.toggle()
                     }
+                    .sheet(isPresented: self.$openDiscoverContent, content: {
+                        NavigationView {
+                            self.discoverViewFunc()
+                        }
+                    })
             }).buttonStyle(ClickMiniButtonStyle())
 
             //premium
             if self.auth.subscriptionStatus == .notSubscribed {
                 Button(action: {
-                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                 }, label: {
                     ContactBannerCell(titleBold: self.dataArray[1].titleBold, title: self.dataArray[1].title, subtitleImage: self.dataArray[1].subtitleImage, subtitle: self.dataArray[1].subtitle, imageMain: self.dataArray[1].imageMain, gradientBG: self.dataArray[1].gradientBG)
                         .frame(width: Constants.screenWidth)
                         .onTapGesture {
+                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                             self.openPremiumContent.toggle()
                         }.sheet(isPresented: self.$openPremiumContent, content: {
                             MembershipView()
@@ -137,11 +143,11 @@ struct ContactListView : View {
             //address book
             if self.addressBook.results.count == 0 {
                 Button(action: {
-                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                 }, label: {
                     ContactBannerCell(titleBold: self.dataArray[2].titleBold, title: self.dataArray[2].title, subtitleImage: self.dataArray[2].subtitleImage, subtitle: self.dataArray[2].subtitle, imageMain: self.dataArray[2].imageMain, gradientBG: self.dataArray[2].gradientBG)
                         .frame(width: Constants.screenWidth)
                         .onTapGesture {
+                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                             self.openAddressBookContent.toggle()
                         }.sheet(isPresented: self.$openAddressBookContent, content: {
                             NavigationView {
@@ -154,11 +160,11 @@ struct ContactListView : View {
             }
             
             Button(action: {
-                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
             }, label: {
                 ContactBannerCell(titleBold: self.dataArray[3].titleBold, title: self.dataArray[3].title, subtitleImage: self.dataArray[3].subtitleImage, subtitle: self.dataArray[3].subtitle, imageMain: self.dataArray[3].imageMain, gradientBG: self.dataArray[3].gradientBG)
                     .frame(width: Constants.screenWidth)
                     .onTapGesture {
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                         self.quickSnapViewState = .camera
                     }
             }).buttonStyle(ClickMiniButtonStyle())
@@ -166,7 +172,7 @@ struct ContactListView : View {
     }
     
     func discoverViewFunc() -> some View {
-        DiscoverView(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails)
+        DiscoverView(removeDoneBtn: false, dismissView: self.$dismissView, showPinDetails: self.$showPinDetails)
             .environmentObject(self.auth)
             .navigationBarTitle("Discover", displayMode: .automatic)
             .background(Color("bgColor")

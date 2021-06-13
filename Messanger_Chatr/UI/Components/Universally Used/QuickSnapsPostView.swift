@@ -174,7 +174,7 @@ struct QuickSnapsPostView: View {
                                     .opacity(self.errorLoading ? 1 : 0)
                                     .padding(.top, 45)
                                     .disabled(self.errorLoading ? false : true)
-                                }
+                                }.frame(width: Constants.screenWidth)
                             }.scaledToFit()
                             .clipShape(RoundedRectangle(cornerRadius: 15))
                             .shadow(color: Color.black.opacity(0.25), radius: 8, x: 0, y: 8)

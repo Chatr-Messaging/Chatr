@@ -39,7 +39,6 @@
 		054E9B8225D246C800365CE0 /* ConfettiSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 054E9B8125D246C800365CE0 /* ConfettiSwiftUI */; };
 		054E9B8325D246C800365CE0 /* ConfettiSwiftUI in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 054E9B8125D246C800365CE0 /* ConfettiSwiftUI */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		0554281725AFE7AD00B6D106 /* ChatrStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0554281625AFE7AD00B6D106 /* ChatrStats.swift */; };
-		05578C2C242989A10016B1E5 /* Messanger_Chatr.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 05578C2A242989A10016B1E5 /* Messanger_Chatr.xcdatamodeld */; };
 		05578C362429CE030016B1E5 /* PersistenceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05578C352429CE030016B1E5 /* PersistenceManager.swift */; };
 		0559B8B325D3682A0069C44A /* InstagramStories.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0559B8B225D3682A0069C44A /* InstagramStories.swift */; };
 		0559B8D325D39AC20069C44A /* KeyboardCardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0559B8D225D39AC20069C44A /* KeyboardCardViewModel.swift */; };
@@ -233,7 +232,6 @@
 		054DA6C1250FF9DF00F28F74 /* AboutChatrView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutChatrView.swift; sourceTree = "<group>"; };
 		054E9B7B25D242BB00365CE0 /* EarlyAdopterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EarlyAdopterView.swift; sourceTree = "<group>"; };
 		0554281625AFE7AD00B6D106 /* ChatrStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatrStats.swift; sourceTree = "<group>"; };
-		05578C2B242989A10016B1E5 /* Messanger_Chatr.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Messanger_Chatr.xcdatamodel; sourceTree = "<group>"; };
 		05578C352429CE030016B1E5 /* PersistenceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceManager.swift; sourceTree = "<group>"; };
 		0559B8B225D3682A0069C44A /* InstagramStories.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramStories.swift; sourceTree = "<group>"; };
 		0559B8D225D39AC20069C44A /* KeyboardCardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardCardViewModel.swift; sourceTree = "<group>"; };
@@ -736,7 +734,6 @@
 		05DB89B0238B851400D4581F /* Messanger_Chatr */ = {
 			isa = PBXGroup;
 			children = (
-				05578C2A242989A10016B1E5 /* Messanger_Chatr.xcdatamodeld */,
 				05AACE6223A6DC0D006307EB /* Messanger_Chatr.entitlements */,
 				053A639A2509649A00571226 /* Configuration.storekit */,
 				05DB89B1238B851400D4581F /* AppDelegate.swift */,
@@ -1170,7 +1167,6 @@
 				0511CB7125A1911000E5F905 /* StoreReviewHelper.swift in Sources */,
 				058E73D926141978008578E3 /* AudioBubble.swift in Sources */,
 				0572BAB72398998800AE9061 /* PhoneNumberView.swift in Sources */,
-				05578C2C242989A10016B1E5 /* Messanger_Chatr.xcdatamodeld in Sources */,
 				058AC52F2599064F0027FD11 /* DiscoverView.swift in Sources */,
 				05B463BD2667257D007EDCEA /* DiscoverFeaturedCell.swift in Sources */,
 				05C93BDD251578100059D1AA /* DialogContactCell.swift in Sources */,
@@ -1768,19 +1764,6 @@
 			productName = Grid;
 		};
 /* End XCSwiftPackageProductDependency section */
-
-/* Begin XCVersionGroup section */
-		05578C2A242989A10016B1E5 /* Messanger_Chatr.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				05578C2B242989A10016B1E5 /* Messanger_Chatr.xcdatamodel */,
-			);
-			currentVersion = 05578C2B242989A10016B1E5 /* Messanger_Chatr.xcdatamodel */;
-			path = Messanger_Chatr.xcdatamodeld;
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
-		};
-/* End XCVersionGroup section */
 	};
 	rootObject = 05DB89A6238B851400D4581F /* Project object */;
 }

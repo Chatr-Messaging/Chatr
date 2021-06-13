@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/exyte/PopupView.git",
         "state": {
           "branch": null,
-          "revision": "3c6a25413e0ce7248d8e702c9764230fec2787a5",
-          "version": "0.0.7"
+          "revision": "9948c76cfc57b12c87bfd0007ed64a5190cace85",
+          "version": "0.0.14"
         }
       },
       {
@@ -33,8 +33,8 @@
         "repositoryURL": "https://github.com/realm/realm-cocoa.git",
         "state": {
           "branch": null,
-          "revision": "7ec5df0a700ef76ad930dcedb9c63c1b354979e1",
-          "version": "5.5.1"
+          "revision": "2dce752b48c3265c63ab04a8c66ddfdf9185f847",
+          "version": "5.5.2"
         }
       },
       {

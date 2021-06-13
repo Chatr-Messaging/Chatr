@@ -342,8 +342,9 @@ struct ChatMessagesView: View {
             .frame(width: Constants.screenWidth)
             .contentShape(Rectangle())
             .onAppear() {
-                DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + 0.6) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                     print("the dialog id is: \(dialogID)")
+                    self.maxMessageCount = self.currentMessages.count
                     self.delayViewMessages = true
                     viewModel.loadDialog(auth: auth, dialogId: dialogID, completion: {
                         print("done loading dialogggg: \(dialogID) && \(self.viewModel.totalMessageCount) && \(currentMessages.count) &&& \(self.viewModel.unreadMessageCount)")
@@ -415,7 +416,7 @@ struct ChatMessagesView: View {
     }
     
     func observePinnedMessages() {
-        let msg = Database.database().reference().child("Dialogs").child(self.dialogID).child("pined")
+        let msg = Database.database().reference().child("Dialogs").child(self.dialogID).child("pinned")
 
         msg.observe(.childAdded, with: { snapAdded in
             changeDialogRealmData.shared.addDialogPin(messageId: snapAdded.key, dialogID: self.dialogID)

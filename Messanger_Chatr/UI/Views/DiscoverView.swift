@@ -185,7 +185,7 @@ struct DiscoverView: View {
                     }.padding(.leading, 20)
                     .frame(height: 85)
                 }.gridStyle(self.style)
-                .padding(.vertical)
+                .padding(.vertical, 5)
                 
                 //MARK: Featured Section
                 if self.bannerDataArray.count > 0 {
@@ -205,12 +205,12 @@ struct DiscoverView: View {
                                 ForEach(self.bannerDataArray.indices, id: \.self) { index in
                                     DiscoverFeaturedCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, groupName: self.bannerDataArray[index].name ?? "no name", memberCount: self.bannerDataArray[index].memberCount ?? 0, description: self.bannerDataArray[index].description ?? "", groupImg: self.bannerDataArray[index].avatar ?? "", backgroundImg: self.bannerDataArray[index].coverPhoto ?? "")
                                         .environmentObject(self.auth)
-                                        .frame(width: Constants.screenWidth * 0.55)
+                                        .frame(width: Constants.screenWidth * 0.68)
                                         .id(self.bannerDataArray[index].id)
                                         .animation(.interactiveSpring())
                                 }
                             }.animation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0))
-                        }.frame(height: 280)
+                        }.frame(height: 340)
                         .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
                     }
                 }
@@ -219,15 +219,21 @@ struct DiscoverView: View {
                 if self.topDialogsData.count > 0 {
                     VStack {
                         HStack {
-                            Text("POPULAR:")
-                                .font(.caption)
-                                .fontWeight(.regular)
-                                .foregroundColor(.secondary)
-                                .padding(.horizontal, 40)
+                            Text("Popular")
+                                .font(.system(size: 26))
+                                .fontWeight(.semibold)
+                                .foregroundColor(.primary)
+                                
                             Spacer()
-                        }
+                            Button(action: {
+                                
+                            }, label: {
+                                Text("See All")
+                                    .foregroundColor(.blue)
+                            })
+                        }.padding(.horizontal, 30)
                         .padding(.top, 30)
-                        .padding(.bottom, 5)
+                        .padding(.bottom, 10)
 
                         self.styleBuilder(content: {
                             ForEach(self.topDialogsData.indices, id: \.self) { id in
@@ -282,15 +288,21 @@ struct DiscoverView: View {
                 if self.recentDialogsData.count > 0 {
                     VStack {
                         HStack {
-                            Text("RECENTLY ADDED:")
-                                .font(.caption)
-                                .fontWeight(.regular)
-                                .foregroundColor(.secondary)
-                                .padding(.horizontal, 40)
+                            Text("Newest")
+                                .font(.system(size: 26))
+                                .fontWeight(.semibold)
+                                .foregroundColor(.primary)
+
                             Spacer()
-                        }
+                            Button(action: {
+                                
+                            }, label: {
+                                Text("See All")
+                                    .foregroundColor(.blue)
+                            })
+                        }.padding(.horizontal, 30)
                         .padding(.top, 30)
-                        .padding(.bottom, 5)
+                        .padding(.bottom, 10)
 
                         self.styleBuilder(content: {
                             ForEach(self.recentDialogsData.indices, id: \.self) { id in

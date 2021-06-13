@@ -44,20 +44,21 @@ struct PublicDialogDiscoverCell: View {
                         
                         WebImage(url: URL(string: self.dialogData.avatar ?? ""))
                             .resizable()
-                            .placeholder{ Image("empty-profile").resizable().frame(width: 54, height: 54, alignment: .center).scaledToFill() }
+                            .placeholder{ Image("empty-profile").resizable().frame(width: 62, height: 62, alignment: .center).scaledToFill().cornerRadius(54 / 4) }
                             .indicator(.activity)
                             .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                             .scaledToFill()
-                            .frame(width: 54, height: 54)
-                            .cornerRadius(50 / 4)
+                            .frame(width: 62, height: 62)
+                            .background(Color("buttonColor"))
+                            .cornerRadius(54 / 4)
                             .clipped()
                             .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 8)
                         
                         VStack(alignment: .leading, spacing: 0) {
                             Text(self.dialogData.name ?? "no name")
-                                .font(.system(size: 20))
+                                .font(.headline)
                                 .fontWeight(.semibold)
-                                .lineLimit(1)
+                                .lineLimit(2)
                                 .foregroundColor(Color.primary)
                                 .multilineTextAlignment(.leading)
                             
@@ -122,6 +123,10 @@ struct PublicDialogDiscoverCell: View {
                 }
             }.buttonStyle(changeBGButtonStyle())
             .onAppear() {
+                guard self.sendDia.id == "" else {
+                    return
+                }
+
                 self.sendDia.id = self.dialogData.id ?? ""
                 self.sendDia.dialogType = "public"
                 self.sendDia.fullName = self.dialogData.name ?? ""
