@@ -53,7 +53,7 @@ struct MorePublicListView: View {
                             .padding(.top, 180)
                             .padding(.bottom, 10)
                         
-                        Text("Empty Chats")
+                        Text("No Chatter")
                             .font(.title)
                             .fontWeight(.bold)
                             .foregroundColor(.primary)

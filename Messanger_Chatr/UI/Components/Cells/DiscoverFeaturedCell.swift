@@ -57,12 +57,12 @@ struct DiscoverFeaturedCell: View, Identifiable {
                     VStack(alignment: .center, spacing: 0) {
                         WebImage(url: URL(string: self.dialogModel.avatar ?? ""))
                             .resizable()
-                            .placeholder{ Image("empty-profile").resizable().frame(width: 70, height: 70, alignment: .center).scaledToFill() }
+                            .placeholder{ Image("empty-profile").resizable().frame(width: 80, height: 80, alignment: .center).scaledToFill() }
                             .indicator(.activity)
                             .scaledToFill()
-                            .frame(width: 70, height: 70)
+                            .frame(width: 80, height: 80)
                             .background(Color("buttonColor"))
-                            .cornerRadius(55 / 4)
+                            .cornerRadius(58 / 4)
                             .padding(.bottom, 5)
                             .shadow(color: Color.black.opacity(0.3), radius: 12, x: 0, y: 8)
                         
@@ -175,7 +175,7 @@ struct DiscoverFeaturedCell: View, Identifiable {
                             }
                         }
                     }
-                    .padding(.top, 120)
+                    .padding(.top, 110)
                     .padding()
                 }
                 .background(Color("buttonColor"))
