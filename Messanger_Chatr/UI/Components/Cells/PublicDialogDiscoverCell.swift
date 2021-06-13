@@ -27,10 +27,6 @@ struct PublicDialogDiscoverCell: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-//            NavigationLink(destination: self.dialogDetails().edgesIgnoringSafeArea(.all).environmentObject(self.auth), tag: 200, selection: self.$actionState) {
-//                EmptyView()
-//            }
-
             NavigationLink(destination: self.dialogDetails().edgesIgnoringSafeArea(.all), isActive: self.$actionState, label: {
                 EmptyView()
             })
@@ -82,7 +78,6 @@ struct PublicDialogDiscoverCell: View {
                         
                         if !self.isMember {
                             Button(action: {
-                                print("join group")
                                 Request.subscribeToPublicDialog(withID: self.dialogData.id ?? "", successBlock: { dialogz in
                                     UINotificationFeedbackGenerator().notificationOccurred(.success)
                                     self.isJoined = true
@@ -100,7 +95,8 @@ struct PublicDialogDiscoverCell: View {
                                     .foregroundColor(self.isJoined ? Color.secondary : Color.blue)
                                     .frame(width: 55, height: 30, alignment: .center)
                                     .background(Color("buttonColor_darker"))
-                            }.cornerRadius(8)
+                            }.buttonStyle(ClickButtonStyle())
+                            .cornerRadius(8)
                         }
 
                         Image(systemName: "chevron.right")
@@ -133,7 +129,6 @@ struct PublicDialogDiscoverCell: View {
                 self.sendDia.bio = self.dialogData.description ?? ""
                 self.sendDia.avatar = self.dialogData.avatar ?? ""
                 self.sendDia.coverPhoto = self.dialogData.coverPhoto ?? ""
-                print("found the diaaaaa :\(self.sendDia.id)")
                 
                 let config = Realm.Configuration(schemaVersion: 1)
                 do {

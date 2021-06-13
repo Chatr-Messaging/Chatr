@@ -9,11 +9,13 @@
 import SwiftUI
 import RealmSwift
 import SDWebImageSwiftUI
+import FirebaseFirestore
 
 class PublicDialogModel {
     var id: String?
     var name: String?
     var memberCount: Int?
+    var creationOrder: Int?
     var dateCreated: String?
     var coverPhoto: String?
     var avatar: String?
@@ -28,6 +30,7 @@ extension PublicDialogModel {
         dialog.id = key
         dialog.name = dict["name"] as? String
         dialog.memberCount = dict["members"] as? Int
+        dialog.creationOrder = dict["creation_order"] as? Int
         dialog.dateCreated = dict["date_created"] as? String
         dialog.coverPhoto = dict["cover_photo"] as? String
         dialog.avatar = dict["avatar"] as? String

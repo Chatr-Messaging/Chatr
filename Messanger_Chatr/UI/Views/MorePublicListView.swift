@@ -8,23 +8,24 @@
 
 import SwiftUI
 
-struct MoreTagDetailView: View {
+struct MorePublicListView: View {
     @EnvironmentObject var auth: AuthModel
     @ObservedObject var viewModel: DiscoverViewModel
     @Binding var dismissView: Bool
     @Binding var showPinDetails: String
     @State var tagsCount: Int = 0
     @State var tagId: String = "tagName"
-    @State var tagsData: [PublicDialogModel] = []
+    @State var dialogData: [PublicDialogModel] = []
     @State var isHiddenIndicator: Bool = false
-
+    var viewState: morePublicListRelationship = .unknown
+    
     var body: some View {
         VStack {
             ScrollView(.vertical, showsIndicators: true) {
-                if !self.tagsData.isEmpty {
+                if !self.dialogData.isEmpty {
                     VStack(spacing: 5) {
                         HStack(alignment: .bottom) {
-                            Text("\(self.tagsCount) TOTAL " + (self.tagsCount <= 1 ? "DIALOG:" : "DIALOGS:"))
+                            Text(self.viewState == .tags ? "\(self.tagsCount) TOTAL " + (self.tagsCount <= 1 ? "DIALOG:" : "DIALOGS:") : self.viewState == .popular ? "TOP DIALOGS:" : self.viewState == .newest ? "RECENTLY ADDED:" : "DIALOGS:")
                                 .font(.caption)
                                 .fontWeight(.regular)
                                 .foregroundColor(.secondary)
@@ -35,9 +36,9 @@ struct MoreTagDetailView: View {
                         }
                         
                         self.styleBuilder(content: {
-                            ForEach(self.tagsData.indices, id: \.self) { id in
+                            ForEach(self.dialogData.indices, id: \.self) { id in
                                 VStack(alignment: .trailing, spacing: 0) {
-                                    PublicDialogDiscoverCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, dialogData: self.tagsData[id], isLast: self.tagsData[id].id == self.tagsData.last?.id)
+                                    PublicDialogDiscoverCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, dialogData: self.dialogData[id], isLast: self.dialogData[id].id == self.dialogData.last?.id)
                                         .environmentObject(self.auth)
                                 }
                             }
@@ -57,7 +58,7 @@ struct MoreTagDetailView: View {
                             .fontWeight(.bold)
                             .foregroundColor(.primary)
                         
-                        Text("No found public dialogs for this tag. 🤔\nPlease explore other tags or check your connection.")
+                        Text(self.viewState == .tags ? "No found public dialogs for this tag. 🤔\nPlease explore other tags or check your connection." : "No found public dialogs. 🤔\nPlease try again or check your connection.")
                             .font(.subheadline)
                             .fontWeight(.none)
                             .foregroundColor(.secondary)
@@ -65,7 +66,7 @@ struct MoreTagDetailView: View {
                             .padding(.horizontal)
                     }
                 } else if !self.isHiddenIndicator {
-                    Text("loading \("#" + self.tagId)...")
+                    Text(self.viewState == .tags ? "loading \("#" + self.tagId)..." : self.viewState == .popular ? "loading more popular..." : self.viewState == .newest ? "loading the newest..." : "loading...")
                         .font(.subheadline)
                         .fontWeight(.none)
                         .foregroundColor(.secondary)
@@ -79,24 +80,44 @@ struct MoreTagDetailView: View {
                     .opacity(self.isHiddenIndicator ? 1 : 0)
             }
         }.frame(width: Constants.screenWidth)
-        .navigationBarTitle("#" + self.tagId, displayMode: .inline)
-        .edgesIgnoringSafeArea(.all)
+        .navigationBarTitle(self.viewState == .tags ? "#" + self.tagId : self.viewState == .popular ? "Popular" : self.viewState == .newest ? "Newest" : "More", displayMode: .inline)
         .background(Color("bgColor"))
+        .edgesIgnoringSafeArea(.all)
         .onAppear() {
-            if self.tagsData.isEmpty {
+            guard self.dialogData.isEmpty else { return }
+
+            if self.viewState == .tags {
                 self.viewModel.observeTopTagDialogs(tagId: self.tagId, kPagination: 20, loadMore: false, completion: { dia in
-                    if !self.tagsData.contains(where: { $0.id == dia.id }) {
-                        self.tagsData.append(dia)
+                    if !self.dialogData.contains(where: { $0.id == dia.id }) {
+                        self.dialogData.append(dia)
                     }
                 }, isHiddenIndicator: { hide in
-                    print("the loading for more tags is hidden: \(String(describing: hide))")
+                    self.dialogData.sort(by: { $0.memberCount ?? 0 > $1.memberCount ?? 0 })
+                    self.isHiddenIndicator = hide ?? false
+                })
+                
+                self.viewModel.fetchTagsDialogCount(tagId, completion: { count in
+                    self.tagsCount = count
+                })
+            } else if self.viewState == .popular {
+                self.viewModel.observeTopDialogs(kPagination: 20, loadMore: false, completion: { dia in
+                    if !self.dialogData.contains(where: { $0.id == dia.id }) {
+                        self.dialogData.append(dia)
+                    }
+                }, isHiddenIndicator: { hide in
+                    self.dialogData.sort(by: { $0.memberCount ?? 0 > $1.memberCount ?? 0 })
+                    self.isHiddenIndicator = hide ?? false
+                })
+            } else if self.viewState == .newest {
+                self.viewModel.observeRecentDialogs(kPagination: 20, loadMore: false, completion: { dia in
+                    if !self.dialogData.contains(where: { $0.id == dia.id }) {
+                        self.dialogData.append(dia)
+                    }
+                }, isHiddenIndicator: { hide in
+                    self.dialogData.sort(by: { $0.creationOrder ?? 0 > $1.creationOrder ?? 0 })
                     self.isHiddenIndicator = hide ?? false
                 })
             }
-            
-            self.viewModel.fetchTagsDialogCount(tagId, completion: { count in
-                self.tagsCount = count
-            })
         }
     }
     

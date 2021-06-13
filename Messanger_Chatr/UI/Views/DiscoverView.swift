@@ -164,7 +164,7 @@ struct DiscoverView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     Grid(self.dialogTags.sorted(by: { $0.title < $1.title }).indices, id: \.self) { item in
                         ZStack {
-                            NavigationLink(destination: self.tagDetails(tagId: self.dialogTags[item].title).edgesIgnoringSafeArea(.all), tag: Int(item), selection: self.$tagSelection) {
+                            NavigationLink(destination: self.moreDetails(tagId: self.dialogTags[item].title, viewState: .tags).edgesIgnoringSafeArea(.all), tag: Int(item), selection: self.$tagSelection) {
                                 EmptyView()
                             }
 
@@ -177,12 +177,12 @@ struct DiscoverView: View {
                                     .padding(.vertical, 7.5)
                                     .padding(.horizontal)
                                     .foregroundColor(self.dialogTags[item].selected ? Color.black : Color.primary)
-                                    .background(RoundedRectangle(cornerRadius: 10).stroke(Color.primary.opacity(0.75), lineWidth: 1.5).background(Color("buttonColor")).cornerRadius(10))
+                                    .background(RoundedRectangle(cornerRadius: 10).stroke(Color.primary.opacity(0.45), lineWidth: 1).background(Color("buttonColor")).cornerRadius(10))
                                     .lineLimit(1)
                                     .fixedSize()
                             }).buttonStyle(ClickButtonStyle())
                         }
-                    }.padding(.leading, 20)
+                    }.padding(.horizontal)
                     .frame(height: 85)
                 }.gridStyle(self.style)
                 .padding(.vertical, 5)
@@ -203,7 +203,7 @@ struct DiscoverView: View {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 0) {
                                 ForEach(self.bannerDataArray.indices, id: \.self) { index in
-                                    DiscoverFeaturedCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, groupName: self.bannerDataArray[index].name ?? "no name", memberCount: self.bannerDataArray[index].memberCount ?? 0, description: self.bannerDataArray[index].description ?? "", groupImg: self.bannerDataArray[index].avatar ?? "", backgroundImg: self.bannerDataArray[index].coverPhoto ?? "")
+                                    DiscoverFeaturedCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, dialogModel: self.bannerDataArray[index])
                                         .environmentObject(self.auth)
                                         .frame(width: Constants.screenWidth * 0.68)
                                         .id(self.bannerDataArray[index].id)
@@ -226,7 +226,8 @@ struct DiscoverView: View {
                                 
                             Spacer()
                             Button(action: {
-                                
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                self.showMoreTopDialogs.toggle()
                             }, label: {
                                 Text("See All")
                                     .foregroundColor(.blue)
@@ -245,7 +246,7 @@ struct DiscoverView: View {
                                     }
                                     
                                     if self.topDialogsData.count > 5 && id == 4 {
-                                        NavigationLink(destination: self.topDialogs(), isActive: $showMoreTopDialogs) {
+                                        NavigationLink(destination: self.moreDetails(tagId: nil, viewState: .popular), isActive: $showMoreTopDialogs) {
                                             VStack(alignment: .trailing, spacing: 0) {
                                                 Divider()
                                                     .frame(width: Constants.screenWidth - 80)
@@ -295,7 +296,8 @@ struct DiscoverView: View {
 
                             Spacer()
                             Button(action: {
-                                
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                self.showMoreRecentDialogs.toggle()
                             }, label: {
                                 Text("See All")
                                     .foregroundColor(.blue)
@@ -315,7 +317,7 @@ struct DiscoverView: View {
                                     }
                                     
                                     if self.recentDialogsData.count > 5 && id == 4 {
-                                        NavigationLink(destination: self.recentDialogs(), isActive: $showMoreRecentDialogs) {
+                                        NavigationLink(destination: self.moreDetails(tagId: nil, viewState: .newest), isActive: $showMoreRecentDialogs) {
                                             VStack(alignment: .trailing, spacing: 0) {
                                                 Divider()
                                                     .frame(width: Constants.screenWidth - 80)
@@ -368,33 +370,29 @@ struct DiscoverView: View {
                         if !self.bannerDataArray.contains(where: { $0.id == dialog.id }) {
                             self.bannerDataArray.append(dialog)
                         }
-                        print("the found banner array: \(dialog.name ?? "no name")")
                     }, isHiddenIndicator: { hide in
-                        print("the loading indicator is done? \(hide ?? false)")
                         self.isDataLoading = hide ?? false
                     })
                 }
                 
                 if self.topDialogsData.isEmpty {
                     self.viewModel.observeTopDialogs(kPagination: 6, loadMore: false, completion: { dia in
-                        print("the found top dialog array: \(dia.name ?? "no name")")
                         if !self.topDialogsData.contains(where: { $0.id == dia.id }) {
                             self.topDialogsData.append(dia)
                         }
                     }, isHiddenIndicator: { hide in
-                        print("the loading indicator is done? \(hide ?? false)")
+                        self.topDialogsData.sort(by: { $0.memberCount ?? 0 > $1.memberCount ?? 0 })
                         self.isDataLoading = hide ?? false
                     })
                 }
 
                 if self.recentDialogsData.isEmpty {
                     self.viewModel.observeRecentDialogs(kPagination: 6, loadMore: false, completion: { dia in
-                        print("the found recent dialog array: \(dia.name ?? "no name")")
                         if !self.recentDialogsData.contains(where: { $0.id == dia.id }) {
                             self.recentDialogsData.append(dia)
                         }
                     }, isHiddenIndicator: { hide in
-                        print("the loading indicator is done? \(hide ?? false)")
+                        self.recentDialogsData.sort(by: { $0.creationOrder ?? 0 > $1.creationOrder ?? 0 })
                         self.isDataLoading = hide ?? false
                     })
                 }
@@ -419,33 +417,12 @@ struct DiscoverView: View {
                     .foregroundColor(.primary)
             }.opacity(self.removeDoneBtn ? 0 : 1))
     }
-        
-    func topDialogs() -> some View {
-        Text("more top dialogs here lol...")
-//        MoreContactsView(dismissView: self.$dismissView,
-//                         dialogModelMemebers: self.$dialogModelMemebers,
-//                         openNewDialogID: self.$openNewDialogID,
-//                         dialogModel: self.$dialogModel,
-//                         currentUserIsPowerful: self.$currentUserIsPowerful,
-//                         showProfile: self.$showProfile)
-//            .environmentObject(self.auth)
-    }
     
-    func tagDetails(tagId: String) -> some View {
-        MoreTagDetailView(viewModel: self.viewModel, dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, tagsCount: 0, tagId: tagId)
+    func moreDetails(tagId: String?, viewState: morePublicListRelationship) -> some View {
+        MorePublicListView(viewModel: self.viewModel, dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, tagsCount: 0, tagId: tagId ?? "", viewState: viewState)
             .environmentObject(self.auth)
     }
-    
-    func recentDialogs() -> some View {
-        Text("more recent dialogs here lol...")
-//        MoreContactsView(dismissView: self.$dismissView,
-//                         dialogModelMemebers: self.$dialogModelMemebers,
-//                         openNewDialogID: self.$openNewDialogID,
-//                         dialogModel: self.$dialogModel,
-//                         currentUserIsPowerful: self.$currentUserIsPowerful,
-//                         showProfile: self.$showProfile)
-//            .environmentObject(self.auth)
-    }
+
     
     func styleBuilder<Content: View>(@ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .center, spacing: 0) {

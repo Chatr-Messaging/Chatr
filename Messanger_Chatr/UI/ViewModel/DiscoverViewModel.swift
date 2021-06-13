@@ -66,7 +66,6 @@ class DiscoverViewModel: ObservableObject {
             var items = snapshot.children.allObjects
             print(items)
             if loadMore {
-                print("contzzzz tagggsss \(String(describing: postCount)) and \(items.count)")
                 if items.count <= postCount! {
                     isHiddenIndicator(true)
                     return
@@ -101,13 +100,12 @@ class DiscoverViewModel: ObservableObject {
 
     func observeRecentDialogs(kPagination: Int, loadMore: Bool, postCount: Int? = 0, completion: @escaping (PublicDialogModel) -> Void, isHiddenIndicator:  @escaping (_ isHiddenIndicator: Bool?) -> Void) {
         
-        let query = Database.database().reference().child("Marketplace").child("public_dialogs").queryOrdered(byChild: "date_created").queryLimited(toLast: UInt(kPagination))
+        let query = Database.database().reference().child("Marketplace").child("public_dialogs").queryOrdered(byChild: "creation_order").queryLimited(toLast: UInt(kPagination))
         query.observeSingleEvent(of: .value, with: {
             snapshot in
             var items = snapshot.children.allObjects
             print(items)
             if loadMore {
-                print("cont Post \(String(describing: postCount)) and \(items.count)")
                 if items.count <= postCount! {
                     isHiddenIndicator(true)
                     return

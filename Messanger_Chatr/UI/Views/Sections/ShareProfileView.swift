@@ -23,6 +23,8 @@ struct ShareProfileView: View {
     @State var contactID: Int
     @State var contactFullName: String
     @State var contactAvatar: String
+    var isPublicDialog: Bool = false
+    var totalMembers: Int = 0
     @State var shareURL = ""
     @State var barcodeType = CBBarcodeView.BarcodeType.qrCode
     @State var rotate = CBBarcodeView.Orientation.up
@@ -117,7 +119,7 @@ struct ShareProfileView: View {
                                             .multilineTextAlignment(.leading)
                                     }.offset(y: self.auth.subscriptionStatus == .subscribed ? 3 : 0)
                                     
-                                    Text(UserDefaults.standard.string(forKey: "phoneNumber")?.format(phoneNumber: String(UserDefaults.standard.string(forKey: "phoneNumber")?.dropFirst().dropFirst() ?? "+1 (123) 456-6789")) ?? "+1 (123) 456-6789")
+                                    Text(self.isPublicDialog ? "\(self.totalMembers) members" : UserDefaults.standard.string(forKey: "phoneNumber")?.format(phoneNumber: String(UserDefaults.standard.string(forKey: "phoneNumber")?.dropFirst().dropFirst() ?? "+1 (123) 456-6789")) ?? "+1 (123) 456-6789")
                                         .font(.caption)
                                         .foregroundColor(.secondary)
                                         .multilineTextAlignment(.leading)

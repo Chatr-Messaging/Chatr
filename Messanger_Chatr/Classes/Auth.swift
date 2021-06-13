@@ -58,6 +58,10 @@ enum visitDialogRelationship {
     case unknown, subscribed, notSubscribed, admin, group, error
 }
 
+enum morePublicListRelationship {
+    case unknown, tags, popular, newest
+}
+
 enum StorageType {
     case userDefaults
     case fileSystem

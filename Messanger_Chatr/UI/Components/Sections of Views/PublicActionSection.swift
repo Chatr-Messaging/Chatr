@@ -102,6 +102,9 @@ struct PublicActionSection: View {
                     .frame(width: 38, height: 26)
                     .background(RoundedRectangle(cornerRadius: 15, style: .circular).frame(width: 54, height: 54).foregroundColor(Color("buttonColor")).shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 6))
             }.buttonStyle(ClickButtonStyle())
+            .onTapGesture {
+                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+            }
         }.padding(.bottom)
     }
 }
