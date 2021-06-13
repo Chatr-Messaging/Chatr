@@ -20,7 +20,8 @@ import SlideOverCard
 struct ShareProfileView: View {
     @EnvironmentObject var auth: AuthModel
     @Binding var dimissView: Bool
-    @State var contactID: Int
+    @State var contactID: Int?
+    @State var dialogID: String?
     @State var contactFullName: String
     @State var contactAvatar: String
     var isPublicDialog: Bool = false
@@ -270,7 +271,7 @@ struct ShareProfileView: View {
                     .padding(.bottom)
                 
             }.frame(width: Constants.screenWidth)
-        }.navigationBarTitle("Share Profile", displayMode: .automatic)
+        }.navigationBarTitle(self.isPublicDialog ? "Share Channel" : "Share Profile", displayMode: .automatic)
         .animation(.spring(response: 0.35, dampingFraction: 0.60, blendDuration: 0))
         .navigationBarItems(trailing:
             Button(action: {
@@ -320,9 +321,9 @@ struct ShareProfileView: View {
         var components = URLComponents()
         components.scheme = "https"
         components.host = "www.chatr-messaging.com"
-        components.path = "/contact"
+        components.path = self.isPublicDialog ? "/publicDialog" : "/contact"
         
-        let recipeIDQueryItem = URLQueryItem(name: "contactID", value: self.contactID.description)
+        let recipeIDQueryItem = URLQueryItem(name: self.isPublicDialog ? "publicDialogID" : "contactID", value: self.isPublicDialog ? self.dialogID ?? "" : self.contactID?.description ?? "")
         components.queryItems = [recipeIDQueryItem]
         
         print("I am sharing this new link: \(String(describing: components.url?.absoluteString))")

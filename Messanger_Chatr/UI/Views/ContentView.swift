@@ -156,6 +156,9 @@ struct mainHomeList: View {
     @State var emptyQuickSnaps: Bool = false
     @State var hasAttachments: Bool = false
     @State var showSharedContact: Bool = false
+    @State var showSharedPublicDialog: Bool = false
+    @State var isEditGroupOpen: Bool = false
+    @State var canEditGroup: Bool = false
     @State var receivedNotification: Bool = false
     @State var disableDialog: Bool = false
     @State var showWelcomeNewUser: Bool = false
@@ -533,9 +536,40 @@ struct mainHomeList: View {
                                 self.showSharedContact.toggle()
                                 self.auth.visitContactProfile = false
                             }
-                        }.onAppear {
+                        }.onChange(of: self.auth.visitPublicDialogProfile) { newValue in
+                            if newValue {
+                                self.showSharedPublicDialog.toggle()
+                                self.auth.visitPublicDialogProfile = false
+                            }
+                        }
+                        .onAppear {
                             self.selectedDialogID = UserDefaults.standard.string(forKey: "selectedDialogID") ?? ""
                         }
+                        .sheet(isPresented: self.$showSharedPublicDialog, content: {
+                            NavigationView {
+                                VisitGroupChannelView(dismissView: self.$showSharedPublicDialog, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$newDialogFromContact, showPinDetails: self.$showPinDetails, fromDialogCell: true, viewState: .fromContacts, dialogRelationship: .subscribed)
+                                    .environmentObject(self.auth)
+                                    .edgesIgnoringSafeArea(.all)
+                                    .navigationBarItems(leading:
+                                                Button(action: {
+                                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                                    withAnimation {
+                                                        self.showSharedPublicDialog.toggle()
+                                                    }
+                                                }) {
+                                                    Text("Done")
+                                                        .foregroundColor(.primary)
+                                                        .fontWeight(.medium)
+                                                }, trailing:
+                                                    Button(action: {
+                                                        self.isEditGroupOpen.toggle()
+                                                    }) {
+                                                        Text("Edit")
+                                                            .foregroundColor(.blue)
+                                                            .opacity(self.canEditGroup ? 1 : 0)
+                                                    }.disabled(self.canEditGroup ? false : true))
+                            }
+                        })
                         /*
                         .simultaneousGesture(DragGesture().onChanged { value in
                             self.keyboardDragState = value.translation

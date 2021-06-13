@@ -86,7 +86,9 @@ class AuthModel: NSObject, ObservableObject {
     
     @Published var isLoacalAuth = false
     @Published var visitContactProfile: Bool = false
+    @Published var visitPublicDialogProfile: Bool = false
     @Published var dynamicLinkContactID: Int = 0
+    @Published var dynamicLinkPublicDialogID: String = ""
     @Published var selectedConnectyDialog: ChatDialog?
     
     @Published public var monthlySubscription: Purchases.Package?
@@ -310,12 +312,21 @@ class AuthModel: NSObject, ObservableObject {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false), let queryItems = components.queryItems else { return }
         
         if components.path == "/contact" {
-            if  let postIdQueryItem = queryItems.first(where: {$0.name == "contactID"}) {
+            if let postIdQueryItem = queryItems.first(where: {$0.name == "contactID"}) {
                 guard let contactId = postIdQueryItem.value else { return }
                 print("WE MADE IT TO GOING INTO A CONTACT: \(Int(contactId) ?? 0)")
                 if self.isUserAuthenticated == .signedIn {
                     self.dynamicLinkContactID = Int(contactId) ?? 0
                     self.visitContactProfile = true
+                } else { print("user is logged out") }
+            }
+        } else if components.path == "/publicDialog" {
+            if let postIdQueryItem = queryItems.first(where: {$0.name == "publicDialogID"}) {
+                guard let dialogId = postIdQueryItem.value else { return }
+                print("WE MADE IT TO GOING INTO A PUBLIC DIALOG: \(dialogId)")
+                if self.isUserAuthenticated == .signedIn {
+                    self.dynamicLinkPublicDialogID = dialogId
+                    self.visitPublicDialogProfile = true
                 } else { print("user is logged out") }
             }
         }

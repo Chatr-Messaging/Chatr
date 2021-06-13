@@ -78,7 +78,7 @@ struct ScanQRView: View {
                         .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 0)
                         .padding(.bottom, 10)
                     
-                    Text("Found Contact!")
+                    Text("Found QR Code!")
                         .font(.title)
                         .fontWeight(.bold)
                         .foregroundColor(.white)

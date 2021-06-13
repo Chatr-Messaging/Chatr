@@ -34,7 +34,7 @@ struct DiscoverFeaturedCell: View, Identifiable {
                 EmptyView()
             })
             
-            NavigationLink(destination: ShareProfileView(dimissView: self.$dismissView, contactID: Int(self.dialogModel.id ?? "") ?? 0, contactFullName: self.dialogModel.name ?? "", contactAvatar: self.dialogModel.avatar ?? "", isPublicDialog: true, totalMembers: self.dialogModel.memberCount ?? 0).environmentObject(self.auth), isActive: self.$shareGroup, label: {
+            NavigationLink(destination: ShareProfileView(dimissView: self.$dismissView, contactID: 0, dialogID: self.dialogModel.id ?? "", contactFullName: self.dialogModel.name ?? "", contactAvatar: self.dialogModel.avatar ?? "", isPublicDialog: true, totalMembers: self.dialogModel.memberCount ?? 0).environmentObject(self.auth), isActive: self.$shareGroup, label: {
                 EmptyView()
             })
 

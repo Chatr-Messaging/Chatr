@@ -36,10 +36,8 @@ extension ChatrApp {
                     chatInstanceConnect(id: UInt(user.id))
                 }
             })
-        } else {
-            if auth.visitContactProfile == false {
-                chatInstanceConnect(id: UInt(user.id))
-            }
+        } else if auth.visitContactProfile == false {
+            chatInstanceConnect(id: UInt(user.id))
         }
     }
     
