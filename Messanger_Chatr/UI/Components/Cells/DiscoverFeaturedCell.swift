@@ -59,7 +59,7 @@ struct DiscoverFeaturedCell: View, Identifiable {
                             .resizable()
                             .placeholder{ Image("empty-profile").resizable().frame(width: 70, height: 70, alignment: .center).scaledToFill() }
                             .indicator(.activity)
-                            .scaledToFit()
+                            .scaledToFill()
                             .frame(width: 70, height: 70)
                             .background(Color("buttonColor"))
                             .cornerRadius(55 / 4)
