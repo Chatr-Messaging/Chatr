@@ -229,7 +229,7 @@ struct DiscoverView: View {
                                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 self.showMoreTopDialogs.toggle()
                             }, label: {
-                                Text("See All")
+                                Text("see all")
                                     .foregroundColor(.blue)
                             })
                         }.padding(.horizontal, 30)
@@ -299,7 +299,7 @@ struct DiscoverView: View {
                                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 self.showMoreRecentDialogs.toggle()
                             }, label: {
-                                Text("See All")
+                                Text("see all")
                                     .foregroundColor(.blue)
                             })
                         }.padding(.horizontal, 30)

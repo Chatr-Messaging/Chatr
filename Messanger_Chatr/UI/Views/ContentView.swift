@@ -547,7 +547,7 @@ struct mainHomeList: View {
                         }
                         .sheet(isPresented: self.$showSharedPublicDialog, content: {
                             NavigationView {
-                                VisitGroupChannelView(dismissView: self.$showSharedPublicDialog, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$newDialogFromContact, showPinDetails: self.$showPinDetails, fromDialogCell: true, viewState: .fromContacts, dialogRelationship: .subscribed)
+                                VisitGroupChannelView(dismissView: self.$showSharedPublicDialog, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$newDialogFromContact, showPinDetails: self.$showPinDetails, fromDialogCell: true, viewState: .fromDynamicLink, dialogRelationship: .unknown)
                                     .environmentObject(self.auth)
                                     .edgesIgnoringSafeArea(.all)
                                     .navigationBarItems(leading:

@@ -110,16 +110,45 @@ class changeProfileRealmDate {
                         if let foundContact = realm.object(ofType: ProfileStruct.self, forPrimaryKey: id) {
                             //print("Contact FOUND in Realm: \(snapshot.key) anddd faceID? : \(String(describing: dict["faceID"] as? Bool))")
                             try realm.safeWrite({
-                                foundContact.bio = dict["bio"] as? String ?? ""
-                                foundContact.facebook = dict["facebook"] as? String ?? ""
-                                foundContact.twitter = dict["twitter"] as? String ?? ""
-                                foundContact.instagramAccessToken = dict["instagramAccessToken"] as? String ?? ""
-                                foundContact.instagramId = dict["instagramId"] as? Int ?? 0
-                                foundContact.lastAddressBookUpdate = dict["lastAddressBookUpload"] as? String ?? ""
-                                foundContact.isLocalAuthOn = dict["faceID"] as? Bool ?? false
-                                foundContact.isPremium = dict["isPremium"] as? Bool ?? false
-                                foundContact.isInfoPrivate = dict["isInfoPrivate"] as? Bool ?? false
-                                foundContact.isMessagingPrivate = dict["isMessagingPrivate"] as? Bool ?? false
+                                if let bio = dict["bio"] as? String, foundContact.bio != bio {
+                                    foundContact.bio = bio
+                                }
+                                
+                                if let facebook = dict["facebook"] as? String, foundContact.facebook != facebook {
+                                    foundContact.facebook = facebook
+                                }
+                                
+                                if let twitter = dict["twitter"] as? String, foundContact.twitter != twitter {
+                                    foundContact.twitter = twitter
+                                }
+                                
+                                if let instagramAccessToken = dict["instagramAccessToken"] as? String, foundContact.instagramAccessToken != instagramAccessToken {
+                                    foundContact.instagramAccessToken = instagramAccessToken
+                                }
+                                
+                                if let instagramId = dict["instagramId"] as? Int, foundContact.instagramId != instagramId {
+                                    foundContact.instagramId = instagramId
+                                }
+                                
+                                if let isPremium = dict["isPremium"] as? Bool, foundContact.isPremium != isPremium {
+                                    foundContact.isPremium = isPremium
+                                }
+                                
+                                if let lastAddressBookUpdate = dict["lastAddressBookUpload"] as? String, foundContact.lastAddressBookUpdate != lastAddressBookUpdate {
+                                    foundContact.lastAddressBookUpdate = lastAddressBookUpdate
+                                }
+                                
+                                if let isLocalAuthOn = dict["faceID"] as? Bool, foundContact.isLocalAuthOn != isLocalAuthOn {
+                                    foundContact.isLocalAuthOn = isLocalAuthOn
+                                }
+                                
+                                if let isInfoPrivate = dict["isInfoPrivate"] as? Bool, foundContact.isInfoPrivate != isInfoPrivate {
+                                    foundContact.isInfoPrivate = isInfoPrivate
+                                }
+                                
+                                if let isMessagingPrivate = dict["isMessagingPrivate"] as? Bool, foundContact.isMessagingPrivate != isMessagingPrivate {
+                                    foundContact.isMessagingPrivate = isMessagingPrivate
+                                }
                                 
                                 realm.add(foundContact, update: .all)
                             })
@@ -156,15 +185,30 @@ class changeProfileRealmDate {
             let realm = try Realm(configuration: config)
             if let oldData = realm.object(ofType: ProfileStruct.self, forPrimaryKey: Session.current.currentUser?.id) {
                 try realm.safeWrite({
-                    oldData.fullName = objects.fullName ?? "No Name"
-                    oldData.lastOnline = objects.lastRequestAt ?? Date()
-                    oldData.avatar = PersistenceManager.shared.getCubeProfileImage(usersID: objects) ?? ""
-                    oldData.website = objects.website ?? ""
-                    oldData.emailAddress = objects.email ?? ""
+                    if let fullName = objects.fullName, oldData.fullName != fullName {
+                        oldData.fullName = fullName
+                    }
+                    
+                    if let lastOnline = objects.lastRequestAt, oldData.lastOnline != lastOnline {
+                        oldData.lastOnline = lastOnline
+                    }
+                    
+                    if let avatar = PersistenceManager.shared.getCubeProfileImage(usersID: objects), oldData.avatar != avatar {
+                        oldData.avatar = avatar
+                    }
+                    
+                    if let website = objects.website, oldData.website != website {
+                        oldData.website = website
+                    }
+                    
+                    if let emailAddress = objects.email, oldData.emailAddress != emailAddress {
+                        oldData.emailAddress = emailAddress
+                    }
+                    
                     //oldData.isLocalAuthOn = self.getCubeProfileLocalAuthSetting(usersID: objects) ?? false
 
                     realm.add(oldData, update: .all)
-                    print("Succsessfuly updated Profile to Realm!")
+
                     DispatchQueue.main.async {
                         completion()
                     }

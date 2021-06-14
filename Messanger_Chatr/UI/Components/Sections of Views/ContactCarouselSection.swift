@@ -103,9 +103,9 @@ struct ContactListView : View {
         HStack(spacing: 0) {
             
             //MARK: Discover Channels
-//            NavigationLink(destination: self.discoverViewFunc(), isActive: self.$openDiscoverContent) {
-//                EmptyView()
-//            }
+            NavigationLink(destination: self.discoverViewFunc(), isActive: self.$openDiscoverContent) {
+                EmptyView()
+            }
 
             Button(action: {
             }, label: {
@@ -115,11 +115,11 @@ struct ContactListView : View {
                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                         self.openDiscoverContent.toggle()
                     }
-                    .sheet(isPresented: self.$openDiscoverContent, content: {
-                        NavigationView {
-                            self.discoverViewFunc()
-                        }
-                    })
+//                    .sheet(isPresented: self.$openDiscoverContent, content: {
+//                        NavigationView {
+//                            self.discoverViewFunc()
+//                        }
+//                    })
             }).buttonStyle(ClickMiniButtonStyle())
 
             //premium
@@ -172,7 +172,7 @@ struct ContactListView : View {
     }
     
     func discoverViewFunc() -> some View {
-        DiscoverView(removeDoneBtn: false, dismissView: self.$dismissView, showPinDetails: self.$showPinDetails)
+        DiscoverView(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails)
             .environmentObject(self.auth)
             .navigationBarTitle("Discover", displayMode: .automatic)
             .background(Color("bgColor")

@@ -32,9 +32,10 @@ struct VisitGroupChannelView: View {
     @State var showMoreMembers: Bool = false
     @State var showMoreAdmins: Bool = false
     @State var showProfile: Bool = false
-    @State var viewState: visitUserState = .unknown
+    @State var viewState: visitPublicDialogState = .unknown
     @State var dialogRelationship: visitDialogRelationship = .unknown
     @State var dialogModel: DialogStruct = DialogStruct()
+    @State var publicDialogModel: PublicDialogModel = PublicDialogModel()
     @State var dialogModelMemebers: [Int] = []
     @State var dialogModelAdmins: [Int] = []
     @State var selectedNewMembers: [Int] = []
@@ -48,7 +49,6 @@ struct VisitGroupChannelView: View {
     @State var showAlert = false
     @State var notiText: String = ""
     @State var notiType: String = ""
-    @State var coverPhotoUrl: String = ""
     @State var showAddMembers: Bool = false
     @State var isRemoving: Bool = false
     @State var isAdmin: Bool = false
@@ -60,7 +60,7 @@ struct VisitGroupChannelView: View {
             VStack(spacing: 0) {
                 ScrollView(.vertical, showsIndicators: true) {
                     //MARK: Top Profile
-                    topGroupHeaderView(dialogModel: self.$dialogModel, groupOccUserAvatar: self.$groupOccUserAvatar, isProfileImgOpen: self.$isProfileImgOpen, isEditGroupOpen: self.$isEditGroupOpen, publicTags: self.$publicTags, coverPhoto: self.$coverPhotoUrl)
+                    topGroupHeaderView(dialogModel: self.$dialogModel, groupOccUserAvatar: self.$groupOccUserAvatar, isProfileImgOpen: self.$isProfileImgOpen, isEditGroupOpen: self.$isEditGroupOpen, publicTags: self.$publicTags)
                         .environmentObject(self.auth)
                         .padding(.top, 40)
                         .padding(.bottom, self.dialogModel.dialogType == "public" ? 5 : 15)
@@ -444,43 +444,120 @@ struct VisitGroupChannelView: View {
             }
         }.background(Color("bgColor"))
         .onAppear() {
+            if self.viewState == .fromDiscover {
+                let config = Realm.Configuration(schemaVersion: 1)
+                do {
+                    let realm = try Realm(configuration: config)
+                    if let foundDialog = realm.object(ofType: DialogStruct.self, forPrimaryKey: self.publicDialogModel.id ?? "") {
+                        self.dialogRelationship = !foundDialog.isDeleted ? .subscribed : .notSubscribed
+
+                        try realm.safeWrite ({
+                            if let name = self.publicDialogModel.name {
+                                foundDialog.fullName = name
+                            }
+                            
+                            if let description = self.publicDialogModel.description {
+                                foundDialog.bio = description
+                            }
+                            
+                            if let avatar = self.publicDialogModel.avatar {
+                                foundDialog.avatar = avatar
+                            }
+                            
+                            if let coverPhoto = self.publicDialogModel.coverPhoto {
+                                foundDialog.coverPhoto = coverPhoto
+                            }
+                            
+                            if let owner = self.publicDialogModel.owner {
+                                foundDialog.owner = owner
+                            }
+                            self.dialogModel = foundDialog
+
+                            realm.add(foundDialog, update: .all)
+                        })
+                    } else {
+                        self.dialogRelationship = .notSubscribed
+                        let dialog = DialogStruct()
+
+                        dialog.id = self.publicDialogModel.id ?? ""
+                        dialog.dialogType = "public"
+                        dialog.isDeleted = true
+                        
+                        if let name = self.publicDialogModel.name {
+                            dialog.fullName = name
+                        }
+                        
+                        if let description = self.publicDialogModel.description {
+                            dialog.bio = description
+                        }
+                        
+                        if let avatar = self.publicDialogModel.avatar {
+                            dialog.avatar = avatar
+                        }
+                        
+                        if let coverPhoto = self.publicDialogModel.coverPhoto {
+                            dialog.coverPhoto = coverPhoto
+                        }
+                        
+                        if let owner = self.publicDialogModel.owner {
+                            dialog.owner = owner
+                        }
+                        self.dialogModel = dialog
+
+                        try realm.safeWrite ({
+                            realm.add(dialog, update: .all)
+                        })
+                    }
+                } catch { self.dialogRelationship = .notSubscribed }
+                
+                if !self.dialogModelAdmins.contains(where: { $0 == self.dialogModel.owner }) && self.dialogModel.owner != 0 {
+                    self.dialogModelAdmins.append(self.dialogModel.owner)
+                }
+            } else if self.viewState == .fromSearch {
+                //not used
+            } else if self.viewState == .fromDialogCell {
+                //NEED to specify self.dialogRelationship state here, if used
+                if self.dialogModel.dialogType == "group" {
+                    self.dialogRelationship = .group
+                }
+            } else if self.viewState == .fromDynamicLink {
+                //NEED to specify self.dialogRelationship state here
+            } else if self.viewState == .fromSharedMessage {
+                //not used
+                //NEED to specify self.dialogRelationship state here, if used
+            } else if self.viewState == .unknown {
+                //not used
+                //NEED to specify self.dialogRelationship state here, if used
+            }
+            
             NotificationCenter.default.addObserver(forName: NSNotification.Name("NotificationAlert"), object: nil, queue: .main) { (_) in
                 self.showAlert.toggle()
             }
 
-            let config = Realm.Configuration(schemaVersion: 1)
-            do {
-                let realm = try Realm(configuration: config)
-                if let foundDialog = realm.object(ofType: DialogStruct.self, forPrimaryKey: self.dialogModel.id) {
-                    //self.dialogRelationship = .subscribed
-                    //changeDialogRealmData.shared.observeFirebaseDialogReturn(dialogModel: foundDialog, completion: { _,_,_ in })
-                    self.dialogModel = foundDialog
-//                    changeDialogRealmData.shared.observeFirebaseDialogReturn(dialogModel: self.dialogModel, completion: { (dialog, coverPhotoUrlz) in
-//                        if let dia = dialog {
-//                            self.coverPhotoUrl = coverPhotoUrlz ?? ""
-//                            self.dialogModel = dia
-//                        }
-//                    })
-                    self.observePinnedMessages()
-                    if self.dialogModel.dialogType == "public" {
-                        self.observeFirebase()
-                    }
-                    print("Foundd thisss: \(self.dialogModel.fullName)")
-                } else {
-                    print("did not find shitttt")
-                    self.observePinnedMessages()
-    
-                    if self.dialogModel.dialogType == "public" {
-                        self.observeFirebase()
-                    }
-//                    changeDialogRealmData.shared.observeFirebaseDialogReturn(dialogModel: self.dialogModel, completion: { dialogz, _, _ in
-//                        if let dia = dialogz {
-//                            self.dialogModel = dia
-//                        }
-//
-//                    })
-                }
-            } catch { }
+//            let config = Realm.Configuration(schemaVersion: 1)
+//            do {
+//                let realm = try Realm(configuration: config)
+//                if let foundDialog = realm.object(ofType: DialogStruct.self, forPrimaryKey: self.dialogModel.id) {
+//                    //self.dialogRelationship = .subscribed
+//                    //changeDialogRealmData.shared.observeFirebaseDialogReturn(dialogModel: foundDialog, completion: { _,_,_ in })
+//                    self.dialogModel = foundDialog
+////                    changeDialogRealmData.shared.observeFirebaseDialogReturn(dialogModel: self.dialogModel, completion: { (dialog, coverPhotoUrlz) in
+////                        if let dia = dialog {
+////                            self.coverPhotoUrl = coverPhotoUrlz ?? ""
+////                            self.dialogModel = dia
+////                        }
+////                    })
+//                    print("Foundd thisss: \(self.dialogModel.fullName)")
+//                } else {
+//                    print("did not find shitttt")
+////                    changeDialogRealmData.shared.observeFirebaseDialogReturn(dialogModel: self.dialogModel, completion: { dialogz, _, _ in
+////                        if let dia = dialogz {
+////                            self.dialogModel = dia
+////                        }
+////
+////                    })
+//                }
+//            } catch { }
 
             print("welcomeee...: \(self.dialogModel.fullName) && \(self.dialogModel.id)")
             self.isOwner = self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? true : false
@@ -488,23 +565,24 @@ struct VisitGroupChannelView: View {
             self.canEditGroup = self.isOwner || self.isAdmin
             self.currentUserIsPowerful = self.isOwner || self.isAdmin ? true : false
             self.dialogModelMemebers = self.dialogModel.occupentsID.filter { $0 != 0 }
+            self.observePinnedMessages(dialogId: self.dialogModel.id)
 
-            if !self.dialogModelAdmins.contains(where: { $0 == self.dialogModel.owner }) && self.dialogModel.owner != 0 {
-                self.dialogModelAdmins.append(self.dialogModel.owner)
-            }
 //            for i in self.dialogModel.adminID {
 //                if !self.dialogModelAdmins.contains(where: { $0 == i }) {
 //                    self.dialogModelAdmins.append(i)
 //                }
 //            }
             
-            if self.dialogRelationship != .notSubscribed || self.dialogRelationship != .unknown {
-                self.loadNotifications()
+            if self.dialogModel.dialogType == "public" && self.dialogModel.id != "" {
+                self.observeFirebase()
             }
-            self.observePinnedMessages()
-//
-            if self.dialogModel.dialogType == "public" {
-                self.observePublicDetails()
+////
+//            if self.dialogModel.dialogType == "public" {
+//                self.observePublicDetails()
+//            }
+            
+            if self.dialogRelationship == .subscribed {
+                self.loadNotifications()
             }
         }
     }
@@ -513,21 +591,107 @@ struct VisitGroupChannelView: View {
         let user = Database.database().reference().child("Marketplace").child("public_dialogs").child("\(dialogModel.id)")
         user.observeSingleEvent(of: .value, with: { (snapshot: DataSnapshot) in
             if let dict = snapshot.value as? [String: Any] {
-                self.coverPhotoUrl = dict["cover_photo"] as? String ?? ""
-                
-                if let owner = dict["owner"] as? Int, !self.dialogModelAdmins.contains(where: { $0 == owner }) && owner != 0 {
-                    self.dialogModelAdmins.append(owner)
-                }
-                //self.dialogModel.canMembersType = dict["canMembersType"] as? Bool ?? false
-                for childSnapshot in snapshot.children {
-                    let childSnap = childSnapshot as! DataSnapshot
-                    if let dict2 = childSnap.value as? [String: Any] {
-                        for tag in dict2 {
-                            if !self.publicTags.contains(tag.key) {
-                                self.publicTags.append(tag.key)
+                //self.coverPhotoUrl = dict["cover_photo"] as? String ?? ""
+                let config = Realm.Configuration(schemaVersion: 1)
+                do {
+                    let realm = try Realm(configuration: config)
+                    if let foundDialog = realm.object(ofType: DialogStruct.self, forPrimaryKey: snapshot.key) {
+                        try realm.safeWrite({
+                            if let name = dict["name"] as? String, foundDialog.fullName != name {
+                                foundDialog.fullName = name
+                            }
+
+                            if let description = dict["description"] as? String, foundDialog.bio != description {
+                                foundDialog.bio = description
+                            }
+                            
+                            if let avatar = dict["avatar"] as? String, foundDialog.avatar != avatar {
+                                foundDialog.avatar = avatar
+                            }
+                            
+                            if let coverPhoto = dict["cover_photo"] as? String, foundDialog.coverPhoto != coverPhoto {
+                                foundDialog.coverPhoto = coverPhoto
+                            }
+                            
+                            if let owner = dict["owner"] as? Int, foundDialog.owner != owner {
+                                foundDialog.owner = owner
+                            }
+                            
+                            if let owner = dict["owner"] as? Int, !self.dialogModelAdmins.contains(where: { $0 == owner }) && owner != 0 {
+                                self.dialogModelAdmins.append(owner)
+                            }
+                            
+                            for childSnapshot in snapshot.children {
+                                let childSnap = childSnapshot as! DataSnapshot
+                                if let dict2 = childSnap.value as? [String: Any] {
+                                    for tag in dict2 {
+                                        if !self.publicTags.contains(tag.key) {
+                                            self.publicTags.append(tag.key)
+                                        }
+                                        
+                                        if !foundDialog.publicTags.contains(tag.key) {
+                                            foundDialog.publicTags.append(tag.key)
+                                        }
+                                    }
+                                }
+                            }
+
+                            realm.add(foundDialog, update: .all)
+                        })
+                    } else {
+                        let dialog = DialogStruct()
+
+                        dialog.id = self.publicDialogModel.id ?? ""
+                        dialog.dialogType = "public"
+                        dialog.isDeleted = true
+                        
+                        if let name = self.publicDialogModel.name {
+                            dialog.fullName = name
+                        }
+                        
+                        if let description = self.publicDialogModel.description {
+                            dialog.bio = description
+                        }
+                        
+                        if let avatar = self.publicDialogModel.avatar {
+                            dialog.avatar = avatar
+                        }
+                        
+                        if let coverPhoto = self.publicDialogModel.coverPhoto {
+                            dialog.coverPhoto = coverPhoto
+                        }
+                        
+                        if let owner = dict["owner"] as? Int {
+                            dialog.owner = owner
+                            if !self.dialogModelAdmins.contains(where: { $0 == owner }) && owner != 0 {
+                                self.dialogModelAdmins.append(owner)
                             }
                         }
+                        
+                        //self.dialogModel.canMembersType = dict["canMembersType"] as? Bool ?? false
+                        for childSnapshot in snapshot.children {
+                            let childSnap = childSnapshot as! DataSnapshot
+                            if let dict2 = childSnap.value as? [String: Any] {
+                                for tag in dict2 {
+                                    if !self.publicTags.contains(tag.key) {
+                                        self.publicTags.append(tag.key)
+                                    }
+                                    
+                                    if !dialog.publicTags.contains(tag.key) {
+                                        dialog.publicTags.append(tag.key)
+                                    }
+                                }
+                            }
+                        }
+
+                        self.dialogModel = dialog
+
+                        try realm.safeWrite ({
+                            realm.add(dialog, update: .all)
+                        })
                     }
+                } catch {
+                    
                 }
             }
         })
@@ -561,10 +725,8 @@ struct VisitGroupChannelView: View {
             .environmentObject(self.auth)
     }
 
-    func observePinnedMessages() {
-        guard self.dialogModel.id != "" else { return }
-
-        let msg = Database.database().reference().child("Dialogs").child(self.dialogModel.id).child("pinned")
+    func observePinnedMessages(dialogId: String) {
+        let msg = Database.database().reference().child("Dialogs").child(dialogId).child("pinned")
 
         msg.observe(.childAdded, with: { snapAdded in
             changeDialogRealmData.shared.addDialogPin(messageId: snapAdded.key, dialogID: self.dialogModel.id)
@@ -574,7 +736,7 @@ struct VisitGroupChannelView: View {
             changeDialogRealmData.shared.removeDialogPin(messageId: snapRemoved.key, dialogID: self.dialogModel.id)
         })
 
-        print("the count of pinned messages are: \(self.dialogModel.pinMessages.count)")
+        print("the count of pinned messages are: \(self.dialogModel.pinMessages.count) for: \(dialogId)")
     }
     
     func observePublicDetails() {
@@ -598,8 +760,6 @@ struct VisitGroupChannelView: View {
 
                 if dia.dialogType == "group" {
                     self.dialogRelationship = .group
-                } else {
-                    self.dialogRelationship = .notSubscribed
                 }
                 
                 Request.updateDialog(withID: self.dialogModel.id, update: UpdateChatDialogParameters(), successBlock: { dialog in
@@ -647,7 +807,7 @@ struct VisitGroupChannelView: View {
                     self.dialogRelationship = .subscribed
                 }
                 
-                self.coverPhotoUrl = coverPhotoUrlz ?? ""
+                //self.coverPhotoUrl = coverPhotoUrlz ?? ""
             }
         })
     }
@@ -661,7 +821,6 @@ struct topGroupHeaderView: View {
     @Binding var isProfileImgOpen: Bool
     @Binding var isEditGroupOpen: Bool
     @Binding var publicTags: [String]
-    @Binding var coverPhoto: String
     @State private var isProfileBioOpen: Bool = false
     @State private var moreBioAction = false
     
@@ -695,7 +854,7 @@ struct topGroupHeaderView: View {
                             .fontWeight(.none)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
-                            .offset(y: -5)
+                            .offset(y: -2.5)
 
                         HStack(alignment: .center, spacing: 10) {
                             ForEach(self.publicTags, id: \.self) { tag in

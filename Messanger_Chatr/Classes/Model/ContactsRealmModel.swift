@@ -162,13 +162,30 @@ class changeContactsRealmData {
                     if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: contactID) {
                         //print("Contact FOUND in Realm: \(snapshot.key) anddd contacts faceID? : \(String(describing: dict["faceID"] as? Bool))")
                         try realm.safeWrite ({
-                            foundContact.bio = dict["bio"] as? String ?? ""
-                            foundContact.facebook = dict["facebook"] as? String ?? ""
-                            foundContact.twitter = dict["twitter"] as? String ?? ""
-                            foundContact.instagramAccessToken = dict["instagramAccessToken"] as? String ?? ""
-                            foundContact.instagramId = dict["instagramId"] as? Int ?? 0
-                            foundContact.isPremium = dict["isPremium"] as? Bool ?? false
+                            if let bio = dict["bio"] as? String, foundContact.bio != bio {
+                                foundContact.bio = bio
+                            }
                             
+                            if let facebook = dict["facebook"] as? String, foundContact.facebook != facebook {
+                                foundContact.facebook = facebook
+                            }
+                            
+                            if let twitter = dict["twitter"] as? String, foundContact.twitter != twitter {
+                                foundContact.twitter = twitter
+                            }
+                            
+                            if let instagramAccessToken = dict["instagramAccessToken"] as? String, foundContact.instagramAccessToken != instagramAccessToken {
+                                foundContact.instagramAccessToken = instagramAccessToken
+                            }
+                            
+                            if let instagramId = dict["instagramId"] as? Int, foundContact.instagramId != instagramId {
+                                foundContact.instagramId = instagramId
+                            }
+                            
+                            if let isPremium = dict["isPremium"] as? Bool, foundContact.isPremium != isPremium {
+                                foundContact.isPremium = isPremium
+                            }
+                                                        
                             try realm.safeWrite({
                                 realm.add(foundContact, update: .all)
                             })
@@ -235,14 +252,30 @@ class changeContactsRealmData {
                             let realm = try Realm(configuration: config)
                             if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: user.id) {
                                 try realm.safeWrite ({
-                                    foundContact.fullName = user.fullName ?? "empty name"
-                                    foundContact.phoneNumber = user.phone ?? "empty phone number"
-                                    foundContact.emailAddress = user.email ?? "empty email address"
-                                    foundContact.website = user.website ?? "empty website"
-                                    if let lastRequest = user.lastRequestAt {
+                                    if let name = user.fullName, foundContact.fullName != name {
+                                        foundContact.fullName = name
+                                    }
+                                    
+                                    if let phoneNumber = user.phone, foundContact.phoneNumber != phoneNumber {
+                                        foundContact.phoneNumber = phoneNumber
+                                    }
+                                    
+                                    if let emailAddress = user.email, foundContact.emailAddress != emailAddress {
+                                        foundContact.emailAddress = emailAddress
+                                    }
+                                    
+                                    if let website = user.website, foundContact.website != website {
+                                        foundContact.website = website
+                                    }
+                                   
+                                    if let lastRequest = user.lastRequestAt, foundContact.lastOnline != lastRequest {
                                         foundContact.lastOnline = lastRequest
                                     }
-                                    foundContact.avatar = PersistenceManager.shared.getCubeProfileImage(usersID: user) ?? ""
+                                    
+                                    if let avatar = PersistenceManager.shared.getCubeProfileImage(usersID: user), foundContact.avatar != avatar {
+                                        foundContact.avatar = avatar
+                                    }
+
                                     foundContact.isMyContact = true
                                     foundContact.isInfoPrivate = false
                                     foundContact.isMessagingPrivate = false
@@ -352,14 +385,30 @@ class changeContactsRealmData {
                     let realm = try Realm(configuration: config)
                     if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: user.id) {
                         try realm.safeWrite ({
-                            foundContact.fullName = user.fullName ?? "empty name"
-                            foundContact.phoneNumber = user.phone ?? "empty phone number"
-                            foundContact.emailAddress = user.email ?? "empty email address"
-                            foundContact.website = user.website ?? "empty website"
-                            if let lastRequest = user.lastRequestAt {
+                            if let name = user.fullName, foundContact.fullName != name {
+                                foundContact.fullName = name
+                            }
+                            
+                            if let phoneNumber = user.phone, foundContact.phoneNumber != phoneNumber {
+                                foundContact.phoneNumber = phoneNumber
+                            }
+                            
+                            if let emailAddress = user.email, foundContact.emailAddress != emailAddress {
+                                foundContact.emailAddress = emailAddress
+                            }
+                            
+                            if let website = user.website, foundContact.website != website {
+                                foundContact.website = website
+                            }
+
+                            if let lastRequest = user.lastRequestAt, foundContact.lastOnline != lastRequest {
                                 foundContact.lastOnline = lastRequest
                             }
-                            foundContact.avatar = PersistenceManager.shared.getCubeProfileImage(usersID: user) ?? ""
+                            
+                            if let avatar = PersistenceManager.shared.getCubeProfileImage(usersID: user), foundContact.avatar != avatar {
+                                foundContact.avatar = avatar
+                            }
+                            
                             foundContact.isMyContact = true
                             
                             realm.add(foundContact, update: .all)

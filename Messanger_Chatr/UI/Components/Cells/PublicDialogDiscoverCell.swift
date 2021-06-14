@@ -15,7 +15,7 @@ struct PublicDialogDiscoverCell: View {
     @EnvironmentObject var auth: AuthModel
     @Binding var dismissView: Bool
     @Binding var showPinDetails: String
-    @State var dialogData: PublicDialogModel
+    @State var dialogData: PublicDialogModel = PublicDialogModel()
     @State var isLast: Bool = false
     @State private var actionState: Bool = false
     @State var isEditGroupOpen: Bool = false
@@ -23,7 +23,6 @@ struct PublicDialogDiscoverCell: View {
     @State var openNewDialogID: Int = 0
     @State var isJoined: Bool = false
     @State var isMember: Bool = false
-    var sendDia: DialogStruct = DialogStruct()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -119,17 +118,6 @@ struct PublicDialogDiscoverCell: View {
                 }
             }.buttonStyle(changeBGButtonStyle())
             .onAppear() {
-                guard self.sendDia.id == "" else {
-                    return
-                }
-
-                self.sendDia.id = self.dialogData.id ?? ""
-                self.sendDia.dialogType = "public"
-                self.sendDia.fullName = self.dialogData.name ?? ""
-                self.sendDia.bio = self.dialogData.description ?? ""
-                self.sendDia.avatar = self.dialogData.avatar ?? ""
-                self.sendDia.coverPhoto = self.dialogData.coverPhoto ?? ""
-                
                 let config = Realm.Configuration(schemaVersion: 1)
                 do {
                     let realm = try Realm(configuration: config)
@@ -145,7 +133,7 @@ struct PublicDialogDiscoverCell: View {
     }
     
     func dialogDetails() -> some View {
-        VisitGroupChannelView(dismissView: self.$dismissView, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$openNewDialogID, showPinDetails: self.$showPinDetails, fromDialogCell: false, viewState: .fromDynamicLink, dialogRelationship: self.isMember || self.isJoined ? .subscribed : .notSubscribed, dialogModel: self.sendDia)
+        VisitGroupChannelView(dismissView: self.$dismissView, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$openNewDialogID, showPinDetails: self.$showPinDetails, fromDialogCell: false, viewState: .fromDiscover, dialogRelationship: self.isMember || self.isJoined ? .subscribed : .notSubscribed, publicDialogModel: self.dialogData)
             .environmentObject(self.auth)
             .edgesIgnoringSafeArea(.all)
             .navigationBarItems(trailing:

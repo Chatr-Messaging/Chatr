@@ -16,6 +16,7 @@ class PublicDialogModel {
     var name: String?
     var memberCount: Int?
     var creationOrder: Int?
+    var owner: Int?
     var dateCreated: String?
     var coverPhoto: String?
     var avatar: String?
@@ -31,6 +32,7 @@ extension PublicDialogModel {
         dialog.name = dict["name"] as? String
         dialog.memberCount = dict["members"] as? Int
         dialog.creationOrder = dict["creation_order"] as? Int
+        dialog.owner = dict["owner"] as? Int
         dialog.dateCreated = dict["date_created"] as? String
         dialog.coverPhoto = dict["cover_photo"] as? String
         dialog.avatar = dict["avatar"] as? String

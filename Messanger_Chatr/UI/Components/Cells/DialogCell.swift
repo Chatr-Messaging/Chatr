@@ -216,7 +216,7 @@ struct DialogCell: View {
                 }
             }.sheet(isPresented: self.$openGroupProfile, content: {
                 NavigationView {
-                    VisitGroupChannelView(dismissView: self.$openGroupProfile, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$openNewDialogID, showPinDetails: self.$showPinDetails, groupOccUserAvatar: self.groupOccUserAvatar, fromDialogCell: true, viewState: .fromContacts, dialogRelationship: .subscribed, dialogModel: self.dialogModel)
+                    VisitGroupChannelView(dismissView: self.$openGroupProfile, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$openNewDialogID, showPinDetails: self.$showPinDetails, groupOccUserAvatar: self.groupOccUserAvatar, fromDialogCell: true, viewState: .fromDialogCell, dialogRelationship: .subscribed, dialogModel: self.dialogModel)
                         .environmentObject(self.auth)
                         .edgesIgnoringSafeArea(.all)
                         .navigationBarItems(leading:

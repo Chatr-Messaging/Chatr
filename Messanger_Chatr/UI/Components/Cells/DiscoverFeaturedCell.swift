@@ -26,7 +26,6 @@ struct DiscoverFeaturedCell: View, Identifiable {
     @State var openNewDialogID: Int = 0
     @State var selectedContact: [Int] = []
     @State var newDialogID: String = ""
-    var sendDia: DialogStruct = DialogStruct()
 
     var body: some View {
         ZStack {
@@ -196,17 +195,6 @@ struct DiscoverFeaturedCell: View, Identifiable {
                 ])
             }
             .onAppear() {
-                guard self.sendDia.id == "" else {
-                    return
-                }
-
-                self.sendDia.id = self.dialogModel.id ?? ""
-                self.sendDia.dialogType = "public"
-                self.sendDia.fullName = self.dialogModel.name ?? ""
-                self.sendDia.bio = self.dialogModel.description ?? ""
-                self.sendDia.avatar = self.dialogModel.avatar ?? ""
-                self.sendDia.coverPhoto = self.dialogModel.coverPhoto ?? ""
-                
                 let config = Realm.Configuration(schemaVersion: 1)
                 do {
                     let realm = try Realm(configuration: config)
@@ -219,7 +207,7 @@ struct DiscoverFeaturedCell: View, Identifiable {
     }
     
     func dialogDetails() -> some View {
-        VisitGroupChannelView(dismissView: self.$dismissView, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$openNewDialogID, showPinDetails: self.$showPinDetails, fromDialogCell: false, viewState: .fromDynamicLink, dialogRelationship: .subscribed, dialogModel: self.sendDia)
+        VisitGroupChannelView(dismissView: self.$dismissView, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$openNewDialogID, showPinDetails: self.$showPinDetails, fromDialogCell: false, viewState: .fromDiscover, dialogRelationship: self.isMember ? .subscribed : .notSubscribed, publicDialogModel: self.dialogModel)
             .environmentObject(self.auth)
             .edgesIgnoringSafeArea(.all)
             .navigationBarItems(trailing:

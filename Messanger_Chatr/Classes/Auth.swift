@@ -50,6 +50,11 @@ enum visitUserState {
     case unknown, fromContacts, fromSearch, fromRequests, fromDynamicLink, fromGroupDialog
 }
 
+enum visitPublicDialogState {
+    case unknown, fromDiscover, fromSearch, fromDialogCell, fromDynamicLink, fromSharedMessage
+}
+
+
 enum visitContactRelationship {
     case unknown, contact, notContact, pendingRequest, pendingRequestForYou
 }

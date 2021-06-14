@@ -14,7 +14,7 @@ import Firebase
 class DialogStruct : Object {
     @objc dynamic var id: String = ""
     @objc dynamic var fullName: String = "No Name"
-    @objc dynamic var lastMessage: String = "no messages"
+    @objc dynamic var lastMessage: String = "no messages sent"
     @objc dynamic var owner: Int = 0
     @objc dynamic var onlineUserCount: Int = 0
     @objc dynamic var lastMessageDate: Date = Date()
@@ -121,44 +121,73 @@ class changeDialogRealmData {
 
             do {
                 let realm = try Realm(configuration: config)
-                let newData = DialogStruct()
-                newData.id = object.id ?? ""
-                newData.fullName = object.name ?? "No Dialog Name"
-                newData.lastMessage = object.lastMessageText ?? "no messages sent"
-                newData.lastMessageDate = object.lastMessageDate ?? Date.init(timeIntervalSinceReferenceDate: 86400)
-                newData.notificationCount = Int(object.unreadMessagesCount)
-                newData.createdAt = object.createdAt ?? Date()
-                newData.owner = Int(object.userID)
-                
-                for occu in object.occupantIDs ?? [] {
-                    newData.occupentsID.append(Int(truncating: occu))
-                }
-
-                if object.type == .private { newData.dialogType = "private" }
-                else if object.type == .group { newData.dialogType = "group" }
-                else if object.type == .broadcast { newData.dialogType = "broadcast" }
-                else if object.type == .public { newData.dialogType = "public" }
-
-                if object.type == .group || object.type == .public {
-                    for admin in object.adminsIDs ?? [] {
-                        newData.adminID.append(Int(truncating: admin))
+                if let foundDialog = realm.object(ofType: DialogStruct.self, forPrimaryKey: object.id) {
+                    try realm.safeWrite({
+                        if let name = object.name, foundDialog.fullName != name {
+                            foundDialog.fullName = name
+                        }
+                        
+                        if let lastMessage = object.lastMessageText, foundDialog.lastMessage != lastMessage {
+                            foundDialog.lastMessage = lastMessage
+                        }
+                        
+                        if let lastMessageDate = object.lastMessageDate, foundDialog.lastMessageDate != lastMessageDate {
+                            foundDialog.lastMessageDate = lastMessageDate
+                        }
+                        
+                        if foundDialog.notificationCount != Int(object.unreadMessagesCount) {
+                            foundDialog.notificationCount = Int(object.unreadMessagesCount)
+                        }
+                        
+                        if let bio = object.dialogDescription, foundDialog.bio != bio {
+                            foundDialog.bio = bio
+                        }
+                        
+                        if let publicUrl = Blob.publicUrl(forFileUID: object.photo ?? ""), foundDialog.avatar != publicUrl {
+                            foundDialog.avatar = publicUrl
+                        }
+                        
+                        realm.add(foundDialog, update: .all)
+                    })
+                } else {
+                    let newData = DialogStruct()
+                    newData.id = object.id ?? ""
+                    newData.fullName = object.name ?? "No Dialog Name"
+                    newData.lastMessage = object.lastMessageText ?? "no messages sent"
+                    newData.lastMessageDate = object.lastMessageDate ?? Date.init(timeIntervalSinceReferenceDate: 86400)
+                    newData.notificationCount = Int(object.unreadMessagesCount)
+                    newData.createdAt = object.createdAt ?? Date()
+                    newData.owner = Int(object.userID)
+                    
+                    for occu in object.occupantIDs ?? [] {
+                        newData.occupentsID.append(Int(truncating: occu))
                     }
 
-                    if let publicUrl = Blob.publicUrl(forFileUID: object.photo ?? "") {
-                        newData.avatar = publicUrl
+                    if object.type == .private { newData.dialogType = "private" }
+                    else if object.type == .group { newData.dialogType = "group" }
+                    else if object.type == .broadcast { newData.dialogType = "broadcast" }
+                    else if object.type == .public { newData.dialogType = "public" }
+
+                    if object.type == .group || object.type == .public {
+                        for admin in object.adminsIDs ?? [] {
+                            newData.adminID.append(Int(truncating: admin))
+                        }
+
+                        if let publicUrl = Blob.publicUrl(forFileUID: object.photo ?? "") {
+                            newData.avatar = publicUrl
+                        }
+
+                        newData.bio = object.dialogDescription ?? ""
                     }
 
-                    newData.bio = object.dialogDescription ?? ""
+                    if newData.id == UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" && UserDefaults.standard.bool(forKey: "localOpen") {
+                        newData.isOpen = true
+                    }
+                    
+                    try realm.safeWrite({
+                        realm.add(newData, update: .all)
+                    })
                 }
-
-                if newData.id == UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" && UserDefaults.standard.bool(forKey: "localOpen") {
-                    newData.isOpen = true
-                }
-                
-                try realm.safeWrite({
-                    realm.add(newData, update: .all)
-                    //print("Successfully added new Dialog data! \(newData.isDeleted) and the threadis: \(Thread.current)")
-                })
             } catch {
                 print(error.localizedDescription)
                 DispatchQueue.main.async {
@@ -237,8 +266,11 @@ class changeDialogRealmData {
             let realm = try Realm(configuration: config)
             try? realm.safeWrite({
                 if let dialogResult = realm.object(ofType: DialogStruct.self, forPrimaryKey: dialogID) {
-                    dialogResult.pinMessages.append(messageId)
-                    realm.add(dialogResult, update: .all)
+                    if !dialogResult.pinMessages.contains(where: { $0 == messageId }) && messageId != "" {
+                        dialogResult.pinMessages.append(messageId)
+                        realm.add(dialogResult, update: .all)
+                    }
+                    
                 }
                 
                 if let messageResult = realm.object(ofType: MessageStruct.self, forPrimaryKey: messageId) {
