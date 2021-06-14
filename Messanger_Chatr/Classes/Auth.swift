@@ -51,7 +51,7 @@ enum visitUserState {
 }
 
 enum visitPublicDialogState {
-    case unknown, fromDiscover, fromSearch, fromDialogCell, fromDynamicLink, fromSharedMessage
+    case unknown, fromDiscover, fromDialogCell, fromDynamicLink, fromSharedMessage
 }
 
 

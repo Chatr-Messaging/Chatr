@@ -36,7 +36,7 @@ struct VisitGroupChannelView: View {
     @State var dialogRelationship: visitDialogRelationship = .unknown
     @State var dialogModel: DialogStruct = DialogStruct()
     @State var publicDialogModel: PublicDialogModel = PublicDialogModel()
-    @State var dialogModelMemebers: [Int] = []
+    @State var dialogModelMembers: [Int] = []
     @State var dialogModelAdmins: [Int] = []
     @State var selectedNewMembers: [Int] = []
     @State var publicTags: [String] = []
@@ -86,7 +86,7 @@ struct VisitGroupChannelView: View {
 
                     //MARK: Admin List Section
                     HStack(alignment: .bottom) {
-                        Text("ADMINS:")
+                        Text(self.dialogModel.dialogType == "public" ? "OWNER:" : "ADMINS:")
                             .font(.caption)
                             .fontWeight(.regular)
                             .foregroundColor(.secondary)
@@ -95,7 +95,7 @@ struct VisitGroupChannelView: View {
                             .padding(.bottom, 5)
                             .offset(y: 2)
                         Spacer()
-                    }
+                    }.opacity(self.dialogModelAdmins.isEmpty ? 0 : 1)
                     
                     VStack(alignment: .center, spacing: 0) {
                         ForEach(self.dialogModelAdmins, id: \.self) { id in
@@ -145,26 +145,24 @@ struct VisitGroupChannelView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
                     .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
                     .padding(.horizontal)
-                    .padding(.bottom, 15)
+                    .padding(.bottom, self.dialogModelAdmins.isEmpty || self.dialogModelMembers.isEmpty ? 0 : 15)
 
-                    //MARK: Memebrs List Section
-                    if self.dialogModel.occupentsID.count > 0 {
-                        HStack(alignment: .bottom) {
-                            Text("\(self.dialogModel.occupentsID.count) TOTAL " + (self.dialogModel.dialogType == "public" ? "MEMBERS:" : "GROUP:"))
-                                .font(.caption)
-                                .fontWeight(.regular)
-                                .foregroundColor(.secondary)
-                                .padding(.horizontal)
-                                .padding(.horizontal)
-                                .offset(y: 2)
-                            Spacer()
-                        }
-                    }
+                    //MARK: Memebrs / Admins List Section
+                    HStack(alignment: .bottom) {
+                        Text(self.dialogModel.dialogType == "public" ? "ADMINS:" : "\(self.dialogModel.occupentsID.count) CONTACTS:")
+                            .font(.caption)
+                            .fontWeight(.regular)
+                            .foregroundColor(.secondary)
+                            .padding(.horizontal)
+                            .padding(.horizontal)
+                            .offset(y: self.dialogModel.dialogType == "public" ? -2 : 2)
+                        Spacer()
+                    }.opacity(self.dialogModelMembers.isEmpty ? 0 : 1)
                     
                     VStack(alignment: .center, spacing: 0) {
-                        ForEach(self.dialogModelMemebers.indices, id: \.self) { id in
+                        ForEach(self.dialogModelMembers.indices, id: \.self) { id in
                             VStack(alignment: .trailing, spacing: 0) {
-                                if id == 0 {
+                                if id == 0 && self.dialogModel.dialogType == "group" {
                                     Button(action: {
                                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                         self.showAddMembers.toggle()
@@ -204,7 +202,7 @@ struct VisitGroupChannelView: View {
                                             for i in self.selectedNewMembers {
                                                 occu.append(NSNumber(value: i))
                                                 if !self.dialogModel.occupentsID.contains(i) {
-                                                    self.dialogModelMemebers.append(i)
+                                                    self.dialogModelMembers.append(i)
                                                 }
                                             }
                                             print("adding new user to group!: \(occu.count)")
@@ -235,11 +233,11 @@ struct VisitGroupChannelView: View {
                                 }
                                 
                                 if id <= 3 {
-                                    DialogContactCell(showAlert: self.$showAlert, notiType: self.$notiType, notiText: self.$notiText, dismissView: self.$dismissView, openNewDialogID: self.$openNewDialogID, showProfile: self.$showProfile, contactID: Int(self.dialogModelMemebers[id]), isAdmin: self.dialogModel.adminID.contains(self.dialogModelMemebers[id]), isOwner: self.dialogModel.owner == self.dialogModelMemebers[id], currentUserIsPowerful: self.$currentUserIsPowerful, isLast: id == 3, isRemoving: self.$isRemoving)
+                                    DialogContactCell(showAlert: self.$showAlert, notiType: self.$notiType, notiText: self.$notiText, dismissView: self.$dismissView, openNewDialogID: self.$openNewDialogID, showProfile: self.$showProfile, contactID: Int(self.dialogModelMembers[id]), isAdmin: self.dialogModel.adminID.contains(self.dialogModelMembers[id]), isOwner: self.dialogModel.owner == self.dialogModelMembers[id], currentUserIsPowerful: self.$currentUserIsPowerful, isLast: id == 3, isRemoving: self.$isRemoving)
                                         .environmentObject(self.auth)
                                 }
                                 
-                                if self.dialogModelMemebers.count > 4 && id == 3 {
+                                if self.dialogModelMembers.count > 4 && id == 3 {
                                     NavigationLink(destination: self.addMore(), isActive: $showMoreMembers) {
                                         VStack(alignment: .trailing, spacing: 0) {
                                             Divider()
@@ -254,7 +252,7 @@ struct VisitGroupChannelView: View {
                                                     .foregroundColor(Color("SoftTextColor"))
                                                     .padding(.leading, 10)
                                                 
-                                                Text("more members...")
+                                                Text("more...")
                                                     .font(.subheadline)
                                                     .foregroundColor(.blue)
                                                     .padding(.horizontal)
@@ -279,7 +277,7 @@ struct VisitGroupChannelView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
                     .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
                     .padding(.horizontal)
-                    .padding(.bottom, 15)
+                    .padding(.bottom, self.dialogModelMembers.isEmpty ? 0 : 15)
                     
                     //MARK: More Section
                     HStack {
@@ -306,7 +304,7 @@ struct VisitGroupChannelView: View {
                                     .frame(width: 20, height: 20, alignment: .center)
                                     .padding(.trailing, 5)
 
-                                Text("More...")
+                                Text("more...")
                                     .font(.none)
                                     .fontWeight(.none)
                                     .foregroundColor(.primary)
@@ -321,6 +319,7 @@ struct VisitGroupChannelView: View {
                                     .frame(width: 7, height: 15, alignment: .center)
                                     .foregroundColor(.secondary)
                             }.padding(.all)
+                            .padding(.vertical, 1.5)
                             .contentShape(Rectangle())
                         }.buttonStyle(changeBGButtonStyle())
                         .frame(minWidth: 100, maxWidth: Constants.screenWidth)
@@ -354,7 +353,7 @@ struct VisitGroupChannelView: View {
                                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                             })
                     }.background(Color("buttonColor"))
-                    .clipShape(RoundedRectangle(cornerRadius: 15, style: .circular))
+                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .circular))
                     .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
                     .padding(.horizontal)
                     .padding(.bottom, 60)
@@ -509,12 +508,6 @@ struct VisitGroupChannelView: View {
                         })
                     }
                 } catch { self.dialogRelationship = .notSubscribed }
-                
-                if !self.dialogModelAdmins.contains(where: { $0 == self.dialogModel.owner }) && self.dialogModel.owner != 0 {
-                    self.dialogModelAdmins.append(self.dialogModel.owner)
-                }
-            } else if self.viewState == .fromSearch {
-                //not used
             } else if self.viewState == .fromDialogCell {
                 //NEED to specify self.dialogRelationship state here, if used
                 if self.dialogModel.dialogType == "group" {
@@ -530,59 +523,45 @@ struct VisitGroupChannelView: View {
                 //NEED to specify self.dialogRelationship state here, if used
             }
             
-            NotificationCenter.default.addObserver(forName: NSNotification.Name("NotificationAlert"), object: nil, queue: .main) { (_) in
-                self.showAlert.toggle()
+            if self.dialogModel.dialogType == "public" {
+                if !self.dialogModelMembers.contains(where: { $0 == self.dialogModel.owner }) && self.dialogModel.owner != 0 {
+                    self.dialogModelMembers.append(self.dialogModel.owner)
+                }
+
+                for i in self.dialogModel.adminID {
+                    if !self.dialogModelMembers.contains(where: { $0 == i }) {
+                        self.dialogModelMembers.append(i)
+                    }
+                }
+            } else if self.dialogModel.dialogType == "group" {
+                if !self.dialogModelAdmins.contains(where: { $0 == self.dialogModel.owner }) && self.dialogModel.owner != 0 {
+                    self.dialogModelAdmins.append(self.dialogModel.owner)
+                }
+
+                for i in self.dialogModel.adminID {
+                    if !self.dialogModelAdmins.contains(where: { $0 == i }) {
+                        self.dialogModelAdmins.append(i)
+                    }
+                }
             }
-
-//            let config = Realm.Configuration(schemaVersion: 1)
-//            do {
-//                let realm = try Realm(configuration: config)
-//                if let foundDialog = realm.object(ofType: DialogStruct.self, forPrimaryKey: self.dialogModel.id) {
-//                    //self.dialogRelationship = .subscribed
-//                    //changeDialogRealmData.shared.observeFirebaseDialogReturn(dialogModel: foundDialog, completion: { _,_,_ in })
-//                    self.dialogModel = foundDialog
-////                    changeDialogRealmData.shared.observeFirebaseDialogReturn(dialogModel: self.dialogModel, completion: { (dialog, coverPhotoUrlz) in
-////                        if let dia = dialog {
-////                            self.coverPhotoUrl = coverPhotoUrlz ?? ""
-////                            self.dialogModel = dia
-////                        }
-////                    })
-//                    print("Foundd thisss: \(self.dialogModel.fullName)")
-//                } else {
-//                    print("did not find shitttt")
-////                    changeDialogRealmData.shared.observeFirebaseDialogReturn(dialogModel: self.dialogModel, completion: { dialogz, _, _ in
-////                        if let dia = dialogz {
-////                            self.dialogModel = dia
-////                        }
-////
-////                    })
-//                }
-//            } catch { }
-
-            print("welcomeee...: \(self.dialogModel.fullName) && \(self.dialogModel.id)")
+            
             self.isOwner = self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? true : false
             self.isAdmin = self.dialogModel.adminID.contains(UserDefaults.standard.integer(forKey: "currentUserID")) ? true : false
             self.canEditGroup = self.isOwner || self.isAdmin
             self.currentUserIsPowerful = self.isOwner || self.isAdmin ? true : false
-            self.dialogModelMemebers = self.dialogModel.occupentsID.filter { $0 != 0 }
+            self.dialogModelMembers = self.dialogModel.occupentsID.filter { $0 != 0 }
             self.observePinnedMessages(dialogId: self.dialogModel.id)
-
-//            for i in self.dialogModel.adminID {
-//                if !self.dialogModelAdmins.contains(where: { $0 == i }) {
-//                    self.dialogModelAdmins.append(i)
-//                }
-//            }
             
             if self.dialogModel.dialogType == "public" && self.dialogModel.id != "" {
                 self.observeFirebase()
             }
-////
-//            if self.dialogModel.dialogType == "public" {
-//                self.observePublicDetails()
-//            }
             
             if self.dialogRelationship == .subscribed {
                 self.loadNotifications()
+            }
+            
+            NotificationCenter.default.addObserver(forName: NSNotification.Name("NotificationAlert"), object: nil, queue: .main) { (_) in
+                self.showAlert.toggle()
             }
         }
     }
@@ -613,24 +592,44 @@ struct VisitGroupChannelView: View {
                                 foundDialog.coverPhoto = coverPhoto
                             }
                             
-                            if let owner = dict["owner"] as? Int, foundDialog.owner != owner {
-                                foundDialog.owner = owner
-                            }
-                            
-                            if let owner = dict["owner"] as? Int, !self.dialogModelAdmins.contains(where: { $0 == owner }) && owner != 0 {
-                                self.dialogModelAdmins.append(owner)
+                            if let owner = dict["owner"] as? Int {
+                                if foundDialog.owner != owner {
+                                    foundDialog.owner = owner
+                                }
+                                
+                                if !self.dialogModelAdmins.contains(where: { $0 == owner }) && owner != 0 {
+                                    self.dialogModelAdmins.append(owner)
+                                }
                             }
                             
                             for childSnapshot in snapshot.children {
                                 let childSnap = childSnapshot as! DataSnapshot
-                                if let dict2 = childSnap.value as? [String: Any] {
-                                    for tag in dict2 {
-                                        if !self.publicTags.contains(tag.key) {
-                                            self.publicTags.append(tag.key)
+                                if childSnap.key == "tags" {
+                                    if let dict2 = childSnap.value as? [String: Any] {
+                                        for tag in dict2 {
+                                            if !self.publicTags.contains(tag.key) {
+                                                self.publicTags.append(tag.key)
+                                            }
+                                            
+                                            if !foundDialog.publicTags.contains(tag.key) {
+                                                foundDialog.publicTags.append(tag.key)
+                                            }
                                         }
-                                        
-                                        if !foundDialog.publicTags.contains(tag.key) {
-                                            foundDialog.publicTags.append(tag.key)
+                                    }
+                                } else if childSnap.key == "adminIds" {
+                                    if let dict2 = childSnap.value as? [String: Any] {
+                                        foundDialog.adminID.removeAll()
+
+                                        for admin in dict2 {
+                                            if let key = Int(admin.key), Int(admin.key) != foundDialog.owner {
+                                                if !self.dialogModelMembers.contains(key) {
+                                                    self.dialogModelMembers.append(key)
+                                                }
+                                                
+                                                if !foundDialog.adminID.contains(key) {
+                                                    foundDialog.adminID.append(key)
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -707,7 +706,7 @@ struct VisitGroupChannelView: View {
     
     func addMore() -> some View {
         MoreContactsView(dismissView: self.$dismissView,
-                         dialogModelMemebers: self.$dialogModelMemebers,
+                         dialogModelMembers: self.$dialogModelMembers,
                          openNewDialogID: self.$openNewDialogID,
                          dialogModel: self.$dialogModel,
                          currentUserIsPowerful: self.$currentUserIsPowerful,
@@ -717,7 +716,7 @@ struct VisitGroupChannelView: View {
     
     func moreMembers() -> some View {
         MoreContactsView(dismissView: self.$dismissView,
-                         dialogModelMemebers: self.$dialogModelAdmins,
+                         dialogModelMembers: self.$dialogModelAdmins,
                          openNewDialogID: self.$openNewDialogID,
                          dialogModel: self.$dialogModel,
                          currentUserIsPowerful: self.$currentUserIsPowerful,
@@ -849,7 +848,7 @@ struct topGroupHeaderView: View {
                             .lineLimit(2)
                             .multilineTextAlignment(.center)
                         
-                        Text("\(self.dialogModel.occupentsID.count) " + (self.dialogModel.dialogType == "public" ? "members" : "people"))
+                        Text("\(self.dialogModel.occupentsID.count) " + (self.dialogModel.dialogType == "public" ? "members" : "contacts"))
                             .font(.subheadline)
                             .fontWeight(.none)
                             .foregroundColor(.secondary)

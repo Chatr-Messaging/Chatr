@@ -227,7 +227,7 @@ struct DialogContactCell: View {
                             if let firstUser = users.first {
                                 let newContact = ContactStruct()
                                 newContact.id = Int(firstUser.id)
-                                newContact.fullName = firstUser.fullName ?? ""
+                                newContact.fullName = firstUser.fullName ?? "no name"
                                 newContact.phoneNumber = firstUser.phone ?? "empty phone number"
                                 newContact.lastOnline = firstUser.lastRequestAt ?? Date()
                                 newContact.createdAccount = firstUser.createdAt ?? Date()

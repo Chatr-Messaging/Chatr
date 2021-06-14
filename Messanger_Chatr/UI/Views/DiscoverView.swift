@@ -211,7 +211,7 @@ struct DiscoverView: View {
                                 }
                             }.animation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0))
                         }.frame(height: 340)
-                        .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
+                        .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
                     }
                 }
 
@@ -262,7 +262,7 @@ struct DiscoverView: View {
                                                     
                                                     Text("more...")
                                                         .font(.subheadline)
-                                                        .foregroundColor(Color("SoftTextColor"))
+                                                        .foregroundColor(Color.blue)
                                                         .padding(.horizontal)
                                                     
                                                     Spacer()
@@ -278,6 +278,10 @@ struct DiscoverView: View {
                                                 .contentShape(Rectangle())
                                             }
                                         }.buttonStyle(changeBGButtonStyle())
+                                        .simultaneousGesture(TapGesture()
+                                            .onEnded { _ in
+                                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                            })
                                     }
                                 }
                             }
@@ -333,7 +337,7 @@ struct DiscoverView: View {
                                                     
                                                     Text("more...")
                                                         .font(.subheadline)
-                                                        .foregroundColor(Color("SoftTextColor"))
+                                                        .foregroundColor(Color.blue)
                                                         .padding(.horizontal)
                                                     
                                                     Spacer()
@@ -349,6 +353,10 @@ struct DiscoverView: View {
                                                 .contentShape(Rectangle())
                                             }
                                         }.buttonStyle(changeBGButtonStyle())
+                                        .simultaneousGesture(TapGesture()
+                                            .onEnded { _ in
+                                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                            })
                                     }
                                 }
                             }

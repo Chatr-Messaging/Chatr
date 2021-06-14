@@ -15,7 +15,7 @@ import PopupView
 struct MoreContactsView: View {
     @EnvironmentObject var auth: AuthModel
     @Binding var dismissView: Bool
-    @Binding var dialogModelMemebers: [Int]
+    @Binding var dialogModelMembers: [Int]
     @Binding var openNewDialogID: Int
     @Binding var dialogModel: DialogStruct
     @Binding var currentUserIsPowerful: Bool
@@ -42,9 +42,9 @@ struct MoreContactsView: View {
                     }
                     
                     LazyVStack(alignment: .center, spacing: 0) {
-                        ForEach(self.dialogModelMemebers.indices, id: \.self) { id in
+                        ForEach(self.dialogModelMembers.indices, id: \.self) { id in
                             VStack(alignment: .trailing, spacing: 0) {
-                                DialogContactCell(showAlert: self.$showAlert, notiType: self.$notiType, notiText: self.$notiText, dismissView: self.$dismissView, openNewDialogID: self.$openNewDialogID, showProfile: self.$showProfile, contactID: Int(self.dialogModelMemebers[id]), isAdmin: self.dialogModel.adminID.contains(self.dialogModelMemebers[id]), isOwner: self.dialogModel.owner == self.dialogModelMemebers[id], currentUserIsPowerful: self.$currentUserIsPowerful, isLast: self.dialogModelMemebers[id] == self.dialogModelMemebers.last, isRemoving: self.$isRemoving)
+                                DialogContactCell(showAlert: self.$showAlert, notiType: self.$notiType, notiText: self.$notiText, dismissView: self.$dismissView, openNewDialogID: self.$openNewDialogID, showProfile: self.$showProfile, contactID: Int(self.dialogModelMembers[id]), isAdmin: self.dialogModel.adminID.contains(self.dialogModelMembers[id]), isOwner: self.dialogModel.owner == self.dialogModelMembers[id], currentUserIsPowerful: self.$currentUserIsPowerful, isLast: self.dialogModelMembers[id] == self.dialogModelMembers.last, isRemoving: self.$isRemoving)
                                     .environmentObject(self.auth)
                             }
                         }
