@@ -42,9 +42,10 @@ struct LockedOutView: View {
             HStack {
                 Button(action: {
                     self.auth.preventDismissal = true
-                    self.auth.logOutFirebase()
-                    self.auth.logOutConnectyCube()
                     self.auth.isUserAuthenticated = .signedOut
+                    self.auth.logOutFirebase(completion: {
+                        self.auth.logOutConnectyCube()
+                    })
                 }) {
                     Text("Log Out")
                         .font(.body)

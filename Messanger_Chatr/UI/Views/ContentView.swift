@@ -195,8 +195,9 @@ struct mainHomeList: View {
                                     if self.auth.isUserAuthenticated != .signedOut {
                                         self.loadSelectedDialog()
                                     } else {
-                                        self.auth.logOutFirebase()
-                                        self.auth.logOutConnectyCube()
+                                        self.auth.logOutFirebase(completion: {
+                                            self.auth.logOutConnectyCube()
+                                        })
                                     }
                                 }) {
                                     if self.auth.isUserAuthenticated == .signedIn {
@@ -255,8 +256,9 @@ struct mainHomeList: View {
                                     self.loadSelectedDialog()
                                 } else {
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
-                                        self.auth.logOutFirebase()
-                                        self.auth.logOutConnectyCube()
+                                        self.auth.logOutFirebase(completion: {
+                                            self.auth.logOutConnectyCube()
+                                        })
                                     }
                                 }
                             }) {

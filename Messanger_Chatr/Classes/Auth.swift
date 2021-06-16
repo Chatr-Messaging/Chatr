@@ -188,7 +188,7 @@ class AuthModel: NSObject, ObservableObject {
                             return
                         } else {
                             //Save ConnectyCube tokenID & loginto ConnectyCube then save & notify
-                            UserDefaults.standard.set(idToken, forKey: "tokenID")
+                            //UserDefaults.standard.set(idToken, forKey: "tokenID")
                             Request.logIn(withFirebaseProjectID: Constants.FirebaseProjectID, accessToken: idToken ?? "", successBlock: { (user) in
                                 UserDefaults.standard.set(user.id, forKey: "currentUserID")
                                 if (userz?.additionalUserInfo?.isNewUser ?? true) == false {
@@ -511,26 +511,29 @@ class AuthModel: NSObject, ObservableObject {
 
     // MARK: - Logout Firebase & Connectycube
     func logOutConnectyCube() {
-        Chat.instance.disconnect { (error) in
-            if error != nil {
-                print("error disconnecting from connecty cube: \(String(describing: error?.localizedDescription))")
-            }
-        }
 //        Request.unregisterSubscription(forUniqueDeviceIdentifier: UIDevice.current.identifierForVendor!.uuidString, successBlock: nil)
         Request.logOut(successBlock: {
             print("success logging out of connecty cube")
             self.verifyPhoneNumberStatus = .undefined
             changeProfileRealmDate.shared.removeAllProfile()
-            changeMessageRealmData.shared.removeAllMessages(completion: { _ in })
-            changeDialogRealmData.shared.removeAllDialogs()
-            changeContactsRealmData.shared.removeAllContacts()
-            changeQuickSnapsRealmData.shared.removeAllQuickSnaps()
+            changeMessageRealmData.shared.removeAllMessages(completion: { _ in
+                changeDialogRealmData.shared.removeAllDialogs()
+                changeContactsRealmData.shared.removeAllContacts()
+                changeQuickSnapsRealmData.shared.removeAllQuickSnaps()
+            })
         }) { (error) in
             print("Error logging out of ConnectyCube: \(error.localizedDescription)")
         }
+
+        Chat.instance.disconnect { (error) in
+            if error != nil {
+                print("error disconnecting from connecty cube: \(String(describing: error?.localizedDescription))")
+            }
+            print("disconnecteddddd")
+        }
     }
     
-    func logOutFirebase() {
+    func logOutFirebase(completion: @escaping () -> Void) {
         let firebaseAuth = Auth.auth()
         self.preventDismissal = true
         do {
@@ -540,8 +543,10 @@ class AuthModel: NSObject, ObservableObject {
             //self.configureFirebaseStateDidChange()
             UserDefaults.standard.set(0, forKey: "selectedWallpaper")
             print("done logging out firebase!")
+            completion()
         } catch let signOutError as NSError {
             print ("Error signing out: %@", signOutError)
+            completion()
         }
     }
     

@@ -143,9 +143,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 UIApplication.shared.applicationIconBadgeNumber = badgeNum + (self.environment.profile.results.first?.contactRequests.count ?? 0)
                 
                 //This causes a crash for some reason...
-                Chat.instance.disconnect { (error) in
-                    print("chat instance did disconnect \(String(describing: error?.localizedDescription))")
-                }
+//                Chat.instance.disconnect { (error) in
+//                    print("chat instance did disconnect \(String(describing: error?.localizedDescription))")
+//                }
             }
         //}
         // Called as the scene transitions from the foreground to the background.
