@@ -16,6 +16,9 @@ struct PublicActionSection: View {
     @Binding var dialogModel: DialogStruct
     @Binding var currentUserIsPowerful: Bool
     @Binding var dismissView: Bool
+    @Binding var notiType: String
+    @Binding var notiText: String
+    @Binding var showAlert: Bool
 
     var body: some View {
         HStack(alignment: .center, spacing: 20) {
@@ -49,15 +52,24 @@ struct PublicActionSection: View {
                             changeDialogRealmData.shared.insertDialogs([dialogz], completion: {
                                 changeDialogRealmData.shared.updateDialogDelete(isDelete: false, dialogID: dialogz.id ?? "")
                                 self.auth.sendPushNoti(userIDs: [NSNumber(value: self.dialogModel.owner)], title: "\(self.dialogModel.fullName) Joined", message: "\(self.auth.profile.results.first?.fullName ?? "No Name") joined your public chat \(self.dialogModel.fullName)")
+                                self.notiType = "success"
+                                self.notiText = "Successfully joined \(dialogModel.fullName)"
+                                self.showAlert.toggle()
                             })
                         }, onError: { err in
                             print("there is an error updating the member count: \(String(describing: err))")
                             UINotificationFeedbackGenerator().notificationOccurred(.error)
                             self.dialogRelationship = .error
+                            self.notiType = "error"
+                            self.notiText = "Error joining \(dialogModel.fullName): \(err?.description)"
+                            self.showAlert.toggle()
                         })
                     }) { (error) in
                         UINotificationFeedbackGenerator().notificationOccurred(.error)
                         self.dialogRelationship = .error
+                        self.notiType = "error"
+                        self.notiText = "Error joining \(dialogModel.fullName): \(error.localizedDescription)"
+                        self.showAlert.toggle()
                     }
                 }) {
                     HStack(alignment: .center) {

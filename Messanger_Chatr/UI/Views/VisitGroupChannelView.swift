@@ -74,7 +74,7 @@ struct VisitGroupChannelView: View {
 
                     //MARK: Action Buttons
                     if self.dialogModel.dialogType == "public" {
-                        PublicActionSection(dialogRelationship: self.$dialogRelationship, dialogModel: self.$dialogModel, currentUserIsPowerful: self.$currentUserIsPowerful, dismissView: self.$dismissView)
+                        PublicActionSection(dialogRelationship: self.$dialogRelationship, dialogModel: self.$dialogModel, currentUserIsPowerful: self.$currentUserIsPowerful, dismissView: self.$dismissView, notiType: self.$notiType, notiText: self.$notiText, showAlert: self.$showAlert)
                             .environmentObject(self.auth)
                             .padding(.bottom)
                     }
