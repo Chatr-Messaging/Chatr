@@ -656,7 +656,7 @@ struct ContactsView: View {
             }.navigationViewStyle(StackNavigationViewStyle())
             .onAppear {
                 self.userPhoneNumber = UserDefaults.standard.string(forKey: "phoneNumber")?.format(phoneNumber: String(UserDefaults.standard.string(forKey: "phoneNumber")?.dropFirst().dropFirst() ?? "+1 (123) 456-6789")) ?? "+1 (123) 456-6789"
-                print("the Chat contacts count: \(String(describing: Chat.instance.contactList?.contacts.count)) & Realm Contacts count: \(self.auth.contacts.results.count)")
+                //print("the Chat contacts count: \(String(describing: Chat.instance.contactList?.contacts.count)) & Realm Contacts count: \(self.auth.contacts.results.count)")
             }
             
             //MARK: Quick Snap View
