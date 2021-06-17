@@ -27,13 +27,12 @@ class DiscoverViewModel: ObservableObject {
     
     func observeTopDialogs(kPagination: Int, loadMore: Bool, postCount: Int? = 0, completion: @escaping (PublicDialogModel) -> Void, isHiddenIndicator:  @escaping (_ isHiddenIndicator: Bool?) -> Void) {
         
-        let query = Database.database().reference().child("Marketplace").child("public_dialogs").queryOrdered(byChild: "members").queryLimited(toLast: UInt(kPagination))
+        let query = Database.database().reference().child("Marketplace").child("public_dialogs").queryOrdered(byChild: "memberCount").queryLimited(toLast: UInt(kPagination))
         query.observeSingleEvent(of: .value, with: {
             snapshot in
             var items = snapshot.children.allObjects
             print(items)
             if loadMore {
-                print("cont Post \(String(describing: postCount)) and \(items.count)")
                 if items.count <= postCount! {
                     isHiddenIndicator(true)
                     return
@@ -60,7 +59,7 @@ class DiscoverViewModel: ObservableObject {
     
     func observeTopTagDialogs(tagId: String, kPagination: Int, loadMore: Bool, postCount: Int? = 0, completion: @escaping (PublicDialogModel) -> Void, isHiddenIndicator:  @escaping (_ isHiddenIndicator: Bool?) -> Void) {
         
-        let query = Database.database().reference().child("Marketplace/tags").child(tagId).child("dialogs").queryOrdered(byChild: "members").queryLimited(toLast: UInt(kPagination))
+        let query = Database.database().reference().child("Marketplace/tags").child(tagId).child("dialogs").queryOrdered(byChild: "memberCount").queryLimited(toLast: UInt(kPagination))
         query.observeSingleEvent(of: .value, with: {
             snapshot in
             var items = snapshot.children.allObjects

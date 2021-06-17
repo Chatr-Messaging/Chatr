@@ -143,16 +143,18 @@ struct DialogContactCell: View {
                     .default(Text(self.isAdmin ? "Remove Admin" : "Add Admin")) {
                         if !self.isAdmin {
                             Request.addAdminsToDialog(withID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "", adminsUserIDs: [NSNumber(value: self.contact.id)], successBlock: { (updatedDialog) in
-                                changeDialogRealmData.shared.insertDialogs([updatedDialog]) {
-                                    self.isAdmin = true
-                                    self.isOwner = false
-                                    print("Success adding contact as admin!")
-                                    UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                    self.notiType = "success"
-                                    self.notiText = "Successfully added \(self.contact.fullName) as admin."
-                                    self.showAlert.toggle()
-                                    self.auth.sendPushNoti(userIDs: [NSNumber(value: self.contact.id)], title: "Added Admin", message: "\(self.auth.profile.results.first?.fullName ?? "Chatr User") added you as an admin 🥳")
-                                }
+                                changeDialogRealmData.shared.addFirebaseAdmins(dialogId: updatedDialog.id ?? "", adminIds: updatedDialog.adminsIDs ?? [], onSuccess: { _ in
+                                    changeDialogRealmData.shared.insertDialogs([updatedDialog]) {
+                                        self.isAdmin = true
+                                        self.isOwner = false
+                                        print("Success adding contact as admin!")
+                                        UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                        self.notiType = "success"
+                                        self.notiText = "Successfully added \(self.contact.fullName) as admin."
+                                        self.showAlert.toggle()
+                                        self.auth.sendPushNoti(userIDs: [NSNumber(value: self.contact.id)], title: "Added Admin", message: "\(self.auth.profile.results.first?.fullName ?? "Chatr User") added you as an admin 🥳")
+                                    }
+                                }, onError: { _ in })
                             }) { (error) in
                                 print("Error adding contact as admin: \(error.localizedDescription) && \(UserDefaults.standard.string(forKey: "selectedDialogID") ?? "")")
                                 UINotificationFeedbackGenerator().notificationOccurred(.error)
@@ -162,16 +164,18 @@ struct DialogContactCell: View {
                             }
                         } else {
                             Request.removeAdminsFromDialog(withID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "", adminsUserIDs: [NSNumber(value: self.contact.id)], successBlock: { (updatedDialog) in
-                                changeDialogRealmData.shared.insertDialogs([updatedDialog]) {
-                                    self.isAdmin = false
-                                    self.isOwner = false
-                                    print("Success removing contact as admin!")
-                                    UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                    self.notiType = "success"
-                                    self.notiText = "Successfully removed \(self.contact.fullName) as admin."
-                                    self.showAlert.toggle()
-                                    self.auth.sendPushNoti(userIDs: [NSNumber(value: self.contact.id)], title: "Removed Admin", message: "\(self.auth.profile.results.first?.fullName ?? "Chatr User") removed you as an admin")
-                                }
+                                changeDialogRealmData.shared.removeFirebaseAdmin(dialogId: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "", adminId: NSNumber(value: self.contact.id), onSuccess: { _ in
+                                    changeDialogRealmData.shared.insertDialogs([updatedDialog]) {
+                                        self.isAdmin = false
+                                        self.isOwner = false
+                                        print("Success removing contact as admin!")
+                                        UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                        self.notiType = "success"
+                                        self.notiText = "Successfully removed \(self.contact.fullName) as admin."
+                                        self.showAlert.toggle()
+                                        self.auth.sendPushNoti(userIDs: [NSNumber(value: self.contact.id)], title: "Removed As Admin", message: "\(self.auth.profile.results.first?.fullName ?? "Chatr User") removed you as an admin")
+                                    }
+                                }, onError: { _ in })
                             }) { (error) in
                                 print("Error removing contact as admin: \(error.localizedDescription)")
                                 UINotificationFeedbackGenerator().notificationOccurred(.error)

@@ -22,6 +22,7 @@ class PublicDialogModel {
     var avatar: String?
     var description: String?
     var canMembersType: Bool?
+    var banned: Bool?
 }
 
 extension PublicDialogModel {
@@ -30,7 +31,7 @@ extension PublicDialogModel {
         
         dialog.id = key
         dialog.name = dict["name"] as? String
-        dialog.memberCount = dict["members"] as? Int
+        dialog.memberCount = dict["memberCount"] as? Int
         dialog.creationOrder = dict["creation_order"] as? Int
         dialog.owner = dict["owner"] as? Int
         dialog.dateCreated = dict["date_created"] as? String
@@ -38,6 +39,7 @@ extension PublicDialogModel {
         dialog.avatar = dict["avatar"] as? String
         dialog.description = dict["description"] as? String
         dialog.canMembersType = dict["canMembersType"] as? Bool
+        dialog.banned = dict["banned"] as? Bool
 
         return dialog
     }

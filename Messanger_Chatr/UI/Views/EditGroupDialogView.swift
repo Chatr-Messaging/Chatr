@@ -71,6 +71,7 @@ struct EditGroupDialogView: View {
                                                 .indicator(.activity)
                                                 .scaledToFill()
                                                 .frame(width: Constants.screenWidth - 32, height: 160, alignment: .center)
+                                                .clipped()
                                                 .offset(y: -20)
                                         } else {
                                             ZStack {
@@ -341,13 +342,13 @@ struct EditGroupDialogView: View {
                         
                         self.styleBuilder(content: {
                             HStack {
-                                Image(systemName: "pencil")
+                                Image(systemName: "keyboard")
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 20, height: 20, alignment: .center)
                                     .foregroundColor(.primary)
 
-                                Toggle("Members Typing", isOn: self.$canMembersType)
+                                Toggle("Member Contributions", isOn: self.$canMembersType)
                                     .padding(.leading, 5)
                                     .onReceive([self.canMembersType].publisher.first()) { (value) in
                                         Database.database().reference().child("Marketplace").child("public_dialogs").child("\(self.dialogModel.id)").updateChildValues(["canMembersType" : value])
@@ -359,6 +360,15 @@ struct EditGroupDialogView: View {
                                 self.canMembersType = self.dialogModel.canMembersType
                             }
                         })
+                        
+                        HStack(alignment: .center) {
+                            Text("member contributions: allows any subscribed member to send messages and media")
+                                .font(.caption)
+                                .fontWeight(.none)
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.leading)
+                        }.padding(.horizontal, 20)
+                        .padding(.bottom, 20)
                     }
                     
                     //MARK: Footer Section
@@ -420,11 +430,14 @@ struct EditGroupDialogView: View {
             parameters.dialogDescription = self.bioText
 
             Request.updateDialog(withID: self.dialogModel.id, update: parameters, successBlock: { (updatedDialog) in
-                changeDialogRealmData.shared.updateDialogNameDescription(name: self.fullNameText, description: self.bioText, dialogID: self.dialogModel.id)
-                UINotificationFeedbackGenerator().notificationOccurred(.success)
-                self.loadingSave = false
-                self.didSave = true
-                //changeDialogRealmData.shared.fetchDialogs(completion: { _ in })
+                let databaseRef = Database.database().reference().child("Marketplace").child(self.dialogModel.id)
+
+                databaseRef.updateChildValues(["canMembersType" : self.canMembersType, "description" : self.bioText, "name" : self.fullNameText], withCompletionBlock: { (_,_) in
+                    changeDialogRealmData.shared.updateDialogNameDescription(name: self.fullNameText, description: self.bioText, membersType: self.canMembersType, dialogID: self.dialogModel.id)
+                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                    self.loadingSave = false
+                    self.didSave = true
+                })
             }) { (error) in
                 UINotificationFeedbackGenerator().notificationOccurred(.error)
                 self.loadingSave = false
@@ -445,8 +458,12 @@ struct EditGroupDialogView: View {
             parameters.photo = blob.uid
             
             Request.updateDialog(withID: self.dialogModel.id, update: parameters, successBlock: { (updatedDialog) in
-                changeDialogRealmData.shared.updateDialogAvatar(avatar: updatedDialog.photo ?? "", dialogID: self.dialogModel.id)
-                completion(true)
+                let databaseRef = Database.database().reference().child("Marketplace").child(self.dialogModel.id)
+                databaseRef.updateChildValues(["avatar" : updatedDialog.photo ?? ""], withCompletionBlock: { (_,_) in
+                    changeDialogRealmData.shared.updateDialogAvatar(avatar: updatedDialog.photo ?? "", dialogID: self.dialogModel.id)
+                    completion(true)
+                })
+                
             }, errorBlock: { (error) in
                 completion(false)
             })
@@ -467,10 +484,10 @@ struct EditGroupDialogView: View {
             let parameters = UpdateChatDialogParameters()
             parameters.photo = blob.uid
             let databaseRef = Database.database().reference().child("Marketplace").child(self.dialogModel.id)
-
-            databaseRef.setValue(["cover_photo" : blob.uid])
-            changeDialogRealmData.shared.updateDialogCoverPhoto(coverPhoto: blob.uid ?? "", dialogID: self.dialogModel.id)
-            completion(true)
+            databaseRef.updateChildValues(["cover_photo" : blob.uid ?? ""], withCompletionBlock: { (_,_) in
+                changeDialogRealmData.shared.updateDialogCoverPhoto(coverPhoto: blob.uid ?? "", dialogID: self.dialogModel.id)
+                completion(true)
+            })
         }) { (error) in
             print("error somehow uploading...\(error.localizedDescription)")
             completion(false)

@@ -79,16 +79,23 @@ struct PublicDialogDiscoverCell: View {
                             Button(action: {
                                 if !self.isJoined {
                                     Request.subscribeToPublicDialog(withID: self.dialogData.id ?? "", successBlock: { dialogz in
-                                        UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                        self.isJoined = true
-                                        changeDialogRealmData.shared.insertDialogs([dialogz], completion: {
-                                            self.auth.sendPushNoti(userIDs: [NSNumber(value: dialogz.userID)], title: "\(dialogz.name ?? "no name") Joined", message: "\(self.auth.profile.results.first?.fullName ?? "No Name") joined your public chat \(dialogz.name ?? "no name")")
+                                        changeDialogRealmData.shared.toggleFirebaseMemberCount(dialogId: dialogz.id ?? "", onSuccess: { _ in
+                                            UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                            self.isJoined = true
+                                            changeDialogRealmData.shared.insertDialogs([dialogz], completion: {
+                                                self.auth.sendPushNoti(userIDs: [NSNumber(value: dialogz.userID)], title: "\(dialogz.name ?? "no name") Joined", message: "\(self.auth.profile.results.first?.fullName ?? "No Name") joined your public chat \(dialogz.name ?? "no name")")
+                                            })
+                                        }, onError: { _ in
+                                            UINotificationFeedbackGenerator().notificationOccurred(.error)
+                                            self.isJoined = false
                                         })
                                     }) { (error) in
                                         UINotificationFeedbackGenerator().notificationOccurred(.error)
+                                        self.isJoined = false
                                     }
                                 } else {
                                     UINotificationFeedbackGenerator().notificationOccurred(.error)
+                                    self.isJoined = false
                                 }
                             }) {
                                 Text(self.isJoined ? "JOINED" : "JOIN")

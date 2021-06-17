@@ -469,18 +469,20 @@ struct NewConversationView: View {
                             Request.uploadFile(with: coverData!, fileName: "publicDialog_coverImg", contentType: "image/jpeg", isPublic: true, progressBlock: { (progress) in
                                 print("uploading cover image: \(progress)")
                             }, successBlock: { (blobCover) in
-                                databaseRef.child(dialog.id?.description ?? "").setValue(["name" : self.groupName, "members" : "0", "date_created" : Date().description, "cover_photo" : blobCover.id.description])
+                                changeDialogRealmData.shared.fetchTotalCountPublicDialogs(completion: { count in
+                                    databaseRef.child(dialog.id?.description ?? "").setValue(["avatar" : dialog.photo ?? "", "banned" : false, "canMembersType" : false, "cover_photo" : blobCover.id.description, "creation_order" : count + 1, "date_created" : Date().description, "description" : dialog.description, "memberCount" : 1, "members" : [UserDefaults.standard.integer(forKey: "currentUserID") : true], "name" : self.groupName, "owner" : UserDefaults.standard.integer(forKey: "currentUserID")])
 
-                                self.description = ""
-                                self.groupName = ""
-                                self.inputImage = nil
-                                self.selectedTags.removeAll()
-                                self.newDialogID = dialog.id?.description ?? ""
-                                UserDefaults.standard.set(self.newDialogID, forKey: "selectedDialogID")
-                                self.creatingDialog = false
-                                withAnimation {
-                                    self.presentationMode.wrappedValue.dismiss()
-                                }
+                                    self.description = ""
+                                    self.groupName = ""
+                                    self.inputImage = nil
+                                    self.selectedTags.removeAll()
+                                    self.newDialogID = dialog.id?.description ?? ""
+                                    UserDefaults.standard.set(self.newDialogID, forKey: "selectedDialogID")
+                                    self.creatingDialog = false
+                                    withAnimation {
+                                        self.presentationMode.wrappedValue.dismiss()
+                                    }
+                                })
                             }) { (error) in
                                 print("error uploading cover image...\(error.localizedDescription)")
                                 self.creatingDialog = false

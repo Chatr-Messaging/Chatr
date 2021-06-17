@@ -43,12 +43,16 @@ struct PublicActionSection: View {
             if self.dialogRelationship == .notSubscribed {
                 Button(action: {
                     Request.subscribeToPublicDialog(withID: self.dialogModel.id, successBlock: { dialogz in
-                        UINotificationFeedbackGenerator().notificationOccurred(.success)
-                        self.dialogRelationship = .subscribed
-                        changeDialogRealmData.shared.insertDialogs([dialogz], completion: {
-                            changeDialogRealmData.shared.observeFirebaseDialogReturn(dialogModel: self.dialogModel, completion: { _,_   in
+                        changeDialogRealmData.shared.toggleFirebaseMemberCount(dialogId: dialogz.id ?? "", onSuccess: { _ in
+                            UINotificationFeedbackGenerator().notificationOccurred(.success)
+                            self.dialogRelationship = .subscribed
+                            changeDialogRealmData.shared.insertDialogs([dialogz], completion: {
                                 self.auth.sendPushNoti(userIDs: [NSNumber(value: self.dialogModel.owner)], title: "\(self.dialogModel.fullName) Joined", message: "\(self.auth.profile.results.first?.fullName ?? "No Name") joined your public chat \(self.dialogModel.fullName)")
                             })
+                        }, onError: { err in
+                            print("there is an error updating the member count: \(String(describing: err))")
+                            UINotificationFeedbackGenerator().notificationOccurred(.error)
+                            self.dialogRelationship = .error
                         })
                     }) { (error) in
                         UINotificationFeedbackGenerator().notificationOccurred(.error)

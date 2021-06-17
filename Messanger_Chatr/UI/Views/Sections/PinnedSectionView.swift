@@ -134,7 +134,7 @@ struct PinnedSectionView: View {
             .padding(.trailing)
             .gridStyle(self.style)
         }
-        .padding(.bottom)
+        .padding(.bottom, 10)
     }
     
     func pinMessage(message: MessageStruct, completion: @escaping (Bool) -> Void) {

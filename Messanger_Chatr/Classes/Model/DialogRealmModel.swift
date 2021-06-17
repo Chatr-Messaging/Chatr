@@ -19,6 +19,7 @@ class DialogStruct : Object {
     @objc dynamic var onlineUserCount: Int = 0
     @objc dynamic var lastMessageDate: Date = Date()
     @objc dynamic var notificationCount: Int = 0
+    @objc dynamic var publicMemberCount: Int = 0
     @objc dynamic var image: String = ""
     @objc dynamic var isOpen : Bool = false
     @objc dynamic var typedText: String = ""
@@ -139,6 +140,10 @@ class changeDialogRealmData {
                             foundDialog.notificationCount = Int(object.unreadMessagesCount)
                         }
                         
+                        if object.type == .public && foundDialog.publicMemberCount != Int(object.occupantsCount) {
+                            foundDialog.publicMemberCount = Int(object.occupantsCount)
+                        }
+                        
                         if let bio = object.dialogDescription, foundDialog.bio != bio {
                             foundDialog.bio = bio
                         }
@@ -166,7 +171,10 @@ class changeDialogRealmData {
                     if object.type == .private { newData.dialogType = "private" }
                     else if object.type == .group { newData.dialogType = "group" }
                     else if object.type == .broadcast { newData.dialogType = "broadcast" }
-                    else if object.type == .public { newData.dialogType = "public" }
+                    else if object.type == .public {
+                        newData.dialogType = "public"
+                        newData.publicMemberCount = Int(object.occupantsCount)
+                    }
 
                     if object.type == .group || object.type == .public {
                         for admin in object.adminsIDs ?? [] {
@@ -242,6 +250,122 @@ class changeDialogRealmData {
             } else {
                 completion(nil, nil)
             }
+        })
+    }
+    
+    func toggleFirebaseMemberCount(dialogId: String, onSuccess: @escaping (PublicDialogModel) -> Void, onError: @escaping (_ errorMessage: String?) -> Void) {
+        //let dialogRef = Api.Post.REF_POSTS.child(dialogId)
+        let dialogRef = Database.database().reference().child("Marketplace").child("public_dialogs").child("\(dialogId)")
+
+        dialogRef.runTransactionBlock({ (currentData: MutableData) -> TransactionResult in
+            if var dia = currentData.value as? [String : AnyObject] {
+                let userId = "\(UserDefaults.standard.integer(forKey: "currentUserID"))"
+                var likes: Dictionary<String, Bool>
+
+                likes = dia["members"] as? [String : Bool] ?? [:]
+                var likeCount = dia["memberCount"] as? Int ?? 0
+                if let _ = likes[userId] {
+                    likeCount -= 1
+                    likes.removeValue(forKey: userId)
+                } else {
+                    likeCount += 1
+                    likes[userId] = true
+                }
+                dia["memberCount"] = likeCount as AnyObject?
+                dia["members"] = likes as AnyObject?
+                
+                currentData.value = dia
+                
+                return TransactionResult.success(withValue: currentData)
+            }
+        
+            return TransactionResult.success(withValue: currentData)
+        }) { (error, committed, snapshot) in
+            if let error = error {
+                onError(error.localizedDescription)
+            }
+
+            if let dict = snapshot?.value as? [String: Any], let snap = snapshot?.key {
+                let dia = PublicDialogModel.transformDialog(dict, key: snap)
+                onSuccess(dia)
+            }
+        }
+    }
+    
+    func addFirebaseAdmins(dialogId: String, adminIds: [NSNumber], onSuccess: @escaping (PublicDialogModel) -> Void, onError: @escaping (_ errorMessage: String?) -> Void) {
+        let dialogRef = Database.database().reference().child("Marketplace").child("public_dialogs").child("\(dialogId)")
+
+        for id in adminIds {
+            dialogRef.runTransactionBlock({ (currentData: MutableData) -> TransactionResult in
+                if var dia = currentData.value as? [String : AnyObject] {
+                    let userId = "\(id)"
+                    var admins: Dictionary<String, Bool>
+
+                    admins = dia["adminIds"] as? [String : Bool] ?? [:]
+                    admins[userId] = true
+                    dia["adminIds"] = admins as AnyObject?
+                    
+                    currentData.value = dia
+                    
+                    return TransactionResult.success(withValue: currentData)
+                }
+            
+                return TransactionResult.success(withValue: currentData)
+            }) { (error, committed, snapshot) in
+                if let error = error {
+                    onError(error.localizedDescription)
+                }
+
+                if let dict = snapshot?.value as? [String: Any], let snap = snapshot?.key {
+                    let dia = PublicDialogModel.transformDialog(dict, key: snap)
+                    onSuccess(dia)
+                }
+            }
+        }
+    }
+
+    func removeFirebaseAdmin(dialogId: String, adminId: NSNumber, onSuccess: @escaping (PublicDialogModel) -> Void, onError: @escaping (_ errorMessage: String?) -> Void) {
+        let dialogRef = Database.database().reference().child("Marketplace").child("public_dialogs").child("\(dialogId)")
+
+        dialogRef.runTransactionBlock({ (currentData: MutableData) -> TransactionResult in
+            if var dia = currentData.value as? [String : AnyObject] {
+                let userId = "\(adminId)"
+                var admins: Dictionary<String, Bool>
+
+                admins = dia["adminIds"] as? [String : Bool] ?? [:]
+                
+                if let _ = admins[userId] {
+                    admins.removeValue(forKey: userId)
+                }
+                
+                admins[userId] = true
+                dia["adminIds"] = admins as AnyObject?
+                
+                currentData.value = dia
+                
+                return TransactionResult.success(withValue: currentData)
+            }
+        
+            return TransactionResult.success(withValue: currentData)
+        }) { (error, committed, snapshot) in
+            if let error = error {
+                onError(error.localizedDescription)
+            }
+
+            if let dict = snapshot?.value as? [String: Any], let snap = snapshot?.key {
+                let dia = PublicDialogModel.transformDialog(dict, key: snap)
+                onSuccess(dia)
+            }
+        }
+    }
+    
+    func fetchTotalCountPublicDialogs(completion: @escaping (Int) -> Void) {
+        let dialogRef = Database.database().reference().child("Marketplace").child("public_dialogs")
+
+        dialogRef.observe(.value, with: {
+            snapshot in
+            let count = Int(snapshot.childrenCount)
+            completion(count)
         })
     }
     
@@ -336,7 +460,7 @@ class changeDialogRealmData {
         }
     }
     
-    func updateDialogNameDescription(name: String, description: String, dialogID: String) {
+    func updateDialogNameDescription(name: String, description: String, membersType: Bool, dialogID: String) {
         let config = Realm.Configuration(schemaVersion: 1)
         do {
             let realm = try Realm(configuration: config)
@@ -345,6 +469,7 @@ class changeDialogRealmData {
             try? realm.safeWrite({
                 dialogResult?.fullName = name
                 dialogResult?.bio = description
+                dialogResult?.canMembersType = membersType
                 realm.add(dialogResult!, update: .all)
             })
         } catch {
@@ -397,7 +522,12 @@ class changeDialogRealmData {
     
     func deletePrivateConnectyDialog(dialogID: String, isOwner: Bool) {
         Request.deleteDialogs(withIDs: Set<String>([dialogID]), forAllUsers: isOwner ? true : false, successBlock: { (deletedObjectsIDs, notFoundObjectsIDs, wrongPermissionsObjectsIDs) in
-            self.updateDialogDelete(isDelete: true, dialogID: dialogID)
+            self.toggleFirebaseMemberCount(dialogId: dialogID, onSuccess: { _ in
+                self.updateDialogDelete(isDelete: true, dialogID: dialogID)
+                changeDialogRealmData.shared.removeFirebaseAdmin(dialogId: dialogID, adminId: NSNumber(value: UserDefaults.standard.integer(forKey: "currentUserID")), onSuccess: { _ in }, onError: { _ in })
+            }, onError: { err in
+                print("error deleting public: \(String(describing: err)) for dialog: \(dialogID)")
+            })
         }) { (error) in
             print("error deleting dialog: \(error.localizedDescription) for dialog: \(dialogID)")
             self.updateDialogDelete(isDelete: true, dialogID: dialogID)
@@ -406,7 +536,12 @@ class changeDialogRealmData {
 
     func unsubscribePublicConnectyDialog(dialogID: String) {
         Request.unsubscribeFromPublicDialog(withID: dialogID, successBlock: {
-            self.updateDialogDelete(isDelete: true, dialogID: dialogID)
+            self.toggleFirebaseMemberCount(dialogId: dialogID, onSuccess: { _ in
+                self.updateDialogDelete(isDelete: true, dialogID: dialogID)
+                changeDialogRealmData.shared.removeFirebaseAdmin(dialogId: dialogID, adminId: NSNumber(value: UserDefaults.standard.integer(forKey: "currentUserID")), onSuccess: { _ in }, onError: { _ in })
+            }, onError: { err in
+                print("error deleting public: \(String(describing: err)) for dialog: \(dialogID)")
+            })
         }, errorBlock: { error in
             print("error deleting public: \(error.localizedDescription) for dialog: \(dialogID)")
         })

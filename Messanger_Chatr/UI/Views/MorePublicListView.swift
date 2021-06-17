@@ -88,7 +88,7 @@ struct MorePublicListView: View {
 
             if self.viewState == .tags {
                 self.viewModel.observeTopTagDialogs(tagId: self.tagId, kPagination: 20, loadMore: false, completion: { dia in
-                    if !self.dialogData.contains(where: { $0.id == dia.id }) {
+                    if dia.banned == false, !self.dialogData.contains(where: { $0.id == dia.id }) {
                         self.dialogData.append(dia)
                     }
                 }, isHiddenIndicator: { hide in
@@ -101,7 +101,7 @@ struct MorePublicListView: View {
                 })
             } else if self.viewState == .popular {
                 self.viewModel.observeTopDialogs(kPagination: 20, loadMore: false, completion: { dia in
-                    if !self.dialogData.contains(where: { $0.id == dia.id }) {
+                    if dia.banned == false, !self.dialogData.contains(where: { $0.id == dia.id }) {
                         self.dialogData.append(dia)
                     }
                 }, isHiddenIndicator: { hide in
@@ -110,7 +110,7 @@ struct MorePublicListView: View {
                 })
             } else if self.viewState == .newest {
                 self.viewModel.observeRecentDialogs(kPagination: 20, loadMore: false, completion: { dia in
-                    if !self.dialogData.contains(where: { $0.id == dia.id }) {
+                    if dia.banned == false, !self.dialogData.contains(where: { $0.id == dia.id }) {
                         self.dialogData.append(dia)
                     }
                 }, isHiddenIndicator: { hide in

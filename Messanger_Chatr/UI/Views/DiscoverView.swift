@@ -91,7 +91,7 @@ struct DiscoverView: View {
                                 //self.grandSeach(searchText: self.searchText)
                                 self.viewModel.searchPublicDialog(withText: self.searchText, completion: { dia in
                                     print("found dialog isss: \(String(describing: dia.name))")
-                                    if !self.grandSearchData.contains(where: { $0.id == dia.id }) {
+                                    if dia.banned == false, !self.grandSearchData.contains(where: { $0.id == dia.id }) {
                                         withAnimation {
                                             self.grandSearchData.append(dia)
                                         }
@@ -218,10 +218,10 @@ struct DiscoverView: View {
                 //MARK: Popular Section
                 if self.topDialogsData.count > 0 {
                     VStack {
-                        HStack {
+                        HStack(alignment: .bottom) {
                             Text("Popular")
-                                .font(.system(size: 26))
-                                .fontWeight(.semibold)
+                                .font(.system(size: 30))
+                                .fontWeight(.bold)
                                 .foregroundColor(.primary)
                                 
                             Spacer()
@@ -231,9 +231,9 @@ struct DiscoverView: View {
                             }, label: {
                                 Text("see all")
                                     .foregroundColor(.blue)
-                            })
+                            }).opacity(self.topDialogsData.count > 5 ? 1 : 0)
                         }.padding(.horizontal, 30)
-                        .padding(.top, 30)
+                        .padding(.top, 35)
                         .padding(.bottom, 10)
 
                         self.styleBuilder(content: {
@@ -292,10 +292,10 @@ struct DiscoverView: View {
                 //MARK: Recent Section
                 if self.recentDialogsData.count > 0 {
                     VStack {
-                        HStack {
+                        HStack(alignment: .bottom) {
                             Text("Newest")
-                                .font(.system(size: 26))
-                                .fontWeight(.semibold)
+                                .font(.system(size: 30))
+                                .fontWeight(.bold)
                                 .foregroundColor(.primary)
 
                             Spacer()
@@ -305,9 +305,9 @@ struct DiscoverView: View {
                             }, label: {
                                 Text("see all")
                                     .foregroundColor(.blue)
-                            })
+                            }).opacity(self.recentDialogsData.count > 5 ? 1 : 0)
                         }.padding(.horizontal, 30)
-                        .padding(.top, 30)
+                        .padding(.top, 35)
                         .padding(.bottom, 10)
 
                         self.styleBuilder(content: {
@@ -375,7 +375,7 @@ struct DiscoverView: View {
                 
                 if self.bannerDataArray.isEmpty {
                     self.viewModel.observeFeaturedDialogs({ dialog in
-                        if !self.bannerDataArray.contains(where: { $0.id == dialog.id }) {
+                        if dialog.banned == false, !self.bannerDataArray.contains(where: { $0.id == dialog.id }) {
                             self.bannerDataArray.append(dialog)
                         }
                     }, isHiddenIndicator: { hide in
@@ -385,7 +385,7 @@ struct DiscoverView: View {
                 
                 if self.topDialogsData.isEmpty {
                     self.viewModel.observeTopDialogs(kPagination: 6, loadMore: false, completion: { dia in
-                        if !self.topDialogsData.contains(where: { $0.id == dia.id }) {
+                        if dia.banned == false, !self.topDialogsData.contains(where: { $0.id == dia.id }) {
                             self.topDialogsData.append(dia)
                         }
                     }, isHiddenIndicator: { hide in
@@ -396,7 +396,7 @@ struct DiscoverView: View {
 
                 if self.recentDialogsData.isEmpty {
                     self.viewModel.observeRecentDialogs(kPagination: 6, loadMore: false, completion: { dia in
-                        if !self.recentDialogsData.contains(where: { $0.id == dia.id }) {
+                        if dia.banned == false, !self.recentDialogsData.contains(where: { $0.id == dia.id }) {
                             self.recentDialogsData.append(dia)
                         }
                     }, isHiddenIndicator: { hide in

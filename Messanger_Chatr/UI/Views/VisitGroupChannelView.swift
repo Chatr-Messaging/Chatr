@@ -76,10 +76,11 @@ struct VisitGroupChannelView: View {
                     if self.dialogModel.dialogType == "public" {
                         PublicActionSection(dialogRelationship: self.$dialogRelationship, dialogModel: self.$dialogModel, currentUserIsPowerful: self.$currentUserIsPowerful, dismissView: self.$dismissView)
                             .environmentObject(self.auth)
+                            .padding(.bottom)
                     }
                     
                     //MARK: Pinned Section
-                    if self.dialogModel.pinMessages.count > 0 {
+                    if !self.dialogModel.pinMessages.isEmpty {
                         PinnedSectionView(showPinDetails: self.$showPinDetails, dialog: self.dialogModel)
                             .environmentObject(self.auth)
                     }
@@ -145,7 +146,7 @@ struct VisitGroupChannelView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
                     .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
                     .padding(.horizontal)
-                    .padding(.bottom, self.dialogModelAdmins.isEmpty || self.dialogModelMembers.isEmpty ? 0 : 15)
+                    .padding(.bottom, !self.dialogModelAdmins.isEmpty || ((self.dialogModel.dialogType == "group") || (self.dialogModel.dialogType == "public") && self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID")) ? 15 : 0)
 
                     //MARK: Memebrs / Admins List Section
                     HStack(alignment: .bottom) {
@@ -155,83 +156,131 @@ struct VisitGroupChannelView: View {
                             .foregroundColor(.secondary)
                             .padding(.horizontal)
                             .padding(.horizontal)
-                            .offset(y: self.dialogModel.dialogType == "public" ? -2 : 2)
+                            .offset(y: 2)
                         Spacer()
-                    }.opacity(self.dialogModelMembers.isEmpty ? 0 : 1)
+                    }.opacity((self.dialogModel.dialogType == "group") || (self.dialogModel.dialogType == "public") && self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? 1 : 0)
                     
                     VStack(alignment: .center, spacing: 0) {
-                        ForEach(self.dialogModelMembers.indices, id: \.self) { id in
-                            VStack(alignment: .trailing, spacing: 0) {
-                                if id == 0 && self.dialogModel.dialogType == "group" {
-                                    Button(action: {
-                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                        self.showAddMembers.toggle()
-                                    }) {
-                                        VStack(alignment: .trailing, spacing: 0) {
-                                            HStack {
-                                                Image(systemName: "person.crop.circle.badge.plus")
-                                                    .resizable()
-                                                    .scaledToFit()
-                                                    .frame(width: 42, height: 20, alignment: .center)
-                                                    .foregroundColor(Color("SoftTextColor"))
-                                                
-                                                Text("Add Members")
-                                                    .font(.subheadline)
-                                                    .foregroundColor(Color.blue)
-                                                
-                                                Spacer()
-                                                Image(systemName: "chevron.right")
-                                                    .resizable()
-                                                    .font(Font.title.weight(.bold))
-                                                    .scaledToFit()
-                                                    .frame(width: 7, height: 15, alignment: .center)
-                                                    .foregroundColor(.secondary)
-                                            }.padding(.horizontal)
-                                            .padding(.vertical, 12.5)
-                                            .contentShape(Rectangle())
-                                            
-                                            Divider()
-                                                .frame(width: Constants.screenWidth - 80)
-                                                .offset(x: 20)
-                                        }
-                                    }.buttonStyle(changeBGButtonStyle())
-                                    .sheet(isPresented: self.$showAddMembers, onDismiss: {
-                                        if self.selectedNewMembers.count > 0 {
-                                            let updateParameters = UpdateChatDialogParameters()
-                                            var occu: [NSNumber] = []
-                                            for i in self.selectedNewMembers {
-                                                occu.append(NSNumber(value: i))
-                                                if !self.dialogModel.occupentsID.contains(i) {
-                                                    self.dialogModelMembers.append(i)
+                        if (self.dialogModel.dialogType == "group") || (self.dialogModel.dialogType == "public") && self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") {
+                            Button(action: {
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                self.showAddMembers.toggle()
+                            }) {
+                                VStack(alignment: .trailing, spacing: 0) {
+                                    HStack {
+                                        Image(systemName: "person.crop.circle.badge.plus")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 42, height: 20, alignment: .center)
+                                            .foregroundColor(Color("SoftTextColor"))
+                                        
+                                        Text(self.dialogModel.dialogType == "public" ? "Add Admins" : "Add Members")
+                                            .font(.subheadline)
+                                            .foregroundColor(Color.blue)
+                                        
+                                        Spacer()
+                                        Image(systemName: "chevron.right")
+                                            .resizable()
+                                            .font(Font.title.weight(.bold))
+                                            .scaledToFit()
+                                            .frame(width: 7, height: 15, alignment: .center)
+                                            .foregroundColor(.secondary)
+                                    }.padding(.horizontal)
+                                    .padding(.vertical, self.dialogModelMembers.isEmpty ? 17.5 : 12.5)
+                                    .contentShape(Rectangle())
+                                    
+                                    Divider()
+                                        .frame(width: Constants.screenWidth - 80)
+                                        .offset(x: 20)
+                                        .opacity(!self.dialogModelMembers.isEmpty ? 1 : 0)
+                                }
+                            }.buttonStyle(changeBGButtonStyle())
+                            .sheet(isPresented: self.$showAddMembers, onDismiss: {
+                                guard self.selectedNewMembers.count > 0 else { return }
+
+                                var occu: [NSNumber] = []
+                                for i in self.selectedNewMembers {
+                                    occu.append(NSNumber(value: i))
+                                }
+                                
+                                if self.dialogModel.dialogType == "public" {
+                                    Request.addAdminsToDialog(withID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "", adminsUserIDs: occu, successBlock: { (updatedDialog) in
+                                        changeDialogRealmData.shared.addFirebaseAdmins(dialogId: updatedDialog.id ?? "", adminIds: updatedDialog.adminsIDs ?? [], onSuccess: { _ in
+                                            changeDialogRealmData.shared.insertDialogs([updatedDialog]) {
+                                                print("Success adding contact as admin!")
+                                                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                                for i in self.selectedNewMembers {
+                                                    if !self.dialogModel.occupentsID.contains(i) {
+                                                        self.dialogModelMembers.append(i)
+                                                        self.auth.sendPushNoti(userIDs: [NSNumber(value: i)], title: "Added Admin", message: "\(self.auth.profile.results.first?.fullName ?? "Chatr User") added you as an admin to \(self.dialogModel.fullName) 🥳")
+                                                    }
                                                 }
-                                            }
-                                            print("adding new user to group!: \(occu.count)")
-                                            updateParameters.occupantsIDsToAdd = occu
-                                            
-                                            Request.updateDialog(withID: self.dialogModel.id, update: updateParameters, successBlock: { (updatedDialog) in
-                                                changeDialogRealmData.shared.insertDialogs([updatedDialog]) { }
-                                                occu.removeAll()
+                                                
                                                 self.addNewMemberID = ""
                                                 self.selectedNewMembers.removeAll()
                                                 self.notiType = "success"
-                                                self.notiText = occu.count == 0 ? "Successfully added a new member" : "Successfully added new members."
-                                                self.showAlert = true
-                                                UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                            }) { (error) in
-                                                self.notiType = "error"
-                                                self.notiText = "One or more of the selected contacts are already in the chat."
-                                                UINotificationFeedbackGenerator().notificationOccurred(.error)
-                                                self.selectedNewMembers.removeAll()
-                                                self.showAlert = true
-                                                print("error adding members to dialog: \(error.localizedDescription)")
+                                                self.notiText = occu.count == 0 ? "Successfully added a new admin." : "Successfully added new admins."
+                                                occu.removeAll()
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                                                    self.showAlert = true
+                                                }
+                                            }
+                                        }, onError: { _ in })
+                                    }) { (error) in
+                                        let notiTextConfig = self.selectedNewMembers.count > 1 ? "The selected contact is already " : "One or more of the selected contacts are already "
+                                        self.notiType = "error"
+                                        self.notiText = notiTextConfig + "an admin."
+                                        UINotificationFeedbackGenerator().notificationOccurred(.error)
+                                        self.selectedNewMembers.removeAll()
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                                            self.showAlert = true
+                                        }
+                                        print("error adding members to dialog: \(error.localizedDescription)")
+                                    }
+                                } else {
+                                    let updateParameters = UpdateChatDialogParameters()
+                                    print("adding new user to group!: \(occu.count)")
+                                    updateParameters.occupantsIDsToAdd = occu
+                                    
+                                    Request.updateDialog(withID: self.dialogModel.id, update: updateParameters, successBlock: { (updatedDialog) in
+                                        changeDialogRealmData.shared.insertDialogs([updatedDialog]) { }
+                                        UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                        
+                                        for i in self.selectedNewMembers {
+                                            if !self.dialogModel.occupentsID.contains(i) {
+                                                self.dialogModelMembers.append(i)
+                                                self.auth.sendPushNoti(userIDs: [NSNumber(value: i)], title: "Added To Group", message: "\(self.auth.profile.results.first?.fullName ?? "Chatr User") added you to \(self.dialogModel.fullName).")
                                             }
                                         }
-                                    }) {
-                                        NewConversationView(usedAsNew: false, selectedContact: self.$selectedNewMembers, newDialogID: self.$addNewMemberID)
-                                            .environmentObject(self.auth)
+                                        
+                                        self.addNewMemberID = ""
+                                        self.selectedNewMembers.removeAll()
+                                        self.notiType = "success"
+                                        self.notiText = occu.count == 0 ? "Successfully added a new member" : "Successfully added new members."
+                                        occu.removeAll()
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                                            self.showAlert = true
+                                        }
+                                    }) { (error) in
+                                        let notiTextConfig = self.selectedNewMembers.count > 1 ? "The selected contact is already " : "One or more of the selected contacts are already "
+                                        self.notiType = "error"
+                                        self.notiText = notiTextConfig + "in the chat."
+                                        UINotificationFeedbackGenerator().notificationOccurred(.error)
+                                        self.selectedNewMembers.removeAll()
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                                            self.showAlert = true
+                                        }
+                                        print("error adding members to dialog: \(error.localizedDescription)")
                                     }
                                 }
-                                
+                            }) {
+                                NewConversationView(usedAsNew: false, selectedContact: self.$selectedNewMembers, newDialogID: self.$addNewMemberID)
+                                    .environmentObject(self.auth)
+                            }
+                        }
+
+                        ForEach(self.dialogModelMembers.indices, id: \.self) { id in
+                            VStack(alignment: .trailing, spacing: 0) {
                                 if id <= 3 {
                                     DialogContactCell(showAlert: self.$showAlert, notiType: self.$notiType, notiText: self.$notiText, dismissView: self.$dismissView, openNewDialogID: self.$openNewDialogID, showProfile: self.$showProfile, contactID: Int(self.dialogModelMembers[id]), isAdmin: self.dialogModel.adminID.contains(self.dialogModelMembers[id]), isOwner: self.dialogModel.owner == self.dialogModelMembers[id], currentUserIsPowerful: self.$currentUserIsPowerful, isLast: id == 3, isRemoving: self.$isRemoving)
                                         .environmentObject(self.auth)
@@ -277,7 +326,7 @@ struct VisitGroupChannelView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
                     .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
                     .padding(.horizontal)
-                    .padding(.bottom, self.dialogModelMembers.isEmpty ? 0 : 15)
+                    .padding(.bottom, (self.dialogModel.dialogType == "group") || (self.dialogModel.dialogType == "public") && self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? 15 : 0)
                     
                     //MARK: More Section
                     HStack {
@@ -345,7 +394,11 @@ struct VisitGroupChannelView: View {
                                                 changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
                                                 self.showingMoreSheet = false
                                                 
-                                                changeDialogRealmData.shared.deletePrivateConnectyDialog(dialogID: self.dialogModel.id, isOwner: self.isOwner)
+                                                if self.dialogModel.dialogType == "public" && !self.isOwner {
+                                                    changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: self.dialogModel.id)
+                                                } else {
+                                                    changeDialogRealmData.shared.deletePrivateConnectyDialog(dialogID: self.dialogModel.id, isOwner: self.isOwner)
+                                                }
                                                 print("done deleting dialog: \(self.dialogModel.id)")
                                             }), .cancel(Text("Done"))])
                         }.simultaneousGesture(TapGesture()
@@ -737,79 +790,6 @@ struct VisitGroupChannelView: View {
 
         print("the count of pinned messages are: \(self.dialogModel.pinMessages.count) for: \(dialogId)")
     }
-    
-    func observePublicDetails() {
-        changeDialogRealmData.shared.observeFirebaseDialogReturn(dialogModel: self.dialogModel, completion: { (dialog, coverPhotoUrlz) in
-            if let dia = dialog {
-                print("the returned dialog is nowww: \(dia.fullName) the dialog is pulled in and had the right data: \(dia)")
-                self.dialogModel = dia
-//                self.dialogModel.id = dia.id
-//                self.dialogModel.coverPhoto = dia.coverPhoto
-//                self.dialogModel.canMembersType = dia.canMembersType
-//                self.dialogModel.publicTags.removeAll()
-//                for tag in dia.publicTags {
-//                    self.dialogModel.publicTags.append(tag)
-//                }
-
-                for tag in dia.publicTags {
-                    if !self.publicTags.contains(tag) {
-                        self.publicTags.append(tag)
-                    }
-                }
-
-                if dia.dialogType == "group" {
-                    self.dialogRelationship = .group
-                }
-                
-                Request.updateDialog(withID: self.dialogModel.id, update: UpdateChatDialogParameters(), successBlock: { dialog in
-                    print("fetched remote dialog")
-                    self.dialogModel.fullName = dialog.name ?? "No Dialog Name"
-                    self.dialogModel.lastMessage = dialog.lastMessageText ?? "no messages sent"
-                    self.dialogModel.lastMessageDate = dialog.lastMessageDate ?? Date.init(timeIntervalSinceReferenceDate: 86400)
-                    self.dialogModel.notificationCount = Int(dialog.unreadMessagesCount)
-                    self.dialogModel.createdAt = dialog.createdAt ?? Date()
-                    self.dialogModel.owner = Int(dialog.userID)
-                    
-                    for occu in dialog.occupantIDs ?? [] {
-                        self.dialogModel.occupentsID.append(Int(truncating: occu))
-                    }
-
-                    if dialog.type == .private { self.dialogModel.dialogType = "private" }
-                    else if dialog.type == .group {
-                        self.dialogModel.dialogType = "group"
-                        self.dialogRelationship = .group
-                    }
-                    else if dialog.type == .broadcast { self.dialogModel.dialogType = "broadcast" }
-                    else if dialog.type == .public { self.dialogModel.dialogType = "public" }
-
-                    if dialog.type == .group || dialog.type == .public {
-                        for admin in dialog.adminsIDs ?? [] {
-                            self.dialogModel.adminID.append(Int(truncating: admin))
-                        }
-
-                        if let publicUrl = Blob.publicUrl(forFileUID: dialog.photo ?? "") {
-                            self.dialogModel.avatar = publicUrl
-                        }
-
-                        self.dialogModel.bio = dialog.dialogDescription ?? ""
-                    }
-
-                    if self.dialogModel.id == UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" && UserDefaults.standard.bool(forKey: "localOpen") {
-                        self.dialogModel.isOpen = true
-                    }
-                })
-            } else {
-                print("the dialog is already saved and just updated it...should refresh")
-                if self.currentUserIsPowerful || self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") {
-                    self.dialogRelationship = .subscribed
-                } else {
-                    self.dialogRelationship = .subscribed
-                }
-                
-                //self.coverPhotoUrl = coverPhotoUrlz ?? ""
-            }
-        })
-    }
 }
 
 //MARK: Top Header View
@@ -848,7 +828,7 @@ struct topGroupHeaderView: View {
                             .lineLimit(2)
                             .multilineTextAlignment(.center)
                         
-                        Text("\(self.dialogModel.occupentsID.count) " + (self.dialogModel.dialogType == "public" ? "members" : "contacts"))
+                        Text(" " + (self.dialogModel.dialogType == "public" ? "\(self.dialogModel.publicMemberCount) members" : "\(self.dialogModel.occupentsID.count) contacts"))
                             .font(.subheadline)
                             .fontWeight(.none)
                             .foregroundColor(.secondary)
