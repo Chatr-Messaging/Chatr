@@ -253,7 +253,7 @@ class changeDialogRealmData {
         })
     }
     
-    func toggleFirebaseMemberCount(dialogId: String, onSuccess: @escaping (PublicDialogModel) -> Void, onError: @escaping (_ errorMessage: String?) -> Void) {
+    func toggleFirebaseMemberCount(dialogId: String, isJoining: Bool, onSuccess: @escaping (PublicDialogModel) -> Void, onError: @escaping (_ errorMessage: String?) -> Void) {
         //let dialogRef = Api.Post.REF_POSTS.child(dialogId)
         let dialogRef = Database.database().reference().child("Marketplace").child("public_dialogs").child("\(dialogId)")
 
@@ -264,13 +264,19 @@ class changeDialogRealmData {
 
                 likes = dia["members"] as? [String : Bool] ?? [:]
                 var likeCount = dia["memberCount"] as? Int ?? 0
-                if let _ = likes[userId] {
-                    likeCount -= 1
-                    likes.removeValue(forKey: userId)
+                
+                if isJoining {
+                    if likes[userId] == nil {
+                        likeCount += 1
+                        likes[userId] = true
+                    }
                 } else {
-                    likeCount += 1
-                    likes[userId] = true
+                    if let _ = likes[userId] {
+                        likeCount -= 1
+                        likes.removeValue(forKey: userId)
+                    }
                 }
+                
                 dia["memberCount"] = likeCount as AnyObject?
                 dia["members"] = likes as AnyObject?
                 
@@ -333,12 +339,8 @@ class changeDialogRealmData {
                 var admins: Dictionary<String, Bool>
 
                 admins = dia["adminIds"] as? [String : Bool] ?? [:]
+                admins.removeValue(forKey: userId)
                 
-                if let _ = admins[userId] {
-                    admins.removeValue(forKey: userId)
-                }
-                
-                admins[userId] = true
                 dia["adminIds"] = admins as AnyObject?
                 
                 currentData.value = dia
@@ -522,7 +524,7 @@ class changeDialogRealmData {
     
     func deletePrivateConnectyDialog(dialogID: String, isOwner: Bool) {
         Request.deleteDialogs(withIDs: Set<String>([dialogID]), forAllUsers: isOwner ? true : false, successBlock: { (deletedObjectsIDs, notFoundObjectsIDs, wrongPermissionsObjectsIDs) in
-            self.toggleFirebaseMemberCount(dialogId: dialogID, onSuccess: { _ in
+            self.toggleFirebaseMemberCount(dialogId: dialogID, isJoining: false, onSuccess: { _ in
                 self.updateDialogDelete(isDelete: true, dialogID: dialogID)
                 changeDialogRealmData.shared.removeFirebaseAdmin(dialogId: dialogID, adminId: NSNumber(value: UserDefaults.standard.integer(forKey: "currentUserID")), onSuccess: { _ in }, onError: { _ in })
             }, onError: { err in
@@ -536,7 +538,7 @@ class changeDialogRealmData {
 
     func unsubscribePublicConnectyDialog(dialogID: String) {
         Request.unsubscribeFromPublicDialog(withID: dialogID, successBlock: {
-            self.toggleFirebaseMemberCount(dialogId: dialogID, onSuccess: { _ in
+            self.toggleFirebaseMemberCount(dialogId: dialogID, isJoining: false, onSuccess: { _ in
                 self.updateDialogDelete(isDelete: true, dialogID: dialogID)
                 changeDialogRealmData.shared.removeFirebaseAdmin(dialogId: dialogID, adminId: NSNumber(value: UserDefaults.standard.integer(forKey: "currentUserID")), onSuccess: { _ in }, onError: { _ in })
             }, onError: { err in

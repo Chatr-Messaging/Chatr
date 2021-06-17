@@ -80,7 +80,7 @@ struct VisitGroupChannelView: View {
                     }
                     
                     //MARK: Pinned Section
-                    if !self.dialogModel.pinMessages.isEmpty {
+                    if !self.dialogModel.pinMessages.isEmpty && !self.dialogModel.messages.isEmpty {
                         PinnedSectionView(showPinDetails: self.$showPinDetails, dialog: self.dialogModel)
                             .environmentObject(self.auth)
                     }
@@ -158,7 +158,7 @@ struct VisitGroupChannelView: View {
                             .padding(.horizontal)
                             .offset(y: 2)
                         Spacer()
-                    }.opacity((self.dialogModel.dialogType == "group") || (self.dialogModel.dialogType == "public") && self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? 1 : 0)
+                    }.opacity((self.dialogModel.dialogType == "group") || !self.dialogModelMembers.isEmpty ||  (self.dialogModel.dialogType == "public") && self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? 1 : 0)
                     
                     VStack(alignment: .center, spacing: 0) {
                         if (self.dialogModel.dialogType == "group") || (self.dialogModel.dialogType == "public") && self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") {
@@ -227,7 +227,7 @@ struct VisitGroupChannelView: View {
                                             }
                                         }, onError: { _ in })
                                     }) { (error) in
-                                        let notiTextConfig = self.selectedNewMembers.count > 1 ? "The selected contact is already " : "One or more of the selected contacts are already "
+                                        let notiTextConfig = self.selectedNewMembers.count == 1 ? "The selected contact is already " : "One or more of the selected contacts are already "
                                         self.notiType = "error"
                                         self.notiText = notiTextConfig + "an admin."
                                         UINotificationFeedbackGenerator().notificationOccurred(.error)
@@ -262,7 +262,7 @@ struct VisitGroupChannelView: View {
                                             self.showAlert = true
                                         }
                                     }) { (error) in
-                                        let notiTextConfig = self.selectedNewMembers.count > 1 ? "The selected contact is already " : "One or more of the selected contacts are already "
+                                        let notiTextConfig = self.selectedNewMembers.count == 1 ? "The selected contact is already " : "One or more of the selected contacts are already "
                                         self.notiType = "error"
                                         self.notiText = notiTextConfig + "in the chat."
                                         UINotificationFeedbackGenerator().notificationOccurred(.error)
@@ -326,7 +326,7 @@ struct VisitGroupChannelView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
                     .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
                     .padding(.horizontal)
-                    .padding(.bottom, (self.dialogModel.dialogType == "group") || (self.dialogModel.dialogType == "public") && self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? 15 : 0)
+                    .padding(.bottom, (self.dialogModel.dialogType == "group") || !self.dialogModelMembers.isEmpty || (self.dialogModel.dialogType == "public") && self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? 15 : 0)
                     
                     //MARK: More Section
                     HStack {
@@ -600,6 +600,7 @@ struct VisitGroupChannelView: View {
             
             self.isOwner = self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? true : false
             self.isAdmin = self.dialogModel.adminID.contains(UserDefaults.standard.integer(forKey: "currentUserID")) ? true : false
+            UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")
             self.canEditGroup = self.isOwner || self.isAdmin
             self.currentUserIsPowerful = self.isOwner || self.isAdmin ? true : false
             self.dialogModelMembers = self.dialogModel.occupentsID.filter { $0 != 0 }

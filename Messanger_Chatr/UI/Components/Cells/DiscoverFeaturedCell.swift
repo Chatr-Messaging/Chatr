@@ -101,12 +101,13 @@ struct DiscoverFeaturedCell: View, Identifiable {
                             if !self.isMember {
                                 Button(action: {
                                     Request.subscribeToPublicDialog(withID: self.dialogModel.id ?? "", successBlock: { dialogz in
-                                        changeDialogRealmData.shared.toggleFirebaseMemberCount(dialogId: dialogz.id ?? "", onSuccess: { _ in
+                                        changeDialogRealmData.shared.toggleFirebaseMemberCount(dialogId: dialogz.id ?? "", isJoining: true, onSuccess: { _ in
                                             UINotificationFeedbackGenerator().notificationOccurred(.success)
                                             withAnimation {
                                                 self.isMember = true
                                             }
                                             changeDialogRealmData.shared.insertDialogs([dialogz], completion: {
+                                                changeDialogRealmData.shared.updateDialogDelete(isDelete: false, dialogID: dialogz.id ?? "")
                                                 self.auth.sendPushNoti(userIDs: [NSNumber(value: dialogz.userID)], title: "\(dialogz.name ?? "no name") Joined", message: "\(self.auth.profile.results.first?.fullName ?? "No Name") joined your public chat \(dialogz.name ?? "no name")")
                                             })
                                         }, onError: { _ in
