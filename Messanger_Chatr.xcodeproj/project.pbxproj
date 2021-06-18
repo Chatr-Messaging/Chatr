@@ -26,6 +26,7 @@
 		0525E4C125EC98A90086EB54 /* PinchZoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0525E4C025EC98A90086EB54 /* PinchZoomView.swift */; };
 		0525E4C525ECC4440086EB54 /* MessageReplyCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0525E4C425ECC4440086EB54 /* MessageReplyCell.swift */; };
 		052E6E2025CE513B00C3EAE4 /* ReactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052E6E1F25CE513B00C3EAE4 /* ReactionsView.swift */; };
+		05390F62267C656C001C5720 /* PublicShareSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05390F61267C656C001C5720 /* PublicShareSection.swift */; };
 		053AC4B225194C080036946E /* GIFController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053AC4B125194C080036946E /* GIFController.swift */; };
 		053AC4B7251982560036946E /* AttachmentBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053AC4B6251982550036946E /* AttachmentBubble.swift */; };
 		053D33F22393C97B00CEE03E /* DismissGuardian.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053D33F12393C97B00CEE03E /* DismissGuardian.swift */; };
@@ -220,6 +221,7 @@
 		0525E4C025EC98A90086EB54 /* PinchZoomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinchZoomView.swift; sourceTree = "<group>"; };
 		0525E4C425ECC4440086EB54 /* MessageReplyCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageReplyCell.swift; sourceTree = "<group>"; };
 		052E6E1F25CE513B00C3EAE4 /* ReactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReactionsView.swift; sourceTree = "<group>"; };
+		05390F61267C656C001C5720 /* PublicShareSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicShareSection.swift; sourceTree = "<group>"; };
 		053A63982509647700571226 /* StoreKitTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKitTest.framework; path = Developer/Library/Frameworks/StoreKitTest.framework; sourceTree = SDKROOT; };
 		053A639A2509649A00571226 /* Configuration.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Configuration.storekit; sourceTree = "<group>"; };
 		053AC4B125194C080036946E /* GIFController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GIFController.swift; sourceTree = "<group>"; };
@@ -454,6 +456,7 @@
 				05A62392260303AB00A2BF40 /* HomeBannerCard.swift */,
 				058E760B261C2518008578E3 /* NewPublicConversationSection.swift */,
 				056BCC612654B6FC006DD302 /* PublicActionSection.swift */,
+				05390F61267C656C001C5720 /* PublicShareSection.swift */,
 				056BCC6326550562006DD302 /* stickyHeaderSection.swift */,
 				05A7BD5E24FEF3870001BFC9 /* QucickSnapsSection.swift */,
 				055F37F52608545B003EDB1F /* KeyboardAudioView.swift */,
@@ -1175,6 +1178,7 @@
 				059D1C4E25D6028800A7FB96 /* ContainerBubble.swift in Sources */,
 				05A7BD5D24FDDFD10001BFC9 /* QuickSnapCell.swift in Sources */,
 				05C6951424F1EC5400EEF819 /* StorageView.swift in Sources */,
+				05390F62267C656C001C5720 /* PublicShareSection.swift in Sources */,
 				05D8A8DE250318FA00D53BE2 /* AddressBookRealmModel.swift in Sources */,
 				05A7BD6324FEF6AC0001BFC9 /* QuickSnapStartView.swift in Sources */,
 				0559B8B325D3682A0069C44A /* InstagramStories.swift in Sources */,

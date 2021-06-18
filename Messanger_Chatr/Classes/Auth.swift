@@ -563,9 +563,9 @@ class AuthModel: NSObject, ObservableObject {
     
     func createTopFloater(alertType: String, message: String) -> some View {
         HStack() {
-            Image(systemName: alertType == "error" ? "xmark.octagon" : alertType == "success" ? "checkmark.circle" : "bell.badge.fill")
+            Image(systemName: alertType == "error" ? "xmark.octagon" : alertType == "success" ? "checkmark.circle" : alertType == "bellOn" ? "bell.fill" : alertType == "bellOff" ? "bell.slash.fill" : alertType == "report" ? "exclamationmark.octagon.fill" : "bell.badge.fill")
                 .resizable()
-                .foregroundColor(alertType == "error" ? .red : alertType == "success" ? .green : .primary)
+                .foregroundColor(alertType == "error" || alertType == "report" ? .red : alertType == "success" ? .green : .primary)
                 .aspectRatio(contentMode: ContentMode.fill)
                 .frame(width: 25, height: 25)
                 .padding(.horizontal, 5)

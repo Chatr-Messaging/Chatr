@@ -430,15 +430,16 @@ struct EditGroupDialogView: View {
             parameters.dialogDescription = self.bioText
 
             Request.updateDialog(withID: self.dialogModel.id, update: parameters, successBlock: { (updatedDialog) in
-                let databaseRef = Database.database().reference().child("Marketplace").child(self.dialogModel.id)
+                let databaseRef = Database.database().reference().child("Marketplace/public_dialogs").child(self.dialogModel.id)
 
-                databaseRef.updateChildValues(["canMembersType" : self.canMembersType, "description" : self.bioText, "name" : self.fullNameText], withCompletionBlock: { (_,_) in
-                    changeDialogRealmData.shared.updateDialogNameDescription(name: self.fullNameText, description: self.bioText, membersType: self.canMembersType, dialogID: self.dialogModel.id)
+                databaseRef.updateChildValues(["canMembersType" : self.canMembersType, "description" : updatedDialog.dialogDescription ?? "", "name" : updatedDialog.name ?? "no name"], withCompletionBlock: { (_,_) in
+                    changeDialogRealmData.shared.updateDialogNameDescription(name: updatedDialog.name ?? "no name", description: updatedDialog.dialogDescription ?? "", membersType: self.canMembersType, dialogID: self.dialogModel.id)
                     UINotificationFeedbackGenerator().notificationOccurred(.success)
                     self.loadingSave = false
                     self.didSave = true
                 })
             }) { (error) in
+                print("the dialogzzzzz : \(error.localizedDescription)")
                 UINotificationFeedbackGenerator().notificationOccurred(.error)
                 self.loadingSave = false
                 self.didSave = false

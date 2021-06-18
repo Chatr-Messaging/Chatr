@@ -101,7 +101,7 @@ struct DiscoverFeaturedCell: View, Identifiable {
                             if !self.isMember {
                                 Button(action: {
                                     Request.subscribeToPublicDialog(withID: self.dialogModel.id ?? "", successBlock: { dialogz in
-                                        changeDialogRealmData.shared.toggleFirebaseMemberCount(dialogId: dialogz.id ?? "", isJoining: true, onSuccess: { _ in
+                                        changeDialogRealmData.shared.toggleFirebaseMemberCount(dialogId: dialogz.id ?? "", isJoining: true, totalCount: Int(dialogz.occupantsCount), onSuccess: { _ in
                                             UINotificationFeedbackGenerator().notificationOccurred(.success)
                                             withAnimation {
                                                 self.isMember = true
@@ -190,16 +190,21 @@ struct DiscoverFeaturedCell: View, Identifiable {
                 .padding(.horizontal, 15)
             }.buttonStyle(ClickMiniButtonStyle())
             .actionSheet(isPresented: $isMoreOpen) {
-                ActionSheet(title: Text("\(self.dialogModel.name ?? "no name")'s Options:"), message: nil, buttons: [
-                    .default(Text("View Details")) {
-                        self.actionState.toggle()
-                    },
-                    .destructive(Text("Unsubscribe")) {
-                        self.isMember = false
-                        changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: self.dialogModel.id ?? "")
-                    },
-                    .cancel()
-                ])
+                ActionSheet(title: Text("\(self.dialogModel.name ?? "no name")'s Options:"), message: nil, buttons: self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? [
+                        .default(Text("View Details")) {
+                            self.actionState.toggle()
+                        },
+                        .cancel()
+                    ] : [
+                        .default(Text("View Details")) {
+                            self.actionState.toggle()
+                        },
+                        .destructive(Text("Unsubscribe")) {
+                            self.isMember = false
+                            changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: self.dialogModel.id ?? "")
+                        },
+                        .cancel()
+                    ])
             }
             .onAppear() {
                 let config = Realm.Configuration(schemaVersion: 1)

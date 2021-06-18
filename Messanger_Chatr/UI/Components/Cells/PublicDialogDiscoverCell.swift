@@ -79,7 +79,7 @@ struct PublicDialogDiscoverCell: View {
                             Button(action: {
                                 if !self.isJoined {
                                     Request.subscribeToPublicDialog(withID: self.dialogData.id ?? "", successBlock: { dialogz in
-                                        changeDialogRealmData.shared.toggleFirebaseMemberCount(dialogId: dialogz.id ?? "", isJoining: true, onSuccess: { _ in
+                                        changeDialogRealmData.shared.toggleFirebaseMemberCount(dialogId: dialogz.id ?? "", isJoining: true, totalCount: Int(dialogz.occupantsCount), onSuccess: { _ in
                                             UINotificationFeedbackGenerator().notificationOccurred(.success)
                                             self.isJoined = true
                                             changeDialogRealmData.shared.insertDialogs([dialogz], completion: {

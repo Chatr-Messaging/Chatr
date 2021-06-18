@@ -826,7 +826,7 @@ struct VisitContactView: View {
 
         //selectedContact
         if self.selectedContact.count == 0 {
-            self.auth.notificationtext = "Forwarded Contact"
+            self.auth.notificationtext = "Successfully forwarded contact"
             UINotificationFeedbackGenerator().notificationOccurred(.success)
             NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
         } else {
@@ -860,7 +860,7 @@ struct VisitContactView: View {
 
                 changeDialogRealmData.shared.fetchDialogs(completion: { _ in
                     self.selectedContact.removeAll()
-                    self.auth.notificationtext = "Forwarded Contact"
+                    self.auth.notificationtext = "Successfully forwarded contact"
                     UINotificationFeedbackGenerator().notificationOccurred(.success)
                     NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
 

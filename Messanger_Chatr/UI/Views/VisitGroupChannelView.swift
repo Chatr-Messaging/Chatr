@@ -57,10 +57,14 @@ struct VisitGroupChannelView: View {
 
     var body: some View {
         ZStack {
+            NavigationLink(destination: self.moreMembers(), isActive: self.$showMoreAdmins) {
+                EmptyView()
+            }
+
             VStack(spacing: 0) {
                 ScrollView(.vertical, showsIndicators: true) {
                     //MARK: Top Profile
-                    topGroupHeaderView(dialogModel: self.$dialogModel, groupOccUserAvatar: self.$groupOccUserAvatar, isProfileImgOpen: self.$isProfileImgOpen, isEditGroupOpen: self.$isEditGroupOpen, publicTags: self.$publicTags)
+                    topGroupHeaderView(dialogModel: self.$dialogModel, groupOccUserAvatar: self.$groupOccUserAvatar, isProfileImgOpen: self.$isProfileImgOpen, isEditGroupOpen: self.$isEditGroupOpen, publicTags: self.$publicTags, showMoreAdmins: self.$showMoreAdmins, reportCount: self.publicDialogModel.reportCount ?? 0)
                         .environmentObject(self.auth)
                         .padding(.top, 40)
                         .padding(.bottom, self.dialogModel.dialogType == "public" ? 5 : 15)
@@ -74,7 +78,7 @@ struct VisitGroupChannelView: View {
 
                     //MARK: Action Buttons
                     if self.dialogModel.dialogType == "public" {
-                        PublicActionSection(dialogRelationship: self.$dialogRelationship, dialogModel: self.$dialogModel, currentUserIsPowerful: self.$currentUserIsPowerful, dismissView: self.$dismissView, notiType: self.$notiType, notiText: self.$notiText, showAlert: self.$showAlert)
+                        PublicActionSection(dialogRelationship: self.$dialogRelationship, dialogModel: self.$dialogModel, currentUserIsPowerful: self.$currentUserIsPowerful, dismissView: self.$dismissView, notiType: self.$notiType, notiText: self.$notiText, showAlert: self.$showAlert, notificationsOn: self.$notificationsOn)
                             .environmentObject(self.auth)
                             .padding(.bottom)
                     }
@@ -84,10 +88,16 @@ struct VisitGroupChannelView: View {
                         PinnedSectionView(showPinDetails: self.$showPinDetails, dialog: self.dialogModel)
                             .environmentObject(self.auth)
                     }
+                    
+                    //MARK: Share Action Section
+                    if self.dialogModel.dialogType == "public" {
+                        PublicShareSection(dismissView: self.$dismissView, newDialogID: self.$showPinDetails, notiType: self.$notiType, notiText: self.$notiText, showAlert: self.$showAlert, dialogModel: self.dialogModel)
+                            .environmentObject(self.auth)
+                    }
 
                     //MARK: Admin List Section
                     HStack(alignment: .bottom) {
-                        Text(self.dialogModel.dialogType == "public" ? "OWNER:" : "ADMINS:")
+                        Text(self.dialogModel.dialogType == "public" ? "MEMBERS:" : "ADMINS:")
                             .font(.caption)
                             .fontWeight(.regular)
                             .foregroundColor(.secondary)
@@ -108,7 +118,10 @@ struct VisitGroupChannelView: View {
                                     .frame(width: Constants.screenWidth - 80)
                                     .offset(x: 40)
                             } else if self.dialogModelAdmins.count > 4 {
-                                NavigationLink(destination: self.moreMembers(), isActive: $showMoreAdmins) {
+                                Button(action: {
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                    self.showMoreAdmins.toggle()
+                                }) {
                                     VStack(alignment: .trailing, spacing: 0) {
                                         Divider()
                                             .frame(width: Constants.screenWidth - 80)
@@ -122,7 +135,7 @@ struct VisitGroupChannelView: View {
                                                 .foregroundColor(Color("SoftTextColor"))
                                                 .padding(.leading, 10)
                                             
-                                            Text("more admins...")
+                                            Text(self.dialogModel.dialogType == "public" ? "more members..." : "more admins...")
                                                 .font(.subheadline)
                                                 .foregroundColor(.blue)
                                                 .padding(.horizontal)
@@ -156,7 +169,7 @@ struct VisitGroupChannelView: View {
                             .foregroundColor(.secondary)
                             .padding(.horizontal)
                             .padding(.horizontal)
-                            .offset(y: 2)
+                            .offset(y: !self.isOwner && self.dialogModel.dialogType == "public" ? -4 : 2)
                         Spacer()
                     }.opacity((self.dialogModel.dialogType == "group") || !self.dialogModelMembers.isEmpty ||  (self.dialogModel.dialogType == "public") && self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? 1 : 0)
                     
@@ -196,83 +209,7 @@ struct VisitGroupChannelView: View {
                                 }
                             }.buttonStyle(changeBGButtonStyle())
                             .sheet(isPresented: self.$showAddMembers, onDismiss: {
-                                guard self.selectedNewMembers.count > 0 else { return }
-
-                                var occu: [NSNumber] = []
-                                for i in self.selectedNewMembers {
-                                    occu.append(NSNumber(value: i))
-                                }
-                                
-                                if self.dialogModel.dialogType == "public" {
-                                    Request.addAdminsToDialog(withID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "", adminsUserIDs: occu, successBlock: { (updatedDialog) in
-                                        changeDialogRealmData.shared.addFirebaseAdmins(dialogId: updatedDialog.id ?? "", adminIds: updatedDialog.adminsIDs ?? [], onSuccess: { _ in
-                                            changeDialogRealmData.shared.insertDialogs([updatedDialog]) {
-                                                print("Success adding contact as admin!")
-                                                UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                                for i in self.selectedNewMembers {
-                                                    if !self.dialogModel.occupentsID.contains(i) {
-                                                        self.dialogModelMembers.append(i)
-                                                        self.auth.sendPushNoti(userIDs: [NSNumber(value: i)], title: "Added Admin", message: "\(self.auth.profile.results.first?.fullName ?? "Chatr User") added you as an admin to \(self.dialogModel.fullName) 🥳")
-                                                    }
-                                                }
-                                                
-                                                self.addNewMemberID = ""
-                                                self.selectedNewMembers.removeAll()
-                                                self.notiType = "success"
-                                                self.notiText = occu.count == 0 ? "Successfully added a new admin." : "Successfully added new admins."
-                                                occu.removeAll()
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                                                    self.showAlert = true
-                                                }
-                                            }
-                                        }, onError: { _ in })
-                                    }) { (error) in
-                                        let notiTextConfig = self.selectedNewMembers.count == 1 ? "The selected contact is already " : "One or more of the selected contacts are already "
-                                        self.notiType = "error"
-                                        self.notiText = notiTextConfig + "an admin."
-                                        UINotificationFeedbackGenerator().notificationOccurred(.error)
-                                        self.selectedNewMembers.removeAll()
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                                            self.showAlert = true
-                                        }
-                                        print("error adding members to dialog: \(error.localizedDescription)")
-                                    }
-                                } else {
-                                    let updateParameters = UpdateChatDialogParameters()
-                                    print("adding new user to group!: \(occu.count)")
-                                    updateParameters.occupantsIDsToAdd = occu
-                                    
-                                    Request.updateDialog(withID: self.dialogModel.id, update: updateParameters, successBlock: { (updatedDialog) in
-                                        changeDialogRealmData.shared.insertDialogs([updatedDialog]) { }
-                                        UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                        
-                                        for i in self.selectedNewMembers {
-                                            if !self.dialogModel.occupentsID.contains(i) {
-                                                self.dialogModelMembers.append(i)
-                                                self.auth.sendPushNoti(userIDs: [NSNumber(value: i)], title: "Added To Group", message: "\(self.auth.profile.results.first?.fullName ?? "Chatr User") added you to \(self.dialogModel.fullName).")
-                                            }
-                                        }
-                                        
-                                        self.addNewMemberID = ""
-                                        self.selectedNewMembers.removeAll()
-                                        self.notiType = "success"
-                                        self.notiText = occu.count == 0 ? "Successfully added a new member" : "Successfully added new members."
-                                        occu.removeAll()
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                                            self.showAlert = true
-                                        }
-                                    }) { (error) in
-                                        let notiTextConfig = self.selectedNewMembers.count == 1 ? "The selected contact is already " : "One or more of the selected contacts are already "
-                                        self.notiType = "error"
-                                        self.notiText = notiTextConfig + "in the chat."
-                                        UINotificationFeedbackGenerator().notificationOccurred(.error)
-                                        self.selectedNewMembers.removeAll()
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                                            self.showAlert = true
-                                        }
-                                        print("error adding members to dialog: \(error.localizedDescription)")
-                                    }
-                                }
+                                self.addMembersDismiss()
                             }) {
                                 NewConversationView(usedAsNew: false, selectedContact: self.$selectedNewMembers, newDialogID: self.$addNewMemberID)
                                     .environmentObject(self.auth)
@@ -329,87 +266,7 @@ struct VisitGroupChannelView: View {
                     .padding(.bottom, (self.dialogModel.dialogType == "group") || !self.dialogModelMembers.isEmpty || (self.dialogModel.dialogType == "public") && self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? 15 : 0)
                     
                     //MARK: More Section
-                    HStack {
-                        Text("MORE:")
-                            .font(.caption)
-                            .fontWeight(.regular)
-                            .foregroundColor(.secondary)
-                            .padding(.horizontal)
-                            .padding(.horizontal)
-                            .offset(y: 2)
-                        Spacer()
-                    }
-                    
-                    VStack(alignment: .center) {
-                        Button(action: {
-                            self.showingMoreSheet.toggle()
-                        }) {
-                            HStack {
-                                Image(systemName: "ellipsis.circle")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .foregroundColor(Color.primary)
-                                    .opacity(0.75)
-                                    .frame(width: 20, height: 20, alignment: .center)
-                                    .padding(.trailing, 5)
-
-                                Text("more...")
-                                    .font(.none)
-                                    .fontWeight(.none)
-                                    .foregroundColor(.primary)
-                                    .multilineTextAlignment(.leading)
-
-                                Spacer()
-
-                                Image(systemName: "chevron.right")
-                                    .resizable()
-                                    .font(Font.title.weight(.bold))
-                                    .scaledToFit()
-                                    .frame(width: 7, height: 15, alignment: .center)
-                                    .foregroundColor(.secondary)
-                            }.padding(.all)
-                            .padding(.vertical, 1.5)
-                            .contentShape(Rectangle())
-                        }.buttonStyle(changeBGButtonStyle())
-                        .frame(minWidth: 100, maxWidth: Constants.screenWidth)
-                        .actionSheet(isPresented: $showingMoreSheet) {
-                            ActionSheet(title: Text(self.dialogModel.fullName), message: nil, buttons: [
-                                            .default(Text(self.notificationsOn ? "Turn Notifications Off" : "Turn Notifications On"), action: {
-                                                self.notificationsOn.toggle()
-                                                Request.updateNotificationsSettings(forDialogID: self.dialogModel.id, enable: self.notificationsOn, successBlock: { result in
-                                                    UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                                    self.notificationsOn = result
-                                                    self.notiType = "success"
-                                                    self.notiText = "Successfully turned notifications settings \(result ? "on" : "off")."
-                                                    self.showAlert.toggle()
-                                                }, errorBlock: { error in
-                                                    print("error setting notifications: \(error.localizedDescription)")
-                                                    UINotificationFeedbackGenerator().notificationOccurred(.error)
-                                                    self.notiType = "error"
-                                                    self.notiText = "Error updating notification settings."
-                                                    self.showAlert.toggle()
-                                                })
-                                            }), .destructive(Text(self.isOwner ? "Destroy Group" : "Leave Group"), action: {
-                                                UserDefaults.standard.set(false, forKey: "localOpen")
-                                                changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
-                                                self.showingMoreSheet = false
-                                                
-                                                if self.dialogModel.dialogType == "public" && !self.isOwner {
-                                                    changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: self.dialogModel.id)
-                                                } else {
-                                                    changeDialogRealmData.shared.deletePrivateConnectyDialog(dialogID: self.dialogModel.id, isOwner: self.isOwner)
-                                                }
-                                                print("done deleting dialog: \(self.dialogModel.id)")
-                                            }), .cancel(Text("Done"))])
-                        }.simultaneousGesture(TapGesture()
-                            .onEnded { _ in
-                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                            })
-                    }.background(Color("buttonColor"))
-                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .circular))
-                    .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
-                    .padding(.horizontal)
-                    .padding(.bottom, 60)
+                    self.moreSectionBuilder()
                                     
                     //MARK: Footer Section
                     FooterInformation(middleText: "Created: \(self.dialogModel.createdAt.getFullElapsedInterval())")
@@ -608,6 +465,7 @@ struct VisitGroupChannelView: View {
             
             if self.dialogModel.dialogType == "public" && self.dialogModel.id != "" {
                 self.observeFirebase()
+                self.observePublicDialogMembers()
             }
             
             if self.dialogRelationship == .subscribed {
@@ -651,8 +509,14 @@ struct VisitGroupChannelView: View {
                                     foundDialog.owner = owner
                                 }
                                 
-                                if !self.dialogModelAdmins.contains(where: { $0 == owner }) && owner != 0 {
-                                    self.dialogModelAdmins.append(owner)
+                                if self.dialogModel.dialogType == "public" {
+                                    if !self.dialogModelMembers.contains(where: { $0 == owner }) && owner != 0 {
+                                        self.dialogModelMembers.append(owner)
+                                    }
+                                } else if self.dialogModel.dialogType == "group" {
+                                    if !self.dialogModelAdmins.contains(where: { $0 == owner }) && owner != 0 {
+                                        self.dialogModelAdmins.append(owner)
+                                    }
                                 }
                             }
                             
@@ -716,8 +580,15 @@ struct VisitGroupChannelView: View {
                         
                         if let owner = dict["owner"] as? Int {
                             dialog.owner = owner
-                            if !self.dialogModelAdmins.contains(where: { $0 == owner }) && owner != 0 {
-                                self.dialogModelAdmins.append(owner)
+                            
+                            if self.dialogModel.dialogType == "public" {
+                                if !self.dialogModelMembers.contains(where: { $0 == owner }) && owner != 0 {
+                                    self.dialogModelMembers.append(owner)
+                                }
+                            } else if self.dialogModel.dialogType == "group" {
+                                if !self.dialogModelAdmins.contains(where: { $0 == owner }) && owner != 0 {
+                                    self.dialogModelAdmins.append(owner)
+                                }
                             }
                         }
                         
@@ -747,6 +618,22 @@ struct VisitGroupChannelView: View {
                     
                 }
             }
+        })
+    }
+
+    func observePublicDialogMembers() {
+        Request.occupants(forPublicDialogID: self.dialogModel.id, paginator: Paginator.limit(6, skip: 0), successBlock: { (users, pagin) in
+            print("successfully pulled memebers for pagin: \(pagin)")
+            for i in users {
+                let id = Int(i.id)
+                if !self.dialogModelAdmins.contains(where: { $0 == id }) && id != 0 && id != self.dialogModel.owner {
+                    self.dialogModelAdmins.append(id)
+                }
+                
+                if self.dialogModelAdmins.count > 4 { break }
+            }
+        }, errorBlock: { err in
+            print("error pulling public dialog members: \(err)")
         })
     }
     
@@ -791,6 +678,209 @@ struct VisitGroupChannelView: View {
 
         print("the count of pinned messages are: \(self.dialogModel.pinMessages.count) for: \(dialogId)")
     }
+    
+    func toggleNotifications() {
+        self.notificationsOn.toggle()
+        Request.updateNotificationsSettings(forDialogID: self.dialogModel.id, enable: self.notificationsOn, successBlock: { result in
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
+            self.notificationsOn = result
+            self.notiType = result ? "notiOn" : "notiOff"
+            self.notiText = "Successfully turned notifications \(result ? "on" : "off")"
+            self.showAlert.toggle()
+        }, errorBlock: { error in
+            print("error setting notifications: \(error.localizedDescription)")
+            self.notificationsOn.toggle()
+            UINotificationFeedbackGenerator().notificationOccurred(.error)
+            self.notiType = "error"
+            let errMsg = error.localizedDescription == "Request failed: forbidden (403)" ? "Not enough permission to update notification settings" : "Error updating notification settings: \(error.localizedDescription)"
+            self.notiText = errMsg
+            self.showAlert.toggle()
+        })
+    }
+    
+    func destroyLeaveGroup() {
+        UserDefaults.standard.set(false, forKey: "localOpen")
+        changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
+        self.showingMoreSheet = false
+        
+        if self.dialogModel.dialogType == "public" && !self.isOwner {
+            changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: self.dialogModel.id)
+        } else {
+            changeDialogRealmData.shared.deletePrivateConnectyDialog(dialogID: self.dialogModel.id, isOwner: self.isOwner)
+        }
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        print("done deleting dialog: \(self.dialogModel.id)")
+    }
+    
+    func reportPublicDialog() {
+        changeDialogRealmData.shared.reportFirebasePublicDialog(dialogId: self.dialogModel.id, onSuccess: { _ in
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
+            self.auth.sendPushNoti(userIDs: [NSNumber(value: self.dialogModel.owner)], title: "\(self.dialogModel.fullName) Reported", message: "\(self.auth.profile.results.first?.fullName ?? "Chatr User") reported your channel \(self.dialogModel.fullName)")
+            self.notiType = "report"
+            self.notiText = "Successfully reported \(self.dialogModel.fullName)"
+            self.showAlert.toggle()
+        }, onError: { err in
+            UINotificationFeedbackGenerator().notificationOccurred(.error)
+            self.notiType = "error"
+            self.notiText = "Error reporting channel: \(String(describing: err))"
+            self.showAlert.toggle()
+        })
+    }
+    
+    func addMembersDismiss() {
+        guard self.selectedNewMembers.count > 0 else { return }
+
+        var occu: [NSNumber] = []
+        for i in self.selectedNewMembers {
+            occu.append(NSNumber(value: i))
+        }
+        
+        if self.dialogModel.dialogType == "public" {
+            Request.addAdminsToDialog(withID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "", adminsUserIDs: occu, successBlock: { (updatedDialog) in
+                changeDialogRealmData.shared.addFirebaseAdmins(dialogId: updatedDialog.id ?? "", adminIds: updatedDialog.adminsIDs ?? [], onSuccess: { _ in
+                    changeDialogRealmData.shared.insertDialogs([updatedDialog]) {
+                        print("Success adding contact as admin!")
+                        UINotificationFeedbackGenerator().notificationOccurred(.success)
+                        for i in self.selectedNewMembers {
+                            if !self.dialogModel.occupentsID.contains(i) {
+                                self.dialogModelMembers.append(i)
+                                self.auth.sendPushNoti(userIDs: [NSNumber(value: i)], title: "Added Admin", message: "\(self.auth.profile.results.first?.fullName ?? "Chatr User") added you as an admin to \(self.dialogModel.fullName) 🥳")
+                            }
+                        }
+                        
+                        self.addNewMemberID = ""
+                        self.selectedNewMembers.removeAll()
+                        self.notiType = "success"
+                        self.notiText = occu.count == 0 ? "Successfully added a new admin." : "Successfully added new admins."
+                        occu.removeAll()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                            self.showAlert = true
+                        }
+                    }
+                }, onError: { _ in })
+            }) { (error) in
+                let notiTextConfig = self.selectedNewMembers.count == 1 ? "The selected contact is " : "One or more of the selected contacts are "
+                self.notiType = "error"
+                self.notiText = notiTextConfig + "already an admin"
+                UINotificationFeedbackGenerator().notificationOccurred(.error)
+                self.selectedNewMembers.removeAll()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                    self.showAlert = true
+                }
+                print("error adding members to dialog: \(error.localizedDescription)")
+            }
+        } else {
+            let updateParameters = UpdateChatDialogParameters()
+            print("adding new user to group!: \(occu.count)")
+            updateParameters.occupantsIDsToAdd = occu
+            
+            Request.updateDialog(withID: self.dialogModel.id, update: updateParameters, successBlock: { (updatedDialog) in
+                changeDialogRealmData.shared.insertDialogs([updatedDialog]) { }
+                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                
+                for i in self.selectedNewMembers {
+                    if !self.dialogModel.occupentsID.contains(i) {
+                        self.dialogModelMembers.append(i)
+                        self.auth.sendPushNoti(userIDs: [NSNumber(value: i)], title: "Added To Group", message: "\(self.auth.profile.results.first?.fullName ?? "Chatr User") added you to \(self.dialogModel.fullName).")
+                    }
+                }
+                
+                self.addNewMemberID = ""
+                self.selectedNewMembers.removeAll()
+                self.notiType = "success"
+                self.notiText = occu.count == 0 ? "Successfully added a new member" : "Successfully added new members."
+                occu.removeAll()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                    self.showAlert = true
+                }
+            }) { (error) in
+                let notiTextConfig = self.selectedNewMembers.count == 1 ? "The selected contact is already " : "One or more of the selected contacts are already "
+                self.notiType = "error"
+                self.notiText = notiTextConfig + "in the chat."
+                UINotificationFeedbackGenerator().notificationOccurred(.error)
+                self.selectedNewMembers.removeAll()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                    self.showAlert = true
+                }
+                print("error adding members to dialog: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    func moreSectionBuilder() -> some View {
+        VStack {
+            HStack {
+                Text("MORE:")
+                    .font(.caption)
+                    .fontWeight(.regular)
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal)
+                    .padding(.horizontal)
+                    .offset(y: 2)
+                Spacer()
+            }
+            
+            VStack(alignment: .center) {
+                Button(action: {
+                    self.showingMoreSheet.toggle()
+                }) {
+                    HStack {
+                        Image(systemName: "ellipsis.circle")
+                            .resizable()
+                            .scaledToFit()
+                            .foregroundColor(Color.primary)
+                            .opacity(0.75)
+                            .frame(width: 20, height: 20, alignment: .center)
+                            .padding(.trailing, 5)
+
+                        Text("more...")
+                            .font(.none)
+                            .fontWeight(.none)
+                            .foregroundColor(.primary)
+                            .multilineTextAlignment(.leading)
+
+                        Spacer()
+
+                        Image(systemName: "chevron.right")
+                            .resizable()
+                            .font(Font.title.weight(.bold))
+                            .scaledToFit()
+                            .frame(width: 7, height: 15, alignment: .center)
+                            .foregroundColor(.secondary)
+                    }.padding(.all)
+                    .padding(.vertical, 1.5)
+                    .contentShape(Rectangle())
+                }.buttonStyle(changeBGButtonStyle())
+                .frame(minWidth: 100, maxWidth: Constants.screenWidth)
+                .actionSheet(isPresented: $showingMoreSheet) {
+                    ActionSheet(title: Text(self.dialogModel.fullName + "'s Options"), message: nil, buttons: !self.isOwner && self.dialogModel.dialogType == "public" ? [
+                                    .default(Text(self.notificationsOn ? "Turn Notifications Off" : "Turn Notifications On"), action: {
+                                        self.toggleNotifications()
+                                    }), .destructive(Text("Report Channel"), action: {
+                                        self.reportPublicDialog()
+                                    }), .destructive(Text(self.isOwner ? "Destroy Channel" : "Leave Channel"), action: {
+                                        self.destroyLeaveGroup()
+                                    }), .cancel(Text("Done"))] : [
+                                    .default(Text(self.isOwner ? "Edit Details" : (self.notificationsOn ? "Turn Notifications Off" : "Turn Notifications On")), action: {
+                                        if self.isOwner {
+                                            self.isEditGroupOpen.toggle()
+                                        } else {
+                                            self.toggleNotifications()
+                                        }
+                                    }), .destructive(Text((self.isOwner ? "Destroy " : "Leave ") + (self.dialogModel.dialogType == "public" ? "Channel" : "Group")), action: {
+                                        self.destroyLeaveGroup()
+                                    }), .cancel(Text("Done"))])
+                }.simultaneousGesture(TapGesture()
+                    .onEnded { _ in
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                    })
+            }.background(Color("buttonColor"))
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .circular))
+            .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
+            .padding(.horizontal)
+            .padding(.bottom, 60)
+        }
+    }
 }
 
 //MARK: Top Header View
@@ -801,9 +891,12 @@ struct topGroupHeaderView: View {
     @Binding var isProfileImgOpen: Bool
     @Binding var isEditGroupOpen: Bool
     @Binding var publicTags: [String]
+    @Binding var showMoreAdmins: Bool
+    @State var reportCount: Int
     @State private var isProfileBioOpen: Bool = false
     @State private var moreBioAction = false
-    
+    @State var tagSelection: Int? = -1
+
     var body: some View {
         ZStack(alignment: .top) {
             NavigationLink(destination: EmptyView()) {
@@ -829,19 +922,38 @@ struct topGroupHeaderView: View {
                             .lineLimit(2)
                             .multilineTextAlignment(.center)
                         
-                        Text(" " + (self.dialogModel.dialogType == "public" ? "\(self.dialogModel.publicMemberCount) members" : "\(self.dialogModel.occupentsID.count) contacts"))
-                            .font(.subheadline)
-                            .fontWeight(.none)
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
-                            .offset(y: -2.5)
-
+                        Button(action: {
+                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                            self.showMoreAdmins.toggle()
+                        }, label: {
+                            Text(self.dialogModel.dialogType == "public" ? "\(self.dialogModel.publicMemberCount) members" : "\(self.dialogModel.occupentsID.count) contacts")
+                                .font(.subheadline)
+                                .fontWeight(.none)
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
+                                .offset(y: -2.5)
+                        }).buttonStyle(ClickMiniButtonStyle())
+                        
+                        if self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") && self.reportCount > 0 {
+                            Text("\(self.reportCount) " + (self.reportCount == 1 ? "report" : "reports"))
+                                .font(.subheadline)
+                                .fontWeight(.none)
+                                .foregroundColor(self.reportCount <= 2 ? .orange : .red)
+                                .multilineTextAlignment(.center)
+                                .offset(y: -2)
+                        }
+                        
                         HStack(alignment: .center, spacing: 10) {
-                            ForEach(self.publicTags, id: \.self) { tag in
+                            ForEach(self.publicTags.indices, id: \.self) { tag in
+//                                NavigationLink(destination: self.moreDetails(tagId: self.publicTags[tag], viewState: .tags).edgesIgnoringSafeArea(.all), tag: Int(tag), selection: self.$tagSelection) {
+//                                    EmptyView()
+//                                }
+
                                 Button(action: {
-                                    UINotificationFeedbackGenerator().notificationOccurred(.error)
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                    self.tagSelection = Int(tag)
                                 }, label: {
-                                    Text("#" + "\(tag)")
+                                    Text("#" + "\(self.publicTags[tag])")
                                         .font(.caption)
                                         .fontWeight(.medium)
                                         .padding(.vertical, 3)

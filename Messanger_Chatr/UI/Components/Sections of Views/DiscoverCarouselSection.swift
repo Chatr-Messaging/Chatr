@@ -15,6 +15,7 @@ class PublicDialogModel {
     var id: String?
     var name: String?
     var memberCount: Int?
+    var reportCount: Int?
     var creationOrder: Int?
     var owner: Int?
     var dateCreated: String?
@@ -32,6 +33,7 @@ extension PublicDialogModel {
         dialog.id = key
         dialog.name = dict["name"] as? String
         dialog.memberCount = dict["memberCount"] as? Int
+        dialog.reportCount = dict["reportCount"] as? Int
         dialog.creationOrder = dict["creation_order"] as? Int
         dialog.owner = dict["owner"] as? Int
         dialog.dateCreated = dict["date_created"] as? String

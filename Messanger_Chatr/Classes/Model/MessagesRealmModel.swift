@@ -372,6 +372,32 @@ class changeMessageRealmData {
         }
     }
     
+    func sendPublicChannel(dialog: DialogStruct, contactID: [String], occupentID: [NSNumber]) {
+        for id in contactID {
+            let attachment = ChatAttachment()
+            attachment["channelID"] = id
+            
+            let message = ChatMessage.markable()
+            message.markable = true
+            message.text = "Shared Channel"
+            message.attachments = [attachment]
+            
+            let pDialog = ChatDialog(dialogID: dialog.id, type: occupentID.count > 2 ? .group : .private)
+            pDialog.occupantIDs = occupentID
+            
+            pDialog.send(message) { (error) in
+                self.insertMessage(message, completion: {
+                    if error != nil {
+                        print("error sending message: \(String(describing: error?.localizedDescription))")
+                        self.updateMessageState(messageID: message.id ?? "", messageState: .error)
+                    } else {
+                        print("Success sending message to ConnectyCube server!")
+                    }
+                })
+            }
+        }
+    }
+    
     func sendLocationMessage(dialog: DialogStruct, longitude: Double, latitude: Double, occupentID: [NSNumber]) {
         let attachment = ChatAttachment()
         attachment["longitude"] = "\(longitude)"
