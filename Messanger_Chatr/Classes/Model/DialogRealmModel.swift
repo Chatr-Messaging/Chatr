@@ -144,6 +144,20 @@ class changeDialogRealmData {
                             foundDialog.publicMemberCount = Int(object.occupantsCount)
                         }
                         
+                        if object.type == .group && foundDialog.occupentsID.count != Int(object.occupantIDs?.count ?? 0) {
+                            foundDialog.occupentsID.removeAll()
+                            for occu in object.occupantIDs ?? [] {
+                                foundDialog.occupentsID.append(Int(truncating: occu))
+                            }
+                        }
+                        
+                        if object.type == .public && foundDialog.adminID.count != Int(object.adminsIDs?.count ?? 0) {
+                            foundDialog.adminID.removeAll()
+                            for admin in object.adminsIDs ?? [] {
+                                foundDialog.adminID.append(Int(truncating: admin))
+                            }
+                        }
+                        
                         if let bio = object.dialogDescription, foundDialog.bio != bio {
                             foundDialog.bio = bio
                         }
@@ -207,6 +221,31 @@ class changeDialogRealmData {
         DispatchQueue.main.async {
             completion()
         }
+    }
+    
+    func insertPublicDialogMembers(dialogId: String, users: [ConnectyCube.User], completion: @escaping () -> Void) {
+        let config = Realm.Configuration(schemaVersion: 1)
+
+        do {
+            let realm = try Realm(configuration: config)
+            if let foundDialog = realm.object(ofType: DialogStruct.self, forPrimaryKey: dialogId) {
+                try realm.safeWrite({
+                    foundDialog.occupentsID.removeAll()
+                    for i in users {
+                        let id = Int(i.id)
+                        if !foundDialog.occupentsID.contains(where: { $0 == id }) && id != 0 {
+                            foundDialog.occupentsID.append(id)
+                        }
+                    }
+
+                    realm.add(foundDialog, update: .all)
+                    completion()
+                })
+            } else {
+                //not found dia
+                completion()
+            }
+        } catch { completion() }
     }
     
     func toggleFirebaseMemberCount(dialogId: String, isJoining: Bool, totalCount: Int?, onSuccess: @escaping (PublicDialogModel) -> Void, onError: @escaping (_ errorMessage: String?) -> Void) {

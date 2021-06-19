@@ -31,6 +31,7 @@ struct DialogContactCell: View {
     @Binding var currentUserIsPowerful: Bool
     @State var isLast: Bool = false
     @Binding var isRemoving: Bool
+    @State var isPublic: Bool
     
     var body: some View {
         VStack(alignment: .center, spacing: 0) {
@@ -150,7 +151,7 @@ struct DialogContactCell: View {
                                         print("Success adding contact as admin!")
                                         UINotificationFeedbackGenerator().notificationOccurred(.success)
                                         self.notiType = "success"
-                                        self.notiText = "Successfully added \(self.contact.fullName) as admin."
+                                        self.notiText = "Successfully added \(self.contact.fullName) as admin"
                                         self.showAlert.toggle()
                                         self.auth.sendPushNoti(userIDs: [NSNumber(value: self.contact.id)], title: "Added Admin", message: "\(self.auth.profile.results.first?.fullName ?? "Chatr User") added you as an admin 🥳")
                                     }
@@ -159,7 +160,7 @@ struct DialogContactCell: View {
                                 print("Error adding contact as admin: \(error.localizedDescription) && \(UserDefaults.standard.string(forKey: "selectedDialogID") ?? "")")
                                 UINotificationFeedbackGenerator().notificationOccurred(.error)
                                 self.notiType = "error"
-                                self.notiText = "Error adding \(self.contact.fullName) as admin."
+                                self.notiText = "Error adding \(self.contact.fullName) as admin"
                                 self.showAlert.toggle()
                             }
                         } else {
@@ -171,7 +172,7 @@ struct DialogContactCell: View {
                                         print("Success removing contact as admin!")
                                         UINotificationFeedbackGenerator().notificationOccurred(.success)
                                         self.notiType = "success"
-                                        self.notiText = "Successfully removed \(self.contact.fullName) as admin."
+                                        self.notiText = "Successfully removed \(self.contact.fullName) as admin"
                                         self.showAlert.toggle()
                                         self.auth.sendPushNoti(userIDs: [NSNumber(value: self.contact.id)], title: "Removed As Admin", message: "\(self.auth.profile.results.first?.fullName ?? "Chatr User") removed you as an admin")
                                     }
@@ -180,28 +181,33 @@ struct DialogContactCell: View {
                                 print("Error removing contact as admin: \(error.localizedDescription)")
                                 UINotificationFeedbackGenerator().notificationOccurred(.error)
                                 self.notiType = "error"
-                                self.notiText = "Error removing \(self.contact.fullName) as admin."
+                                self.notiText = "Error removing \(self.contact.fullName) as admin"
                                 self.showAlert.toggle()
                             }
                         }
                     },
-                    .destructive(Text("Remove From Group"), action: {
+                    .destructive(Text(isPublic ? "Remove From Channel" : "Remove From Group"), action: {
                         let updateParameters = UpdateChatDialogParameters()
                         updateParameters.occupantsIDsToRemove = [NSNumber(value: self.contact.id)]
                         Request.updateDialog(withID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "", update: updateParameters, successBlock: { (updatedDialog) in
+                            
+                            if let id = updatedDialog.id, isPublic {
+                                changeDialogRealmData.shared.toggleFirebaseMemberCount(dialogId: id, isJoining: false, totalCount: nil, onSuccess: { _ in }, onError: { _ in })
+                            }
+                            
                             changeDialogRealmData.shared.insertDialogs([updatedDialog]) {
                                 print("Success removing contact from dialog")
                                 UINotificationFeedbackGenerator().notificationOccurred(.success)
                                 self.notiType = "success"
-                                self.notiText = "Successfully removed \(self.contact.fullName) from group chat."
+                                self.notiText = ("Successfully removed \(self.contact.fullName) from the ") + (isPublic ? "channel" : "group chat")
                                 self.showAlert.toggle()
-                                self.auth.sendPushNoti(userIDs: [NSNumber(value: self.contact.id)], title: "Removed from Group", message: "\(self.auth.profile.results.first?.fullName ?? "Chatr User") removed you from the group chat")
+                                self.auth.sendPushNoti(userIDs: [NSNumber(value: self.contact.id)], title: isPublic ? "Remove From Channel" : "Remove From Group", message: ("\(self.auth.profile.results.first?.fullName ?? "Chatr User") removed you from the ") + (isPublic ? "channel" : "group chat"))
                             }
                         }) { (error) in
                             print("Error removing contact from dialog: \(error.localizedDescription)")
                             UINotificationFeedbackGenerator().notificationOccurred(.error)
                             self.notiType = "error"
-                            self.notiText = "Error removing \(self.contact.fullName) from group chat."
+                            self.notiText = ("Error removing \(self.contact.fullName) from the ") + (isPublic ? "channel" : "group chat")
                             self.showAlert.toggle()
                         }
                     }),

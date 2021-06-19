@@ -44,7 +44,7 @@ struct MoreContactsView: View {
                     LazyVStack(alignment: .center, spacing: 0) {
                         ForEach(self.dialogModelMembers.indices, id: \.self) { id in
                             VStack(alignment: .trailing, spacing: 0) {
-                                DialogContactCell(showAlert: self.$showAlert, notiType: self.$notiType, notiText: self.$notiText, dismissView: self.$dismissView, openNewDialogID: self.$openNewDialogID, showProfile: self.$showProfile, contactID: Int(self.dialogModelMembers[id]), isAdmin: self.dialogModel.adminID.contains(self.dialogModelMembers[id]), isOwner: self.dialogModel.owner == self.dialogModelMembers[id], currentUserIsPowerful: self.$currentUserIsPowerful, isLast: self.dialogModelMembers[id] == self.dialogModelMembers.last, isRemoving: self.$isRemoving)
+                                DialogContactCell(showAlert: self.$showAlert, notiType: self.$notiType, notiText: self.$notiText, dismissView: self.$dismissView, openNewDialogID: self.$openNewDialogID, showProfile: self.$showProfile, contactID: Int(self.dialogModelMembers[id]), isAdmin: self.dialogModel.adminID.contains(self.dialogModelMembers[id]), isOwner: self.dialogModel.owner == self.dialogModelMembers[id], currentUserIsPowerful: self.$currentUserIsPowerful, isLast: self.dialogModelMembers[id] == self.dialogModelMembers.last, isRemoving: self.$isRemoving, isPublic: self.dialogModel.dialogType == "public")
                                     .environmentObject(self.auth)
                             }
                         }

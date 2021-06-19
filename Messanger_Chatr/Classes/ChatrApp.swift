@@ -26,7 +26,7 @@ extension ChatrApp {
     static func connect() {
         guard let user = self.auth.profile.results.first, !Chat.instance.isConnected && !Chat.instance.isConnecting else { return }
 
-        print("\(Thread.current.isMainThread) logged in with: \(user.fullName)")
+        print("\(Thread.current.isMainThread) logged in with: \(user.fullName) && \(Session.current.currentUser?.password)")
         Chat.instance.addDelegate(ChatrApp.auth)
         Purchases.shared.identify("\(user.id)") { (_, _) in }
         if Session.current.tokenHasExpired {

@@ -470,7 +470,7 @@ struct NewConversationView: View {
                                 print("uploading cover image: \(progress)")
                             }, successBlock: { (blobCover) in
                                 changeDialogRealmData.shared.fetchTotalCountPublicDialogs(completion: { count in
-                                    databaseRef.child(dialog.id?.description ?? "").setValue(["avatar" : dialog.photo ?? "", "banned" : false, "canMembersType" : false, "cover_photo" : blobCover.id.description, "creation_order" : count + 1, "date_created" : Date().description, "description" : dialog.description, "memberCount" : 0, "members" : [UserDefaults.standard.integer(forKey: "currentUserID") : true], "name" : self.groupName, "owner" : UserDefaults.standard.integer(forKey: "currentUserID")])
+                                    databaseRef.child(dialog.id?.description ?? "").setValue(["avatar" : dialog.photo ?? "", "banned" : false, "canMembersType" : false, "cover_photo" : blobCover.id.description, "creation_order" : count + 1, "date_created" : Date().description, "description" : dialog.description, "memberCount" : 1, "members" : [UserDefaults.standard.integer(forKey: "currentUserID") : true], "name" : self.groupName, "owner" : UserDefaults.standard.integer(forKey: "currentUserID")])
 
                                     self.description = ""
                                     self.groupName = ""
