@@ -38,7 +38,7 @@ struct PublicActionSection: View {
                         .frame(width: 38, height: 26)
 
                     if self.dialogRelationship != .notSubscribed {
-                        Text("Message")
+                        Text("Messages")
                             .font(.none)
                             .fontWeight(.semibold)
                             .foregroundColor(.white)
@@ -89,7 +89,7 @@ struct PublicActionSection: View {
                             .foregroundColor(.white)
                             .padding(2.5)
                         
-                        Text("Join Chat")
+                        Text("Join Channel")
                             .font(.none)
                             .fontWeight(.semibold)
                             .foregroundColor(.white)

@@ -167,7 +167,7 @@ struct DiscoverFeaturedCell: View, Identifiable {
                                                 .frame(width: 16, height: 16, alignment: .center)
                                                 .foregroundColor(.blue)
                                             
-                                            Text("Share Group")
+                                            Text("Share Channel")
                                                 .font(.subheadline)
                                                 .fontWeight(.medium)
                                                 .multilineTextAlignment(.center)

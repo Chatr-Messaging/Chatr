@@ -430,7 +430,6 @@ struct DiscoverView: View {
         MorePublicListView(viewModel: self.viewModel, dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, tagsCount: 0, tagId: tagId ?? "", viewState: viewState)
             .environmentObject(self.auth)
     }
-
     
     func styleBuilder<Content: View>(@ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .center, spacing: 0) {

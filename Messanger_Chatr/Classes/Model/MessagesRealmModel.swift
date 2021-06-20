@@ -122,9 +122,116 @@ class changeMessageRealmData {
 
             do {
                 let realm = try Realm(configuration: config)
-                if realm.object(ofType: MessageStruct.self, forPrimaryKey: object.id ?? "") == nil {
+                if let foundMessage = realm.object(ofType: MessageStruct.self, forPrimaryKey: object.id ?? "") {
+                    try realm.write({
+                        
+                        if let text = object.text, foundMessage.text != text {
+                            foundMessage.text = text
+                        }
+                        
+                        if let dialogID = object.dialogID, foundMessage.dialogID != dialogID {
+                            foundMessage.dialogID = dialogID
+                        }
+                        
+                        if let date = object.dateSent, foundMessage.date != date {
+                            foundMessage.date = date
+                        }
+                        
+                        if foundMessage.senderID != Int(object.senderID) {
+                            foundMessage.senderID = Int(object.senderID)
+                        }
+                        
+                        if let readz = object.readIDs {
+                            for read in readz {
+                                if !foundMessage.readIDs.contains(Int(truncating: read)) {
+                                    foundMessage.readIDs.append(Int(truncating: read))
+                                }
+                            }
+                        }
+                        
+                        if !foundMessage.readIDs.contains(Int(Session.current.currentUserID)) {
+                            Chat.instance.read(object) { (error) in }
+                        }
+                        
+                        if let delivered = object.deliveredIDs {
+                            for deliv in delivered {
+                                if !foundMessage.deliveredIDs.contains(Int(truncating: deliv)) {
+                                    foundMessage.deliveredIDs.append(Int(truncating: deliv))
+                                }
+                            }
+                        }
+                        
+                        //case delivered, sending, read, isTyping, editied, deleted, error
+                        if let deliverCount = object.deliveredIDs?.count, deliverCount > 1 {
+                            foundMessage.messageState = .delivered
+                        } else {
+                            foundMessage.messageState = .sending
+                        }
+                        if object.readIDs?.count ?? 0 > 0 {
+                            foundMessage.messageState = .read
+                        }
+                        if object.edited {
+                            foundMessage.messageState = .editied
+                        }
+                        if object.removed {
+                            foundMessage.messageState = .deleted
+                        }
+                        if object.delayed, !foundMessage.hadDelay {
+                            foundMessage.hadDelay = true
+                        }
+
+                        if (object.destroyAfterInterval > 0), foundMessage.destroyDate != Int(object.destroyAfterInterval) {
+                            foundMessage.destroyDate = Int(object.destroyAfterInterval)
+                        }
+                        
+                        if let attachments = object.attachments {
+                            for attach in attachments {
+                                //image/video attachment
+                                if let uid = attach.id {
+                                    //let storage = Storage.storage()
+                                    if let fileURL = Blob.privateUrl(forFileUID: uid), foundMessage.image != fileURL {
+                                        foundMessage.image = fileURL
+                                    } else if let fileURLPub = Blob.publicUrl(forFileUID: uid), foundMessage.image != fileURLPub {
+                                        foundMessage.image = fileURLPub
+                                    }
+
+                                    if let type = attach.type, foundMessage.imageType != type {
+                                        foundMessage.imageType = type
+                                    }
+                                }
+                                
+                                if let contactIDPram = attach.customParameters as? [String: String], let contactId = Int(contactIDPram["contactID"] ?? ""), foundMessage.contactID != contactId {
+                                    foundMessage.contactID = contactId
+                                    print("the shared contact ID is: \(foundMessage.contactID)")
+                                }
+                                
+                                if let channelIDParam = attach.customParameters as? [String: String], let channelId = channelIDParam["channelID"], foundMessage.channelID != channelId {
+                                    foundMessage.channelID = channelId
+                                    print("the shared channel ID is: \(foundMessage.channelID)")
+                                }
+                                
+                                if let longitude = attach.customParameters["longitude"], foundMessage.longitude != Double("\(longitude)") ?? 0 {
+                                    foundMessage.longitude = Double("\(longitude)") ?? 0
+                                    print("the shared longitude ID is: \(foundMessage.longitude) && \(longitude)")
+                                }
+                                
+                                if let latitude = attach.customParameters["latitude"], foundMessage.latitude != Double("\(latitude)") ?? 0 {
+                                    foundMessage.latitude = Double("\(latitude)") ?? 0
+                                    print("the shared latitude is: \(foundMessage.latitude) && \(latitude)")
+                                }
+                                
+                                if let videoUrl = attach.customParameters["videoId"], foundMessage.image != "\(videoUrl)" {
+                                    foundMessage.image = "\(videoUrl)"
+                                    foundMessage.imageType = attach.type ?? ""
+                                    print("the video is: \(String(describing: attach.type)) && \(videoUrl)")
+                                }
+                            }
+                        }
+                        
+                        realm.add(foundMessage, update: .all)
+                    })
+                } else {
                     let newData = MessageStruct()
-                    var hasRead = false
 
                     newData.id = object.id ?? ""
                     newData.text = object.text ?? ""
@@ -132,17 +239,19 @@ class changeMessageRealmData {
                     newData.date = object.dateSent ?? Date()
                     newData.senderID = Int(object.senderID)
                     for read in object.readIDs ?? [] {
-                        if read.intValue == Session.current.currentUserID {
-                            hasRead = true
+                        if !newData.readIDs.contains(Int(truncating: read)) {
+                            newData.readIDs.append(Int(truncating: read))
                         }
-                        newData.readIDs.append(Int(truncating: read))
                     }
-                    if !hasRead {
+
+                    if !newData.readIDs.contains(Int(Session.current.currentUserID)) {
                         Chat.instance.read(object) { (error) in }
                     }
-                    hasRead = false
+                    
                     for deliv in object.deliveredIDs ?? [] {
-                        newData.deliveredIDs.append(Int(truncating: deliv))
+                        if !newData.deliveredIDs.contains(Int(truncating: deliv)) {
+                            newData.deliveredIDs.append(Int(truncating: deliv))
+                        }
                     }
                     
                     //case delivered, sending, read, isTyping, editied, deleted, error
@@ -235,7 +344,117 @@ class changeMessageRealmData {
         let config = Realm.Configuration(schemaVersion: 1)
         do {
             let realm = try Realm(configuration: config)
-            if realm.object(ofType: MessageStruct.self, forPrimaryKey: object.id ?? "") == nil {
+            if let foundMessage = realm.object(ofType: MessageStruct.self, forPrimaryKey: object.id ?? "") {
+                try realm.write({
+                    if let text = object.text, foundMessage.text != text {
+                        foundMessage.text = text
+                    }
+                    
+                    if let dialogID = object.dialogID, foundMessage.dialogID != dialogID {
+                        foundMessage.dialogID = dialogID
+                    }
+                    
+                    if let date = object.dateSent, foundMessage.date != date {
+                        foundMessage.date = date
+                    }
+                    
+                    if foundMessage.senderID != Int(object.senderID) {
+                        foundMessage.senderID = Int(object.senderID)
+                    }
+                    
+                    if let readz = object.readIDs {
+                        for read in readz {
+                            if !foundMessage.readIDs.contains(Int(truncating: read)) {
+                                foundMessage.readIDs.append(Int(truncating: read))
+                            }
+                        }
+                    }
+                    
+                    if !foundMessage.readIDs.contains(Int(Session.current.currentUserID)) {
+                        Chat.instance.read(object) { (error) in }
+                    }
+                    
+                    if let delivered = object.deliveredIDs {
+                        for deliv in delivered {
+                            if !foundMessage.deliveredIDs.contains(Int(truncating: deliv)) {
+                                foundMessage.deliveredIDs.append(Int(truncating: deliv))
+                            }
+                        }
+                    }
+                    
+                    //case delivered, sending, read, isTyping, editied, deleted, error
+                    if let deliverCount = object.deliveredIDs?.count, deliverCount > 1 {
+                        foundMessage.messageState = .delivered
+                    } else {
+                        foundMessage.messageState = .sending
+                    }
+                    if object.readIDs?.count ?? 0 > 0 {
+                        foundMessage.messageState = .read
+                    }
+                    if object.edited {
+                        foundMessage.messageState = .editied
+                    }
+                    if object.removed {
+                        foundMessage.messageState = .deleted
+                    }
+                    if object.delayed, !foundMessage.hadDelay {
+                        foundMessage.hadDelay = true
+                    }
+
+                    if (object.destroyAfterInterval > 0), foundMessage.destroyDate != Int(object.destroyAfterInterval) {
+                        foundMessage.destroyDate = Int(object.destroyAfterInterval)
+                    }
+                    
+                    if let attachments = object.attachments {
+                        for attach in attachments {
+                            //image/video attachment
+                            if let uid = attach.id {
+                                //let storage = Storage.storage()
+                                if let fileURL = Blob.privateUrl(forFileUID: uid), foundMessage.image != fileURL {
+                                    foundMessage.image = fileURL
+                                } else if let fileURLPub = Blob.publicUrl(forFileUID: uid), foundMessage.image != fileURLPub {
+                                    foundMessage.image = fileURLPub
+                                }
+
+                                if let type = attach.type, foundMessage.imageType != type {
+                                    foundMessage.imageType = type
+                                }
+                            }
+                            
+                            if let contactIDPram = attach.customParameters as? [String: String], let contactId = Int(contactIDPram["contactID"] ?? ""), foundMessage.contactID != contactId {
+                                foundMessage.contactID = contactId
+                                print("the shared contact ID is: \(foundMessage.contactID)")
+                            }
+                            
+                            if let channelIDParam = attach.customParameters as? [String: String], let channelId = channelIDParam["channelID"], foundMessage.channelID != channelId {
+                                foundMessage.channelID = channelId
+                                print("the shared channel ID is: \(foundMessage.channelID)")
+                            }
+                            
+                            if let longitude = attach.customParameters["longitude"], foundMessage.longitude != Double("\(longitude)") ?? 0 {
+                                foundMessage.longitude = Double("\(longitude)") ?? 0
+                                print("the shared longitude ID is: \(foundMessage.longitude) && \(longitude)")
+                            }
+                            
+                            if let latitude = attach.customParameters["latitude"], foundMessage.latitude != Double("\(latitude)") ?? 0 {
+                                foundMessage.latitude = Double("\(latitude)") ?? 0
+                                print("the shared latitude is: \(foundMessage.latitude) && \(latitude)")
+                            }
+                            
+                            if let videoUrl = attach.customParameters["videoId"], foundMessage.image != "\(videoUrl)" {
+                                foundMessage.image = "\(videoUrl)"
+                                foundMessage.imageType = attach.type ?? ""
+                                print("the video is: \(String(describing: attach.type)) && \(videoUrl)")
+                            }
+                        }
+                    }
+                    
+                    realm.add(foundMessage, update: .all)
+                    DispatchQueue.main.async {
+                        completion()
+                    }
+                })
+            } else {
                 let newData = MessageStruct()
                 newData.id = object.id ?? ""
                 newData.text = object.text ?? ""

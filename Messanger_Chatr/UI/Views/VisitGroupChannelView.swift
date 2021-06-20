@@ -769,14 +769,14 @@ struct VisitGroupChannelView: View {
     func destroyLeaveGroup() {
         UserDefaults.standard.set(false, forKey: "localOpen")
         changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
-        self.showingMoreSheet = false
         
         if self.dialogModel.dialogType == "public" && !self.isOwner {
-            changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: self.dialogModel.id)
             if let index = self.dialogModelAdmins.firstIndex(of: UserDefaults.standard.integer(forKey: "currentUserID")) {
                 self.dialogModelAdmins.remove(at: index)
             }
             self.dialogRelationship = .notSubscribed
+            self.showingMoreSheet = false
+            changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: self.dialogModel.id)
         } else {
             changeDialogRealmData.shared.deletePrivateConnectyDialog(dialogID: self.dialogModel.id, isOwner: self.isOwner)
         }
