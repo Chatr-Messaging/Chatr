@@ -78,7 +78,7 @@ struct VisitGroupChannelView: View {
 
                     //MARK: Action Buttons
                     if self.dialogModel.dialogType == "public" {
-                        PublicActionSection(dialogRelationship: self.$dialogRelationship, dialogModel: self.$dialogModel, currentUserIsPowerful: self.$currentUserIsPowerful, dismissView: self.$dismissView, notiType: self.$notiType, notiText: self.$notiText, showAlert: self.$showAlert, notificationsOn: self.$notificationsOn)
+                        PublicActionSection(dialogRelationship: self.$dialogRelationship, dialogModel: self.$dialogModel, currentUserIsPowerful: self.$currentUserIsPowerful, dismissView: self.$dismissView, notiType: self.$notiType, notiText: self.$notiText, showAlert: self.$showAlert, notificationsOn: self.$notificationsOn, dialogModelAdmins: self.$dialogModelAdmins)
                             .environmentObject(self.auth)
                             .padding(.bottom)
                     }
@@ -380,6 +380,10 @@ struct VisitGroupChannelView: View {
                             if let owner = self.publicDialogModel.owner {
                                 foundDialog.owner = owner
                             }
+                            
+                            if let memCount = self.publicDialogModel.memberCount, memCount != 0 {
+                                foundDialog.publicMemberCount = memCount
+                            }
                             self.dialogModel = foundDialog
 
                             realm.add(foundDialog, update: .all)
@@ -410,6 +414,10 @@ struct VisitGroupChannelView: View {
                         
                         if let owner = self.publicDialogModel.owner {
                             dialog.owner = owner
+                        }
+
+                        if let memCount = self.publicDialogModel.memberCount {
+                            dialog.publicMemberCount = memCount
                         }
                         self.dialogModel = dialog
 
@@ -551,8 +559,26 @@ struct VisitGroupChannelView: View {
                                             }
                                         }
                                     }
+                                } else if childSnap.key == "members" {
+                                    if let dict2 = childSnap.value as? [String: Any] {
+                                        foundDialog.occupentsID.removeAll()
+
+                                        for admin in dict2 {
+                                            if let key = Int(admin.key), Int(admin.key) != foundDialog.owner {
+                                                if !self.dialogModelAdmins.contains(key) {
+                                                    self.dialogModelAdmins.append(key)
+                                                }
+                                                
+                                                if !foundDialog.occupentsID.contains(key) {
+                                                    foundDialog.occupentsID.append(key)
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
+                            
+                            self.dialogModel = foundDialog
 
                             realm.add(foundDialog, update: .all)
                         })
@@ -596,14 +622,49 @@ struct VisitGroupChannelView: View {
                         //self.dialogModel.canMembersType = dict["canMembersType"] as? Bool ?? false
                         for childSnapshot in snapshot.children {
                             let childSnap = childSnapshot as! DataSnapshot
-                            if let dict2 = childSnap.value as? [String: Any] {
-                                for tag in dict2 {
-                                    if !self.publicTags.contains(tag.key) {
-                                        self.publicTags.append(tag.key)
+                            if childSnap.key == "tags" {
+                                if let dict2 = childSnap.value as? [String: Any] {
+                                    for tag in dict2 {
+                                        if !self.publicTags.contains(tag.key) {
+                                            self.publicTags.append(tag.key)
+                                        }
+                                        
+                                        if !dialog.publicTags.contains(tag.key) {
+                                            dialog.publicTags.append(tag.key)
+                                        }
                                     }
-                                    
-                                    if !dialog.publicTags.contains(tag.key) {
-                                        dialog.publicTags.append(tag.key)
+                                }
+                            } else if childSnap.key == "adminIds" {
+                                if let dict2 = childSnap.value as? [String: Any] {
+                                    dialog.adminID.removeAll()
+
+                                    for admin in dict2 {
+                                        if let key = Int(admin.key), Int(admin.key) != dialog.owner {
+                                            if !self.dialogModelMembers.contains(key) {
+                                                self.dialogModelMembers.append(key)
+                                            }
+                                            
+                                            if !dialog.adminID.contains(key) {
+                                                dialog.adminID.append(key)
+                                            }
+                                        }
+                                    }
+                                }
+                            } else if childSnap.key == "members" {
+                                if let dict2 = childSnap.value as? [String: Any] {
+                                    dialog.occupentsID.removeAll()
+
+                                    for admin in dict2 {
+                                        
+                                        if let key = Int(admin.key), Int(admin.key) != dialog.owner {
+                                            if !self.dialogModelAdmins.contains(key) {
+                                                self.dialogModelAdmins.append(key)
+                                            }
+                                            
+                                            if !dialog.occupentsID.contains(key) {
+                                                dialog.occupentsID.append(key)
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -638,9 +699,9 @@ struct VisitGroupChannelView: View {
         for id in self.dialogModel.occupentsID {
             if !self.dialogModelAdmins.contains(where: { $0 == id }) && id != 0 && id != self.dialogModel.owner {
                 self.dialogModelAdmins.append(id)
+                
+                if self.dialogModelAdmins.count > 4 { break }
             }
-            
-            if self.dialogModelAdmins.count > 4 { break }
         }
     }
     
@@ -712,6 +773,10 @@ struct VisitGroupChannelView: View {
         
         if self.dialogModel.dialogType == "public" && !self.isOwner {
             changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: self.dialogModel.id)
+            if let index = self.dialogModelAdmins.firstIndex(of: UserDefaults.standard.integer(forKey: "currentUserID")) {
+                self.dialogModelAdmins.remove(at: index)
+            }
+            self.dialogRelationship = .notSubscribed
         } else {
             changeDialogRealmData.shared.deletePrivateConnectyDialog(dialogID: self.dialogModel.id, isOwner: self.isOwner)
         }
@@ -866,7 +931,9 @@ struct VisitGroupChannelView: View {
                                     }), .destructive(Text("Report Channel"), action: {
                                         self.reportPublicDialog()
                                     }), .destructive(Text(self.isOwner ? "Destroy Channel" : "Leave Channel"), action: {
-                                        self.destroyLeaveGroup()
+                                        withAnimation {
+                                            self.destroyLeaveGroup()
+                                        }
                                     }), .cancel(Text("Done"))] : [
                                     .default(Text(self.isOwner ? "Edit Details" : (self.notificationsOn ? "Turn Notifications Off" : "Turn Notifications On")), action: {
                                         if self.isOwner {
@@ -875,7 +942,9 @@ struct VisitGroupChannelView: View {
                                             self.toggleNotifications()
                                         }
                                     }), .destructive(Text((self.isOwner ? "Destroy " : "Leave ") + (self.dialogModel.dialogType == "public" ? "Channel" : "Group")), action: {
-                                        self.destroyLeaveGroup()
+                                        withAnimation {
+                                            self.destroyLeaveGroup()
+                                        }
                                     }), .cancel(Text("Done"))])
                 }.simultaneousGesture(TapGesture()
                     .onEnded { _ in
@@ -933,7 +1002,7 @@ struct topGroupHeaderView: View {
                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                             self.showMoreAdmins.toggle()
                         }, label: {
-                            Text(self.dialogModel.dialogType == "public" ? ("\(self.dialogModel.publicMemberCount) member") + (self.dialogModel.publicMemberCount <= 1 ? "" : "s") : ("\(self.dialogModel.occupentsID.count) contact") + (self.dialogModel.occupentsID.count <= 1 ? "" : "s"))
+                            Text(self.dialogModel.dialogType == "public" ? ("\(self.dialogModel.publicMemberCount) member") + (self.dialogModel.publicMemberCount == 1 ? "" : "s") : ("\(self.dialogModel.occupentsID.count) contact") + (self.dialogModel.occupentsID.count == 1 ? "" : "s"))
                                 .font(.subheadline)
                                 .fontWeight(.none)
                                 .foregroundColor(.secondary)

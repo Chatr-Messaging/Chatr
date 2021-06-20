@@ -20,6 +20,8 @@ class ChatMessageViewModel: ObservableObject {
     @Published var message: MessageStruct = MessageStruct()
     @Published var contact: ContactStruct = ContactStruct()
     @Published var contactRelationship: visitContactRelationship = .unknown
+    @Published var dismissView: Bool = true
+    @Published var showPinDetails: String = ""
     @Published var player: AVPlayer = AVPlayer()
     @Published var totalDuration: Float = 0.0
     @Published var videoTimeText: String = "0:00"

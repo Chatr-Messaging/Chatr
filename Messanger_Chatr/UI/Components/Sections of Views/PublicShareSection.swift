@@ -51,7 +51,7 @@ struct PublicShareSection: View {
                             .frame(width: 20, height: 20, alignment: .center)
                             .padding(.trailing, 5)
                         
-                        Text("Share Channel")
+                        Text("Share Chat")
                             .font(.none)
                             .fontWeight(.none)
                             .foregroundColor(.primary)
@@ -86,7 +86,7 @@ struct PublicShareSection: View {
                         .frame(width: 20, height: 20, alignment: .center)
                         .padding(.trailing, 5)
                     
-                    Text("Forward Channel")
+                    Text("Forward Chat")
                         .font(.none)
                         .fontWeight(.none)
                         .foregroundColor(.primary)
@@ -137,7 +137,6 @@ struct PublicShareSection: View {
                         //replace below with selected contact id:
                         if self.selectedContact.contains(id) {
                             if let selectedDialog = self.auth.dialogs.results.filter("id == %@", dialog.id).first {
-                                //changeMessageRealmData.shared.sendContactMessage(dialog: selectedDialog, contactID: [self.contact.id], occupentID: [NSNumber(value: id), NSNumber(value: Int(self.auth.profile.results.first?.id ?? 0))])
                                 changeMessageRealmData.shared.sendPublicChannel(dialog: selectedDialog, contactID: [self.dialogModel.id], occupentID: [NSNumber(value: id), NSNumber(value: Int(self.auth.profile.results.first?.id ?? 0))])
                                 
                                 if let index = self.selectedContact.firstIndex(of: id) {
@@ -154,8 +153,8 @@ struct PublicShareSection: View {
         if self.selectedContact.count == 0 {
             UINotificationFeedbackGenerator().notificationOccurred(.success)
             self.notiType = "success"
-            self.notiText = "Successfully forwarded channel"
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+            self.notiText = "Successfully forwarded chat"
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                 self.showAlert = true
             }
         } else {
@@ -170,7 +169,7 @@ struct PublicShareSection: View {
                    
                    let message = ChatMessage.markable()
                    message.markable = true
-                   message.text = "Shared Channel"
+                    message.text = "Shared chat: \(self.dialogModel.fullName)"
                    message.attachments = [attachment]
                    
                    dialog.send(message) { (error) in

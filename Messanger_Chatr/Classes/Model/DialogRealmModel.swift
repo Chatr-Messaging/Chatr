@@ -572,6 +572,7 @@ class changeDialogRealmData {
         Request.unsubscribeFromPublicDialog(withID: dialogID, successBlock: {
             self.toggleFirebaseMemberCount(dialogId: dialogID, isJoining: false, totalCount: nil, onSuccess: { _ in
                 self.updateDialogDelete(isDelete: true, dialogID: dialogID)
+                self.removePublicMemberRealmDialog(memberId: UserDefaults.standard.integer(forKey: "currentUserID"), dialogId: dialogID)
                 changeDialogRealmData.shared.removeFirebaseAdmin(dialogId: dialogID, adminId: NSNumber(value: UserDefaults.standard.integer(forKey: "currentUserID")), onSuccess: { _ in }, onError: { _ in })
             }, onError: { err in
                 print("error deleting public: \(String(describing: err)) for dialog: \(dialogID)")
@@ -579,6 +580,42 @@ class changeDialogRealmData {
         }, errorBlock: { error in
             print("error deleting public: \(error.localizedDescription) for dialog: \(dialogID)")
         })
+    }
+    
+    func removePublicMemberRealmDialog(memberId: Int, dialogId: String) {
+        let config = Realm.Configuration(schemaVersion: 1)
+        do {
+            let realm = try Realm(configuration: config)
+            if let dialogResult = realm.object(ofType: DialogStruct.self, forPrimaryKey: dialogId) {
+                if let index = dialogResult.occupentsID.firstIndex(of: memberId) {
+                    try? realm.safeWrite({
+                        dialogResult.occupentsID.remove(at: index)
+                        dialogResult.publicMemberCount -= 1
+
+                        realm.add(dialogResult, update: .all)
+                    })
+                }
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
+    func addPublicMemberCountRealmDialog(count: Int, dialogId: String) {
+        //I need this func to update public member count live
+        let config = Realm.Configuration(schemaVersion: 1)
+        do {
+            let realm = try Realm(configuration: config)
+            if let dialogResult = realm.object(ofType: DialogStruct.self, forPrimaryKey: dialogId) {
+                try? realm.safeWrite({
+                    dialogResult.publicMemberCount = count
+
+                    realm.add(dialogResult, update: .all)
+                })
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
     }
     
     func removeAllDialogs() {

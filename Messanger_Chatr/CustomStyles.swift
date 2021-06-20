@@ -50,9 +50,9 @@ struct HomeButtonStyle: ButtonStyle {
         configuration.label
             .background(configuration.isPressed ? Color("bgColor_light") : Color("buttonColor"))
             .cornerRadius(Constants.menuBtnSize / 4)
-            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
             .shadow(color: Color("buttonShadow_Deeper"), radius: 10, x: 0, y: 8)
             .frame(width: Constants.menuBtnSize, height: Constants.menuBtnSize)
+            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
     }
 }
 
@@ -74,9 +74,9 @@ struct ClickMiniButtonStyle: ButtonStyle {
 struct ClickMiniButtonStyleBG: ButtonStyle {
     public func makeBody(configuration: ClickMiniButtonStyleBG.Configuration) -> some View {
         configuration.label
-            .scaleEffect(configuration.isPressed ? 0.975 : 1.0)
             .background(configuration.isPressed ? Color("bgColor_light") : Color.clear)
             .cornerRadius(20)
+            .scaleEffect(configuration.isPressed ? 0.975 : 1.0)
     }
 }
 
@@ -114,10 +114,10 @@ struct changeBGButtonStyleDisabled: ButtonStyle {
 struct highlightedButtonStyle: ButtonStyle {
     public func makeBody(configuration: highlightedButtonStyle.Configuration) -> some View {
         configuration.label
-            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
             .opacity(configuration.isPressed ? 0.95 : 1)
             .background(configuration.isPressed ? Color("bgColor_light") : Color("buttonColor"))
             .cornerRadius(20)
+            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
     }
 }
 
@@ -127,31 +127,31 @@ struct interactionButtonStyle: ButtonStyle {
     
     public func makeBody(configuration: interactionButtonStyle.Configuration) -> some View {
         configuration.label
-            .scaleEffect(configuration.isPressed ? 0.9 : 1.0)
             .opacity(configuration.isPressed ? 0.9 : 1)
             .background(RoundedRectangle(cornerRadius: 20).shadow(color: Color.black.opacity(0.2), radius: 3, x: 0, y: 3))
             .foregroundColor(configuration.isPressed ? (isHighlighted ? Color.blue.opacity(0.85) : Color("bgColor").opacity(0.85)) : isHighlighted ? Color("main_blue").opacity(0.65) : Color("interactionBtnColor").opacity(0.75))
             .overlay(RoundedRectangle(cornerRadius: 20).stroke(isHighlighted ? (configuration.isPressed ? Color.blue.opacity(1) : Color.blue.opacity(0.8)) : (configuration.isPressed ? Color("interactionBtnBorderUnselected").opacity(0.2) : Color("interactionBtnBorderUnselected")), lineWidth: 1.5))
+            .scaleEffect(configuration.isPressed ? 0.9 : 1.0)
     }
 }
 
 struct interactionDefaultButtonStyle: ButtonStyle {
-    public func makeBody(configuration: interactionButtonStyle.Configuration) -> some View {
+    public func makeBody(configuration: interactionDefaultButtonStyle.Configuration) -> some View {
         configuration.label
-            .scaleEffect(configuration.isPressed ? 0.9 : 1.0)
             .opacity(configuration.isPressed ? 0.9 : 1)
             .background(RoundedRectangle(cornerRadius: 20).shadow(color: Color.black.opacity(0.2), radius: 3, x: 0, y: 3))
             .foregroundColor(configuration.isPressed ? Color("bgColor").opacity(0.85) : Color("interactionBtnColor").opacity(0.75))
             .overlay(RoundedRectangle(cornerRadius: 20).stroke(configuration.isPressed ? Color("interactionBtnBorderUnselected").opacity(0.2) : Color("interactionBtnBorderUnselected"), lineWidth: 1.5))
+            .scaleEffect(configuration.isPressed ? 0.9 : 1.0)
     }
 }
 
 struct interactionSendButtonStyle: ButtonStyle {
     public func makeBody(configuration: interactionSendButtonStyle.Configuration) -> some View {
         configuration.label
-            .scaleEffect(configuration.isPressed ? 0.9 : 1.0)
             .opacity(configuration.isPressed ? 0.9 : 1)
             .overlay(Circle().strokeBorder(Color("interactionBtnBorderUnselected").opacity(0.4), lineWidth: 1).blur(radius: 1.8))
+            .scaleEffect(configuration.isPressed ? 0.9 : 1.0)
     }
 }
 

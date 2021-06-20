@@ -23,6 +23,7 @@ struct PublicActionSection: View {
     @Binding var notiText: String
     @Binding var showAlert: Bool
     @Binding var notificationsOn: Bool
+    @Binding var dialogModelAdmins: [Int]
 
     var body: some View {
         HStack(alignment: .center, spacing: 20) {
@@ -52,9 +53,13 @@ struct PublicActionSection: View {
                     Request.subscribeToPublicDialog(withID: self.dialogModel.id, successBlock: { dialogz in
                         changeDialogRealmData.shared.toggleFirebaseMemberCount(dialogId: dialogz.id ?? "", isJoining: true, totalCount: Int(dialogz.occupantsCount), onSuccess: { _ in
                             UINotificationFeedbackGenerator().notificationOccurred(.success)
-                            self.dialogRelationship = .subscribed
                             changeDialogRealmData.shared.insertDialogs([dialogz], completion: {
                                 changeDialogRealmData.shared.updateDialogDelete(isDelete: false, dialogID: dialogz.id ?? "")
+                                changeDialogRealmData.shared.addPublicMemberCountRealmDialog(count: Int(dialogz.occupantsCount), dialogId: dialogz.id ?? "")
+                                withAnimation {
+                                    self.dialogRelationship = .subscribed
+                                    self.dialogModelAdmins.append(UserDefaults.standard.integer(forKey: "currentUserID"))
+                                }
                                 self.auth.sendPushNoti(userIDs: [NSNumber(value: self.dialogModel.owner)], title: "\(self.dialogModel.fullName) Joined", message: "\(self.auth.profile.results.first?.fullName ?? "No Name") joined your public chat \(self.dialogModel.fullName)")
                                 self.notiType = "success"
                                 self.notiText = "Successfully joined \(dialogModel.fullName)"
@@ -84,7 +89,7 @@ struct PublicActionSection: View {
                             .foregroundColor(.white)
                             .padding(2.5)
                         
-                        Text("Join Group")
+                        Text("Join Chat")
                             .font(.none)
                             .fontWeight(.semibold)
                             .foregroundColor(.white)

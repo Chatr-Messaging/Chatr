@@ -84,6 +84,8 @@ struct PublicDialogDiscoverCell: View {
                                             self.isJoined = true
                                             changeDialogRealmData.shared.insertDialogs([dialogz], completion: {
                                                 changeDialogRealmData.shared.updateDialogDelete(isDelete: false, dialogID: dialogz.id ?? "")
+                                                
+                                                self.dialogData.memberCount = Int(dialogz.occupantsCount)
                                                 self.auth.sendPushNoti(userIDs: [NSNumber(value: dialogz.userID)], title: "\(dialogz.name ?? "no name") Joined", message: "\(self.auth.profile.results.first?.fullName ?? "No Name") joined your public chat \(dialogz.name ?? "no name")")
                                             })
                                         }, onError: { _ in

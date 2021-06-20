@@ -13,7 +13,7 @@ struct stickyHeaderSection: View {
     @Binding var dialogModel: DialogStruct
     @State var offset: CGFloat = 0
     let headerHeight = CGFloat(220)
-    let scrollBackHeight = CGFloat(110)
+    let scrollBackHeight = CGFloat(120)
 
     var body: some View {
         //MARK: Sticky Header

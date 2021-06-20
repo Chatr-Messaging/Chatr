@@ -78,6 +78,9 @@ struct ContainerBubble: View {
                         } else if self.message.contactID != 0 {
                             ContactBubble(viewModel: self.viewModel, chatContact: self.$newDialogFromSharedContact, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior, namespace: self.namespace)
                                 .environmentObject(self.auth)
+                        } else if self.message.channelID != "" && self.message.messageState != .deleted {
+                            ChannelBubble(viewModel: self.viewModel, dialogId: self.message.channelID, hasPrior: self.hasPrior)
+                                .environmentObject(self.auth)
                         } else if self.message.longitude != 0 && self.message.latitude != 0 {
                             LocationBubble(viewModel: self.viewModel, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior, namespace: self.namespace)
                         } else {

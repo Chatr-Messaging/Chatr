@@ -27,6 +27,7 @@
 		0525E4C525ECC4440086EB54 /* MessageReplyCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0525E4C425ECC4440086EB54 /* MessageReplyCell.swift */; };
 		052E6E2025CE513B00C3EAE4 /* ReactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052E6E1F25CE513B00C3EAE4 /* ReactionsView.swift */; };
 		05390F62267C656C001C5720 /* PublicShareSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05390F61267C656C001C5720 /* PublicShareSection.swift */; };
+		05390F64267F107E001C5720 /* ChannelBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05390F63267F107E001C5720 /* ChannelBubble.swift */; };
 		053AC4B225194C080036946E /* GIFController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053AC4B125194C080036946E /* GIFController.swift */; };
 		053AC4B7251982560036946E /* AttachmentBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053AC4B6251982550036946E /* AttachmentBubble.swift */; };
 		053D33F22393C97B00CEE03E /* DismissGuardian.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053D33F12393C97B00CEE03E /* DismissGuardian.swift */; };
@@ -222,6 +223,7 @@
 		0525E4C425ECC4440086EB54 /* MessageReplyCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageReplyCell.swift; sourceTree = "<group>"; };
 		052E6E1F25CE513B00C3EAE4 /* ReactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReactionsView.swift; sourceTree = "<group>"; };
 		05390F61267C656C001C5720 /* PublicShareSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicShareSection.swift; sourceTree = "<group>"; };
+		05390F63267F107E001C5720 /* ChannelBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelBubble.swift; sourceTree = "<group>"; };
 		053A63982509647700571226 /* StoreKitTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKitTest.framework; path = Developer/Library/Frameworks/StoreKitTest.framework; sourceTree = SDKROOT; };
 		053A639A2509649A00571226 /* Configuration.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Configuration.storekit; sourceTree = "<group>"; };
 		053AC4B125194C080036946E /* GIFController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GIFController.swift; sourceTree = "<group>"; };
@@ -682,6 +684,7 @@
 				053AC4B6251982550036946E /* AttachmentBubble.swift */,
 				055F37BF2607DAA2003EDB1F /* VideoControlBubble.swift */,
 				0583A84E251AFB740005B7E1 /* ContactBubble.swift */,
+				05390F63267F107E001C5720 /* ChannelBubble.swift */,
 				058E73D826141978008578E3 /* AudioBubble.swift */,
 				0569348F252312F7001BDFF0 /* LocationBubble.swift */,
 			);
@@ -1065,6 +1068,7 @@
 				0559B8D325D39AC20069C44A /* KeyboardCardViewModel.swift in Sources */,
 				05196DDB24EE3BD20026B9A7 /* ContactsRealmModel.swift in Sources */,
 				056B989524C8F76B003F7FBA /* HomeUserInfoHeader.swift in Sources */,
+				05390F64267F107E001C5720 /* ChannelBubble.swift in Sources */,
 				054DA6C2250FF9DF00F28F74 /* AboutChatrView.swift in Sources */,
 				059EF95224C9153A004BA17C /* ChatMessagesView.swift in Sources */,
 				055F37BC2606F45F003EDB1F /* CachingPlayerItem.swift in Sources */,

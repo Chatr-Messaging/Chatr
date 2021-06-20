@@ -26,6 +26,7 @@ class MessageStruct : Object, Identifiable {
     @objc dynamic var longitude: Double = 0.0
     @objc dynamic var latitude: Double = 0.0
     @objc dynamic var contactID: Int = 0
+    @objc dynamic var channelID: String = ""
     @objc dynamic var image: String = ""
     @objc dynamic var localAttachmentPath: String = ""
     @objc dynamic var imageType: String = ""
@@ -186,6 +187,11 @@ class changeMessageRealmData {
                                 print("the shared contact ID is: \(newData.contactID)")
                             }
                             
+                            if let contactID = attach.customParameters as? [String: String] {
+                                newData.channelID = contactID["channelID"] ?? ""
+                                print("the shared channel ID is: \(newData.channelID)")
+                            }
+                            
                             if let longitude = attach.customParameters["longitude"] {
                                 newData.longitude = Double("\(longitude)") ?? 0
                                 print("the shared longitude ID is: \(newData.longitude) && \(longitude)")
@@ -285,6 +291,11 @@ class changeMessageRealmData {
                             print("the shared contact ID is: \(newData.contactID)")
                         }
                         
+                        if let contactID = attach.customParameters as? [String: String] {
+                            newData.channelID = contactID["channelID"] ?? ""
+                            print("the shared channel ID is: \(newData.channelID)")
+                        }
+                        
                         if let longitude = attach.customParameters["longitude"] {
                             newData.longitude = Double("\(longitude)") ?? 0
                             print("the shared longitude ID is: \(newData.longitude) & \(longitude)")
@@ -379,7 +390,7 @@ class changeMessageRealmData {
             
             let message = ChatMessage.markable()
             message.markable = true
-            message.text = "Shared Channel"
+            message.text = "Shared chat \(dialog.fullName)"
             message.attachments = [attachment]
             
             let pDialog = ChatDialog(dialogID: dialog.id, type: occupentID.count > 2 ? .group : .private)
