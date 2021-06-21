@@ -253,7 +253,13 @@ struct mainHomeList: View {
                             .padding(.bottom)
                             .sheet(isPresented: self.$showContacts, onDismiss: {
                                 if self.auth.isUserAuthenticated != .signedOut {
-                                    self.loadSelectedDialog()
+                                    if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), !diaId.isEmpty {
+                                        self.loadPublicDialog(diaId: diaId)
+                                    } else if let diaId = UserDefaults.standard.string(forKey: "openingDialogId"), !diaId.isEmpty {
+                                        self.loadPublicDialog(diaId: diaId)
+                                    } else {
+                                        self.loadSelectedDialog()
+                                    }
                                 } else {
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
                                         self.auth.logOutFirebase(completion: {
@@ -429,6 +435,11 @@ struct mainHomeList: View {
                                 .buttonStyle(ClickButtonStyle())
                                 .sheet(isPresented: self.$isDiscoverOpen, onDismiss: {
                                     print("dismiss discover vieww")
+                                    if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), !diaId.isEmpty {
+                                        self.loadPublicDialog(diaId: diaId)
+                                    } else if let diaId = UserDefaults.standard.string(forKey: "openingDialogId"), !diaId.isEmpty {
+                                        self.loadPublicDialog(diaId: diaId)
+                                    }
                                 }) {
                                     NavigationView {
                                         DiscoverView(removeDoneBtn: false, dismissView: self.$isDiscoverOpen, showPinDetails: self.$showPinDetails)
@@ -547,7 +558,13 @@ struct mainHomeList: View {
                         .onAppear {
                             self.selectedDialogID = UserDefaults.standard.string(forKey: "selectedDialogID") ?? ""
                         }
-                        .sheet(isPresented: self.$showSharedPublicDialog, content: {
+                        .sheet(isPresented: self.$showSharedPublicDialog, onDismiss: {
+                            if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), !diaId.isEmpty {
+                                self.loadPublicDialog(diaId: diaId)
+                            } else if let diaId = UserDefaults.standard.string(forKey: "openingDialogId"), !diaId.isEmpty {
+                                self.loadPublicDialog(diaId: diaId)
+                            }
+                        }) {
                             NavigationView {
                                 VisitGroupChannelView(dismissView: self.$showSharedPublicDialog, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$newDialogFromContact, showPinDetails: self.$showPinDetails, fromDialogCell: true, viewState: .fromDynamicLink, dialogRelationship: .unknown)
                                     .environmentObject(self.auth)
@@ -571,7 +588,7 @@ struct mainHomeList: View {
                                                             .opacity(self.canEditGroup ? 1 : 0)
                                                     }.disabled(self.canEditGroup ? false : true))
                             }
-                        })
+                        }
                         /*
                         .simultaneousGesture(DragGesture().onChanged { value in
                             self.keyboardDragState = value.translation
@@ -676,6 +693,25 @@ struct mainHomeList: View {
         }
     }
     
+    func loadPublicDialog(diaId: String) {
+        self.isLocalOpen = false
+        UserDefaults.standard.set(false, forKey: "localOpen")
+        if let oldDiaId = UserDefaults.standard.string(forKey: "selectedDialogID") {
+            changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: oldDiaId)
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
+            UserDefaults.standard.set(diaId, forKey: "selectedDialogID")
+            self.selectedDialogID = diaId
+            self.newDialogFromContact = 0
+            self.isLocalOpen = true
+            UserDefaults.standard.set(true, forKey: "localOpen")
+            changeDialogRealmData.shared.updateDialogOpen(isOpen: true, dialogID: diaId)
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            UserDefaults.standard.set("", forKey: "openingDialogId")
+        }
+    }
+    
     func onCellTapGesture(id: String, dialogType: String) {
         UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
@@ -689,6 +725,10 @@ struct mainHomeList: View {
             }
             changeDialogRealmData.shared.updateDialogOpen(isOpen: true, dialogID: id)
         } else {
+            if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), !diaId.isEmpty {
+                UserDefaults.standard.set("", forKey: "visitingDialogId")
+                changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: diaId)
+            }
             self.isLocalOpen = false
             UserDefaults.standard.set(false, forKey: "localOpen")
             changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: id)
@@ -716,6 +756,10 @@ struct mainHomeList: View {
             UserDefaults.standard.set(false, forKey: "localOpen")
             self.isLocalOpen = false
             changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: id)
+            if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), !diaId.isEmpty {
+                UserDefaults.standard.set("", forKey: "visitingDialogId")
+                changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: diaId)
+            }
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
                 changeDialogRealmData.shared.fetchDialogs(completion: { _ in })

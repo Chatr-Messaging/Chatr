@@ -330,7 +330,7 @@ struct EditGroupDialogView: View {
                     //MARK: Settings Section
                     if self.dialogModel.dialogType == "public" {
                         HStack {
-                            Text("SETTINGS:")
+                            Text("SETINGS:")
                                 .font(.caption)
                                 .fontWeight(.regular)
                                 .foregroundColor(.secondary)
@@ -362,7 +362,7 @@ struct EditGroupDialogView: View {
                         })
                         
                         HStack(alignment: .center) {
-                            Text("member contributions: allows any subscribed member to send messages and media")
+                            Text("member contributions allows any subscribed member to send messages and media along with admins")
                                 .font(.caption)
                                 .fontWeight(.none)
                                 .foregroundColor(.secondary)

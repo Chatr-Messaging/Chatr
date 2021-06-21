@@ -199,7 +199,7 @@ struct DiscoverFeaturedCell: View, Identifiable {
                         .default(Text("View Details")) {
                             self.actionState.toggle()
                         },
-                        .destructive(Text("Unsubscribe")) {
+                        .destructive(Text("Leave Channel")) {
                             self.isMember = false
                             changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: self.dialogModel.id ?? "")
                         },

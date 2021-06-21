@@ -409,6 +409,13 @@ class changeDialogRealmData {
             let realm = try Realm(configuration: config)
             try? realm.safeWrite({
                 if let dialogResult = realm.object(ofType: DialogStruct.self, forPrimaryKey: dialogID) {
+                    if dialogResult.dialogType == "public" {
+                        if !dialogResult.canMembersType, dialogResult.owner != UserDefaults.standard.integer(forKey: "currentUserID"), !dialogResult.adminID.contains(UserDefaults.standard.integer(forKey: "currentUserID")) {
+                            UserDefaults.standard.set(!dialogResult.canMembersType, forKey: "disabledMessaging")
+                        }
+                    } else {
+                        UserDefaults.standard.set(false, forKey: "disabledMessaging")
+                    }
                     dialogResult.isOpen = isOpen
                     realm.add(dialogResult, update: .all)
                 }
@@ -470,8 +477,9 @@ class changeDialogRealmData {
             try? realm.safeWrite({
                 if let dialogResult = realm.object(ofType: DialogStruct.self, forPrimaryKey: dialogID) {
                     dialogResult.isDeleted = isDelete
+                    
                     realm.add(dialogResult, update: .all)
-                    print("Succsessfuly deleted Dialog! \(String(describing: dialogResult.isDeleted))")
+                    print("Successfully deleted or adjusted Dialog! \(String(describing: dialogResult.isDeleted))")
                 }
             })
         } catch {
@@ -571,6 +579,7 @@ class changeDialogRealmData {
     func unsubscribePublicConnectyDialog(dialogID: String) {
         Request.unsubscribeFromPublicDialog(withID: dialogID, successBlock: {
             self.toggleFirebaseMemberCount(dialogId: dialogID, isJoining: false, totalCount: nil, onSuccess: { _ in
+                UserDefaults.standard.set(false, forKey: "localOpen")
                 self.updateDialogDelete(isDelete: true, dialogID: dialogID)
                 self.removePublicMemberRealmDialog(memberId: UserDefaults.standard.integer(forKey: "currentUserID"), dialogId: dialogID)
                 changeDialogRealmData.shared.removeFirebaseAdmin(dialogId: dialogID, adminId: NSNumber(value: UserDefaults.standard.integer(forKey: "currentUserID")), onSuccess: { _ in }, onError: { _ in })

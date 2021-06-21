@@ -78,7 +78,7 @@ struct VisitGroupChannelView: View {
 
                     //MARK: Action Buttons
                     if self.dialogModel.dialogType == "public" {
-                        PublicActionSection(dialogRelationship: self.$dialogRelationship, dialogModel: self.$dialogModel, currentUserIsPowerful: self.$currentUserIsPowerful, dismissView: self.$dismissView, notiType: self.$notiType, notiText: self.$notiText, showAlert: self.$showAlert, notificationsOn: self.$notificationsOn, dialogModelAdmins: self.$dialogModelAdmins)
+                        PublicActionSection(dialogRelationship: self.$dialogRelationship, dialogModel: self.$dialogModel, currentUserIsPowerful: self.$currentUserIsPowerful, dismissView: self.$dismissView, notiType: self.$notiType, notiText: self.$notiText, showAlert: self.$showAlert, notificationsOn: self.$notificationsOn, dialogModelAdmins: self.$dialogModelAdmins, openNewDialogID: self.$openNewDialogID)
                             .environmentObject(self.auth)
                             .padding(.bottom)
                     }
@@ -513,6 +513,10 @@ struct VisitGroupChannelView: View {
                                 foundDialog.coverPhoto = coverPhoto
                             }
                             
+                            if let canType = dict["canMembersType"] as? Bool, foundDialog.canMembersType != canType {
+                                foundDialog.canMembersType = canType
+                            }
+                            
                             if let owner = dict["owner"] as? Int {
                                 if foundDialog.owner != owner {
                                     foundDialog.owner = owner
@@ -603,6 +607,10 @@ struct VisitGroupChannelView: View {
                         
                         if let coverPhoto = self.publicDialogModel.coverPhoto {
                             dialog.coverPhoto = coverPhoto
+                        }
+                        
+                        if let canType = self.publicDialogModel.canMembersType {
+                            dialog.canMembersType = canType
                         }
                         
                         if let owner = dict["owner"] as? Int {

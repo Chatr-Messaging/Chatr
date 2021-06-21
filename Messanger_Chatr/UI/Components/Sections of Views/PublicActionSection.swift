@@ -24,12 +24,41 @@ struct PublicActionSection: View {
     @Binding var showAlert: Bool
     @Binding var notificationsOn: Bool
     @Binding var dialogModelAdmins: [Int]
+    @Binding var openNewDialogID: Int
 
     var body: some View {
         HStack(alignment: .center, spacing: 20) {
             Button(action: {
-                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                self.dismissView.toggle()
+                if self.dialogRelationship != .subscribed {
+                    Request.subscribeToPublicDialog(withID: self.dialogModel.id, successBlock: { dialogz in
+                        changeDialogRealmData.shared.toggleFirebaseMemberCount(dialogId: dialogz.id ?? "", isJoining: true, totalCount: Int(dialogz.occupantsCount), onSuccess: { _ in
+                            changeDialogRealmData.shared.insertDialogs([dialogz], completion: {
+                                changeDialogRealmData.shared.updateDialogDelete(isDelete: false, dialogID: dialogz.id ?? "")
+                                changeDialogRealmData.shared.addPublicMemberCountRealmDialog(count: Int(dialogz.occupantsCount), dialogId: dialogz.id ?? "")
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                self.dismissView.toggle()
+                                UserDefaults.standard.set(dialogz.id ?? "", forKey: "visitingDialogId")
+                            })
+                        }, onError: { err in
+                            print("there is an error visiting the member count: \(String(describing: err))")
+                            UINotificationFeedbackGenerator().notificationOccurred(.error)
+                            self.dialogRelationship = .error
+                            self.notiType = "error"
+                            self.notiText = "Error fetching \(dialogModel.fullName)'s info: \(err ?? "no error")"
+                            self.showAlert.toggle()
+                        })
+                    }) { (error) in
+                        UINotificationFeedbackGenerator().notificationOccurred(.error)
+                        self.dialogRelationship = .error
+                        self.notiType = "error"
+                        self.notiText = "Error fetching \(dialogModel.fullName)'s info: \(error.localizedDescription)"
+                        self.showAlert.toggle()
+                    }
+                } else if self.dialogRelationship == .subscribed {
+                    UserDefaults.standard.set(self.dialogModel.id, forKey: "openingDialogId")
+                    self.dismissView.toggle()
+                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                }
             }) {
                 HStack {
                     Image("ChatBubble")
@@ -37,7 +66,7 @@ struct PublicActionSection: View {
                         .scaledToFit()
                         .frame(width: 38, height: 26)
 
-                    if self.dialogRelationship != .notSubscribed {
+                    if self.dialogRelationship == .subscribed {
                         Text("Messages")
                             .font(.none)
                             .fontWeight(.semibold)
@@ -48,14 +77,14 @@ struct PublicActionSection: View {
                 .background(RoundedRectangle(cornerRadius: 15, style: .circular).frame(minWidth: 54).frame(height: 54).foregroundColor(Constants.baseBlue).shadow(color: Color.blue.opacity(0.4), radius: 10, x: 0, y: 6))
             }.buttonStyle(ClickButtonStyle())
 
-            if self.dialogRelationship == .notSubscribed {
+            if self.dialogRelationship == .notSubscribed || self.dialogRelationship == .error {
                 Button(action: {
                     Request.subscribeToPublicDialog(withID: self.dialogModel.id, successBlock: { dialogz in
                         changeDialogRealmData.shared.toggleFirebaseMemberCount(dialogId: dialogz.id ?? "", isJoining: true, totalCount: Int(dialogz.occupantsCount), onSuccess: { _ in
-                            UINotificationFeedbackGenerator().notificationOccurred(.success)
                             changeDialogRealmData.shared.insertDialogs([dialogz], completion: {
                                 changeDialogRealmData.shared.updateDialogDelete(isDelete: false, dialogID: dialogz.id ?? "")
                                 changeDialogRealmData.shared.addPublicMemberCountRealmDialog(count: Int(dialogz.occupantsCount), dialogId: dialogz.id ?? "")
+                                UINotificationFeedbackGenerator().notificationOccurred(.success)
                                 withAnimation {
                                     self.dialogRelationship = .subscribed
                                     self.dialogModelAdmins.append(UserDefaults.standard.integer(forKey: "currentUserID"))
@@ -106,7 +135,7 @@ struct PublicActionSection: View {
                     Button(action: {
                         self.toggleNotifications()
                     }) {
-                        Label("Notifications \(self.notificationsOn ? "Off" : "On")", systemImage: self.notificationsOn ? "bell.slash" : "bell")
+                        Label("Turn Notifications \(self.notificationsOn ? "Off" : "On")", systemImage: self.notificationsOn ? "bell.slash" : "bell")
                     }
                 }
                 

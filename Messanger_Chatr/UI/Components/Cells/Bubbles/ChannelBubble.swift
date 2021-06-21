@@ -180,9 +180,12 @@ struct ChannelBubble: View {
             .shadow(color: Color.black.opacity(0.15), radius: 12, x: 0, y: 14)
             .buttonStyle(highlightedButtonStyle())
             .sheet(isPresented: self.$showChannel, onDismiss: {
-//                if self.chatContact != 0 && self.chatContact != self.message.senderID {
                    print("need to open Chat view!!")
-//                }
+                if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), !diaId.isEmpty {
+                    self.loadPublicDialog(diaId: diaId)
+                } else if let diaId = UserDefaults.standard.string(forKey: "openingDialogId"), !diaId.isEmpty {
+                    self.loadPublicDialog(diaId: diaId)
+                }
             }) {
                 NavigationView {
                     VisitGroupChannelView(dismissView: self.$showChannel, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$openNewDialogID, showPinDetails: self.$showPinDetails, groupOccUserAvatar: self.groupOccUserAvatar, fromDialogCell: true, viewState: .fromDialogCell, dialogRelationship: self.isMember ? .subscribed : .notSubscribed, dialogModel: self.dialogModel)
@@ -251,6 +254,10 @@ struct ChannelBubble: View {
                                 foundDialog.owner = owner
                             }
                             
+                            if let canType = dict["canMembersType"] as? Bool, foundDialog.canMembersType != canType {
+                                foundDialog.canMembersType = canType
+                            }
+                            
                             for childSnapshot in snapshot.children {
                                 let childSnap = childSnapshot as! DataSnapshot
                                 if childSnap.key == "tags" {
@@ -300,8 +307,8 @@ struct ChannelBubble: View {
                         dialog.avatar = dict["avatar"] as? String ?? ""
                         dialog.coverPhoto = dict["cover_photo"] as? String ?? ""
                         dialog.owner = dict["owner"] as? Int ?? 0
+                        dialog.canMembersType = dict["canMembersType"] as? Bool ?? false
                         
-                        //self.dialogModel.canMembersType = dict["canMembersType"] as? Bool ?? false
                         for childSnapshot in snapshot.children {
                             let childSnap = childSnapshot as! DataSnapshot
                             if childSnap.key == "tags" {
@@ -347,5 +354,20 @@ struct ChannelBubble: View {
                 }
             }
         })
+    }
+    
+    func loadPublicDialog(diaId: String) {
+        UserDefaults.standard.set(false, forKey: "localOpen")
+        if let oldDiaId = UserDefaults.standard.string(forKey: "selectedDialogID") {
+            changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: oldDiaId)
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
+            UserDefaults.standard.set(diaId, forKey: "selectedDialogID")
+            UserDefaults.standard.set(true, forKey: "localOpen")
+            changeDialogRealmData.shared.updateDialogOpen(isOpen: true, dialogID: diaId)
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            UserDefaults.standard.set("", forKey: "openingDialogId")
+        }
     }
 }

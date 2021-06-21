@@ -35,63 +35,84 @@ class ChatMessageViewModel: ObservableObject {
     }()
 
     func loadDialog(auth: AuthModel, dialogId: String, completion: @escaping () -> Void) {
+        let extRequest : [String: String] = ["sort_desc" : "lastMessageDate"]
+
         Request.updateDialog(withID: dialogId, update: UpdateChatDialogParameters(), successBlock: { dialog in
-            auth.selectedConnectyDialog = dialog
-            dialog.sendUserStoppedTyping()
-            self.updateDialogMessageCount(dialogId: dialogId, completion: {
-                dialog.onUserIsTyping = { (userID: UInt) in
-                    if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
-                        changeMessageRealmData.shared.addTypingMessage(userID: String(userID), dialogID: dialogId)
-                    }
-                }
-
-                dialog.onUserStoppedTyping = { (userID: UInt) in
-                    if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
-                        changeMessageRealmData.shared.removeTypingMessage(userID: String(userID), dialogID: dialogId)
-                    }
-                }
-
-                guard dialog.type == .group || dialog.type == .public else {
-                    completion()
-
-                    return
-                }
-                
-                dialog.requestOnlineUsers(completionBlock: { (online, error) in
-                    print("The online count is!!: \(String(describing: online?.count))")
-                    //self.onlineCount = online?.count ?? 0
-                    self.setOnlineCount(dialog: dialog)
-                })
-
-                dialog.onUpdateOccupant = { (userID: UInt) in
-                    print("update occupant: \(userID)")
-                    self.setOnlineCount(dialog: dialog)
-                }
-
-                dialog.onJoinOccupant = { (userID: UInt) in
-                    print("on join occupant: \(userID)")
-                    self.setOnlineCount(dialog: dialog)
-                }
-
-                dialog.onLeaveOccupant = { (userID: UInt) in
-                    print("on leave occupant: \(userID)")
-                    self.setOnlineCount(dialog: dialog)
-                }
-
-                guard !dialog.isJoined(), Chat.instance.isConnected else {
-                    completion()
-                    return
-                }
-
-                dialog.join(completionBlock: { _ in
-                    self.setOnlineCount(dialog: dialog)
-                    completion()
-                })
+            self.syncLoadFoundDialog(dialog: dialog, auth: auth, dialogId: dialogId, completion: {
+                completion()
             })
         }) { (error) in
             print("error fetching the dialog: \(error.localizedDescription)")
-            completion()
+            Request.dialogs(with: Paginator.limit(100, skip: 0), extendedRequest: extRequest, successBlock: { (dialogs, usersIDs, paginator) in
+                for dialog in dialogs {
+                    if dialog.id == dialogId {
+                        self.syncLoadFoundDialog(dialog: dialog, auth: auth, dialogId: dialogId, completion: {
+                            completion()
+                        })
+                        
+                        break
+                    }
+                }
+            }) { (error) in
+                print("error fetching the dialog againnn: \(error.localizedDescription)")
+                completion()
+            }
         }
+    }
+    
+    func syncLoadFoundDialog(dialog: ChatDialog, auth: AuthModel, dialogId: String, completion: @escaping () -> Void) {
+        auth.selectedConnectyDialog = dialog
+        dialog.sendUserStoppedTyping()
+        self.updateDialogMessageCount(dialogId: dialogId, completion: {
+            dialog.onUserIsTyping = { (userID: UInt) in
+                if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
+                    changeMessageRealmData.shared.addTypingMessage(userID: String(userID), dialogID: dialogId)
+                }
+            }
+
+            dialog.onUserStoppedTyping = { (userID: UInt) in
+                if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
+                    changeMessageRealmData.shared.removeTypingMessage(userID: String(userID), dialogID: dialogId)
+                }
+            }
+
+            guard dialog.type == .group || dialog.type == .public else {
+                completion()
+
+                return
+            }
+            
+            dialog.requestOnlineUsers(completionBlock: { (online, error) in
+                print("The online count is!!: \(String(describing: online?.count))")
+                //self.onlineCount = online?.count ?? 0
+                self.setOnlineCount(dialog: dialog)
+            })
+
+            dialog.onUpdateOccupant = { (userID: UInt) in
+                print("update occupant: \(userID)")
+                self.setOnlineCount(dialog: dialog)
+            }
+
+            dialog.onJoinOccupant = { (userID: UInt) in
+                print("on join occupant: \(userID)")
+                self.setOnlineCount(dialog: dialog)
+            }
+
+            dialog.onLeaveOccupant = { (userID: UInt) in
+                print("on leave occupant: \(userID)")
+                self.setOnlineCount(dialog: dialog)
+            }
+
+            guard !dialog.isJoined(), Chat.instance.isConnected else {
+                completion()
+                return
+            }
+
+            dialog.join(completionBlock: { _ in
+                self.setOnlineCount(dialog: dialog)
+                completion()
+            })
+        })
     }
     
     func updateDialogMessageCount(dialogId: String, completion: @escaping () -> Void) {

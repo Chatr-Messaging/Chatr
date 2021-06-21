@@ -106,7 +106,7 @@ struct PublicDialogDiscoverCell: View {
                                     .fontWeight(.semibold)
                                     .multilineTextAlignment(.center)
                                     .foregroundColor(self.isJoined ? Color.secondary : Color.blue)
-                                    .frame(width: 55, height: 30, alignment: .center)
+                                    .frame(width: 60, height: 30, alignment: .center)
                                     .background(Color("buttonColor_darker"))
                             }.buttonStyle(ClickButtonStyle())
                             .cornerRadius(8)

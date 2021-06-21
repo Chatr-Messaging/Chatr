@@ -271,7 +271,7 @@ struct DialogCell: View {
                                 self.openGroupProfile.toggle()
                             }
                         },
-                        .destructive(Text(self.dialogModel.dialogType == "private" ? "Delete Dialog" : (self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? (self.dialogModel.dialogType == "public" ? "Destroy Channel" : "Destroy Group") : (self.dialogModel.dialogType == "public" ? "Leave Channel" : "Leave Group"))), action: {
+                        .destructive(Text(self.dialogModel.dialogType == "private" ? "Delete Dialog" : (self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? (self.dialogModel.dialogType == "public" ? "Destroy Channel" : "Destroy Group") : (self.dialogModel.dialogType == "public" ? (UserDefaults.standard.string(forKey: "visitingDialogId") != "" ? "Dismiss Channel" : "Leave Channel") : "Leave Group"))), action: {
                             changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
 
                             self.isOpen = false
@@ -282,6 +282,7 @@ struct DialogCell: View {
                                 if self.dialogModel.dialogType == "private" || self.dialogModel.dialogType == "group" {
                                     changeDialogRealmData.shared.deletePrivateConnectyDialog(dialogID: self.dialogModel.id, isOwner: self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? true : false)
                                 } else if self.dialogModel.dialogType == "public" {
+                                    UserDefaults.standard.set("", forKey: "visitingDialogId")
                                     changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: self.dialogModel.id)
                                 }
                             }
@@ -296,6 +297,10 @@ struct DialogCell: View {
                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                     UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
                     changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
+                    if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), diaId != "" {
+                        changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: diaId)
+                        UserDefaults.standard.set("", forKey: "visitingDialogId")
+                    }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
                         changeDialogRealmData.shared.fetchDialogs(completion: { _ in })
                     }
