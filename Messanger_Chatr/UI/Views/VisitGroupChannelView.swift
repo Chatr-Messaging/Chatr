@@ -353,6 +353,7 @@ struct VisitGroupChannelView: View {
             }
         }.background(Color("bgColor"))
         .onAppear() {
+            self.showProfile = false
             if self.viewState == .fromDiscover {
                 let config = Realm.Configuration(schemaVersion: 1)
                 do {

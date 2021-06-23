@@ -79,15 +79,6 @@ struct DiscoverFeaturedCell: View, Identifiable {
                                 .foregroundColor(Color.secondary)
                                 .multilineTextAlignment(.center)
                                 .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
-
-        //                        Text("#" + self.catagory)
-        //                            .font(.caption)
-        //                            .fontWeight(.regular)
-        //                            .multilineTextAlignment(.center)
-        //                            .foregroundColor(Color.primary)
-        //                            .shadow(color: Color.black.opacity(0.3), radius: 3, x: 0, y: 0)
-        //                            .padding(2.5).background(Color.primary.opacity(0.05)).cornerRadius(4)
-        //                            .background(RoundedRectangle(cornerRadius: 4).stroke(Color.secondary, lineWidth: 1.5).background( Color.primary.opacity(0.05)).cornerRadius(4))
                             
                             Text(self.dialogModel.description ?? "")
                                 .font(.subheadline)
@@ -141,23 +132,6 @@ struct DiscoverFeaturedCell: View, Identifiable {
                                 HStack(spacing: 5) {
                                     Button(action: {
                                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                        self.isMoreOpen.toggle()
-                                    }) {
-                                        ZStack {
-                                            Image(systemName: "ellipsis")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 16, height: 16, alignment: .center)
-                                                .foregroundColor(.primary)
-                                        }.frame(width: 36, height: 36, alignment: .center)
-                                        .background(Color("buttonColor"))
-                                        .cornerRadius(8)
-                                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.45), lineWidth: 1))
-                                    }.buttonStyle(ClickButtonStyle())
-                                    .padding(.bottom, 4)
-
-                                    Button(action: {
-                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                         self.shareGroup.toggle()
                                     }) {
                                         HStack {
@@ -173,6 +147,22 @@ struct DiscoverFeaturedCell: View, Identifiable {
                                                 .multilineTextAlignment(.center)
                                                 .foregroundColor(Color.blue)
                                         }.frame(width: Constants.screenWidth * 0.60 - 86, height: 36, alignment: .center)
+                                        .background(Color("buttonColor_darker"))
+                                        .cornerRadius(8)
+                                    }.buttonStyle(ClickButtonStyle())
+                                    .padding(.bottom, 4)
+
+                                    Button(action: {
+                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                        self.isMoreOpen.toggle()
+                                    }) {
+                                        ZStack {
+                                            Image(systemName: "ellipsis")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 16, height: 16, alignment: .center)
+                                                .foregroundColor(.primary)
+                                        }.frame(width: 36, height: 36, alignment: .center)
                                         .background(Color("buttonColor_darker"))
                                         .cornerRadius(8)
                                     }.buttonStyle(ClickButtonStyle())

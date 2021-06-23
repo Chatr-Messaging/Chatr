@@ -36,6 +36,7 @@ struct KeyboardCardView: View {
     @State var shareContact: Bool = false
     @State var isRecordingAudio: Bool = false
     @State var hasAudioToSend: Bool = false
+    @State var isMoreOpen: Bool = false
     @State var isVisiting: String = UserDefaults.standard.string(forKey: "visitingDialogId") ?? ""
     @State var gifURL: String = ""
     @State private var inputImage: UIImage? = nil
@@ -54,7 +55,53 @@ struct KeyboardCardView: View {
     var body: some View {
         VStack(alignment: .center, spacing: 0) {
             if UserDefaults.standard.bool(forKey: "disabledMessaging") {
-                Text("disabled")
+                HStack(spacing: 5) {
+                    Button(action: {
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                        //self.shareGroup.toggle()
+                    }) {
+                        HStack {
+                            Image(systemName: "paperplane.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 16, height: 16, alignment: .center)
+                                .foregroundColor(.blue)
+                            
+                            Text("Share Channel")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                                .multilineTextAlignment(.center)
+                                .foregroundColor(Color.blue)
+                        }.frame(width: Constants.screenWidth * 0.60 - 86, height: 36, alignment: .center)
+                        .background(Color("buttonColor"))
+                        .cornerRadius(8)
+                    }.buttonStyle(ClickButtonStyle())
+                    .padding(.bottom, 4)
+
+                    Button(action: {
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                        self.isMoreOpen.toggle()
+                    }) {
+                        ZStack {
+                            Image(systemName: "ellipsis")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 16, height: 16, alignment: .center)
+                                .foregroundColor(.primary)
+                        }.frame(width: 36, height: 36, alignment: .center)
+                        .background(Color("buttonColor"))
+                        .cornerRadius(8)
+                        //.overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.45), lineWidth: 1))
+                    }.buttonStyle(ClickButtonStyle())
+                    .padding(.bottom, 4)
+                    .actionSheet(isPresented: $isMoreOpen) {
+                        ActionSheet(title: Text("Options:"), message: nil, buttons: [
+                                .default(Text("View Details")) {
+                                },
+                                .cancel()
+                            ])
+                    }
+                }.padding(.top, 10)
             } else if self.isVisiting.isEmpty {
                 //MARK: Attachments Section
                 ScrollView(.horizontal, showsIndicators: false, content: {

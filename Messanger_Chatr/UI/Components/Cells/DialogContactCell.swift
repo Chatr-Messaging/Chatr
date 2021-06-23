@@ -42,8 +42,8 @@ struct DialogContactCell: View {
                 if self.currentUserIsPowerful && !self.isOwner {
                     self.openActionSheet.toggle()
                 } else {
-                    self.actionState = 1
                     self.showProfile = true
+                    self.actionState = 1
                 }
             }) {
                 VStack(alignment: .center, spacing: 0) {
