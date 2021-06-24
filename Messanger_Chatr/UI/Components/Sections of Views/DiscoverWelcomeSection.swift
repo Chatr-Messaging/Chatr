@@ -51,7 +51,7 @@ struct DiscoverWelcomeSection: View {
                     withAnimation {
                         self.isShowing.toggle()
                     }
-                    UserDefaults.standard.set(true, forKey: "discoverAgree1")
+                    UserDefaults.standard.set(true, forKey: "discoverAgree")
                 }) {
                     HStack(alignment: .center, spacing: 15) {
                         Image(systemName: "checkmark.shield")

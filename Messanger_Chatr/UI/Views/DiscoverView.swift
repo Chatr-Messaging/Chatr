@@ -36,31 +36,9 @@ struct DiscoverView: View {
     @State var style = StaggeredGridStyle(.horizontal, tracks: .fixed(35), spacing: 8)
 
     var body: some View {
-        if UserDefaults.standard.bool(forKey: "discoverAgree1") || self.isShowingWelcome {
+        if UserDefaults.standard.bool(forKey: "discoverAgree") || self.isShowingWelcome {
         ScrollView(.vertical, showsIndicators: true) {
             VStack(alignment: .center) {
-                /*
-                Text("Under Construction")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .multilineTextAlignment(.center)
-                    .foregroundColor(.primary)
-                    .padding(.horizontal)
-
-                Text("coming soon...")
-                    .font(.headline)
-                    .fontWeight(.regular)
-                    .multilineTextAlignment(.center)
-                    .foregroundColor(.secondary)
-                    .padding(.horizontal)
-
-                Spacer()
-                Image("Construction")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: Constants.screenWidth)
-*/
-                
                 //SEARCH BAR
                 VStack {
                     HStack {
@@ -372,9 +350,6 @@ struct DiscoverView: View {
                     .opacity(!self.grandSearchData.isEmpty ? 0 : 1)
             }
             .onAppear {
-                //self.bannerCount = self.bannerDataArray.count
-                //self.topDialogsCount = self.topDialogsData.count
-                
                 if self.bannerDataArray.isEmpty {
                     self.viewModel.observeFeaturedDialogs({ dialog in
                         if dialog.banned == false, !self.bannerDataArray.contains(where: { $0.id == dialog.id }) {

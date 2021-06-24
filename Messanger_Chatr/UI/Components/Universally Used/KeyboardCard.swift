@@ -36,7 +36,8 @@ struct KeyboardCardView: View {
     @State var shareContact: Bool = false
     @State var isRecordingAudio: Bool = false
     @State var hasAudioToSend: Bool = false
-    @State var isMoreOpen: Bool = false
+    //@State var isMoreOpen: Bool = false
+    @State var isShareChannelOpen: Bool = false
     @State var isVisiting: String = UserDefaults.standard.string(forKey: "visitingDialogId") ?? ""
     @State var gifURL: String = ""
     @State private var inputImage: UIImage? = nil
@@ -51,6 +52,7 @@ struct KeyboardCardView: View {
         }
     }
     let transition = AnyTransition.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(.spring()), removal: AnyTransition.move(edge: .bottom).animation(.easeOut(duration: 0.2)))
+    //Share variables
 
     var body: some View {
         VStack(alignment: .center, spacing: 0) {
@@ -58,7 +60,7 @@ struct KeyboardCardView: View {
                 HStack(spacing: 5) {
                     Button(action: {
                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                        //self.shareGroup.toggle()
+                        self.isShareChannelOpen.toggle()
                     }) {
                         HStack {
                             Image(systemName: "paperplane.fill")
@@ -77,30 +79,49 @@ struct KeyboardCardView: View {
                         .cornerRadius(8)
                     }.buttonStyle(ClickButtonStyle())
                     .padding(.bottom, 4)
-
-                    Button(action: {
-                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                        self.isMoreOpen.toggle()
+                    .sheet(isPresented: self.$isShareChannelOpen, onDismiss: {
+                        print("printz dismiss share dia")
                     }) {
-                        ZStack {
-                            Image(systemName: "ellipsis")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 16, height: 16, alignment: .center)
-                                .foregroundColor(.primary)
-                        }.frame(width: 36, height: 36, alignment: .center)
-                        .background(Color("buttonColor"))
-                        .cornerRadius(8)
-                        //.overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.45), lineWidth: 1))
-                    }.buttonStyle(ClickButtonStyle())
-                    .padding(.bottom, 4)
-                    .actionSheet(isPresented: $isMoreOpen) {
-                        ActionSheet(title: Text("Options:"), message: nil, buttons: [
-                                .default(Text("View Details")) {
-                                },
-                                .cancel()
-                            ])
+                        NavigationView() {
+                            ShareProfileView(dimissView: self.$isShareChannelOpen, contactID: 0, dialogID: self.auth.selectedConnectyDialog?.id, contactFullName: self.auth.selectedConnectyDialog?.name ?? "", contactAvatar: self.auth.selectedConnectyDialog?.photo ?? "", isPublicDialog: true, totalMembers: 0).environmentObject(self.auth)
+                                .navigationTitle("Share Channel")
+                                .navigationBarItems(leading:
+                                            Button(action: {
+                                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                                withAnimation {
+                                                    self.isShareChannelOpen.toggle()
+                                                }
+                                            }) {
+                                                Text("Done")
+                                                    .foregroundColor(.primary)
+                                                    .fontWeight(.medium)
+                                            })
+                        }
                     }
+
+//                    Button(action: {
+//                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+//                        self.isMoreOpen.toggle()
+//                    }) {
+//                        ZStack {
+//                            Image(systemName: "ellipsis")
+//                                .resizable()
+//                                .scaledToFit()
+//                                .frame(width: 16, height: 16, alignment: .center)
+//                                .foregroundColor(.primary)
+//                        }.frame(width: 36, height: 36, alignment: .center)
+//                        .background(Color("buttonColor"))
+//                        .cornerRadius(8)
+//                        //.overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.45), lineWidth: 1))
+//                    }.buttonStyle(ClickButtonStyle())
+//                    .padding(.bottom, 4)
+//                    .actionSheet(isPresented: $isMoreOpen) {
+//                        ActionSheet(title: Text("Options:"), message: nil, buttons: [
+//                                .default(Text("View Details")) {
+//                                },
+//                                .cancel()
+//                            ])
+//                    }
                 }.padding(.top, 10)
             } else if self.isVisiting.isEmpty {
                 //MARK: Attachments Section
