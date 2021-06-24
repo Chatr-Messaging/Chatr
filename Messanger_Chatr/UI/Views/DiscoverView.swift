@@ -32,9 +32,11 @@ struct DiscoverView: View {
     @State var showMoreTopDialogs: Bool = false
     @State var showMoreRecentDialogs: Bool = false
     @State var isDataLoading: Bool = true
+    @State var isShowingWelcome: Bool = false
     @State var style = StaggeredGridStyle(.horizontal, tracks: .fixed(35), spacing: 8)
 
     var body: some View {
+        if UserDefaults.standard.bool(forKey: "discoverAgree") || self.isShowingWelcome {
         ScrollView(.vertical, showsIndicators: true) {
             VStack(alignment: .center) {
                 /*
@@ -424,6 +426,9 @@ struct DiscoverView: View {
                 Text("Done")
                     .foregroundColor(.primary)
             }.opacity(self.removeDoneBtn ? 0 : 1))
+        } else {
+            DiscoverWelcomeSection(isShowing: self.$isShowingWelcome)
+        }
     }
     
     func moreDetails(tagId: String?, viewState: morePublicListRelationship) -> some View {
