@@ -48,10 +48,10 @@ struct DiscoverWelcomeSection: View {
                 
                 Button(action: {
                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                    UserDefaults.standard.set(true, forKey: "discoverAgree")
                     withAnimation {
                         self.isShowing.toggle()
                     }
+                    UserDefaults.standard.set(true, forKey: "discoverAgree1")
                 }) {
                     HStack(alignment: .center, spacing: 15) {
                         Image(systemName: "checkmark.shield")
@@ -72,7 +72,10 @@ struct DiscoverWelcomeSection: View {
                     .frame(maxWidth: 230)
                     .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 8)
                 }.buttonStyle(ClickButtonStyle())
-                .padding(.bottom)
+                .padding(.vertical, 40)
+                
+                FooterInformation()
+                    .padding(.vertical, 25)
             }
         }
     }
