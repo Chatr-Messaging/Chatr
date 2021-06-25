@@ -24,6 +24,7 @@ struct DialogCell: View {
     @State var openNewDialogID: Int = 0
     @State var isEditGroupOpen: Bool = false
     @State var canEditGroup: Bool = false
+    @State var isJoining: Bool = true
     @Binding var isOpen: Bool
     @Binding var activeView: CGSize
     @Binding var selectedDialogID: String
@@ -188,13 +189,21 @@ struct DialogCell: View {
                         .fixedSize(horizontal: false, vertical: true)
 
                     if let dialog = self.auth.selectedConnectyDialog, self.isOpen && (self.dialogModel.dialogType == "group" || self.dialogModel.dialogType == "public") {
-                        Text(!dialog.isJoined() ? "joining chat..." : (self.dialogModel.onlineUserCount > 1 ? "\(self.dialogModel.onlineUserCount) online" : ""))
+                        Text(self.isJoining ? "joining chat..." : (self.dialogModel.onlineUserCount > 1 ? "\(self.dialogModel.onlineUserCount) online" : ""))
                             .font(.footnote)
                             .fontWeight(.regular)
                             .lineLimit(1)
                             .multilineTextAlignment(.leading)
                             .offset(x: -4, y: -4)
-                            .foregroundColor(dialog.isJoined() && self.dialogModel.onlineUserCount > 0 ? .green : .gray)
+                            .foregroundColor(!self.isJoining && self.dialogModel.onlineUserCount > 0 ? .green : .gray)
+                            .onChange(of: dialog.isJoined(), perform: { value in
+                                self.isJoining = !value
+                            })
+                            .onAppear() {
+                                dialog.join(completionBlock: { _ in
+                                    self.isJoining = !dialog.isJoined()
+                                })
+                            }
                     }
                 }
             }.onTapGesture {

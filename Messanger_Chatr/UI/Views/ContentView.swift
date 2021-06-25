@@ -725,19 +725,25 @@ struct mainHomeList: View {
             }
             changeDialogRealmData.shared.updateDialogOpen(isOpen: true, dialogID: id)
         } else {
-            if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), !diaId.isEmpty {
-                UserDefaults.standard.set("", forKey: "visitingDialogId")
-                changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: diaId)
-            }
+
             self.isLocalOpen = false
             UserDefaults.standard.set(false, forKey: "localOpen")
-            changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: id)
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
-                changeDialogRealmData.shared.fetchDialogs(completion: { _ in })
-                if dialogType == "group" || dialogType == "public" {
-                    self.auth.leaveDialog()
-                }
+                changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: id)
+
+                Request.cancelAllRequests({
+                    if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), !diaId.isEmpty {
+                        UserDefaults.standard.set("", forKey: "visitingDialogId")
+                        changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: diaId)
+                    } else {
+                        changeDialogRealmData.shared.fetchDialogs(completion: { _ in
+                            if dialogType == "group" || dialogType == "public" {
+                                self.auth.leaveDialog()
+                            }
+                        })
+                    }
+                })
             }
         }
     }
@@ -755,17 +761,22 @@ struct mainHomeList: View {
             UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
             UserDefaults.standard.set(false, forKey: "localOpen")
             self.isLocalOpen = false
-            changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: id)
-            if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), !diaId.isEmpty {
-                UserDefaults.standard.set("", forKey: "visitingDialogId")
-                changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: diaId)
-            }
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
-                changeDialogRealmData.shared.fetchDialogs(completion: { _ in })
-                if dialogType == "group" || dialogType == "public" {
-                    self.auth.leaveDialog()
-                }
+                Request.cancelAllRequests({
+                    changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: id)
+                    
+                    changeDialogRealmData.shared.fetchDialogs(completion: { _ in
+                        if dialogType == "group" || dialogType == "public" {
+                            self.auth.leaveDialog()
+                        }
+                    })
+
+                    if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), !diaId.isEmpty {
+                        UserDefaults.standard.set("", forKey: "visitingDialogId")
+                        changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: diaId)
+                    }
+                })
             }
         }
         self.activeView.height = .zero

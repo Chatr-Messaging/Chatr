@@ -707,12 +707,15 @@ struct KeyboardCardView: View {
             }
         })
         .onChange(of: UserDefaults.standard.bool(forKey: "localOpen"), perform: { value in
-            if value {
-                if let typedText = UserDefaults.standard.string(forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText") {
-                    self.mainText = typedText
-                } else { self.mainText = "" }
-            } else {
-                UserDefaults.standard.setValue(self.mainText, forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                if value {
+                    if let typedText = UserDefaults.standard.string(forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText") {
+                        self.mainText = typedText
+                    } else { self.mainText = "" }
+                } else {
+                    UserDefaults.standard.setValue(self.mainText, forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText")
+                    self.mainText = ""
+                }
             }
         })
         .onAppear() {
