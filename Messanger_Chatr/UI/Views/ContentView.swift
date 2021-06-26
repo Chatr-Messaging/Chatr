@@ -468,7 +468,7 @@ struct mainHomeList: View {
                                     .opacity(isLocalOpen ? (i.isOpen ? 1 : 0) : 1)
                                     .offset(y: i.isOpen && isLocalOpen ? -geo.frame(in: .global).minY + (emptyQuickSnaps ? (UIDevice.current.hasNotch ? 50 : 25) : 110) : emptyQuickSnaps ? -25 : 70)
                                     .shadow(color: Color.black.opacity(isLocalOpen ? (colorScheme == .dark ? 0.25 : 0.15) : 0.15), radius: isLocalOpen ? 15 : 8, x: 0, y: self.isLocalOpen ? (colorScheme == .dark ? 15 : 5) : 5)
-                                    .animation(.spring(response: 0.45, dampingFraction: 0.95, blendDuration: 0))
+                                    .animation(.spring(response: isLocalOpen ? 0.375 : 0.45, dampingFraction: isLocalOpen ? 0.65 : 0.8, blendDuration: 0))
                                     .id(i.id)
                                     .onTapGesture {
                                         onCellTapGesture(id: i.id, dialogType: i.dialogType)

@@ -1211,6 +1211,7 @@ struct welcomeBackView: View {
                                             if self.auth.isFirstTimeUser == false {
                                                 UINotificationFeedbackGenerator().notificationOccurred(.success)
                                             }
+                                            self.auth.configureFirebaseStateDidChange()
                                             self.dismissView = true
                                         }
                                     }))

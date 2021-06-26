@@ -58,6 +58,7 @@
 		05670318256A3C43004123EB /* CarBode in Frameworks */ = {isa = PBXBuildFile; productRef = 05670317256A3C43004123EB /* CarBode */; };
 		0568B54E25C645790054E934 /* ScanQRView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0568B54D25C645790054E934 /* ScanQRView.swift */; };
 		05693490252312F7001BDFF0 /* LocationBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0569348F252312F7001BDFF0 /* LocationBubble.swift */; };
+		056A6C362686EC93000E2153 /* ScrollViewSafeAreaInset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056A6C352686EC93000E2153 /* ScrollViewSafeAreaInset.swift */; };
 		056B989524C8F76B003F7FBA /* HomeUserInfoHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056B989424C8F76B003F7FBA /* HomeUserInfoHeader.swift */; };
 		056B989C24C8F9BD003F7FBA /* MenuButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056B989B24C8F9BD003F7FBA /* MenuButton.swift */; };
 		056B989E24C8F9E7003F7FBA /* ContactsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056B989D24C8F9E7003F7FBA /* ContactsButton.swift */; };
@@ -253,6 +254,7 @@
 		055F37F9260854B1003EDB1F /* VoiceViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceViewModel.swift; sourceTree = "<group>"; };
 		0568B54D25C645790054E934 /* ScanQRView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanQRView.swift; sourceTree = "<group>"; };
 		0569348F252312F7001BDFF0 /* LocationBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationBubble.swift; sourceTree = "<group>"; };
+		056A6C352686EC93000E2153 /* ScrollViewSafeAreaInset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollViewSafeAreaInset.swift; sourceTree = "<group>"; };
 		056B989424C8F76B003F7FBA /* HomeUserInfoHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeUserInfoHeader.swift; sourceTree = "<group>"; };
 		056B989B24C8F9BD003F7FBA /* MenuButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuButton.swift; sourceTree = "<group>"; };
 		056B989D24C8F9E7003F7FBA /* ContactsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsButton.swift; sourceTree = "<group>"; };
@@ -795,6 +797,7 @@
 			children = (
 				05EE518A25CA5BCD0063A558 /* WebsiteView.swift */,
 				058E751326158A55008578E3 /* SwipableSegment.swift */,
+				056A6C352686EC93000E2153 /* ScrollViewSafeAreaInset.swift */,
 			);
 			path = Utility;
 			sourceTree = "<group>";
@@ -1122,6 +1125,7 @@
 				0599798824D53C9500969318 /* AlertIndicator.swift in Sources */,
 				05F37C0225DF95B300F92005 /* KeyboardObserver.swift in Sources */,
 				05F8E11823F122490066954C /* userModel.swift in Sources */,
+				056A6C362686EC93000E2153 /* ScrollViewSafeAreaInset.swift in Sources */,
 				058966BE265DF50700303F1E /* PublicDialogDiscoverCell.swift in Sources */,
 				056B98AB24C900D7003F7FBA /* PullToRefreshIndicator.swift in Sources */,
 				05196DD424EB208C0026B9A7 /* ProfileRealmModel.swift in Sources */,

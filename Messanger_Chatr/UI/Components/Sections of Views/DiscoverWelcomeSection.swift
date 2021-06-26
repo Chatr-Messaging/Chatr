@@ -72,7 +72,8 @@ struct DiscoverWelcomeSection: View {
                     .frame(maxWidth: 230)
                     .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 8)
                 }.buttonStyle(ClickButtonStyle())
-                .padding(.vertical, 40)
+                .padding(.vertical)
+                .padding(.bottom)
                 
                 FooterInformation()
                     .padding(.vertical, 25)
@@ -116,7 +117,7 @@ struct DiscoverWelcomeRulesSection: View {
             
             //Banning
             HStack(alignment: .top, spacing: 10) {
-                Image(systemName: "exclamationmark.bubble.fill")
+                Image(systemName: "xmark.octagon.fill")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 20, height: 20)

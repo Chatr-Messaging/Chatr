@@ -27,7 +27,7 @@ struct addNewContactView: View {
         NavigationView {
             ScrollView(.vertical, showsIndicators: true) {
                 VStack() {
-                    
+                    /*
                     //MARK: MAIN SEARCH BAR
                     VStack {
                         miniHeader(title: "SEARCH NAME OR PHONE NUMBER:", doubleIndent: false)
@@ -182,6 +182,7 @@ struct addNewContactView: View {
                     .padding(.horizontal)
                     .padding(.top, self.isLoading || (self.outputSearchText.count > 0 && self.grandUsers.count == 0) ? 50 : 0)
                     .padding(.bottom, self.grandUsers.count > 0 && !self.isLoading ? 60 : 15)
+                    */
                     
                     //MARK: Regristered Section
                     if self.regristeredAddressBook.count != 0 {

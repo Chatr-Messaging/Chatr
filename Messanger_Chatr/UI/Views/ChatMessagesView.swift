@@ -173,16 +173,17 @@ struct ChatMessagesView: View {
                                     VStack(spacing: 0) {
                                         HStack() {
                                             if messagePosition == .right { Spacer() }
+                                            let hasPrevious = self.hasPrevious(index: message)
                                             
-                                            ContainerBubble(viewModel: self.viewModel, newDialogFromSharedContact: self.$newDialogFromSharedContact, isPriorWider: self.isPriorWider(index: message), message: currentMessages[message], messagePosition: messagePosition, hasPrior: self.hasPrevious(index: message), namespace: self.namespace)
+                                            ContainerBubble(viewModel: self.viewModel, newDialogFromSharedContact: self.$newDialogFromSharedContact, isPriorWider: self.isPriorWider(index: message), message: currentMessages[message], messagePosition: messagePosition, hasPrior: hasPrevious, namespace: self.namespace)
                                                 .environmentObject(self.auth)
                                                 .contentShape(Rectangle())
                                                 .fixedSize(horizontal: false, vertical: true)
                                                 .padding(.horizontal, 25)
                                                 .padding(.trailing, messagePosition != .right ? 40 : 0)
                                                 .padding(.leading, messagePosition == .right ? 40 : 0)
-                                                .padding(.bottom, self.hasPrevious(index: message) ? -6 : 10)
-                                                .padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 110 : 0) + 32)
+                                                .padding(.bottom, hasPrevious ? -6 : 10)
+                                                //.padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 110 : 0) + 32)
                                                 .resignKeyboardOnDragGesture()
                                                 .id(currentMessages[message].id)
 
@@ -343,7 +344,15 @@ struct ChatMessagesView: View {
                     }
                 }.ignoresSafeArea(.keyboard, edges: .bottom)
                 .resignKeyboardOnDragGesture()
-            }.coordinateSpace(name: "scroll")
+
+                ExtraBottomSafeAreaInset()
+            }
+            .bottomSafeAreaInset(
+                RoundedRectangle(cornerRadius: 0)
+                    .fill(Color.clear)
+                    .frame(height: self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 110 : 0) + 32)
+            )
+            .coordinateSpace(name: "scroll")
             .frame(width: Constants.screenWidth)
             .contentShape(Rectangle())
             .onAppear() {
@@ -386,8 +395,9 @@ struct ChatMessagesView: View {
 
     func hasPrevious(index: Int) -> Bool {
         let result = self.auth.messages.selectedDialog(dialogID: self.dialogID)
-
-        return result[index] != result.last ? (result[index + 1].senderID == result[index].senderID && result[index + 1].date <= result[index].date.addingTimeInterval(86400) ? true : false) : false
+        print("has previous")
+        
+        return result[index].id != result.last?.id ? (result[index + 1].senderID == result[index].senderID && result[index + 1].date <= result[index].date.addingTimeInterval(86400) ? true : false) : false
     }
 
     func needsTimestamp(index: Int) -> Bool {
