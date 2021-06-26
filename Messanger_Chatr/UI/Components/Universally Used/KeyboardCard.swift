@@ -824,10 +824,24 @@ struct ResizableTextField : UIViewRepresentable {
                 if self.parent.isMessageView ?? true {
                     if textView.text.count == 0 {
                         self.hasTyped = false
-                        self.parent.auth.selectedConnectyDialog?.sendUserStoppedTyping()
+                        if let dia = self.parent.auth.selectedConnectyDialog {
+                            if dia.isJoined() {
+                                dia.sendUserStoppedTyping()
+                            } else {
+                                dia.sendUserStoppedTypingWithoutJoin()
+                            }
+                        }
+                            
                     } else if !self.hasTyped {
                         self.hasTyped = true
-                        self.parent.auth.selectedConnectyDialog?.sendUserIsTyping()
+                        
+                        if let dia = self.parent.auth.selectedConnectyDialog {
+                            if dia.isJoined() {
+                                dia.sendUserIsTyping()
+                            } else {
+                                dia.sendUserIsTypingWithoutJoin()
+                            }
+                        }
                     }
                 }
 

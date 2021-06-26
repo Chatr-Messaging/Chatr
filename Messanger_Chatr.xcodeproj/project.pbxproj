@@ -32,6 +32,7 @@
 		053AC4B7251982560036946E /* AttachmentBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053AC4B6251982550036946E /* AttachmentBubble.swift */; };
 		053D33F22393C97B00CEE03E /* DismissGuardian.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053D33F12393C97B00CEE03E /* DismissGuardian.swift */; };
 		053D33F42394511400CEE03E /* BlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053D33F32394511300CEE03E /* BlurView.swift */; };
+		0542311426869E6400DF65C4 /* miniHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0542311326869E6400DF65C4 /* miniHeader.swift */; };
 		054CAB7425AA6DF700DD3F7C /* InstagramApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054CAB7325AA6DF700DD3F7C /* InstagramApi.swift */; };
 		054CAB7925AA6E1F00DD3F7C /* InstagramTestUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054CAB7825AA6E1F00DD3F7C /* InstagramTestUser.swift */; };
 		054CAB7E25AA6E3700DD3F7C /* InstagramWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054CAB7D25AA6E3700DD3F7C /* InstagramWebView.swift */; };
@@ -231,6 +232,7 @@
 		053AC4B6251982550036946E /* AttachmentBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentBubble.swift; sourceTree = "<group>"; };
 		053D33F12393C97B00CEE03E /* DismissGuardian.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DismissGuardian.swift; sourceTree = "<group>"; };
 		053D33F32394511300CEE03E /* BlurView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlurView.swift; sourceTree = "<group>"; };
+		0542311326869E6400DF65C4 /* miniHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = miniHeader.swift; sourceTree = "<group>"; };
 		054CAB7325AA6DF700DD3F7C /* InstagramApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramApi.swift; sourceTree = "<group>"; };
 		054CAB7825AA6E1F00DD3F7C /* InstagramTestUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramTestUser.swift; sourceTree = "<group>"; };
 		054CAB7D25AA6E3700DD3F7C /* InstagramWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramWebView.swift; sourceTree = "<group>"; };
@@ -483,6 +485,7 @@
 				056B98A824C8FD1D003F7FBA /* SearchBar.swift */,
 				0599798724D53C9500969318 /* AlertIndicator.swift */,
 				05A7BD6424FEFA160001BFC9 /* QuickSnapsPostView.swift */,
+				0542311326869E6400DF65C4 /* miniHeader.swift */,
 				05909317261FDAFE00DA686D /* FlexibleView */,
 			);
 			path = "Universally Used";
@@ -1189,6 +1192,7 @@
 				05390F62267C656C001C5720 /* PublicShareSection.swift in Sources */,
 				05D8A8DE250318FA00D53BE2 /* AddressBookRealmModel.swift in Sources */,
 				05A7BD6324FEF6AC0001BFC9 /* QuickSnapStartView.swift in Sources */,
+				0542311426869E6400DF65C4 /* miniHeader.swift in Sources */,
 				0559B8B325D3682A0069C44A /* InstagramStories.swift in Sources */,
 				055F37C02607DAA2003EDB1F /* VideoControlBubble.swift in Sources */,
 				05786B5826499F83001554CA /* PinnedVideoCell.swift in Sources */,

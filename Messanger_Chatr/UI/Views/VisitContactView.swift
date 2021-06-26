@@ -63,12 +63,12 @@ struct VisitContactView: View {
 
                 //MARK: Action Buttons
                 actionButtonView(viewModel: self.viewModel, contact: self.$contact, quickSnapViewState: self.$quickSnapViewState, contactRelationship: self.$contactRelationship, newMessage: self.$newMessage, dismissView: self.$dismissView)
-                    .padding(.vertical, 5)
+                    .padding(.vertical, 15)
 
                 //MARK: Social Section
                 if self.contact.facebook != "" || self.contact.twitter != "" || self.contact.instagramAccessToken != "" {
-                    self.viewModel.drawMiniHeader(text: "SOCIAL:")
-                    
+                    miniHeader(title: "SOCIAL:")
+
                     self.viewModel.styleBuilder(content: {
                         if self.contact.instagramAccessToken != "" && (!self.contact.isInfoPrivate || self.contactRelationship == .contact) {
                             VStack(spacing: 0) {
@@ -230,9 +230,9 @@ struct VisitContactView: View {
                         }
                     }).padding(.bottom, 10)
                 }
-
+                
                 //MARK: Info Section
-                self.viewModel.drawMiniHeader(text: "INFO:")
+                miniHeader(title: "INFO:")
                 
                 self.viewModel.styleBuilder(content: {
                     VStack(alignment: .trailing, spacing: 0) {
@@ -352,7 +352,7 @@ struct VisitContactView: View {
                 }).padding(.bottom, 10)
 
                 //MARK: Action Section
-                self.viewModel.drawMiniHeader(text: "ACTIONS:")
+                miniHeader(title: "ACTIONS:")
                 
                 self.viewModel.styleBuilder(content: {
                     //QR Code button
@@ -480,7 +480,7 @@ struct VisitContactView: View {
                 }
                 
                 //MARK: More Section
-                self.viewModel.drawMiniHeader(text: "MORE:")
+                miniHeader(title: "MORE:")
                 
                 self.viewModel.styleBuilder(content: {
                     Button(action: {

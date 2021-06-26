@@ -80,6 +80,7 @@ struct VisitGroupChannelView: View {
                     if self.dialogModel.dialogType == "public" {
                         PublicActionSection(dialogRelationship: self.$dialogRelationship, dialogModel: self.$dialogModel, currentUserIsPowerful: self.$currentUserIsPowerful, dismissView: self.$dismissView, notiType: self.$notiType, notiText: self.$notiText, showAlert: self.$showAlert, notificationsOn: self.$notificationsOn, dialogModelAdmins: self.$dialogModelAdmins, openNewDialogID: self.$openNewDialogID)
                             .environmentObject(self.auth)
+                            .padding(.vertical, 5)
                             .padding(.bottom)
                     }
                     

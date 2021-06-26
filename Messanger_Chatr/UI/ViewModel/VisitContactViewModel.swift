@@ -220,19 +220,6 @@ class VisitContactViewModel: ObservableObject {
             }
         }
     }
-    
-    func drawMiniHeader(text: String) -> some View {
-        HStack {
-            Text(text)
-                .font(.caption)
-                .fontWeight(.regular)
-                .foregroundColor(.secondary)
-                .padding(.horizontal)
-                .padding(.horizontal)
-                .offset(y: 2)
-            Spacer()
-        }
-    }
 
     func styleBuilder<Content: View>(@ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .center, spacing: 0) {

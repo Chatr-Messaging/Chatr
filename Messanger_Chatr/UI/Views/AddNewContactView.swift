@@ -30,15 +30,7 @@ struct addNewContactView: View {
                     
                     //MARK: MAIN SEARCH BAR
                     VStack {
-                        HStack {
-                            Text("SEARCH NAME OR PHONE NUMBER:")
-                                .font(.caption)
-                                .fontWeight(.regular)
-                                .foregroundColor(.secondary)
-                                .padding(.horizontal)
-                                .offset(y: 2)
-                            Spacer()
-                        }
+                        miniHeader(title: "SEARCH NAME OR PHONE NUMBER:", doubleIndent: false)
                         
                         VStack(alignment: .center) {
                             HStack {
@@ -84,18 +76,8 @@ struct addNewContactView: View {
                     
                     //MARK: Search Section
                     if !self.isLoading && self.grandUsers.count > 0 {
-                        HStack {
-                            Text("SEARCH RESULTS:")
-                                .font(.caption)
-                                .fontWeight(.regular)
-                                .foregroundColor(.secondary)
-                                .padding(.horizontal)
-                                .padding(.horizontal)
-                                .offset(y: 2)
-                                .padding(.top)
-                            
-                            Spacer()
-                        }
+                        miniHeader(title: "SEARCH RESULTS:")
+                            .padding(.top)
                     }
                     
                     VStack(alignment: .center, spacing: 0) {
