@@ -222,8 +222,8 @@ struct addNewContactView: View {
                                                     .indicator(.activity)
                                                     .transition(.fade(duration: 0.25))
                                                     .scaledToFill()
-                                                    .clipShape(Circle())
                                                     .frame(width: 45, height: 45, alignment: .center)
+                                                    .clipShape(Circle())
                                                     .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 6)
                                             }
                                             

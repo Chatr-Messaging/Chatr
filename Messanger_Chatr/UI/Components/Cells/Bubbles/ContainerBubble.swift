@@ -307,17 +307,34 @@ struct ContainerBubble: View {
                     }
                 }
 
-                WebImage(url: URL(string: self.avatar))
-                    .resizable()
-                    .placeholder{ Image("empty-profile").resizable().frame(width: self.hasPrior ? 0 : Constants.smallAvitarSize, height: self.hasPrior ? 0 : Constants.smallAvitarSize, alignment: .bottom).scaledToFill() }
-                    .indicator(.activity)
-                    .scaledToFill()
-                    .clipShape(Circle())
-                    .frame(width: self.hasPrior ? 0 : Constants.smallAvitarSize, height: self.hasPrior ? 0 : Constants.smallAvitarSize, alignment: .bottom)
-                    .offset(x: messagePosition == .right ? (Constants.smallAvitarSize / 2) : -(Constants.smallAvitarSize / 2))
-                    .offset(y: 2)
-                    .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 3)
-                    .opacity(self.hasPrior && self.message.messageState != .error ? 0 : 1)
+                if !self.hasPrior, self.message.messageState != .error {
+                    if self.avatar != "" {
+                        WebImage(url: URL(string: self.avatar))
+                            .resizable()
+                            .placeholder{ Image("empty-profile").resizable().frame(width: self.hasPrior ? 0 : Constants.smallAvitarSize, height: self.hasPrior ? 0 : Constants.smallAvitarSize, alignment: .bottom).scaledToFill() }
+                            .indicator(.activity)
+                            .scaledToFill()
+                            .frame(width: Constants.smallAvitarSize, height: Constants.smallAvitarSize, alignment: .bottom)
+                            .clipShape(Circle())
+                            .offset(x: messagePosition == .right ? (Constants.smallAvitarSize / 2) : -(Constants.smallAvitarSize / 2))
+                            .offset(y: 2)
+                            .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 3)
+                    } else {
+                        ZStack {
+                            Circle()
+                                .frame(width: Constants.smallAvitarSize, height: Constants.smallAvitarSize, alignment: .center)
+                                .foregroundColor(Color("bgColor"))
+                                .shadow(color: Color.black.opacity(0.18), radius: 6, x: 0, y: 2)
+
+                            Text("".firstLeters(text: self.fullName))
+                                .font(.system(size: 13))
+                                .fontWeight(.semibold)
+                                .foregroundColor(.secondary)
+                        }
+                        .offset(x: messagePosition == .right ? (Constants.smallAvitarSize / 2) : -(Constants.smallAvitarSize / 2))
+                        .offset(y: 2)
+                    }
+                }
             }.actionSheet(isPresented: self.$deleteActionSheet) {
                 ActionSheet(title: Text("Are you sure?"), message: Text("This message will be gone forever"), buttons: [
                     .destructive(Text("Delete Message"), action: {

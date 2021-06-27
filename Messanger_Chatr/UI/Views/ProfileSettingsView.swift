@@ -53,8 +53,8 @@ struct ProfileView: View {
                                         .indicator(.activity)
                                         .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                                         .scaledToFill()
-                                        .clipShape(Circle())
                                         .frame(width: 55, height: 55, alignment: .center)
+                                        .clipShape(Circle())
                                         .padding(.vertical, 10)
                                         .shadow(color: Color("buttonShadow"), radius: 8, x: 0, y: 5)
                                 }

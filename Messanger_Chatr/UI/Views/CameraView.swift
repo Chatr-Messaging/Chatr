@@ -67,9 +67,9 @@ struct CameraView: View {
                                     .indicator(.activity)
                                     .transition(.fade(duration: 0.25))
                                     .scaledToFill()
-                                    .clipShape(Circle())
                                     .foregroundColor(Color("bgColor"))
                                     .frame(width: Constants.smallAvitarSize, height: Constants.smallAvitarSize, alignment: .center)
+                                    .clipShape(Circle())
                                     .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 0)
                             }
                         }

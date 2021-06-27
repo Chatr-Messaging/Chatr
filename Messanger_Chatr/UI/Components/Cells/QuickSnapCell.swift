@@ -33,24 +33,24 @@ struct QuickSnapCell: View {
                             .background(Color.clear)
                     }
                     
-                    if let avitarURL = quickSnap.avatar {
+                    if let avitarURL = quickSnap.avatar, avitarURL != "" {
                         WebImage(url: URL(string: avitarURL))
                             .resizable()
                             .placeholder{ Image("empty-profile").resizable().frame(width: Constants.quickSnapBtnSize, height: Constants.quickSnapBtnSize, alignment: .center).scaledToFill() }
                             .indicator(.activity)
                             .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.01)), removal: AnyTransition.identity))
                             .scaledToFill()
-                            .clipShape(Circle())
                             .frame(width: Constants.quickSnapBtnSize, height: Constants.quickSnapBtnSize, alignment: .center)
+                            .clipShape(Circle())
                             .shadow(color: Color.black.opacity(0.25), radius: 6, x: 0, y: 6)
                     } else {
                         Circle()
-                            .frame(width: 40, height: 40, alignment: .center)
-                            .foregroundColor(Color("bgColor"))
+                            .frame(width: Constants.quickSnapBtnSize, height: Constants.quickSnapBtnSize, alignment: .center)
+                            .foregroundColor(Color("emptyProfileBG_0"))
 
                         Text("".firstLeters(text: quickSnap.fullName))
-                            .font(.system(size: 14))
-                            .fontWeight(.medium)
+                            .font(.system(size: 28))
+                            .fontWeight(.bold)
                             .foregroundColor(.secondary)
                     }
                     

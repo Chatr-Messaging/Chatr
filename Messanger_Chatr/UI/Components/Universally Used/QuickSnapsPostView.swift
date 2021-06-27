@@ -37,8 +37,8 @@ struct QuickSnapsPostView: View {
                                 .indicator(.activity)
                                 .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                                 .scaledToFill()
-                                .clipShape(Circle())
                                 .frame(width: Constants.smallBtnSize, height: Constants.smallBtnSize, alignment: .center)
+                                .clipShape(Circle())
                                 .shadow(color: Color.black.opacity(0.25), radius: 8, x: 0, y: 8)
                             
                             if self.quickSnapsRealm.results.filter("id == %@", selectedQuickSnapContact.quickSnaps.first ?? "").count > 0 {
@@ -210,8 +210,8 @@ struct QuickSnapsPostView: View {
                                 .indicator(.activity)
                                 .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                                 .scaledToFill()
-                                .clipShape(Circle())
                                 .frame(width: 80, height: 80, alignment: .center)
+                                .clipShape(Circle())
                                 .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 8)
                                 .onAppear() {
                                     self.timer.upstream.connect().cancel()

@@ -24,8 +24,8 @@ struct ProfileImage: View {
                     .indicator(.activity)
                     .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                     .scaledToFill()
-                    .clipShape(Circle())
                     .frame(width: size, height: size, alignment: .center)
+                    .clipShape(Circle())
                     .shadow(color: Color("buttonShadow_Deeper"), radius: 10, x: 0, y: 8)
             }
             

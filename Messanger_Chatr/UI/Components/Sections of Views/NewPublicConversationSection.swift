@@ -318,8 +318,6 @@ struct NewPublicConversationSection: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.75, execute: {
                 self.loadTags(completion: {  })
             })
-        }.onDisappear() {
-            self.description = ""
         }
     }
 

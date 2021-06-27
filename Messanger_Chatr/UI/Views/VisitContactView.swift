@@ -841,7 +841,7 @@ struct VisitContactView: View {
                    
                    let message = ChatMessage.markable()
                    message.markable = true
-                   message.text = "Shared Contact"
+                   message.text = "Shared contact"
                    message.attachments = [attachment]
                    
                    dialog.send(message) { (error) in
@@ -946,8 +946,8 @@ struct topHeaderContactView: View {
                         .indicator(.activity)
                         .transition(.fade(duration: 0.25))
                         .scaledToFill()
-                        .clipShape(Circle())
                         .frame(width: 110, height: 110, alignment: .center)
+                        .clipShape(Circle())
                         .shadow(color: Color.black.opacity(0.25), radius: 10, x: 0, y: 8)
 
                     if self.contact.quickSnaps.count > 0 {

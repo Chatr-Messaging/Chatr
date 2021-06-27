@@ -70,8 +70,8 @@ struct MessageReplyCell: View {
                         .indicator(.activity)
                         .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                         .scaledToFill()
-                        .clipShape(Circle())
                         .frame(width: 30, height: 30, alignment: .center)
+                        .clipShape(Circle())
                         .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 5)
                 }
             }.buttonStyle(ClickButtonStyle())

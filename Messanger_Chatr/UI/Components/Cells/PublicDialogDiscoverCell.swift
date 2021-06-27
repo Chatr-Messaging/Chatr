@@ -147,7 +147,7 @@ struct PublicDialogDiscoverCell: View {
     }
     
     func dialogDetails() -> some View {
-        VisitGroupChannelView(dismissView: self.$dismissView, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$openNewDialogID, showPinDetails: self.$showPinDetails, fromDialogCell: false, viewState: .fromDiscover, dialogRelationship: self.isMember || self.isJoined ? .subscribed : .notSubscribed, publicDialogModel: self.dialogData)
+        VisitGroupChannelView(dismissView: self.$dismissView, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$openNewDialogID, showPinDetails: self.$showPinDetails, viewState: .fromDiscover, dialogRelationship: self.isMember || self.isJoined ? .subscribed : .notSubscribed, publicDialogModel: self.dialogData)
             .environmentObject(self.auth)
             .edgesIgnoringSafeArea(.all)
             .navigationBarItems(trailing:

@@ -152,7 +152,7 @@ class ChatMessageViewModel: ObservableObject {
                     Request.users(withIDs: [NSNumber(value: senderId)], paginator: Paginator.limit(1, skip: 0), successBlock: { (paginator, users) in
                         DispatchQueue.main.async {
                             if let firstUser = users.first {
-                                compleation(PersistenceManager.shared.getCubeProfileImage(usersID: firstUser) ?? "", firstUser.fullName ?? "Chatr User", firstUser.lastRequestAt ?? Date())
+                                compleation(PersistenceManager.shared.getCubeProfileImage(usersID: firstUser) ?? "", firstUser.fullName ?? "No Name", firstUser.lastRequestAt ?? Date())
                             }
                         }
                     })

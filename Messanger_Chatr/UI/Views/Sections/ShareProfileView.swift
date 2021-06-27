@@ -16,6 +16,8 @@ import SDWebImageSwiftUI
 import AVFoundation
 import SCSDKCreativeKit
 import SlideOverCard
+import PopupView
+import ConnectyCube
 
 struct ShareProfileView: View {
     @EnvironmentObject var auth: AuthModel
@@ -36,6 +38,12 @@ struct ShareProfileView: View {
     @State var hasCopiedUrl = false
     @State var openScan = false
     @State var showingTwitter = false
+    @State var showAlert = false
+    @State var notiText: String = ""
+    @State var notiType: String = ""
+    @State var newDialogID: String = "" //never used but need for forwarding channel
+    @State var showForwardChannel: Bool = false
+    @State var selectedContact: [Int] = []
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
@@ -96,10 +104,10 @@ struct ShareProfileView: View {
                                         .indicator(.activity)
                                         .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                                         .scaledToFill()
-                                        .clipShape(Circle())
                                         .frame(width: 38, height: 38, alignment: .center)
-                                        .padding(.vertical, 10)
+                                        .clipShape(Circle())
                                         .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 3)
+                                        .padding(.vertical, 10)
                                 }
                                 
                                 VStack(alignment: .leading) {
@@ -130,147 +138,193 @@ struct ShareProfileView: View {
                         }.offset(y: 35)
                     }.padding(.bottom, 30)
                     .opacity(self.shareURL != "" ? 1 : 0)
-                }.padding(.top)
-
-                //MARK: Copy Link
-                HStack {
-                    Text("PROFILE LINK:")
-                        .font(.caption)
-                        .fontWeight(.regular)
-                        .foregroundColor(.secondary)
-                        .padding(.horizontal)
-                        .padding(.horizontal)
-                        .offset(y: 2)
-                    Spacer()
-                }.padding(.top)
-                
-                HStack() {
-                    HStack {
-                        Image("linkIcon")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 22)
-                            .padding(.leading, 10)
-                        
-                        Text(self.shareURL)
-                            .foregroundColor(.primary)
-                            .font(.system(size: 16))
-                            .lineLimit(1)
-                            .padding(.vertical, 15)
-                            .padding(.trailing, 10)
-                    }.foregroundColor(.gray)
-                    .background(Color("buttonColor"))
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .circular))
-                    .shadow(color: Color.black.opacity(0.20), radius: 10, x: 0, y: 8)
-                    
-                    Button(action: {
-                        if self.hasCopiedUrl {
-                            UINotificationFeedbackGenerator().notificationOccurred(.success)
-                        } else {
-                            UINotificationFeedbackGenerator().notificationOccurred(.success)
-                            UIPasteboard.general.setValue(self.shareURL, forPasteboardType: kUTTypePlainText as String)
-                            self.hasCopiedUrl = true
-                        }
-                    }) {
-                        Image(systemName: hasCopiedUrl ? "checkmark" : "doc.on.doc")
-                            .resizable()
-                            .scaledToFit()
-                            .padding(Constants.menuBtnSize * 0.25)
-                            .padding(.horizontal, 2)
-                            .foregroundColor(.primary)
-                    }.buttonStyle(HomeButtonStyle())
-                }.padding(.horizontal)
-                .padding(.bottom)
-                
+                }.padding(.vertical)
                 
                 //MARK: Action Buttons
-                HStack(alignment: .center, spacing: 20) {
-                    Button(action: {
-                        let photo = SCSDKSnapPhoto(imageUrl: URL(string: "https://homepages.cae.wisc.edu/~ece533/images/frymire.png")!)
-                        let snap = SCSDKPhotoSnapContent(snapPhoto: photo)
-                        let sticker = SCSDKSnapSticker(stickerImage: #imageLiteral(resourceName: "iconCoin"))
-                        snap.sticker = sticker
-                        snap.caption = "Add me on Chatr! It's a simple, fun, & secure messaging app we can use to message eachother for FREE! Download at: " + Constants.appStoreLink
-                        snap.attachmentUrl = self.shareURL
-                        
-                        SCSDKSnapAPI().startSending(snap, completionHandler: { error in
-                            print("Shared \(self.shareURL)) on SnapChat.")
-                            if let error = error {
-                                print(error.localizedDescription)
-                                UINotificationFeedbackGenerator().notificationOccurred(.error)
-                            } else {
-                                UINotificationFeedbackGenerator().notificationOccurred(.success)
-                            }
-                        })
-                    }) {
-                        VStack {
-                            Image("snapchatIcon")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 30, height: 30, alignment: .center)
-                                .foregroundColor(.white)
+                 VStack(alignment: .center, spacing: 10) {
+                     HStack(alignment: .center, spacing: 25) {
+                         Spacer()
 
-                            Text("Snapchat")
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.black)
-                        }.frame(width: 100, height: 75, alignment: .center)
-                        .background(Color(red: 255/255, green: 252/255, blue: 0/255, opacity: 1.0))
-                        .cornerRadius(15)
-                        .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 3)
-                        .shadow(color: Color(red: 255/255, green: 252/255, blue: 0/255, opacity: 0.3), radius: 20, x: 0, y: 10)
-                    }.buttonStyle(ClickButtonStyle())
-                    
-                    Button(action: {
-                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                        self.shareBackgroundImage()
-                    }) {
-                        VStack {
-                            Image("instagramIcon_black")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 30, height: 30, alignment: .center)
-                                .foregroundColor(.white)
-                            
-                            Text("Instagram")
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.primary)
-                        }.frame(width: 100, height: 75, alignment: .center)
-                        .background(Color("buttonColor"))
-                        .cornerRadius(15)
-                        .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 3)
-                    }.buttonStyle(ClickButtonStyle())
-                    
-                    Button(action: {
-                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                        self.openScan.toggle()
-                    }) {
-                        VStack {
-                            Image(systemName: "qrcode.viewfinder")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 30, height: 30, alignment: .center)
-                                .foregroundColor(.white)
+                         Button(action: {
+                             let photo = SCSDKSnapPhoto(imageUrl: URL(string: "https://homepages.cae.wisc.edu/~ece533/images/frymire.png")!)
+                             let snap = SCSDKPhotoSnapContent(snapPhoto: photo)
+                             let sticker = SCSDKSnapSticker(stickerImage: #imageLiteral(resourceName: "iconCoin"))
+                             snap.sticker = sticker
+                             snap.caption = "Add me on Chatr! It's a simple, fun, & secure messaging app we can use to message eachother for FREE! Download at: " + Constants.appStoreLink
+                             snap.attachmentUrl = self.shareURL
+                             
+                             SCSDKSnapAPI().startSending(snap, completionHandler: { error in
+                                 print("Shared \(self.shareURL)) on SnapChat.")
+                                 if let error = error {
+                                     print(error.localizedDescription)
+                                     UINotificationFeedbackGenerator().notificationOccurred(.error)
+                                 } else {
+                                     UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                 }
+                             })
+                         }) {
+                             VStack {
+                                 Image("snapchatIcon")
+                                     .resizable()
+                                     .scaledToFit()
+                                     .frame(width: 24, height: 24, alignment: .center)
+                                     .foregroundColor(.white)
 
-                            Text("Scan QR")
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.white)
-                        }.frame(width: 100, height: 75, alignment: .center)
-                        .background(Color.blue)
-                        .cornerRadius(15)
-                        .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
-                        .shadow(color: Color.blue.opacity(0.2), radius: 10, x: 0, y: 6)
-                    }.buttonStyle(ClickButtonStyle())
-                }.padding(.all)
-                .frame(width: Constants.screenWidth)
+                                 Text("Snapchat")
+                                     .font(.caption)
+                                     .fontWeight(.medium)
+                                     .foregroundColor(.black)
+                                     .offset(y: -2)
+                             }.frame(width: 80, height: 60, alignment: .center)
+                             .background(Color(red: 255/255, green: 252/255, blue: 0/255, opacity: 1.0))
+                             .cornerRadius(12.5)
+                             .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 3)
+                             .shadow(color: Color(red: 255/255, green: 252/255, blue: 0/255, opacity: 0.3), radius: 20, x: 0, y: 10)
+                         }.buttonStyle(ClickButtonStyle())
+                         
+                         Button(action: {
+                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                             self.shareBackgroundImage()
+                         }) {
+                             VStack {
+                                 Image("instagramIcon_black")
+                                     .resizable()
+                                     .scaledToFit()
+                                     .frame(width: 22, height: 22, alignment: .center)
+                                     .foregroundColor(.white)
+                                 
+                                 Text("Instagram")
+                                     .font(.caption)
+                                     .fontWeight(.medium)
+                                     .foregroundColor(.primary)
+                             }.frame(width: 80, height: 60, alignment: .center)
+                             .background(Color("buttonColor"))
+                             .cornerRadius(12.5)
+                             .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 3)
+                         }.buttonStyle(ClickButtonStyle())
+                         
+                         Button(action: {
+                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                             self.openScan.toggle()
+                         }) {
+                             VStack {
+                                 Image(systemName: "qrcode.viewfinder")
+                                     .resizable()
+                                     .scaledToFit()
+                                     .frame(width: 22, height: 22, alignment: .center)
+                                     .foregroundColor(.white)
+
+                                 Text("Scan QR")
+                                     .font(.caption)
+                                     .fontWeight(.medium)
+                                     .foregroundColor(.white)
+                             }.frame(width: 80, height: 60, alignment: .center)
+                             .background(Color.blue)
+                             .cornerRadius(12.5)
+                             .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
+                             .shadow(color: Color.blue.opacity(0.2), radius: 10, x: 0, y: 6)
+                         }.buttonStyle(ClickButtonStyle())
+                         Spacer()
+                     }.padding(.bottom)
+
+                     //MARK: Copy Link
+                     HStack() {
+                         HStack {
+                             Image("linkIcon")
+                                 .resizable()
+                                 .scaledToFit()
+                                 .cornerRadius(2.5)
+                                 .foregroundColor(.primary)
+                                 .frame(height: 22)
+                                 .padding(.leading, 15)
+                             
+                             Text(self.shareURL)
+                                 .foregroundColor(.primary)
+                                 .font(.system(size: 16))
+                                 .lineLimit(1)
+                                 .padding(.vertical, 15)
+                                 .padding(.trailing, 15)
+                                 .animation(nil)
+                                 
+                             Spacer()
+                         }
+                         .background(Color("buttonColor"))
+                         .clipShape(RoundedRectangle(cornerRadius: 14, style: .circular))
+                         .shadow(color: Color.black.opacity(0.20), radius: 10, x: 0, y: 8)
+                         .redacted(reason: self.shareURL == "" ? .placeholder : [])
+                         .padding(.trailing, 2.5)
+                         
+                         
+                         Button(action: {
+                             if self.hasCopiedUrl {
+                                 UINotificationFeedbackGenerator().notificationOccurred(.success)
+                             } else {
+                                 UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                 UIPasteboard.general.setValue(self.shareURL, forPasteboardType: kUTTypePlainText as String)
+                                 self.hasCopiedUrl = true
+                                 
+                                 self.notiType = "success"
+                                 self.notiText = "Successfully copied channel URL"
+                                 self.showAlert.toggle()
+                             }
+                         }) {
+                             Image(systemName: hasCopiedUrl ? "checkmark" : "doc.on.doc")
+                                 .resizable()
+                                 .scaledToFit()
+                                 .font(Font.system(size: 14, weight: .regular))
+                                 .padding(Constants.menuBtnSize * 0.25)
+                                 .padding(.horizontal, 2)
+                                 .foregroundColor(.primary)
+                         }.buttonStyle(HomeButtonStyle())
+                     }
+
+                     if self.isPublicDialog {
+                         Button(action: {
+                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                             self.showForwardChannel.toggle()
+                         }) {
+                             HStack(alignment: .center, spacing: 20) {
+                                 Spacer()
+                                 Image(systemName: "paperplane")
+                                     .resizable()
+                                     .scaledToFit()
+                                     .frame(width: 20, height: 20, alignment: .center)
+                                     .foregroundColor(.white)
+
+                                 Text("Forward Channel")
+                                     .font(.none)
+                                     .fontWeight(.semibold)
+                                     .foregroundColor(.white)
+                                 Spacer()
+                             }.frame(height: 55, alignment: .center)
+                             .background(Color.blue)
+                             .cornerRadius(15)
+                             .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
+                             .shadow(color: Color.blue.opacity(0.2), radius: 10, x: 0, y: 6)
+                         }.buttonStyle(ClickButtonStyle())
+                         .sheet(isPresented: self.$showForwardChannel, onDismiss: {
+                             guard !self.selectedContact.isEmpty else { return }
+
+                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
+                                 self.forwardContact()
+                             }
+                         }) {
+                             NewConversationView(usedAsNew: false, forwardContact: true, selectedContact: self.$selectedContact, newDialogID: self.$newDialogID)
+                                 .environmentObject(self.auth)
+                         }
+                     }
+                 }
+                 .padding(.all)
 
                 FooterInformation()
                     .padding(.top, 80)
                     .padding(.bottom)
                 
             }.frame(width: Constants.screenWidth)
+            .popup(isPresented: self.$showAlert, type: .floater(), position: .bottom, animation: Animation.spring(), autohideIn: 4, closeOnTap: true) {
+                self.auth.createTopFloater(alertType: self.notiType, message: self.notiText)
+                    .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 8)
+            }
         }.navigationBarTitle(self.isPublicDialog ? "Share Channel" : "Share Profile", displayMode: .automatic)
         .animation(.spring(response: 0.35, dampingFraction: 0.60, blendDuration: 0))
         .navigationBarItems(trailing:
@@ -283,7 +337,7 @@ struct ShareProfileView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .padding(.trailing, 5)
-                    .font(Font.system(size: 22, weight: .regular))
+                    .font(Font.system(size: 18, weight: .regular))
                     .foregroundColor(.primary)
             }.disabled(self.foundUser ? false : true)
         ).onAppear {
@@ -364,6 +418,77 @@ struct ShareProfileView: View {
         let sticker = UIImage(imageLiteralResourceName: "like")
 
         InstagramStories.Shared.post(bgImage: image, stickerImage: sticker, contentURL: self.shareURL)
+    }
+
+    func forwardContact() {
+        for dialog in self.auth.dialogs.results {
+            if dialog.dialogType == "private" {
+                for id in dialog.occupentsID {
+                    if id != self.auth.profile.results.first?.id {
+                        print("the user ID is: \(id)")
+                        //replace below with selected contact id:
+                        if self.selectedContact.contains(id) {
+                            if let selectedDialog = self.auth.dialogs.results.filter("id == %@", dialog.id).first {
+                                changeMessageRealmData.shared.sendPublicChannel(dialog: selectedDialog, contactID: [self.dialogID ?? ""], occupentID: [NSNumber(value: id), NSNumber(value: Int(self.auth.profile.results.first?.id ?? 0))])
+                                
+                                if let index = self.selectedContact.firstIndex(of: id) {
+                                    self.selectedContact.remove(at: index)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        //selectedContact
+        if self.selectedContact.count == 0 {
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
+            self.notiType = "success"
+            self.notiText = "Successfully forwarded chat"
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                self.showAlert = true
+            }
+        } else {
+            // does not have a dialog for the selected user so we create one
+            for contact in self.selectedContact {
+                let dialog = ChatDialog(dialogID: nil, type: .private)
+                dialog.occupantIDs = [NSNumber(value: contact), NSNumber(value: Int(self.auth.profile.results.first?.id ?? 0))]  // an ID of opponent
+
+                Request.createDialog(dialog, successBlock: { (dialog) in
+                   let attachment = ChatAttachment()
+                    attachment["channelID"] = dialog.id ?? ""
+                   
+                   let message = ChatMessage.markable()
+                   message.markable = true
+                    message.text = "Shared channel \(dialog.name ?? "")"
+                   message.attachments = [attachment]
+                   
+                   dialog.send(message) { (error) in
+                       changeMessageRealmData.shared.insertMessage(message, completion: {
+                           if error != nil {
+                               print("error sending message: \(String(describing: error?.localizedDescription))")
+                               changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .error)
+                           } else {
+                               print("Success sending message to ConnectyCube server!")
+                           }
+                       })
+                   }
+                }) { (error) in
+                    print("error making dialog: \(error.localizedDescription)")
+                }
+
+                changeDialogRealmData.shared.fetchDialogs(completion: { _ in
+                    self.selectedContact.removeAll()
+                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                    self.notiType = "success"
+                    self.notiText = "Successfully forwarded \(dialog.name ?? "")"
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                        self.showAlert = true
+                    }
+                })
+            }
+        }
     }
 }
 

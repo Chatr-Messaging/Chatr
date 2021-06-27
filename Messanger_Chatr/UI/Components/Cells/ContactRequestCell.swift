@@ -36,8 +36,8 @@ struct ContactRequestCell: View {
                     .indicator(.activity)
                     .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                     .scaledToFill()
-                    .clipShape(Circle())
                     .frame(width: 45, height: 45, alignment: .center)
+                    .clipShape(Circle())
                     .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 8)
                 
                 VStack(alignment: .leading) {

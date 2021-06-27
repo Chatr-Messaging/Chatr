@@ -350,7 +350,7 @@ struct ChatMessagesView: View {
             .bottomSafeAreaInset(
                 RoundedRectangle(cornerRadius: 0)
                     .fill(Color.clear)
-                    .frame(height: self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 110 : 0) + 32)
+                    .frame(height: self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 110 : 0) + 38)
             )
             .coordinateSpace(name: "scroll")
             .frame(width: Constants.screenWidth)

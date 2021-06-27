@@ -49,15 +49,15 @@ struct DialogContactCell: View {
                 VStack(alignment: .center, spacing: 0) {
                     HStack {
                         ZStack() {
-                            if let avitarURL = contact.avatar {
+                            if let avitarURL = contact.avatar, avitarURL != "" {
                                 WebImage(url: URL(string: avitarURL))
                                     .resizable()
                                     .placeholder{ Image("empty-profile").resizable().frame(width: 40, height: 40, alignment: .center).scaledToFill() }
                                     .indicator(.activity)
                                     .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                                     .scaledToFill()
-                                    .clipShape(Circle())
                                     .frame(width: 40, height: 40, alignment: .center)
+                                    .clipShape(Circle())
                                     .shadow(color: Color.black.opacity(0.25), radius: 5, x: 0, y: 5)
                             } else {
                                 ZStack(alignment: .center) {
@@ -66,9 +66,9 @@ struct DialogContactCell: View {
                                         .foregroundColor(Color("bgColor"))
                                     
                                     Text("".firstLeters(text: contact.fullName))
-                                        .font(.system(size: 14))
+                                        .font(.system(size: 20))
                                         .fontWeight(.bold)
-                                        .foregroundColor(.primary)
+                                        .foregroundColor(.secondary)
                                 }
                             }
                             

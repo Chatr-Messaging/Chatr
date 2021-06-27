@@ -21,37 +21,35 @@ struct HighlightedContactCell: View {
         ZStack {
             VStack(alignment: .leading) {
                 HStack(alignment: .top) {
-                    if let avitarURL = contact.avatar {
-                        ZStack {
+                    ZStack {
+                        if let avitarURL = contact.avatar, avitarURL != "" {
                             WebImage(url: URL(string: avitarURL))
                                 .resizable()
                                 .placeholder{ Image("empty-profile").resizable().frame(width: 35, height: 35, alignment: .center).scaledToFill() }
                                 .indicator(.activity)
                                 .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                                 .scaledToFill()
-                                .clipShape(Circle())
                                 .frame(width: 35, height: 35, alignment: .center)
+                                .clipShape(Circle())
                                 .shadow(color: Color.black.opacity(0.25), radius: 5, x: 0, y: 5)
-                            
-                            RoundedRectangle(cornerRadius: 5)
-                                .frame(width: 10, height: 10)
-                                .foregroundColor(.green)
-                                .overlay(Circle().stroke(Color("bgColor"), lineWidth: 2))
-                                .opacity(contact.isOnline ? 1 : 0)
-                                .offset(x: 12, y: 12)
-                        }.padding(.horizontal)
-                    } else {
-                        ZStack {
+                        } else {
                             Circle()
-                                .frame(width: 25, height: 25, alignment: .center)
+                                .frame(width: 35, height: 35, alignment: .center)
                                 .foregroundColor(Color("bgColor"))
 
                             Text("".firstLeters(text: contact.fullName))
                                 .font(.system(size: 14))
-                                .fontWeight(.medium)
+                                .fontWeight(.bold)
                                 .foregroundColor(.secondary)
-                        }.padding(.horizontal)
-                    }
+                        }
+                        
+                        RoundedRectangle(cornerRadius: 5)
+                            .frame(width: 10, height: 10)
+                            .foregroundColor(.green)
+                            .overlay(Circle().stroke(Color("bgColor"), lineWidth: 2))
+                            .opacity(contact.isOnline ? 1 : 0)
+                            .offset(x: 12, y: 12)
+                    }.padding(.horizontal)
                     
                     Spacer()
                     

@@ -188,7 +188,7 @@ struct ChannelBubble: View {
                 }
             }) {
                 NavigationView {
-                    VisitGroupChannelView(dismissView: self.$showChannel, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$openNewDialogID, showPinDetails: self.$showPinDetails, groupOccUserAvatar: self.groupOccUserAvatar, fromDialogCell: true, viewState: .fromDialogCell, dialogRelationship: self.isMember ? .subscribed : .notSubscribed, dialogModel: self.dialogModel)
+                    VisitGroupChannelView(dismissView: self.$showChannel, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$openNewDialogID, showPinDetails: self.$showPinDetails, groupOccUserAvatar: self.groupOccUserAvatar, viewState: .fromDialogCell, dialogRelationship: self.isMember ? .subscribed : .notSubscribed, dialogModel: self.dialogModel)
                         .environmentObject(self.auth)
                         .edgesIgnoringSafeArea(.all)
                         .navigationBarItems(leading:

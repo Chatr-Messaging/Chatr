@@ -71,8 +71,8 @@ struct EditProfileView: View {
                                                     .indicator(.activity)
                                                     .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                                                     .scaledToFill()
-                                                    .clipShape(Circle())
                                                     .frame(width: 80, height: 80, alignment: .center)
+                                                    .clipShape(Circle())
                                                     .shadow(color: Color.black.opacity(0.20), radius: 12, x: 0, y: 8)
                                             }
                                             

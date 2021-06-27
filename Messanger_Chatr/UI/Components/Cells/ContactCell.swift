@@ -21,15 +21,26 @@ struct ContactCell: View {
                     .frame(width: 35, height: 35, alignment: .center)
                     .foregroundColor(Color("bgColor"))
                 
-                WebImage(url: URL(string: PersistenceManager.shared.getCubeProfileImage(usersID: self.user) ?? ""))
-                    .resizable()
-                    .placeholder{ Image("empty-profile").resizable().frame(width: 45, height: 45, alignment: .center).scaledToFill() }
-                    .indicator(.activity)
-                    .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
-                    .scaledToFill()
-                    .clipShape(Circle())
-                    .frame(width: 45, height: 45, alignment: .center)
-                    .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 5)
+                if let avatarUrl = PersistenceManager.shared.getCubeProfileImage(usersID: self.user), avatarUrl != "" {
+                    WebImage(url: URL(string: avatarUrl))
+                        .resizable()
+                        .placeholder{ Image("empty-profile").resizable().frame(width: 45, height: 45, alignment: .center).scaledToFill() }
+                        .indicator(.activity)
+                        .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
+                        .scaledToFill()
+                        .frame(width: 45, height: 45, alignment: .center)
+                        .clipShape(Circle())
+                        .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 5)
+                } else {
+                    Circle()
+                        .frame(width: 45, height: 45, alignment: .center)
+                        .foregroundColor(Color("bgColor"))
+
+                    Text("".firstLeters(text: self.user.fullName ?? "No Name"))
+                        .font(.system(size: 22))
+                        .fontWeight(.bold)
+                        .foregroundColor(.secondary)
+                }
             }
             
             VStack(alignment: .leading) {

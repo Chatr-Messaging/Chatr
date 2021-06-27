@@ -38,7 +38,7 @@ class Users: NSObject {
                             }
                         })
                     }, errorBlock: { error in
-                        ChatrApp.connect()
+                        //ChatrApp.connect()
                         print("error logging into ConnectyCube: \(error.localizedDescription)")
                     })
                 }

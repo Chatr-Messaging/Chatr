@@ -72,6 +72,19 @@ struct DialogCell: View {
                                 }
                             }
                         
+                        if self.dialogModel.avatar == "" && self.privateDialogContact.avatar == "" {
+                            RoundedRectangle(cornerRadius: self.dialogModel.dialogType == "public" ? 12.5 : 27.5)
+                                .frame(width: 55, height: 55, alignment: .center)
+                                .foregroundColor(Color("bgColor"))
+                                .offset(x: self.dialogModel.dialogType == "public" ? -7.5 : -5)
+
+                            Text("".firstLeters(text: self.dialogModel.dialogType == "public" ? self.dialogModel.fullName : self.privateDialogContact.id != 0 ? self.privateDialogContact.fullName : "??"))
+                                .font(.system(size: 28))
+                                .fontWeight(.bold)
+                                .foregroundColor(.secondary)
+                                .offset(x: self.dialogModel.dialogType == "public" ? -7.5 : -5)
+                        }
+                        
                         AlertIndicator(dialogModel: self.dialogModel)
                             .offset(x: -36, y: -27.5)
                             .opacity(self.isOpen ? 0 : 1)
@@ -91,8 +104,8 @@ struct DialogCell: View {
                                         .indicator(.activity)
                                         .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.05)), removal: AnyTransition.identity))
                                         .scaledToFill()
-                                        .clipShape(Circle())
                                         .frame(width: self.groupOccUserAvatar.count >= 3 ? 31 : self.groupOccUserAvatar.count == 2 ? 34 : 55, height: self.groupOccUserAvatar.count >= 3 ? 31 : self.groupOccUserAvatar.count == 2 ? 34 : 55, alignment: .center)
+                                        .clipShape(Circle())
                                         .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 5)
                                     
                                     if id == 2 && self.dialogModel.occupentsID.count >= 5 {
@@ -225,7 +238,7 @@ struct DialogCell: View {
                 }
             }.sheet(isPresented: self.$openGroupProfile, content: {
                 NavigationView {
-                    VisitGroupChannelView(dismissView: self.$openGroupProfile, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$openNewDialogID, showPinDetails: self.$showPinDetails, groupOccUserAvatar: self.groupOccUserAvatar, fromDialogCell: true, viewState: .fromDialogCell, dialogRelationship: .subscribed, dialogModel: self.dialogModel)
+                    VisitGroupChannelView(dismissView: self.$openGroupProfile, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$openNewDialogID, showPinDetails: self.$showPinDetails, groupOccUserAvatar: self.groupOccUserAvatar, viewState: .fromDialogCell, dialogRelationship: .subscribed, dialogModel: self.dialogModel)
                         .environmentObject(self.auth)
                         .edgesIgnoringSafeArea(.all)
                         .navigationBarItems(leading:
@@ -383,7 +396,7 @@ struct DialogCell: View {
                 return
             }
             
-            if occ != UserDefaults.standard.integer(forKey: "currentUserID"){
+            if occ != UserDefaults.standard.integer(forKey: "currentUserID") {
                 do {
                     let realm = try Realm(configuration: Realm.Configuration(schemaVersion: 1))
                     if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: occ) {

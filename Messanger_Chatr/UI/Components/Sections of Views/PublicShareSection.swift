@@ -107,10 +107,10 @@ struct PublicShareSection: View {
                 })
         }).padding(.bottom, 10)
         .sheet(isPresented: self.$showForwardChannel, onDismiss: {
-            if self.selectedContact.count > 0 {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
-                    self.forwardContact()
-                }
+            guard !self.selectedContact.isEmpty else { return }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
+                self.forwardContact()
             }
         }) {
             NewConversationView(usedAsNew: false, forwardContact: true, selectedContact: self.$selectedContact, newDialogID: self.$newDialogID)
@@ -169,7 +169,7 @@ struct PublicShareSection: View {
                    
                    let message = ChatMessage.markable()
                    message.markable = true
-                    message.text = "Shared chat: \(self.dialogModel.fullName)"
+                    message.text = "Shared channel \(self.dialogModel.fullName)"
                    message.attachments = [attachment]
                    
                    dialog.send(message) { (error) in

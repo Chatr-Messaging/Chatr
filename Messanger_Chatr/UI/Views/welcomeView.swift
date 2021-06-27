@@ -1177,8 +1177,8 @@ struct welcomeBackView: View {
                                     .indicator(.activity)
                                     .transition(.fade(duration: 0.25))
                                     .scaledToFill()
-                                    .clipShape(Circle())
                                     .frame(width: 55, height: 55, alignment: .center)
+                                    .clipShape(Circle())
                                     .padding(.leading)
                             }
                             

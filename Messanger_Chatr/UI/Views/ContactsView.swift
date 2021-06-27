@@ -58,8 +58,8 @@ struct ContactsView: View {
                                                     .indicator(.activity)
                                                     .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                                                     .scaledToFill()
-                                                    .clipShape(Circle())
                                                     .frame(width: 55, height: 55, alignment: .center)
+                                                    .clipShape(Circle())
                                                     .padding(.leading, 10)
                                                     .shadow(color: Color("buttonShadow"), radius: 8, x: 0, y: 5)
                                             }
@@ -433,24 +433,25 @@ struct ContactsView: View {
                                                         VStack(alignment: .trailing, spacing: 0) {
                                                             HStack {
                                                                 ZStack() {
-                                                                    if let avitarURL = contact.avatar {
+                                                                    if let avitarURL = contact.avatar, avitarURL != "" {
                                                                         WebImage(url: URL(string: avitarURL))
                                                                             .resizable()
                                                                             .placeholder{ Image("empty-profile").resizable().frame(width: 40, height: 40, alignment: .center).scaledToFill() }
                                                                             .indicator(.activity)
                                                                             .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                                                                             .scaledToFill()
-                                                                            .clipShape(Circle())
                                                                             .frame(width: 40, height: 40, alignment: .center)
+                                                                            .clipShape(Circle())
                                                                             .shadow(color: Color.black.opacity(0.20), radius: 6, x: 0, y: 4)
                                                                     } else {
                                                                         ZStack(alignment: .center) {
                                                                             Circle()
                                                                                 .frame(width: 40, height: 40, alignment: .center)
                                                                                 .foregroundColor(Color("bgColor"))
+                                                                                .shadow(color: Color.black.opacity(0.18), radius: 6, x: 0, y: 2)
                                                                             
                                                                             Text("".firstLeters(text: contact.fullName))
-                                                                                .font(.system(size: 14))
+                                                                                .font(.system(size: 20))
                                                                                 .fontWeight(.bold)
                                                                                 .foregroundColor(.primary)
                                                                         }
@@ -540,24 +541,25 @@ struct ContactsView: View {
                                                     VStack(alignment: .trailing, spacing: 0) {
                                                         HStack {
                                                             ZStack() {
-                                                                if let avitarURL = contact.avatar {
+                                                                if let avitarURL = contact.avatar, avitarURL != "" {
                                                                     WebImage(url: URL(string: avitarURL))
                                                                         .resizable()
                                                                         .placeholder{ Image("empty-profile").resizable().frame(width: 40, height: 40, alignment: .center).scaledToFill() }
                                                                         .indicator(.activity)
                                                                         .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                                                                         .scaledToFill()
-                                                                        .clipShape(Circle())
                                                                         .frame(width: 40, height: 40, alignment: .center)
+                                                                        .clipShape(Circle())
                                                                         .shadow(color: Color.black.opacity(0.20), radius: 6, x: 0, y: 4)
                                                                 } else {
                                                                     ZStack(alignment: .center) {
                                                                         Circle()
                                                                             .frame(width: 40, height: 40, alignment: .center)
                                                                             .foregroundColor(Color("bgColor"))
+                                                                            .shadow(color: Color.black.opacity(0.18), radius: 6, x: 0, y: 2)
                                                                         
                                                                         Text("".firstLeters(text: contact.fullName))
-                                                                            .font(.system(size: 14))
+                                                                            .font(.system(size: 20))
                                                                             .fontWeight(.bold)
                                                                             .foregroundColor(.primary)
                                                                     }

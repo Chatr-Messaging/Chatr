@@ -583,7 +583,7 @@ class changeMessageRealmData {
             
             let message = ChatMessage.markable()
             message.markable = true
-            message.text = "Shared Contact"
+            message.text = "Shared contact"
             message.attachments = [attachment]
             
             let pDialog = ChatDialog(dialogID: dialog.id, type: dialog.dialogType == "public" ? .public : occupentID.count > 2 ? .group : .private)
@@ -609,7 +609,7 @@ class changeMessageRealmData {
             
             let message = ChatMessage.markable()
             message.markable = true
-            message.text = "Shared chat \(dialog.fullName)"
+            message.text = "Shared channel \(dialog.fullName)"
             message.attachments = [attachment]
             
             let pDialog = ChatDialog(dialogID: dialog.id, type: occupentID.count > 2 ? .group : .private)

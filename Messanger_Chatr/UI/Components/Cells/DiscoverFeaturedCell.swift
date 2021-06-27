@@ -209,7 +209,7 @@ struct DiscoverFeaturedCell: View, Identifiable {
     }
     
     func dialogDetails() -> some View {
-        VisitGroupChannelView(dismissView: self.$dismissView, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$openNewDialogID, showPinDetails: self.$showPinDetails, fromDialogCell: false, viewState: .fromDiscover, dialogRelationship: self.isMember ? .subscribed : .notSubscribed, publicDialogModel: self.dialogModel)
+        VisitGroupChannelView(dismissView: self.$dismissView, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$openNewDialogID, showPinDetails: self.$showPinDetails, viewState: .fromDiscover, dialogRelationship: self.isMember ? .subscribed : .notSubscribed, publicDialogModel: self.dialogModel)
             .environmentObject(self.auth)
             .edgesIgnoringSafeArea(.all)
             .navigationBarItems(trailing:

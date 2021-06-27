@@ -326,20 +326,36 @@ struct mainHomeList: View {
                         }) {
                             NewConversationView(usedAsNew: true, selectedContact: self.$selectedContacts, newDialogID: self.$newDialogID)
                                 .environmentObject(self.auth)
-                                .sheet(isPresented: self.$showSharedContact, onDismiss: {
-                                    if self.newDialogFromContact != 0 {
-                                        self.isLocalOpen = false
-                                        UserDefaults.standard.set(false, forKey: "localOpen")
-                                        changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: "\(self.newDialogFromContact)")
-                                    }
-                                    self.loadSelectedDialog()
-                                }) {
-                                    NavigationView {
-                                        VisitContactView(fromDialogCell: true, newMessage: self.$newDialogFromContact, dismissView: self.$showSharedContact, viewState: .fromDynamicLink)
-                                            .environmentObject(self.auth)
-                                            .edgesIgnoringSafeArea(.all)
-                                    }
-                                }
+                        }
+                        .sheet(isPresented: self.$isDiscoverOpen, onDismiss: {
+                            print("dismiss discover vieww")
+                            if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), !diaId.isEmpty {
+                                self.loadPublicDialog(diaId: diaId)
+                            } else if let diaId = UserDefaults.standard.string(forKey: "openingDialogId"), !diaId.isEmpty {
+                                self.loadPublicDialog(diaId: diaId)
+                            }
+                        }) {
+                            NavigationView {
+                                DiscoverView(removeDoneBtn: false, dismissView: self.$isDiscoverOpen, showPinDetails: self.$showPinDetails)
+                                    .environmentObject(self.auth)
+                                    .navigationBarTitle("Discover", displayMode: .automatic)
+                                    .background(Color("bgColor")
+                                    .edgesIgnoringSafeArea(.all))
+                            }
+                        }
+                        .sheet(isPresented: self.$showSharedContact, onDismiss: {
+                            if self.newDialogFromContact != 0 {
+                                self.isLocalOpen = false
+                                UserDefaults.standard.set(false, forKey: "localOpen")
+                                changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: "\(self.newDialogFromContact)")
+                            }
+                            self.loadSelectedDialog()
+                        }) {
+                            NavigationView {
+                                VisitContactView(fromDialogCell: true, newMessage: self.$newDialogFromContact, dismissView: self.$showSharedContact, viewState: .fromDynamicLink)
+                                    .environmentObject(self.auth)
+                                    .edgesIgnoringSafeArea(.all)
+                            }
                         }
                         
 //                        //MARK: Pull to refresh - loading dialogs
@@ -420,7 +436,7 @@ struct mainHomeList: View {
                                             .font(.headline)
                                             .foregroundColor(.primary)
                                         
-                                        Image(systemName: "magnifyingglass")
+                                        Image(systemName: "safari")
                                             .resizable()
                                             .scaledToFit()
                                             .frame(width: 22, height: 22, alignment: .center)
@@ -433,22 +449,6 @@ struct mainHomeList: View {
                                     .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 8)
                                 }
                                 .buttonStyle(ClickButtonStyle())
-                                .sheet(isPresented: self.$isDiscoverOpen, onDismiss: {
-                                    print("dismiss discover vieww")
-                                    if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), !diaId.isEmpty {
-                                        self.loadPublicDialog(diaId: diaId)
-                                    } else if let diaId = UserDefaults.standard.string(forKey: "openingDialogId"), !diaId.isEmpty {
-                                        self.loadPublicDialog(diaId: diaId)
-                                    }
-                                }) {
-                                    NavigationView {
-                                        DiscoverView(removeDoneBtn: false, dismissView: self.$isDiscoverOpen, showPinDetails: self.$showPinDetails)
-                                            .environmentObject(self.auth)
-                                            .navigationBarTitle("Discover", displayMode: .automatic)
-                                            .background(Color("bgColor")
-                                            .edgesIgnoringSafeArea(.all))
-                                    }
-                                }
                             }.offset(y: Constants.screenWidth < 375 ? 60 : 10)
                         }
                         
@@ -493,10 +493,10 @@ struct mainHomeList: View {
                                 disableDialog = false
                             }
                         }
-                        //.onAppear {
-                        //UserDefaults.standard.set(false, forKey: "localOpen")
-                        //ChatrApp.dialogs.getDialogUpdates() { result in }
-                        //}
+                        .onAppear {
+                            UserDefaults.standard.set(false, forKey: "localOpen")
+                            self.isLocalOpen = false
+                        }
                         
                         if self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.count >= 3 {
                             FooterInformation()
@@ -551,6 +551,11 @@ struct mainHomeList: View {
                             }
                         }.onChange(of: self.auth.visitPublicDialogProfile) { newValue in
                             if newValue {
+                                print("did I make it this far lolll: \(newValue)")
+                                if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), !diaId.isEmpty {
+                                    print("helooo we here: \(diaId) && \(self.auth.dynamicLinkPublicDialogID)")
+                                }
+
                                 self.showSharedPublicDialog.toggle()
                                 self.auth.visitPublicDialogProfile = false
                             }
@@ -559,6 +564,12 @@ struct mainHomeList: View {
                             self.selectedDialogID = UserDefaults.standard.string(forKey: "selectedDialogID") ?? ""
                         }
                         .sheet(isPresented: self.$showSharedPublicDialog, onDismiss: {
+                            guard self.auth.dynamicLinkPublicDialogID == "" else {
+                                self.auth.dynamicLinkPublicDialogID = ""
+
+                                return
+                            }
+
                             if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), !diaId.isEmpty {
                                 self.loadPublicDialog(diaId: diaId)
                             } else if let diaId = UserDefaults.standard.string(forKey: "openingDialogId"), !diaId.isEmpty {
@@ -566,7 +577,7 @@ struct mainHomeList: View {
                             }
                         }) {
                             NavigationView {
-                                VisitGroupChannelView(dismissView: self.$showSharedPublicDialog, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$newDialogFromContact, showPinDetails: self.$showPinDetails, fromDialogCell: true, viewState: .fromDynamicLink, dialogRelationship: .unknown)
+                                VisitGroupChannelView(dismissView: self.$showSharedPublicDialog, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$newDialogFromContact, showPinDetails: self.$showPinDetails, fromSharedPublicDialog: self.auth.dynamicLinkPublicDialogID, viewState: .fromDiscover, dialogRelationship: .unknown)
                                     .environmentObject(self.auth)
                                     .edgesIgnoringSafeArea(.all)
                                     .navigationBarItems(leading:
@@ -696,11 +707,9 @@ struct mainHomeList: View {
     func loadPublicDialog(diaId: String) {
         self.isLocalOpen = false
         UserDefaults.standard.set(false, forKey: "localOpen")
-        if let oldDiaId = UserDefaults.standard.string(forKey: "selectedDialogID") {
-            changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: oldDiaId)
-        }
+        changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: self.selectedDialogID)
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
             UserDefaults.standard.set(diaId, forKey: "selectedDialogID")
             self.selectedDialogID = diaId
             self.newDialogFromContact = 0

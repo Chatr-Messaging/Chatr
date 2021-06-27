@@ -52,8 +52,8 @@ struct BubbleDetailView: View {
                             .placeholder{ Image("empty-profile").resizable().frame(width: 34, height: 34, alignment: .bottom).scaledToFill() }
                             .indicator(.activity)
                             .scaledToFill()
-                            .clipShape(Circle())
                             .frame(width: 35, height: 35, alignment: .center)
+                            .clipShape(Circle())
                             .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 0)
 
                         VStack(alignment: .leading) {

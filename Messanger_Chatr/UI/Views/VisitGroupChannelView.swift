@@ -28,7 +28,7 @@ struct VisitGroupChannelView: View {
     @Binding var openNewDialogID: Int
     @Binding var showPinDetails: String
     @State var groupOccUserAvatar: [String] = []
-    @State var fromDialogCell: Bool = false
+    @State var fromSharedPublicDialog: String = ""
     @State var showMoreMembers: Bool = false
     @State var showMoreAdmins: Bool = false
     @State var showProfile: Bool = false
@@ -359,7 +359,7 @@ struct VisitGroupChannelView: View {
                 let config = Realm.Configuration(schemaVersion: 1)
                 do {
                     let realm = try Realm(configuration: config)
-                    if let foundDialog = realm.object(ofType: DialogStruct.self, forPrimaryKey: self.publicDialogModel.id ?? "") {
+                    if let foundDialog = realm.object(ofType: DialogStruct.self, forPrimaryKey: self.publicDialogModel.id ?? self.fromSharedPublicDialog) {
                         self.dialogRelationship = !foundDialog.isDeleted ? .subscribed : .notSubscribed
 
                         try realm.safeWrite ({
@@ -389,12 +389,14 @@ struct VisitGroupChannelView: View {
                             self.dialogModel = foundDialog
 
                             realm.add(foundDialog, update: .all)
+                            
+                            print("ccomon nowww: founddd \(self.dialogModel.dialogType == "public") && \(self.dialogModel.id) && \(fromSharedPublicDialog)")
                         })
                     } else {
                         self.dialogRelationship = .notSubscribed
                         let dialog = DialogStruct()
 
-                        dialog.id = self.publicDialogModel.id ?? ""
+                        dialog.id = self.publicDialogModel.id ?? self.fromSharedPublicDialog
                         dialog.dialogType = "public"
                         dialog.isDeleted = true
                         
@@ -426,6 +428,9 @@ struct VisitGroupChannelView: View {
                         try realm.safeWrite ({
                             realm.add(dialog, update: .all)
                         })
+                        
+                        print("ccomon nowww: madeee \(self.dialogModel.dialogType == "public") && \(self.dialogModel.id) && \(fromSharedPublicDialog)")
+
                     }
                 } catch { self.dialogRelationship = .notSubscribed }
             } else if self.viewState == .fromDialogCell {
@@ -472,11 +477,14 @@ struct VisitGroupChannelView: View {
             UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")
             self.canEditGroup = self.isOwner || self.isAdmin
             self.currentUserIsPowerful = self.isOwner || self.isAdmin ? true : false
-            self.observePinnedMessages(dialogId: self.dialogModel.id)
             
-            if self.dialogModel.dialogType == "public" && self.dialogModel.id != "" {
+            print("ccomon nowww: \(self.dialogModel.dialogType == "public") && \(self.dialogModel.id) && \(fromSharedPublicDialog)")
+            if self.dialogModel.dialogType == "public" && self.dialogModel.id != "" {                
                 self.observeFirebase()
                 self.observePublicDialogMembers()
+                self.observePinnedMessages(dialogId: self.dialogModel.id)
+            } else if self.dialogModel.dialogType == "group" && self.dialogModel.id != "" {
+                self.observePinnedMessages(dialogId: self.dialogModel.id)
             }
             
             if self.dialogRelationship == .subscribed {
@@ -486,11 +494,15 @@ struct VisitGroupChannelView: View {
             NotificationCenter.default.addObserver(forName: NSNotification.Name("NotificationAlert"), object: nil, queue: .main) { (_) in
                 self.showAlert.toggle()
             }
+
+            self.fromSharedPublicDialog = ""
         }
     }
     
     func observeFirebase() {
-        let user = Database.database().reference().child("Marketplace").child("public_dialogs").child("\(dialogModel.id)")
+        print("did we get to the observeFirebase? :\(dialogModel.id)")
+        
+        let user = Database.database().reference().child("Marketplace").child("public_dialogs").child("\(self.dialogModel.id)")
         user.observeSingleEvent(of: .value, with: { (snapshot: DataSnapshot) in
             if let dict = snapshot.value as? [String: Any] {
                 //self.coverPhotoUrl = dict["cover_photo"] as? String ?? ""
@@ -744,6 +756,8 @@ struct VisitGroupChannelView: View {
     }
 
     func observePinnedMessages(dialogId: String) {
+        print("the observePinnedMessages isss: \(dialogId)")
+
         let msg = Database.database().reference().child("Dialogs").child(dialogId).child("pinned")
 
         msg.observe(.childAdded, with: { snapAdded in
@@ -1146,8 +1160,8 @@ struct topGroupHeaderView: View {
                                     .indicator(.activity)
                                     .transition(.fade(duration: 0.15))
                                     .scaledToFill()
-                                    .clipShape(Circle())
                                     .frame(width: self.groupOccUserAvatar.count > 2 ? 50 : self.groupOccUserAvatar.count > 1 ? 70 : 100, height: self.groupOccUserAvatar.count > 2 ? 50 : self.groupOccUserAvatar.count > 1 ? 70 : 100, alignment: .center)
+                                    .clipShape(Circle())
                                     
                             }.offset(x: self.groupOccUserAvatar.count >= 3 ? (id == 0 ? 0 : (id == 1 ? -23 : (id == 2 ? 23 : 0))) : self.groupOccUserAvatar.count == 1 ? 0 : (id == 0 ? -23 : 20), y: self.groupOccUserAvatar.count >= 3 ? (id == 0 ? -15 : (id == 1 ? 23 : (id == 2 ? 23 : 0))) : 0)
                             .zIndex(id == 0 ? 1 : 0)
