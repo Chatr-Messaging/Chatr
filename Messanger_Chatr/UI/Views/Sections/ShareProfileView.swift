@@ -167,7 +167,7 @@ struct ShareProfileView: View {
                                  Image("snapchatIcon")
                                      .resizable()
                                      .scaledToFit()
-                                     .frame(width: 24, height: 24, alignment: .center)
+                                     .frame(width: 28, height: 26, alignment: .center)
                                      .foregroundColor(.white)
 
                                  Text("Snapchat")
@@ -190,7 +190,7 @@ struct ShareProfileView: View {
                                  Image("instagramIcon_black")
                                      .resizable()
                                      .scaledToFit()
-                                     .frame(width: 22, height: 22, alignment: .center)
+                                     .frame(width: 26, height: 26, alignment: .center)
                                      .foregroundColor(.white)
                                  
                                  Text("Instagram")
@@ -211,7 +211,7 @@ struct ShareProfileView: View {
                                  Image(systemName: "qrcode.viewfinder")
                                      .resizable()
                                      .scaledToFit()
-                                     .frame(width: 22, height: 22, alignment: .center)
+                                     .frame(width: 26, height: 26, alignment: .center)
                                      .foregroundColor(.white)
 
                                  Text("Scan QR")

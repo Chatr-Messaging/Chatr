@@ -69,7 +69,7 @@ struct DialogContactCell: View {
                                         .font(.system(size: 20))
                                         .fontWeight(.bold)
                                         .foregroundColor(.secondary)
-                                }
+                                }.shadow(color: Color.black.opacity(0.18), radius: 6, x: 0, y: 4)
                             }
                             
                             if self.contact.quickSnaps.count > 0 {

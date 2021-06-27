@@ -76,6 +76,7 @@ struct DialogCell: View {
                             RoundedRectangle(cornerRadius: self.dialogModel.dialogType == "public" ? 12.5 : 27.5)
                                 .frame(width: 55, height: 55, alignment: .center)
                                 .foregroundColor(Color("bgColor"))
+                                .shadow(color: Color.black.opacity(0.23), radius: 7, x: 0, y: 5)
                                 .offset(x: self.dialogModel.dialogType == "public" ? -7.5 : -5)
 
                             Text("".firstLeters(text: self.dialogModel.dialogType == "public" ? self.dialogModel.fullName : self.privateDialogContact.id != 0 ? self.privateDialogContact.fullName : "??"))

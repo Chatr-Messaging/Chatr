@@ -35,6 +35,7 @@ struct ContactCell: View {
                     Circle()
                         .frame(width: 45, height: 45, alignment: .center)
                         .foregroundColor(Color("bgColor"))
+                        .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 5)
 
                     Text("".firstLeters(text: self.user.fullName ?? "No Name"))
                         .font(.system(size: 22))

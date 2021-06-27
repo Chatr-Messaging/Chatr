@@ -56,7 +56,7 @@ struct KeyboardCardView: View {
 
     var body: some View {
         VStack(alignment: .center, spacing: 0) {
-            if UserDefaults.standard.bool(forKey: "disabledMessaging") {
+            if UserDefaults.standard.bool(forKey: "disabledMessaging") && UserDefaults.standard.string(forKey: "visitingDialogId") ?? "" == "" {
                 HStack(spacing: 5) {
                     Button(action: {
                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
@@ -672,10 +672,26 @@ struct KeyboardCardView: View {
             } else {
                 Button(action: {
                     print("join ehhh")
-                    withAnimation {
-                        self.isVisiting = ""
+                    Request.subscribeToPublicDialog(withID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "", successBlock: { dialogz in
+                        changeDialogRealmData.shared.toggleFirebaseMemberCount(dialogId: dialogz.id ?? "", isJoining: true, totalCount: Int(dialogz.occupantsCount), onSuccess: { _ in
+                            changeDialogRealmData.shared.insertDialogs([dialogz], completion: {
+                                changeDialogRealmData.shared.updateDialogDelete(isDelete: false, dialogID: dialogz.id ?? "")
+                                changeDialogRealmData.shared.addPublicMemberCountRealmDialog(count: Int(dialogz.occupantsCount), dialogId: dialogz.id ?? "")
+                                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                withAnimation {
+                                    self.isVisiting = ""
+                                }
+                                UserDefaults.standard.set("", forKey: "visitingDialogId")
+                                self.auth.notificationtext = "Successfully joined channel"
+                                NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+                            })
+                        }, onError: { err in
+                            print("there is an error visiting the member count: \(String(describing: err))")
+                            UINotificationFeedbackGenerator().notificationOccurred(.error)
+                        })
+                    }) { (error) in
+                        UINotificationFeedbackGenerator().notificationOccurred(.error)
                     }
-                    UserDefaults.standard.set("", forKey: "visitingDialogId")
                 }, label: {
                     Text("Join Channel")
                         .font(.subheadline)

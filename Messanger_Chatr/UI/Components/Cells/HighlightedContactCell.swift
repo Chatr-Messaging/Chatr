@@ -36,6 +36,7 @@ struct HighlightedContactCell: View {
                             Circle()
                                 .frame(width: 35, height: 35, alignment: .center)
                                 .foregroundColor(Color("bgColor"))
+                                .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 5)
 
                             Text("".firstLeters(text: contact.fullName))
                                 .font(.system(size: 14))

@@ -47,6 +47,7 @@ struct QuickSnapCell: View {
                         Circle()
                             .frame(width: Constants.quickSnapBtnSize, height: Constants.quickSnapBtnSize, alignment: .center)
                             .foregroundColor(Color("emptyProfileBG_0"))
+                            .shadow(color: Color.black.opacity(0.25), radius: 6, x: 0, y: 6)
 
                         Text("".firstLeters(text: quickSnap.fullName))
                             .font(.system(size: 28))
