@@ -46,7 +46,7 @@ struct ProfileView: View {
                         
                         HStack {
                             if self.auth.isUserAuthenticated == .signedIn {
-                                if let avitarURL = self.profile.results.first?.avatar {
+                                if let avitarURL = self.profile.results.first?.avatar, avitarURL != "" {
                                     WebImage(url: URL(string: avitarURL))
                                         .resizable()
                                         .placeholder{ Image("empty-profile").resizable().frame(width: 55, height: 55, alignment: .center).scaledToFill() }
@@ -56,7 +56,20 @@ struct ProfileView: View {
                                         .frame(width: 55, height: 55, alignment: .center)
                                         .clipShape(Circle())
                                         .padding(.vertical, 10)
-                                        .shadow(color: Color("buttonShadow"), radius: 8, x: 0, y: 5)
+                                        .shadow(color: Color("buttonShadow"), radius: 8, x: 0, y: 2.5)
+                                } else {
+                                    ZStack {
+                                        Circle()
+                                            .frame(width: 55, height: 55, alignment: .center)
+                                            .padding(.vertical, 10)
+                                            .foregroundColor(Color("bgColor"))
+                                            .shadow(color: Color("buttonShadow"), radius: 8, x: 0, y: 5)
+
+                                        Text("".firstLeters(text: self.auth.profile.results.first?.fullName ?? "?"))
+                                            .font(.system(size: 24))
+                                            .fontWeight(.semibold)
+                                            .foregroundColor(.primary)
+                                    }
                                 }
                             }
                             

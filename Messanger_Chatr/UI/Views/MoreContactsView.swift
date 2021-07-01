@@ -30,7 +30,7 @@ struct MoreContactsView: View {
             ScrollView(.vertical, showsIndicators: true) {
                 VStack(spacing: 5) {
                     HStack(alignment: .bottom) {
-                        Text("\(self.dialogModel.occupentsID.count) TOTAL MEMBERS:")
+                        Text("\(self.dialogModel.occupentsID.count + 1) TOTAL MEMBERS:")
                             .font(.caption)
                             .fontWeight(.regular)
                             .foregroundColor(.secondary)

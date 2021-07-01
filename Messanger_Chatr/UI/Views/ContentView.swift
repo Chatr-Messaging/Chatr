@@ -493,10 +493,10 @@ struct mainHomeList: View {
                                 disableDialog = false
                             }
                         }
-                        .onAppear {
-                            UserDefaults.standard.set(false, forKey: "localOpen")
-                            self.isLocalOpen = false
-                        }
+//                        .onAppear {
+//                            UserDefaults.standard.set(false, forKey: "localOpen")
+//                            self.isLocalOpen = false
+//                        }
                         
                         if self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.count >= 3 {
                             FooterInformation()

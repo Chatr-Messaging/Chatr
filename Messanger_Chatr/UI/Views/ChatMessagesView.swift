@@ -360,23 +360,23 @@ struct ChatMessagesView: View {
                     print("the dialog id is: \(dialogID)")
                     self.maxMessageCount = self.currentMessages.count
                     self.delayViewMessages = true
+                    self.scrollPage += 1
                     viewModel.loadDialog(auth: auth, dialogId: dialogID, completion: {
                         print("done loading dialogggg: \(dialogID) && \(self.viewModel.totalMessageCount) && \(currentMessages.count) &&& \(self.viewModel.unreadMessageCount)")
                         self.maxMessageCount = self.viewModel.totalMessageCount
                         if (self.viewModel.totalMessageCount > self.currentMessages.count && self.viewModel.unreadMessageCount != 0) || self.currentMessages.count == 0 {
                             print("local and pulled do not match... pulling delta: \(self.viewModel.totalMessageCount) && \(self.currentMessages.count)")
-                            changeMessageRealmData.shared.getMessageUpdates(dialogID: dialogID, limit: pageShowCount * (self.scrollPage + 1), skip: currentMessages.count - self.minPagination, completion: { done in
+                            changeMessageRealmData.shared.getMessageUpdates(dialogID: dialogID, limit: pageShowCount * (self.scrollPage), skip: currentMessages.count - self.minPagination, completion: { done in
                                 DispatchQueue.main.async {
-                                    self.scrollPage += 1
                                     
                                     print("STARTTT Load more From Empty view the load limit: \(pageShowCount * (self.scrollPage + 1)) and the skip:\(currentMessages.count - self.minPagination)...... the indexes are \(self.maxPagination).....< \(self.minPagination) anddddd nowww the scroll to index is: \(self.maxPagination + 1)")
                                 }
                             })
                         } else {
                             DispatchQueue.main.async {
-                                self.scrollPage += 1
+                                //self.scrollPage += 1
                                 
-                                print("STARTTT From Empty view the load limit: \(pageShowCount * (self.scrollPage + 1)) and the skip:\(currentMessages.count - self.minPagination).....\(self.maxMessageCount). the indexes are \(self.maxPagination).....< \(self.minPagination) anddddd nowww the scroll to index is: \(self.maxPagination + 1)")
+                                print("STARTTT From Empty view the load limit: \(pageShowCount * (self.scrollPage)) and the skip:\(currentMessages.count - self.minPagination).....\(self.maxMessageCount). the indexes are \(self.maxPagination).....< \(self.minPagination) anddddd nowww the scroll to index is: \(self.maxPagination + 1)")
                             }
                         }
 

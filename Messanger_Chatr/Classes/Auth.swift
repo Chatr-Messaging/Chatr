@@ -377,7 +377,7 @@ class AuthModel: NSObject, ObservableObject {
         let image = image
         let data = image.jpegData(compressionQuality: 0.5)
         
-        Request.uploadFile(with: data!, fileName: "user's_profileImg", contentType: "image/jpeg", isPublic: true, progressBlock: { (progress) in
+        Request.uploadFile(with: data!, fileName: "user's_profileImg" + Date().localString(), contentType: "image/jpeg", isPublic: true, progressBlock: { (progress) in
             print("the upload progress is: \(progress)")
             self.avatarProgress = CGFloat(progress)
         }, successBlock: { (blob) in

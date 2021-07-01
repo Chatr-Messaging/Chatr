@@ -88,13 +88,7 @@ class changeDialogRealmData {
         let extRequest : [String: String] = ["sort_desc" : "lastMessageDate"]
 
         Request.dialogs(with: Paginator.limit(100, skip: 0), extendedRequest: extRequest, successBlock: { (dialogs, usersIDs, paginator) in
-            if dialogs.count > 0 {
-                self.insertDialogs(dialogs) {
-                    DispatchQueue.main.async {
-                        completion(true)
-                    }
-                }
-            } else {
+            self.insertDialogs(dialogs) {
                 let config = Realm.Configuration(schemaVersion: 1)
                 do {
                     let realm = try! Realm(configuration: config)
@@ -102,12 +96,19 @@ class changeDialogRealmData {
 
                     try! realm.safeWrite {
                         for dia in realmDialogs {
-                            dia.isDeleted = true
-                            realm.add(dia, update: .all)
+                            if !dialogs.contains(where: { $0.id == dia.id }) {
+                                dia.isDeleted = true
+                                realm.add(dia, update: .all)
+                            }
+                        }
+
+                        DispatchQueue.main.async {
+                            completion(true)
                         }
                     }
                 }
             }
+
         }) { (error) in
             print("Error in fetching dialogs... error: \(error.localizedDescription)")
             DispatchQueue.main.async {
@@ -469,6 +470,23 @@ class changeDialogRealmData {
             print(error.localizedDescription)
         }
     }
+    
+    func updateDialogMembersType(canType: Bool, dialogID: String) {
+        let config = Realm.Configuration(schemaVersion: 1)
+        do {
+            let realm = try Realm(configuration: config)
+            try? realm.safeWrite({
+                if let dialogResult = realm.object(ofType: DialogStruct.self, forPrimaryKey: dialogID) {
+                    dialogResult.canMembersType = canType
+                    
+                    realm.add(dialogResult, update: .all)
+                    print("Successfully updated or adjusted Dialog! \(String(describing: dialogResult.canMembersType))")
+                }
+            })
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
 
     func updateDialogDelete(isDelete: Bool, dialogID: String) {
         let config = Realm.Configuration(schemaVersion: 1)
@@ -569,6 +587,7 @@ class changeDialogRealmData {
                 changeDialogRealmData.shared.removeFirebaseAdmin(dialogId: dialogID, adminId: NSNumber(value: UserDefaults.standard.integer(forKey: "currentUserID")), onSuccess: { _ in }, onError: { _ in })
             }, onError: { err in
                 print("error deleting public: \(String(describing: err)) for dialog: \(dialogID)")
+                self.updateDialogDelete(isDelete: true, dialogID: dialogID)
             })
         }) { (error) in
             print("error deleting dialog: \(error.localizedDescription) for dialog: \(dialogID)")

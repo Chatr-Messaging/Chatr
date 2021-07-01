@@ -217,7 +217,7 @@ struct VisitGroupChannelView: View {
                             }
                         }
 
-                        ForEach(self.dialogModelMembers.indices, id: \.self) { id in
+                        ForEach(self.dialogModelMembers.sorted(by: { $0 > $1 }).indices, id: \.self) { id in
                             VStack(alignment: .trailing, spacing: 0) {
                                 if id <= 3 {
                                     DialogContactCell(showAlert: self.$showAlert, notiType: self.$notiType, notiText: self.$notiText, dismissView: self.$dismissView, openNewDialogID: self.$openNewDialogID, showProfile: self.$showProfile, contactID: Int(self.dialogModelMembers[id]), isAdmin: self.dialogModel.adminID.contains(self.dialogModelMembers[id]), isOwner: self.dialogModel.owner == self.dialogModelMembers[id], currentUserIsPowerful: self.$currentUserIsPowerful, isLast: id == 3 || self.dialogModelMembers.last == self.dialogModelMembers[id] , isRemoving: self.$isRemoving, isPublic: self.dialogModel.dialogType == "public")

@@ -594,7 +594,7 @@ struct BubbleDetailView: View {
                             }.offset(y: -4)
                         }
                     )
-            }.frame(maxWidth: .infinity)
+            }//.frame(maxWidth: .infinity)
             .offset(y: -self.keyboardChange)
             .padding(.bottom, UIDevice.current.hasNotch ? 50 : 30)
             //.padding(.bottom, self.keyboardChange != 0 ? (self.keyboardChange - (UIDevice.current.hasNotch ? 50 : 30)) : (UIDevice.current.hasNotch ? 50 : 30))

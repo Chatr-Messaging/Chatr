@@ -51,7 +51,7 @@ struct ContactsView: View {
                                 HStack {
                                     if self.auth.isUserAuthenticated == .signedIn {
                                         ZStack {
-                                            if let avitarURL = ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.avatar {
+                                            if let avitarURL = ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.avatar, avitarURL != "" {
                                                 WebImage(url: URL(string: avitarURL))
                                                     .resizable()
                                                     .placeholder{ Image("empty-profile").resizable().frame(width: 55, height: 55, alignment: .center).scaledToFill() }
@@ -62,7 +62,20 @@ struct ContactsView: View {
                                                     .clipShape(Circle())
                                                     .padding(.leading, 10)
                                                     .shadow(color: Color("buttonShadow"), radius: 8, x: 0, y: 5)
+                                            } else {
+                                                ZStack {
+                                                    Circle()
+                                                        .frame(width: 55, height: 55, alignment: .center)
+                                                        .foregroundColor(Color("bgColor"))
+                                                        .shadow(color: Color("buttonShadow"), radius: 8, x: 0, y: 5)
+
+                                                    Text("".firstLeters(text: self.auth.profile.results.first?.fullName ?? "?"))
+                                                        .font(.system(size: 24))
+                                                        .fontWeight(.semibold)
+                                                        .foregroundColor(.primary)
+                                                }.padding(.leading, 10)
                                             }
+
                                             ZStack(alignment: .center) {
                                                 HStack {
                                                     Text("\((self.auth.profile.results.first?.contactRequests.count ?? 0))")

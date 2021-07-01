@@ -169,7 +169,7 @@ struct PublicShareSection: View {
                    
                    let message = ChatMessage.markable()
                    message.markable = true
-                    message.text = "Shared channel \(self.dialogModel.fullName)"
+                    message.text = "Shared channel \(dialog.name ?? "no name")"
                    message.attachments = [attachment]
                    
                    dialog.send(message) { (error) in

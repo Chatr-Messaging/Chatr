@@ -40,8 +40,8 @@ struct ImagePicker: UIViewControllerRepresentable {
 
             switch mediaType {
             case kUTTypeImage:
-                print("Selected media is image")
                 image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage
+                print("Selected media is image \(image)")
 
             case kUTTypeMovie:
                 let videoUrl = info[UIImagePickerController.InfoKey.mediaURL] as! URL
@@ -64,12 +64,13 @@ struct ImagePicker: UIViewControllerRepresentable {
 
     func makeUIViewController(context: UIViewControllerRepresentableContext<ImagePicker>) -> UIImagePickerController {
         let picker = UIImagePickerController()
-        if !self.imageOnly {
+        //if !self.imageOnly {
             picker.sourceType = .photoLibrary
             picker.mediaTypes = UIImagePickerController.availableMediaTypes(for: .photoLibrary) ?? []
-        }
-        picker.allowsEditing = imageOnly
+        //}
+        //picker.allowsEditing = imageOnly
         picker.delegate = context.coordinator
+
         return picker
     }
 

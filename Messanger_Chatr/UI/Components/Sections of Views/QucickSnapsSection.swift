@@ -90,7 +90,7 @@ struct QuickSnapsSection: View {
                             changeContactsRealmData.shared.updateContacts(contactList: Chat.instance.contactList?.contacts ?? [], completion: { _ in
                                 print("done refreshing quick snap contacts!... just in case")
                             })
-                            print("empty quick snaps so try to refresh to dubble check: \(self.emptyQuickSnaps)")
+                            print("empty quick snaps so try to refresh to double check: \(self.emptyQuickSnaps)")
                         }
                     }
 //                Button(action: {

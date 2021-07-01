@@ -202,22 +202,36 @@ struct DialogCell: View {
                         .foregroundColor(.gray)
                         .fixedSize(horizontal: false, vertical: true)
 
-                    if let dialog = self.auth.selectedConnectyDialog, self.isOpen && (self.dialogModel.dialogType == "group" || self.dialogModel.dialogType == "public") {
-                        Text(self.isJoining ? "joining chat..." : (self.dialogModel.onlineUserCount > 1 ? "\(self.dialogModel.onlineUserCount) online" : ""))
-                            .font(.footnote)
-                            .fontWeight(.regular)
-                            .lineLimit(1)
-                            .multilineTextAlignment(.leading)
-                            .offset(x: -4, y: -4)
-                            .foregroundColor(!self.isJoining && self.dialogModel.onlineUserCount > 0 ? .green : .gray)
-                            .onChange(of: dialog.isJoined(), perform: { value in
-                                self.isJoining = !value
-                            })
+                    if let dialog = self.auth.selectedConnectyDialog, dialog.id != "", self.isOpen && (self.dialogModel.dialogType == "group" || self.dialogModel.dialogType == "public") && Chat.instance.isConnected {
+                        if self.isJoining {
+                            Text("joining chat...")
+                                .font(.footnote)
+                                .fontWeight(.regular)
+                                .lineLimit(1)
+                                .multilineTextAlignment(.leading)
+                                .offset(x: -4, y: -4)
+                                .foregroundColor(.gray)
+                        } else if self.dialogModel.onlineUserCount > 1 {
+                            Text("\(self.dialogModel.onlineUserCount) online")
+                                .font(.footnote)
+                                .fontWeight(.regular)
+                                .lineLimit(1)
+                                .multilineTextAlignment(.leading)
+                                .offset(x: -4, y: -4)
+                                .foregroundColor(.green)
+                        }
+
+                        Text(" ")
                             .onAppear() {
-                                dialog.join(completionBlock: { _ in
+                                self.isJoining = true
+                                dialog.join(completionBlock: { val in
+                                    print("done join dia logggg: \(val) && \(!dialog.isJoined())")
                                     self.isJoining = !dialog.isJoined()
                                 })
                             }
+                            .onChange(of: dialog.isJoined(), perform: { value in
+                                self.isJoining = !value
+                            })
                     }
                 }
             }.onTapGesture {

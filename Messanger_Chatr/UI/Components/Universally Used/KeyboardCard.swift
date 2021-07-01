@@ -14,6 +14,7 @@ import RealmSwift
 import ConnectyCube
 import SDWebImageSwiftUI
 import AVKit
+import Firebase
 
 struct KeyboardCardView: View {
     @EnvironmentObject var auth: AuthModel
@@ -725,16 +726,20 @@ struct KeyboardCardView: View {
         .onChange(of: UserDefaults.standard.bool(forKey: "localOpen"), perform: { value in
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 if value {
+                    observePublicMembersType()
                     if let typedText = UserDefaults.standard.string(forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText") {
                         self.mainText = typedText
                     } else { self.mainText = "" }
                 } else {
                     UserDefaults.standard.setValue(self.mainText, forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText")
+                    UserDefaults.standard.set(false, forKey: "disabledMessaging")
                     self.mainText = ""
                 }
             }
         })
         .onAppear() {
+            UserDefaults.standard.set(false, forKey: "disabledMessaging")
+            observePublicMembersType()
             keyboard.observe { (event) in
                 switch event.type {
                 case .willShow:
@@ -767,6 +772,25 @@ struct KeyboardCardView: View {
 
         return formatter.string(from: second) ?? "0:00"
     }
+    
+    func observePublicMembersType() {
+        guard let selectedDialog = self.auth.dialogs.results.filter("id == %@", UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").first, selectedDialog.dialogType == "public", !selectedDialog.adminID.contains(where: { $0 == UserDefaults.standard.integer(forKey: "currentUserID") }), selectedDialog.owner != UserDefaults.standard.integer(forKey: "currentUserID") else {
+            changeDialogRealmData.shared.updateDialogMembersType(canType: false, dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "")
+            UserDefaults.standard.set(false, forKey: "disabledMessaging")
+
+            return
+        }
+        
+        let dia = Database.database().reference().child("Marketplace/public_dialogs").child(selectedDialog.id)
+        
+        dia.observeSingleEvent(of: .value, with: { (snapshot: DataSnapshot) in
+            if let dict = snapshot.value as? [String: Any] {
+                changeDialogRealmData.shared.updateDialogMembersType(canType: dict["canMembersType"] as? Bool ?? false, dialogID: selectedDialog.id)
+                UserDefaults.standard.set(!(dict["canMembersType"] as? Bool ?? false), forKey: "disabledMessaging")
+            }
+        })
+    }
+        
 }
 
 //MARK: Message Text Field

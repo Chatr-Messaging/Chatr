@@ -17,7 +17,7 @@ struct ProfileImage: View {
 
     var body: some View {
         ZStack {
-            if let avatarURL = self.auth.profile.results.first?.avatar {
+            if let avatarURL = self.auth.profile.results.first?.avatar, avatarURL != "" {
                 WebImage(url: URL(string: avatarURL))
                     .resizable()
                     .placeholder{ Image("empty-profile").resizable().frame(width: size, height: size, alignment: .center).scaledToFill() }
@@ -27,6 +27,18 @@ struct ProfileImage: View {
                     .frame(width: size, height: size, alignment: .center)
                     .clipShape(Circle())
                     .shadow(color: Color("buttonShadow_Deeper"), radius: 10, x: 0, y: 8)
+            } else {
+                ZStack {
+                    Circle()
+                        .frame(width: size, height: size, alignment: .center)
+                        .foregroundColor(Color("bgColor"))
+                        .shadow(color: Color("buttonShadow_Deeper"), radius: 10, x: 0, y: 4)
+
+                    Text("".firstLeters(text: self.auth.profile.results.first?.fullName ?? "?"))
+                        .font(.system(size: 24))
+                        .fontWeight(.semibold)
+                        .foregroundColor(.primary)
+                }
             }
             
             ZStack(alignment: .center) {

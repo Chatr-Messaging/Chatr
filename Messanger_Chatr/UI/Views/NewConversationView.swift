@@ -423,7 +423,10 @@ struct NewConversationView: View {
                     }
                     Request.createDialog(dialog, successBlock: { (dialog) in
                         changeDialogRealmData.shared.fetchDialogs(completion: { _ in
-                            self.auth.sendPushNoti(userIDs: occu, title: "Created New Group", message: "\(self.auth.profile.results.first?.fullName ?? "Chatr User") created a new group chat with you included")
+                            let title = dialog.type == .private ? "New Chat" : "New Group Chat"
+                            let msg = dialog.type == .private ? "started a new chat with you" : "started a new group chat with you"
+
+                            self.auth.sendPushNoti(userIDs: occu, title: title, message: "\(self.auth.profile.results.first?.fullName ?? "Chatr User") " + msg)
                             self.selectedContact.removeAll()
                             self.newDialogID = dialog.id?.description ?? ""
                             UserDefaults.standard.set(self.newDialogID, forKey: "selectedDialogID")
