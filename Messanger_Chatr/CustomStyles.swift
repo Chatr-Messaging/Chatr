@@ -36,12 +36,9 @@ struct MainButtonStyleDeselected: ButtonStyle {
         configuration.label
             .frame(minWidth: 40, maxWidth: Constants.screenWidth, minHeight: 55, maxHeight: 55)
             .foregroundColor(Color("disabledButton"))
-            .background(configuration.isPressed ? Color.secondary : Color(.clear))
+            .background(Color("bgColor_light"))
             .cornerRadius(15)
-            .overlay(
-                 RoundedRectangle(cornerRadius: 15)
-                    .stroke(Color("disabledButton").opacity(0.4), lineWidth: 1)
-             )
+            .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
     }
 }
 

@@ -803,7 +803,6 @@ struct PhoneNumberView: View {
                         .frame(width: 160)
                         .offset(x: -10)
                         .padding(.trailing)
-                        .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
                     }
                 }
             } else {
