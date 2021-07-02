@@ -33,6 +33,7 @@ struct DiscoverView: View {
     @State var showMoreRecentDialogs: Bool = false
     @State var isDataLoading: Bool = true
     @State var isShowingWelcome: Bool = false
+    @State var isLoading: Bool = false
     @State var style = StaggeredGridStyle(.horizontal, tracks: .fixed(35), spacing: 8)
 
     var body: some View {
@@ -140,207 +141,230 @@ struct DiscoverView: View {
                     .padding(.vertical, 40)
                 }
 
-                //MARK: Tag Section
-                ScrollView(.horizontal, showsIndicators: false) {
-                    Grid(self.dialogTags.sorted(by: { $0.title < $1.title }).indices, id: \.self) { item in
-                        ZStack {
-                            NavigationLink(destination: self.moreDetails(tagId: self.dialogTags[item].title, viewState: .tags).edgesIgnoringSafeArea(.all), tag: Int(item), selection: self.$tagSelection) {
-                                EmptyView()
+                if self.recentDialogsData.isEmpty && self.dialogTags.isEmpty && self.bannerDataArray.isEmpty && self.topDialogsData.isEmpty {
+                    VStack(alignment: .center, spacing: 12) {
+                        Circle()
+                            .trim(from: 0, to: 0.8)
+                            .stroke(Color.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                            .frame(width: 25, height: 25)
+                            .rotationEffect(.init(degrees: self.isLoading ? 360 : 0))
+                            .animation(Animation.linear(duration: 0.8).repeatForever(autoreverses: false))
+                            .padding(.horizontal, 45)
+                            .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 0)
+                            .onAppear() {
+                                self.isLoading.toggle()
                             }
-
-                            Button(action: {
-                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                self.tagSelection = Int(item)
-                            }, label: {
-                                Text("#" + "\(self.dialogTags[item].title)")
-                                    .fontWeight(.medium)
-                                    .padding(.vertical, 7.5)
-                                    .padding(.horizontal)
-                                    .foregroundColor(self.dialogTags[item].selected ? Color.black : Color.primary)
-                                    .background(RoundedRectangle(cornerRadius: 10).stroke(Color.primary.opacity(0.45), lineWidth: 1).background(Color("buttonColor")).cornerRadius(10))
-                                    .lineLimit(1)
-                                    .fixedSize()
-                            }).buttonStyle(ClickButtonStyle())
-                        }
-                    }.padding(.horizontal)
-                    .frame(height: 85)
-                }.gridStyle(self.style)
-                .padding(.vertical, 5)
-                
-                //MARK: Featured Section
-                if self.bannerDataArray.count > 0 {
-                    VStack {
-                        HStack {
-                            Text("FEATURED:")
-                                .font(.caption)
-                                .fontWeight(.regular)
-                                .foregroundColor(.secondary)
-                                .padding(.horizontal, 40)
-                            Spacer()
-                        }
-                        .padding(.bottom, 2)
-
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 0) {
-                                ForEach(self.bannerDataArray.indices, id: \.self) { index in
-                                    DiscoverFeaturedCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, dialogModel: self.bannerDataArray[index])
-                                        .environmentObject(self.auth)
-                                        .frame(width: Constants.screenWidth * 0.68)
-                                        .id(self.bannerDataArray[index].id)
-                                        .animation(.interactiveSpring())
+                        
+                        Text("loading...")
+                            .font(.caption)
+                            .fontWeight(.none)
+                            .foregroundColor(.primary)
+                            .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 0)
+                            .offset(x: 5)
+                    }.padding(.vertical, 80)
+                } else {
+                    //MARK: Tag Section
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        Grid(self.dialogTags.sorted(by: { $0.title < $1.title }).indices, id: \.self) { item in
+                            ZStack {
+                                NavigationLink(destination: self.moreDetails(tagId: self.dialogTags[item].title, viewState: .tags).edgesIgnoringSafeArea(.all), tag: Int(item), selection: self.$tagSelection) {
+                                    EmptyView()
                                 }
-                            }.animation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0))
-                        }.frame(height: 340)
-                        .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
-                    }
-                }
 
-                //MARK: Popular Section
-                if self.topDialogsData.count > 0 {
-                    VStack {
-                        HStack(alignment: .bottom) {
-                            Text("Popular")
-                                .font(.system(size: 30))
-                                .fontWeight(.bold)
-                                .foregroundColor(.primary)
-                                
-                            Spacer()
-                            Button(action: {
-                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                self.showMoreTopDialogs.toggle()
-                            }, label: {
-                                Text("see all")
-                                    .foregroundColor(.blue)
-                            }).opacity(self.topDialogsData.count > 5 ? 1 : 0)
-                        }.padding(.horizontal, 30)
-                        .padding(.top, 35)
-                        .padding(.bottom, 10)
+                                Button(action: {
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                    self.tagSelection = Int(item)
+                                }, label: {
+                                    Text("#" + "\(self.dialogTags[item].title)")
+                                        .fontWeight(.medium)
+                                        .padding(.vertical, 7.5)
+                                        .padding(.horizontal)
+                                        .foregroundColor(self.dialogTags[item].selected ? Color.black : Color.primary)
+                                        .background(RoundedRectangle(cornerRadius: 10).stroke(Color.primary.opacity(0.45), lineWidth: 1).background(Color("buttonColor")).cornerRadius(10))
+                                        .lineLimit(1)
+                                        .fixedSize()
+                                }).buttonStyle(ClickButtonStyle())
+                            }
+                        }.padding(.horizontal)
+                        .frame(height: 85)
+                    }.gridStyle(self.style)
+                    .padding(.vertical, 5)
+                    
+                    //MARK: Featured Section
+                    if self.bannerDataArray.count > 0 {
+                        VStack {
+                            HStack {
+                                Text("FEATURED:")
+                                    .font(.caption)
+                                    .fontWeight(.regular)
+                                    .foregroundColor(.secondary)
+                                    .padding(.horizontal, 40)
+                                Spacer()
+                            }
+                            .padding(.bottom, 2)
 
-                        self.styleBuilder(content: {
-                            ForEach(self.topDialogsData.indices, id: \.self) { id in
-                                VStack(alignment: .trailing, spacing: 0) {
-                                    if id <= 4 {
-                                        PublicDialogDiscoverCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, dialogData: self.topDialogsData[id], isLast: id == 4)
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 0) {
+                                    ForEach(self.bannerDataArray.indices, id: \.self) { index in
+                                        DiscoverFeaturedCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, dialogModel: self.bannerDataArray[index])
                                             .environmentObject(self.auth)
-                                            .id(self.topDialogsData[id].id)
+                                            .frame(width: Constants.screenWidth * 0.68)
+                                            .id(self.bannerDataArray[index].id)
+                                            .animation(.interactiveSpring())
                                     }
-                                    
-                                    if self.topDialogsData.count > 5 && id == 4 {
-                                        NavigationLink(destination: self.moreDetails(tagId: nil, viewState: .popular), isActive: $showMoreTopDialogs) {
-                                            VStack(alignment: .trailing, spacing: 0) {
-                                                Divider()
-                                                    .frame(width: Constants.screenWidth - 80)
-                                                    .offset(x: 20)
-                                                
-                                                HStack {
-                                                    Image(systemName: "ellipsis.circle")
-                                                        .resizable()
-                                                        .scaledToFit()
-                                                        .frame(width: 20, height: 20, alignment: .center)
-                                                        .foregroundColor(Color("SoftTextColor"))
-                                                        .padding(.leading, 10)
-                                                    
-                                                    Text("more...")
-                                                        .font(.subheadline)
-                                                        .foregroundColor(Color.blue)
-                                                        .padding(.horizontal)
-                                                    
-                                                    Spacer()
-                                                    Image(systemName: "chevron.right")
-                                                        .resizable()
-                                                        .font(Font.title.weight(.bold))
-                                                        .scaledToFit()
-                                                        .frame(width: 7, height: 15, alignment: .center)
-                                                        .foregroundColor(.secondary)
-                                                }.padding(.horizontal)
-                                                .padding(.top, 10)
-                                                .padding(.bottom, 15)
-                                                .contentShape(Rectangle())
-                                            }
-                                        }.buttonStyle(changeBGButtonStyle())
-                                        .simultaneousGesture(TapGesture()
-                                            .onEnded { _ in
-                                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                            })
-                                    }
-                                }
-                            }
-                        })
+                                }.animation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0))
+                            }.frame(height: 340)
+                            .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
+                        }
                     }
-                }
-                
-                //MARK: Recent Section
-                if self.recentDialogsData.count > 0 {
-                    VStack {
-                        HStack(alignment: .bottom) {
-                            Text("Newest")
-                                .font(.system(size: 30))
-                                .fontWeight(.bold)
-                                .foregroundColor(.primary)
 
-                            Spacer()
-                            Button(action: {
-                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                self.showMoreRecentDialogs.toggle()
-                            }, label: {
-                                Text("see all")
-                                    .foregroundColor(.blue)
-                            }).opacity(self.recentDialogsData.count > 5 ? 1 : 0)
-                        }.padding(.horizontal, 30)
-                        .padding(.top, 35)
-                        .padding(.bottom, 10)
-
-                        self.styleBuilder(content: {
-                            ForEach(self.recentDialogsData.indices, id: \.self) { id in
-                                VStack(alignment: .trailing, spacing: 0) {
-                                    if id <= 4 {
-                                     //Public dialog cell
-                                        PublicDialogDiscoverCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, dialogData: self.recentDialogsData[id], isLast: id == 4 || self.recentDialogsData[id].id == self.recentDialogsData.last?.id)
-                                            .environmentObject(self.auth)
-                                            .id(self.recentDialogsData[id].id)
-                                    }
+                    //MARK: Popular Section
+                    if self.topDialogsData.count > 0 {
+                        VStack {
+                            HStack(alignment: .center) {
+                                Text("Popular")
+                                    .font(.system(size: 30))
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.primary)
                                     
-                                    if self.recentDialogsData.count > 5 && id == 4 {
-                                        NavigationLink(destination: self.moreDetails(tagId: nil, viewState: .newest), isActive: $showMoreRecentDialogs) {
-                                            VStack(alignment: .trailing, spacing: 0) {
-                                                Divider()
-                                                    .frame(width: Constants.screenWidth - 80)
-                                                    .offset(x: 20)
-                                                
-                                                HStack {
-                                                    Image(systemName: "ellipsis.circle")
-                                                        .resizable()
-                                                        .scaledToFit()
-                                                        .frame(width: 20, height: 20, alignment: .center)
-                                                        .foregroundColor(Color("SoftTextColor"))
-                                                        .padding(.leading, 10)
+                                Spacer()
+                                Button(action: {
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                    self.showMoreTopDialogs.toggle()
+                                }, label: {
+                                    Text("see all")
+                                        .foregroundColor(.blue)
+                                }).opacity(self.topDialogsData.count > 5 ? 1 : 0)
+                            }.padding(.horizontal, 30)
+                            .padding(.top, 35)
+                            .padding(.bottom, 10)
+
+                            self.styleBuilder(content: {
+                                ForEach(self.topDialogsData.indices, id: \.self) { id in
+                                    VStack(alignment: .trailing, spacing: 0) {
+                                        if id <= 4 {
+                                            PublicDialogDiscoverCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, dialogData: self.topDialogsData[id], isLast: id == 4)
+                                                .environmentObject(self.auth)
+                                                .id(self.topDialogsData[id].id)
+                                        }
+                                        
+                                        if self.topDialogsData.count > 5 && id == 4 {
+                                            NavigationLink(destination: self.moreDetails(tagId: nil, viewState: .popular), isActive: $showMoreTopDialogs) {
+                                                VStack(alignment: .trailing, spacing: 0) {
+                                                    Divider()
+                                                        .frame(width: Constants.screenWidth - 80)
+                                                        .offset(x: 20)
                                                     
-                                                    Text("more...")
-                                                        .font(.subheadline)
-                                                        .foregroundColor(Color.blue)
-                                                        .padding(.horizontal)
-                                                    
-                                                    Spacer()
-                                                    Image(systemName: "chevron.right")
-                                                        .resizable()
-                                                        .font(Font.title.weight(.bold))
-                                                        .scaledToFit()
-                                                        .frame(width: 7, height: 15, alignment: .center)
-                                                        .foregroundColor(.secondary)
-                                                }.padding(.horizontal)
-                                                .padding(.top, 10)
-                                                .padding(.bottom, 15)
-                                                .contentShape(Rectangle())
-                                            }
-                                        }.buttonStyle(changeBGButtonStyle())
-                                        .simultaneousGesture(TapGesture()
-                                            .onEnded { _ in
-                                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                            })
+                                                    HStack {
+                                                        Image(systemName: "ellipsis.circle")
+                                                            .resizable()
+                                                            .scaledToFit()
+                                                            .frame(width: 20, height: 20, alignment: .center)
+                                                            .foregroundColor(Color("SoftTextColor"))
+                                                            .padding(.leading, 10)
+                                                        
+                                                        Text("more...")
+                                                            .font(.subheadline)
+                                                            .foregroundColor(Color.blue)
+                                                            .padding(.horizontal)
+                                                        
+                                                        Spacer()
+                                                        Image(systemName: "chevron.right")
+                                                            .resizable()
+                                                            .font(Font.title.weight(.bold))
+                                                            .scaledToFit()
+                                                            .frame(width: 7, height: 15, alignment: .center)
+                                                            .foregroundColor(.secondary)
+                                                    }.padding(.horizontal)
+                                                    .padding(.top, 10)
+                                                    .padding(.bottom, 15)
+                                                    .contentShape(Rectangle())
+                                                }
+                                            }.buttonStyle(changeBGButtonStyle())
+                                            .simultaneousGesture(TapGesture()
+                                                .onEnded { _ in
+                                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                                })
+                                        }
                                     }
                                 }
-                            }
-                        })
+                            })
+                        }
+                    }
+                    
+                    //MARK: Recent Section
+                    if self.recentDialogsData.count > 0 {
+                        VStack {
+                            HStack(alignment: .center) {
+                                Text("Newest")
+                                    .font(.system(size: 30))
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.primary)
+
+                                Spacer()
+                                Button(action: {
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                    self.showMoreRecentDialogs.toggle()
+                                }, label: {
+                                    Text("see all")
+                                        .foregroundColor(.blue)
+                                }).opacity(self.recentDialogsData.count > 5 ? 1 : 0)
+                            }.padding(.horizontal, 30)
+                            .padding(.top, 35)
+                            .padding(.bottom, 10)
+
+                            self.styleBuilder(content: {
+                                ForEach(self.recentDialogsData.indices, id: \.self) { id in
+                                    VStack(alignment: .trailing, spacing: 0) {
+                                        if id <= 4 {
+                                         //Public dialog cell
+                                            PublicDialogDiscoverCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, dialogData: self.recentDialogsData[id], isLast: id == 4 || self.recentDialogsData[id].id == self.recentDialogsData.last?.id)
+                                                .environmentObject(self.auth)
+                                                .id(self.recentDialogsData[id].id)
+                                        }
+                                        
+                                        if self.recentDialogsData.count > 5 && id == 4 {
+                                            NavigationLink(destination: self.moreDetails(tagId: nil, viewState: .newest), isActive: $showMoreRecentDialogs) {
+                                                VStack(alignment: .trailing, spacing: 0) {
+                                                    Divider()
+                                                        .frame(width: Constants.screenWidth - 80)
+                                                        .offset(x: 20)
+                                                    
+                                                    HStack {
+                                                        Image(systemName: "ellipsis.circle")
+                                                            .resizable()
+                                                            .scaledToFit()
+                                                            .frame(width: 20, height: 20, alignment: .center)
+                                                            .foregroundColor(Color("SoftTextColor"))
+                                                            .padding(.leading, 10)
+                                                        
+                                                        Text("more...")
+                                                            .font(.subheadline)
+                                                            .foregroundColor(Color.blue)
+                                                            .padding(.horizontal)
+                                                        
+                                                        Spacer()
+                                                        Image(systemName: "chevron.right")
+                                                            .resizable()
+                                                            .font(Font.title.weight(.bold))
+                                                            .scaledToFit()
+                                                            .frame(width: 7, height: 15, alignment: .center)
+                                                            .foregroundColor(.secondary)
+                                                    }.padding(.horizontal)
+                                                    .padding(.top, 10)
+                                                    .padding(.bottom, 15)
+                                                    .contentShape(Rectangle())
+                                                }
+                                            }.buttonStyle(changeBGButtonStyle())
+                                            .simultaneousGesture(TapGesture()
+                                                .onEnded { _ in
+                                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                                })
+                                        }
+                                    }
+                                }
+                            })
+                        }
                     }
                 }
                 

@@ -660,12 +660,12 @@ extension AuthModel: ChatDelegate {
     }
 
     func chatDidDisconnectWithError(_ error: Error) {
-        print("Chat did Disconnect: \(error.localizedDescription)")
+        //print("Chat did Disconnect: \(error.localizedDescription)")
         //self.connectionState = .disconnected
     }
 
     func chatDidNotConnectWithError(_ error: Error) {
-        print("Chat did not connect: \(error.localizedDescription)")
+        //print("Chat did not connect: \(error.localizedDescription)")
         //self.connectionState = .disconnected
         self.configureFirebaseStateDidChange()
     }
