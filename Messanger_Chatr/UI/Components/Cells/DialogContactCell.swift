@@ -68,7 +68,7 @@ struct DialogContactCell: View {
                                     Text("".firstLeters(text: contact.fullName))
                                         .font(.system(size: 20))
                                         .fontWeight(.bold)
-                                        .foregroundColor(.secondary)
+                                        .foregroundColor(.primary)
                                 }.shadow(color: Color.black.opacity(0.18), radius: 6, x: 0, y: 4)
                             }
                             

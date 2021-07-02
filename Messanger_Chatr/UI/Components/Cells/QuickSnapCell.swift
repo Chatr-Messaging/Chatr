@@ -52,7 +52,7 @@ struct QuickSnapCell: View {
                         Text("".firstLeters(text: quickSnap.fullName))
                             .font(.system(size: 28))
                             .fontWeight(.bold)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.primary)
                     }
                     
                     if self.quickSnap.quickSnaps.count == 0 {

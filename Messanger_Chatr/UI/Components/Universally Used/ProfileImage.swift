@@ -31,8 +31,8 @@ struct ProfileImage: View {
                 ZStack {
                     Circle()
                         .frame(width: size, height: size, alignment: .center)
-                        .foregroundColor(Color("bgColor"))
-                        .shadow(color: Color("buttonShadow_Deeper"), radius: 10, x: 0, y: 4)
+                        .foregroundColor(Color("buttonColor"))
+                        .shadow(color: Color("buttonShadow_Deeper"), radius: 10, x: 0, y: 5)
 
                     Text("".firstLeters(text: self.auth.profile.results.first?.fullName ?? "?"))
                         .font(.system(size: 24))

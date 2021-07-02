@@ -47,6 +47,7 @@
 		0559B8D325D39AC20069C44A /* KeyboardCardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0559B8D225D39AC20069C44A /* KeyboardCardViewModel.swift */; };
 		055AEE382512EC9500F35B8F /* EditProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 055AEE372512EC9500F35B8F /* EditProfileView.swift */; };
 		055AEE3A2512F63F00F35B8F /* MultilineTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 055AEE392512F63F00F35B8F /* MultilineTextView.swift */; };
+		055AF72D268EB14C002899D2 /* SearchAddNewContactSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 055AF72C268EB14C002899D2 /* SearchAddNewContactSection.swift */; };
 		055BC4EC26841E85004944F3 /* DiscoverWelcomeSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 055BC4EB26841E85004944F3 /* DiscoverWelcomeSection.swift */; };
 		055C2A6224D3FDD200F7AE16 /* MembershipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 055C2A6124D3FDD200F7AE16 /* MembershipView.swift */; };
 		055E516625ACDC0B003BE668 /* WKView in Frameworks */ = {isa = PBXBuildFile; productRef = 055E516525ACDC0B003BE668 /* WKView */; };
@@ -245,6 +246,7 @@
 		0559B8D225D39AC20069C44A /* KeyboardCardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardCardViewModel.swift; sourceTree = "<group>"; };
 		055AEE372512EC9500F35B8F /* EditProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileView.swift; sourceTree = "<group>"; };
 		055AEE392512F63F00F35B8F /* MultilineTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultilineTextView.swift; sourceTree = "<group>"; };
+		055AF72C268EB14C002899D2 /* SearchAddNewContactSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchAddNewContactSection.swift; sourceTree = "<group>"; };
 		055BC4EB26841E85004944F3 /* DiscoverWelcomeSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverWelcomeSection.swift; sourceTree = "<group>"; };
 		055C2A6124D3FDD200F7AE16 /* MembershipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MembershipView.swift; sourceTree = "<group>"; };
 		055F37BB2606F45F003EDB1F /* CachingPlayerItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CachingPlayerItem.swift; sourceTree = "<group>"; };
@@ -468,6 +470,7 @@
 				056BCC6326550562006DD302 /* stickyHeaderSection.swift */,
 				05A7BD5E24FEF3870001BFC9 /* QucickSnapsSection.swift */,
 				055F37F52608545B003EDB1F /* KeyboardAudioView.swift */,
+				055AF72C268EB14C002899D2 /* SearchAddNewContactSection.swift */,
 				057F2B4D250B025E005DFB21 /* ContactCarouselSection.swift */,
 				058AC5332599158C0027FD11 /* DiscoverCarouselSection.swift */,
 				055BC4EB26841E85004944F3 /* DiscoverWelcomeSection.swift */,
@@ -1126,6 +1129,7 @@
 				05F37C0225DF95B300F92005 /* KeyboardObserver.swift in Sources */,
 				05F8E11823F122490066954C /* userModel.swift in Sources */,
 				056A6C362686EC93000E2153 /* ScrollViewSafeAreaInset.swift in Sources */,
+				055AF72D268EB14C002899D2 /* SearchAddNewContactSection.swift in Sources */,
 				058966BE265DF50700303F1E /* PublicDialogDiscoverCell.swift in Sources */,
 				056B98AB24C900D7003F7FBA /* PullToRefreshIndicator.swift in Sources */,
 				05196DD424EB208C0026B9A7 /* ProfileRealmModel.swift in Sources */,

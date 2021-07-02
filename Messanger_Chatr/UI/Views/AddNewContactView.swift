@@ -27,6 +27,8 @@ struct addNewContactView: View {
         NavigationView {
             ScrollView(.vertical, showsIndicators: true) {
                 VStack() {
+                    SearchAddNewContactSection(searchText: self.$searchText, grandUsers: self.$grandUsers, outputSearchText: self.$outputSearchText, isLoading: self.$isLoading, newDialogID: self.$newDialogID, dismissView: self.$dismissView)
+                        .environmentObject(self.auth)
                     /*
                     //MARK: MAIN SEARCH BAR
                     VStack {
@@ -400,32 +402,7 @@ struct addNewContactView: View {
                 )
         }
     }
-    
-    func grandSeach(searchText: String) {
-        Request.users(withFullName: searchText, paginator: Paginator.limit(20, skip: 0), successBlock: { (paginator, users) in
-            for i in users {
-                if i.id != Session.current.currentUserID {
-                    self.grandUsers.append(i)
-                    self.grandUsers.removeDuplicates()
-                }
-            }
-        }) { (error) in
-            print("error searching for name user \(error.localizedDescription)")
-        }
         
-        Request.users(withPhoneNumbers: [searchText], paginator: Paginator.limit(5, skip: 0), successBlock: { (paginator, users) in
-            for i in users {
-                if i.id != Session.current.currentUserID {
-                    self.grandUsers.append(i)
-                    self.grandUsers.removeDuplicates()
-                }
-            }
-            self.isLoading = false
-        }) { (error) in
-            print("error searching for phone number user \(error.localizedDescription)")
-        }
-    }
-    
     func isUserNotContact(id: UInt) -> Bool {
         let config = Realm.Configuration(schemaVersion: 1)
         do {
