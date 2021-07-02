@@ -66,8 +66,8 @@ struct DialogCell: View {
                                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                     self.isOpen = true
                                     self.selectedDialogID = self.dialogModel.id
-                                    UserDefaults.standard.set(true, forKey: "localOpen")
                                     UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")
+                                    UserDefaults.standard.set(true, forKey: "localOpen")
                                     changeDialogRealmData.shared.updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
                                 }
                             }
@@ -137,8 +137,8 @@ struct DialogCell: View {
                                         withAnimation(Animation.easeOut(duration: 0.6)) {
                                             self.isOpen = true
                                         }
-                                        UserDefaults.standard.set(true, forKey: "localOpen")
                                         UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")
+                                        UserDefaults.standard.set(true, forKey: "localOpen")
 
                                         self.selectedDialogID = self.dialogModel.id
                                         changeDialogRealmData.shared.updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
@@ -248,10 +248,31 @@ struct DialogCell: View {
                     self.selectedDialogID = self.dialogModel.id
 
                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                    UserDefaults.standard.set(true, forKey: "localOpen")
                     UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")
+                    UserDefaults.standard.set(true, forKey: "localOpen")
                 }
-            }.sheet(isPresented: self.$openGroupProfile, content: {
+            }.sheet(isPresented: self.$openGroupProfile, onDismiss: {
+                guard let diaOpen = UserDefaults.standard.string(forKey: "openingDialogId"), diaOpen != self.dialogModel.id, diaOpen != "" else {
+                    return
+                }
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    self.isOpen = false
+                    UserDefaults.standard.set(false, forKey: "localOpen")
+                    changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
+
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
+                        print("the current one is: \(self.dialogModel.id) and now the new one: \(diaOpen)")
+                        UserDefaults.standard.set(diaOpen, forKey: "selectedDialogID")
+                        self.selectedDialogID = diaOpen
+                        self.isOpen = true
+                        UserDefaults.standard.set(true, forKey: "localOpen")
+                        changeDialogRealmData.shared.updateDialogOpen(isOpen: true, dialogID: diaOpen)
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        UserDefaults.standard.set("", forKey: "openingDialogId")
+                    }
+                }
+            }) {
                 NavigationView {
                     VisitGroupChannelView(dismissView: self.$openGroupProfile, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$openNewDialogID, showPinDetails: self.$showPinDetails, groupOccUserAvatar: self.groupOccUserAvatar, viewState: .fromDialogCell, dialogRelationship: .subscribed, dialogModel: self.dialogModel)
                         .environmentObject(self.auth)
@@ -275,7 +296,7 @@ struct DialogCell: View {
                                                 .opacity(self.canEditGroup ? 1 : 0)
                                         }.disabled(self.canEditGroup ? false : true))
                 }
-            })
+            }
 
             HStack() {
                 Button(action: {

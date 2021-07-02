@@ -99,7 +99,7 @@ struct ChannelBubble: View {
                                         }
                                         changeDialogRealmData.shared.insertDialogs([dialogz], completion: {
                                             changeDialogRealmData.shared.updateDialogDelete(isDelete: false, dialogID: dialogz.id ?? "")
-                                            self.auth.sendPushNoti(userIDs: [NSNumber(value: dialogz.userID)], title: "\(dialogz.name ?? "no name") Joined", message: "\(self.auth.profile.results.first?.fullName ?? "No Name") joined your public chat \(dialogz.name ?? "no name")")
+                                            self.auth.sendPushNoti(userIDs: [NSNumber(value: dialogz.userID)], title: "New Member joined \(dialogz.name ?? "no name")", message: "\(self.auth.profile.results.first?.fullName ?? "No Name") joined your public chat \(dialogz.name ?? "no name")")
                                         })
                                     }, onError: { _ in
                                         UINotificationFeedbackGenerator().notificationOccurred(.error)
@@ -180,12 +180,16 @@ struct ChannelBubble: View {
             .shadow(color: Color.black.opacity(0.15), radius: 12, x: 0, y: 14)
             .buttonStyle(highlightedButtonStyle())
             .sheet(isPresented: self.$showChannel, onDismiss: {
-                   print("need to open Chat view!!")
-                if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), !diaId.isEmpty {
-                    self.loadPublicDialog(diaId: diaId)
-                } else if let diaId = UserDefaults.standard.string(forKey: "openingDialogId"), !diaId.isEmpty {
-                    self.loadPublicDialog(diaId: diaId)
+                   print("need to open Chat view!!3333")
+                let diaId = UserDefaults.standard.string(forKey: "visitingDialogId")
+                let diaId2 = UserDefaults.standard.string(forKey: "openingDialogId")
+                
+                if diaId != "" {
+                    self.loadPublicDialog(diaId: diaId ?? "")
+                } else if diaId2 != "" {
+                    self.loadPublicDialog(diaId: diaId2 ?? "")
                 }
+                print("come omnnnnoww: \(diaId) && \(diaId2)")
             }) {
                 NavigationView {
                     VisitGroupChannelView(dismissView: self.$showChannel, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$openNewDialogID, showPinDetails: self.$showPinDetails, groupOccUserAvatar: self.groupOccUserAvatar, viewState: .fromDialogCell, dialogRelationship: self.isMember ? .subscribed : .notSubscribed, dialogModel: self.dialogModel)
@@ -357,17 +361,22 @@ struct ChannelBubble: View {
     }
     
     func loadPublicDialog(diaId: String) {
-        UserDefaults.standard.set(false, forKey: "localOpen")
-        if let oldDiaId = UserDefaults.standard.string(forKey: "selectedDialogID") {
-            changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: oldDiaId)
+        print("laoding pub dia: \(diaId) ** \(UserDefaults.standard.string(forKey: "selectedDialogID") ?? "") && \(self.dialogId)")
+        guard diaId != UserDefaults.standard.string(forKey: "selectedDialogID") ?? "", diaId != "" else {
+            print("laoding pub dia faileddd")
+            return
         }
 
+        UserDefaults.standard.set(false, forKey: "localOpen")
+        changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "")
+        print("going onto selected dia: \(UserDefaults.standard.string(forKey: "selectedDialogID") ?? "")")
+            
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
             UserDefaults.standard.set(diaId, forKey: "selectedDialogID")
             UserDefaults.standard.set(true, forKey: "localOpen")
             changeDialogRealmData.shared.updateDialogOpen(isOpen: true, dialogID: diaId)
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
-            UserDefaults.standard.set("", forKey: "openingDialogId")
+            //UserDefaults.standard.set("", forKey: "openingDialogId")
         }
     }
 }

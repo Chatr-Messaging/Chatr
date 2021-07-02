@@ -356,6 +356,7 @@ struct ChatMessagesView: View {
             .frame(width: Constants.screenWidth)
             .contentShape(Rectangle())
             .onAppear() {
+                //self.dialogID = UserDefaults.standard.string(forKey: "selectedDialogID") ?? ""
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                     print("the dialog id is: \(dialogID)")
                     self.maxMessageCount = self.currentMessages.count
@@ -389,6 +390,8 @@ struct ChatMessagesView: View {
                 self.maxMessageCount = -1
                 self.scrollViewHeight = 0
                 self.firstScroll = true
+                self.dialogID = ""
+                self.delayViewMessages = false
             }
         }
     }

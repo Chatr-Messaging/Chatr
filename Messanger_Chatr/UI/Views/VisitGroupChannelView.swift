@@ -471,7 +471,7 @@ struct VisitGroupChannelView: View {
             
             self.isOwner = self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? true : false
             self.isAdmin = self.dialogModel.adminID.contains(UserDefaults.standard.integer(forKey: "currentUserID")) ? true : false
-            UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")
+            //UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")
             self.canEditGroup = self.isOwner || self.isAdmin
             self.currentUserIsPowerful = self.isOwner || self.isAdmin ? true : false
             
@@ -828,7 +828,7 @@ struct VisitGroupChannelView: View {
         }
         
         if self.dialogModel.dialogType == "public" {
-            Request.addAdminsToDialog(withID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "", adminsUserIDs: occu, successBlock: { (updatedDialog) in
+            Request.addAdminsToDialog(withID: self.dialogModel.id, adminsUserIDs: occu, successBlock: { (updatedDialog) in
                 changeDialogRealmData.shared.addFirebaseAdmins(dialogId: updatedDialog.id ?? "", adminIds: updatedDialog.adminsIDs ?? [], onSuccess: { _ in
                     changeDialogRealmData.shared.insertDialogs([updatedDialog]) {
                         print("Success adding contact as admin!")

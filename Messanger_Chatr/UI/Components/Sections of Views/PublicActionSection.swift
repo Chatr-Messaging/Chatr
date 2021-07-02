@@ -35,9 +35,9 @@ struct PublicActionSection: View {
                             changeDialogRealmData.shared.insertDialogs([dialogz], completion: {
                                 changeDialogRealmData.shared.updateDialogDelete(isDelete: false, dialogID: dialogz.id ?? "")
                                 changeDialogRealmData.shared.addPublicMemberCountRealmDialog(count: Int(dialogz.occupantsCount), dialogId: dialogz.id ?? "")
+                                UserDefaults.standard.set(dialogz.id ?? "", forKey: "visitingDialogId")
                                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 self.dismissView.toggle()
-                                UserDefaults.standard.set(dialogz.id ?? "", forKey: "visitingDialogId")
                             })
                         }, onError: { err in
                             print("there is an error visiting the member count: \(String(describing: err))")
@@ -89,7 +89,7 @@ struct PublicActionSection: View {
                                     self.dialogRelationship = .subscribed
                                     self.dialogModelAdmins.append(UserDefaults.standard.integer(forKey: "currentUserID"))
                                 }
-                                self.auth.sendPushNoti(userIDs: [NSNumber(value: self.dialogModel.owner)], title: "\(self.dialogModel.fullName) Joined", message: "\(self.auth.profile.results.first?.fullName ?? "No Name") joined your public chat \(self.dialogModel.fullName)")
+                                self.auth.sendPushNoti(userIDs: [NSNumber(value: self.dialogModel.owner)], title: "New Member joined \(dialogz.name ?? "no name")", message: "\(self.auth.profile.results.first?.fullName ?? "No Name") joined your public chat \(self.dialogModel.fullName)")
                                 self.notiType = "success"
                                 self.notiText = "Successfully joined \(dialogModel.fullName)"
                                 self.showAlert.toggle()

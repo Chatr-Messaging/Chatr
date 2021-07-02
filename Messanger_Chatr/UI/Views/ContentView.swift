@@ -487,7 +487,13 @@ struct mainHomeList: View {
                             .padding(.horizontal, isLocalOpen && i.isOpen ? 0 : 20)
                         }
                         .disabled(self.disableDialog)
-                        .onChange(of: UserDefaults.standard.bool(forKey: "localOpen")) { _ in
+                        .onChange(of: UserDefaults.standard.bool(forKey: "localOpen")) { isOpen in
+                            print("is local open?? :\(isOpen)")
+                            //self.isLocalOpen = isOpen
+//                            if !isOpen {
+//                                self.isLocalOpen = false
+//                            }
+
                             disableDialog = true
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                                 disableDialog = false
