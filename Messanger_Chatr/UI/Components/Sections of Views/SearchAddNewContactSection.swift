@@ -65,7 +65,7 @@ struct SearchAddNewContactSection: View {
                     }.background(Color("buttonColor"))
                         .clipShape(RoundedRectangle(cornerRadius: 15, style: .circular))
                         .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
-                }.padding(.top, 5)
+                }.padding(.top, 2)
             }.padding(.all)
             
             //MARK: Search Section

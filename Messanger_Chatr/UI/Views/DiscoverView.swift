@@ -43,14 +43,14 @@ struct DiscoverView: View {
                 //SEARCH BAR
                 VStack {
                     HStack {
-                        Text("SEARCH NAME:")
+                        Text("SEARCH CHANNEL NAME:")
                             .font(.caption)
                             .fontWeight(.regular)
                             .foregroundColor(.secondary)
                             .padding(.horizontal)
                         Spacer()
                     }
-                    .padding(.bottom, 2)
+                    .padding(.bottom, 4)
                     
                     HStack {
                         Image(systemName: "magnifyingglass")
