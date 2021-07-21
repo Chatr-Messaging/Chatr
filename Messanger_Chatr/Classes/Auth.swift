@@ -21,6 +21,7 @@ import CoreLocation
 import Contacts
 import UserNotifications
 import Purchases
+import Uploadcare
 
 enum AuthState {
     case undefined, signedOut, signedIn, error
@@ -77,6 +78,8 @@ enum PremiumSubscriptionStatus {
 }
 
 class AuthModel: NSObject, ObservableObject {
+    @Published var currentTask: UploadTaskResumable?
+
     @Published var attempted: Bool = false
     @Published var preventDismissal: Bool = false
         
@@ -373,31 +376,18 @@ class AuthModel: NSObject, ObservableObject {
         }
     }
     
-    func setUserAvatar(image: UIImage, completion: @escaping (Bool) -> Void) {
-        let image = image
-        let data = image.jpegData(compressionQuality: 1.0)
-        
-        Request.uploadFile(with: data!, fileName: "user's_profileImg" + Date().localString(), contentType: "image/jpeg", isPublic: true, progressBlock: { (progress) in
-            print("the upload progress is: \(progress)")
-            self.avatarProgress = CGFloat(progress)
-        }, successBlock: { (blob) in
-            let parameters = UpdateUserParameters()
-            let customData = ["avatar_uid" : blob.uid]
-            if let theJSONData = try? JSONSerialization.data(withJSONObject: customData, options: .prettyPrinted) {
-                parameters.customData = String(data: theJSONData, encoding: .utf8)
-            }
-            Request.updateCurrentUser(parameters, successBlock: { (user) in
-                changeProfileRealmDate.shared.updateProfile(user, completion: {
-                    self.haveUserProfileImg = true
-                    completion(true)
-                })        
-            }, errorBlock: { (error) in
-                completion(false)
+    func setUserAvatar(imageId: String, completion: @escaping (Bool) -> Void) {
+        let parameters = UpdateUserParameters()
+        parameters.avatar = Constants.uploadcareBaseUrl + imageId + Constants.uploadcareStandardTransform
+
+        Request.updateCurrentUser(parameters, successBlock: { (user) in
+            changeProfileRealmDate.shared.updateProfile(user, completion: {
+                self.haveUserProfileImg = true
+                completion(true)
             })
-        }) { (error) in
-            print("error somehow uploading...\(error.localizedDescription)")
+        }, errorBlock: { (error) in
             completion(false)
-        }
+        })
     }
     
     func removeContactRequest(userID: UInt) {
@@ -426,6 +416,96 @@ class AuthModel: NSObject, ObservableObject {
         .clipShape(RoundedRectangle(cornerRadius: 15, style: .circular))
         .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
         .padding(.horizontal)
+    }
+    
+    // MARK: - Upload Care Functions
+    
+    func uploadFile(_ url: URL, completionHandler: @escaping (String) -> Void) {
+        let data: Data
+        do {
+            data = try Data(contentsOf: url)
+        } catch let error {
+            print("the error getting contents of url data: " + error.localizedDescription)
+            completionHandler("")
+            return
+        }
+        
+        self.avatarProgress = 0
+        let filename = url.lastPathComponent
+
+        if data.count < UploadAPI.multipartMinFileSize {
+            self.performDirectUpload(filename: filename, data: data, completionHandler: completionHandler)
+        } else {
+            self.performMultipartUpload(filename: filename, fileUrl: url, completionHandler: completionHandler)
+        }
+    }
+    
+    func performDirectUpload(filename: String, data: Data, completionHandler: @escaping (String) -> Void) {
+        let uploadcare = Uploadcare(withPublicKey: Constants.uploadcarePublicKey, secretKey: Constants.uploadcareSecretKey)
+        let semaphore = DispatchSemaphore(value: 0)
+        
+        uploadcare.uploadAPI.upload(files: [filename: data], store: .store, { (progress) in
+            DispatchQueue.main.async { [weak self] in
+                print("upload progress: \(progress * 100)%")
+                self?.avatarProgress = progress
+            }
+        }) { (resultDictionary, error) in
+            defer {
+                semaphore.signal()
+            }
+            
+            if let error = error {
+                print("the error uploading direct files: " + error.debugDescription)
+                completionHandler("")
+            }
+
+            guard let uploadData = resultDictionary, let fileId = uploadData.first?.value else {
+                completionHandler("")
+                return
+            }
+            
+            print("success uploading direct file. Here is the data: " + "\(fileId)")
+            completionHandler(fileId)
+        }
+        
+        semaphore.wait()
+    }
+    
+    func performMultipartUpload(filename: String, fileUrl: URL, completionHandler: @escaping (String) -> Void) {
+        let uploadcare = Uploadcare(withPublicKey: Constants.uploadcarePublicKey, secretKey: Constants.uploadcareSecretKey)
+
+        let onProgress: (Double)->Void = { (progress) in
+            DispatchQueue.main.async { [weak self] in
+                self?.avatarProgress = progress
+                
+//                switch UIApplication.shared.applicationState {
+//                case .background:
+//                    let remain = UIApplication.shared.backgroundTimeRemaining.rounded(toPlaces: 2)
+//                    DLog("Background time remaining = \(remain) seconds")
+//                default: break
+//                }
+            }
+        }
+
+        guard let fileForUploading = uploadcare.uploadAPI.file(withContentsOf: fileUrl) else {
+            assertionFailure("file not found")
+            return
+        }
+        
+        self.currentTask = fileForUploading.upload(withName: filename, store: .store, onProgress, { (file, error) in
+            defer {
+                self.currentTask = nil
+            }
+            
+            if let error = error {
+                print(error)
+                return
+            }
+            
+            guard let file = file else { return }
+            completionHandler(file.fileId)
+            print("success uploading multipart upload: " + "\(file)")
+        })
     }
     
     // MARK: - Save User Image

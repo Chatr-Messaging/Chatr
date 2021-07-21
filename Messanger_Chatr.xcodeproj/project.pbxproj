@@ -113,6 +113,7 @@
 		05A6D54725B021E400AD66DD /* AdvancedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A6D54625B021E400AD66DD /* AdvancedViewModel.swift */; };
 		05A7633A25060EB2002712FA /* AddNewContactView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A7633925060EB2002712FA /* AddNewContactView.swift */; };
 		05A7633C2506FD42002712FA /* ContactRequestCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A7633B2506FD42002712FA /* ContactRequestCell.swift */; };
+		05A7B8E226A7656F00BAEC59 /* Uploadcare in Frameworks */ = {isa = PBXBuildFile; productRef = 05A7B8E126A7656F00BAEC59 /* Uploadcare */; };
 		05A7BD4D24F851760001BFC9 /* TermsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A7BD4C24F851760001BFC9 /* TermsView.swift */; };
 		05A7BD4F24F9E8D20001BFC9 /* ContactRealmCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A7BD4E24F9E8D20001BFC9 /* ContactRealmCell.swift */; };
 		05A7BD5124FA0F800001BFC9 /* VisitContactView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A7BD5024FA0F800001BFC9 /* VisitContactView.swift */; };
@@ -387,6 +388,7 @@
 				055E516625ACDC0B003BE668 /* WKView in Frameworks */,
 				05C7885F25ADFD81004DCCD6 /* Pods_Messanger_Chatr.framework in Frameworks */,
 				059B18102522C32000988201 /* RealmSwift in Frameworks */,
+				05A7B8E226A7656F00BAEC59 /* Uploadcare in Frameworks */,
 				05903A3F25925C3400D70A13 /* WKView in Frameworks */,
 				05670318256A3C43004123EB /* CarBode in Frameworks */,
 				059B18122522C32000988201 /* Realm in Frameworks */,
@@ -872,6 +874,7 @@
 				054E9B7625D22CF600365CE0 /* SlideOverCard */,
 				054E9B8125D246C800365CE0 /* ConfettiSwiftUI */,
 				05D466D5263F7B050015B61D /* Grid */,
+				05A7B8E126A7656F00BAEC59 /* Uploadcare */,
 			);
 			productName = Messanger_Chatr;
 			productReference = 05DB89AE238B851400D4581F /* Messanger_Chatr.app */;
@@ -953,6 +956,7 @@
 				054E9B7525D22CF600365CE0 /* XCRemoteSwiftPackageReference "SlideOverCard" */,
 				054E9B8025D246C800365CE0 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */,
 				05D466D4263F7B050015B61D /* XCRemoteSwiftPackageReference "swiftui-grid" */,
+				05A7B8E026A7656F00BAEC59 /* XCRemoteSwiftPackageReference "uploadcare-swift" */,
 			);
 			productRefGroup = 05DB89AF238B851400D4581F /* Products */;
 			projectDirPath = "";
@@ -1724,6 +1728,14 @@
 				minimumVersion = 5.4.4;
 			};
 		};
+		05A7B8E026A7656F00BAEC59 /* XCRemoteSwiftPackageReference "uploadcare-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/uploadcare/uploadcare-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.3.1;
+			};
+		};
 		05C36C15252D62B90031CB3F /* XCRemoteSwiftPackageReference "PopupView" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/exyte/PopupView.git";
@@ -1776,6 +1788,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 059B180E2522C32000988201 /* XCRemoteSwiftPackageReference "realm-cocoa" */;
 			productName = Realm;
+		};
+		05A7B8E126A7656F00BAEC59 /* Uploadcare */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 05A7B8E026A7656F00BAEC59 /* XCRemoteSwiftPackageReference "uploadcare-swift" */;
+			productName = Uploadcare;
 		};
 		05C36C16252D62B90031CB3F /* PopupView */ = {
 			isa = XCSwiftPackageProductDependency;

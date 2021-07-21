@@ -27,7 +27,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
         #if DEBUG
         //Debugging tools
-        NFX.sharedInstance().start()
+        //NFX.sharedInstance().start()
 
         #endif
 

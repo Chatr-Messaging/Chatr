@@ -114,7 +114,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         print("scene will enter foreground \(Thread.isMainThread)")
         self.environment.configureFirebaseStateDidChange()
 
-        DispatchQueue.global(qos: .background).async {
+        //DispatchQueue.global(qos: .background).async {
             if self.environment.isUserAuthenticated == .signedIn {
                 DispatchQueue.main.async {
                     ChatrApp.connect()
@@ -125,7 +125,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             
             StoreReviewHelper.incrementAppOpenedCount()
             StoreReviewHelper.checkAndAskForReview()
-        }
+        //}
     }
     
     func sceneDidEnterBackground(_ scene: UIScene) {
@@ -142,7 +142,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 }
                 UIApplication.shared.applicationIconBadgeNumber = badgeNum + (self.environment.profile.results.first?.contactRequests.count ?? 0)
                 
-                //This causes a crash for some reason...
+                //This causes a crash for some reason...not anymore because of print
                 Chat.instance.disconnect { (error) in
                     print("chat instance did disconnect \(String(describing: error?.localizedDescription))")
                 }

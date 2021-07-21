@@ -2,7 +2,16 @@
   "object": {
     "pins": [
       {
-        "package": "CarBode",
+        "package": "Alamofire",
+        "repositoryURL": "https://github.com/Alamofire/Alamofire.git",
+        "state": {
+          "branch": null,
+          "revision": "f96b619bcb2383b43d898402283924b80e2c4bae",
+          "version": "5.4.3"
+        }
+      },
+      {
+        "package": "CarBode-Barcode-Scanner-For-SwiftUI",
         "repositoryURL": "https://github.com/heart/CarBode-Barcode-Scanner-For-SwiftUI",
         "state": {
           "branch": null,
@@ -29,7 +38,7 @@
         }
       },
       {
-        "package": "Realm",
+        "package": "realm-cocoa",
         "repositoryURL": "https://github.com/realm/realm-cocoa.git",
         "state": {
           "branch": null,
@@ -38,7 +47,7 @@
         }
       },
       {
-        "package": "RealmCore",
+        "package": "realm-core",
         "repositoryURL": "https://github.com/realm/realm-core",
         "state": {
           "branch": null,
@@ -56,12 +65,21 @@
         }
       },
       {
-        "package": "Grid",
+        "package": "swiftui-grid",
         "repositoryURL": "https://github.com/spacenation/swiftui-grid.git",
         "state": {
           "branch": null,
           "revision": "623f995c6ee0e5a5ed0e104d142daeae67b0ec92",
           "version": "1.1.0"
+        }
+      },
+      {
+        "package": "uploadcare-swift",
+        "repositoryURL": "https://github.com/uploadcare/uploadcare-swift.git",
+        "state": {
+          "branch": null,
+          "revision": "035fc3d6886166a00eae1bce9845a8f0a08bc542",
+          "version": "0.3.1"
         }
       },
       {

@@ -193,8 +193,10 @@ class changeProfileRealmDate {
                         oldData.lastOnline = lastOnline
                     }
                     
-                    if let avatar = PersistenceManager.shared.getCubeProfileImage(usersID: objects), oldData.avatar != avatar {
+                    if let avatar = objects.avatar, oldData.avatar != avatar {
                         oldData.avatar = avatar
+                    } else if let avatarCube = PersistenceManager.shared.getCubeProfileImage(usersID: objects), oldData.avatar != avatarCube {
+                        oldData.avatar = avatarCube
                     }
                     
                     if let website = objects.website, oldData.website != website {
@@ -218,7 +220,7 @@ class changeProfileRealmDate {
                 newData.id = Int(objects.id)
                 newData.fullName = objects.fullName ?? "No Name"
                 newData.lastOnline = objects.lastRequestAt ?? Date()
-                newData.avatar = PersistenceManager.shared.getCubeProfileImage(usersID: objects) ?? ""
+                newData.avatar = objects.avatar ?? PersistenceManager.shared.getCubeProfileImage(usersID: objects) ?? ""
                 newData.website = objects.website ?? ""
                 newData.emailAddress = objects.email ?? ""
                 //newData.isLocalAuthOn = self.getCubeProfileLocalAuthSetting(usersID: objects) ?? false

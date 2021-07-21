@@ -1079,8 +1079,14 @@ struct AddProfileImageView: View {
                              }
                         }
                     }.buttonStyle(ClickButtonStyle())
-                    .sheet(isPresented: $showImagePicker, onDismiss: loadImage) {
-                        ImagePicker(image: self.$inputImage)
+                    .sheet(isPresented: $showImagePicker) {
+                        ImagePicker22(sourceType: .photoLibrary) { imageUrl in
+                            self.auth.uploadFile(imageUrl, completionHandler: { imageId in
+                                self.auth.setUserAvatar(imageId: imageId, completion: { success in
+                                    print("DONEEE SETTING UP URL! \(success)")
+                                })
+                            })
+                        }
                     }
                     
                     image?.resizable().scaledToFill().clipped().frame(width: 90, height: 90).cornerRadius(45)
@@ -1118,21 +1124,6 @@ struct AddProfileImageView: View {
                 Spacer()
             }
         }
-    }
-    
-    func loadImage() {
-        guard let inputImage = inputImage else { return }
-        image = Image(uiImage: inputImage)
-        self.auth.setUserAvatar(image: inputImage, completion: { result in
-            UINotificationFeedbackGenerator().notificationOccurred(.success)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                self.presentationMode.wrappedValue.dismiss()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                    self.auth.preventDismissal = false
-                    self.auth.isUserAuthenticated = .signedIn
-                }
-            }
-        })
     }
 }
 

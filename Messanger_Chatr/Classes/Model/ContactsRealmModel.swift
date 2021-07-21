@@ -272,8 +272,10 @@ class changeContactsRealmData {
                                         foundContact.lastOnline = lastRequest
                                     }
                                     
-                                    if let avatar = PersistenceManager.shared.getCubeProfileImage(usersID: user), foundContact.avatar != avatar {
+                                    if let avatar = user.avatar, avatar != "", foundContact.avatar != avatar {
                                         foundContact.avatar = avatar
+                                    } else if let avatarCube = PersistenceManager.shared.getCubeProfileImage(usersID: user), avatarCube != "", foundContact.avatar != avatarCube {
+                                        foundContact.avatar = avatarCube
                                     }
 
                                     foundContact.isMyContact = true
@@ -298,7 +300,7 @@ class changeContactsRealmData {
                                 if let lastRequest = user.lastRequestAt {
                                     newData.lastOnline = lastRequest
                                 }
-                                newData.avatar = PersistenceManager.shared.getCubeProfileImage(usersID: user) ?? ""
+                                newData.avatar = user.avatar ?? PersistenceManager.shared.getCubeProfileImage(usersID: user) ?? ""
                                 newData.createdAccount = user.createdAt ?? Date()
                                     
                                 try realm.safeWrite ({
@@ -405,8 +407,10 @@ class changeContactsRealmData {
                                 foundContact.lastOnline = lastRequest
                             }
                             
-                            if let avatar = PersistenceManager.shared.getCubeProfileImage(usersID: user), foundContact.avatar != avatar {
+                            if let avatar = user.avatar, avatar != "", foundContact.avatar != avatar {
                                 foundContact.avatar = avatar
+                            } else if let avatarCube = PersistenceManager.shared.getCubeProfileImage(usersID: user), avatarCube != "", foundContact.avatar != avatarCube {
+                                foundContact.avatar = avatarCube
                             }
                             
                             foundContact.isMyContact = true
@@ -426,7 +430,7 @@ class changeContactsRealmData {
                         if let lastRequest = user.lastRequestAt {
                             newData.lastOnline = lastRequest
                         }
-                        newData.avatar = PersistenceManager.shared.getCubeProfileImage(usersID: user) ?? ""
+                        newData.avatar = user.avatar ?? PersistenceManager.shared.getCubeProfileImage(usersID: user) ?? ""
                         newData.createdAccount = user.createdAt ?? Date()
                             
                         try realm.safeWrite ({

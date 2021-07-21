@@ -11,6 +11,7 @@ import RealmSwift
 import SDWebImageSwiftUI
 import ConnectyCube
 import FirebaseDatabase
+import Uploadcare
 
 struct EditProfileView: View {
     @EnvironmentObject var auth: AuthModel
@@ -64,17 +65,15 @@ struct EditProfileView: View {
                                     HStack(alignment: .center) {
                                         Spacer()
                                         VStack(alignment: .center) {
-                                            if let avitarURL = self.auth.profile.results.first?.avatar {
-                                                WebImage(url: URL(string: avitarURL))
-                                                    .resizable()
-                                                    .placeholder{ Image("empty-profile").resizable().frame(width: 80, height: 80, alignment: .center).scaledToFill() }
-                                                    .indicator(.activity)
-                                                    .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
-                                                    .scaledToFill()
-                                                    .frame(width: 80, height: 80, alignment: .center)
-                                                    .clipShape(Circle())
-                                                    .shadow(color: Color.black.opacity(0.20), radius: 12, x: 0, y: 8)
-                                            }
+                                            WebImage(url: URL(string: self.auth.profile.results.first?.avatar ?? ""))
+                                                .resizable()
+                                                .placeholder{ Image("empty-profile").resizable().frame(width: 80, height: 80, alignment: .center).scaledToFill() }
+                                                .indicator(.activity)
+                                                .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
+                                                .scaledToFill()
+                                                .frame(width: 80, height: 80, alignment: .center)
+                                                .clipShape(Circle())
+                                                .shadow(color: Color.black.opacity(0.20), radius: 12, x: 0, y: 8)
                                             
                                             Text("Change Profile Picture")
                                                 .font(.none)
@@ -101,8 +100,14 @@ struct EditProfileView: View {
                         .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
                         .padding(.horizontal)
                         .padding(.bottom, 5)
-                        .sheet(isPresented: self.$showImagePicker, onDismiss: self.loadImage) {
-                            ImagePicker(image: self.$inputImage)
+                        .sheet(isPresented: self.$showImagePicker) {
+                            ImagePicker22(sourceType: .photoLibrary) { imageUrl in
+                                self.auth.uploadFile(imageUrl, completionHandler: { imageId in
+                                    self.auth.setUserAvatar(imageId: imageId, completion: { success in
+                                        print("DONEEE SETTING UP URL! \(success)")
+                                    })
+                                })
+                            }
                         }
                         
                         //MARK: Name & Bio Section
@@ -487,11 +492,5 @@ struct EditProfileView: View {
                 }
             }
         }
-    }
-    
-    func loadImage() {
-        guard let inputImage = inputImage else { return }
-        image = Image(uiImage: inputImage)
-        self.auth.setUserAvatar(image: inputImage, completion: { _ in })
     }
 }

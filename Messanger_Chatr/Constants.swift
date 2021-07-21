@@ -23,16 +23,27 @@ struct Constants {
     static let smallAvitarSize = CGFloat(30)
     static let maxNumberGroupOccu = 10
     static let maxNumberEarlyAdopters = 1000
+
     static let screenWidth = UIScreen.main.bounds.width
     static let screenHeight = UIScreen.main.bounds.height
     static let edges = UIApplication.shared.windows.first?.safeAreaInsets
+
     static let FirebaseProjectID = "chatr-b849e"
     static let FirebaseStoragePath = "gs://chatr-b849e.appspot.com"
+    static let firebaseCurrentUser = Auth.auth().currentUser
+
+    static let uploadcarePublicKey = "58ae497bf7dad52e4a35"
+    static let uploadcareSecretKey = "709171e4d5148528c64f"
+    static let uploadcareBaseUrl = "https://ucarecdn.com/"
+    static let uploadcareStandardTransform = "/-/preview/-/quality/smart_retina/-/format/auto/"
+
     static let projectVersion = "0.9989"
     static let appStoreLink = "https://bit.ly/35fMzUg"
-    static let firebaseCurrentUser = Auth.auth().currentUser
+
     static let allowedHosts = [".com", ".me", ".org", ".io", ".edu", ".net", ".app", ".web", ".co", ".uk", ".us", ".gov", ".biz", ".info", ",jobs", ".ly", ".name", ".xyz"]
+
     let connectyCurrentUserID = UserDefaults.standard.integer(forKey: "currentUserID")
+
     static var userHasiOS14 : Bool {
         get { if #available(iOS 14.0, *) { return true } else { return false } }
     }
