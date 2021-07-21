@@ -120,29 +120,27 @@ struct NewPublicConversationSection: View {
                         self.showImagePicker.toggle()
                     }
                 }, label: {
-                    VStack(alignment: .trailing, spacing: 0) {
-                        HStack {
-                            Text("Select Avatar")
-                                .font(.none)
-                                .fontWeight(.none)
-                                .foregroundColor(.blue)
-                                .padding(.leading)
-                            Spacer()
-                            
-                            Image(systemName: "chevron.right")
-                                .resizable()
-                                .font(Font.title.weight(.bold))
-                                .scaledToFit()
-                                .frame(width: 7, height: 15, alignment: .center)
-                                .foregroundColor(.secondary)
-                        }
+                    HStack {
+                        Text("Select Avatar")
+                            .font(.none)
+                            .fontWeight(.none)
+                            .foregroundColor(.blue)
+                            .padding(.leading)
+                        Spacer()
+                        
+                        Image(systemName: "chevron.right")
+                            .resizable()
+                            .font(Font.title.weight(.bold))
+                            .scaledToFit()
+                            .frame(width: 7, height: 15, alignment: .center)
+                            .foregroundColor(.secondary)
                     }.padding(.horizontal)
                     .padding(.vertical, 14)
-
-                    Divider()
-                        .frame(width: Constants.screenWidth - 70)
-                        .offset(x: 10)
                 }).buttonStyle(changeBGButtonStyle())
+
+                Divider()
+                    .frame(width: Constants.screenWidth - 70)
+                    .offset(x: 10)
                 
                 Button(action: {
                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()

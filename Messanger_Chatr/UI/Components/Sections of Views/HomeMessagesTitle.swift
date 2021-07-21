@@ -29,7 +29,7 @@ struct HomeMessagesTitle: View {
                 .offset(x: -5)
 
             MenuBtn(showNewChat: self.$newChat, selectedContacts: self.$selectedContacts)
-        }.zIndex(self.isLocalOpen ? 0 : 2)
+        }
         .padding(.horizontal)
     }
 }

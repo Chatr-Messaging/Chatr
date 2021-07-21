@@ -377,6 +377,10 @@ class AuthModel: NSObject, ObservableObject {
     }
     
     func setUserAvatar(imageId: String, completion: @escaping (Bool) -> Void) {
+        //First check if current profile image has a photo to delete from backend
+        //removeOldProfileImage(oldString: "https://ucarecdn.com/a4405bbf-ab5f-45d7-9160-2d966fd6a276/", completion: { _ in })
+        
+        //Next update connecty cube personal profile
         let parameters = UpdateUserParameters()
         parameters.avatar = Constants.uploadcareBaseUrl + imageId + Constants.uploadcareStandardTransform
 
@@ -388,6 +392,35 @@ class AuthModel: NSObject, ObservableObject {
         }, errorBlock: { (error) in
             completion(false)
         })
+    }
+    
+    func removeOldProfileImage(oldString: String, completion: @escaping (Bool) -> Void) {
+        guard oldString != "" else {
+            completion(false)
+            return
+        }
+  
+        let uploadcare = Uploadcare(withPublicKey: Constants.uploadcarePublicKey, secretKey: Constants.uploadcareSecretKey)
+        let trimmedString = oldString.replacingOccurrences(of: Constants.uploadcareBaseUrl, with: "").replacingOccurrences(of: Constants.uploadcareStandardTransform, with: "").replacingOccurrences(of: "/", with: "")
+        print("the trimmed string is now: \(trimmedString)")
+        let semaphore = DispatchSemaphore(value: 0)
+
+        uploadcare.deleteFile(withUUID: trimmedString, { (file, error) in
+            defer {
+                semaphore.signal()
+            }
+            
+            if let error = error {
+                print(error)
+                completion(false)
+                return
+            }
+            
+            print(file ?? "")
+            completion(true)
+        })
+        
+        semaphore.wait()
     }
     
     func removeContactRequest(userID: UInt) {
