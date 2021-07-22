@@ -44,7 +44,7 @@ struct DialogCell: View {
 
                 if self.dialogModel.dialogType == "private" || self.dialogModel.dialogType == "public" || self.dialogModel.dialogType == "broadcast" {
                     ZStack {
-                        WebImage(url: URL(string: self.dialogModel.dialogType == "public" ? (self.dialogModel.avatar) : (self.privateDialogContact.id != 0 ? self.privateDialogContact.avatar : PersistenceManager.shared.getCubeProfileImage(usersID: self.connectyContact)) ?? ""))
+                        WebImage(url: URL(string: self.dialogModel.dialogType == "public" ? (self.dialogModel.avatar) : (self.privateDialogContact.id != 0 ? self.privateDialogContact.avatar : self.connectyContact.avatar ?? PersistenceManager.shared.getCubeProfileImage(usersID: self.connectyContact)) ?? ""))
                             .resizable()
                             .placeholder{ Image("empty-profile").resizable().frame(width: 55, height: 55, alignment: .center).scaledToFill() }
                             .indicator(.activity)
@@ -439,7 +439,7 @@ struct DialogCell: View {
                         if foundContact.avatar == "" {
                             Request.users(withIDs: [NSNumber(value: occ)], paginator: Paginator.limit(1, skip: 0), successBlock: { (paginator, users) in
                                 for i in users {
-                                    self.groupOccUserAvatar.append(PersistenceManager().getCubeProfileImage(usersID: i) ?? "")
+                                    self.groupOccUserAvatar.append(i.avatar ?? PersistenceManager().getCubeProfileImage(usersID: i) ?? "")
                                     if self.groupOccUserAvatar.count >= 3 { return }
                                 }
                             })
@@ -449,7 +449,7 @@ struct DialogCell: View {
                     } else {
                         Request.users(withIDs: [NSNumber(value: occ)], paginator: Paginator.limit(1, skip: 0), successBlock: { (paginator, users) in
                             for i in users {
-                                self.groupOccUserAvatar.append(PersistenceManager().getCubeProfileImage(usersID: i) ?? "")
+                                self.groupOccUserAvatar.append(i.avatar ?? PersistenceManager().getCubeProfileImage(usersID: i) ?? "")
                                 if self.groupOccUserAvatar.count >= 3 { return }
                             }
                         })
@@ -471,7 +471,7 @@ struct DialogCell: View {
                         newContact.phoneNumber = self.connectyContact.phone ?? ""
                         newContact.lastOnline = self.connectyContact.lastRequestAt ?? Date()
                         newContact.createdAccount = self.connectyContact.createdAt ?? Date()
-                        newContact.avatar = PersistenceManager.shared.getCubeProfileImage(usersID: self.connectyContact) ?? ""
+                        newContact.avatar = self.connectyContact.avatar ?? PersistenceManager.shared.getCubeProfileImage(usersID: self.connectyContact) ?? ""
                         newContact.bio = firebaseContact.bio
                         newContact.facebook = firebaseContact.facebook
                         newContact.twitter = firebaseContact.twitter

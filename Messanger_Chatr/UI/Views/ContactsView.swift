@@ -281,14 +281,13 @@ struct ContactsView: View {
                         if self.auth.contacts.results.filter({ $0.isMyContact == true }).count == 0 {
                             //MARK: No Contact Section
                             VStack {
-                                Spacer()
-                                Text("No Contacts")
+                                Text("Empty Contacts")
                                     .font(.largeTitle)
                                     .foregroundColor(.primary)
                                     .fontWeight(.bold)
                                     .frame(maxWidth: Constants.screenWidth, alignment: .center)
-                                    .padding(.top, 15)
-                                    .padding(.bottom, 5)
+                                    .padding(.top, 5)
+                                    .padding(.bottom, 2.5)
                                 
                                 Text("Start connecting to people \naround the world!")
                                     .font(.subheadline)
@@ -301,7 +300,6 @@ struct ContactsView: View {
                                     .scaledToFit()
                                     .padding(.horizontal, 10)
                                     .padding(.bottom, 20)
-                                
                                 
                                 Button(action: {
                                     self.showAddChat.toggle()

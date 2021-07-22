@@ -21,7 +21,6 @@ struct addNewContactView: View {
     @State var isLoading: Bool = false
     @State var grandUsers: [User] = []
     @State var regristeredAddressBook: [User] = []
-    @ObservedObject var addressBook = AddressBookRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(AddressBookStruct.self))
     
     var body: some View {
         NavigationView {
@@ -50,7 +49,7 @@ struct addNewContactView: View {
                         .padding(.horizontal)
                         .padding(.horizontal)
                         
-                        VStack(alignment: .center, spacing: 0) {
+                        LazyVStack(alignment: .center, spacing: 0) {
                             ForEach(self.regristeredAddressBook, id: \.self) { contact in
                                 NavigationLink(destination: VisitContactView(newMessage: self.$newDialogID, dismissView: self.$dismissView, viewState: .fromSearch, connectyContact: contact).environmentObject(self.auth).edgesIgnoringSafeArea(.all)) {
                                     var isAdded: Bool = false
@@ -62,7 +61,7 @@ struct addNewContactView: View {
                                                     .frame(width: 35, height: 35, alignment: .center)
                                                     .foregroundColor(Color("bgColor"))
                                                 
-                                                WebImage(url: URL(string: PersistenceManager.shared.getCubeProfileImage(usersID: contact) ?? ""))
+                                                WebImage(url: URL(string: contact.avatar ?? PersistenceManager.shared.getCubeProfileImage(usersID: contact) ?? ""))
                                                     .resizable()
                                                     .placeholder{ Image("empty-profile").resizable().frame(width: 45, height: 45, alignment: .center).scaledToFill() }
                                                     .indicator(.activity)
@@ -100,7 +99,7 @@ struct addNewContactView: View {
                                                         event.type = .oneShot
 
                                                         var pushParameters = [String : String]()
-                                                        pushParameters["message"] = "\(ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.fullName ?? "A user")) sent you a contact request."
+                                                        pushParameters["message"] = "\(self.auth.profile.results.first?.fullName ?? "A user")) sent you a contact request."
                                                         pushParameters["ios_sound"] = "app_sound.wav"
 
                                                         if let jsonData = try? JSONSerialization.data(withJSONObject: pushParameters,
@@ -161,14 +160,14 @@ struct addNewContactView: View {
                     }
 
                     //MARK: Address Book Section
-                    if self.addressBook.filterAddressBook(text: self.searchText).count == 0 {
+                    if self.auth.addressBook.results.count == 0 {
                         //MARK: SHOW Sync VIEW
-                        if self.addressBook.results.count == 0 {
+                        if self.auth.addressBook.results.count == 0 {
                             SyncAddressBook()
                                 .animation(.spring(response: 0.45, dampingFraction: 0.70, blendDuration: 0))
                         }
                     } else {
-                        if self.addressBook.filterAddressBook(text: self.searchText).count != 0 {
+                        if self.auth.addressBook.results.count != 0 {
                             HStack {
                                 VStack(alignment: .leading) {
                                     Text("Address Book:")
@@ -177,7 +176,7 @@ struct addNewContactView: View {
                                         .foregroundColor(.primary)
                                         .multilineTextAlignment(.leading)
 
-                                    Text("\(self.addressBook.results.count) TOTAL CONTACTS")
+                                    Text("\(self.auth.addressBook.results.count) TOTAL CONTACTS")
                                         .font(.footnote)
                                         .foregroundColor(.secondary)
                                         .multilineTextAlignment(.leading)
@@ -188,25 +187,22 @@ struct addNewContactView: View {
                         }
 
                         VStack {
-                            if #available(iOS 14.0, *) {
-                                LazyVStack {
-                                    ForEach(self.addressBook.filterAddressBook(text: self.searchText).sorted { $0.name < $1.name }, id: \.self) { result in
-                                        SelectableAddressBookContact(addressBook: result)
-                                            .padding(.horizontal)
-                                            .contentShape(Rectangle())
-                                            .onTapGesture {
-                                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                                            }
-                                        if self.addressBook.filterAddressBook(text: self.searchText).sorted { $0.name < $1.name }.last != result {
-                                            Divider()
-                                                .frame(width: Constants.screenWidth - 80)
-                                                .offset(x: 35)
+                            LazyVStack {
+                                ForEach(self.auth.addressBook.results.sorted { $0.name < $1.name }, id: \.self) { result in
+                                    SelectableAddressBookContact(addressBook: result)
+                                        .padding(.horizontal)
+                                        .contentShape(Rectangle())
+                                        .onTapGesture {
+                                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                                         }
+
+                                    if self.auth.addressBook.results.sorted { $0.name < $1.name }.last != result {
+                                        Divider()
+                                            .frame(width: Constants.screenWidth - 80)
+                                            .offset(x: 35)
                                     }
-                                }.padding(.vertical, 10)
-                            } else {
-                                // Fallback on earlier versions
-                            }
+                                }
+                            }.padding(.vertical, 10)
                         }.animation(.spring(response: 0.25, dampingFraction: 0.70, blendDuration: 0))
                         .background(Color("buttonColor"))
                         .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
@@ -216,7 +212,6 @@ struct addNewContactView: View {
                     }
                     
                     Spacer()
-                    
                     if !self.isLoading && self.grandUsers.count > 0 || (self.outputSearchText.count > 0 && self.grandUsers.count == 0) {
                         FooterInformation()
                     }
@@ -225,8 +220,10 @@ struct addNewContactView: View {
                     Request.registeredUsersFromAddressBook(withUdid: UIDevice.current.identifierForVendor?.uuidString, isCompact: false, successBlock: { (users) in
                         self.regristeredAddressBook.removeAll()
                         for i in users {
-                            if self.isUserNotContact(id: i.id) && i.id != Session.current.currentUserID {
-                                self.regristeredAddressBook.append(i)
+                            DispatchQueue.main.async {
+                                if self.isUserNotContact(id: i.id) && i.id != Session.current.currentUserID {
+                                    self.regristeredAddressBook.append(i)
+                                }
                             }
                         }
                     })

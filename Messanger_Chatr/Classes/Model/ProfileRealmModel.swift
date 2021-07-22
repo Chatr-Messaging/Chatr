@@ -195,7 +195,7 @@ class changeProfileRealmDate {
                     
                     if let avatar = objects.avatar, oldData.avatar != avatar {
                         oldData.avatar = avatar
-                    } else if let avatarCube = PersistenceManager.shared.getCubeProfileImage(usersID: objects), oldData.avatar != avatarCube {
+                    } else if objects.avatar == "", let avatarCube = PersistenceManager.shared.getCubeProfileImage(usersID: objects), oldData.avatar != avatarCube {
                         oldData.avatar = avatarCube
                     }
                     

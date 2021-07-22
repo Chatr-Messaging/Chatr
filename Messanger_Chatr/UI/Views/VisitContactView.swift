@@ -52,6 +52,7 @@ struct VisitContactView: View {
             ScrollView(.vertical, showsIndicators: true) {
                 //MARK: Top Profile
                 topHeaderContactView(viewModel: self.viewModel, contact: self.$contact, quickSnapViewState: self.$quickSnapViewState, isProfileImgOpen: self.$isProfileImgOpen, isProfileBioOpen: self.$isProfileBioOpen, selectedImageUrl: self.$selectedImageUrl)
+                    .environmentObject(self.auth)
                     .padding(.top)
                     .background(GeometryReader {
                         Color.clear.preference(key: ViewOffsetKey.self,
@@ -767,7 +768,7 @@ struct VisitContactView: View {
                                             newContact.phoneNumber = self.connectyContact.phone ?? ""
                                             newContact.lastOnline = self.connectyContact.lastRequestAt ?? Date()
                                             newContact.createdAccount = self.connectyContact.createdAt ?? Date()
-                                            newContact.avatar = PersistenceManager.shared.getCubeProfileImage(usersID: self.connectyContact) ?? ""
+                                            newContact.avatar = self.connectyContact.avatar ?? PersistenceManager.shared.getCubeProfileImage(usersID: self.connectyContact) ?? ""
                                             newContact.bio = firebaseContact.bio
                                             newContact.facebook = firebaseContact.facebook
                                             newContact.twitter = firebaseContact.twitter
@@ -892,7 +893,7 @@ struct VisitContactView: View {
             newContact.phoneNumber = self.viewState == .fromGroupDialog ? self.contact.phoneNumber : self.connectyContact.phone ?? ""
             newContact.lastOnline = self.viewState == .fromGroupDialog ? self.contact.lastOnline : self.connectyContact.lastRequestAt ?? Date()
             newContact.createdAccount = self.viewState == .fromGroupDialog ? self.contact.createdAccount : self.connectyContact.createdAt ?? Date()
-            newContact.avatar = self.viewState == .fromGroupDialog ? self.contact.avatar : PersistenceManager.shared.getCubeProfileImage(usersID: self.connectyContact) ?? ""
+            newContact.avatar = self.contact.avatar
             newContact.bio = firebaseContact.bio
             newContact.facebook = firebaseContact.facebook
             newContact.twitter = firebaseContact.twitter
@@ -940,7 +941,7 @@ struct topHeaderContactView: View {
                 }
             }) {
                 ZStack {
-                    WebImage(url: URL(string: contact.avatar))
+                    WebImage(url: URL(string: self.contact.avatar)))
                         .resizable()
                         .placeholder{ Image("empty-profile").resizable().frame(width: 110, height: 110, alignment: .center).scaledToFill() }
                         .indicator(.activity)

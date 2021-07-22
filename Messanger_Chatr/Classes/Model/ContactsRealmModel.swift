@@ -274,7 +274,7 @@ class changeContactsRealmData {
                                     
                                     if let avatar = user.avatar, avatar != "", foundContact.avatar != avatar {
                                         foundContact.avatar = avatar
-                                    } else if let avatarCube = PersistenceManager.shared.getCubeProfileImage(usersID: user), avatarCube != "", foundContact.avatar != avatarCube {
+                                    } else if user.avatar == "", let avatarCube = PersistenceManager.shared.getCubeProfileImage(usersID: user), avatarCube != "", foundContact.avatar != avatarCube {
                                         foundContact.avatar = avatarCube
                                     }
 
@@ -372,7 +372,7 @@ class changeContactsRealmData {
         var avitarURLs: [String] = []
         Request.users(withIDs: occuIDs, paginator: Paginator.limit(100, skip: 0), successBlock: { (paginator, users) in
             for user in users {
-                avitarURLs.append(PersistenceManager.shared.getCubeProfileImage(usersID: user) ?? "")
+                avitarURLs.append(user.avatar ?? PersistenceManager.shared.getCubeProfileImage(usersID: user) ?? "")
             }
             completion(avitarURLs)
         })
@@ -409,7 +409,7 @@ class changeContactsRealmData {
                             
                             if let avatar = user.avatar, avatar != "", foundContact.avatar != avatar {
                                 foundContact.avatar = avatar
-                            } else if let avatarCube = PersistenceManager.shared.getCubeProfileImage(usersID: user), avatarCube != "", foundContact.avatar != avatarCube {
+                            } else if user.avatar == "", let avatarCube = PersistenceManager.shared.getCubeProfileImage(usersID: user), avatarCube != "", foundContact.avatar != avatarCube {
                                 foundContact.avatar = avatarCube
                             }
                             

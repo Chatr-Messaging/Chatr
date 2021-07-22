@@ -74,14 +74,14 @@ struct SearchAddNewContactSection: View {
                     .padding(.top)
             }
             
-            VStack(alignment: .center, spacing: 0) {
+            LazyVStack(alignment: .center, spacing: 0) {
                 if !self.isLoading {
                     if self.grandUsers.count > 0 {
                         ForEach(self.grandUsers.indices, id: \.self) { contact in
                             NavigationLink(destination: VisitContactView(newMessage: self.$newDialogID, dismissView: self.$dismissView, viewState: .fromSearch, connectyContact: self.grandUsers[contact]).environmentObject(self.auth).edgesIgnoringSafeArea(.all)) {
                                 VStack(alignment: .trailing, spacing: 0) {
                                     HStack {
-                                        if let avatar = PersistenceManager.shared.getCubeProfileImage(usersID: self.grandUsers[contact]), avatar != "" {
+                                        if let avatar = self.grandUsers[contact].avatar ?? PersistenceManager.shared.getCubeProfileImage(usersID: self.grandUsers[contact]), avatar != "" {
                                             WebImage(url: URL(string: avatar))
                                                 .resizable()
                                                 .placeholder{ Image("empty-profile").resizable().frame(width: 45, height: 45, alignment: .center).scaledToFill() }
@@ -197,24 +197,28 @@ struct SearchAddNewContactSection: View {
         Request.users(withFullName: searchText, paginator: Paginator.limit(20, skip: 0), successBlock: { (paginator, users) in
             for i in users {
                 if i.id != Session.current.currentUserID {
-                    self.grandUsers.append(i)
-                    self.grandUsers.removeDuplicates()
+                    withAnimation {
+                        self.grandUsers.append(i)
+                        self.grandUsers.removeDuplicates()
+                    }
                 }
+            }
+            
+            Request.users(withPhoneNumbers: [searchText], paginator: Paginator.limit(5, skip: 0), successBlock: { (paginator, users) in
+                for i in users {
+                    if i.id != Session.current.currentUserID {
+                        withAnimation {
+                            self.grandUsers.append(i)
+                            self.grandUsers.removeDuplicates()
+                        }
+                    }
+                }
+                self.isLoading = false
+            }) { (error) in
+                print("error searching for phone number user \(error.localizedDescription)")
             }
         }) { (error) in
             print("error searching for name user \(error.localizedDescription)")
-        }
-        
-        Request.users(withPhoneNumbers: [searchText], paginator: Paginator.limit(5, skip: 0), successBlock: { (paginator, users) in
-            for i in users {
-                if i.id != Session.current.currentUserID {
-                    self.grandUsers.append(i)
-                    self.grandUsers.removeDuplicates()
-                }
-            }
-            self.isLoading = false
-        }) { (error) in
-            print("error searching for phone number user \(error.localizedDescription)")
         }
     }
     

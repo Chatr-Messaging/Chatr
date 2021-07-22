@@ -21,7 +21,7 @@ struct ContactCell: View {
                     .frame(width: 35, height: 35, alignment: .center)
                     .foregroundColor(Color("bgColor"))
                 
-                if let avatarUrl = PersistenceManager.shared.getCubeProfileImage(usersID: self.user), avatarUrl != "" {
+                if let avatarUrl = self.user.avatar ?? PersistenceManager.shared.getCubeProfileImage(usersID: self.user), avatarUrl != "" {
                     WebImage(url: URL(string: avatarUrl))
                         .resizable()
                         .placeholder{ Image("empty-profile").resizable().frame(width: 45, height: 45, alignment: .center).scaledToFill() }

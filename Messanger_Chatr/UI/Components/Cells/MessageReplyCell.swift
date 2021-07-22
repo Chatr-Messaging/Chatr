@@ -103,7 +103,7 @@ struct MessageReplyCell: View {
                         Request.users(withIDs: [NSNumber(value: Int(self.reply.fromId) ?? 0)], paginator: Paginator.limit(1, skip: 0), successBlock: { (paginator, users) in
                             for i in users {
                                 if i.id == UInt(self.reply.fromId) {
-                                    self.avatar = PersistenceManager().getCubeProfileImage(usersID: i) ?? ""
+                                    self.avatar = i.avatar ?? PersistenceManager().getCubeProfileImage(usersID: i) ?? ""
                                     self.fullName = i.fullName ?? "no name"
                                 }
                             }
@@ -116,7 +116,7 @@ struct MessageReplyCell: View {
                     Request.users(withIDs: [NSNumber(value: Int(self.reply.fromId) ?? 0)], paginator: Paginator.limit(1, skip: 0), successBlock: { (paginator, users) in
                         for i in users {
                             if i.id == UInt(self.reply.fromId) {
-                                self.avatar = PersistenceManager().getCubeProfileImage(usersID: i) ?? ""
+                                self.avatar = i.avatar ?? PersistenceManager().getCubeProfileImage(usersID: i) ?? ""
                                 self.fullName = i.fullName ?? "no name"
                             }
                         }

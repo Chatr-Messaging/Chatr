@@ -187,7 +187,7 @@ struct ContactBubble: View {
                                         newContact.phoneNumber = firstUser.phone ?? "empty phone number"
                                         newContact.lastOnline = firstUser.lastRequestAt ?? Date()
                                         newContact.createdAccount = firstUser.createdAt ?? Date()
-                                        newContact.avatar = PersistenceManager.shared.getCubeProfileImage(usersID: firstUser) ?? ""
+                                        newContact.avatar = firstUser.avatar ?? PersistenceManager.shared.getCubeProfileImage(usersID: firstUser) ?? ""
                                         newContact.bio = contact.bio
                                         newContact.facebook = contact.facebook
                                         newContact.twitter = contact.twitter

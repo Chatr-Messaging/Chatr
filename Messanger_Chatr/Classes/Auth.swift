@@ -112,6 +112,7 @@ class AuthModel: NSObject, ObservableObject {
     @ObservedObject var contacts = ContactsRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ContactStruct.self))
     @ObservedObject var dialogs = DialogRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(DialogStruct.self))
     @ObservedObject var messages = MessagesRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(MessageStruct.self))
+    @ObservedObject var addressBook = AddressBookRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(AddressBookStruct.self))
     
     var anyCancellable: AnyCancellable? = nil
     var anyCancellable1: AnyCancellable? = nil
@@ -200,7 +201,8 @@ class AuthModel: NSObject, ObservableObject {
                                     if user.fullName != nil {
                                         self.haveUserFullName = true
                                     }
-                                    if PersistenceManager.shared.getCubeProfileImage(usersID: user) != nil {
+
+                                    if user.avatar != "" || PersistenceManager.shared.getCubeProfileImage(usersID: user) != nil {
                                         self.haveUserProfileImg = true
                                     }
                                 } else {
