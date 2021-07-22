@@ -1080,9 +1080,9 @@ struct AddProfileImageView: View {
                         }
                     }.buttonStyle(ClickButtonStyle())
                     .sheet(isPresented: $showImagePicker) {
-                        ImagePicker22(sourceType: .photoLibrary) { imageUrl in
+                        ImagePicker22(sourceType: .photoLibrary) { (imageUrl, _) in
                             self.auth.uploadFile(imageUrl, completionHandler: { imageId in
-                                self.auth.setUserAvatar(imageId: imageId, completion: { success in
+                                self.auth.setUserAvatar(imageId: imageId, oldLink: "", completion: { success in
                                     print("DONEEE SETTING UP URL! \(success)")
                                 })
                             })

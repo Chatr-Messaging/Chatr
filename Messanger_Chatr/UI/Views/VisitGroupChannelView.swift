@@ -796,7 +796,7 @@ struct VisitGroupChannelView: View {
             }
             self.dialogRelationship = .notSubscribed
             self.showingMoreSheet = false
-            changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: self.dialogModel.id)
+            changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: self.dialogModel.id, isOwner: self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID"))
         } else {
             changeDialogRealmData.shared.deletePrivateConnectyDialog(dialogID: self.dialogModel.id, isOwner: self.isOwner)
         }

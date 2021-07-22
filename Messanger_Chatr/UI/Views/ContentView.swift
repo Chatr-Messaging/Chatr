@@ -751,7 +751,7 @@ struct mainHomeList: View {
                 Request.cancelAllRequests({
                     if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), !diaId.isEmpty {
                         UserDefaults.standard.set("", forKey: "visitingDialogId")
-                        changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: diaId)
+                        changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: diaId, isOwner: false)
                     } else {
                         changeDialogRealmData.shared.fetchDialogs(completion: { _ in
                             if dialogType == "group" || dialogType == "public" {
@@ -790,7 +790,7 @@ struct mainHomeList: View {
 
                     if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), !diaId.isEmpty {
                         UserDefaults.standard.set("", forKey: "visitingDialogId")
-                        changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: diaId)
+                        changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: diaId, isOwner: false)
                     }
                 })
             }

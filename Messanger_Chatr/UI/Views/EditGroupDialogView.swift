@@ -22,8 +22,6 @@ struct EditGroupDialogView: View {
     @State var keyboardHeight: CGFloat = 0
     @State var didSave: Bool = true
     @State var username: String = ""
-    @State var inputImage: UIImage? = nil
-    @State var inputCoverImage: UIImage? = nil
     @State var groupImage: Image? = nil
     @State var coverImage: Image? = nil
     @State var avatarDownload: CGFloat = 0.0
@@ -48,8 +46,24 @@ struct EditGroupDialogView: View {
                                 .offset(y: 2)
                             Spacer()
                         }.padding(.top, 5)
-                        .sheet(isPresented: self.$showCoverImagePicker, onDismiss: self.loadCoverImage) {
-                            ImagePicker(image: self.$inputCoverImage)
+                        .sheet(isPresented: self.$showCoverImagePicker) {
+                            ImagePicker22(sourceType: .photoLibrary) { (imageUrl, img) in
+                                if let newImg = img {
+                                    self.coverImage = Image(uiImage: newImg)
+                                }
+                                
+                                self.auth.uploadFile(imageUrl, completionHandler: { coverId in
+                                    DispatchQueue.main.async {
+                                        let databaseRef = Database.database().reference().child("Marketplace/public_dialogs").child(self.dialogModel.id)
+                                        let fullImgLink = Constants.uploadcareBaseUrl + coverId + Constants.uploadcareStandardTransform
+
+                                        databaseRef.updateChildValues(["cover_photo" : "\(fullImgLink)"], withCompletionBlock: { (_,_) in
+                                            changeDialogRealmData.shared.updateDialogCoverPhoto(coverPhoto: "\(imageUrl)", dialogID: self.dialogModel.id)
+                                            UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                        })
+                                    }
+                                })
+                            }
                         }
                         
                         //Cover Image
@@ -179,38 +193,36 @@ struct EditGroupDialogView: View {
                                     self.showImagePicker.toggle()
                                 }
                             }, label: {
-                                VStack(alignment: .trailing, spacing: 0) {
-                                    HStack {
-                                        Text("Select Avatar")
-                                            .font(.none)
-                                            .fontWeight(.none)
-                                            .foregroundColor(.blue)
-                                            .padding(.leading)
-                                        Spacer()
-                                        
-                                        Image(systemName: "chevron.right")
-                                            .resizable()
-                                            .font(Font.title.weight(.bold))
-                                            .scaledToFit()
-                                            .frame(width: 7, height: 15, alignment: .center)
-                                            .foregroundColor(.secondary)
-                                    }
+                                HStack {
+                                    Text("Select Avatar")
+                                        .font(.none)
+                                        .fontWeight(.none)
+                                        .foregroundColor(.blue)
+                                        .padding(.leading)
+                                    Spacer()
+                                    
+                                    Image(systemName: "chevron.right")
+                                        .resizable()
+                                        .font(Font.title.weight(.bold))
+                                        .scaledToFit()
+                                        .frame(width: 7, height: 15, alignment: .center)
+                                        .foregroundColor(.secondary)
                                 }.padding(.horizontal)
                                 .padding(.vertical, 14)
-
-                                Divider()
-                                    .frame(width: Constants.screenWidth - 70)
-                                    .offset(x: 10)
                             }).buttonStyle(changeBGButtonStyle())
+
+                            Divider()
+                                .frame(width: Constants.screenWidth - 70)
+                                .offset(x: 10)
                             
                             Button(action: {
                                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 withAnimation {
-                                    self.showImagePicker.toggle()
+                                    self.showCoverImagePicker.toggle()
                                 }
                             }, label: {
                                 HStack {
-                                    Text("Upload Cover Photo")
+                                    Text("Select Cover Photo")
                                         .font(.none)
                                         .fontWeight(.none)
                                         .foregroundColor(.blue)
@@ -231,8 +243,23 @@ struct EditGroupDialogView: View {
                         .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
                         .padding(.horizontal)
                         .padding(.bottom, 5)
-                        .sheet(isPresented: self.$showImagePicker, onDismiss: self.loadImage) {
-                            ImagePicker(image: self.$inputImage)
+                        .sheet(isPresented: self.$showImagePicker) {
+                            ImagePicker22(sourceType: .photoLibrary) { (imageUrl, img) in
+                                if let newImg = img {
+                                    self.groupImage = Image(uiImage: newImg)
+                                }
+                                
+                                self.auth.uploadFile(imageUrl, completionHandler: { avatarId in
+                                    DispatchQueue.main.async {
+                                        let fullImgLink = Constants.uploadcareBaseUrl + avatarId + Constants.uploadcareStandardTransform
+                                        
+                                        self.setGroupAvatar(avatarLink: fullImgLink, completion: { didUpdate in
+                                            print("done updating channel avatar: \(didUpdate)")
+                                            UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                        })
+                                    }
+                                })
+                            }
                         }
                     }
                     
@@ -403,18 +430,6 @@ struct EditGroupDialogView: View {
             }
         }
     }
-    
-    func loadImage() {
-        guard let inputImage = inputImage else { return }
-        groupImage = Image(uiImage: inputImage)
-        setGroupAvatar(image: inputImage, completion: { _ in })
-    }
-    
-    func loadCoverImage() {
-        guard let inputImage = inputCoverImage else { return }
-        coverImage = Image(uiImage: inputImage)
-        setGroupCoverImage(image: inputImage, completion: { _ in })
-    }
 
     func saveGroupInfo() {
         guard self.bioText.count < 220 else {
@@ -447,31 +462,19 @@ struct EditGroupDialogView: View {
         }
     }
     
-    func setGroupAvatar(image: UIImage, completion: @escaping (Bool) -> Void) {
-        let image = image
-        let data = image.jpegData(compressionQuality: 0.5)
+    func setGroupAvatar(avatarLink: String, completion: @escaping (Bool) -> Void) {
+        let parameters = UpdateChatDialogParameters()
+        parameters.photo = avatarLink
         
-        Request.uploadFile(with: data!, fileName: "\(self.dialogModel.fullName)s_avatarImg", contentType: "image/jpeg", isPublic: true, progressBlock: { (progress) in
-            print("the upload progress is: \(progress)")
-            self.avatarDownload = CGFloat(progress)
-        }, successBlock: { (blob) in
-            let parameters = UpdateChatDialogParameters()
-            parameters.photo = blob.uid
-            
-            Request.updateDialog(withID: self.dialogModel.id, update: parameters, successBlock: { (updatedDialog) in
-                let databaseRef = Database.database().reference().child("Marketplace").child(self.dialogModel.id)
-                databaseRef.updateChildValues(["avatar" : updatedDialog.photo ?? ""], withCompletionBlock: { (_,_) in
-                    changeDialogRealmData.shared.updateDialogAvatar(avatar: updatedDialog.photo ?? "", dialogID: self.dialogModel.id)
-                    completion(true)
-                })
-                
-            }, errorBlock: { (error) in
-                completion(false)
+        Request.updateDialog(withID: self.dialogModel.id, update: parameters, successBlock: { (updatedDialog) in
+            let databaseRef = Database.database().reference().child("Marketplace/public_dialogs").child(self.dialogModel.id)
+            databaseRef.updateChildValues(["avatar" : updatedDialog.photo ?? avatarLink], withCompletionBlock: { (_,_) in
+                changeDialogRealmData.shared.updateDialogAvatar(avatar: updatedDialog.photo ?? avatarLink, dialogID: self.dialogModel.id)
+                completion(true)
             })
-        }) { (error) in
-            print("error somehow uploading...\(error.localizedDescription)")
+        }, errorBlock: { (error) in
             completion(false)
-        }
+        })
     }
     
     func setGroupCoverImage(image: UIImage, completion: @escaping (Bool) -> Void) {

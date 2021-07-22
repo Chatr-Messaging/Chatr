@@ -163,7 +163,7 @@ class changeDialogRealmData {
                             foundDialog.bio = bio
                         }
                         
-                        if let publicUrl = Blob.publicUrl(forFileUID: object.photo ?? ""), foundDialog.avatar != publicUrl {
+                        if let publicUrl = object.photo, foundDialog.avatar != publicUrl {
                             foundDialog.avatar = publicUrl
                         }
                         
@@ -196,7 +196,7 @@ class changeDialogRealmData {
                             newData.adminID.append(Int(truncating: admin))
                         }
 
-                        if let publicUrl = Blob.publicUrl(forFileUID: object.photo ?? "") {
+                        if let publicUrl = object.photo {
                             newData.avatar = publicUrl
                         }
 
@@ -355,6 +355,12 @@ class changeDialogRealmData {
                 onSuccess(dia)
             }
         }
+    }
+
+    func removePublicFirebaseChild(dialogId: String) {
+        let dialogRef = Database.database().reference().child("Marketplace").child("public_dialogs").child("\(dialogId)")
+
+        dialogRef.removeValue { (_, _) in }
     }
 
     func reportFirebasePublicDialog(dialogId: String, onSuccess: @escaping (PublicDialogModel) -> Void, onError: @escaping (_ errorMessage: String?) -> Void) {
@@ -595,8 +601,16 @@ class changeDialogRealmData {
         }
     }
 
-    func unsubscribePublicConnectyDialog(dialogID: String) {
+    func unsubscribePublicConnectyDialog(dialogID: String, isOwner: Bool) {
         Request.unsubscribeFromPublicDialog(withID: dialogID, successBlock: {
+            if isOwner {
+                changeDialogRealmData.shared.removePublicFirebaseChild(dialogId: dialogID)
+                self.updateDialogDelete(isDelete: true, dialogID: dialogID)
+                UserDefaults.standard.set(false, forKey: "localOpen")
+                
+                return
+            }
+            
             self.toggleFirebaseMemberCount(dialogId: dialogID, isJoining: false, totalCount: nil, onSuccess: { _ in
                 UserDefaults.standard.set(false, forKey: "localOpen")
                 self.updateDialogDelete(isDelete: true, dialogID: dialogID)

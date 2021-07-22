@@ -23,8 +23,10 @@ struct NewPublicConversationSection: View {
     @Binding var isNotPresent: Bool
     @Binding var groupName: String
     @Binding var description: String
-    @Binding var inputImage: UIImage?
-    @Binding var inputCoverImage: UIImage?
+    @Binding var inputImageUrl: URL?
+    @Binding var inputCoverImageUrl: URL?
+    @State var inputImage: UIImage?
+    @State var inputCoverImage: UIImage?
     @State var groupImage: Image? = nil
     @State var coverImage: Image? = nil
     @Binding var selectedTags: [publicTag]
@@ -71,7 +73,7 @@ struct NewPublicConversationSection: View {
                                     Image(systemName: "photo.on.rectangle.angled")
                                         .resizable()
                                         .scaledToFit()
-                                        .foregroundColor(Color.secondary)
+                                        .foregroundColor(Color.primary)
                                         .frame(width: 36, height: 34, alignment: .center)
 
                                     Text("cover photo")
@@ -83,7 +85,8 @@ struct NewPublicConversationSection: View {
                         } else {
                             coverImage?.resizable().aspectRatio(contentMode: .fill).frame(width: Constants.screenWidth - 30, height: 160).clipped()
                         }
-                    }).padding(.bottom, 30)
+                    }).buttonStyle(ClickMiniButtonStyle())
+                    .padding(.bottom, 30)
                     
                     Button(action: {
                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
@@ -92,23 +95,29 @@ struct NewPublicConversationSection: View {
                         }
                     }, label: {
                         if (groupImage == nil) {
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 20)
-                                    .frame(width: 80, height: 80, alignment: .center)
-                                    .foregroundColor(Color("buttonColor"))
-
-                                Image(systemName: "person.crop.circle.badge.plus")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .foregroundColor(Color.secondary)
-                                    .frame(width: 45, height: 45, alignment: .center)
-                                    .offset(x: -3)
-                            }.shadow(color: Color("buttonShadow"), radius: 12, x: 0, y: 5)
+                            Image(systemName: "person.crop.circle.badge.plus")
+                                .resizable()
+                                .scaledToFit()
+                                .foregroundColor(Color.primary)
+                                .frame(width: 40, height: 40, alignment: .center)
+                                .offset(x: -3)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 20)
+                                        .frame(width: 80, height: 80, alignment: .center)
+                                        .foregroundColor(Color("buttonColor"))
+                                        .shadow(color: Color("buttonShadow"), radius: 12, x: 0, y: 5)
+                                )
                         } else {
-                            groupImage?.resizable().aspectRatio(contentMode: .fill).frame(width: 80, height: 80).cornerRadius(16)
-                                .shadow(color: Color("buttonShadow"), radius: 12, x: 0, y: 5)
+                            groupImage?.resizable().aspectRatio(contentMode: .fill).frame(width: 80, height: 80).cornerRadius(20)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 20)
+                                        .frame(width: 80, height: 80, alignment: .center)
+                                        .foregroundColor(Color("buttonColor"))
+                                        .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 5)
+                                ).offset(y: 17.5)
                         }
-                    }).offset(y: -12)
+                    }).buttonStyle(ClickButtonStyle())
+                    .offset(y: -34)
                 }
                 Divider()
                     .frame(width: Constants.screenWidth - 70)
@@ -145,11 +154,11 @@ struct NewPublicConversationSection: View {
                 Button(action: {
                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                     withAnimation {
-                        self.showImagePicker.toggle()
+                        self.showCoverImagePicker.toggle()
                     }
                 }, label: {
                     HStack {
-                        Text("Upload Cover Photo")
+                        Text("Select Cover Photo")
                             .font(.none)
                             .fontWeight(.none)
                             .foregroundColor(.blue)
@@ -170,8 +179,14 @@ struct NewPublicConversationSection: View {
             .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
             .padding(.horizontal)
             .padding(.bottom, 5)
-            .sheet(isPresented: self.$showImagePicker, onDismiss: self.loadImage) {
-                ImagePicker(image: self.$inputImage)
+            .sheet(isPresented: self.$showImagePicker) {
+                ImagePicker22(sourceType: .photoLibrary) { (imageUrl, img) in
+                    self.inputImageUrl = imageUrl
+                    
+                    if let newImg = img {
+                        self.groupImage = Image(uiImage: newImg)
+                    }
+                }
             }
             
             //MARK: Name & Bio Section
@@ -300,8 +315,14 @@ struct NewPublicConversationSection: View {
                         }.frame(maxHeight: 175)
                     }
                 }
-            }).sheet(isPresented: self.$showCoverImagePicker, onDismiss: self.loadCoverImage) {
-                ImagePicker(image: self.$inputCoverImage)
+            }).sheet(isPresented: self.$showCoverImagePicker) {
+                ImagePicker22(sourceType: .photoLibrary) { (imageUrl, img) in
+                    self.inputCoverImageUrl = imageUrl
+                    
+                    if let newImg = img {
+                        self.coverImage = Image(uiImage: newImg)
+                    }
+                }
             }
 
             HStack(alignment: .center) {

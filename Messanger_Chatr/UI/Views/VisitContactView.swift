@@ -941,7 +941,7 @@ struct topHeaderContactView: View {
                 }
             }) {
                 ZStack {
-                    WebImage(url: URL(string: self.contact.avatar)))
+                    WebImage(url: URL(string: self.contact.avatar))
                         .resizable()
                         .placeholder{ Image("empty-profile").resizable().frame(width: 110, height: 110, alignment: .center).scaledToFill() }
                         .indicator(.activity)

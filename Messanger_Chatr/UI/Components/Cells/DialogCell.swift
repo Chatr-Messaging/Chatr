@@ -341,7 +341,7 @@ struct DialogCell: View {
                                     changeDialogRealmData.shared.deletePrivateConnectyDialog(dialogID: self.dialogModel.id, isOwner: self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? true : false)
                                 } else if self.dialogModel.dialogType == "public" {
                                     UserDefaults.standard.set("", forKey: "visitingDialogId")
-                                    changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: self.dialogModel.id)
+                                    changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: self.dialogModel.id, isOwner: self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID"))
                                 }
                             }
                         }),
@@ -356,7 +356,7 @@ struct DialogCell: View {
                     UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
                     changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
                     if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), diaId != "" {
-                        changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: diaId)
+                        changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: diaId, isOwner: false)
                         UserDefaults.standard.set("", forKey: "visitingDialogId")
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {

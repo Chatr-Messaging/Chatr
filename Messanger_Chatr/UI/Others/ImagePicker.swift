@@ -83,18 +83,18 @@ struct ImagePicker22: UIViewControllerRepresentable {
     private var presentationMode
 
     let sourceType: UIImagePickerController.SourceType
-    let onImagePicked: (URL) -> Void
+    let onImagePicked: (URL, UIImage?) -> Void
 
     final class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
 
         @Binding
         private var presentationMode: PresentationMode
         private let sourceType: UIImagePickerController.SourceType
-        private let onImagePicked: (URL) -> Void
+        private let onImagePicked: (URL, UIImage?) -> Void
         
         init(presentationMode: Binding<PresentationMode>,
              sourceType: UIImagePickerController.SourceType,
-             onImagePicked: @escaping (URL) -> Void) {
+             onImagePicked: @escaping (URL, UIImage?) -> Void) {
             _presentationMode = presentationMode
             self.sourceType = sourceType
             self.onImagePicked = onImagePicked
@@ -102,8 +102,9 @@ struct ImagePicker22: UIViewControllerRepresentable {
 
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
             let imageUrl = info[UIImagePickerController.InfoKey.imageURL] as! URL
-            
-            onImagePicked(imageUrl)
+            let img = info[UIImagePickerController.InfoKey.originalImage] as? UIImage
+
+            onImagePicked(imageUrl, img)
             presentationMode.dismiss()
         }
         

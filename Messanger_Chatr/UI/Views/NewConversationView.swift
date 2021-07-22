@@ -29,8 +29,8 @@ struct NewConversationView: View {
     @State var creatingDialog: Bool = false
     @State var groupName: String = ""
     @State var description: String = ""
-    @State var inputImage: UIImage? = nil
-    @State var inputCoverImage: UIImage? = nil
+    @State var inputImageUrl: URL? = nil
+    @State var inputCoverImageUrl: URL? = nil
     @State var selectedTags: [publicTag] = []
     @ObservedObject var contacts = ContactsRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ContactStruct.self))
     @ObservedObject var profile = ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self))
@@ -332,7 +332,8 @@ struct NewConversationView: View {
 
                     //MARK: Public Dialog
                     VStack {
-                        NewPublicConversationSection(creatingDialog: self.$creatingDialog, isNotPresent: self.$navigationPrivate, groupName: self.$groupName, description: self.$description, inputImage: self.$inputImage, inputCoverImage: self.$inputCoverImage, selectedTags: self.$selectedTags)
+                        NewPublicConversationSection(creatingDialog: self.$creatingDialog, isNotPresent: self.$navigationPrivate, groupName: self.$groupName, description: self.$description, inputImageUrl: self.$inputImageUrl, inputCoverImageUrl: self.$inputCoverImageUrl, selectedTags: self.$selectedTags)
+                            .environmentObject(auth)
                             .resignKeyboardOnDragGesture()
                         
                         //MARK: FOOTER
@@ -453,15 +454,14 @@ struct NewConversationView: View {
                 dialog.name = self.groupName
                 dialog.dialogDescription = self.description
 
-                let data = inputImage?.jpegData(compressionQuality: 1.0)
-                let coverData = inputCoverImage?.jpegData(compressionQuality: 1.0)
+                //let data = inputImage?.jpegData(compressionQuality: 1.0)
+                //let coverData = inputCoverImage?.jpegData(compressionQuality: 1.0)
                 let databaseRef = Database.database().reference().child("Marketplace")
+                guard let avatarUrl = self.inputImageUrl, let coverUrl = inputCoverImageUrl else { return }
 
-                Request.uploadFile(with: data!, fileName: "publicDialog_profileImg", contentType: "image/jpeg", isPublic: true, progressBlock: { (progress) in
-                    print("uploading image: \(progress)")
-                }, successBlock: { (blob) in
-                    dialog.photo = blob.uid
-                    
+                self.auth.uploadFile(avatarUrl, completionHandler: { avatarId in
+                    dialog.photo = Constants.uploadcareBaseUrl + avatarId + Constants.uploadcareStandardTransform
+
                     Request.createDialog(dialog, successBlock: { (dialog) in
                         changeDialogRealmData.shared.fetchDialogs(completion: { _ in
                             for i in self.selectedTags {
@@ -469,15 +469,13 @@ struct NewConversationView: View {
                                 databaseRef.child("tags").child(i.title).child("dialogs").setValue([dialog.id : true])
                             }
                             
-                            Request.uploadFile(with: coverData!, fileName: "publicDialog_coverImg", contentType: "image/jpeg", isPublic: true, progressBlock: { (progress) in
-                                print("uploading cover image: \(progress)")
-                            }, successBlock: { (blobCover) in
+                            self.auth.uploadFile(coverUrl, completionHandler: { coverPhotoId in
                                 changeDialogRealmData.shared.fetchTotalCountPublicDialogs(completion: { count in
-                                    databaseRef.child(dialog.id?.description ?? "").setValue(["avatar" : dialog.photo ?? "", "banned" : false, "canMembersType" : false, "cover_photo" : blobCover.id.description, "creation_order" : count + 1, "date_created" : Date().description, "description" : dialog.description, "memberCount" : 1, "members" : [UserDefaults.standard.integer(forKey: "currentUserID") : true], "name" : self.groupName, "owner" : UserDefaults.standard.integer(forKey: "currentUserID")])
+                                    databaseRef.child("public_dialogs").child(dialog.id?.description ?? "").setValue(["avatar" : dialog.photo ?? Constants.uploadcareBaseUrl + avatarId + Constants.uploadcareStandardTransform, "banned" : false, "canMembersType" : false, "cover_photo" : Constants.uploadcareBaseUrl + coverPhotoId + Constants.uploadcareStandardTransform, "creation_order" : count + 1, "date_created" : Date().description, "description" : dialog.dialogDescription ?? "empty description", "memberCount" : 1, "members" : ["\(UserDefaults.standard.integer(forKey: "currentUserID"))" : true], "name" : dialog.name ?? self.groupName, "owner" : UserDefaults.standard.integer(forKey: "currentUserID")])
 
                                     self.description = ""
                                     self.groupName = ""
-                                    self.inputImage = nil
+                                    self.inputImageUrl = nil
                                     self.selectedTags.removeAll()
                                     self.newDialogID = dialog.id?.description ?? ""
                                     UserDefaults.standard.set(self.newDialogID, forKey: "selectedDialogID")
@@ -486,21 +484,15 @@ struct NewConversationView: View {
                                         self.presentationMode.wrappedValue.dismiss()
                                     }
                                 })
-                            }) { (error) in
-                                print("error uploading cover image...\(error.localizedDescription)")
-                                self.creatingDialog = false
-                            }
+                            })
                         })
                     }) { (error) in
                         print("the error creating profile dialog...\(error.localizedDescription)")
                         UINotificationFeedbackGenerator().notificationOccurred(.error)
                         self.creatingDialog = false
                     }
-
-                }) { (error) in
-                    print("error uploading profile image...\(error.localizedDescription)")
-                    self.creatingDialog = false
-                }
+                    
+                })
             }
         } else {
             withAnimation {
@@ -512,7 +504,7 @@ struct NewConversationView: View {
     func canCreate() -> Bool {
         if self.navigationPrivate && self.selectedContact.count != 0 {
             return true
-        } else if self.selectedTags.count != 0 && self.groupName.count != 0 && self.description.count != 0 && self.inputImage != nil && !self.creatingDialog {
+        } else if self.selectedTags.count != 0 && self.groupName.count != 0 && self.description.count != 0 && self.inputImageUrl != nil && self.inputCoverImageUrl != nil && !self.creatingDialog {
             return true
         } else {
             return false
