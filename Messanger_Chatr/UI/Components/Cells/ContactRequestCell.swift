@@ -30,15 +30,27 @@ struct ContactRequestCell: View {
             self.action = 1
         }) {
             HStack {
-                WebImage(url: URL(string: self.contact.avatar))
-                    .resizable()
-                    .placeholder{ Image("empty-profile").resizable().frame(width: 45, height: 45, alignment: .center).scaledToFill() }
-                    .indicator(.activity)
-                    .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
-                    .scaledToFill()
-                    .frame(width: 45, height: 45, alignment: .center)
-                    .clipShape(Circle())
-                    .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 8)
+                if let avitarURL = self.contact.avatar, avitarURL != "" {
+                    WebImage(url: URL(string: avitarURL))
+                        .resizable()
+                        .placeholder{ Image("empty-profile").resizable().frame(width: 45, height: 45, alignment: .center).scaledToFill() }
+                        .indicator(.activity)
+                        .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
+                        .scaledToFill()
+                        .frame(width: 45, height: 45, alignment: .center)
+                        .clipShape(Circle())
+                        .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 8)
+                } else {
+                    Circle()
+                        .frame(width: 45, height: 45, alignment: .center)
+                        .foregroundColor(Color("bgColor"))
+                        .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 5)
+
+                    Text("".firstLeters(text: self.contact.fullName))
+                        .font(.system(size: 24))
+                        .fontWeight(.bold)
+                        .foregroundColor(.secondary)
+                }
                 
                 VStack(alignment: .leading) {
                     Text(self.contact.fullName)

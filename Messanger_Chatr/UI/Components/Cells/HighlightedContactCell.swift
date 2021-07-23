@@ -131,7 +131,7 @@ struct HighlightedContactCell: View {
                             .padding(3)
                     }.buttonStyle(ClickButtonStyle())
                 }.frame(width: 160)
-            }.padding(.all)
+            }.padding(.vertical, 10)
         }
     }
 }

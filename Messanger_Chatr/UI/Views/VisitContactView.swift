@@ -840,15 +840,27 @@ struct topHeaderContactView: View {
                 }
             }) {
                 ZStack {
-                    WebImage(url: URL(string: self.contact.avatar))
-                        .resizable()
-                        .placeholder{ Image("empty-profile").resizable().frame(width: 110, height: 110, alignment: .center).scaledToFill() }
-                        .indicator(.activity)
-                        .transition(.fade(duration: 0.25))
-                        .scaledToFill()
-                        .frame(width: 110, height: 110, alignment: .center)
-                        .clipShape(Circle())
-                        .shadow(color: Color.black.opacity(0.25), radius: 10, x: 0, y: 8)
+                    if self.contact.avatar != "" {
+                        WebImage(url: URL(string: self.contact.avatar))
+                            .resizable()
+                            .placeholder{ Image("empty-profile").resizable().frame(width: 110, height: 110, alignment: .center).scaledToFill() }
+                            .indicator(.activity)
+                            .transition(.fade(duration: 0.25))
+                            .scaledToFill()
+                            .frame(width: 110, height: 110, alignment: .center)
+                            .clipShape(Circle())
+                            .shadow(color: Color.black.opacity(0.25), radius: 12, x: 0, y: 8)
+                    } else {
+                        Circle()
+                            .frame(width: 110, height: 110, alignment: .center)
+                            .foregroundColor(Color("bgColor"))
+                            .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 8)
+
+                        Text("".firstLeters(text: contact.fullName))
+                            .font(.system(size: 52))
+                            .fontWeight(.semibold)
+                            .foregroundColor(.primary)
+                    }
 
                     if self.contact.quickSnaps.count > 0 {
                         Circle()
@@ -1057,7 +1069,7 @@ struct topHeaderContactView: View {
                         }
                     }.padding(.top, 40)
                     .actionSheet(isPresented: self.$openActionSheet) {
-                        ActionSheet(title: Text("Are you sure?"), message: Text("Opening \(self.contact.fullName)'s profile will leave the current application."), buttons: [
+                        ActionSheet(title: Text("Open \(self.contact.fullName)'s Profile?"), message: Text("Opening will leave the current application."), buttons: [
                             .default(Text("Open " + "\(self.openNetwork == .facebook ? "Facebook" : self.openNetwork == .instagram ? "Instagram" : self.openNetwork == .twitter ? "Twitter" : "Profile")")) {
                                 if self.openNetwork == .facebook {
                                     self.viewModel.openFacebookApp(screenName: self.contact.facebook)
