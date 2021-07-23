@@ -118,7 +118,6 @@ struct ChatMessagesView: View {
                                 Spacer()
                                 ForEach(maxPagination ..< currentMessages.count, id: \.self) { message in
                                     let messagePosition: messagePosition = UInt(currentMessages[message].senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? .right : .left
-                                    let notLast = currentMessages[message].id != currentMessages.last?.id
                                     let topMsg = currentMessages[message].id == currentMessages.first?.id && currentMessages.count >= self.maxMessageCount
 
                                     if topMsg {
@@ -192,6 +191,7 @@ struct ChatMessagesView: View {
                                         .background(Color.clear)
                                     }.onAppear {
                                         //print("the adding mesg id is: \(currentMessages[message].id) but the on i am looking for is: \(currentMessages[(pageShowCount * self.scrollPage) + self.pageShowCount].id) at index: \((pageShowCount * self.scrollPage) - self.pageShowCount)")
+                                        let notLast = currentMessages[message].id != currentMessages.last?.id
                                         if !notLast {
                                             print("called on appear: \(message)")
                                             if self.firstScroll {

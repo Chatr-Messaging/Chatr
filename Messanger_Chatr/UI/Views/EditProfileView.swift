@@ -102,9 +102,10 @@ struct EditProfileView: View {
                     .padding(.horizontal)
                     .padding(.bottom, 5)
                     .sheet(isPresented: self.$showImagePicker) {
-                        ImagePicker22(sourceType: .photoLibrary) { (imageUrl, _) in
+                        ImagePicker22(sourceType: .savedPhotosAlbum) { (imageUrl, _) in
                             self.auth.uploadFile(imageUrl, completionHandler: { imageId in
                                 DispatchQueue.main.async {
+                                    self.showImagePicker = false
                                     self.auth.setUserAvatar(imageId: imageId, oldLink: self.auth.profile.results.first?.avatar ?? "", completion: { success in
                                         print("DONEEE SETTING UP URL! \(success)")
                                         UINotificationFeedbackGenerator().notificationOccurred(.success)

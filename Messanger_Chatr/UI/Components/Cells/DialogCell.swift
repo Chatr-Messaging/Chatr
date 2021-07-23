@@ -44,35 +44,36 @@ struct DialogCell: View {
 
                 if self.dialogModel.dialogType == "private" || self.dialogModel.dialogType == "public" || self.dialogModel.dialogType == "broadcast" {
                     ZStack {
-                        WebImage(url: URL(string: self.dialogModel.dialogType == "public" ? (self.dialogModel.avatar) : (self.privateDialogContact.id != 0 ? self.privateDialogContact.avatar : self.connectyContact.avatar ?? PersistenceManager.shared.getCubeProfileImage(usersID: self.connectyContact)) ?? ""))
-                            .resizable()
-                            .placeholder{ Image("empty-profile").resizable().frame(width: 55, height: 55, alignment: .center).scaledToFill() }
-                            .indicator(.activity)
-                            .scaledToFill()
-                            .frame(width: 55, height: 55, alignment: .center)
-                            .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.05)), removal: AnyTransition.identity))
-                            .cornerRadius(self.dialogModel.dialogType == "public" ? 12.5 : 27.5)
-                            .offset(x: self.dialogModel.dialogType == "public" ? -7.5 : -5)
-                            .shadow(color: Color.black.opacity(0.23), radius: 7, x: 0, y: 5)
-                            .onTapGesture {
-                                if isOpen {
-                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                    if self.dialogModel.dialogType == "private" {
-                                        self.openContactProfile.toggle()
-                                    } else if self.dialogModel.dialogType == "group" || self.dialogModel.dialogType == "public" {
-                                        self.openGroupProfile.toggle()
+                        if self.dialogModel.avatar != "" || self.privateDialogContact.avatar != "" {
+                            WebImage(url: URL(string: self.dialogModel.dialogType == "public" ? (self.dialogModel.avatar) : (self.privateDialogContact.id != 0 ? self.privateDialogContact.avatar : self.connectyContact.avatar ?? PersistenceManager.shared.getCubeProfileImage(usersID: self.connectyContact)) ?? ""))
+                                .resizable()
+                                .placeholder{ Image("empty-profile").resizable().frame(width: 55, height: 55, alignment: .center).scaledToFill() }
+                                .indicator(.activity)
+                                .scaledToFill()
+                                .frame(width: 55, height: 55, alignment: .center)
+                                .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.05)), removal: AnyTransition.identity))
+                                .cornerRadius(self.dialogModel.dialogType == "public" ? 12.5 : 27.5)
+                                .offset(x: self.dialogModel.dialogType == "public" ? -7.5 : -5)
+                                .shadow(color: Color.black.opacity(0.23), radius: 7, x: 0, y: 5)
+                                .onTapGesture {
+                                    if isOpen {
+                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                        if self.dialogModel.dialogType == "private" {
+                                            self.openContactProfile.toggle()
+                                        } else if self.dialogModel.dialogType == "group" || self.dialogModel.dialogType == "public" {
+                                            self.openGroupProfile.toggle()
+                                        }
+                                    } else {
+                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                        self.isOpen = true
+                                        self.selectedDialogID = self.dialogModel.id
+                                        UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")
+                                        UserDefaults.standard.set(true, forKey: "localOpen")
+                                        changeDialogRealmData.shared.updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
                                     }
-                                } else {
-                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                    self.isOpen = true
-                                    self.selectedDialogID = self.dialogModel.id
-                                    UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")
-                                    UserDefaults.standard.set(true, forKey: "localOpen")
-                                    changeDialogRealmData.shared.updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
                                 }
-                            }
                         
-                        if self.dialogModel.avatar == "" && self.privateDialogContact.avatar == "" {
+                        } else {
                             RoundedRectangle(cornerRadius: self.dialogModel.dialogType == "public" ? 12.5 : 27.5)
                                 .frame(width: 55, height: 55, alignment: .center)
                                 .foregroundColor(Color("bgColor"))

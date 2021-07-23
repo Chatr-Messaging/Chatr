@@ -32,10 +32,10 @@ struct NewConversationView: View {
     @State var inputImageUrl: URL? = nil
     @State var inputCoverImageUrl: URL? = nil
     @State var selectedTags: [publicTag] = []
-    @ObservedObject var contacts = ContactsRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ContactStruct.self))
-    @ObservedObject var profile = ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self))
-    @ObservedObject var addressBook = AddressBookRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(AddressBookStruct.self))
-    @ObservedObject var dialogs = DialogRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(DialogStruct.self))
+    //@ObservedObject var contacts = ContactsRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ContactStruct.self))
+    //@ObservedObject var profile = ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self))
+    //@ObservedObject var addressBook = AddressBookRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(AddressBookStruct.self))
+    //@ObservedObject var dialogs = DialogRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(DialogStruct.self))
 
     var body: some View {
         NavigationView {
@@ -188,7 +188,7 @@ struct NewConversationView: View {
                         }
 
                         //MARK: Contacts Section
-                        if self.contacts.filterContact(text: self.searchText).filter({ $0.isMyContact == true }).count != 0 {
+                        if self.auth.contacts.filterContact(text: self.searchText).filter({ $0.isMyContact == true }).count != 0 {
                             HStack {
                                 VStack(alignment: .leading) {
                                     Text("Contacts:")
@@ -197,7 +197,7 @@ struct NewConversationView: View {
                                         .foregroundColor(.primary)
                                         .multilineTextAlignment(.leading)
 
-                                    Text(Chat.instance.contactList?.contacts.count == 1 ? "\(Chat.instance.contactList?.contacts.count ?? 0) CONTACT" : "\(self.contacts.filterContact(text: self.searchText).filter({ $0.id != UserDefaults.standard.integer(forKey: "currentUserID") && $0.fullName != "No Name" && $0.isMyContact == true }).count) CONTACTS")
+                                    Text(Chat.instance.contactList?.contacts.count == 1 ? "\(Chat.instance.contactList?.contacts.count ?? 0) CONTACT" : "\(self.auth.contacts.filterContact(text: self.searchText).filter({ $0.id != UserDefaults.standard.integer(forKey: "currentUserID") && $0.fullName != "No Name" && $0.isMyContact == true }).count) CONTACTS")
                                         .font(.caption)
                                         .foregroundColor(.secondary)
                                         .multilineTextAlignment(.leading)
@@ -208,7 +208,7 @@ struct NewConversationView: View {
                             .padding(.top, 25)
 
                             self.styleBuilder(content: {
-                                ForEach(self.contacts.filterContact(text: self.searchText).filter({ $0.isMyContact == true }).sorted { $0.fullName < $1.fullName }.filter({ $0.id != UserDefaults.standard.integer(forKey: "currentUserID") && $0.fullName != "No Name" }), id: \.self) { contact in
+                                ForEach(self.auth.contacts.filterContact(text: self.searchText).filter({ $0.isMyContact == true }).sorted { $0.fullName < $1.fullName }.filter({ $0.id != UserDefaults.standard.integer(forKey: "currentUserID") && $0.fullName != "No Name" }), id: \.self) { contact in
                                     VStack(alignment: .trailing, spacing: 0) {
                                         ContactRealmCell(selectedContact: self.$selectedContact, contact: contact)
                                             .animation(.spring(response: 0.15, dampingFraction: 0.60, blendDuration: 0))
@@ -226,7 +226,7 @@ struct NewConversationView: View {
                                                 }
                                             }
 
-                                        if self.contacts.filterContact(text: self.searchText).sorted { $0.fullName < $1.fullName }.last != contact {
+                                        if self.auth.contacts.filterContact(text: self.searchText).sorted { $0.fullName < $1.fullName }.last != contact {
                                             Divider()
                                                 .frame(width: Constants.screenWidth - 100)
                                         }
@@ -293,7 +293,7 @@ struct NewConversationView: View {
                                         .foregroundColor(.primary)
                                         .multilineTextAlignment(.leading)
 
-                                    Text("\(self.addressBook.filterAddressBook(text: self.searchText).sorted { $0.name < $1.name }.count) CONTACTS")
+                                    Text("\(self.auth.addressBook.filterAddressBook(text: self.searchText).sorted { $0.name < $1.name }.count) CONTACTS")
                                         .font(.footnote)
                                         .foregroundColor(.secondary)
                                         .multilineTextAlignment(.leading)
@@ -301,18 +301,18 @@ struct NewConversationView: View {
                                 Spacer()
                             }.padding(.horizontal)
                             .padding(.horizontal)
-                            .opacity(self.addressBook.filterAddressBook(text: self.searchText).sorted { $0.name < $1.name }.count != 0 ? 1 : 0)
+                            .opacity(self.auth.addressBook.filterAddressBook(text: self.searchText).sorted { $0.name < $1.name }.count != 0 ? 1 : 0)
                             .padding(.top, 25)
                             
                             self.styleBuilder(content: {
-                                ForEach(self.addressBook.filterAddressBook(text: self.searchText).sorted { $0.name < $1.name }, id: \.self) { result in
+                                ForEach(self.auth.addressBook.filterAddressBook(text: self.searchText).sorted { $0.name < $1.name }, id: \.self) { result in
                                     VStack(alignment: .trailing, spacing: 0) {
                                         SelectableAddressBookContact(addressBook: result)
                                             .animation(.spring(response: 0.15, dampingFraction: 0.60, blendDuration: 0))
                                             .padding(.horizontal)
                                             .padding(.vertical, 10)
 
-                                        if self.addressBook.filterAddressBook(text: self.searchText).sorted { $0.name < $1.name }.last != result {
+                                        if self.auth.addressBook.filterAddressBook(text: self.searchText).sorted { $0.name < $1.name }.last != result {
                                             Divider()
                                                 .frame(width: Constants.screenWidth - 100)
                                         }
@@ -321,12 +321,12 @@ struct NewConversationView: View {
                             })
 
                             SyncAddressBook()
-                                .opacity(self.addressBook.results.count == 0 ? 1 : 0)
+                                .opacity(self.auth.addressBook.results.count == 0 ? 1 : 0)
                                 .offset(y: -60)
                         }
                         
                         //MARK: FOOTER
-                        FooterInformation(middleText: self.addressBook.results.count + self.regristeredAddressBook.count + self.contacts.results.count == 1 ? "\(self.addressBook.results.count + self.regristeredAddressBook.count + self.contacts.results.count) total contact above" : "\(self.addressBook.results.count + self.regristeredAddressBook.count + self.contacts.results.count) total contacts above")
+                        FooterInformation(middleText: self.auth.addressBook.results.count + self.regristeredAddressBook.count + self.auth.contacts.results.count == 1 ? "\(self.auth.addressBook.results.count + self.regristeredAddressBook.count + self.auth.contacts.results.count) total contact above" : "\(self.auth.addressBook.results.count + self.regristeredAddressBook.count + self.auth.contacts.results.count) total contacts above")
                             .padding(.vertical, 35)
                     }.frame(width: Constants.screenWidth)
 

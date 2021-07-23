@@ -171,8 +171,8 @@ class VisitContactViewModel: ObservableObject {
                     event.message = jsonString
 
                     Request.createEvent(event, successBlock: { _ in }, errorBlock: {(error) in
-                        UINotificationFeedbackGenerator().notificationOccurred(.error)
-                        completion(.pendingRequestForYou)
+                        //UINotificationFeedbackGenerator().notificationOccurred(.error)
+                        //completion(.pendingRequestForYou)
                         print("error in sending push noti: \(error.localizedDescription)")
                     })
                     completion(.contact)

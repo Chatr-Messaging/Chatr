@@ -32,6 +32,7 @@ class MessageStruct : Object, Identifiable {
     @objc dynamic var imageType: String = ""
     @objc dynamic var hadDelay: Bool = false
     @objc dynamic var isPinned: Bool = false
+    @objc dynamic var needsTimestamp: Bool = false
     @objc dynamic var status = messageStatus.sending.rawValue
     var messageState: messageStatus {
         get { return messageStatus(rawValue: status) ?? .delivered }
@@ -117,12 +118,24 @@ class changeMessageRealmData {
     }
     
     func insertMessages<T>(_ objects: [T], completion: @escaping () -> Void) where T: ChatMessage {
+        var previousMessage: ChatMessage?
+        var needsTime = false
+
         objects.forEach({ (object) in
             let config = Realm.Configuration(schemaVersion: 1)
 
             do {
                 let realm = try Realm(configuration: config)
                 if let foundMessage = realm.object(ofType: MessageStruct.self, forPrimaryKey: object.id ?? "") {
+
+                    if previousMessage == nil {
+                        previousMessage = object as ChatMessage
+                    } else {
+                        if objects.first?.id != foundMessage.id, foundMessage.messageState != .isTyping, foundMessage.date >= previousMessage?.createdAt?.addingTimeInterval(86400) ?? Date().addingTimeInterval(86400) {
+                            needsTime = true
+                        }
+                    }
+                    
                     try realm.write({
                         
                         if let text = object.text, foundMessage.text != text {
@@ -135,6 +148,12 @@ class changeMessageRealmData {
                         
                         if let date = object.dateSent, foundMessage.date != date {
                             foundMessage.date = date
+                        }
+
+                        if needsTime == true, foundMessage.needsTimestamp != true {
+                            foundMessage.needsTimestamp = true
+                        } else if needsTime == false, foundMessage.needsTimestamp != false {
+                            foundMessage.needsTimestamp = false
                         }
                         
                         if foundMessage.senderID != Int(object.senderID) {
@@ -234,6 +253,7 @@ class changeMessageRealmData {
                     let newData = MessageStruct()
 
                     newData.id = object.id ?? ""
+                    newData.needsTimestamp = needsTime
                     newData.text = object.text ?? ""
                     newData.dialogID = object.dialogID ?? ""
                     newData.date = object.dateSent ?? Date()

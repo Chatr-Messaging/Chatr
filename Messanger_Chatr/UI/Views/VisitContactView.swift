@@ -118,7 +118,7 @@ struct VisitContactView: View {
                                         }).buttonStyle(ClickMiniButtonStyle())
                                     }.gridStyle(self.igImageStyle)
                                     .cornerRadius(10)
-                                    .frame(minHeight: 275, maxHeight: 275, alignment: .center)
+                                    .frame(minHeight: 300, maxHeight: 300, alignment: .center)
                                     .padding(.leading)
                                 }.padding(.trailing)
                                 .padding(.vertical, 10)
@@ -960,7 +960,7 @@ struct topHeaderContactView: View {
                         
                         //MARK: Social Buttons
                         if self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") || !self.contact.isInfoPrivate || self.contact.isMyContact {
-                            HStack(alignment: .center, spacing: 20) {
+                            HStack(alignment: .center, spacing: 10) {
                                 if self.contact.facebook != "" {
                                     Button(action: {
                                         if !self.contact.isInfoPrivate || self.contact.isMyContact {
@@ -980,6 +980,7 @@ struct topHeaderContactView: View {
                                             Text("@\(self.contact.facebook.lowercased())")
                                                 .font(.caption)
                                                 .fontWeight(.medium)
+                                                .lineLimit(1)
                                                 .background(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? Color.clear : !self.contact.isInfoPrivate || self.contact.isMyContact ? Color.clear : Color.secondary)
                                                 .foregroundColor(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? .secondary : !self.contact.isInfoPrivate || self.contact.isMyContact ? self.contact.facebook == "" ? .gray : .secondary : .clear)
                                             
@@ -1015,6 +1016,7 @@ struct topHeaderContactView: View {
                                             Text("@\(self.contact.twitter)")
                                                 .font(.caption)
                                                 .fontWeight(.medium)
+                                                .lineLimit(1)
                                                 .background(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? Color.clear : !self.contact.isInfoPrivate || self.contact.isMyContact ? Color.clear : Color.secondary)
                                                 .foregroundColor(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? .secondary : !self.contact.isInfoPrivate || self.contact.isMyContact ? self.contact.twitter == "" ? .gray : .secondary : .clear)
 
@@ -1050,6 +1052,7 @@ struct topHeaderContactView: View {
                                             Text("@\(self.viewModel.username)")
                                                 .font(.caption)
                                                 .fontWeight(.medium)
+                                                .lineLimit(1)
                                                 .background(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? Color.clear : !self.contact.isInfoPrivate || self.contact.isMyContact ? Color.clear : Color.secondary)
                                                 .foregroundColor(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? .secondary : !self.contact.isInfoPrivate || self.contact.isMyContact ? self.contact.facebook == "" ? .gray : .secondary : .clear)
 

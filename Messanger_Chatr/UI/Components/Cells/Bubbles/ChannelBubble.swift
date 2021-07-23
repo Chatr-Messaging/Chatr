@@ -38,9 +38,10 @@ struct ChannelBubble: View {
                         .resizable()
                         .placeholder{ Image(systemName: "photo.on.rectangle.angled").resizable().frame(width: 30, height: 27, alignment: .center).scaledToFill().offset(y: -18) }
                         .indicator(.activity)
+                        .aspectRatio(contentMode: .fill)
                         .frame(height: 100)
+                        .clipped()
                         .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.05)), removal: AnyTransition.identity))
-                        .aspectRatio(contentMode: .fit)
                         //.cornerRadius(12.5)
                         .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 4)
 
