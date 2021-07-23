@@ -125,7 +125,7 @@ struct PublicActionSection: View {
                     }.padding(.all, 12)
                     .padding(.horizontal, 5)
                     .background(self.dialogRelationship == .error ? Color("alertRed") : Constants.baseBlue)
-                    .cornerRadius(12.5)
+                    .cornerRadius(15)
                     .shadow(color: Color.blue.opacity(0.30), radius: 8, x: 0, y: 8)
                 }.buttonStyle(ClickButtonStyle())
             }

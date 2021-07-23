@@ -195,7 +195,11 @@ struct EditProfileView: View {
                                         .multilineTextAlignment(.leading)
                                         .lineLimit(6)
                                         .offset(x: -7, y: -8)
-                                        .onChange(of: self.bioText) { _ in
+                                        .onChange(of: self.bioText) { bioText in
+                                            if bioText.count >= 225 {
+                                                self.bioText.removeLast()
+                                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                            }
                                             self.didSave = false
                                         }
                                     
@@ -342,7 +346,7 @@ struct EditProfileView: View {
                                         self.presentAuth.toggle()
                                     }
                                 }) {
-                                    Text(self.viewModel.testUserData.user_id == 0 ? "Link Instagram Account" : " @\(self.username)")
+                                    Text(self.viewModel.testUserData.user_id == 0 ? "Connect Instagram Account" : " @\(self.username)")
                                         .font(.none)
                                         .foregroundColor(self.viewModel.testUserData.user_id == 0 ? .blue : .primary)
                                 }.offset(x: -2.5)
@@ -382,7 +386,12 @@ struct EditProfileView: View {
                                     .autocapitalization(.none)
                                     .keyboardType(.emailAddress)
                                     .offset(x: twitterText.count > 0 ? -8 : -4)
-                                    .onChange(of: self.twitterText) { _ in
+                                    .onChange(of: self.twitterText) { twrText in
+                                        if twrText.contains(" ") {
+                                            let reducedText = twrText.replacingOccurrences(of: " ", with: "")
+                                            self.twitterText = reducedText
+                                        }
+
                                         self.didSave = false
                                     }
                                 
@@ -420,7 +429,11 @@ struct EditProfileView: View {
                                     .autocapitalization(.none)
                                     .keyboardType(.emailAddress)
                                     .offset(x: facebookText.count > 0 ? -8 : -4)
-                                    .onChange(of: self.facebookText) { _ in
+                                    .onChange(of: self.facebookText) { fbText in
+                                        if fbText.contains(" ") {
+                                            let reducedText = fbText.replacingOccurrences(of: " ", with: "")
+                                            self.facebookText = reducedText
+                                        }
                                         self.didSave = false
                                     }
                                     

@@ -11,7 +11,7 @@
         }
       },
       {
-        "package": "CarBode-Barcode-Scanner-For-SwiftUI",
+        "package": "CarBode",
         "repositoryURL": "https://github.com/heart/CarBode-Barcode-Scanner-For-SwiftUI",
         "state": {
           "branch": null,
@@ -38,7 +38,7 @@
         }
       },
       {
-        "package": "realm-cocoa",
+        "package": "Realm",
         "repositoryURL": "https://github.com/realm/realm-cocoa.git",
         "state": {
           "branch": null,
@@ -47,7 +47,7 @@
         }
       },
       {
-        "package": "realm-core",
+        "package": "RealmCore",
         "repositoryURL": "https://github.com/realm/realm-core",
         "state": {
           "branch": null,
@@ -65,7 +65,7 @@
         }
       },
       {
-        "package": "swiftui-grid",
+        "package": "Grid",
         "repositoryURL": "https://github.com/spacenation/swiftui-grid.git",
         "state": {
           "branch": null,
@@ -74,7 +74,7 @@
         }
       },
       {
-        "package": "uploadcare-swift",
+        "package": "Uploadcare",
         "repositoryURL": "https://github.com/uploadcare/uploadcare-swift.git",
         "state": {
           "branch": null,

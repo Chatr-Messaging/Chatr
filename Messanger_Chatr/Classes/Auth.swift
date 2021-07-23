@@ -55,6 +55,9 @@ enum visitPublicDialogState {
     case unknown, fromDiscover, fromDialogCell, fromDynamicLink, fromSharedMessage
 }
 
+enum openProfileSocialLink {
+    case instagram, facebook, twitter, none
+}
 
 enum visitContactRelationship {
     case unknown, contact, notContact, pendingRequest, pendingRequestForYou
