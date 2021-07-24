@@ -41,7 +41,7 @@ struct GIFController : UIViewControllerRepresentable {
         }
         
         func didSelectMedia(giphyViewController: GiphyViewController, media: GPHMedia) {
-            let url = media.url(rendition: .fixedWidth, fileType: .gif)
+            let url = media.url(rendition: .fixedHeightDownsampled, fileType: .mp4)
             parent.url = url ?? ""
             parent.present.toggle()
         }

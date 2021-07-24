@@ -543,7 +543,7 @@ struct mainHomeList: View {
 
                 //MARK: Keyboard View
                 GeometryReader { geo in
-                    KeyboardCardView(height: self.$textFieldHeight, isOpen: self.$isLocalOpen, mainText: self.$keyboardText, hasAttachments: self.$hasAttachments, showImagePicker: self.$showKeyboardMediaAssets, isKeyboardActionOpen: self.$isKeyboardActionOpen)
+                    KeyboardCardView(chatViewModel: self.messageViewModel, height: self.$textFieldHeight, isOpen: self.$isLocalOpen, mainText: self.$keyboardText, hasAttachments: self.$hasAttachments, showImagePicker: self.$showKeyboardMediaAssets, isKeyboardActionOpen: self.$isKeyboardActionOpen)
                         .environmentObject(self.auth)
                         .frame(width: Constants.screenWidth, height: Constants.screenHeight * 0.75, alignment: .center)
                         .shadow(color: Color.black.opacity(0.15), radius: 14, x: 0, y: -5)

@@ -33,6 +33,7 @@ class MessageStruct : Object, Identifiable {
     @objc dynamic var hadDelay: Bool = false
     @objc dynamic var isPinned: Bool = false
     @objc dynamic var needsTimestamp: Bool = false
+    @objc dynamic var uploadMediaId: String = ""
     @objc dynamic var status = messageStatus.sending.rawValue
     var messageState: messageStatus {
         get { return messageStatus(rawValue: status) ?? .delivered }
@@ -206,17 +207,19 @@ class changeMessageRealmData {
                         if let attachments = object.attachments {
                             for attach in attachments {
                                 //image/video attachment
-                                if let uid = attach.id {
-                                    //let storage = Storage.storage()
-                                    if let fileURL = Blob.privateUrl(forFileUID: uid), foundMessage.image != fileURL {
-                                        foundMessage.image = fileURL
-                                    } else if let fileURLPub = Blob.publicUrl(forFileUID: uid), foundMessage.image != fileURLPub {
-                                        foundMessage.image = fileURLPub
-                                    }
-
-                                    if let type = attach.type, foundMessage.imageType != type {
-                                        foundMessage.imageType = type
-                                    }
+                                if let type = attach.type, foundMessage.imageType != type {
+                                    foundMessage.imageType = type
+                                }
+                                
+                                if let imagePram = attach.customParameters as? [String: String], let imagePram = imagePram["imageURL"], foundMessage.image != imagePram {
+                                    foundMessage.image = imagePram
+                                    print("the shared image is: \(foundMessage.image)")
+                                }
+                                
+                                if let imageUploadPram = attach.customParameters as? [String: String], let imageUploadId = imageUploadPram["uploadId"], foundMessage.image != imageUploadId {
+                                    foundMessage.uploadMediaId = imageUploadId
+                                    foundMessage.imageType = "image/png"
+                                    print("the upload media id is: \(foundMessage.uploadMediaId)")
                                 }
                                 
                                 if let contactIDPram = attach.customParameters as? [String: String], let contactId = Int(contactIDPram["contactID"] ?? ""), foundMessage.contactID != contactId {
@@ -300,15 +303,16 @@ class changeMessageRealmData {
                     if let attachments = object.attachments {
                         for attach in attachments {
                             //image/video attachment
-                            if let uid = attach.id {
-                                //let storage = Storage.storage()
-                                if let fileURL = Blob.privateUrl(forFileUID: uid) {
-                                    newData.image = fileURL
-                                } else if let fileURLPub = Blob.publicUrl(forFileUID: uid) {
-                                    newData.image = fileURLPub
-                                }
-
+                            if let imagePram = attach.customParameters as? [String: String] {
+                                newData.image = imagePram["imageURL"] ?? ""
                                 newData.imageType = attach.type ?? ""
+                                print("the shared image is: \(newData.image) && type: \(newData.imageType)")
+                            }
+                            
+                            if let imageUploadPram = attach.customParameters as? [String: String] {
+                                newData.uploadMediaId = imageUploadPram["uploadId"] ?? ""
+                                newData.imageType = "image/png"
+                                print("the upload media id is: \(newData.uploadMediaId)")
                             }
                             
                             if let contactID = attach.customParameters as? [String: String] {
@@ -428,17 +432,19 @@ class changeMessageRealmData {
                     if let attachments = object.attachments {
                         for attach in attachments {
                             //image/video attachment
-                            if let uid = attach.id {
-                                //let storage = Storage.storage()
-                                if let fileURL = Blob.privateUrl(forFileUID: uid), foundMessage.image != fileURL {
-                                    foundMessage.image = fileURL
-                                } else if let fileURLPub = Blob.publicUrl(forFileUID: uid), foundMessage.image != fileURLPub {
-                                    foundMessage.image = fileURLPub
-                                }
-
-                                if let type = attach.type, foundMessage.imageType != type {
-                                    foundMessage.imageType = type
-                                }
+                            if let type = attach.type, foundMessage.imageType != type {
+                                foundMessage.imageType = type
+                            }
+                            
+                            if let imagePram = attach.customParameters as? [String: String], let imagePram = imagePram["imageURL"], foundMessage.image != imagePram {
+                                foundMessage.image = imagePram
+                                print("the shared image is: \(foundMessage.image)")
+                            }
+                            
+                            if let imageUploadPram = attach.customParameters as? [String: String], let imageUploadId = imageUploadPram["uploadId"], foundMessage.image != imageUploadId {
+                                foundMessage.uploadMediaId = imageUploadId
+                                foundMessage.imageType = "image/png"
+                                print("the upload media id is: \(foundMessage.uploadMediaId)")
                             }
                             
                             if let contactIDPram = attach.customParameters as? [String: String], let contactId = Int(contactIDPram["contactID"] ?? ""), foundMessage.contactID != contactId {
@@ -514,15 +520,16 @@ class changeMessageRealmData {
                 if let attachments = object.attachments {
                     for attach in attachments {
                         //image/video attachment
-                        if let uid = attach.id {
-                            //let storage = Storage.storage()
-                            if let fileURL = Blob.privateUrl(forFileUID: uid) {
-                                newData.image = fileURL
-                            } else if let fileURLPub = Blob.publicUrl(forFileUID: uid) {
-                                newData.image = fileURLPub
-                            }
-
+                        if let imagePram = attach.customParameters as? [String: String] {
+                            newData.image = imagePram["imageURL"] ?? ""
                             newData.imageType = attach.type ?? ""
+                            print("the shared image is: \(newData.image) && type: \(newData.imageType)")
+                        }
+
+                        if let imageUploadPram = attach.customParameters as? [String: String] {
+                            newData.uploadMediaId = imageUploadPram["uploadId"] ?? ""
+                            newData.imageType = "image/png"
+                            print("the upload media id is: \(newData.uploadMediaId)")
                         }
                         
                         if let contactID = attach.customParameters as? [String: String] {
@@ -714,47 +721,30 @@ class changeMessageRealmData {
 
     func sendGIFAttachment(dialog: DialogStruct, attachmentStrings: [String], occupentID: [NSNumber]) {
         for attachment in attachmentStrings {
-            do {
-                let attachURL = try Data(contentsOf: URL(string: attachment)!, options: [.alwaysMapped , .uncached])
-                print("upload url is: \(attachURL.count)")
-                Request.uploadFile(with: attachURL,
-                                   fileName: "\(UserDefaults.standard.integer(forKey: "currentUserID"))\(dialog.id)\(dialog.fullName)\(Date()).gif",
-                                   contentType: "image/gif",
-                                   isPublic: true,
-                                   progressBlock: { (progress) in
-                                    //Update UI with upload progress
-                                    print("upload progress is: \(progress)")
-                }, successBlock: { (blob) in
-                    let attachment = ChatAttachment()
-                    attachment.type = "image/gif"
-                    attachment.id = blob.uid
-                    
-                    let pDialog = ChatDialog(dialogID: dialog.id, type: dialog.dialogType == "public" ? .public : occupentID.count > 2 ? .group : .private)
-                    pDialog.occupantIDs = occupentID
-                    
-                    let message = ChatMessage()
-                    message.text = "GIF Attachment"
-                    message.attachments = [attachment]
-                    
-                    pDialog.send(message) { (error) in
-                        self.insertMessage(message, completion: {
-                            if error != nil {
-                                print("error sending attachment: \(String(describing: error?.localizedDescription))")
-                                self.updateMessageState(messageID: message.id ?? "", messageState: .error)
-                            } else {
-                                print("Success sending attachment to ConnectyCube server!")
-                            }
-                        })
+            let attachmentz = ChatAttachment()
+            attachmentz.type = "image/gif"
+            attachmentz["imageURL"] = attachment
+            
+            let pDialog = ChatDialog(dialogID: dialog.id, type: dialog.dialogType == "public" ? .public : occupentID.count > 2 ? .group : .private)
+            pDialog.occupantIDs = occupentID
+            
+            let message = ChatMessage()
+            message.text = "GIF attachment"
+            message.attachments = [attachmentz]
+            
+            pDialog.send(message) { (error) in
+                self.insertMessage(message, completion: {
+                    if error != nil {
+                        print("error sending attachment: \(String(describing: error?.localizedDescription))")
+                        self.updateMessageState(messageID: message.id ?? "", messageState: .error)
+                    } else {
+                        print("Success sending attachment to ConnectyCube server!")
                     }
-                }) { (error) in
-                    print("there is an error uploading attachment: \(error.localizedDescription)")
-                }
-            } catch {
-                print("error setting url data")
+                })
             }
         }
     }
-
+    
     func sendPhotoAttachment(dialog: DialogStruct, attachmentImages: [UIImage], occupentID: [NSNumber]) {
         for attachment in attachmentImages {
             let data = attachment.jpegData(compressionQuality: 1.0)

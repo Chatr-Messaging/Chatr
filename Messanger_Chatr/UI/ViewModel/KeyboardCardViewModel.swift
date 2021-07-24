@@ -12,6 +12,7 @@ import Photos
 import AVKit
 import CoreLocation
 import Uploadcare
+import ConnectyCube
 import MapKit
 
 enum LibraryStatus {
@@ -26,6 +27,7 @@ struct KeyboardMediaAsset: Identifiable, Hashable {
     var image: UIImage
     var progress: CGFloat = 0.0
     var uploadId: String?
+    var preparedMessageId: String?
     var selected: Bool = false
 }
 
@@ -113,6 +115,54 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
             }
 
             semaphore.wait()
+        }
+    }
+    
+    func sendPhotoMessage(dialog: DialogStruct, attachmentImages: [KeyboardMediaAsset], occupentID: [NSNumber]) {
+        for attachment in attachmentImages {
+            
+            guard let uploadedId = attachment.uploadId else {
+                let chatAttachment = ChatAttachment()
+                chatAttachment["uploadId"] = attachment.id
+                
+                let message = ChatMessage()
+                message.text = "Uploading image attachment..."
+                message.attachments = [chatAttachment]
+                message.dialogID = dialog.id
+                message.senderID = UInt(UserDefaults.standard.integer(forKey: "currentUserID"))
+                
+                changeMessageRealmData.shared.insertMessage(message, completion: {
+                    print("successfully added local message while its uploading!!")
+                    guard let idz = message.id, let localMedia = self.selectedPhotos.firstIndex(of: attachment) else { return }
+                    
+                    self.selectedPhotos[localMedia].preparedMessageId = idz.description
+                })
+                
+                return
+            }
+            
+            let attachment = ChatAttachment()
+            attachment["imageURL"] = Constants.uploadcareBaseUrl + uploadedId + Constants.uploadcareStandardTransform
+            attachment.type = "image/png"
+            
+            let pDialog = ChatDialog(dialogID: dialog.id, type: dialog.dialogType == "public" ? .public : occupentID.count > 2 ? .group : .private)
+            pDialog.occupantIDs = occupentID
+            
+            let message = ChatMessage()
+            message.text = "Image Attachment"
+            message.attachments = [attachment]
+            
+            pDialog.send(message) { (error) in
+                print("SENT image...")
+                changeMessageRealmData.shared.insertMessage(message, completion: {
+                    if error != nil {
+                        print("error sending attachment: \(String(describing: error?.localizedDescription))")
+                        changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .error)
+                    } else {
+                        print("Success sending attachment to ConnectyCube server!")
+                    }
+                })
+            }
         }
     }
     
