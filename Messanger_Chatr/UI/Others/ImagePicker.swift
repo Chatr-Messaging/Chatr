@@ -101,11 +101,14 @@ struct ImagePicker22: UIViewControllerRepresentable {
         }
 
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-            let imageUrl = info[UIImagePickerController.InfoKey.imageURL] as! URL
-            let img = info[UIImagePickerController.InfoKey.originalImage] as? UIImage
-
-            onImagePicked(imageUrl, img)
             presentationMode.dismiss()
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+                let imageUrl = info[UIImagePickerController.InfoKey.imageURL] as! URL
+                let img = info[UIImagePickerController.InfoKey.originalImage] as? UIImage
+                
+                self.onImagePicked(imageUrl, img)
+            }
         }
         
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {

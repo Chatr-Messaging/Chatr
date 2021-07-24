@@ -11,6 +11,8 @@ import SwiftUI
 import Photos
 import AVKit
 import CoreLocation
+import Uploadcare
+import MapKit
 
 enum LibraryStatus {
     case denied
@@ -22,6 +24,8 @@ struct KeyboardMediaAsset: Identifiable, Hashable {
     var id = UUID().uuidString
     var asset: PHAsset
     var image: UIImage
+    var progress: CGFloat = 0.0
+    var uploadId: String?
     var selected: Bool = false
 }
 
@@ -38,6 +42,79 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
     @Published var imageData: [UIImage] = []
     @Published var videoData: [AVAsset] = []
     @Published var pastedImages: [UIImage] = []
+    var auth: AuthModel = AuthModel()
+        
+    func uploadSelectedImages() {
+        DispatchQueue.global(qos: .utility).async {
+            for media in self.selectedPhotos {
+                guard media.uploadId == nil, media.progress == 0.0, let foundMediaIndex = self.selectedPhotos.firstIndex(of: media), let data = media.image.jpegData(compressionQuality: 1.0) else { return }
+                
+                let uploadcare = Uploadcare(withPublicKey: Constants.uploadcarePublicKey, secretKey: Constants.uploadcareSecretKey)
+                let filename = "\(media.id)" + Date().description.replacingOccurrences(of: " ", with: "")
+                let semaphore = DispatchSemaphore(value: 0)
+                
+                uploadcare.uploadAPI.upload(files: [filename: data], store: .store, { (progress) in
+                    DispatchQueue.main.async {
+                        self.selectedPhotos[foundMediaIndex].progress = progress
+                    }
+                }) { (resultDictionary, error) in
+                    defer {
+                        semaphore.signal()
+                    }
+                    
+                    if let error = error {
+                        print("the error uploading direct files: " + error.debugDescription)
+                    }
+
+                    guard let uploadData = resultDictionary, let fileId = uploadData.first?.value else {
+                        return
+                    }
+                    
+                    DispatchQueue.main.async {
+                        self.selectedPhotos[foundMediaIndex].uploadId = fileId
+                        print("success uploading direct file. Here is the data: " + "\(fileId)")
+                    }
+                }
+
+                semaphore.wait()
+            }
+        }
+    }
+    
+    func uploadSelectedImage(media: KeyboardMediaAsset) {
+        DispatchQueue.global(qos: .utility).async {
+            guard media.uploadId == nil, media.progress == 0.0, let foundMediaIndex = self.selectedPhotos.firstIndex(of: media), let data = media.image.jpegData(compressionQuality: 1.0) else { return }
+            
+            let uploadcare = Uploadcare(withPublicKey: Constants.uploadcarePublicKey, secretKey: Constants.uploadcareSecretKey)
+            let filename = "\(media.id)" + Date().description.replacingOccurrences(of: " ", with: "")
+            let semaphore = DispatchSemaphore(value: 0)
+            
+            uploadcare.uploadAPI.upload(files: [filename: data], store: .store, { (progress) in
+                DispatchQueue.main.async {
+                    self.selectedPhotos[foundMediaIndex].progress = progress
+                }
+            }) { (resultDictionary, error) in
+                defer {
+                    semaphore.signal()
+                }
+                
+                if let error = error {
+                    print("the error uploading direct files: " + error.debugDescription)
+                }
+
+                guard let uploadData = resultDictionary, let fileId = uploadData.first?.value else {
+                    return
+                }
+                
+                DispatchQueue.main.async {
+                    self.selectedPhotos[foundMediaIndex].uploadId = fileId
+                    print("success uploading direct file. Here is the data: " + "\(fileId)")
+                }
+            }
+
+            semaphore.wait()
+        }
+    }
     
     func openImagePicker(completion: @escaping () -> Void) {
         if fetchedPhotos.isEmpty {
@@ -59,7 +136,9 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
         
         fetchResults.enumerateObjects { [self] (asset, index, _) in
             getImageFromAsset(asset: asset, size: CGSize(width: asset.pixelWidth, height: asset.pixelHeight)) { (image) in
-                fetchedPhotos.append(KeyboardMediaAsset(asset: asset, image: image))
+                DispatchQueue.main.async {
+                    fetchedPhotos.append(KeyboardMediaAsset(asset: asset, image: image))
+                }
             }
             
             completion()

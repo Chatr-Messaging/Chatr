@@ -758,6 +758,7 @@ class changeMessageRealmData {
     func sendPhotoAttachment(dialog: DialogStruct, attachmentImages: [UIImage], occupentID: [NSNumber]) {
         for attachment in attachmentImages {
             let data = attachment.jpegData(compressionQuality: 1.0)
+            
             print("about to upload image... && \(data?.count)")
             Request.uploadFile(with: data!,
                                fileName: "\(UserDefaults.standard.integer(forKey: "currentUserID"))\(dialog.id)\(dialog.fullName)\(Date()).png",
