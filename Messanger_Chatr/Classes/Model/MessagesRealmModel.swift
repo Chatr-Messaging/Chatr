@@ -804,7 +804,7 @@ class changeMessageRealmData {
                                            progressBlock: { (progress) in
                                             print("the upload progress is: \(progress)")
                         }, successBlock: { (blob) in
-                            self.sendVideoMessage(id: newVideIdString, dialog: dialog, blobId: blob.uid ?? "", occupentID: occupentID)
+                            self.sendVideoMessage(id: newVideIdString, dialog: dialog, videoId: blob.uid ?? "", occupentID: occupentID)
                         }) { (error) in
 
                         }
@@ -814,10 +814,10 @@ class changeMessageRealmData {
         }
     }
     
-    func sendVideoMessage(id: String, dialog: DialogStruct, blobId: String, occupentID: [NSNumber]) {
+    func sendVideoMessage(id: String, dialog: DialogStruct, videoId: String, occupentID: [NSNumber]) {
         let attachment = ChatAttachment()
         attachment.type = "video/mov"
-        attachment["videoId"] = blobId
+        attachment["videoId"] = Constants.uploadcareBaseUrl + videoId + Constants.uploadcareStandardTransform
 
         let pDialog = ChatDialog(dialogID: dialog.id, type: dialog.dialogType == "public" ? .public : occupentID.count > 2 ? .group : .private)
         pDialog.occupantIDs = occupentID

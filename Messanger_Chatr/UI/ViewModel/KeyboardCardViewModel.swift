@@ -29,6 +29,17 @@ struct KeyboardMediaAsset: Identifiable, Hashable {
     var uploadId: String?
     var preparedMessageId: String?
     var selected: Bool = false
+    
+    init(asset: PHAsset, image: UIImage) {
+        self.asset = asset
+        self.image = image
+        print("hello new object")
+        upload()
+    }
+    
+    func upload() {
+        print("printtttt")
+    }
 }
 
 class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObserver {
@@ -115,6 +126,79 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
             }
 
             semaphore.wait()
+        }
+    }
+    
+    func uploadSelectedVideo(media: KeyboardMediaAsset) {
+        DispatchQueue.global(qos: .utility).async {
+            guard media.uploadId == nil, media.progress == 0.0, let foundMediaIndex = self.selectedVideos.firstIndex(of: media), let data = NSData(contentsOfURL: media.asset) else { return }
+            
+            let uploadcare = Uploadcare(withPublicKey: Constants.uploadcarePublicKey, secretKey: Constants.uploadcareSecretKey)
+            let filename = "\(media.id)" + Date().description.replacingOccurrences(of: " ", with: "")
+            let semaphore = DispatchSemaphore(value: 0)
+            
+            uploadcare.uploadAPI.upload(files: [filename: data], store: .store, { (progress) in
+                DispatchQueue.main.async {
+                    self.selectedVideos[foundMediaIndex].progress = progress
+                }
+            }) { (resultDictionary, error) in
+                defer {
+                    semaphore.signal()
+                }
+                
+                if let error = error {
+                    print("the error uploading direct files: " + error.debugDescription)
+                }
+
+                guard let uploadData = resultDictionary, let fileId = uploadData.first?.value else {
+                    return
+                }
+                
+                DispatchQueue.main.async {
+                    self.selectedVideos[foundMediaIndex].uploadId = fileId
+                    print("success uploading direct file video. Here is the data: " + "\(fileId)")
+                }
+            }
+
+            semaphore.wait()
+        }
+    }
+    
+    func uploadSelectedVideos(dialog: DialogStruct, attachmentVideos: [KeyboardMediaAsset], occupentID: [NSNumber]) {
+        DispatchQueue.global(qos: .utility).async {
+            for vid in attachmentVideos {
+                guard vid.uploadId == nil, vid.progress == 0.0, let foundMediaIndex = self.selectedVideos.firstIndex(of: vid) else { return }
+                
+                let uploadcare = Uploadcare(withPublicKey: Constants.uploadcarePublicKey, secretKey: Constants.uploadcareSecretKey)
+                //let filename = "\(vid.id)" + Date().description.replacingOccurrences(of: " ", with: "")
+                let semaphore = DispatchSemaphore(value: 0)
+                
+                let options = PHVideoRequestOptions()
+                options.isNetworkAccessAllowed = true
+                
+                PHImageManager.default().requestAVAsset(forVideo: vid.asset, options: options) { (asset, mix, args) in
+                    guard let assz = asset as? AVURLAsset else { return }
+                    
+                    uploadcare.uploadAPI.upload(task: UploadFromURLTask(sourceUrl: assz.url), { (resultDictionary, error) in
+                        defer {
+                            semaphore.signal()
+                        }
+                        
+                        if let error = error {
+                            print("the error uploading direct files: " + error.debugDescription)
+                        }
+
+                        guard let uploadData = resultDictionary, let fileId = uploadData.fileInfo?.uuid else {
+                            return
+                        }
+                        
+                        DispatchQueue.main.async {
+                            self.selectedVideos[foundMediaIndex].uploadId = fileId
+                            print("success uploading direct video. Here is the data: " + "\(fileId)")
+                        }
+                    })
+                }
+            }
         }
     }
     

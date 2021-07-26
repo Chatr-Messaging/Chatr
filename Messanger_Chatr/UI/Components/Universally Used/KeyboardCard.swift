@@ -288,6 +288,28 @@ struct KeyboardCardView: View {
                                                 .scaledToFill()
                                                 .frame(height: 90)
                                                 .frame(minWidth: 85, maxWidth: Constants.screenWidth * 0.4)
+                                                .overlay(
+                                                    ZStack(alignment: .center) {
+                                                        BlurView(style: .systemUltraThinMaterial).opacity(self.chatViewModel.imagePicker.selectedVideos[vid].progress >= 1.0 ? 0 : 1).animation(.easeInOut)
+
+                                                    Circle()
+                                                        .trim(from: 0, to: 1)
+                                                        .stroke(Color.primary.opacity(0.2), style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                                                        .frame(width: 20, height: 20)
+                                                        .padding(4)
+                                                        .opacity(self.chatViewModel.imagePicker.selectedVideos[vid].progress >= 1.0 ? 0 : 1)
+                                                        .animation(.easeInOut)
+
+                                                    Circle()
+                                                        .trim(from: 0, to: self.chatViewModel.imagePicker.selectedVideos[vid].progress)
+                                                        .stroke(Color.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                                                        .frame(width: 20, height: 20)
+                                                        .rotationEffect(.init(degrees: -90))
+                                                        .padding(4)
+                                                        .opacity(self.chatViewModel.imagePicker.selectedVideos[vid].progress >= 1.0 ? 0 : 1)
+                                                        .animation(.easeOut)
+                                                    }
+                                                )
                                                 .cornerRadius(10)
                                             
                                             HStack {
