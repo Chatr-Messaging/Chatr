@@ -46,7 +46,7 @@ struct DiscoverFeaturedCell: View, Identifiable {
                         .resizable()
                         .placeholder{ Image(systemName: "photo.on.rectangle.angled").resizable().frame(width: 30, height: 27, alignment: .center).scaledToFill().offset(y: -18) }
                         .indicator(.activity)
-                        .frame(width: Constants.screenWidth * 0.68 - 30, height: 180)
+                        .frame(width: Constants.screenWidth * 0.68 - 30, height: 140)
                         .fixedSize(horizontal: true, vertical: false)
                         .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
                         .aspectRatio(contentMode: .fit)
@@ -85,8 +85,8 @@ struct DiscoverFeaturedCell: View, Identifiable {
                                 .fontWeight(.regular)
                                 .foregroundColor(Color.primary)
                                 .multilineTextAlignment(.center)
-                                .lineLimit(2)
-                                .frame(height: 40)
+                                .lineLimit(3)
+                                .frame(height: 60)
                             
                             Spacer()
                             if !self.isMember {
@@ -171,7 +171,7 @@ struct DiscoverFeaturedCell: View, Identifiable {
                             }
                         }
                     }
-                    .padding(.top, 110)
+                    .padding(.top, 75)
                     .padding()
                 }
                 .background(Color("buttonColor"))

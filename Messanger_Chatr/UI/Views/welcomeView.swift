@@ -77,57 +77,36 @@ struct MainBody: View {
              
     var body: some View {
         ZStack {
-            VStack {
-                GeometryReader { geo in
-                    ZStack {
-                        Image("Walkthrough BG1")
-                            .resizable()
-                            .scaledToFill()
-                            .offset(x: -60)
-                            .offset(x: -self.scrollOffset / 3)
-                            .offset(x: continuePermissions ? -50 : 0)
-                            .offset(x: continuePt1 ? -50 : 0)
-                            .offset(x: self.auth.verifyPhoneNumberStatus == .success ? -50 : 0)
-                            .offset(x: self.auth.haveUserFullName == true && self.auth.haveUserProfileImg == true && self.auth.isFirstTimeUser == false && self.auth.verifyCodeStatus == .success ? -50 : 0)
-                            .offset(x: self.continuePt4 || (self.auth.haveUserProfileImg == false && self.auth.verifyCodeStatus == .success) ? -50 : 0)
-                            .frame(width: Constants.screenWidth * 3.5, height: Constants.screenHeight, alignment: .leading)
-                            .animation(.spring(response: 0.6, dampingFraction: 0.45, blendDuration: 0.4))
-                            .zIndex(-1)
+            VStack(alignment: .center) {
+                HStack(alignment: .bottom) {
+                    VStack(alignment: .leading) {
+                        Text("Welcome to")
+                            .font(.subheadline)
+                            .fontWeight(.regular)
+                            .foregroundColor(Color("SoftTextColor"))
                         
-                        VStack(alignment: .leading) {
-                            HStack {
-                                VStack(alignment: .leading) {
-                                    Text("Welcome to")
-                                        .fontWeight(.regular)
-                                        .foregroundColor(Color("SoftTextColor"))
-                                    
-                                    Text("Chatr")
-                                        .font(.system(size: 55))
-                                        .fontWeight(.bold)
-                                        .foregroundColor(Color("SoftTextColor"))
-                                }
-                                
-                                Spacer()
-                                Image("iconCoin")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 60, height: 60, alignment: .center)
-                                    .shadow(color: Color("buttonShadow"), radius: 20, x: 0, y: 10)
-                            }.padding(.all)
-                            .offset(y: Constants.screenWidth == 375 ? -geo.frame(in: .global).minY + 50 : -geo.frame(in: .global).minY + 80)
-                            
-                            Spacer()
-                            Carousel(width: Constants.screenWidth, page: self.$pageIndex, scrollOffset: self.$scrollOffset, height: geo.frame(in: .global).height - 120)
-                                .disabled(self.continuePermissions || self.continuePt1 ? true : false)
-                                .opacity(self.continuePermissions || self.continuePt1 ? 0.0 : 1.0)
-                                .frame(width: Constants.screenWidth)
-                                .offset(y: Constants.screenWidth == 375 ? -30 : 0)
-                                .animation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0))
-                        }
+                        Image("logo-word")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 38, alignment: .leading)
                     }
-                }
+                    
+                    Spacer()
+                    Image("iconCoin")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 60, height: 60, alignment: .center)
+                        .shadow(color: Color("buttonShadow"), radius: 20, x: 0, y: 10)
+                }.padding(.all, 30)
+                .padding(.top, 10)
+
+                Carousel(width: Constants.screenWidth, page: self.$pageIndex, scrollOffset: self.$scrollOffset, height: Constants.screenHeight - 250)
+                    .disabled(self.continuePermissions || self.continuePt1 ? true : false)
+                    .opacity(self.continuePermissions || self.continuePt1 ? 0.0 : 1.0)
+                    .frame(width: Constants.screenWidth)
+                    .offset(y: Constants.screenWidth == 375 ? -30 : 0)
+                    .animation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0))
                 
-                Spacer()
                 HStack(alignment: .center) {
                     PageControl(page: self.$pageIndex, color: "black")
                         .disabled(self.continuePermissions || self.continuePt1 ? true : false)
@@ -135,30 +114,31 @@ struct MainBody: View {
                         .frame(minWidth: 35, idealWidth: 50, maxWidth: 75)
                         .animation(.spring(response: 0.45, dampingFraction: 0.45, blendDuration: 0))
  
-                     Spacer()
-                     Button(action: {
+                    Spacer()
+                    Button(action: {
                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                         if self.contactsPermission == true && self.locationPermission == true && self.photoPermission == true && self.notificationPermission == true && self.cameraPermission {
                             self.continuePt1.toggle()
                         } else {
                             self.continuePermissions.toggle()
                         }
-                        }) {
+                    }) {
                         HStack(alignment: .center, spacing: 15) {
-                            Text("Start Chatting")
-                                .fontWeight(.semibold)
-                                .foregroundColor(.white)
-                            
-                            Image(systemName: "arrow.right")
+                            Image("ChatBubble")
                                 .resizable()
                                 .scaledToFit()
                                 .font(Font.title.weight(.semibold))
-                                .frame(width: 20, height: 18, alignment: .center)
-                        }.padding(.horizontal, 15)
+                                .frame(width: 28, height: 24, alignment: .center)
+
+                            Text("Start Chatting")
+                                .fontWeight(.semibold)
+                                .foregroundColor(.white)
+                        }.padding(.horizontal, 10)
                      }.buttonStyle(MainButtonStyle())
-                    .frame(maxWidth: 190)
+                    .frame(maxWidth: 210)
+                    .overlay(RoundedRectangle(cornerRadius: 15).stroke(Color.white.opacity(0.125), lineWidth: 2.5))
                     .disabled(self.continuePermissions || self.continuePt1 ? true : false)
-                    .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
+                    .shadow(color: Color("buttonShadow"), radius: 20, x: 0, y: 10)
                 }.padding(.horizontal, 25)
                 .offset(y: self.continuePermissions || self.continuePt1 ? 150 : -44)
             }
@@ -250,7 +230,22 @@ struct MainBody: View {
                 .offset(x: self.auth.haveUserFullName == true && self.auth.haveUserProfileImg == true && self.auth.isFirstTimeUser == false && self.auth.verifyCodeStatus == .success ? 0 : Constants.screenWidth, y: 50)
                 .animation(.spring(response: 0.48, dampingFraction: 0.45, blendDuration: 0))
                 .resignKeyboardOnDragGesture()
-        }
+        }.ignoresSafeArea()
+        .background(
+            Image("Walkthrough BG1")
+                .resizable()
+                .scaledToFill()
+                .offset(x: -60)
+                .offset(x: -self.scrollOffset / 3)
+                .offset(x: continuePermissions ? -50 : 0)
+                .offset(x: continuePt1 ? -50 : 0)
+                .offset(x: self.auth.verifyPhoneNumberStatus == .success ? -50 : 0)
+                .offset(x: self.auth.haveUserFullName == true && self.auth.haveUserProfileImg == true && self.auth.isFirstTimeUser == false && self.auth.verifyCodeStatus == .success ? -50 : 0)
+                .offset(x: self.continuePt4 || (self.auth.haveUserProfileImg == false && self.auth.verifyCodeStatus == .success) ? -50 : 0)
+                .frame(width: Constants.screenWidth * 3.5, alignment: .leading)
+                .animation(.spring(response: 0.6, dampingFraction: 0.45, blendDuration: 0.4))
+                .zIndex(-1)
+        )
     }
 }
 
@@ -262,38 +257,32 @@ struct WalkthroughCell: View, Identifiable {
     @State var imageName : String
 
     var body: some View {
-        VStack(alignment: .center) {
-            GeometryReader { geo in
-                ZStack {
-                    VStack(alignment: .center) {
-                        Image(self.imageName)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(minHeight: Constants.screenHeight / 2.25)
-                        
+                ZStack(alignment: .bottom) {
+                    Image(self.imageName)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(minHeight: Constants.screenHeight / 2.25)
+                        .padding(.bottom, 75)
+
+                    VStack(alignment: .center, spacing: 10) {
                         Text(self.title)
-                            .font(.system(size: 28))
+                            .font(.system(size: 30))
                             .fontWeight(.bold)
                             .multilineTextAlignment(.center)
                             .foregroundColor(Color.primary.opacity(0.9))
-                            .padding(.horizontal)
                         
                         Text(self.subTitleText)
                             .font(.subheadline)
                             .foregroundColor(Color.primary.opacity(0.9))
                             .multilineTextAlignment(.center)
-                            .padding(.top, 5)
-                            .padding(.horizontal, 30)
-                    }
+                    }.padding(25)
+                    .frame(minWidth: Constants.screenWidth / 2, maxWidth: Constants.screenWidth - 80, alignment: .center)
+                    .background(
+                        BlurView(style: .systemUltraThinMaterial)
+                            .cornerRadius(25)
+                            .overlay(RoundedRectangle(cornerRadius: 25).stroke(Color("blurBorder"), lineWidth: 2.5))
+                    ).shadow(color: Color("buttonShadow"), radius: 20, x: 0, y: 20)
                 }.frame(width: Constants.screenWidth)
-                //.frame(width: geo.size.width - 40)
-                //.background(BlurView(style: .systemUltraThinMaterial))
-                //.cornerRadius(30)
-                //.padding(.horizontal)
-                .padding(.bottom, 30)
-                .shadow(color: Color("buttonShadow"), radius: 20, x: 0, y: 20)
-            }
-        }
     }
 }
 
@@ -1330,8 +1319,8 @@ struct ListView : View {
             ForEach(walkthroughData) { i in
                 WalkthroughCell(title: i.title, subTitleText: i.subtitle, imageName: i.image)
                     .frame(width: Constants.screenWidth)
-                    .padding(.vertical)
-                    .padding(.bottom, 25)
+                    .padding(.top)
+                    .padding(.bottom, 100)
             }
         }
     }

@@ -41,7 +41,10 @@ struct PHAssetPickerSheet: UIViewControllerRepresentable {
                         self.imagePicker.getImageFromAsset(asset: asset, size: CGSize(width: asset.pixelWidth, height: asset.pixelHeight)) { (image) in
                             let newMedia = KeyboardMediaAsset(asset: asset, image: image)
                             self.imagePicker.selectedVideos.append(newMedia)
-                            self.imagePicker.uploadSelectedVideo(media: newMedia)
+                            
+                            //FIX ME: Still need to upload video...
+                            //self.imagePicker.uploadSelectedVideo(media: newMedia)
+                            
                             self.hasAttachments = true
                         }
                     } else if asset.mediaType == .image {

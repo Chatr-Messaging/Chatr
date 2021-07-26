@@ -130,6 +130,7 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
     }
     
     func uploadSelectedVideo(media: KeyboardMediaAsset) {
+        /*
         DispatchQueue.global(qos: .utility).async {
             guard media.uploadId == nil, media.progress == 0.0, let foundMediaIndex = self.selectedVideos.firstIndex(of: media), let data = NSData(contentsOfURL: media.asset) else { return }
             
@@ -162,6 +163,7 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
 
             semaphore.wait()
         }
+        */
     }
     
     func uploadSelectedVideos(dialog: DialogStruct, attachmentVideos: [KeyboardMediaAsset], occupentID: [NSNumber]) {
