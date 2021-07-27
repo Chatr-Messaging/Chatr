@@ -398,14 +398,14 @@ struct mainHomeList: View {
                                     .fontWeight(.semibold)
                                     .frame(alignment: .center)
                                     .padding(.top, 15)
+                                    .padding(.bottom, 2.5)
                                 
                                 Text("Start a new conversation \nor discover an existing group!")
                                     .font(.subheadline)
                                     .foregroundColor(.secondary)
                                     .lineLimit(3)
                                     .multilineTextAlignment(.center)
-                                    .padding(.bottom, 25)
-                                    .frame(height: 80)
+                                    .padding(.bottom, 30)
                                 
                                 Button(action: {
                                     self.showNewChat.toggle()
@@ -425,6 +425,7 @@ struct mainHomeList: View {
                                 }.buttonStyle(MainButtonStyle())
                                 .frame(maxWidth: 230)
                                 .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 8)
+                                .padding(.bottom, 5)
                                 
                                 Button(action: {
                                     print("the screen is: \(Constants.screenWidth)")

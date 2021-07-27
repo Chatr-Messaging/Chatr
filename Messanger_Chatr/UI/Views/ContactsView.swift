@@ -281,26 +281,23 @@ struct ContactsView: View {
                         if self.auth.contacts.results.filter({ $0.isMyContact == true }).count == 0 {
                             //MARK: No Contact Section
                             VStack {
+                                Image("NoContacts")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .padding(.horizontal, 40)
+
                                 Text("Empty Contacts")
                                     .font(.largeTitle)
                                     .foregroundColor(.primary)
                                     .fontWeight(.bold)
                                     .frame(maxWidth: Constants.screenWidth, alignment: .center)
-                                    .padding(.top, 5)
-                                    .padding(.bottom, 2.5)
+                                    .padding(.bottom, 2)
                                 
                                 Text("Start connecting to people \naround the world!")
                                     .font(.subheadline)
                                     .foregroundColor(Color.secondary)
                                     .multilineTextAlignment(.center)
-                                    .padding(.bottom, 10)
-                                
-                                Image("NoContacts")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .padding(.horizontal, 10)
-                                    .padding(.bottom, 20)
-                                
+                                    .padding(.bottom)
                                 Button(action: {
                                     self.showAddChat.toggle()
                                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
@@ -333,7 +330,7 @@ struct ContactsView: View {
                                 }
                                 
                                 Spacer()
-                            }.animation(.spring(response: 0.45, dampingFraction: 0.70, blendDuration: 0))
+                            }.offset(y: -20).animation(.spring(response: 0.45, dampingFraction: 0.70, blendDuration: 0))
                         } else {
                             
                             //MARK: Search, Filter, & Add Section

@@ -20,8 +20,8 @@ struct SyncAddressBook: View {
                     .fontWeight(.bold)
                     .multilineTextAlignment(.center)
                     .foregroundColor(.primary)
-                    //.padding(.top, 20)
                     .padding(.horizontal, 40)
+                    .padding(.bottom, 2.5)
                 
                 Text("Syncing your address book you will be able to discover registered contacts.")
                     .font(.subheadline)
@@ -29,14 +29,13 @@ struct SyncAddressBook: View {
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 20)
-                    .padding(.top, 10)
                     .padding(.bottom, 15)
                                     
                 Image("NoContacts")
                     .resizable()
                     .scaledToFit()
                     .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
-                    //.padding(.horizontal, 5)
+                    .padding(.horizontal)
                 
                 Button(action: {
                     print("add the fetch address book function here")
@@ -57,7 +56,7 @@ struct SyncAddressBook: View {
                 .frame(height: 45)
                 .frame(minWidth: 220, maxWidth: 270)
                 .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
-                .padding(.top, 20)
+                .padding(.top, 5)
                 .padding()
             }
         }.onAppear() {
