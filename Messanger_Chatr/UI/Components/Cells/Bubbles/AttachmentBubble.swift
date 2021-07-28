@@ -82,7 +82,19 @@ struct AttachmentBubble: View {
                         .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.8) : Color.clear, lineWidth: 3).offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0))
                         .matchedGeometryEffect(id: self.message.id.description + "png", in: namespace)
                 } else {
-                    Text("uploading image here... \(self.message.uploadMediaId)").padding(60)
+                    Text("uploading image here...\(self.message.uploadProgress)% && \(self.message.uploadMediaId)")
+                        .padding(60)
+                        .onAppear(perform: {
+                            if self.message.uploadMediaId != "" {
+                                print("updating the upload id: \(self.message.uploadMediaId)")
+                                //changeMessageRealmData.shared.updateMessageImageUrl(messageID: self.message.id.description, url: Constants.uploadcareBaseUrl + self.message.uploadMediaId + Constants.uploadcareStandardTransform)
+                            }
+                            if let uploadingImg = self.viewModel.imagePicker.selectedPhotos.firstIndex(where: { $0.preparedMessageId == self.message.id.description }) {
+                                print("found the uploading imageeee! \(self.viewModel.imagePicker.selectedPhotos[uploadingImg].progress)")
+                            } else {
+                                print("did not find upload img")
+                            }
+                        })
                     //uploadingPlaceholderImage?.resizable().scaledToFill().clipped().frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.55 : 0.65)), alignment: self.messagePosition == .right ? .trailing : .leading).frame(maxHeight: CGFloat(Constants.screenHeight * 0.65)).clipShape(CustomGIFShape()).shadow(color: Color("buttonShadow"), radius: 8, x: 0, y: 5)
                 }
             } else if self.message.imageType == "video/mov" && self.message.messageState != .deleted {

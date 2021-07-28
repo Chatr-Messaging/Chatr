@@ -50,7 +50,7 @@ struct WalkthroughData: Identifiable {
 }
 
 var WalkthroughDataArray = [
-    WalkthroughData(title: "Messaging Reimagined", subtitle: "The most fun messaging experiance.\nSafe. Fun. & Free.", image: "WalkthroughImage1"),
+    WalkthroughData(title: "Messaging \nReimagined", subtitle: "The most fun messaging experiance.\nSafe. Fun. & Free.", image: "WalkthroughImage1"),
     WalkthroughData(title: "The Most Fun", subtitle: "Send contacts fun messages using GIF's, Photos, or Quick Snaps!", image: "WalkthroughImage2"),
     WalkthroughData(title: "Fast & Reliable", subtitle: "Chatr uses the fastest servers to make it a seemless experiance", image: "WalkthroughImage3"),
     WalkthroughData(title: "Your Contacts \nAre Waiting", subtitle: "Contacts that have regristered are \nwaiting to for you to say hello 👋", image: "WalkthroughImage4")

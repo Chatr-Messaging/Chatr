@@ -34,6 +34,7 @@ class MessageStruct : Object, Identifiable {
     @objc dynamic var isPinned: Bool = false
     @objc dynamic var needsTimestamp: Bool = false
     @objc dynamic var uploadMediaId: String = ""
+    @objc dynamic var uploadProgress: Double = 0.0
     @objc dynamic var status = messageStatus.sending.rawValue
     var messageState: messageStatus {
         get { return messageStatus(rawValue: status) ?? .delivered }
@@ -956,6 +957,38 @@ class changeMessageRealmData {
                         realmContact.messageState = messageState
                         realm.add(realmContact, update: .all)
                     }
+                }
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+
+    func updateMessageImageUrl(messageID: String, url: String) {
+        let config = Realm.Configuration(schemaVersion: 1)
+        do {
+            let realm = try Realm(configuration: config)
+            if let realmContact = realm.object(ofType: MessageStruct.self, forPrimaryKey: messageID) {
+                //Contact is in Realm...
+                try realm.safeWrite {
+                    realmContact.image = url
+                    realm.add(realmContact, update: .all)
+                }
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+
+    func updateMessageMediaProgress(messageID: String, progress: Double) {
+        let config = Realm.Configuration(schemaVersion: 1)
+        do {
+            let realm = try Realm(configuration: config)
+            if let realmContact = realm.object(ofType: MessageStruct.self, forPrimaryKey: messageID) {
+                //Contact is in Realm...
+                try realm.safeWrite {
+                    realmContact.uploadProgress = progress
+                    realm.add(realmContact, update: .all)
                 }
             }
         } catch {

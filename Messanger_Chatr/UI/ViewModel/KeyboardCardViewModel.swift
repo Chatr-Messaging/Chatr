@@ -103,8 +103,12 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
             let semaphore = DispatchSemaphore(value: 0)
             
             uploadcare.uploadAPI.upload(files: [filename: data], store: .store, { (progress) in
-                DispatchQueue.main.async {
-                    self.selectedPhotos[foundMediaIndex].progress = progress
+                if let realmId = self.selectedPhotos[foundMediaIndex].preparedMessageId {
+                    changeMessageRealmData.shared.updateMessageMediaProgress(messageID: realmId, progress: progress)
+                } else {
+                    DispatchQueue.main.async {
+                        self.selectedPhotos[foundMediaIndex].progress = progress
+                    }
                 }
             }) { (resultDictionary, error) in
                 defer {
