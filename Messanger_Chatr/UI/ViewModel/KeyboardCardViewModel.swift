@@ -29,6 +29,17 @@ struct KeyboardMediaAsset: Identifiable, Hashable {
     var uploadId: String?
     var preparedMessageId: String?
     var selected: Bool = false
+    
+    init(asset: PHAsset, image: UIImage) {
+        self.asset = asset
+        self.image = image
+        print("hello new object")
+        upload()
+    }
+    
+    func upload() {
+        print("printtttt")
+    }
 }
 
 class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObserver {

@@ -16,6 +16,7 @@ import Cache
 
 class ChatMessageViewModel: ObservableObject {
     @ObservedObject var profile = ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self))
+    @ObservedObject var imagePicker = KeyboardCardViewModel()
     @Published var isDetailOpen: Bool = false
     @Published var message: MessageStruct = MessageStruct()
     @Published var contact: ContactStruct = ContactStruct()
