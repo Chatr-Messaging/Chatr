@@ -17,53 +17,61 @@ struct PHAssetPickerSheet: UIViewControllerRepresentable {
     @Binding var isPresented: Bool
     @Binding var hasAttachments: Bool
     @State var imagePicker: KeyboardCardViewModel
+    let onMediaPicked: ([KeyboardMediaAsset]) -> Void
 
     class Coordinator: NSObject, UINavigationControllerDelegate, PHPickerViewControllerDelegate {
         @Binding var presentationMode: PresentationMode
         @Binding var isPresented: Bool
         @Binding var hasAttachments: Bool
         @Binding var imagePicker: KeyboardCardViewModel
+        private let onMediaPicked: ([KeyboardMediaAsset]) -> Void
 
-        init(presentationMode: Binding<PresentationMode>, isPresented: Binding<Bool>, hasAttachments: Binding<Bool>, imagePicker: Binding<KeyboardCardViewModel>) {
+        init(presentationMode: Binding<PresentationMode>, isPresented: Binding<Bool>, hasAttachments: Binding<Bool>, imagePicker: Binding<KeyboardCardViewModel>, onMediaPicked: @escaping ([KeyboardMediaAsset]) -> Void) {
             _presentationMode = presentationMode
             _isPresented = isPresented
             _hasAttachments = hasAttachments
             _imagePicker = imagePicker
+            self.onMediaPicked = onMediaPicked
         }
 
         func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
             let identifiers = results.compactMap(\.assetIdentifier)
             let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: identifiers, options: nil)
-
+            var mediaz: [KeyboardMediaAsset] = []
+            
             fetchResult.enumerateObjects { [self] (asset, index, _) in
                 self.imagePicker.extractPreviewData(asset: asset, completion: {
                     if asset.mediaType == .video {
                         self.imagePicker.getImageFromAsset(asset: asset, size: CGSize(width: asset.pixelWidth, height: asset.pixelHeight)) { (image) in
                             let newMedia = KeyboardMediaAsset(asset: asset, image: image)
-                            self.imagePicker.selectedVideos.append(newMedia)
-                            
+                            DispatchQueue.main.async {
+                                mediaz.append(newMedia)
+                                self.hasAttachments = true
+                            }
                             //FIX ME: Still need to upload video...
-                            //self.imagePicker.uploadSelectedVideo(media: newMedia)
-                            
-                            self.hasAttachments = true
+                            self.imagePicker.uploadSelectedVideo(media: newMedia)
+                            print("trying to upload new video!")
                         }
                     } else if asset.mediaType == .image {
                         self.imagePicker.getImageFromAsset(asset: asset, size: CGSize(width: asset.pixelWidth, height: asset.pixelHeight)) { (image) in
                             let newMedia = KeyboardMediaAsset(asset: asset, image: image)
-                            self.imagePicker.selectedPhotos.append(newMedia)
                             self.imagePicker.uploadSelectedImage(media: newMedia)
+                            self.imagePicker.selectedPhotos.append(newMedia)
+                            mediaz.append(newMedia)
+                            print("trying to upload new photo!")
                             self.hasAttachments = true
                         }
                     }
                 })
             }
-
-            isPresented = false
+            
+            //self.onMediaPicked(mediaz)
+            self.isPresented = false
         }
     }
 
     func makeCoordinator() -> Coordinator {
-        return Coordinator(presentationMode: presentationMode, isPresented: $isPresented, hasAttachments: $hasAttachments, imagePicker: $imagePicker)
+        return Coordinator(presentationMode: presentationMode, isPresented: $isPresented, hasAttachments: $hasAttachments, imagePicker: $imagePicker, onMediaPicked: onMediaPicked)
     }
 
     func makeUIViewController(context: UIViewControllerRepresentableContext<PHAssetPickerSheet>) -> PHPickerViewController {

@@ -86,14 +86,14 @@ struct AttachmentBubble: View {
                         .padding(60)
                         .onAppear(perform: {
                             if self.message.uploadMediaId != "" {
-                                print("updating the upload id: \(self.message.uploadMediaId)")
+                                print("updating the upload id: \(self.message.uploadMediaId) && \(self.message.uploadProgress / 100)%")
                                 //changeMessageRealmData.shared.updateMessageImageUrl(messageID: self.message.id.description, url: Constants.uploadcareBaseUrl + self.message.uploadMediaId + Constants.uploadcareStandardTransform)
                             }
-                            if let uploadingImg = self.viewModel.imagePicker.selectedPhotos.firstIndex(where: { $0.preparedMessageId == self.message.id.description }) {
-                                print("found the uploading imageeee! \(self.viewModel.imagePicker.selectedPhotos[uploadingImg].progress)")
-                            } else {
-                                print("did not find upload img")
-                            }
+//                            if let uploadingImg = self.viewModel.imagePicker.selectedPhotos.firstIndex(where: { $0.preparedMessageId == self.message.id.description }) {
+//                                print("found the uploading imageeee! \(self.viewModel.imagePicker.selectedPhotos[uploadingImg].progress)")
+//                            } else {
+//                                print("did not find upload img")
+//                            }
                         })
                     //uploadingPlaceholderImage?.resizable().scaledToFill().clipped().frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.55 : 0.65)), alignment: self.messagePosition == .right ? .trailing : .leading).frame(maxHeight: CGFloat(Constants.screenHeight * 0.65)).clipShape(CustomGIFShape()).shadow(color: Color("buttonShadow"), radius: 8, x: 0, y: 5)
                 }

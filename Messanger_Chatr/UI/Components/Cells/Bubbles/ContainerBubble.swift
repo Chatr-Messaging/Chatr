@@ -71,7 +71,6 @@ struct ContainerBubble: View {
                //MARK: Main content section:
                 ZStack(alignment: self.messagePosition == .left ? .topTrailing : .topLeading) {
                     ZStack(alignment: self.messagePosition == .left ? .trailing : .leading) {
-                        
                         if self.message.image != "" || self.message.uploadMediaId != "" {
                             AttachmentBubble(viewModel: self.viewModel, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior, player: self.$player, totalDuration: self.$totalDuration, namespace: self.namespace)
                                 .environmentObject(self.auth)
