@@ -34,11 +34,6 @@ struct KeyboardMediaAsset: Identifiable, Hashable {
         self.asset = asset
         self.image = image
         print("hello new object")
-        upload()
-    }
-    
-    func upload() {
-        print("printtttt")
     }
 }
 
@@ -107,6 +102,7 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
                     changeMessageRealmData.shared.updateMessageMediaProgress(messageID: realmId, progress: progress)
                 } else {
                     DispatchQueue.main.async {
+                        print("the upload progress is: \(progress)")
                         self.selectedPhotos[foundMediaIndex].progress = progress
                     }
                 }
@@ -258,32 +254,32 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
     
     func openImagePicker(completion: @escaping () -> Void) {
         if fetchedPhotos.isEmpty {
-            fetchPhotos(completion: {
+            //fetchPhotos(completion: {
                 completion()
-            })
+            //})
         } else {
             completion()
         }
     }
     
-    func fetchPhotos(completion: @escaping () -> Void) {
-        let options = PHFetchOptions()
-        options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-        options.includeHiddenAssets = false
-        
-        let fetchResults = PHAsset.fetchAssets(with: options)
-        allPhotos = fetchResults
-        
-        fetchResults.enumerateObjects { [self] (asset, index, _) in
-            getImageFromAsset(asset: asset, size: CGSize(width: asset.pixelWidth, height: asset.pixelHeight)) { (image) in
-                DispatchQueue.main.async {
-                    fetchedPhotos.append(KeyboardMediaAsset(asset: asset, image: image))
-                }
-            }
-            
-            completion()
-        }
-    }
+//    func fetchPhotos(completion: @escaping () -> Void) {
+//        let options = PHFetchOptions()
+//        options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+//        options.includeHiddenAssets = false
+//
+//        let fetchResults = PHAsset.fetchAssets(with: options)
+//        allPhotos = fetchResults
+//
+//        fetchResults.enumerateObjects { [self] (asset, index, _) in
+//            getImageFromAsset(asset: asset, size: CGSize(width: asset.pixelWidth, height: asset.pixelHeight)) { (image) in
+//                DispatchQueue.main.async {
+//                    fetchedPhotos.append(KeyboardMediaAsset(asset: asset, image: image, imagePicker: self.chatV))
+//                }
+//            }
+//
+//            completion()
+//        }
+//    }
 
     func setUpAuthStatus() {
         PHPhotoLibrary.requestAuthorization(for: .readWrite) { [self] (status) in
@@ -302,46 +298,49 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
     }
         
     func photoLibraryDidChange(_ changeInstance: PHChange) {
-        guard let _ = allPhotos else { return }
-        
-        if let updates = changeInstance.changeDetails(for: allPhotos) {
-            let updatedPhotos = updates.fetchResultAfterChanges
-            
-            // There is bug in it...
-            // It is not updating the inserted or removed items....
-            
-//            print(updates.insertedObjects.count)
-//            print(updates.removedObjects.count)
-            
-            // So were Going to verify All And Append Only No in the list...
-            // To Avoid Of reloading all and ram usage...
-            
-            updatedPhotos.enumerateObjects { [self] (asset, index, _) in
-                if !allPhotos.contains(asset) {
-                    getImageFromAsset(asset: asset, size: CGSize(width: 150, height: 150)) { (image) in
-                        DispatchQueue.main.async {
-                            fetchedPhotos.append(KeyboardMediaAsset(asset: asset, image: image))
-                        }
-                    }
-                }
-            }
-            
-            // To Remove If Image is removed...
-            allPhotos.enumerateObjects { (asset, index, _) in
-                if !updatedPhotos.contains(asset) {
-                    DispatchQueue.main.async {
-                        self.fetchedPhotos.removeAll { (result) -> Bool in
-                            return result.asset == asset
-                        }
-                    }
-                }
-            }
-            
-            DispatchQueue.main.async {
-                self.allPhotos = updatedPhotos
-            }
-        }
+        print("photo library did change! \(changeInstance)")
     }
+//    func photoLibraryDidChange(_ changeInstance: PHChange) {
+//        guard let _ = allPhotos else { return }
+//
+//        if let updates = changeInstance.changeDetails(for: allPhotos) {
+//            let updatedPhotos = updates.fetchResultAfterChanges
+//
+//            // There is bug in it...
+//            // It is not updating the inserted or removed items....
+//
+////            print(updates.insertedObjects.count)
+////            print(updates.removedObjects.count)
+//
+//            // So were Going to verify All And Append Only No in the list...
+//            // To Avoid Of reloading all and ram usage...
+//
+//            updatedPhotos.enumerateObjects { [self] (asset, index, _) in
+//                if !allPhotos.contains(asset) {
+//                    getImageFromAsset(asset: asset, size: CGSize(width: 150, height: 150)) { (image) in
+//                        DispatchQueue.main.async {
+//                            fetchedPhotos.append(KeyboardMediaAsset(asset: asset, image: image))
+//                        }
+//                    }
+//                }
+//            }
+//
+//            // To Remove If Image is removed...
+//            allPhotos.enumerateObjects { (asset, index, _) in
+//                if !updatedPhotos.contains(asset) {
+//                    DispatchQueue.main.async {
+//                        self.fetchedPhotos.removeAll { (result) -> Bool in
+//                            return result.asset == asset
+//                        }
+//                    }
+//                }
+//            }
+//
+//            DispatchQueue.main.async {
+//                self.allPhotos = updatedPhotos
+//            }
+//        }
+//    }
     
     func getImageFromAsset(asset: PHAsset, size: CGSize, completion: @escaping (UIImage)->()) {
         DispatchQueue.global(qos: .utility).async {
@@ -364,51 +363,56 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
     // Opening Image Or Video....
     func extractPreviewData(asset: PHAsset, completion: @escaping () -> Void) {
         DispatchQueue.global(qos: .utility).async {
-        let manager = PHCachingImageManager()
-        if asset.mediaType == .image {
+            let manager = PHCachingImageManager()
             self.getImageFromAsset(asset: asset, size: PHImageManagerMaximumSize) { (image) in
-                DispatchQueue.main.async {
-                    guard let imgRemove = self.imageData.firstIndex(of: image) else {
-                        DispatchQueue.main.async {
-                            self.imageData.append(image)
-                            completion()
-                        }
-
-                        return
-                    }
-
+                if asset.mediaType == .image {
                     DispatchQueue.main.async {
-                        self.videoData.remove(at: imgRemove)
-                        completion()
-                    }
-                }
-            }
-        }
+                        guard let imgRemove = self.imageData.firstIndex(of: image) else {
+                            DispatchQueue.main.async {
+                                let newMedia = KeyboardMediaAsset(asset: asset, image: image)
+                                self.selectedPhotos.append(newMedia)
+                                self.uploadSelectedImage(media: newMedia)
+                                self.imageData.append(image)
 
-        if asset.mediaType == .video {
-            let videoManager = PHVideoRequestOptions()
-            videoManager.deliveryMode = .highQualityFormat
+                                completion()
+                            }
 
-            manager.requestAVAsset(forVideo: asset, options: videoManager) { (videoAsset, _, _) in
-                guard let videoUrl = videoAsset else{return}
-                
-                DispatchQueue.main.async {
-                    guard let vidRemove = self.videoData.firstIndex(of: videoUrl) else {
-                        self.videoData.append(videoUrl)
+                            return
+                        }
+
                         DispatchQueue.main.async {
+                            self.videoData.remove(at: imgRemove)
                             completion()
                         }
+                    }
+                } else if asset.mediaType == .video {
+                    let videoManager = PHVideoRequestOptions()
+                    videoManager.deliveryMode = .highQualityFormat
+
+                    manager.requestAVAsset(forVideo: asset, options: videoManager) { (videoAsset, _, _) in
+                        guard let videoUrl = videoAsset else{return}
                         
-                        return
-                    }
+                        DispatchQueue.main.async {
+                            guard let vidRemove = self.videoData.firstIndex(of: videoUrl) else {
+                                DispatchQueue.main.async {
+                                    let newMedia = KeyboardMediaAsset(asset: asset, image: image)
+                                    self.selectedVideos.append(newMedia)
+                                    self.videoData.append(videoUrl)
 
-                    self.videoData.remove(at: vidRemove)
-                    DispatchQueue.main.async {
-                        completion()
+                                    completion()
+                                }
+                                
+                                return
+                            }
+
+                            self.videoData.remove(at: vidRemove)
+                            DispatchQueue.main.async {
+                                completion()
+                            }
+                        }
                     }
                 }
             }
-        }
         }
     }
 
