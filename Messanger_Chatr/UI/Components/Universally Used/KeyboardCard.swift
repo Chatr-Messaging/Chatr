@@ -524,8 +524,22 @@ struct KeyboardCardView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(alignment: .center, spacing: 25) {
                         Button(action: {
-                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                            self.showImagePicker.toggle()
+                            let status = PHPhotoLibrary.authorizationStatus()
+
+                            if status == .authorized {
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                self.showImagePicker.toggle()
+                            } else {
+                                PHPhotoLibrary.requestAuthorization({ statusz in
+                                    if statusz == .authorized{
+                                      DispatchQueue.main.async(execute: {
+                                          self.showImagePicker.toggle()
+                                      })
+                                    } else {
+                                        UINotificationFeedbackGenerator().notificationOccurred(.error)
+                                    }
+                                })
+                            }
                         }, label: {
                             Image(systemName: "photo.on.rectangle")
                                 .resizable()
