@@ -21,7 +21,7 @@ enum LibraryStatus {
     case limited
 }
 
-struct KeyboardMediaAsset: Identifiable, Hashable {
+struct KeyboardMediaAsset: Hashable, Equatable, Identifiable {
     var id = UUID().uuidString
     var asset: PHAsset
     var image: UIImage

@@ -41,7 +41,9 @@ struct PHAssetPickerSheet: UIViewControllerRepresentable {
                 })
             }
 
-            isPresented = false
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                self.isPresented = false
+            }
         }
     }
 
