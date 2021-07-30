@@ -19,7 +19,7 @@ import Firebase
 struct KeyboardCardView: View {
     @EnvironmentObject var auth: AuthModel
     @ObservedObject var audio = VoiceViewModel()
-    @ObservedObject var chatViewModel: ChatMessageViewModel
+    @StateObject var imagePicker = KeyboardCardViewModel()
     @Binding var height: CGFloat
     @Binding var isOpen: Bool
     @State var open: Bool = UserDefaults.standard.bool(forKey: "localOpen")
@@ -46,7 +46,7 @@ struct KeyboardCardView: View {
     @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 25.7617, longitude: 80.1918), span: MKCoordinateSpan(latitudeDelta: 10, longitudeDelta: 10))
     let keyboard = KeyboardObserver()
     var contentAvailable: Bool {
-        if self.mainText.count > 0 || self.gifData.count > 0 || self.chatViewModel.imagePicker.selectedPhotos.count > 0 || self.chatViewModel.imagePicker.selectedVideos.count > 0 || self.enableLocation || self.chatViewModel.imagePicker.pastedImages.count > 0 || (self.hasAudioToSend && self.isRecordingAudio) {
+        if self.mainText.count > 0 || self.gifData.count > 0 || self.imagePicker.selectedPhotos.count > 0 || self.imagePicker.selectedVideos.count > 0 || self.enableLocation || self.imagePicker.pastedImages.count > 0 || (self.hasAudioToSend && self.isRecordingAudio) {
             return true
         } else {
             return false
@@ -135,7 +135,6 @@ struct KeyboardCardView: View {
                                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                     withAnimation(.easeOut(duration: 0.25)) {
                                         self.enableLocation = false
-                                        self.checkAttachments()
                                     }
                                 }, label: {
                                     Map(coordinateRegion: $region, interactionModes: MapInteractionModes.all, showsUserLocation: true, userTrackingMode: $userTrackingMode)
@@ -168,10 +167,7 @@ struct KeyboardCardView: View {
                                         
                                         Button(action: {
                                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                            withAnimation(.easeOut(duration: 0.25)) {
-                                                self.gifData.remove(at: url)
-                                                self.checkAttachments()
-                                            }
+                                            self.gifData.remove(at: url)
                                         }, label: {
                                             Image(systemName: "xmark.circle.fill")
                                                 .resizable()
@@ -185,11 +181,11 @@ struct KeyboardCardView: View {
                         }
 
                         //MARK: Pasted Photo Section
-                        if !self.chatViewModel.imagePicker.pastedImages.isEmpty {
+                        if !self.imagePicker.pastedImages.isEmpty {
                             HStack {
-                                ForEach(self.chatViewModel.imagePicker.pastedImages.indices, id: \.self) { index in
+                                ForEach(self.imagePicker.pastedImages.indices, id: \.self) { index in
                                     ZStack(alignment: .topLeading) {
-                                        Image(uiImage: self.chatViewModel.imagePicker.pastedImages[index])
+                                        Image(uiImage: self.imagePicker.pastedImages[index])
                                             .resizable()
                                             .scaledToFill()
                                             .frame(height: 90)
@@ -198,16 +194,10 @@ struct KeyboardCardView: View {
                                             .cornerRadius(10)
                                             .padding(.leading, 10)
                                             .padding(.top, 10)
-                                            .onAppear {
-                                                self.checkAttachments()
-                                            }
 
                                         Button(action: {
                                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                            withAnimation(.easeOut(duration: 0.25)) {
-                                                self.chatViewModel.imagePicker.pastedImages.remove(at: index)
-                                                self.checkAttachments()
-                                            }
+                                            self.imagePicker.pastedImages.remove(at: index)
                                         }, label: {
                                             Image(systemName: "xmark.circle.fill")
                                                 .resizable()
@@ -221,11 +211,11 @@ struct KeyboardCardView: View {
                         }
 
                         //MARK: Photo Section
-                        if !self.chatViewModel.imagePicker.selectedPhotos.isEmpty {
-                            HStack {
-                                ForEach(self.chatViewModel.imagePicker.selectedPhotos.indices, id: \.self) { img in
+                        if !self.imagePicker.selectedPhotos.isEmpty {
+                            HStack(alignment: .center) {
+                                ForEach(self.imagePicker.selectedPhotos.indices, id: \.self) { img in
                                     ZStack(alignment: .topLeading) {
-                                        Image(uiImage: self.chatViewModel.imagePicker.selectedPhotos[img].image)
+                                        Image(uiImage: self.imagePicker.selectedPhotos[img].image)
                                             .resizable()
                                             .scaledToFill()
                                             .frame(height: 90)
@@ -242,27 +232,21 @@ struct KeyboardCardView: View {
                                                         .animation(.easeInOut)
 
                                                     Circle()
-                                                        .trim(from: 0, to: self.chatViewModel.imagePicker.selectedPhotos[img].progress)
+                                                        .trim(from: 0, to: self.imagePicker.selectedPhotos[img].progress)
                                                         .stroke(Color.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                                                         .frame(width: 20, height: 20)
                                                         .rotationEffect(.init(degrees: -90))
                                                         .padding(4)
                                                         .animation(.easeOut)
-                                                }.opacity(self.chatViewModel.imagePicker.selectedPhotos[img].uploadId != "" ? 0 : 1)
+                                                }.opacity(self.imagePicker.selectedPhotos[img].uploadId != "" ? 0 : 1)
                                             )
-                                            .cornerRadius(10)
+                                            .cornerRadius(14)
                                             .padding(.leading, 10)
                                             .padding(.top, 10)
 
                                         Button(action: {
                                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                            if let deselectIndex = self.chatViewModel.imagePicker.fetchedPhotos.firstIndex(where: { $0.asset == self.chatViewModel.imagePicker.selectedPhotos[img].asset }) {
-                                                self.chatViewModel.imagePicker.fetchedPhotos[deselectIndex].selected = false
-                                            }
-                                            withAnimation {
-                                                self.chatViewModel.imagePicker.selectedPhotos.remove(at: img)
-                                                self.checkAttachments()
-                                            }
+                                            self.imagePicker.selectedPhotos.remove(at: img)
                                         }, label: {
                                             Image(systemName: "xmark.circle.fill")
                                                 .resizable()
@@ -276,78 +260,70 @@ struct KeyboardCardView: View {
                         }
 
                         //MARK: Video Section
-                        if !self.chatViewModel.imagePicker.selectedVideos.isEmpty {
-                            HStack {
-                                ForEach(self.chatViewModel.imagePicker.selectedVideos.indices, id: \.self) { vid in
-                                    ZStack(alignment: .topLeading) {
-                                        ZStack(alignment: .bottomLeading) {
-                                            Image(uiImage: self.chatViewModel.imagePicker.selectedVideos[vid].image)
-                                                .resizable()
-                                                .scaledToFill()
-                                                .frame(height: 90)
-                                                .frame(minWidth: 85, maxWidth: Constants.screenWidth * 0.4)
-                                                .overlay(
-                                                    ZStack(alignment: .center) {
-                                                        BlurView(style: .systemUltraThinMaterial).opacity(self.chatViewModel.imagePicker.selectedVideos[vid].progress >= 1.0 ? 0 : 1).animation(.easeInOut)
+                        HStack {
+                            ForEach(self.imagePicker.selectedVideos.indices, id: \.self) { vid in
+                                ZStack(alignment: .topLeading) {
+                                    ZStack(alignment: .bottomLeading) {
+                                        Image(uiImage: self.imagePicker.selectedVideos[vid].image)
+                                            .resizable()
+                                            .scaledToFill()
+                                            .frame(height: 90)
+                                            .frame(minWidth: 85, maxWidth: Constants.screenWidth * 0.4)
+                                            .overlay(
+                                                ZStack(alignment: .center) {
+                                                    BlurView(style: .systemUltraThinMaterial).animation(.easeInOut)
 
                                                     Circle()
                                                         .trim(from: 0, to: 1)
                                                         .stroke(Color.primary.opacity(0.2), style: StrokeStyle(lineWidth: 2, lineCap: .round))
                                                         .frame(width: 20, height: 20)
                                                         .padding(4)
-                                                        .opacity(self.chatViewModel.imagePicker.selectedVideos[vid].progress >= 1.0 ? 0 : 1)
                                                         .animation(.easeInOut)
 
                                                     Circle()
-                                                        .trim(from: 0, to: self.chatViewModel.imagePicker.selectedVideos[vid].progress)
+                                                        .trim(from: 0, to: self.imagePicker.selectedVideos[vid].progress)
                                                         .stroke(Color.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                                                         .frame(width: 20, height: 20)
                                                         .rotationEffect(.init(degrees: -90))
                                                         .padding(4)
-                                                        .opacity(self.chatViewModel.imagePicker.selectedVideos[vid].progress >= 1.0 ? 0 : 1)
                                                         .animation(.easeOut)
-                                                    }
-                                                )
-                                                .cornerRadius(10)
-                                            
-                                            HStack {
-                                                Image(systemName: "video.fill")
-                                                    .font(.subheadline)
-                                                    .foregroundColor(.white)
+                                                }.opacity(self.imagePicker.selectedVideos[vid].uploadId != "" ? 0 : 1)
+                                            )
+                                            .cornerRadius(14)
+                                        
+                                        HStack {
+                                            Image(systemName: "video.fill")
+                                                .font(.subheadline)
+                                                .foregroundColor(.white)
 
-                                                Text("\(self.formatVideoDuration(second: self.chatViewModel.imagePicker.selectedVideos[vid].asset.duration))")
-                                                    .font(.caption)
-                                                    .fontWeight(.regular)
-                                                    .foregroundColor(.white)
-                                            }.padding(5)
-                                            .background(BlurView(style: .systemThinMaterialDark).cornerRadius(5))
-                                            .offset(x: 5, y: -5)
-                                        }.padding(.leading, 10)
-                                        .padding(.top, 10)
+//                                                Text("\(self.formatVideoDuration(second: self.imagePicker.selectedVideos[vid].asset?.duration ?? CMTime(seconds: 0.0, preferredTimescale: 100)))")
+//                                                    .font(.caption)
+//                                                    .fontWeight(.regular)
+//                                                    .foregroundColor(.white)
+                                        }.padding(5)
+                                        .background(BlurView(style: .systemThinMaterialDark).cornerRadius(5))
+                                        .offset(x: 5, y: -5)
+                                    }.padding(.leading, 10)
+                                    .padding(.top, 10)
 
-                                        Button(action: {
-                                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                            if let deselectIndex = self.chatViewModel.imagePicker.fetchedPhotos.firstIndex(where: { $0.asset == self.chatViewModel.imagePicker.selectedVideos[vid].asset }) {
-                                                self.chatViewModel.imagePicker.fetchedPhotos[deselectIndex].selected = false
-                                            }
-                                            withAnimation {
-                                                self.chatViewModel.imagePicker.selectedVideos.remove(at: vid)
-                                                self.checkAttachments()
-                                            }
-                                        }, label: {
-                                            Image(systemName: "xmark.circle.fill")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 24, height: 24, alignment: .center)
-                                                .foregroundColor(.primary)
-                                        }).background(Color.clear)
-                                    }.transition(transition)
-                                }.animation(.spring(response: 0.3, dampingFraction: 0.75, blendDuration: 0))
-                            }
+                                    Button(action: {
+                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                        self.imagePicker.selectedVideos.remove(at: vid)
+                                    }, label: {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 24, height: 24, alignment: .center)
+                                            .foregroundColor(.primary)
+                                    }).background(Color.clear)
+                                }.transition(transition)
+                            }.animation(.spring(response: 0.3, dampingFraction: 0.75, blendDuration: 0))
                         }
-                    }.padding(.vertical, self.hasAttachments ? 5 : 0)
+                    }
+                    .padding(.vertical, !self.imagePicker.selectedVideos.isEmpty || !self.imagePicker.selectedPhotos.isEmpty ? 5 : 0)
                     .padding(.horizontal)
-                }).shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 8)
+                })
+                .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 8)
                 .transition(transition)
                 
                 //MARK: Text Field & Send Btn
@@ -355,10 +331,10 @@ struct KeyboardCardView: View {
                     if !self.isRecordingAudio {
                         HStack(alignment: .bottom, spacing: 0) {
                             Button(action: {
-                                withAnimation(Animation.spring(response: 0.38, dampingFraction: 0.8, blendDuration: 0), {
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                withAnimation(Animation.spring(response: 0.35, dampingFraction: 0.65, blendDuration: 0), {
                                     self.isKeyboardActionOpen.toggle()
                                 })
-                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                             }) {
                                 Image(systemName: self.isKeyboardActionOpen ? "xmark" : "paperclip")
                                     .resizable()
@@ -371,13 +347,13 @@ struct KeyboardCardView: View {
                             }.buttonStyle(changeBGPaperclipButtonStyle())
                             .cornerRadius(self.height < 160 ? 12.5 : 17.5)
 
-                            ResizableTextField(imagePicker: self.chatViewModel.imagePicker, height: self.$height, text: self.$mainText)
+                            ResizableTextField(imagePicker: self.imagePicker, height: self.$height, text: self.$mainText)
                                 .environmentObject(self.auth)
                                 .frame(height: self.height < 175 ? self.height : 175)
                                 .padding(.trailing, 7.5)
                                 .offset(x: -5, y: -1)
 
-                            if self.mainText.count == 0 && !self.enableLocation && self.gifData.isEmpty && self.chatViewModel.imagePicker.pastedImages.isEmpty && self.chatViewModel.imagePicker.selectedVideos.isEmpty && self.chatViewModel.imagePicker.selectedPhotos.isEmpty {
+                            if self.mainText.count == 0 && !self.enableLocation && self.gifData.isEmpty && self.imagePicker.pastedImages.isEmpty && self.imagePicker.selectedVideos.isEmpty && self.imagePicker.selectedPhotos.isEmpty {
                                 Button(action: {
                                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                     withAnimation(Animation.easeInOut(duration: 0.25)) {
@@ -448,39 +424,41 @@ struct KeyboardCardView: View {
                                 }
                             }
                             
-                            if !self.chatViewModel.imagePicker.selectedPhotos.isEmpty || !self.chatViewModel.imagePicker.pastedImages.isEmpty {
+                            if !self.imagePicker.selectedPhotos.isEmpty || !self.imagePicker.pastedImages.isEmpty {
                                 var uploadImg: [UIImage] = []
                                 
-                                for i in self.chatViewModel.imagePicker.selectedPhotos {
+                                for i in self.imagePicker.selectedPhotos {
                                     uploadImg.append(i.image)
                                 }
 
-                                for pastedImage in self.chatViewModel.imagePicker.pastedImages {
+                                for pastedImage in self.imagePicker.pastedImages {
                                     uploadImg.append(pastedImage)
                                 }
                                 
-                                self.chatViewModel.imagePicker.sendPhotoMessage(dialog: selectedDialog, attachmentImages: self.chatViewModel.imagePicker.selectedPhotos, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
+                                self.imagePicker.sendPhotoMessage(dialog: selectedDialog, attachmentImages: self.imagePicker.selectedPhotos, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                                 //changeMessageRealmData.shared.sendPhotoAttachment(dialog: selectedDialog, attachmentImages: uploadImg, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                             
                                 uploadImg.removeAll()
                                 withAnimation {
-                                    self.chatViewModel.imagePicker.selectedPhotos.removeAll()
-                                    self.chatViewModel.imagePicker.pastedImages.removeAll()
+                                    self.imagePicker.selectedPhotos.removeAll()
+                                    self.imagePicker.pastedImages.removeAll()
                                 }
                             }
 
-                            if self.chatViewModel.imagePicker.selectedVideos.count > 0 {
-                                var uploadVid: [PHAsset] = []
+                            if self.imagePicker.selectedVideos.count > 0 {
+                                var uploadVid: [AVAsset] = []
 
-                                for i in self.chatViewModel.imagePicker.selectedVideos {
-                                    uploadVid.append(i.asset)
+                                for i in self.imagePicker.selectedVideos {
+                                    if let asset = i.asset {
+                                        uploadVid.append(asset)
+                                    }
                                 }
 
-                                changeMessageRealmData.shared.sendVideoAttachment(dialog: selectedDialog, attachmentVideos: uploadVid, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
+                                //changeMessageRealmData.shared.sendVideoAttachment(dialog: selectedDialog, attachmentVideos: uploadVid, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                                 
                                 uploadVid.removeAll()
                                 withAnimation {
-                                    self.chatViewModel.imagePicker.selectedVideos.removeAll()
+                                    self.imagePicker.selectedVideos.removeAll()
                                 }
                             }
                             
@@ -494,7 +472,7 @@ struct KeyboardCardView: View {
                             }
 
                             withAnimation {
-                                self.checkAttachments()
+                                //self.checkAttachments()
                             }
                         }
 
@@ -551,11 +529,23 @@ struct KeyboardCardView: View {
                         .buttonStyle(keyboardButtonStyle())
                         .padding(.leading)
                         .sheet(isPresented: self.$showImagePicker, onDismiss: {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.28) {
-                                self.checkAttachments()
-                            }
+//                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.28) {
+//                                self.checkAttachments()
+//                            }
                         }) {
-                            PHAssetPickerSheet(isPresented: self.$showImagePicker, hasAttachments: self.$hasAttachments, imagePicker: self.chatViewModel.imagePicker)
+                            PHAssetPickerSheet(isPresented: self.$showImagePicker, onMediaPicked: { resultsz in
+                                let identifiers = resultsz.compactMap(\.assetIdentifier)
+                                let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: identifiers, options: nil)
+
+                                fetchResult.enumerateObjects { [self] (asset, index, _) in
+                                    self.imagePicker.extractPreviewData(asset: asset, completion: {
+                                        //self.checkAttachments()
+                                    })
+                                }
+                                
+                                //self.hasAttachments = true
+
+                            })
                         }
 
                         Button(action: {
@@ -576,7 +566,7 @@ struct KeyboardCardView: View {
 
                             self.gifData.append(gifURL)
                             self.gifURL = ""
-                            self.checkAttachments()
+                            //self.checkAttachments()
                         }) {
                             GIFController(url: self.$gifURL, present: self.$presentGIF)
                         }
@@ -614,17 +604,15 @@ struct KeyboardCardView: View {
                         Button(action: {
                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                             withAnimation {
-                                self.hasAttachments.toggle()
                                 self.enableLocation.toggle()
-                                self.checkAttachments()
                             }
 
-                            self.chatViewModel.imagePicker.checkLocationPermission()
-                            if self.chatViewModel.imagePicker.locationPermission {
-                                self.region.center.longitude = self.chatViewModel.imagePicker.locationManager.location?.coordinate.longitude ?? 0
-                                self.region.center.latitude = self.chatViewModel.imagePicker.locationManager.location?.coordinate.latitude ?? 0
+                            self.imagePicker.checkLocationPermission()
+                            if self.imagePicker.locationPermission {
+                                self.region.center.longitude = self.imagePicker.locationManager.location?.coordinate.longitude ?? 0
+                                self.region.center.latitude = self.imagePicker.locationManager.location?.coordinate.latitude ?? 0
                             } else {
-                                self.chatViewModel.imagePicker.requestLocationPermission()
+                                self.imagePicker.requestLocationPermission()
                             }
                         }, label: {
                             Image(systemName: self.enableLocation ? "location.fill" : "location")
@@ -771,6 +759,7 @@ struct KeyboardCardView: View {
         .cornerRadius(22)
         .overlay(RoundedRectangle(cornerRadius: 22).stroke(Color("blurBorder"), lineWidth: 2.5))
         .padding(.vertical, 2.5)
+        .offset(y: checkAttachments() ? -110 : 0)
         .onChange(of: UserDefaults.standard.string(forKey: "visitingDialogId"), perform: { value in
             if value == "" {
                 withAnimation {
@@ -799,28 +788,31 @@ struct KeyboardCardView: View {
         .onAppear() {
             UserDefaults.standard.set(false, forKey: "disabledMessaging")
             observePublicMembersType()
-            keyboard.observe { (event) in
-                switch event.type {
-                case .willShow:
-                    if self.hasAttachments && self.showImagePicker {
-                        UIView.animate(withDuration: event.duration, delay: 0.0, options: [event.options], animations: {
-                            self.showImagePicker = false
-                        }, completion: nil)
-                    }
-                    
-                case .willHide:
-                    guard presentGIF, showImagePicker else { return }
-                    self.isKeyboardActionOpen = false
-
-                default:
-                    break
-                }
-            }
+//            keyboard.observe { (event) in
+//                switch event.type {
+//                case .willShow:
+//                    if self.hasAttachments && self.showImagePicker {
+//                        UIView.animate(withDuration: event.duration, delay: 0.0, options: [event.options], animations: {
+//                            self.showImagePicker = false
+//                        }, completion: nil)
+//                    }
+//
+//                case .willHide:
+//                    guard presentGIF, showImagePicker else { return }
+//                    self.isKeyboardActionOpen = false
+//
+//                default:
+//                    break
+//                }
+//            }
         }
     }
     
-    func checkAttachments() {
-        self.hasAttachments = self.chatViewModel.imagePicker.selectedPhotos.count > 0 || self.gifData.count > 0 || self.chatViewModel.imagePicker.selectedVideos.count > 0 || self.enableLocation || self.chatViewModel.imagePicker.pastedImages.count > 0
+    func checkAttachments() -> Bool {
+        let hasIt = !self.imagePicker.selectedPhotos.isEmpty || !self.imagePicker.selectedVideos.isEmpty || !self.gifData.isEmpty || self.enableLocation || !self.imagePicker.pastedImages.isEmpty
+
+        self.hasAttachments = hasIt
+        return hasIt
     }
     
     func formatVideoDuration(second: TimeInterval) -> String {
@@ -989,19 +981,19 @@ struct ThumbnailView: View {
                 .cornerRadius(10)
             
             HStack {
-                if photo.asset.mediaType == .video {
-                    HStack {
-                        Image(systemName: "video.fill")
-                            .font(.subheadline)
-                            .foregroundColor(.white)
-                        
-                        Text("\(self.formatVideoDuration(second: photo.asset.duration))")
-                            .font(.caption)
-                            .fontWeight(.regular)
-                            .foregroundColor(.white)
-                    }.padding(5)
-                    .background(BlurView(style: .systemThinMaterialDark).cornerRadius(5))
-                }
+//                if photo.asset.mediaType == .video {
+//                    HStack {
+//                        Image(systemName: "video.fill")
+//                            .font(.subheadline)
+//                            .foregroundColor(.white)
+//
+//                        Text("\(self.formatVideoDuration(second: photo.asset.duration))")
+//                            .font(.caption)
+//                            .fontWeight(.regular)
+//                            .foregroundColor(.white)
+//                    }.padding(5)
+//                    .background(BlurView(style: .systemThinMaterialDark).cornerRadius(5))
+//                }
                 
                 Spacer()
                 

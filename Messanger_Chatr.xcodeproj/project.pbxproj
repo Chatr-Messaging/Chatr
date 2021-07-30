@@ -132,6 +132,7 @@
 		05B463B9266164F4007EDCEA /* RemoteImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05B463B8266164F4007EDCEA /* RemoteImageView.swift */; };
 		05B463BB2661656B007EDCEA /* ImageNetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05B463BA2661656B007EDCEA /* ImageNetworkManager.swift */; };
 		05B463BD2667257D007EDCEA /* DiscoverFeaturedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05B463BC2667257D007EDCEA /* DiscoverFeaturedCell.swift */; };
+		05B8622626B3875400657B7A /* KeyboardAdjusting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05B8622526B3875400657B7A /* KeyboardAdjusting.swift */; };
 		05BB401625008A3200B8DD37 /* FooterInformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BB401525008A3200B8DD37 /* FooterInformation.swift */; };
 		05BCE40D250B4EA400E29F39 /* HighlightedContactCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BCE40C250B4EA400E29F39 /* HighlightedContactCell.swift */; };
 		05BCE40F250C55E100E29F39 /* ShareProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BCE40E250C55E100E29F39 /* ShareProfileView.swift */; };
@@ -328,6 +329,7 @@
 		05B463B8266164F4007EDCEA /* RemoteImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteImageView.swift; sourceTree = "<group>"; };
 		05B463BA2661656B007EDCEA /* ImageNetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageNetworkManager.swift; sourceTree = "<group>"; };
 		05B463BC2667257D007EDCEA /* DiscoverFeaturedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverFeaturedCell.swift; sourceTree = "<group>"; };
+		05B8622526B3875400657B7A /* KeyboardAdjusting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardAdjusting.swift; sourceTree = "<group>"; };
 		05BB401525008A3200B8DD37 /* FooterInformation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FooterInformation.swift; sourceTree = "<group>"; };
 		05BCE40C250B4EA400E29F39 /* HighlightedContactCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightedContactCell.swift; sourceTree = "<group>"; };
 		05BCE40E250C55E100E29F39 /* ShareProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareProfileView.swift; sourceTree = "<group>"; };
@@ -721,6 +723,7 @@
 				0511CB7025A1911000E5F905 /* StoreReviewHelper.swift */,
 				05B463B7266164A6007EDCEA /* RemoteImage */,
 				05F37C0125DF95B300F92005 /* KeyboardObserver.swift */,
+				05B8622526B3875400657B7A /* KeyboardAdjusting.swift */,
 				055F37BB2606F45F003EDB1F /* CachingPlayerItem.swift */,
 				05ECD98B25E0FA6800B5783A /* CacheManager.swift */,
 				055F37C42607F15F003EDB1F /* Cryptography.swift */,
@@ -1073,6 +1076,7 @@
 				057F2B4E250B026F005DFB21 /* ContactCarouselSection.swift in Sources */,
 				05A7633C2506FD42002712FA /* ContactRequestCell.swift in Sources */,
 				056B98A924C8FD1D003F7FBA /* SearchBar.swift in Sources */,
+				05B8622626B3875400657B7A /* KeyboardAdjusting.swift in Sources */,
 				05ECD99025E0FBE600B5783A /* PlayerView.swift in Sources */,
 				054CAB7E25AA6E3700DD3F7C /* InstagramWebView.swift in Sources */,
 				058E760C261C2518008578E3 /* NewPublicConversationSection.swift in Sources */,

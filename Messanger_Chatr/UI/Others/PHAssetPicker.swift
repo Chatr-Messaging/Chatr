@@ -15,40 +15,27 @@ struct PHAssetPickerSheet: UIViewControllerRepresentable {
     @Environment(\.presentationMode)
     var presentationMode
     @Binding var isPresented: Bool
-    @Binding var hasAttachments: Bool
-    @State var imagePicker: KeyboardCardViewModel
+    let onMediaPicked: ([PHPickerResult]) -> Void
 
     class Coordinator: NSObject, UINavigationControllerDelegate, PHPickerViewControllerDelegate {
         @Binding var presentationMode: PresentationMode
         @Binding var isPresented: Bool
-        @Binding var hasAttachments: Bool
-        @Binding var imagePicker: KeyboardCardViewModel
+        private let onMediaPicked: ([PHPickerResult]) -> Void
 
-        init(presentationMode: Binding<PresentationMode>, isPresented: Binding<Bool>, hasAttachments: Binding<Bool>, imagePicker: Binding<KeyboardCardViewModel>) {
+        init(presentationMode: Binding<PresentationMode>, isPresented: Binding<Bool>, onMediaPicked: @escaping ([PHPickerResult]) -> Void) {
             _presentationMode = presentationMode
             _isPresented = isPresented
-            _hasAttachments = hasAttachments
-            _imagePicker = imagePicker
+            self.onMediaPicked = onMediaPicked
         }
 
         func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-            let identifiers = results.compactMap(\.assetIdentifier)
-            let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: identifiers, options: nil)
-
-            fetchResult.enumerateObjects { [self] (asset, index, _) in
-                self.imagePicker.extractPreviewData(asset: asset, completion: {
-                    self.hasAttachments = true
-                })
-            }
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                self.isPresented = false
-            }
+            onMediaPicked(results)
+            self.isPresented = false
         }
     }
 
     func makeCoordinator() -> Coordinator {
-        return Coordinator(presentationMode: presentationMode, isPresented: $isPresented, hasAttachments: $hasAttachments, imagePicker: $imagePicker)
+        return Coordinator(presentationMode: presentationMode, isPresented: $isPresented, onMediaPicked: onMediaPicked)
     }
 
     func makeUIViewController(context: UIViewControllerRepresentableContext<PHAssetPickerSheet>) -> PHPickerViewController {

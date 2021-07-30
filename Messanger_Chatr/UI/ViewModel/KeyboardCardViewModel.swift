@@ -23,18 +23,12 @@ enum LibraryStatus {
 
 struct KeyboardMediaAsset: Hashable, Equatable, Identifiable {
     var id = UUID().uuidString
-    var asset: PHAsset
+    var asset: AVAsset?
     var image: UIImage
     var progress: CGFloat = 0.0
     var uploadId: String?
     var preparedMessageId: String?
     var selected: Bool = false
-    
-    init(asset: PHAsset, image: UIImage) {
-        self.asset = asset
-        self.image = image
-        print("hello new object")
-    }
 }
 
 class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObserver {
@@ -129,7 +123,7 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
         }
     }
     
-    func uploadSelectedVideo(media: KeyboardMediaAsset) {
+    //func uploadSelectedVideo(media: KeyboardMediaAsset) {
         /*
         DispatchQueue.global(qos: .utility).async {
             guard media.uploadId == nil, media.progress == 0.0, let foundMediaIndex = self.selectedVideos.firstIndex(of: media), let data = NSData(contentsOfURL: media.asset) else { return }
@@ -164,43 +158,41 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
             semaphore.wait()
         }
         */
-    }
+    //}
     
-    func uploadSelectedVideos(dialog: DialogStruct, attachmentVideos: [KeyboardMediaAsset], occupentID: [NSNumber]) {
+    func uploadSelectedVideo(vid: KeyboardMediaAsset) {
         DispatchQueue.global(qos: .utility).async {
-            for vid in attachmentVideos {
-                guard vid.uploadId == nil, vid.progress == 0.0, let foundMediaIndex = self.selectedVideos.firstIndex(of: vid) else { return }
+            guard vid.uploadId == nil, vid.progress == 0.0, let foundMediaIndex = self.selectedVideos.firstIndex(of: vid), let assz = vid.asset as? AVURLAsset, let videoData = try? Data(contentsOf: assz.url) else { return }
+            
+            let uploadcare = Uploadcare(withPublicKey: Constants.uploadcarePublicKey, secretKey: Constants.uploadcareSecretKey)
+            let filename = "\(vid.id)" + Date().description.replacingOccurrences(of: " ", with: "")
+            let semaphore = DispatchSemaphore(value: 0)
+            
+            uploadcare.uploadAPI.upload(files: [filename: videoData], store: .store, { (progress) in
+                DispatchQueue.main.async {
+                    print("the progress uploading the video is: \(progress * 100)%")
+                    self.selectedVideos[foundMediaIndex].progress = progress
+                }
+            }) { (resultDictionary, error) in
+                defer {
+                    semaphore.signal()
+                }
                 
-                let uploadcare = Uploadcare(withPublicKey: Constants.uploadcarePublicKey, secretKey: Constants.uploadcareSecretKey)
-                //let filename = "\(vid.id)" + Date().description.replacingOccurrences(of: " ", with: "")
-                let semaphore = DispatchSemaphore(value: 0)
-                
-                let options = PHVideoRequestOptions()
-                options.isNetworkAccessAllowed = true
-                
-                PHImageManager.default().requestAVAsset(forVideo: vid.asset, options: options) { (asset, mix, args) in
-                    guard let assz = asset as? AVURLAsset else { return }
-                    
-                    uploadcare.uploadAPI.upload(task: UploadFromURLTask(sourceUrl: assz.url), { (resultDictionary, error) in
-                        defer {
-                            semaphore.signal()
-                        }
-                        
-                        if let error = error {
-                            print("the error uploading direct files: " + error.debugDescription)
-                        }
+                if let error = error {
+                    print("the error uploading direct files: " + error.debugDescription)
+                }
 
-                        guard let uploadData = resultDictionary, let fileId = uploadData.fileInfo?.uuid else {
-                            return
-                        }
-                        
-                        DispatchQueue.main.async {
-                            self.selectedVideos[foundMediaIndex].uploadId = fileId
-                            print("success uploading direct video. Here is the data: " + "\(fileId)")
-                        }
-                    })
+                guard let uploadData = resultDictionary, let fileId = uploadData.first?.value else {
+                    return
+                }
+                
+                DispatchQueue.main.async {
+                    self.selectedVideos[foundMediaIndex].uploadId = fileId
+                    print("success uploading direct video. Here is the data: " + "\(fileId)")
                 }
             }
+            
+            semaphore.wait()
         }
     }
     
@@ -366,49 +358,47 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
             let manager = PHCachingImageManager()
             self.getImageFromAsset(asset: asset, size: PHImageManagerMaximumSize) { (image) in
                 if asset.mediaType == .image {
-                    DispatchQueue.main.async {
-                        guard let imgRemove = self.imageData.firstIndex(of: image) else {
-                            DispatchQueue.main.async {
-                                let newMedia = KeyboardMediaAsset(asset: asset, image: image)
-                                self.selectedPhotos.append(newMedia)
-                                self.uploadSelectedImage(media: newMedia)
-                                self.imageData.append(image)
-
-                                completion()
-                            }
-
-                            return
-                        }
-
+                    guard let imgRemove = self.imageData.firstIndex(of: image) else {
                         DispatchQueue.main.async {
-                            self.videoData.remove(at: imgRemove)
+                            let newMedia = KeyboardMediaAsset(image: image)
+                            self.selectedPhotos.append(newMedia)
+                            self.imageData.append(image)
+                            self.uploadSelectedImage(media: newMedia)
+
                             completion()
                         }
+
+                        return
+                    }
+
+                    DispatchQueue.main.async {
+                        self.videoData.remove(at: imgRemove)
+                        completion()
                     }
                 } else if asset.mediaType == .video {
                     let videoManager = PHVideoRequestOptions()
                     videoManager.deliveryMode = .highQualityFormat
+                    videoManager.isNetworkAccessAllowed = true
 
                     manager.requestAVAsset(forVideo: asset, options: videoManager) { (videoAsset, _, _) in
-                        guard let videoUrl = videoAsset else{return}
+                        guard let videoUrl = videoAsset else { return }
                         
-                        DispatchQueue.main.async {
-                            guard let vidRemove = self.videoData.firstIndex(of: videoUrl) else {
-                                DispatchQueue.main.async {
-                                    let newMedia = KeyboardMediaAsset(asset: asset, image: image)
-                                    self.selectedVideos.append(newMedia)
-                                    self.videoData.append(videoUrl)
-
-                                    completion()
-                                }
-                                
-                                return
-                            }
-
-                            self.videoData.remove(at: vidRemove)
+                        guard let vidRemove = self.videoData.firstIndex(of: videoUrl) else {
                             DispatchQueue.main.async {
+                                let newMedia = KeyboardMediaAsset(asset: videoUrl, image: image)
+                                self.selectedVideos.append(newMedia)
+                                self.videoData.append(videoUrl)
+                                self.uploadSelectedVideo(vid: newMedia)
+
                                 completion()
                             }
+                            
+                            return
+                        }
+
+                        self.videoData.remove(at: vidRemove)
+                        DispatchQueue.main.async {
+                            completion()
                         }
                     }
                 }

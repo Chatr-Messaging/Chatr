@@ -544,12 +544,11 @@ struct mainHomeList: View {
 
                 //MARK: Keyboard View
                 GeometryReader { geo in
-                    KeyboardCardView(chatViewModel: self.messageViewModel, height: self.$textFieldHeight, isOpen: self.$isLocalOpen, mainText: self.$keyboardText, hasAttachments: self.$hasAttachments, showImagePicker: self.$showKeyboardMediaAssets, isKeyboardActionOpen: self.$isKeyboardActionOpen)
+                    KeyboardCardView(height: self.$textFieldHeight, isOpen: self.$isLocalOpen, mainText: self.$keyboardText, hasAttachments: self.$hasAttachments, showImagePicker: self.$showKeyboardMediaAssets, isKeyboardActionOpen: self.$isKeyboardActionOpen)
                         .environmentObject(self.auth)
                         .frame(width: Constants.screenWidth, height: Constants.screenHeight * 0.75, alignment: .center)
                         .shadow(color: Color.black.opacity(0.15), radius: 14, x: 0, y: -5)
-                        .offset(y: self.isLocalOpen ? geo.frame(in: .global).maxY - 40 -
-                            (UIDevice.current.hasNotch ? 0 : -20) - (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) - (self.hasAttachments ? 110 : 0) - self.keyboardHeight + (self.isKeyboardActionOpen ? -80 : 0) : geo.frame(in: .global).maxY)
+                        .offset(y: self.isLocalOpen ? geo.frame(in: .global).maxY - 40 - (UIDevice.current.hasNotch ? 0 : -20) - (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) - (self.hasAttachments ? 110 : 0) - self.keyboardHeight + (self.isKeyboardActionOpen ? -80 : 0) : geo.frame(in: .global).maxY)
                         .animation(.spring(response: 0.45, dampingFraction: 0.7, blendDuration: 0))
                         .zIndex(2)
                         .onChange(of: self.auth.visitContactProfile) { newValue in
