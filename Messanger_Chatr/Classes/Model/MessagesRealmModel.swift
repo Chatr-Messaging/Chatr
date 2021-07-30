@@ -243,7 +243,7 @@ class changeMessageRealmData {
                                     print("the shared latitude is: \(foundMessage.latitude) && \(latitude)")
                                 }
                                 
-                                if let videoUrl = attach.customParameters["videoId"], foundMessage.image != "\(videoUrl)" {
+                                if let videoUrl = attach.customParameters["videoURL"], foundMessage.image != "\(videoUrl)" {
                                     foundMessage.image = "\(videoUrl)"
                                     foundMessage.imageType = attach.type ?? ""
                                     print("the video is: \(String(describing: attach.type)) && \(videoUrl)")
@@ -336,7 +336,7 @@ class changeMessageRealmData {
                                 print("the shared latitude is: \(newData.latitude) && \(latitude)")
                             }
                             
-                            if let videoUrl = attach.customParameters["videoId"] {
+                            if let videoUrl = attach.customParameters["videoURL"] {
                                 newData.image = "\(videoUrl)"
                                 newData.imageType = attach.type ?? ""
                                 print("the video is: \(attach.type) && \(videoUrl)")
@@ -468,7 +468,7 @@ class changeMessageRealmData {
                                 print("the shared latitude is: \(foundMessage.latitude) && \(latitude)")
                             }
                             
-                            if let videoUrl = attach.customParameters["videoId"], foundMessage.image != "\(videoUrl)" {
+                            if let videoUrl = attach.customParameters["videoURL"], foundMessage.image != "\(videoUrl)" {
                                 foundMessage.image = "\(videoUrl)"
                                 foundMessage.imageType = attach.type ?? ""
                                 print("the video is: \(String(describing: attach.type)) && \(videoUrl)")
@@ -553,7 +553,7 @@ class changeMessageRealmData {
                             print("the shared latitude is: \(newData.latitude) && \(latitude)")
                         }
 
-                        if let videoUrl = attach.customParameters["videoId"] {
+                        if let videoUrl = attach.customParameters["videoURL"] {
                             newData.image = "\(videoUrl)"
                             newData.imageType = attach.type ?? ""
                             print("the video is: \(newData.image) && \(videoUrl)")
@@ -694,7 +694,7 @@ class changeMessageRealmData {
             }, successBlock: { (blob) in
                 let attachment = ChatAttachment()
                 attachment.type = "audio/m4a"
-                attachment["videoId"] = blob.uid
+                attachment["videoURL"] = blob.uid
                 
                 let pDialog = ChatDialog(dialogID: dialog.id, type: dialog.dialogType == "public" ? .public : occupentID.count > 2 ? .group : .private)
                 pDialog.occupantIDs = occupentID
@@ -818,14 +818,14 @@ class changeMessageRealmData {
     func sendVideoMessage(id: String, dialog: DialogStruct, videoId: String, occupentID: [NSNumber]) {
         let attachment = ChatAttachment()
         attachment.type = "video/mov"
-        attachment["videoId"] = Constants.uploadcareBaseUrl + videoId + Constants.uploadcareStandardTransform
+        attachment["videoURL"] = Constants.uploadcareBaseUrl + videoId + Constants.uploadcareStandardTransform
 
         let pDialog = ChatDialog(dialogID: dialog.id, type: dialog.dialogType == "public" ? .public : occupentID.count > 2 ? .group : .private)
         pDialog.occupantIDs = occupentID
         
         let message = ChatMessage()
         message.markable = true
-        message.text = "Video Attachment"
+        message.text = "Video attachment"
         message.attachments = [attachment]
 
         pDialog.send(message) { (error) in

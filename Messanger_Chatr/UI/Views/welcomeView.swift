@@ -275,8 +275,10 @@ struct WalkthroughCell: View, Identifiable {
                             .font(.subheadline)
                             .foregroundColor(Color.primary.opacity(0.9))
                             .multilineTextAlignment(.center)
-                    }.padding(25)
-                    .frame(minWidth: Constants.screenWidth / 2, maxWidth: Constants.screenWidth - 80, alignment: .center)
+                    }.padding(.vertical, 15)
+                    .padding(.bottom, 10)
+                    .padding(.horizontal)
+                    .frame(minWidth: Constants.screenWidth / 2, maxWidth: Constants.screenWidth - 60, alignment: .center)
                     .background(
                         BlurView(style: .systemUltraThinMaterial)
                             .cornerRadius(25)

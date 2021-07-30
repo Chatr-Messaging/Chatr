@@ -500,17 +500,16 @@ struct ContainerBubble: View {
     }
     
     func openReplyDetailView() {
-        if self.message.messageState != .isTyping && self.message.messageState != .error {
-            if self.message.imageType == "video/mov" {
-                self.player.pause()
-                self.viewModel.player = self.player
-            }
-
-            self.viewModel.message = self.message
-            withAnimation {
-                self.viewModel.isDetailOpen = true
-            }
+        guard self.message.messageState != .isTyping && self.message.messageState != .error else { return }
+   
+        print("trying to open details")
+        if self.message.imageType == "video/mov" {
+            self.player.pause()
+            self.viewModel.player = self.player
         }
+
+        self.viewModel.message = self.message
+        self.viewModel.isDetailOpen = true
     }
 
     func pinMessage() {

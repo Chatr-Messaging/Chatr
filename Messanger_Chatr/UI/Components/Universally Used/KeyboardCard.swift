@@ -19,7 +19,7 @@ import Firebase
 struct KeyboardCardView: View {
     @EnvironmentObject var auth: AuthModel
     @ObservedObject var audio = VoiceViewModel()
-    @StateObject var imagePicker = KeyboardCardViewModel()
+    @ObservedObject var imagePicker = KeyboardCardViewModel()
     @Binding var height: CGFloat
     @Binding var isOpen: Bool
     @State var open: Bool = UserDefaults.standard.bool(forKey: "localOpen")
@@ -212,7 +212,7 @@ struct KeyboardCardView: View {
 
                         //MARK: Photo Section
                         if !self.imagePicker.selectedPhotos.isEmpty {
-                            HStack(alignment: .center) {
+                            HStack {
                                 ForEach(self.imagePicker.selectedPhotos.indices, id: \.self) { img in
                                     ZStack(alignment: .topLeading) {
                                         Image(uiImage: self.imagePicker.selectedPhotos[img].image)
@@ -238,7 +238,7 @@ struct KeyboardCardView: View {
                                                         .rotationEffect(.init(degrees: -90))
                                                         .padding(4)
                                                         .animation(.easeOut)
-                                                }.opacity(self.imagePicker.selectedPhotos[img].uploadId != "" ? 0 : 1)
+                                                }.opacity(self.imagePicker.selectedPhotos[img].uploadId == "" ? 1 : 0)
                                             )
                                             .cornerRadius(14)
                                             .padding(.leading, 10)
@@ -254,7 +254,9 @@ struct KeyboardCardView: View {
                                                 .frame(width: 24, height: 24, alignment: .center)
                                                 .foregroundColor(.primary)
                                         }).background(Color.clear)
-                                    }.transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(.spring()), removal: AnyTransition.move(edge: .bottom).animation(.easeOut(duration: 0.2))))
+                                        .opacity(self.imagePicker.selectedPhotos[img].canSend ? 0 : 1)
+                                    }.id(self.imagePicker.selectedPhotos[img].id)
+                                    .transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(.spring()), removal: AnyTransition.move(edge: .bottom).animation(.easeOut(duration: 0.2))))
                                 }.animation(.spring(response: 0.3, dampingFraction: 0.75, blendDuration: 0))
                             }
                         }
@@ -316,7 +318,9 @@ struct KeyboardCardView: View {
                                             .frame(width: 24, height: 24, alignment: .center)
                                             .foregroundColor(.primary)
                                     }).background(Color.clear)
-                                }.transition(transition)
+                                    .opacity(self.imagePicker.selectedVideos[vid].canSend ? 0 : 1)
+                                }.id(self.imagePicker.selectedVideos[vid].id)
+                                .transition(transition)
                             }.animation(.spring(response: 0.3, dampingFraction: 0.75, blendDuration: 0))
                         }
                     }
@@ -425,41 +429,11 @@ struct KeyboardCardView: View {
                             }
                             
                             if !self.imagePicker.selectedPhotos.isEmpty || !self.imagePicker.pastedImages.isEmpty {
-                                var uploadImg: [UIImage] = []
-                                
-                                for i in self.imagePicker.selectedPhotos {
-                                    uploadImg.append(i.image)
-                                }
-
-                                for pastedImage in self.imagePicker.pastedImages {
-                                    uploadImg.append(pastedImage)
-                                }
-                                
-                                self.imagePicker.sendPhotoMessage(dialog: selectedDialog, attachmentImages: self.imagePicker.selectedPhotos, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
-                                //changeMessageRealmData.shared.sendPhotoAttachment(dialog: selectedDialog, attachmentImages: uploadImg, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
-                            
-                                uploadImg.removeAll()
-                                withAnimation {
-                                    self.imagePicker.selectedPhotos.removeAll()
-                                    self.imagePicker.pastedImages.removeAll()
-                                }
+                                self.imagePicker.sendPhotoMessage(auth: self.auth)
                             }
 
                             if self.imagePicker.selectedVideos.count > 0 {
-                                var uploadVid: [AVAsset] = []
-
-                                for i in self.imagePicker.selectedVideos {
-                                    if let asset = i.asset {
-                                        uploadVid.append(asset)
-                                    }
-                                }
-
-                                //changeMessageRealmData.shared.sendVideoAttachment(dialog: selectedDialog, attachmentVideos: uploadVid, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
-                                
-                                uploadVid.removeAll()
-                                withAnimation {
-                                    self.imagePicker.selectedVideos.removeAll()
-                                }
+                                self.imagePicker.sendVideoMessage(auth: self.auth)
                             }
                             
                             if self.enableLocation {
@@ -528,23 +502,14 @@ struct KeyboardCardView: View {
                         }).frame(width: Constants.screenWidth / 5.5, height: 65)
                         .buttonStyle(keyboardButtonStyle())
                         .padding(.leading)
-                        .sheet(isPresented: self.$showImagePicker, onDismiss: {
-//                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.28) {
-//                                self.checkAttachments()
-//                            }
-                        }) {
+                        .sheet(isPresented: self.$showImagePicker) {
                             PHAssetPickerSheet(isPresented: self.$showImagePicker, onMediaPicked: { resultsz in
                                 let identifiers = resultsz.compactMap(\.assetIdentifier)
                                 let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: identifiers, options: nil)
 
                                 fetchResult.enumerateObjects { [self] (asset, index, _) in
-                                    self.imagePicker.extractPreviewData(asset: asset, completion: {
-                                        //self.checkAttachments()
-                                    })
+                                    self.imagePicker.extractPreviewData(asset: asset, auth: self.auth, completion: {  })
                                 }
-                                
-                                //self.hasAttachments = true
-
                             })
                         }
 
@@ -566,7 +531,6 @@ struct KeyboardCardView: View {
 
                             self.gifData.append(gifURL)
                             self.gifURL = ""
-                            //self.checkAttachments()
                         }) {
                             GIFController(url: self.$gifURL, present: self.$presentGIF)
                         }
@@ -996,13 +960,13 @@ struct ThumbnailView: View {
 //                }
                 
                 Spacer()
-                
-                Image(systemName: photo.selected ? "checkmark.circle.fill" : "circle")
-                    .resizable()
-                    .scaledToFit()
-                    .font(Font.title.weight(.medium))
-                    .foregroundColor(photo.selected ? .blue : .white)
-                    .frame(width: 22, height: 22, alignment: .center)
+//
+//                Image(systemName: photo.selected ? "checkmark.circle.fill" : "circle")
+//                    .resizable()
+//                    .scaledToFit()
+//                    .font(Font.title.weight(.medium))
+//                    .foregroundColor(photo.selected ? .blue : .white)
+//                    .frame(width: 22, height: 22, alignment: .center)
             }.padding(.horizontal, 10)
             .padding(.bottom, 5)
         })
