@@ -192,8 +192,8 @@ struct ChatMessagesView: View {
                                         let notLast = currentMessages[message].id != currentMessages.last?.id
                                         if !notLast {
                                             print("called on appear: \(message)")
-                                            if self.firstScroll {
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
+                                            if self.firstScroll, self.scrollViewHeight > Constants.screenHeight * 0.8 {
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
                                                     reader.scrollTo(currentMessages[message].id, anchor: .bottom)
                                                     print("scrolllling2222 is nowwww \(message)")
                                                     self.firstScroll = false
