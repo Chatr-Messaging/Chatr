@@ -32,40 +32,46 @@ struct VideoControlBubble: View {
                         Image(systemName: self.mute ? "speaker.slash.fill" : "speaker.wave.2.fill")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
-                            .frame(width: 20, height: 20, alignment: .center)
+                            .frame(width: 18, height: 18, alignment: .center)
                             .foregroundColor(.white)
-                    }).zIndex(1)
+                    }).buttonStyle(ClickMiniButtonStyle())
+                    .zIndex(1)
+                    .padding(8)
+                    .background(BlurView(style: .systemUltraThinMaterial).cornerRadius(7.5))
 
                     Spacer()
-                    if play || self.player.currentTime().seconds > 0.1 {
+                    if self.totalDuration > 25.0 {
                         Text(self.getTotalDurationString())
-                            .font(.caption)
+                            .font(.subheadline)
                             .fontWeight(.semibold)
                             .foregroundColor(.white)
+                            .padding(5)
+                            .background(BlurView(style: .systemUltraThinMaterial).cornerRadius(7.5))
                             .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 0)
-                            .padding(.horizontal, 2.5)
-                    }
+                            .padding(.trailing, 7.5)
+                    } else if self.totalDuration != 0.0 {
+                        ZStack {
+                            Circle()
+                                .stroke(Color.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                                .frame(width: 18, height: 18)
+                                .opacity(0.35)
 
-                    ZStack {
-                        Circle()
-                            .stroke(Color.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
-                            .frame(width: 20, height: 20)
-                            .opacity(0.35)
-
-                        Circle()
-                            .trim(from: self.progressBar, to: 1.0)
-                            .stroke(Color.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
-                            .frame(width: 20, height: 20)
-                            .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 0)
-                            .rotationEffect(.init(degrees: -90))
-                            .animation(Animation.linear(duration: 0.1))
+                            Circle()
+                                .trim(from: self.progressBar, to: 1.0)
+                                .stroke(Color.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                                .frame(width: 18, height: 18)
+                                .rotationEffect(.init(degrees: -270))
+                                .animation(Animation.linear(duration: 0.1))
+                        }
+                        .padding(7.5)
+                        .background(BlurView(style: .systemUltraThinMaterial).cornerRadius(7.5))
+                        .padding(.trailing, 7.5)
+                        .onChange(of: self.totalDuration) { newValue in
+                            self.progressBar = CGFloat(newValue / (player.currentItem?.duration.seconds ?? 1))
+                        }
                     }
-                    .padding(.trailing, 5)
-                    .onChange(of: self.totalDuration) { newValue in
-                        self.progressBar = CGFloat(newValue / (player.currentItem?.duration.seconds ?? 1))
-                    }
-                }.padding(.top)
-                .padding(.horizontal, 10)
+                }.padding(.top, 7.5)
+                .padding(.horizontal, 7.5)
              
                 Spacer()
                 Button(action: {
@@ -82,13 +88,14 @@ struct VideoControlBubble: View {
                     Image(systemName: self.viewModel.isDetailOpen ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(width: 20, height: 20, alignment: .center)
+                        .frame(width: 17, height: 17, alignment: .center)
                         .foregroundColor(.white)
-                        .padding(.vertical)
-                        .padding(.horizontal)
-                        .padding(.bottom, 5)
-                })
+                }).buttonStyle(ClickMiniButtonStyle())
+                .padding(8)
+                .background(BlurView(style: .systemUltraThinMaterial).cornerRadius(7.5))
                 .transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.spring()), removal: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.easeOut(duration: 0.1))))
+                .padding(.bottom, 7.5)
+                .padding(.horizontal, 15)
             }
             
             //Big Play Button
