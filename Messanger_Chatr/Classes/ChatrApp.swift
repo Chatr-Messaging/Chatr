@@ -24,7 +24,7 @@ struct ChatrApp {
 extension ChatrApp {
     /// Connect to chat / Login if needed / Dialogs updates & more...
     static func connect() {
-        guard let user = self.auth.profile.results.first, !Chat.instance.isConnected && !Chat.instance.isConnecting else { return }
+        guard let user = auth.profile.results.first, !Chat.instance.isConnected && !Chat.instance.isConnecting else { return }
 
         print("\(Thread.current.isMainThread) logged in with: \(user.fullName) && \(user.id)")
         Chat.instance.addDelegate(ChatrApp.auth)
@@ -59,14 +59,14 @@ extension ChatrApp {
                 changeDialogRealmData.shared.fetchDialogs(completion: { _ in })
                 changeContactsRealmData.shared.observeQuickSnaps()
                 changeProfileRealmDate.shared.observeFirebaseUser(with: Int(id))
-                self.joinInitOpenDialog()
-                self.auth.initIAPurchase()
+                joinInitOpenDialog()
+                auth.initIAPurchase()
             }
         }
     }
 
     static func joinInitOpenDialog() {
-        guard let openDialog = self.auth.dialogs.results.filter({ $0.isOpen == true }).first, openDialog.dialogType == "group" || openDialog.dialogType == "public", UserDefaults.standard.bool(forKey: "localOpen") else {
+        guard let openDialog = auth.dialogs.results.filter({ $0.isOpen == true }).first, openDialog.dialogType == "group" || openDialog.dialogType == "public", UserDefaults.standard.bool(forKey: "localOpen") else {
             return
         }
 
@@ -77,7 +77,7 @@ extension ChatrApp {
     }
     
     static func getCryptoKey() -> String {
-        guard let user = self.auth.profile.results.first else { return "" }
+        guard let user = auth.profile.results.first else { return "" }
 
         return user.id.description.sha256()
     }

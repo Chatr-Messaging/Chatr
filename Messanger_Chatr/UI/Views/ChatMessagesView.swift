@@ -115,7 +115,7 @@ struct ChatMessagesView: View {
                     if self.delayViewMessages {
                         ScrollViewReader { reader in
                             VStack(alignment: .center) {
-                                Spacer()
+                                //Spacer()
                                 ForEach(maxPagination ..< currentMessages.count, id: \.self) { message in
                                     let messagePosition: messagePosition = UInt(currentMessages[message].senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? .right : .left
                                     let topMsg = currentMessages[message].id == currentMessages.first?.id && currentMessages.count >= self.maxMessageCount
@@ -169,27 +169,25 @@ struct ChatMessagesView: View {
                                         }
                                     }
 
-                                    VStack(spacing: 0) {
-                                        HStack() {
-                                            if messagePosition == .right { Spacer() }
-                                            let hasPrevious = self.hasPrevious(index: message)
-                                            
-                                            ContainerBubble(viewModel: self.viewModel, newDialogFromSharedContact: self.$newDialogFromSharedContact, isPriorWider: self.isPriorWider(index: message), message: currentMessages[message], messagePosition: messagePosition, hasPrior: hasPrevious, namespace: self.namespace)
-                                                .environmentObject(self.auth)
-                                                .contentShape(Rectangle())
-                                                .fixedSize(horizontal: false, vertical: true)
-                                                .padding(.horizontal, 25)
-                                                .padding(.trailing, messagePosition != .right ? 40 : 0)
-                                                .padding(.leading, messagePosition == .right ? 40 : 0)
-                                                .padding(.bottom, hasPrevious ? -6 : 10)
-                                                //.padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 110 : 0) + 32)
-                                                .resignKeyboardOnDragGesture()
-                                                .id(currentMessages[message].id)
+                                    HStack() {
+                                        if messagePosition == .right { Spacer() }
+                                        let hasPrevious = self.hasPrevious(index: message)
+                                        
+                                        ContainerBubble(viewModel: self.viewModel, newDialogFromSharedContact: self.$newDialogFromSharedContact, isPriorWider: self.isPriorWider(index: message), message: currentMessages[message], messagePosition: messagePosition, hasPrior: hasPrevious, namespace: self.namespace)
+                                            .environmentObject(self.auth)
+                                            .contentShape(Rectangle())
+                                            .fixedSize(horizontal: false, vertical: true)
+                                            .padding(.horizontal, 25)
+                                            .padding(.trailing, messagePosition != .right ? 40 : 0)
+                                            .padding(.leading, messagePosition == .right ? 40 : 0)
+                                            .padding(.bottom, hasPrevious ? -6 : 10)
+                                            //.padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 110 : 0) + 32)
+                                            .resignKeyboardOnDragGesture()
+                                            .id(currentMessages[message].id)
 
-                                            if messagePosition == .left { Spacer() }
-                                        }
-                                        .background(Color.clear)
-                                    }.onAppear {
+                                        if messagePosition == .left { Spacer() }
+                                    }.background(Color.clear)
+                                    .onAppear {
                                         //print("the adding mesg id is: \(currentMessages[message].id) but the on i am looking for is: \(currentMessages[(pageShowCount * self.scrollPage) + self.pageShowCount].id) at index: \((pageShowCount * self.scrollPage) - self.pageShowCount)")
                                         let notLast = currentMessages[message].id != currentMessages.last?.id
                                         if !notLast {
@@ -202,7 +200,7 @@ struct ChatMessagesView: View {
                                                 }
                                             } else if self.scrollViewHeight > Constants.screenHeight * 0.8 && self.permissionLoadMore {
                                                 print("scrolllling is nowwww \(self.scrollViewHeight) ** \(Constants.screenHeight * 0.8)")
-                                                withAnimation(Animation.easeOut(duration: 0.6).delay(0.15)) {
+                                                withAnimation(Animation.easeOut(duration: 0.25)) {
                                                     reader.scrollTo(currentMessages[message].id, anchor: .bottom)
                                                 }
                                             }
@@ -215,7 +213,21 @@ struct ChatMessagesView: View {
                                             }
                                         }
                                     }
-                                }.contentShape(Rectangle())
+                                    .onDisappear {
+                                        guard let prevIndex = currentMessages.firstIndex(of: currentMessages[message - 1]) else {
+                                            return
+                                        }
+                                        
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                            withAnimation(Animation.easeOut(duration: 0.30)) {
+                                                reader.scrollTo(currentMessages[prevIndex].id, anchor: .bottom)
+                                            }
+                                            self.scrollToId = ""
+                                        }
+                                    }
+                                    
+                                }.transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(Animation.easeOut(duration: 0.35)), removal: AnyTransition.move(edge: .bottom).animation(Animation.easeOut(duration: 0.35))))
+                                .contentShape(Rectangle())
                             }.background(GeometryReader { fullView in
                                 Color.clear.preference(key: ViewOffsetKey.self,
                                     value: -fullView.frame(in: .named("scroll")).origin.y)
@@ -224,7 +236,7 @@ struct ChatMessagesView: View {
                                         //If the 10 to show is not enough then show another page
                                             self.scrollViewHeight = fullView.size.height
                                             print("the view height on aprear: \(self.scrollViewHeight) ** \(Constants.screenHeight * 0.8)")
-                                            if self.scrollViewHeight < Constants.screenHeight * 0.8 && self.maxPagination != 0 && self.scrollPage <= 1 {
+                                            if self.scrollViewHeight < Constants.screenHeight * 0.8, self.maxPagination != 0, self.scrollPage <= 1 {
                                                 print("added another scroll pageee")
                                                 //self.scrollToId = currentMessages.last?.id ?? ""
                                                 self.scrollPage += 1
@@ -234,7 +246,7 @@ struct ChatMessagesView: View {
                                     .onChange(of: fullView.size.height) { value in
                                         print("the view height isss: \(value)")
                                         self.scrollViewHeight = value
-                                        if self.scrollViewHeight < Constants.screenHeight * 0.8 && self.maxPagination != 0 && self.scrollPage <= 1 {
+                                        if self.scrollViewHeight < Constants.screenHeight * 0.8, self.maxPagination != 0, self.scrollPage <= 1 {
                                             print("added another scroll page")
                                             //self.scrollToId = currentMessages.last?.id ?? ""
                                             self.scrollPage += 2
@@ -248,7 +260,7 @@ struct ChatMessagesView: View {
                                 }
 
                                 print("the offset is: \($0)")
-                                if $0 < -60 && !firstScroll && !self.isLoadingMore && self.permissionLoadMore {
+                                if $0 < -60 && !firstScroll, !self.isLoadingMore, self.permissionLoadMore {
                                     self.isLoadingMore = true
                                     self.permissionLoadMore = false
                                     //$0 > self.scrollViewHeight && self.minPagination != currentMessages.count {
@@ -339,13 +351,11 @@ struct ChatMessagesView: View {
                                         }
                                     }
                                 }
-                            }.opacity(self.firstScroll ? 0 : 1)
+                            }
                         }
                     }
                 }.ignoresSafeArea(.keyboard, edges: .bottom)
                 .resignKeyboardOnDragGesture()
-
-                ExtraBottomSafeAreaInset()
             }
             .bottomSafeAreaInset(
                 RoundedRectangle(cornerRadius: 0)
