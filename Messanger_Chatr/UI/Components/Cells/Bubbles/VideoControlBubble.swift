@@ -34,10 +34,11 @@ struct VideoControlBubble: View {
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 18, height: 18, alignment: .center)
                             .foregroundColor(.white)
-                    }).buttonStyle(ClickMiniButtonStyle())
+                            .padding(8)
+                            .background(BlurView(style: .systemUltraThinMaterialDark).cornerRadius(7.5))
+                            .overlay(RoundedRectangle(cornerRadius: 7.5).stroke(Color.black.opacity(0.15), lineWidth: 2))
+                    }).buttonStyle(ClickButtonStyle())
                     .zIndex(1)
-                    .padding(8)
-                    .background(BlurView(style: .systemUltraThinMaterial).cornerRadius(7.5))
 
                     Spacer()
                     if self.totalDuration > 25.0 {
@@ -46,7 +47,7 @@ struct VideoControlBubble: View {
                             .fontWeight(.semibold)
                             .foregroundColor(.white)
                             .padding(5)
-                            .background(BlurView(style: .systemUltraThinMaterial).cornerRadius(7.5))
+                            .background(BlurView(style: .systemUltraThinMaterialDark).cornerRadius(7.5))
                             .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 0)
                             .padding(.trailing, 7.5)
                     } else if self.totalDuration != 0.0 {
@@ -57,14 +58,15 @@ struct VideoControlBubble: View {
                                 .opacity(0.35)
 
                             Circle()
-                                .trim(from: self.progressBar, to: 1.0)
+                                .trim(from: 0.0, to: self.progressBar)
                                 .stroke(Color.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
                                 .frame(width: 18, height: 18)
-                                .rotationEffect(.init(degrees: -270))
+                                .rotationEffect(.init(degrees: -90))
                                 .animation(Animation.linear(duration: 0.1))
                         }
                         .padding(7.5)
-                        .background(BlurView(style: .systemUltraThinMaterial).cornerRadius(7.5))
+                        .background(BlurView(style: .systemUltraThinMaterialDark).cornerRadius(7.5))
+                        .overlay(RoundedRectangle(cornerRadius: 7.5).stroke(Color.black.opacity(0.15), lineWidth: 2))
                         .padding(.trailing, 7.5)
                         .onChange(of: self.totalDuration) { newValue in
                             self.progressBar = CGFloat(newValue / (player.currentItem?.duration.seconds ?? 1))
@@ -90,9 +92,10 @@ struct VideoControlBubble: View {
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 17, height: 17, alignment: .center)
                         .foregroundColor(.white)
-                }).buttonStyle(ClickMiniButtonStyle())
-                .padding(8)
-                .background(BlurView(style: .systemUltraThinMaterial).cornerRadius(7.5))
+                        .padding(8)
+                        .background(BlurView(style: .systemUltraThinMaterialDark).cornerRadius(7.5))
+                        .overlay(RoundedRectangle(cornerRadius: 7.5).stroke(Color.black.opacity(0.15), lineWidth: 2))
+                }).buttonStyle(ClickButtonStyle())
                 .transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.spring()), removal: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.easeOut(duration: 0.1))))
                 .padding(.bottom, 7.5)
                 .padding(.horizontal, 15)
@@ -108,7 +111,7 @@ struct VideoControlBubble: View {
                     self.play ? self.playVideo() : self.pause()
                 }) {
                     ZStack {
-                        BlurView(style: .systemUltraThinMaterial)
+                        BlurView(style: .systemUltraThinMaterialDark)
                             .frame(width: 60, height: 60)
                             .clipShape(Circle())
 
@@ -120,8 +123,9 @@ struct VideoControlBubble: View {
                             .foregroundColor(.white)
                             .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 2)
                             .padding(.all)
-                    }
-                }.padding(.vertical, self.videoDownload != 0 || self.videoDownload != 1.0 ? 20 : 125)
+                    }.overlay(RoundedRectangle(cornerRadius: 30).stroke(Color.black.opacity(0.15), lineWidth: 2))
+                }.buttonStyle(ClickButtonStyle())
+                .padding(.vertical, self.videoDownload != 0 || self.videoDownload != 1.0 ? 20 : 125)
                 .opacity(self.videoDownload == 0.0 || self.videoDownload == 1.0 ? 1 : 0)
                 .transition(.asymmetric(insertion: AnyTransition.scale.animation(.spring(response: 0.2, dampingFraction: 0.65, blendDuration: 0)), removal: AnyTransition.scale.animation(.easeOut(duration: 0.14))))
                 .zIndex(1)
