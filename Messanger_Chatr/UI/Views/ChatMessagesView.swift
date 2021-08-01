@@ -175,7 +175,6 @@ struct ChatMessagesView: View {
                                         
                                         ContainerBubble(viewModel: self.viewModel, newDialogFromSharedContact: self.$newDialogFromSharedContact, isPriorWider: self.isPriorWider(index: message), message: currentMessages[message], messagePosition: messagePosition, hasPrior: hasPrevious, namespace: self.namespace)
                                             .environmentObject(self.auth)
-                                            .contentShape(Rectangle())
                                             .fixedSize(horizontal: false, vertical: true)
                                             .padding(.horizontal, 25)
                                             .padding(.trailing, messagePosition != .right ? 40 : 0)
