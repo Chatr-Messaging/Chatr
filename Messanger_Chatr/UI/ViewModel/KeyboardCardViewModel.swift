@@ -49,17 +49,19 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
     var storage: Cache.Storage<String, Data>? = {
         return try? Cache.Storage(diskConfig: DiskConfig(name: "DiskCache"), memoryConfig: MemoryConfig(expiry: .date(Calendar.current.date(byAdding: .day, value: 4, to: Date()) ?? Date()), countLimit: 10, totalCostLimit: 10), transformer: TransformerFactory.forData())
     }()
+    
+    private lazy var uploadcare = Uploadcare(withPublicKey: Constants.uploadcarePublicKey, secretKey: Constants.uploadcareSecretKey)
         
     func uploadSelectedImages() {
         DispatchQueue.global(qos: .utility).async {
             for media in self.selectedPhotos {
                 guard media.uploadId == nil, media.progress == 0.0, let foundMediaIndex = self.selectedPhotos.firstIndex(of: media), let data = media.image.jpegData(compressionQuality: 1.0) else { return }
                 
-                let uploadcare = Uploadcare(withPublicKey: Constants.uploadcarePublicKey, secretKey: Constants.uploadcareSecretKey)
+                //let uploadcare = Uploadcare(withPublicKey: Constants.uploadcarePublicKey, secretKey: Constants.uploadcareSecretKey)
                 let filename = "\(media.id)" + Date().description.replacingOccurrences(of: " ", with: "")
                 let semaphore = DispatchSemaphore(value: 0)
                 
-                uploadcare.uploadAPI.upload(files: [filename: data], store: .store, { (progress) in
+                self.uploadcare.uploadAPI.upload(files: [filename: data], store: .store, { (progress) in
                     DispatchQueue.main.async {
                         self.selectedPhotos[foundMediaIndex].progress = progress
                     }
@@ -91,14 +93,13 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
         DispatchQueue.global(qos: .utility).async {
             guard media.uploadId == nil, media.progress == 0.0, let foundMediaIndex = self.selectedPhotos.firstIndex(of: media), let data = media.image.jpegData(compressionQuality: 1.0) else { return }
             
-            let uploadcare = Uploadcare(withPublicKey: Constants.uploadcarePublicKey, secretKey: Constants.uploadcareSecretKey)
             let filename = "\(media.id)" + Date().description.replacingOccurrences(of: " ", with: "")
             let semaphore = DispatchSemaphore(value: 0)
             
-            uploadcare.uploadAPI.upload(files: [filename: data], store: .store, { (progress) in
+            self.uploadcare.uploadAPI.upload(files: [filename: data], store: .doNotStore, { (progress) in
                 DispatchQueue.main.async {
                     print("the upload progress is: \(progress)")
-                    self.selectedPhotos[foundMediaIndex].progress = progress
+                    self.selectedPhotos[foundMediaIndex].progress = CGFloat(progress)
                 }
             }) { (resultDictionary, error) in
                 defer {
@@ -119,7 +120,7 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
                     if self.selectedPhotos[foundMediaIndex].canSend {
                         print("sending message now. Here is the id: " + "\(fileId)")
                         DispatchQueue.main.async {
-                            self.sendPhotoMessage(auth: auth)
+                            self.sendPhotoMessage(attachment: self.selectedPhotos[foundMediaIndex], auth: auth)
                         }
                     } else {
                         print("error can send not allowed yet. Here is the id: " + "\(fileId)")
@@ -135,43 +136,44 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
         DispatchQueue.global(qos: .utility).async {
             guard vid.uploadId == nil, vid.progress == 0.0, let foundMediaIndex = self.selectedVideos.firstIndex(of: vid), let assz = vid.asset as? AVURLAsset, let videoData = try? Data(contentsOf: assz.url) else { return }
             
-            let uploadcare = Uploadcare(withPublicKey: Constants.uploadcarePublicKey, secretKey: Constants.uploadcareSecretKey)
             let filename = vid.id + assz.url.lastPathComponent
             let semaphore = DispatchSemaphore(value: 0)
             
-            uploadcare.uploadAPI.upload(files: [filename: videoData], store: .store, { (progress) in
-                DispatchQueue.main.async {
-                    self.selectedVideos[foundMediaIndex].progress = progress
-                    print("the progress uploading the video is: \(progress * 100)%")
-                }
-            }) { (resultDictionary, error) in
-                defer {
-                    semaphore.signal()
-                }
-                
-                if let error = error {
-                    print("the error uploading direct files: " + error.debugDescription)
-                }
+            DispatchQueue.main.async {
+                self.uploadcare.uploadAPI.upload(files: [filename: videoData], store: .doNotStore, { (progress) in
+                    DispatchQueue.main.async {
+                        self.selectedVideos[foundMediaIndex].progress = CGFloat(progress)
+                        print("the progress uploading the video is: \(progress * 100)%")
+                    }
+                }) { (resultDictionary, error) in
+                    defer {
+                        semaphore.signal()
+                    }
+                    
+                    if let error = error {
+                        print("the error uploading direct files: " + error.debugDescription)
+                    }
 
-                guard let uploadData = resultDictionary, let fileId = uploadData.first?.value else {
-                    return
-                }
-                print("success uploading direct video. Here is the data: " + "\(fileId)")
-
-                DispatchQueue.main.async {
-                    self.storage?.async.setObject(videoData, forKey: Constants.uploadcareBaseUrl + fileId + Constants.uploadcareStandardTransform, completion: { test in
-                        print("the testtt data is: \(test)")
-                        
-                        self.selectedVideos[foundMediaIndex].uploadId = fileId
-                        if self.selectedVideos[foundMediaIndex].canSend {
-                            print("sending message now. Here is the id: " + "\(fileId)")
-                            DispatchQueue.main.async {
-                                self.sendVideoMessage(auth: auth)
+                    guard let uploadData = resultDictionary, let fileId = uploadData.first?.value else {
+                        return
+                    }
+                    print("success uploading direct video. Here is the data: " + "\(fileId)")
+                    
+                    DispatchQueue.main.async {
+                        self.storage?.async.setObject(videoData, forKey: Constants.uploadcareBaseUrl + fileId, completion: { test in
+                            print("the testtt data is: \(test)")
+                            
+                            self.selectedVideos[foundMediaIndex].uploadId = fileId
+                            if self.selectedVideos[foundMediaIndex].canSend {
+                                print("sending message now. Here is the id: " + "\(fileId)")
+                                DispatchQueue.main.async {
+                                    self.sendVideoMessage(auth: auth)
+                                }
+                            } else {
+                                print("error can send not allowed yet. video Here is the id: " + "\(fileId)")
                             }
-                        } else {
-                            print("error can send not allowed yet. Here is the id: " + "\(fileId)")
-                        }
-                    })
+                        })
+                    }
                 }
             }
             
@@ -179,14 +181,15 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
         }
     }
     
-    func sendPhotoMessage(auth: AuthModel) {
+    func sendPhotoMessage(attachment: KeyboardMediaAsset, auth: AuthModel) {
         guard let selectedDialog = auth.dialogs.results.filter("id == %@", UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").first else { return }
         
-        for attachment in self.selectedPhotos {
-            guard let uploadedId = attachment.uploadId else {
-                if let index = self.selectedPhotos.firstIndex(of: attachment) {
-                    self.selectedPhotos[index].canSend = true
-                }
+        print("running through photo: \(attachment.id)")
+        guard let uploadedId = attachment.uploadId else {
+            if let index = self.selectedPhotos.firstIndex(of: attachment) {
+                print("had the save for after upload: \(attachment.id)")
+                self.selectedPhotos[index].canSend = true
+            }
 //                let chatAttachment = ChatAttachment()
 //                chatAttachment["uploadId"] = attachment.id
 //
@@ -202,36 +205,36 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
 //
 //                    self.selectedPhotos[localMedia].preparedMessageId = idz.description
 //                })
-                
-                return
-            }
             
-            let attachmentz = ChatAttachment()
-            attachmentz["imageURL"] = Constants.uploadcareBaseUrl + uploadedId + Constants.uploadcareStandardTransform
-            attachmentz.type = "image/png"
-            
-            let occupants = auth.selectedConnectyDialog?.occupantIDs ?? []
-            let pDialog = ChatDialog(dialogID: selectedDialog.id, type: selectedDialog.dialogType == "public" ? .public : occupants.count > 2 ? .group : .private)
-            pDialog.occupantIDs = occupants
-            
-            let message = ChatMessage()
-            message.text = "Image attachment"
-            message.attachments = [attachmentz]
-            
-            pDialog.send(message) { (error) in
-                print("SENT image...")
-                changeMessageRealmData.shared.insertMessage(message, completion: {
-                    if error != nil {
-                        print("error sending attachment: \(String(describing: error?.localizedDescription))")
-                        changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .error)
-                    } else {
-                        print("Success sending attachment to ConnectyCube server!")
-                        if let indexDelete = self.selectedPhotos.firstIndex(of: attachment) {
-                            self.selectedPhotos.remove(at: indexDelete)
-                        }
+            return
+        }
+        
+        let attachmentz = ChatAttachment()
+        attachmentz["imageURL"] = Constants.uploadcareBaseUrl + uploadedId + Constants.uploadcareStandardTransform
+        attachmentz.type = "image/png"
+        
+        let occupants = auth.selectedConnectyDialog?.occupantIDs ?? []
+        let pDialog = ChatDialog(dialogID: selectedDialog.id, type: selectedDialog.dialogType == "public" ? .public : occupants.count > 2 ? .group : .private)
+        pDialog.occupantIDs = occupants
+        
+        let message = ChatMessage()
+        message.text = "Image attachment"
+        message.attachments = [attachmentz]
+        
+        pDialog.send(message) { (error) in
+            print("SENT image...")
+            changeMessageRealmData.shared.insertMessage(message, completion: {
+                if error != nil {
+                    print("error sending attachment: \(String(describing: error?.localizedDescription))")
+                    changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .error)
+                } else {
+                    print("Success sending attachment to ConnectyCube server!")
+                    if let index = self.selectedPhotos.firstIndex(of: attachment), let storeId = self.selectedPhotos[index].uploadId {
+                        self.selectedPhotos.remove(at: index)
+                        self.storeUploadMedia(id: storeId)
                     }
-                })
-            }
+                }
+            })
         }
     }
     
@@ -239,16 +242,18 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
         guard let selectedDialog = auth.dialogs.results.filter("id == %@", UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").first else { return }
 
         for attachment in self.selectedVideos {
+            print("running through video: \(attachment.id)")
             guard let uploadedId = attachment.uploadId else {
                 if let index = self.selectedVideos.firstIndex(of: attachment) {
+                    print("had the save for after upload: \(attachment.id)")
                     self.selectedVideos[index].canSend = true
                 }
-                
-                return
+
+                continue
             }
             
             let attachmentz = ChatAttachment()
-            attachmentz["videoURL"] = Constants.uploadcareBaseUrl + uploadedId + Constants.uploadcareStandardTransform
+            attachmentz["videoURL"] = Constants.uploadcareBaseUrl + uploadedId
             attachmentz.type = "video/mov"
             
             let occupants = auth.selectedConnectyDialog?.occupantIDs ?? []
@@ -268,13 +273,32 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
                         changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .error)
                     } else {
                         print("Success sending attachment to ConnectyCube server!")
-                        if let indexDelete = self.selectedVideos.firstIndex(of: attachment) {
-                            self.selectedVideos.remove(at: indexDelete)
+                        if let index = self.selectedVideos.firstIndex(of: attachment), let storeId = self.selectedVideos[index].uploadId {
+                            self.selectedVideos.remove(at: index)
+                            self.storeUploadMedia(id: storeId)
                         }
                     }
                 })
             }
         }
+    }
+
+    func storeUploadMedia(id: String) {
+        print("<------ testRESTStoreFile ------>")
+        //let semaphore = DispatchSemaphore(value: 0)
+
+        uploadcare.storeFile(withUUID: id) { (response, error) in
+
+            if let error = error {
+                print("the error chcing ios: \(error)")
+                //semaphore.resume()
+                return
+            }
+            print("success storing sent media!")
+            print(response ?? "")
+            //semaphore.resume()
+        }
+        //semaphore.wait()
     }
     
     func openImagePicker(completion: @escaping () -> Void) {

@@ -141,6 +141,7 @@ struct mainHomeList: View {
     @EnvironmentObject var auth: AuthModel
     @Environment(\.colorScheme) var colorScheme
     @ObservedObject var messageViewModel = ChatMessageViewModel()
+    @ObservedObject var imagePicker = KeyboardCardViewModel()
     @GestureState var isDragging = false
     @State var showContacts: Bool = false
     @State var showUserProfile: Bool = false
@@ -515,7 +516,7 @@ struct mainHomeList: View {
                 }.overlay(
                     //MARK: Chat Messages View
                     GeometryReader { geo in
-                        ChatMessagesView(viewModel: self.messageViewModel, activeView: self.$activeView, keyboardChange: self.$keyboardHeight, dialogID: self.$selectedDialogID, textFieldHeight: self.$textFieldHeight, keyboardDragState: self.$keyboardDragState, hasAttachment: self.$hasAttachments, newDialogFromSharedContact: self.$newDialogFromSharedContact, namespace: self.namespace)
+                    ChatMessagesView(viewModel: self.messageViewModel, activeView: self.$activeView, keyboardChange: self.$keyboardHeight, dialogID: self.$selectedDialogID, textFieldHeight: self.$textFieldHeight, keyboardDragState: self.$keyboardDragState, hasAttachment: self.$hasAttachments, newDialogFromSharedContact: self.$newDialogFromSharedContact, isKeyboardActionOpen: self.$isKeyboardActionOpen, namespace: self.namespace)
                             .environmentObject(self.auth)
                             //.position(x: UIScreen.main.bounds.size.width / 2, y: self.activeView.height)
                             .frame(width: Constants.screenWidth, height: Constants.screenHeight - (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 127 : 91) : 201), alignment: .bottom)
@@ -544,9 +545,9 @@ struct mainHomeList: View {
 
                 //MARK: Keyboard View
                 GeometryReader { geo in
-                    KeyboardCardView(height: self.$textFieldHeight, isOpen: self.$isLocalOpen, mainText: self.$keyboardText, hasAttachments: self.$hasAttachments, showImagePicker: self.$showKeyboardMediaAssets, isKeyboardActionOpen: self.$isKeyboardActionOpen)
+                    KeyboardCardView(imagePicker: self.imagePicker, height: self.$textFieldHeight, isOpen: self.$isLocalOpen, mainText: self.$keyboardText, hasAttachments: self.$hasAttachments, showImagePicker: self.$showKeyboardMediaAssets, isKeyboardActionOpen: self.$isKeyboardActionOpen)
                         .environmentObject(self.auth)
-                        .frame(width: Constants.screenWidth, height: Constants.screenHeight * 0.75, alignment: .center)
+                        .frame(width: Constants.screenWidth, alignment: .center)
                         .shadow(color: Color.black.opacity(0.15), radius: 14, x: 0, y: -5)
                         .offset(y: self.isLocalOpen ? geo.frame(in: .global).maxY - 40 - (UIDevice.current.hasNotch ? 0 : -20) - (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) - (self.hasAttachments ? 110 : 0) - self.keyboardHeight - (self.isKeyboardActionOpen ? 80 : 0) : geo.frame(in: .global).maxY)
                         .animation(.spring(response: 0.45, dampingFraction: 0.7, blendDuration: 0))

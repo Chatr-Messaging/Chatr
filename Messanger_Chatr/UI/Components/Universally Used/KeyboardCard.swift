@@ -19,7 +19,7 @@ import Firebase
 struct KeyboardCardView: View {
     @EnvironmentObject var auth: AuthModel
     @ObservedObject var audio = VoiceViewModel()
-    @ObservedObject var imagePicker = KeyboardCardViewModel()
+    @ObservedObject var imagePicker: KeyboardCardViewModel
     @Binding var height: CGFloat
     @Binding var isOpen: Bool
     @State var open: Bool = UserDefaults.standard.bool(forKey: "localOpen")
@@ -52,7 +52,7 @@ struct KeyboardCardView: View {
             return false
         }
     }
-    let transition = AnyTransition.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(.spring()), removal: AnyTransition.move(edge: .bottom).animation(.easeOut(duration: 0.2)))
+    let transition = AnyTransition.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(.spring()), removal: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.easeOut(duration: 0.3)))
     //Share variables
 
     var body: some View {
@@ -168,6 +168,7 @@ struct KeyboardCardView: View {
                                         Button(action: {
                                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                             self.gifData.remove(at: url)
+                                            self.checkAttachments()
                                         }, label: {
                                             Image(systemName: "xmark.circle.fill")
                                                 .resizable()
@@ -198,6 +199,7 @@ struct KeyboardCardView: View {
                                         Button(action: {
                                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                             self.imagePicker.pastedImages.remove(at: index)
+                                            self.checkAttachments()
                                         }, label: {
                                             Image(systemName: "xmark.circle.fill")
                                                 .resizable()
@@ -238,7 +240,7 @@ struct KeyboardCardView: View {
                                                         .rotationEffect(.init(degrees: -90))
                                                         .padding(4)
                                                         .animation(.easeOut)
-                                                }.opacity(self.imagePicker.selectedPhotos[img].uploadId == "" ? 1 : 0)
+                                            }.opacity(self.imagePicker.selectedPhotos[img].progress >= 1.0 || self.imagePicker.selectedPhotos[img].progress <= 0.0 ? 0 : 1)
                                             )
                                             .cornerRadius(14)
                                             .padding(.leading, 10)
@@ -247,6 +249,7 @@ struct KeyboardCardView: View {
                                         Button(action: {
                                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                             self.imagePicker.selectedPhotos.remove(at: img)
+                                            self.checkAttachments()
                                         }, label: {
                                             Image(systemName: "xmark.circle.fill")
                                                 .resizable()
@@ -289,7 +292,7 @@ struct KeyboardCardView: View {
                                                         .rotationEffect(.init(degrees: -90))
                                                         .padding(4)
                                                         .animation(.easeOut)
-                                                }.opacity(self.imagePicker.selectedVideos[vid].uploadId != "" ? 0 : 1)
+                                            }.opacity(self.imagePicker.selectedVideos[vid].progress >= 1.0 || self.imagePicker.selectedVideos[vid].progress <= 0.0 ? 0 : 1)
                                             )
                                             .cornerRadius(14)
                                         
@@ -311,6 +314,7 @@ struct KeyboardCardView: View {
                                     Button(action: {
                                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                         self.imagePicker.selectedVideos.remove(at: vid)
+                                        self.checkAttachments()
                                     }, label: {
                                         Image(systemName: "xmark.circle.fill")
                                             .resizable()
@@ -429,7 +433,9 @@ struct KeyboardCardView: View {
                             }
                             
                             if !self.imagePicker.selectedPhotos.isEmpty || !self.imagePicker.pastedImages.isEmpty {
-                                self.imagePicker.sendPhotoMessage(auth: self.auth)
+                                for i in self.imagePicker.selectedPhotos {
+                                    self.imagePicker.sendPhotoMessage(attachment: i, auth: self.auth)
+                                }
                             }
 
                             if self.imagePicker.selectedVideos.count > 0 {
@@ -445,9 +451,7 @@ struct KeyboardCardView: View {
                                 changeMessageRealmData.shared.sendMessage(dialog: selectedDialog, text: self.mainText, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                             }
 
-                            withAnimation {
-                                //self.checkAttachments()
-                            }
+                            self.checkAttachments()
                         }
 
                         self.mainText = ""
@@ -508,7 +512,10 @@ struct KeyboardCardView: View {
                                 let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: identifiers, options: nil)
 
                                 fetchResult.enumerateObjects { [self] (asset, index, _) in
-                                    self.imagePicker.extractPreviewData(asset: asset, auth: self.auth, completion: {  })
+                                    print("rannn ayyy yooooooo")
+                                    self.imagePicker.extractPreviewData(asset: asset, auth: self.auth, completion: {
+                                        self.checkAttachments()
+                                    })
                                 }
                             })
                         }
@@ -530,6 +537,7 @@ struct KeyboardCardView: View {
                             print("the adding gif url is: \(gifURL.description)")
 
                             self.gifData.append(gifURL)
+                            self.checkAttachments()
                             self.gifURL = ""
                         }) {
                             GIFController(url: self.$gifURL, present: self.$presentGIF)
@@ -567,14 +575,16 @@ struct KeyboardCardView: View {
 
                         Button(action: {
                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                            withAnimation {
-                                self.enableLocation.toggle()
-                            }
 
                             self.imagePicker.checkLocationPermission()
                             if self.imagePicker.locationPermission {
                                 self.region.center.longitude = self.imagePicker.locationManager.location?.coordinate.longitude ?? 0
                                 self.region.center.latitude = self.imagePicker.locationManager.location?.coordinate.latitude ?? 0
+                                
+                                withAnimation {
+                                    self.enableLocation.toggle()
+                                }
+                                self.checkAttachments()
                             } else {
                                 self.imagePicker.requestLocationPermission()
                             }
@@ -723,7 +733,6 @@ struct KeyboardCardView: View {
         .cornerRadius(22)
         .overlay(RoundedRectangle(cornerRadius: 22).stroke(Color("blurBorder"), lineWidth: 2.5))
         .padding(.vertical, 2.5)
-        .offset(y: checkAttachments() ? -110 : 0)
         .onChange(of: UserDefaults.standard.string(forKey: "visitingDialogId"), perform: { value in
             if value == "" {
                 withAnimation {
@@ -739,6 +748,7 @@ struct KeyboardCardView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 if value {
                     observePublicMembersType()
+                    checkAttachments()
                     if let typedText = UserDefaults.standard.string(forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText") {
                         self.mainText = typedText
                     } else { self.mainText = "" }
@@ -752,31 +762,28 @@ struct KeyboardCardView: View {
         .onAppear() {
             UserDefaults.standard.set(false, forKey: "disabledMessaging")
             observePublicMembersType()
-//            keyboard.observe { (event) in
-//                switch event.type {
-//                case .willShow:
-//                    if self.hasAttachments && self.showImagePicker {
-//                        UIView.animate(withDuration: event.duration, delay: 0.0, options: [event.options], animations: {
-//                            self.showImagePicker = false
-//                        }, completion: nil)
-//                    }
-//
-//                case .willHide:
-//                    guard presentGIF, showImagePicker else { return }
-//                    self.isKeyboardActionOpen = false
-//
-//                default:
-//                    break
-//                }
-//            }
+            keyboard.observe { (event) in
+                switch event.type {
+                case .willShow:
+                    if self.hasAttachments && self.showImagePicker {
+                        UIView.animate(withDuration: event.duration, delay: 0.0, options: [event.options], animations: {
+                            self.showImagePicker = false
+                        }, completion: nil)
+                    }
+
+                case .willHide:
+                    guard presentGIF, showImagePicker else { return }
+                    self.isKeyboardActionOpen = false
+
+                default:
+                    break
+                }
+            }
         }
     }
     
-    func checkAttachments() -> Bool {
-        let hasIt = !self.imagePicker.selectedPhotos.isEmpty || !self.imagePicker.selectedVideos.isEmpty || !self.gifData.isEmpty || self.enableLocation || !self.imagePicker.pastedImages.isEmpty
-
-        self.hasAttachments = hasIt
-        return hasIt
+    func checkAttachments() {
+        self.hasAttachments = !self.imagePicker.selectedPhotos.isEmpty || !self.imagePicker.selectedVideos.isEmpty || !self.gifData.isEmpty || self.enableLocation || !self.imagePicker.pastedImages.isEmpty
     }
     
     func formatVideoDuration(second: TimeInterval) -> String {

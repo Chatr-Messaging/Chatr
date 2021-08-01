@@ -40,6 +40,7 @@ struct ChatMessagesView: View {
     @Binding var keyboardDragState: CGSize
     @Binding var hasAttachment: Bool
     @Binding var newDialogFromSharedContact: Int
+    @Binding var isKeyboardActionOpen: Bool
     @State private var delayViewMessages: Bool = false
     @State private var firstScroll: Bool = true
     @State private var isLoadingMore: Bool = false
@@ -192,7 +193,7 @@ struct ChatMessagesView: View {
                                         if !notLast {
                                             print("called on appear: \(message)")
                                             if self.firstScroll {
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
                                                     reader.scrollTo(currentMessages[message].id, anchor: .bottom)
                                                     print("scrolllling2222 is nowwww \(message)")
                                                     self.firstScroll = false
@@ -359,7 +360,8 @@ struct ChatMessagesView: View {
             .bottomSafeAreaInset(
                 RoundedRectangle(cornerRadius: 0)
                     .fill(Color.clear)
-                    .frame(height: self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 110 : 0) + 38)
+                    .animation(Animation.easeInOut(duration: 0.35))
+                    .frame(height: self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 110 : 0) + (self.isKeyboardActionOpen ? 80 : 0) + 38)
             )
             .coordinateSpace(name: "scroll")
             .frame(width: Constants.screenWidth)
@@ -405,6 +407,7 @@ struct ChatMessagesView: View {
         }
     }
 
+    //FIX ME: Should try to add this logic to the Realm DB message model
     func hasPrevious(index: Int) -> Bool {
         let result = self.auth.messages.selectedDialog(dialogID: self.dialogID)
         print("has previous")
@@ -412,12 +415,14 @@ struct ChatMessagesView: View {
         return result[index].id != result.last?.id ? (result[index + 1].senderID == result[index].senderID && result[index + 1].date <= result[index].date.addingTimeInterval(86400) ? true : false) : false
     }
 
+    //FIX ME: Should try to add this logic to the Realm DB message model
     func needsTimestamp(index: Int) -> Bool {
         let result = self.auth.messages.selectedDialog(dialogID: self.dialogID)
 
         return result[index] != result.first ? (result[index].messageState != .isTyping && result[index].date >= result[index - 1].date.addingTimeInterval(86400) ? true : false) : false
     }
     
+    //FIX ME: Should try to add this logic to the Realm DB message model
     func isPriorWider(index: Int) -> Bool {
         let result = self.auth.messages.selectedDialog(dialogID: self.dialogID)
 
