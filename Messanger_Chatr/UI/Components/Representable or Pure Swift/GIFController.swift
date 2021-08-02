@@ -54,7 +54,7 @@ struct GIFController : UIViewControllerRepresentable {
 
 struct CustomGIFShape: Shape {
     func path(in rect: CGRect) -> Path {
-        let path = UIBezierPath(roundedRect: rect, byRoundingCorners: [.topLeft, .topRight, .bottomLeft, .bottomRight], cornerRadii: CGSize(width: 20, height: 20))
+        let path = UIBezierPath(roundedRect: rect, byRoundingCorners: [.topLeft, .topRight, .bottomLeft, .bottomRight], cornerRadii: CGSize(width: 22.5, height: 22.5))
         
         return Path(path.cgPath)
     }

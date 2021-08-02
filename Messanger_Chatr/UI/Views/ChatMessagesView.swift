@@ -29,6 +29,66 @@ struct SizePreferenceKey: PreferenceKey {
     }
 }
 
+struct Stack<Content: View>: View {
+    var axis: Axis.Set
+    var content: Content
+    
+    init(_ axis: Axis.Set = .vertical, @ViewBuilder builder: ()->Content) {
+        self.axis = axis
+        self.content = builder()
+    }
+    
+    var body: some View {
+        switch axis {
+        case .horizontal:
+            HStack {
+                content
+            }
+        case .vertical:
+            VStack {
+                content
+            }
+        default:
+            VStack {
+                content
+            }
+        }
+    }
+}
+
+struct ReversedScrollView<Content: View>: View {
+    var axis: Axis.Set
+    var content: Content
+    
+    init(_ axis: Axis.Set = .horizontal, @ViewBuilder builder: ()->Content) {
+        self.axis = axis
+        self.content = builder()
+    }
+    
+    var body: some View {
+        GeometryReader { proxy in
+            ScrollView(axis, showsIndicators: false) {
+                Stack(axis) {
+                    Spacer()
+                    content
+                }
+                .frame(
+                   minWidth: minWidth(in: proxy, for: axis),
+                   minHeight: minHeight(in: proxy, for: axis)
+                )
+            }
+        }
+    }
+    
+    func minWidth(in proxy: GeometryProxy, for axis: Axis.Set) -> CGFloat? {
+       axis.contains(.horizontal) ? proxy.size.width : nil
+    }
+        
+    func minHeight(in proxy: GeometryProxy, for axis: Axis.Set) -> CGFloat? {
+       axis.contains(.vertical) ? proxy.size.height : nil
+    }
+}
+
 struct ChatMessagesView: View {
     @EnvironmentObject var auth: AuthModel
     @Environment(\.colorScheme) var colorScheme
@@ -102,7 +162,7 @@ struct ChatMessagesView: View {
         //let currentMessages = self.auth.messages.selectedDialog(dialogID: self.dialogID)
 
         if UserDefaults.standard.bool(forKey: "localOpen") {
-            ScrollView(.vertical, showsIndicators: false) {
+            ReversedScrollView(.vertical) {
                 LazyVStack(alignment: .center) {
                     Text(self.maxMessageCount == 0 ? "no messages found" : maxMessageCount == -1 ? "loading messages..." : "")
                         .font(.subheadline)
@@ -187,44 +247,44 @@ struct ChatMessagesView: View {
 
                                         if messagePosition == .left { Spacer() }
                                     }.background(Color.clear)
-                                    .onAppear {
-                                        //print("the adding mesg id is: \(currentMessages[message].id) but the on i am looking for is: \(currentMessages[(pageShowCount * self.scrollPage) + self.pageShowCount].id) at index: \((pageShowCount * self.scrollPage) - self.pageShowCount)")
-                                        let notLast = currentMessages[message].id != currentMessages.last?.id
-                                        if !notLast {
-                                            print("called on appear: \(message)")
-                                            if self.firstScroll, self.scrollViewHeight > Constants.screenHeight * 0.8 {
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
-                                                    reader.scrollTo(currentMessages[message].id, anchor: .bottom)
-                                                    print("scrolllling2222 is nowwww \(message)")
-                                                    self.firstScroll = false
-                                                }
-                                            } else if self.scrollViewHeight > Constants.screenHeight * 0.8 && self.permissionLoadMore {
-                                                print("scrolllling is nowwww \(self.scrollViewHeight) ** \(Constants.screenHeight * 0.8)")
-                                                withAnimation(Animation.easeOut(duration: 0.25)) {
-                                                    reader.scrollTo(currentMessages[message].id, anchor: .bottom)
-                                                }
-                                            }
-                                        }
-
-                                        if self.scrollToId == currentMessages[message].id {
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                                                reader.scrollTo(currentMessages[message].id, anchor: .top)
-                                                self.scrollToId = ""
-                                            }
-                                        }
-                                    }
-                                    .onDisappear {
-                                        guard let prevIndex = currentMessages.firstIndex(of: currentMessages[message - 1]) else {
-                                            return
-                                        }
-                                        
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                                            withAnimation(Animation.easeOut(duration: 0.30)) {
-                                                reader.scrollTo(currentMessages[prevIndex].id, anchor: .bottom)
-                                            }
-                                            self.scrollToId = ""
-                                        }
-                                    }
+//                                    .onAppear {
+//                                        //print("the adding mesg id is: \(currentMessages[message].id) but the on i am looking for is: \(currentMessages[(pageShowCount * self.scrollPage) + self.pageShowCount].id) at index: \((pageShowCount * self.scrollPage) - self.pageShowCount)")
+//                                        let notLast = currentMessages[message].id != currentMessages.last?.id
+//                                        if !notLast {
+//                                            print("called on appear: \(message)")
+//                                            if self.firstScroll {
+//                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
+//                                                    reader.scrollTo(currentMessages[message].id, anchor: .bottom)
+//                                                    print("scrolllling2222 is nowwww \(message)")
+//                                                    self.firstScroll = false
+//                                                }
+//                                            } else if self.scrollViewHeight > Constants.screenHeight * 0.8 && self.permissionLoadMore {
+//                                                print("scrolllling is nowwww \(self.scrollViewHeight) ** \(Constants.screenHeight * 0.8)")
+//                                                withAnimation(Animation.easeOut(duration: 0.25)) {
+//                                                    //reader.scrollTo(currentMessages[message].id, anchor: .bottom)
+//                                                }
+//                                            }
+//                                        }
+//
+//                                        if self.scrollToId == currentMessages[message].id {
+//                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+//                                                //reader.scrollTo(currentMessages[message].id, anchor: .top)
+//                                                self.scrollToId = ""
+//                                            }
+//                                        }
+//                                    }
+//                                    .onDisappear {
+//                                        guard let prevIndex = currentMessages.firstIndex(of: currentMessages[message - 1]) else {
+//                                            return
+//                                        }
+//
+//                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+//                                            withAnimation(Animation.easeOut(duration: 0.30)) {
+//                                                //reader.scrollTo(currentMessages[prevIndex].id, anchor: .bottom)
+//                                            }
+//                                            self.scrollToId = ""
+//                                        }
+//                                    }
                                     
                                 }.transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(Animation.easeOut(duration: 0.35)), removal: AnyTransition.move(edge: .bottom).animation(Animation.easeOut(duration: 0.35))))
                                 .contentShape(Rectangle())

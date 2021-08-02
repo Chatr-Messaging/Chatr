@@ -126,7 +126,7 @@ struct KeyboardCardView: View {
                 }.padding(.top, 10)
             } else if self.isVisiting.isEmpty {
                 //MARK: Attachments Section
-                ScrollView(.horizontal, showsIndicators: false, content: {
+                ReversedScrollView(.horizontal) {
                     HStack(spacing: 8) {
                         //MARK: Location Section
                         if self.enableLocation {
@@ -141,9 +141,10 @@ struct KeyboardCardView: View {
                                         .aspectRatio(contentMode: .fill)
                                         .frame(width: 130, height: 90)
                                         .cornerRadius(10)
+                                        .padding(.top, 10)
                                 }).buttonStyle(ClickMiniButtonStyle())
                                 .background(Color.clear)
-                                .transition(AnyTransition.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(.easeOut(duration: 0.2)), removal: AnyTransition.move(edge: .bottom).animation(.easeOut(duration: 0.2))))
+                                .transition(AnyTransition.asymmetric(insertion: AnyTransition.move(edge: .top).animation(.easeOut(duration: 0.2)), removal: AnyTransition.move(edge: .top).animation(.easeOut(duration: 0.2))))
                             }.onAppear() {
                                 self.region.span = MKCoordinateSpan(latitudeDelta: 0.25, longitudeDelta: 0.25)
                             }
@@ -176,7 +177,7 @@ struct KeyboardCardView: View {
                                                 .frame(width: 24, height: 24, alignment: .center)
                                                 .foregroundColor(.primary)
                                         }).background(Color.clear)
-                                    }.transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(.spring()), removal: AnyTransition.move(edge: .bottom).animation(.easeOut(duration: 0.2))))
+                                    }.transition(.asymmetric(insertion: AnyTransition.move(edge: .top).animation(.spring()), removal: AnyTransition.move(edge: .top).animation(.easeOut(duration: 0.2))))
                                 }.animation(.spring(response: 0.3, dampingFraction: 0.75, blendDuration: 0))
                             }
                         }
@@ -330,7 +331,7 @@ struct KeyboardCardView: View {
                     }
                     .padding(.vertical, !self.imagePicker.selectedVideos.isEmpty || !self.imagePicker.selectedPhotos.isEmpty ? 5 : 0)
                     .padding(.horizontal)
-                })
+                }.frame(height: self.hasAttachments ? 110 : 0)
                 .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 8)
                 .transition(transition)
                 
