@@ -1154,18 +1154,15 @@ struct welcomeBackView: View {
                         .shadow(color: Color("buttonShadow"), radius: 8, x: 0, y: 5)
                     
                     HStack(alignment: .center) {
-                        if self.auth.verifyCodeStatus == .success  && self.auth.haveUserProfileImg == true {
-                            if let avitarURL = self.auth.profile.results.first?.avatar ?? "" {
-                                WebImage(url: URL(string: avitarURL))
-                                    .resizable()
-                                    .placeholder{ Image(systemName: "person.fill") }
-                                    .indicator(.activity)
-                                    .transition(.fade(duration: 0.25))
-                                    .scaledToFill()
-                                    .frame(width: 55, height: 55, alignment: .center)
-                                    .clipShape(Circle())
-                                    .padding(.leading)
-                            }
+                            WebImage(url: URL(string: self.auth.profile.results.first?.avatar ?? ""))
+                                .resizable()
+                                .placeholder{ Image(systemName: "person.fill") }
+                                .indicator(.activity)
+                                .transition(.fade(duration: 0.25))
+                                .scaledToFill()
+                                .frame(width: 55, height: 55, alignment: .center)
+                                .clipShape(Circle())
+                                .padding(.leading)
                             
                             VStack(alignment: .leading) {
                                 Text(self.auth.haveUserFullName == true ? self.auth.profile.results.first?.fullName ?? "Chatr User" : "Chatr User")
@@ -1182,26 +1179,24 @@ struct welcomeBackView: View {
                             
                             Spacer()
                             
-                            if self.auth.haveUserFullName == true && self.auth.haveUserProfileImg == true {
-                                Circle()
-                                    .trim(from: 0, to: 0.8)
-                                    .stroke(Color.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
-                                    .frame(width: 25, height: 25)
-                                    .rotationEffect(.init(degrees: self.loadAni ? 360 : 0))
-                                    .padding(.trailing)
-                                    .animation(Animation.linear(duration: 0.75).repeatForever(autoreverses: false))
-                                    .onAppear(perform: ({
-                                        self.loadAni.toggle()
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 3.5) {
-                                            if self.auth.isFirstTimeUser == false {
-                                                UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                            }
-                                            self.auth.configureFirebaseStateDidChange()
-                                            self.dismissView = true
+                            Circle()
+                                .trim(from: 0, to: 0.8)
+                                .stroke(Color.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                                .frame(width: 25, height: 25)
+                                .rotationEffect(.init(degrees: self.loadAni ? 360 : 0))
+                                .padding(.trailing)
+                                .animation(Animation.linear(duration: 0.75).repeatForever(autoreverses: false))
+                                .opacity(self.auth.haveUserFullName && self.auth.haveUserProfileImg ? 1 : 0)
+                                .onAppear(perform: ({
+                                    self.loadAni.toggle()
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 3.5) {
+                                        if self.auth.isFirstTimeUser == false {
+                                            UINotificationFeedbackGenerator().notificationOccurred(.success)
                                         }
-                                    }))
-                            }
-                        }
+                                        self.auth.configureFirebaseStateDidChange()
+                                        self.dismissView = true
+                                    }
+                                }))
                     }.padding(.all)
                 }
                 

@@ -663,7 +663,7 @@ class changeMessageRealmData {
         
         let message = ChatMessage.markable()
         message.markable = true
-        message.text = "Current Location"
+        message.text = "Current location"
         message.attachments = [attachment]
         
         let pDialog = ChatDialog(dialogID: dialog.id, type: dialog.dialogType == "public" ? .public : occupentID.count > 2 ? .group : .private)
@@ -700,7 +700,7 @@ class changeMessageRealmData {
                 pDialog.occupantIDs = occupentID
                 
                 let message = ChatMessage()
-                message.text = "Audio Message"
+                message.text = "Audio message"
                 message.attachments = [attachment]
                 
                 pDialog.send(message) { (error) in

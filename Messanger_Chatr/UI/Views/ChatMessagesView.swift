@@ -255,7 +255,7 @@ struct ChatMessagesView: View {
                                         //if  {
                                         self.firstScroll = false
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.275) {
-                                            reader.scrollTo(currentMessages[message].id, anchor: .bottom)
+                                            reader.scrollTo(currentMessages.last?.id, anchor: .bottom)
                                             print("scrolllling2222 is nowwww \(message)")
                                             //self.permissionToScroll = true
                                         }

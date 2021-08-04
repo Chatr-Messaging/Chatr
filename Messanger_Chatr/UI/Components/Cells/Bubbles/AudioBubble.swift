@@ -14,7 +14,6 @@ import Cache
 
 struct AudioBubble: View {
     @ObservedObject var viewModel: ChatMessageViewModel
-    @ObservedObject var audio = VoiceViewModel()
     @State var message: MessageStruct
     @State var messageRight: Bool = false
     @State var audioKey: String = ""
@@ -36,15 +35,16 @@ struct AudioBubble: View {
         HStack(spacing: 5) {
             Button(action: {
                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                if self.audio.isPlayingAudio {
-                    self.audio.stopAudioRecording()
+                if self.isPlayingAudio {
+                    self.viewModel.audio.stopAudioRecording()
                     print("stop playing")
                  } else {
-                    self.playAudio()
+                    //self.playAudio()
+                     self.loadAudio(fileId: self.audioKey)
                     print("stop??? lolll playing")
                  }
             }) {
-                Image(systemName: self.audio.isPlayingAudio ? "pause.fill" : "play.fill")
+                Image(systemName: self.isPlayingAudio ? "pause.fill" : "play.fill")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 20, height: 20, alignment: .center)
@@ -53,7 +53,7 @@ struct AudioBubble: View {
                     .padding(.leading, 15)
             }
             
-            Text(self.audio.durationString)
+            Text(self.viewModel.audio.durationString)
                 .foregroundColor(.secondary)
                 .font(.subheadline)
                 .fontWeight(.semibold)
@@ -84,44 +84,49 @@ struct AudioBubble: View {
             gradient: Gradient(colors: [Color("buttonColor"), Color("buttonColor_darker")]), startPoint: .top, endPoint: .bottom))
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
         .shadow(color: self.messageRight ? Color.blue.opacity(0.15) : Color.black.opacity(0.15), radius: 6, x: 0, y: 6)
-        .onAppear() {
-            self.loadAudio(localPath: self.message.localAttachmentPath, fileId: self.audioKey, completion: { })
-        }
     }
     
-    func loadAudio(localPath: String, fileId: String, completion: @escaping () -> Void) {
-        Request.downloadFile(withUID: fileId, progressBlock: { (progress) in
-            print("the progress of the audio download is: \(progress)")
-        }, successBlock: { data in
-            //self.storage?.async.setObject(data, forKey: fileId, completion: { _ in })
-            
-            let path = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-            let fileFolder = path.appendingPathComponent("dialog_audioMsg/\(fileId)")
-
-            let folderExists = (try? fileFolder.checkResourceIsReachable()) ?? false
-            if !folderExists {
-                try? FileManager.default.createDirectory(at: fileFolder.absoluteURL, withIntermediateDirectories: false)
-            }
-
-            //let randomInt = Int.random(in: 1000000..<9999999)
-            let fileName = fileFolder.appendingPathComponent("\(fileId).m4a")
-
+    func loadAudio(fileId: String) {
+        DispatchQueue.main.async {
             do {
-                try data.write(to: fileName)
-                //updateMessageVideoURL(messageId: self.message.id, localUrl: fileName.absoluteString)
-                print("ayyy saved the audio file rigth at: \(fileName)")
-                self.fetchAudioRecording(completion: {  })
+                print("the audio cashed id is: \(fileId)")
+                let result = try storage?.entry(forKey: fileId)
+                if let objectData = result?.object {
+                    self.viewModel.audio.audioPlayer = try AVAudioPlayer(data: objectData)
+                    print("got it and now going to play it222")
+                    self.viewModel.audio.audioPlayer.play()
+                    self.viewModel.audio.isPlayingAudio = true
+                    print("successfully added cached audio data \(String(describing: result?.object))")
+                } else {
+                    print("error setting audio")
+                }
+                
+                //self.audioPlayer = try AVAudioPlayer(data: result?.object ?? Data())
             } catch {
-                print(error.localizedDescription)
+                print("could not find cached audio... downloading now..")
+                Request.downloadFile(withUID: fileId, progressBlock: { (progress) in
+                    print("the progress of the audio download is: \(progress)")
+                }, successBlock: { data in
+                    //self.storage?.async.setObject(data, forKey: fileId, completion: { _ in })
+                    self.storage?.async.setObject(data, forKey: fileId, completion: { test in
+                        print("the testtt data is: \(data)")
+                    })
+                    
+                    do {
+                        self.viewModel.audio.audioPlayer = try AVAudioPlayer(data: data)
+                        print("got it and now going to play it")
+                        self.viewModel.audio.audioPlayer.play()
+                        self.isPlayingAudio = true
+                    } catch {
+                        print("failed to set new audio")
+                    }
+         
+                    print("successfully saved the audio file from download")
+                }, errorBlock: { error in
+                    print("the error audiooo is: \(String(describing: error.localizedDescription))")
+                })
             }
- 
-            print("successfully saved the audio file from download")
-            
-            completion()
-        }, errorBlock: { error in
-            print("the error audiooo is: \(String(describing: error.localizedDescription))")
-            completion()
-        })
+        }
     }
     
     func updateMessageVideoURL(messageId: String, localUrl: String) {
@@ -152,7 +157,7 @@ struct AudioBubble: View {
     }
     
     func fetchAudioRecording(completion: @escaping () -> (Void)) {
-        self.audio.recordingsList.removeAll()
+        self.viewModel.audio.recordingsList.removeAll()
         
         let documentDirectory = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)[0]
 
@@ -161,41 +166,40 @@ struct AudioBubble: View {
 
         let recording = Recording(fileURL: folderUrl, createdAt: self.getCreationDate(for: folderUrl))
         print("contents: \(folderString)")
-        self.audio.recordingsList.append(recording)
+        self.viewModel.audio.recordingsList.append(recording)
 
-        print("the recording count is: \(self.audio.recordingsList.count)")
+        print("the recording count is: \(self.viewModel.audio.recordingsList.count)")
 
         completion()
     }
 
     func stopAudio() {
         DispatchQueue.main.async {
-            self.audio.isPlayingAudio = false
+            self.viewModel.audio.isPlayingAudio = false
 
-            guard self.audio.audioPlayer.isPlaying else { return }
+            guard self.viewModel.audio.audioPlayer.isPlaying else { return }
 
-            self.audio.audioPlayer.pause()
+            self.viewModel.audio.audioPlayer.pause()
         }
     }
     
     func playAudio() {
         //DispatchQueue.main.async {
-            if let recording = self.audio.recordingsList.first {
-                try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, policy: .default, options: .defaultToSpeaker)
+            //if let recording = self.viewModel.audio.recordingsList.first {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, policy: .default, options: .defaultToSpeaker)
+        } catch {
+            
+        }
 
-                do {
-                    print("trying to play from url: \(recording.fileURL)")
-                    self.audio.audioPlayer = try AVAudioPlayer(contentsOf: recording.fileURL)
-                    //self.timer = Timer.publish(every: 0.2, on: .main, in: .common).autoconnect()
-                    //self.audioPlayer.delegate = self
-                    //self.audioPlayer.prepareToPlay()
-                    self.audio.audioPlayer.play()
-                    self.audio.isPlayingAudio = true
-                 } catch {
-                    print("Error playing audio")
-                    self.audio.isPlayingAudio = false
-                 }
-            }
+        print("trying to play")
+        self.viewModel.audio.audioPlayer = self.audioPlayer
+        //self.timer = Timer.publish(every: 0.2, on: .main, in: .common).autoconnect()
+        //self.audioPlayer.delegate = self
+        //self.audioPlayer.prepareToPlay()
+        self.viewModel.audio.audioPlayer.play()
+        self.viewModel.audio.isPlayingAudio = true
+                //}
         //}
     }
     
