@@ -202,6 +202,7 @@ struct DialogCell: View {
                         .offset(x: -2, y: -4)
                         .foregroundColor(.gray)
                         .fixedSize(horizontal: false, vertical: true)
+                        .animation(nil)
 
                     if let dialog = self.auth.selectedConnectyDialog, dialog.id != "", self.isOpen && (self.dialogModel.dialogType == "group" || self.dialogModel.dialogType == "public") && Chat.instance.isConnected {
                         if self.isJoining {

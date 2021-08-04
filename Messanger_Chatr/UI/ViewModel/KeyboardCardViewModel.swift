@@ -120,7 +120,7 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
                     if self.selectedPhotos[foundMediaIndex].canSend {
                         print("sending message now. Here is the id: " + "\(fileId)")
                         DispatchQueue.main.async {
-                            self.sendPhotoMessage(attachment: self.selectedPhotos[foundMediaIndex], auth: auth)
+                            self.sendPhotoMessage(attachment: self.selectedPhotos[foundMediaIndex], auth: auth, completion: {  })
                         }
                     } else {
                         print("error can send not allowed yet. Here is the id: " + "\(fileId)")
@@ -181,7 +181,7 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
         }
     }
     
-    func sendPhotoMessage(attachment: KeyboardMediaAsset, auth: AuthModel) {
+    func sendPhotoMessage(attachment: KeyboardMediaAsset, auth: AuthModel, completion: @escaping () -> Void) {
         guard let selectedDialog = auth.dialogs.results.filter("id == %@", UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").first else { return }
         
         print("running through photo: \(attachment.id)")
@@ -190,6 +190,7 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
                 print("had the save for after upload: \(attachment.id)")
                 self.selectedPhotos[index].canSend = true
             }
+            completion()
 //                let chatAttachment = ChatAttachment()
 //                chatAttachment["uploadId"] = attachment.id
 //
@@ -227,12 +228,14 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
                 if error != nil {
                     print("error sending attachment: \(String(describing: error?.localizedDescription))")
                     changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .error)
+                    completion()
                 } else {
                     print("Success sending attachment to ConnectyCube server!")
                     if let index = self.selectedPhotos.firstIndex(of: attachment), let storeId = self.selectedPhotos[index].uploadId {
                         self.selectedPhotos.remove(at: index)
                         self.storeUploadMedia(id: storeId)
                     }
+                    completion()
                 }
             })
         }
@@ -253,7 +256,7 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
             }
             
             let attachmentz = ChatAttachment()
-            attachmentz["videoURL"] = Constants.uploadcareBaseUrl + uploadedId
+            attachmentz["videoURL"] = Constants.uploadcareBaseUrl + uploadedId + Constants.uploadcareStandardVideoTransform
             attachmentz.type = "video/mov"
             
             let occupants = auth.selectedConnectyDialog?.occupantIDs ?? []

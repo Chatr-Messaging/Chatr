@@ -104,6 +104,7 @@ struct ChatMessagesView: View {
     @State private var delayViewMessages: Bool = false
     @State private var firstScroll: Bool = true
     @State private var isLoadingMore: Bool = false
+    @State private var permissionToScroll: Bool = false
     @State private var permissionLoadMore: Bool = true
     @State private var scrollPage: Int = 0
     @State private var scrollToId: String = ""
@@ -169,102 +170,109 @@ struct ChatMessagesView: View {
                         .foregroundColor(.secondary)
                         .frame(width: 160)
                         .padding(.all, self.maxMessageCount >= 1 && self.delayViewMessages ? 0 : 20)
-                        .offset(y: self.maxMessageCount >= 1 && self.delayViewMessages ? 0 : 40)
+                        .padding(.vertical, self.maxMessageCount >= 1 ? 0 : 80)
+                        //.offset(y: self.maxMessageCount >= 1 && self.delayViewMessages ? 0 : 40)
                         .opacity(self.maxMessageCount >= 1 && self.delayViewMessages ? 0 : 1)
                     
                     //CUSTOM MESSAGE BUBBLE:
-                    if self.delayViewMessages {
-                        ScrollViewReader { reader in
-                            VStack(alignment: .center) {
-                                //Spacer()
-                                ForEach(maxPagination ..< currentMessages.count, id: \.self) { message in
-                                    let messagePosition: messagePosition = UInt(currentMessages[message].senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? .right : .left
-                                    let topMsg = currentMessages[message].id == currentMessages.first?.id && currentMessages.count >= self.maxMessageCount
+                    ScrollViewReader { reader in
+                        VStack(alignment: .center) {
+                            //Spacer()
+                            ForEach(self.maxPagination ..< self.currentMessages.count, id: \.self) { message in
+                                let messagePosition: messagePosition = UInt(currentMessages[message].senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? .right : .left
+                                let topMsg = currentMessages[message].id == currentMessages.first?.id && currentMessages.count >= self.maxMessageCount
 
-                                    if topMsg {
-                                        VStack {
-                                            Text("Beginning of Chat")
-                                                .font(.subheadline)
-                                                .fontWeight(.medium)
-                                                .foregroundColor(.primary)
-                                                .padding(.top, 2.5)
-                                                .padding(.horizontal, 40)
-                                            
-                                            Text("created \(self.viewModel.dateFormatTime(date: changeDialogRealmData.shared.getRealmDialog(dialogId: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").createdAt))")
-                                                .font(.caption)
-                                                .fontWeight(.regular)
-                                                .foregroundColor(.secondary)
-                                                .multilineTextAlignment(.center)
-                                                .offset(y: 2)
-
-                                            Divider()
-                                                .padding(.top, 5)
-                                                .padding(.bottom)
-                                                .padding(.horizontal, 30)
-                                        }
-                                    }
-                                    
-                                    if needsTimestamp(index: message) {
-                                        Text("\(self.viewModel.dateFormatTime(date: currentMessages[message].date))")
+                                if topMsg {
+                                    VStack {
+                                        Text("Beginning of Chat")
+                                            .font(.subheadline)
+                                            .fontWeight(.medium)
+                                            .foregroundColor(.primary)
+                                            .padding(.top, 2.5)
+                                            .padding(.horizontal, 40)
+                                        
+                                        Text("created \(self.viewModel.dateFormatTime(date: changeDialogRealmData.shared.getRealmDialog(dialogId: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").createdAt))")
                                             .font(.caption)
-                                            .fontWeight(.semibold)
+                                            .fontWeight(.regular)
                                             .foregroundColor(.secondary)
                                             .multilineTextAlignment(.center)
-                                            .padding(.top, message == 0 ? 0 : 15)
-                                            .padding(.bottom, 15)
+                                            .offset(y: 2)
+
+                                        Divider()
+                                            .padding(.top, 5)
+                                            .padding(.bottom)
+                                            .padding(.horizontal, 30)
                                     }
+                                }
+                                
+                                if needsTimestamp(index: message) {
+                                    Text("\(self.viewModel.dateFormatTime(date: currentMessages[message].date))")
+                                        .font(.caption)
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(.secondary)
+                                        .multilineTextAlignment(.center)
+                                        .padding(.top, message == 0 ? 0 : 15)
+                                        .padding(.bottom, 15)
+                                }
 
-                                    if self.isLoadingMore && !firstScroll && self.maxPagination != 0 && message == self.maxPagination {
-                                        VStack(alignment: .center) {
-                                            Circle()
-                                                .trim(from: 0, to: 0.8)
-                                                .stroke(Color.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
-                                                .frame(width: 20, height: 20)
-                                                .animation(Animation.linear(duration: 0.55).repeatForever(autoreverses: false))
-                                                .rotation3DEffect(Angle(degrees: 180), axis: (x: 1, y: 0, z: 0))
-                                                .rotationEffect(.degrees(self.isLoadingMore ? 360 : 0))
+                                if self.isLoadingMore && !firstScroll && self.maxPagination != 0 && message == self.maxPagination {
+                                    VStack(alignment: .center) {
+                                        Circle()
+                                            .trim(from: 0, to: 0.8)
+                                            .stroke(Color.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                                            .frame(width: 20, height: 20)
+                                            .animation(Animation.linear(duration: 0.55).repeatForever(autoreverses: false))
+                                            .rotation3DEffect(Angle(degrees: 180), axis: (x: 1, y: 0, z: 0))
+                                            .rotationEffect(.degrees(self.isLoadingMore ? 360 : 0))
 
-                                            Text("loading more...")
-                                                .font(.caption)
-                                                .foregroundColor(.secondary)
-                                        }
+                                        Text("loading more...")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
                                     }
+                                }
 
-                                    HStack() {
-                                        if messagePosition == .right { Spacer() }
-                                        let hasPrevious = self.hasPrevious(index: message)
-                                        
-                                        ContainerBubble(viewModel: self.viewModel, newDialogFromSharedContact: self.$newDialogFromSharedContact, isPriorWider: self.isPriorWider(index: message), message: currentMessages[message], messagePosition: messagePosition, hasPrior: hasPrevious, namespace: self.namespace)
-                                            .environmentObject(self.auth)
-                                            .fixedSize(horizontal: false, vertical: true)
-                                            .padding(.horizontal, 25)
-                                            .padding(.trailing, messagePosition != .right ? 40 : 0)
-                                            .padding(.leading, messagePosition == .right ? 40 : 0)
-                                            .padding(.bottom, hasPrevious ? -6 : 10)
-                                            //.padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 110 : 0) + 32)
-                                            .resignKeyboardOnDragGesture()
-                                            .id(currentMessages[message].id)
+                                HStack() {
+                                    if messagePosition == .right { Spacer() }
+                                    let hasPrevious = self.hasPrevious(index: message)
+                                    
+                                    ContainerBubble(viewModel: self.viewModel, newDialogFromSharedContact: self.$newDialogFromSharedContact, isPriorWider: self.isPriorWider(index: message), message: currentMessages[message], messagePosition: messagePosition, hasPrior: hasPrevious, namespace: self.namespace)
+                                        .environmentObject(self.auth)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                        .padding(.horizontal, 25)
+                                        .padding(.trailing, messagePosition != .right ? 40 : 0)
+                                        .padding(.leading, messagePosition == .right ? 40 : 0)
+                                        .padding(.bottom, hasPrevious ? -6 : 10)
+                                        //.padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 110 : 0) + 32)
+                                        .resignKeyboardOnDragGesture()
+                                        .id(currentMessages[message].id)
 
-                                        if messagePosition == .left { Spacer() }
-                                    }.background(Color.clear)
-//                                    .onAppear {
+                                    if messagePosition == .left { Spacer() }
+                                }.background(Color.clear)
+                                .onAppear {
 //                                        //print("the adding mesg id is: \(currentMessages[message].id) but the on i am looking for is: \(currentMessages[(pageShowCount * self.scrollPage) + self.pageShowCount].id) at index: \((pageShowCount * self.scrollPage) - self.pageShowCount)")
-//                                        let notLast = currentMessages[message].id != currentMessages.last?.id
-//                                        if !notLast {
+                                    if self.firstScroll, currentMessages[message].id == currentMessages.last?.id, self.scrollViewHeight > Constants.screenHeight * 0.8 {
 //                                            print("called on appear: \(message)")
-//                                            if self.firstScroll {
-//                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
-//                                                    reader.scrollTo(currentMessages[message].id, anchor: .bottom)
-//                                                    print("scrolllling2222 is nowwww \(message)")
-//                                                    self.firstScroll = false
-//                                                }
-//                                            } else if self.scrollViewHeight > Constants.screenHeight * 0.8 && self.permissionLoadMore {
+                                        //if  {
+                                        self.firstScroll = false
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.275) {
+                                            reader.scrollTo(currentMessages[message].id, anchor: .bottom)
+                                            print("scrolllling2222 is nowwww \(message)")
+                                            //self.permissionToScroll = true
+                                        }
+                                        //} //else if self.scrollViewHeight > Constants.screenHeight * 0.8 && self.permissionLoadMore {
 //                                                print("scrolllling is nowwww \(self.scrollViewHeight) ** \(Constants.screenHeight * 0.8)")
 //                                                withAnimation(Animation.easeOut(duration: 0.25)) {
-//                                                    //reader.scrollTo(currentMessages[message].id, anchor: .bottom)
+//                                                    reader.scrollTo(currentMessages[message].id, anchor: .bottom)
 //                                                }
 //                                            }
-//                                        }
+                                    } else if self.permissionToScroll, currentMessages[message].id == currentMessages.last?.id {
+                                        self.permissionToScroll = false
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                            withAnimation(Animation.easeOut(duration: 0.25)) {
+                                                reader.scrollTo(currentMessages[message].id, anchor: .bottom)
+                                            }
+                                        }
+                                    }
 //
 //                                        if self.scrollToId == currentMessages[message].id {
 //                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
@@ -272,7 +280,7 @@ struct ChatMessagesView: View {
 //                                                self.scrollToId = ""
 //                                            }
 //                                        }
-//                                    }
+                                }
 //                                    .onDisappear {
 //                                        guard let prevIndex = currentMessages.firstIndex(of: currentMessages[message - 1]) else {
 //                                            return
@@ -285,130 +293,129 @@ struct ChatMessagesView: View {
 //                                            self.scrollToId = ""
 //                                        }
 //                                    }
-                                    
-                                }.transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(Animation.easeOut(duration: 0.35)), removal: AnyTransition.move(edge: .bottom).animation(Animation.easeOut(duration: 0.35))))
-                                .contentShape(Rectangle())
-                            }.background(GeometryReader { fullView in
-                                Color.clear.preference(key: ViewOffsetKey.self,
-                                    value: -fullView.frame(in: .named("scroll")).origin.y)
-                                    .onAppear {
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
-                                        //If the 10 to show is not enough then show another page
-                                            self.scrollViewHeight = fullView.size.height
-                                            print("the view height on aprear: \(self.scrollViewHeight) ** \(Constants.screenHeight * 0.8)")
-                                            if self.scrollViewHeight < Constants.screenHeight * 0.8, self.maxPagination != 0, self.scrollPage <= 1 {
-                                                print("added another scroll pageee")
-                                                //self.scrollToId = currentMessages.last?.id ?? ""
-                                                self.scrollPage += 1
-                                            }
-                                        }
-                                    }
-                                    .onChange(of: fullView.size.height) { value in
-                                        print("the view height isss: \(value)")
-                                        self.scrollViewHeight = value
+                                
+                            }.transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(Animation.easeOut(duration: 0.35)), removal: AnyTransition.move(edge: .bottom).animation(Animation.easeOut(duration: 0.35))))
+                            .contentShape(Rectangle())
+                        }.background(GeometryReader { fullView in
+                            Color.clear.preference(key: ViewOffsetKey.self,
+                                value: -fullView.frame(in: .named("scroll")).origin.y)
+                                .onAppear {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
+                                    //If the 10 to show is not enough then show another page
+                                        self.scrollViewHeight = fullView.size.height
+                                        print("the view height on aprear: \(self.scrollViewHeight) ** \(Constants.screenHeight * 0.8)")
                                         if self.scrollViewHeight < Constants.screenHeight * 0.8, self.maxPagination != 0, self.scrollPage <= 1 {
-                                            print("added another scroll page")
+                                            print("added another scroll pageee")
                                             //self.scrollToId = currentMessages.last?.id ?? ""
-                                            self.scrollPage += 2
+                                            self.scrollPage += 1
                                         }
                                     }
-                            })
-                            .onPreferenceChange(ViewOffsetKey.self) {
-                                guard self.activeView.height == 0 else {
-                                    print("dragging down dialog cell...")
-                                    return
                                 }
+                                .onChange(of: fullView.size.height) { value in
+                                    print("the view height isss: \(value)")
+                                    self.scrollViewHeight = value
+                                    if self.scrollViewHeight < Constants.screenHeight * 0.8, self.maxPagination != 0, self.scrollPage <= 1 {
+                                        print("added another scroll page")
+                                        //self.scrollToId = currentMessages.last?.id ?? ""
+                                        self.scrollPage += 2
+                                    }
+                                }
+                        })
+                        .onPreferenceChange(ViewOffsetKey.self) {
+                            guard self.activeView.height == 0 else {
+                                print("dragging down dialog cell...")
+                                return
+                            }
 
-                                print("the offset is: \($0)")
-                                if $0 < -60 && !firstScroll, !self.isLoadingMore, self.permissionLoadMore {
-                                    self.isLoadingMore = true
-                                    self.permissionLoadMore = false
-                                    //$0 > self.scrollViewHeight && self.minPagination != currentMessages.count {
-                                    if self.maxPagination != 0 {
-                                        //have more local data to load
-                                        print("has more needs to just increase the local page \(self.maxMessageCount) && \(self.maxPagination) && \(currentMessages.count)")
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
-                                            self.scrollPage += 1
-                                            if self.maxPagination != 0 {
-                                                print("scrolling tooo: \(self.maxPagination + pageShowCount - 1)")
-                                                self.scrollToId = self.currentMessages[self.maxPagination + pageShowCount - 1].id
-                                            } else {
-                                                let divisor = currentMessages.count / pageShowCount
-                                                let remainder = currentMessages.count - divisor * pageShowCount
-                                                let scrollToIndex = remainder == 0 ? pageShowCount - 1 : remainder - 1
-                                                print("the scroll to max is attt 0: \(divisor) && \(remainder) && \(scrollToIndex)")
-                                                self.scrollToId = currentMessages[scrollToIndex].id
-                                            }
-
-                                            self.isLoadingMore = false
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                                                self.permissionLoadMore = true
-                                            }
+                            print("the offset is: \($0)")
+                            if $0 < -60 && !firstScroll, !self.isLoadingMore, self.permissionLoadMore {
+                                self.isLoadingMore = true
+                                self.permissionLoadMore = false
+                                //$0 > self.scrollViewHeight && self.minPagination != currentMessages.count {
+                                if self.maxPagination != 0 {
+                                    //have more local data to load
+                                    print("has more needs to just increase the local page \(self.maxMessageCount) && \(self.maxPagination) && \(currentMessages.count)")
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
+                                        self.scrollPage += 1
+                                        if self.maxPagination != 0 {
+                                            print("scrolling tooo: \(self.maxPagination + pageShowCount - 1)")
+                                            self.scrollToId = self.currentMessages[self.maxPagination + pageShowCount - 1].id
+                                        } else {
+                                            let divisor = currentMessages.count / pageShowCount
+                                            let remainder = currentMessages.count - divisor * pageShowCount
+                                            let scrollToIndex = remainder == 0 ? pageShowCount - 1 : remainder - 1
+                                            print("the scroll to max is attt 0: \(divisor) && \(remainder) && \(scrollToIndex)")
+                                            self.scrollToId = currentMessages[scrollToIndex].id
                                         }
-                                    } else if self.maxMessageCount > currentMessages.count {
-                                        //loading more from server
-                                        print("local has more to fetch \(self.maxMessageCount) && \(self.viewModel.unreadMessageCount) && \(currentMessages.count) limit: \(pageShowCount * (self.scrollPage + 1)) skip: \(currentMessages.count)")
 
-                                        changeMessageRealmData.shared.getMessageUpdates(dialogID: self.dialogID, limit: pageShowCount * (self.scrollPage + 1), skip: currentMessages.count, completion: { _ in
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
-                                                self.scrollPage += 1
-
-                                                if self.maxMessageCount >= currentMessages.count {
-                                                    print("scrolling to: \(pageShowCount - 1)")
-                                                    self.scrollToId = self.currentMessages[pageShowCount - 1].id
-                                                } else {
-                                                    let divisor = currentMessages.count / pageShowCount
-                                                    let remainder = currentMessages.count - divisor * pageShowCount
-                                                    let scrollToIndex = remainder == 0 ? pageShowCount - 1 : remainder - 1
-                                                    print("the scroll to max is at 0: \(divisor) && \(remainder) && \(scrollToIndex)")
-                                                    self.scrollToId = currentMessages[scrollToIndex].id
-                                                }
-                                                self.isLoadingMore = false
-                                                
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                                                    self.permissionLoadMore = true
-                                                }
-                                            }
-                                        })
-                                    } else {
-                                        //do nothing.. turn everything back
-                                        print("has it all good \(maxMessageCount) && \(currentMessages.count)")
-                                        
-                                        let divisor = currentMessages.count / pageShowCount
-                                        let remainder = currentMessages.count - divisor * pageShowCount
-                                        let scrollToIndex = remainder == 0 ? pageShowCount - 1 : remainder - 1
-
-                                        print("the scroll to max is at 0: \(divisor) && \(remainder) && \(scrollToIndex)")
-                                        self.scrollToId = currentMessages[scrollToIndex].id
                                         self.isLoadingMore = false
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
                                             self.permissionLoadMore = true
                                         }
                                     }
+                                } else if self.maxMessageCount > currentMessages.count {
+                                    //loading more from server
+                                    print("local has more to fetch \(self.maxMessageCount) && \(self.viewModel.unreadMessageCount) && \(currentMessages.count) limit: \(pageShowCount * (self.scrollPage + 1)) skip: \(currentMessages.count)")
+
+                                    changeMessageRealmData.shared.getMessageUpdates(dialogID: self.dialogID, limit: pageShowCount * (self.scrollPage + 1), skip: currentMessages.count, completion: { _ in
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
+                                            self.scrollPage += 1
+
+                                            if self.maxMessageCount >= currentMessages.count {
+                                                print("scrolling to: \(pageShowCount - 1)")
+                                                self.scrollToId = self.currentMessages[pageShowCount - 1].id
+                                            } else {
+                                                let divisor = currentMessages.count / pageShowCount
+                                                let remainder = currentMessages.count - divisor * pageShowCount
+                                                let scrollToIndex = remainder == 0 ? pageShowCount - 1 : remainder - 1
+                                                print("the scroll to max is at 0: \(divisor) && \(remainder) && \(scrollToIndex)")
+                                                self.scrollToId = currentMessages[scrollToIndex].id
+                                            }
+                                            self.isLoadingMore = false
+                                            
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                                                self.permissionLoadMore = true
+                                            }
+                                        }
+                                    })
+                                } else {
+                                    //do nothing.. turn everything back
+                                    print("has it all good \(maxMessageCount) && \(currentMessages.count)")
+                                    
+                                    let divisor = currentMessages.count / pageShowCount
+                                    let remainder = currentMessages.count - divisor * pageShowCount
+                                    let scrollToIndex = remainder == 0 ? pageShowCount - 1 : remainder - 1
+
+                                    print("the scroll to max is at 0: \(divisor) && \(remainder) && \(scrollToIndex)")
+                                    self.scrollToId = currentMessages[scrollToIndex].id
+                                    self.isLoadingMore = false
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                                        self.permissionLoadMore = true
+                                    }
                                 }
                             }
-                            .onAppear {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
-                                    keyboard.observe { (event) in
-                                        guard !self.viewModel.isDetailOpen else { return }
+                        }
+                        .onAppear {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
+                                keyboard.observe { (event) in
+                                    guard !self.viewModel.isDetailOpen else { return }
 
-                                        let keyboardFrameEnd = event.keyboardFrameEnd
-                                        
-                                        switch event.type {
-                                        case .willShow:
-                                            UIView.animate(withDuration: event.duration, delay: 0.0, options: [event.options], animations: {
-                                                self.keyboardChange = keyboardFrameEnd.height - 10
-                                                reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
-                                            }, completion: nil)
-                                           
-                                        case .willHide:
-                                            UIView.animate(withDuration: event.duration, delay: 0.0, options: [event.options], animations: {
-                                                self.keyboardChange = 0
-                                            }, completion: nil)
+                                    let keyboardFrameEnd = event.keyboardFrameEnd
+                                    
+                                    switch event.type {
+                                    case .willShow:
+                                        UIView.animate(withDuration: event.duration, delay: 0.0, options: [event.options], animations: {
+                                            self.keyboardChange = keyboardFrameEnd.height - 10
+                                            reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
+                                        }, completion: nil)
+                                       
+                                    case .willHide:
+                                        UIView.animate(withDuration: event.duration, delay: 0.0, options: [event.options], animations: {
+                                            self.keyboardChange = 0
+                                        }, completion: nil)
 
-                                        default:
-                                            break
-                                        }
+                                    default:
+                                        break
                                     }
                                 }
                             }
@@ -428,10 +435,11 @@ struct ChatMessagesView: View {
             .contentShape(Rectangle())
             .onAppear() {
                 //self.dialogID = UserDefaults.standard.string(forKey: "selectedDialogID") ?? ""
+                self.delayViewMessages = true
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                     print("the dialog id is: \(dialogID)")
                     self.maxMessageCount = self.currentMessages.count
-                    self.delayViewMessages = true
+                    
                     self.scrollPage += 1
                     viewModel.loadDialog(auth: auth, dialogId: dialogID, completion: {
                         print("done loading dialogggg: \(dialogID) && \(self.viewModel.totalMessageCount) && \(currentMessages.count) &&& \(self.viewModel.unreadMessageCount)")

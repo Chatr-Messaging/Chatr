@@ -434,8 +434,10 @@ struct KeyboardCardView: View {
                             }
                             
                             if !self.imagePicker.selectedPhotos.isEmpty || !self.imagePicker.pastedImages.isEmpty {
-                                for i in self.imagePicker.selectedPhotos {
-                                    self.imagePicker.sendPhotoMessage(attachment: i, auth: self.auth)
+                                DispatchQueue.main.async {
+                                    for i in self.imagePicker.selectedPhotos {
+                                        self.imagePicker.sendPhotoMessage(attachment: i, auth: self.auth, completion: { self.checkAttachments() })
+                                    }
                                 }
                             }
 
@@ -451,10 +453,9 @@ struct KeyboardCardView: View {
                             if self.mainText.count > 0 {
                                 changeMessageRealmData.shared.sendMessage(dialog: selectedDialog, text: self.mainText, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                             }
-
-                            self.checkAttachments()
                         }
-
+                        
+                        self.checkAttachments()
                         self.mainText = ""
                         self.height = 38
                         UserDefaults.standard.setValue(self.mainText, forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText")
@@ -474,6 +475,11 @@ struct KeyboardCardView: View {
                 }
                 .padding(.horizontal, 10)
                 .padding(.top, 10)
+                .onChange(of: self.contentAvailable, perform: { value in
+                    guard self.hasAttachments else { return }
+
+                    self.hasAttachments = value
+                })
 
                 //MARK: Action Buttons
                 ScrollView(.horizontal, showsIndicators: false) {
