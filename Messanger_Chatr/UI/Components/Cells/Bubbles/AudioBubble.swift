@@ -37,6 +37,7 @@ struct AudioBubble: View {
                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                 if self.isPlayingAudio {
                     self.viewModel.audio.stopAudioRecording()
+                    self.isPlayingAudio = false
                     print("stop playing")
                  } else {
                     //self.playAudio()
@@ -95,7 +96,7 @@ struct AudioBubble: View {
                     self.viewModel.audio.audioPlayer = try AVAudioPlayer(data: objectData)
                     print("got it and now going to play it222")
                     self.viewModel.audio.audioPlayer.play()
-                    self.viewModel.audio.isPlayingAudio = true
+                    self.isPlayingAudio = true
                     print("successfully added cached audio data \(String(describing: result?.object))")
                 } else {
                     print("error setting audio")
@@ -175,7 +176,7 @@ struct AudioBubble: View {
 
     func stopAudio() {
         DispatchQueue.main.async {
-            self.viewModel.audio.isPlayingAudio = false
+            self.isPlayingAudio = false
 
             guard self.viewModel.audio.audioPlayer.isPlaying else { return }
 
