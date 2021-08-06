@@ -22,6 +22,7 @@ class VoiceViewModel: NSObject , ObservableObject , AVAudioPlayerDelegate {
     @Published var isPlayingAudio: Bool = false
     @Published var recordingsList: [Recording] = []
     @Published var durationString: String = "0:00"
+    @Published var playingBubbleId: String = ""
     @Published var timer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
     @Published var time = 0
 
@@ -58,8 +59,6 @@ class VoiceViewModel: NSObject , ObservableObject , AVAudioPlayerDelegate {
     }
     
     func stopAudioRecording() {
-        self.isPlayingAudio = false
-
         guard self.audioPlayer.isPlaying else { return }
 
         self.audioPlayer.pause()
@@ -171,10 +170,10 @@ class VoiceViewModel: NSObject , ObservableObject , AVAudioPlayerDelegate {
         }
     }
 
-    func getTotalPlaybackDurationString() {
+    func getTotalPlaybackDurationString() -> String {
         let (_, m, s) = secondsToHoursMinutesSeconds(seconds: (Int(self.audioPlayer.duration) - Int(self.audioPlayer.currentTime)))
 
-        self.durationString = String(format: "%d:%02d", arguments: [m, s])
+        return String(format: "%d:%02d", arguments: [m, s])
     }
 
     func getTotalDurationString() -> String {

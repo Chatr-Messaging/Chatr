@@ -61,7 +61,8 @@ struct VideoControlBubble: View {
                                 .trim(from: 0.0, to: self.progressBar)
                                 .stroke(Color.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
                                 .frame(width: 18, height: 18)
-                                .rotationEffect(.init(degrees: -90))
+                                .rotationEffect(.init(degrees: 90))
+                                .rotation3DEffect(Angle(degrees: 180), axis: (x: 1, y: 0, z: 0))
                                 .animation(Animation.linear(duration: 0.1))
                         }
                         .padding(7.5)

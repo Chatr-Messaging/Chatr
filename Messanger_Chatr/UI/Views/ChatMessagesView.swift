@@ -265,11 +265,12 @@ struct ChatMessagesView: View {
 //                                                    reader.scrollTo(currentMessages[message].id, anchor: .bottom)
 //                                                }
 //                                            }
-                                    } else if self.permissionToScroll, currentMessages[message].id == currentMessages.last?.id {
+                                    } else if self.scrollToId == currentMessages[message].id {
                                         self.permissionToScroll = false
+                                        self.scrollToId = ""
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                                             withAnimation(Animation.easeOut(duration: 0.25)) {
-                                                reader.scrollTo(currentMessages[message].id, anchor: .bottom)
+                                                reader.scrollTo(currentMessages[message].id, anchor: .top)
                                             }
                                         }
                                     }
@@ -336,22 +337,20 @@ struct ChatMessagesView: View {
                                     //have more local data to load
                                     print("has more needs to just increase the local page \(self.maxMessageCount) && \(self.maxPagination) && \(currentMessages.count)")
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
-                                        self.scrollPage += 1
                                         if self.maxPagination != 0 {
                                             print("scrolling tooo: \(self.maxPagination + pageShowCount - 1)")
                                             self.scrollToId = self.currentMessages[self.maxPagination + pageShowCount - 1].id
+                                            self.permissionToScroll = true
                                         } else {
                                             let divisor = currentMessages.count / pageShowCount
                                             let remainder = currentMessages.count - divisor * pageShowCount
                                             let scrollToIndex = remainder == 0 ? pageShowCount - 1 : remainder - 1
                                             print("the scroll to max is attt 0: \(divisor) && \(remainder) && \(scrollToIndex)")
                                             self.scrollToId = currentMessages[scrollToIndex].id
+                                            self.permissionToScroll = true
                                         }
-
                                         self.isLoadingMore = false
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                                            self.permissionLoadMore = true
-                                        }
+                                        self.scrollPage += 1
                                     }
                                 } else if self.maxMessageCount > currentMessages.count {
                                     //loading more from server
@@ -359,8 +358,7 @@ struct ChatMessagesView: View {
 
                                     changeMessageRealmData.shared.getMessageUpdates(dialogID: self.dialogID, limit: pageShowCount * (self.scrollPage + 1), skip: currentMessages.count, completion: { _ in
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
-                                            self.scrollPage += 1
-
+                                            
                                             if self.maxMessageCount >= currentMessages.count {
                                                 print("scrolling to: \(pageShowCount - 1)")
                                                 self.scrollToId = self.currentMessages[pageShowCount - 1].id
@@ -372,7 +370,8 @@ struct ChatMessagesView: View {
                                                 self.scrollToId = currentMessages[scrollToIndex].id
                                             }
                                             self.isLoadingMore = false
-                                            
+                                            self.scrollPage += 1
+
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
                                                 self.permissionLoadMore = true
                                             }

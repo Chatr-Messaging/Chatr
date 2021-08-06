@@ -12,8 +12,23 @@ import RealmSwift
 import ConnectyCube
 import Cache
 
+struct BarView: View {
+    var value: CGFloat
+    let numberOfSamples = 8
+    var messageRight: Bool = false
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 5)
+                .fill(self.messageRight ? .white : .primary)
+                .frame(width: (60 - CGFloat(numberOfSamples) * 4) / CGFloat(numberOfSamples), height: value)
+        }
+    }
+}
+
 struct AudioBubble: View {
     @ObservedObject var viewModel: ChatMessageViewModel
+    @ObservedObject private var visualize = AudioVisualizeObserver(numberOfSamples: 8)
     @State var message: MessageStruct
     @State var messageRight: Bool = false
     @State var audioKey: String = ""
@@ -21,63 +36,93 @@ struct AudioBubble: View {
     @State var isPlayingAudio: Bool = false
     @State var durationString: String = "0:00"
     @State var recordingsList: [Recording] = []
-    @State var timer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
+    @State var timer = Timer.publish(every: 0.2, on: .main, in: .common).autoconnect()
     @State var time = 0
 
     @State var audioPlayer: AVAudioPlayer = AVAudioPlayer()
     @State var player: AVPlayer = AVPlayer()
+    
+    private func normalizeSoundLevel(level: Float) -> CGFloat {
+        let level = max(0.2, CGFloat(level) + 10) / 2 // between 0.1 and 25
+        print("the normal sound level is: \(level)")
+        
+        return CGFloat(level) // scaled to max at 300 (our height of our bar)
+    }
     
     var storage: Cache.Storage<String, Data>? = {
         return try? Cache.Storage(diskConfig: DiskConfig(name: "DiskCache"), memoryConfig: MemoryConfig(expiry: .date(Calendar.current.date(byAdding: .day, value: 4, to: Date()) ?? Date()), countLimit: 10, totalCostLimit: 10), transformer: TransformerFactory.forData())
     }()
 
     var body: some View {
-        HStack(spacing: 5) {
-            Button(action: {
-                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                if self.isPlayingAudio {
-                    self.viewModel.audio.stopAudioRecording()
-                    self.isPlayingAudio = false
-                    print("stop playing")
-                 } else {
-                    //self.playAudio()
-                     self.loadAudio(fileId: self.audioKey)
-                    print("stop??? lolll playing")
-                 }
-            }) {
-                Image(systemName: self.isPlayingAudio ? "pause.fill" : "play.fill")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 20, height: 20, alignment: .center)
-                    .font(Font.title.weight(.regular))
-                    .foregroundColor(self.messageRight ? .white : .blue)
-                    .padding(.leading, 15)
-            }
-            
-            Text(self.viewModel.audio.durationString)
-                .foregroundColor(.secondary)
-                .font(.subheadline)
-                .fontWeight(.semibold)
-                .frame(width: 40)
-//                .onReceive(self.timer) { time in
-//                    self.viewModel.getTotalPlaybackDurationString()
-//                    self.audioProgress = CGFloat(self.viewModel.audioPlayer.currentTime / self.viewModel.audioPlayer.duration) * CGFloat(Constants.screenWidth * 0.25)
-//                }
+        ZStack(alignment: .leading) {
+            RoundedRectangle(cornerRadius: 0)
+                .frame(width: self.audioProgress)
+                .foregroundColor(Color("bgColor_opposite"))
+                .opacity(0.35)
 
-                //Progress Bar
-                ZStack(alignment: .leading) {
-                    Capsule()
-                        .foregroundColor(.primary)
-                        .opacity(0.25)
+            HStack(alignment: .center, spacing: 5) {
+                Button(action: {
+                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                    if self.isPlayingAudio {
+                        self.viewModel.audio.stopAudioRecording()
+                        self.timer.upstream.connect().cancel()
+                        self.visualize.stopObservingViz()
+                        self.isPlayingAudio = false
+                        print("stop playing")
+                     } else {
+                         //self.playAudio()
+                         self.timer = Timer.publish(every: 0.2, on: .main, in: .common).autoconnect()
+                         self.visualize.startObservingViz()
+                         self.loadAudio(fileId: self.audioKey)
+                         print("stop??? lolll playing")
+                     }
+                }) {
+                    Image(systemName: self.isPlayingAudio ? "pause.fill" : "play.fill")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 18, height: 20, alignment: .center)
+                        .font(Font.title.weight(.regular))
+                        .foregroundColor(self.messageRight ? .white : .blue)
+                        .padding(.leading, 5)
+                }
+                
+                Text(self.durationString)
+                    .foregroundColor(self.messageRight ? .white : .primary)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .frame(width: 40)
+                    .padding(.horizontal, 5)
+                    .onReceive(self.timer) { time in
+                        guard self.viewModel.audio.playingBubbleId == self.message.id.description else {
+                            print("not the correct cell to play from: \(self.message.id.description)")
+                            self.isPlayingAudio = false
+                            self.visualize.stopObservingViz()
+                            self.timer.upstream.connect().cancel()
 
-                    Capsule()
-                        .foregroundColor(.primary)
-                        .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
-                        //.frame(width: self.audioProgress)
-                }.frame(width: Constants.screenWidth * 0.25, height: 4)
-                .padding(.trailing, 2.5)
-        }.padding(.horizontal, 15)
-        .padding(.vertical, 10)
+                            return
+                        }
+
+//                        if self.viewModel.audio.audioPlayer.currentTime >= self.viewModel.audio.audioPlayer.duration {
+//                            print("doneeee")
+//                            self.isPlayingAudio = false
+//                            self.timer.upstream.connect().cancel()
+//                            self.visualize.stopObservingViz()
+//                        }
+
+                        print("the time is: \(time) for: \(self.message.id.description)")
+                        self.durationString = self.viewModel.audio.getTotalPlaybackDurationString()
+                        self.audioProgress = CGFloat(self.viewModel.audio.audioPlayer.currentTime / self.viewModel.audio.audioPlayer.duration) * CGFloat(Constants.screenWidth * 0.4)
+                    }
+
+                HStack(spacing: 2) {
+                    ForEach(visualize.soundSamples, id: \.self) { level in
+                        BarView(value: self.normalizeSoundLevel(level: level), messageRight: self.messageRight)
+                    }
+                }
+            }.padding(.horizontal)
+            .padding(.vertical, 10)
+            .frame(width: Constants.screenWidth * 0.4)
+        }
         //.transition(AnyTransition.scale)
         .background(self.messageRight ? LinearGradient(
         gradient: Gradient(colors: [Color(red: 46 / 255, green: 168 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)]),
@@ -85,10 +130,22 @@ struct AudioBubble: View {
             gradient: Gradient(colors: [Color("buttonColor"), Color("buttonColor_darker")]), startPoint: .top, endPoint: .bottom))
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
         .shadow(color: self.messageRight ? Color.blue.opacity(0.15) : Color.black.opacity(0.15), radius: 6, x: 0, y: 6)
+        .onAppear {
+            self.visualize.viewModel = self.viewModel
+        }
     }
     
     func loadAudio(fileId: String) {
         DispatchQueue.main.async {
+            guard self.viewModel.audio.playingBubbleId != self.message.id.description else {
+                self.viewModel.audio.audioPlayer.play()
+                self.isPlayingAudio = true
+
+                return
+            }
+
+            self.viewModel.audio.playingBubbleId = self.message.id.description
+
             do {
                 print("the audio cashed id is: \(fileId)")
                 let result = try storage?.entry(forKey: fileId)
@@ -116,8 +173,8 @@ struct AudioBubble: View {
                     do {
                         self.viewModel.audio.audioPlayer = try AVAudioPlayer(data: data)
                         print("got it and now going to play it")
-                        self.viewModel.audio.audioPlayer.play()
                         self.isPlayingAudio = true
+                        self.viewModel.audio.audioPlayer.play()
                     } catch {
                         print("failed to set new audio")
                     }

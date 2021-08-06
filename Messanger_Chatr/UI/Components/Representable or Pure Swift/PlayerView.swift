@@ -138,10 +138,12 @@ struct CustomProgressBar : UIViewRepresentable {
         @objc func changed(slider : UISlider){
             if slider.isTracking{
                 parent.viewModel.player.pause()
-                let sec = Double(slider.value * Float((parent.viewModel.player.currentItem?.duration.seconds)!))
+                guard let secondz = parent.viewModel.player.currentItem?.duration.seconds else { return }
+                let sec = Double(slider.value * Float(secondz))
                 parent.viewModel.player.seek(to: CMTime(seconds: sec, preferredTimescale: 1))
             } else {
-                let sec = Double(slider.value * Float((parent.viewModel.player.currentItem?.duration.seconds)!))
+                guard let secondz = parent.viewModel.player.currentItem?.duration.seconds else { return }
+                let sec = Double(slider.value * Float(secondz))
 
                 parent.viewModel.player.seek(to: CMTime(seconds: sec, preferredTimescale: 1))
                 if parent.viewModel.playVideoo {

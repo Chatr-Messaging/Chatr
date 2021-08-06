@@ -296,7 +296,7 @@ struct DiscoverView: View {
                     if self.recentDialogsData.count > 0 {
                         VStack {
                             HStack(alignment: .center) {
-                                Text("Newest")
+                                Text("Just Added")
                                     .font(.system(size: 30))
                                     .fontWeight(.bold)
                                     .foregroundColor(.primary)
