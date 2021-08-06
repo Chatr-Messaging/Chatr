@@ -52,8 +52,8 @@ struct AttachmentBubble: View {
                         }
                     }.aspectRatio(contentMode: .fill)
                     .clipShape(CustomGIFShape())
-                    //.frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.55 : 0.65)), alignment: self.messagePosition == .right ? .trailing : .leading)
-                    .frame(minHeight: 100, maxHeight: CGFloat(Constants.screenHeight * 0.65))
+                    .frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.7 : 0.8)), alignment: self.messagePosition == .right ? .trailing : .leading)
+                    .frame(minHeight: 100, maxHeight: CGFloat(Constants.screenHeight * 0.8))
                     .padding(.bottom, self.hasPrior ? 0 : 4)
                     .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 14)
                     .padding(.bottom, self.hasPrior ? 0 : 4)
@@ -73,8 +73,8 @@ struct AttachmentBubble: View {
                         }.padding(.vertical, 100)
                     }.aspectRatio(contentMode: .fit)
                     .clipShape(CustomGIFShape())
-                    .frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.55 : 0.65)), alignment: self.messagePosition == .right ? .trailing : .leading)
-                    .frame(maxHeight: CGFloat(Constants.screenHeight * 0.65))
+                    .frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.7 : 0.8)), alignment: self.messagePosition == .right ? .trailing : .leading)
+                    .frame(maxHeight: CGFloat(Constants.screenHeight * 0.8))
                     .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 14)
                     .padding(.bottom, self.hasPrior ? 0 : 4)
                     .offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
@@ -89,8 +89,8 @@ struct AttachmentBubble: View {
                         .background(Color("bgColor"))
                         .clipShape(CustomGIFShape())
                         .frame(width: self.videoSize.width, height: self.videoSize.height)
-                        .frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.55 : 0.65)), alignment: self.messagePosition == .right ? .trailing : .leading)
-                        .frame(minHeight: self.videoSize.height == 0 ? CGFloat(Constants.screenHeight * 0.65) : 140, maxHeight: CGFloat(Constants.screenHeight * 0.65))
+                        .frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.7 : 0.75)), alignment: self.messagePosition == .right ? .trailing : .leading)
+                        .frame(minHeight: self.videoSize.height == 0 ? CGFloat(Constants.screenHeight * 0.4) : 140, maxHeight: self.videoSize.height == 0 ? CGFloat(Constants.screenHeight * 0.4) : CGFloat(Constants.screenHeight * 0.75))
                         .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 14)
                         .padding(.bottom, self.hasPrior ? 0 : 4)
                         .offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
@@ -143,10 +143,10 @@ struct AttachmentBubble: View {
                                     self.totalDuration = item.duration.seconds - item.currentTime().seconds
                                 }
 
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
                                     if let videoAssetTrack = self.player.currentItem?.asset.tracks(withMediaType: AVMediaType.video).first {
                                         let naturalSize = videoAssetTrack.naturalSize.applying(videoAssetTrack.preferredTransform)
-                                        let width = abs(naturalSize.width) > UIScreen.main.bounds.width * 0.65 ? UIScreen.main.bounds.width * 0.65 : abs(naturalSize.width)
+                                        let width = abs(naturalSize.width) > UIScreen.main.bounds.width * 0.75 ? UIScreen.main.bounds.width * 0.75 : abs(naturalSize.width)
                                         //let heightRatio = abs(naturalSize.height) * (abs(naturalSize.height) / width)
                                         let height = width * (abs(naturalSize.height) / abs(naturalSize.width))
                                         let rect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: width, height: height))

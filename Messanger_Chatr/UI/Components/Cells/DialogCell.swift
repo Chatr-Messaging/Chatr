@@ -201,8 +201,8 @@ struct DialogCell: View {
                         .multilineTextAlignment(.leading)
                         .offset(x: -2, y: -4)
                         .foregroundColor(.gray)
-                        .fixedSize()
-                    
+                        .fixedSize(horizontal: false, vertical: true)
+
                     if let dialog = self.auth.selectedConnectyDialog, dialog.id != "", self.isOpen && (self.dialogModel.dialogType == "group" || self.dialogModel.dialogType == "public") && Chat.instance.isConnected {
                         if self.isJoining {
                             Text("joining chat...")
