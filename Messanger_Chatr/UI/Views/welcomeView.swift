@@ -627,7 +627,7 @@ struct PermissionsView: View {
                                 .italic()
                                 .font(.system(size: 16))
                                 .fontWeight(.medium)
-                                .foregroundColor(Color("disabledButton"))
+                                .foregroundColor(.secondary)
                                 .multilineTextAlignment(.center)
                                 .padding(.all, 15)
                                 .padding(.horizontal, 10)
@@ -743,13 +743,13 @@ struct PhoneNumberView: View {
                             .fontWeight(.semibold)
                             .padding(20)
                             .foregroundColor(Color.white)
-                    }.buttonStyle(MainButtonStyle())
+                    }.buttonStyle(MainButtonStyleDeselected())
                     .frame(height: 40)
                     .padding(.horizontal, 45)
                     .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
                 }
             } else if auth.verifyPhoneNumberStatus == .undefined {
-                if !self.text.isEmpty {
+                if self.text.count >= 5 {
                     HStack() {
                         Spacer()
                         Button(action: {
@@ -765,6 +765,7 @@ struct PhoneNumberView: View {
                                     .resizable()
                                     .scaledToFit()
                                     .font(Font.title.weight(.semibold))
+                                    .foregroundColor(.white)
                                     .frame(width: 20, height: 18, alignment: .center)
                             }.padding(.horizontal, 15)
                         }.buttonStyle(MainButtonStyle())
@@ -782,12 +783,13 @@ struct PhoneNumberView: View {
                             HStack(alignment: .center, spacing: 10) {
                                 Text("Verify")
                                     .fontWeight(.semibold)
-                                    .foregroundColor(Color("disabledButton"))
+                                    .foregroundColor(.secondary)
                                 
                                 Image(systemName: "arrow.right")
                                     .resizable()
                                     .scaledToFit()
                                     .font(Font.title.weight(.medium))
+                                    .foregroundColor(.secondary)
                                     .frame(width: 20, height: 18, alignment: .center)
                             }.padding(.horizontal, 15)
                         }.buttonStyle(MainButtonStyleDeselected())
@@ -1154,31 +1156,32 @@ struct welcomeBackView: View {
                         .shadow(color: Color("buttonShadow"), radius: 8, x: 0, y: 5)
                     
                     HStack(alignment: .center) {
-                            WebImage(url: URL(string: self.auth.profile.results.first?.avatar ?? ""))
-                                .resizable()
-                                .placeholder{ Image(systemName: "person.fill") }
-                                .indicator(.activity)
-                                .transition(.fade(duration: 0.25))
-                                .scaledToFill()
-                                .frame(width: 55, height: 55, alignment: .center)
-                                .clipShape(Circle())
-                                .padding(.leading)
+                        WebImage(url: URL(string: self.auth.profile.results.first?.avatar ?? ""))
+                            .resizable()
+                            .placeholder{ Image(systemName: "person.fill") }
+                            .indicator(.activity)
+                            .transition(.fade(duration: 0.25))
+                            .scaledToFill()
+                            .frame(width: 55, height: 55, alignment: .center)
+                            .clipShape(Circle())
+                            .padding(.leading)
+                        
+                        VStack(alignment: .leading) {
+                            Text(self.auth.haveUserFullName == true ? self.auth.profile.results.first?.fullName ?? "Chatr User" : "Chatr User")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.primary)
+                                .multilineTextAlignment(.leading)
                             
-                            VStack(alignment: .leading) {
-                                Text(self.auth.haveUserFullName == true ? self.auth.profile.results.first?.fullName ?? "Chatr User" : "Chatr User")
-                                    .font(.headline)
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.primary)
-                                    .multilineTextAlignment(.leading)
-                                
-                                Text(UserDefaults.standard.string(forKey: "phoneNumber")?.format(phoneNumber: String(UserDefaults.standard.string(forKey: "phoneNumber")?.dropFirst().dropFirst() ?? "+1 (123) 456-6789")) ?? "+1 (123) 456-6789")
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
-                                    .multilineTextAlignment(.leading)
-                            }
+                            Text(UserDefaults.standard.string(forKey: "phoneNumber")?.format(phoneNumber: String(UserDefaults.standard.string(forKey: "phoneNumber")?.dropFirst().dropFirst() ?? "+1 (123) 456-6789")) ?? "+1 (123) 456-6789")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.leading)
+                        }
+                        
+                        Spacer()
                             
-                            Spacer()
-                            
+                        if self.auth.haveUserFullName && self.auth.haveUserProfileImg {
                             Circle()
                                 .trim(from: 0, to: 0.8)
                                 .stroke(Color.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
@@ -1186,17 +1189,16 @@ struct welcomeBackView: View {
                                 .rotationEffect(.init(degrees: self.loadAni ? 360 : 0))
                                 .padding(.trailing)
                                 .animation(Animation.linear(duration: 0.75).repeatForever(autoreverses: false))
-                                .opacity(self.auth.haveUserFullName && self.auth.haveUserProfileImg ? 1 : 0)
                                 .onAppear(perform: ({
                                     self.loadAni.toggle()
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 3.5) {
                                         if self.auth.isFirstTimeUser == false {
                                             UINotificationFeedbackGenerator().notificationOccurred(.success)
                                         }
-                                        self.auth.configureFirebaseStateDidChange()
                                         self.dismissView = true
                                     }
                                 }))
+                        }
                     }.padding(.all)
                 }
                 

@@ -65,7 +65,7 @@ struct LockedOutView: View {
                             DispatchQueue.main.async {
                                 if success {
                                     self.auth.isLoacalAuth = false
-                                    //ChatrApp.connect()
+                                    ChatrApp.connect()
                                 } else {
                                     // error
                                     print("error! logging in")

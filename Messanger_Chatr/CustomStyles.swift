@@ -35,8 +35,7 @@ struct MainButtonStyleDeselected: ButtonStyle {
     public func makeBody(configuration: MainButtonStyleDeselected.Configuration) -> some View {
         configuration.label
             .frame(minWidth: 40, maxWidth: Constants.screenWidth, minHeight: 55, maxHeight: 55)
-            .foregroundColor(Color("disabledButton"))
-            .background(Color("bgColor_light"))
+            .background(configuration.isPressed ? Color("disabledButton") : Color.clear)
             .cornerRadius(15)
             .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
     }
@@ -105,6 +104,7 @@ struct changeBGButtonStyleDisabled: ButtonStyle {
         configuration.label
             .background(configuration.isPressed ? Color("disabledButton") : Color.clear)
             .cornerRadius(10)
+            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
     }
 }
 

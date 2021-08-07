@@ -486,6 +486,7 @@ struct ChatMessagesView: View {
     //FIX ME: Should try to add this logic to the Realm DB message model
     func needsTimestamp(index: Int) -> Bool {
         let result = self.auth.messages.selectedDialog(dialogID: self.dialogID)
+        print("needsTimestamp")
 
         return result[index] != result.first ? (result[index].messageState != .isTyping && result[index].date >= result[index - 1].date.addingTimeInterval(86400) ? true : false) : false
     }
@@ -493,6 +494,7 @@ struct ChatMessagesView: View {
     //FIX ME: Should try to add this logic to the Realm DB message model
     func isPriorWider(index: Int) -> Bool {
         let result = self.auth.messages.selectedDialog(dialogID: self.dialogID)
+        print("isPriorWider")
 
         return result[index] != result.first ? (result[index].senderID == result[index - 1].senderID && (result[index].date >= result[index - 1].date.addingTimeInterval(86400) ? false : true) && result[index].bubbleWidth > result[index - 1].bubbleWidth ? false : true) : true //- (result[index].dislikedId.count >= 1 && result[index].likedId.count >= 1 ? 48 : 16)
     }
