@@ -445,7 +445,7 @@ struct ShareProfileView: View {
         if self.selectedContact.count == 0 {
             UINotificationFeedbackGenerator().notificationOccurred(.success)
             self.notiType = "success"
-            self.notiText = "Successfully forwarded chat"
+            self.notiText = "Successfully forwarded channel"
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                 self.showAlert = true
             }

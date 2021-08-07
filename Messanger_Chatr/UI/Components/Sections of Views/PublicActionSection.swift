@@ -33,9 +33,9 @@ struct PublicActionSection: View {
                     Request.subscribeToPublicDialog(withID: self.dialogModel.id, successBlock: { dialogz in
                         changeDialogRealmData.shared.toggleFirebaseMemberCount(dialogId: dialogz.id ?? "", isJoining: true, totalCount: Int(dialogz.occupantsCount), onSuccess: { _ in
                             changeDialogRealmData.shared.insertDialogs([dialogz], completion: {
-                                changeDialogRealmData.shared.updateDialogDelete(isDelete: false, dialogID: dialogz.id ?? "")
-                                changeDialogRealmData.shared.addPublicMemberCountRealmDialog(count: Int(dialogz.occupantsCount), dialogId: dialogz.id ?? "")
-                                UserDefaults.standard.set(dialogz.id ?? "", forKey: "visitingDialogId")
+                                changeDialogRealmData.shared.updateDialogDelete(isDelete: false, dialogID: self.dialogModel.id)
+                                changeDialogRealmData.shared.addPublicMemberCountRealmDialog(count: Int(dialogz.occupantsCount), dialogId: self.dialogModel.id)
+                                UserDefaults.standard.set(self.dialogModel.id, forKey: "visitingDialogId")
                                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 self.dismissView.toggle()
                             })

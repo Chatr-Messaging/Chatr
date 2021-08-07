@@ -492,9 +492,9 @@ struct mainHomeList: View {
                         .onChange(of: UserDefaults.standard.bool(forKey: "localOpen")) { isOpen in
                             print("is local open?? :\(isOpen)")
                             //self.isLocalOpen = isOpen
-//                            if !isOpen {
-//                                self.isLocalOpen = false
-//                            }
+                            if !isOpen {
+                                self.isLocalOpen = false
+                            }
 
                             self.disableDialog = true
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
@@ -516,7 +516,7 @@ struct mainHomeList: View {
                 }.overlay(
                     //MARK: Chat Messages View
                     GeometryReader { geo in
-                        ChatMessagesView(viewModel: self.messageViewModel, activeView: self.$activeView, keyboardChange: self.$keyboardHeight, dialogID: self.$selectedDialogID, textFieldHeight: self.$textFieldHeight, keyboardDragState: self.$keyboardDragState, hasAttachment: self.$hasAttachments, newDialogFromSharedContact: self.$newDialogFromSharedContact, isKeyboardActionOpen: self.$isKeyboardActionOpen, namespace: self.namespace)
+                        ChatMessagesView(viewModel: self.messageViewModel, activeView: self.$activeView, keyboardChange: self.$keyboardHeight, dialogID: self.$selectedDialogID, textFieldHeight: self.$textFieldHeight, keyboardDragState: self.$keyboardDragState, hasAttachment: self.$hasAttachments, newDialogFromSharedContact: self.$newDialogFromSharedContact, isKeyboardActionOpen: self.$isKeyboardActionOpen, isHomeDialogOpen: self.$isLocalOpen, namespace: self.namespace)
                             .environmentObject(self.auth)
                             //.position(x: UIScreen.main.bounds.size.width / 2, y: self.activeView.height)
                             .frame(width: Constants.screenWidth, height: Constants.screenHeight - (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 127 : 91) : 201), alignment: .bottom)
@@ -591,6 +591,8 @@ struct mainHomeList: View {
                                     .navigationBarItems(leading:
                                                 Button(action: {
                                                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                                    UserDefaults.standard.set("", forKey: "visitingDialogId")
+                                                    UserDefaults.standard.set("", forKey: "openingDialogId")
                                                     withAnimation {
                                                         self.showSharedPublicDialog.toggle()
                                                     }
@@ -667,47 +669,45 @@ struct mainHomeList: View {
     }
     
     func loadSelectedDialog() {
-        if self.newDialogFromContact != 0 {
-            for dia in dialogs.filterDia(text: self.searchText).filter({ $0.isDeleted != true }) {
-                for occu in dia.occupentsID {
-                    if occu == self.newDialogFromContact && dia.dialogType == "private" {
-                        UserDefaults.standard.set(dia.id, forKey: "selectedDialogID")
-                        self.selectedDialogID = dia.id
-                        self.newDialogFromContact = 0
-                        self.isLocalOpen = true
-                        UserDefaults.standard.set(true, forKey: "localOpen")
-                        changeDialogRealmData.shared.updateDialogOpen(isOpen: self.isLocalOpen, dialogID: dia.id)
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        
-                        break
-                    }
-                }
-                
-                if self.newDialogFromContact == 0 { break }
-            }
+        guard self.newDialogFromContact != 0 else { return }
 
-            if self.newDialogFromContact != 0 {
-                let dialog = ChatDialog(dialogID: nil, type: .private)
-                dialog.occupantIDs = [NSNumber(value: self.newDialogFromContact)]  // an ID of opponent
-
-                Request.createDialog(dialog, successBlock: { (dialog) in
-                    changeDialogRealmData.shared.fetchDialogs(completion: { _ in
-                        UserDefaults.standard.set(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id, forKey: "selectedDialogID")
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                            print("opening new dialog: \(self.newDialogID) & \(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id ?? "")")
-                            self.selectedDialogID = UserDefaults.standard.string(forKey: "selectedDialogID") ?? ""
-                            self.isLocalOpen = true
-                            UserDefaults.standard.set(self.isLocalOpen, forKey: "localOpen")
-                            changeDialogRealmData.shared.updateDialogOpen(isOpen: self.isLocalOpen, dialogID: self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id ?? "")
-                            self.newDialogFromContact = 0
-                        }
-                    })
-                }) { (error) in
-                    //occu.removeAll()
-                    UINotificationFeedbackGenerator().notificationOccurred(.error)
-                    print("error making dialog: \(error.localizedDescription)")
+        for dia in dialogs.filterDia(text: self.searchText).filter({ $0.isDeleted != true }) {
+            for occu in dia.occupentsID {
+                if occu == self.newDialogFromContact && dia.dialogType == "private" {
+                    UserDefaults.standard.set(dia.id, forKey: "selectedDialogID")
+                    self.selectedDialogID = dia.id
+                    self.newDialogFromContact = 0
+                    self.isLocalOpen = true
+                    UserDefaults.standard.set(true, forKey: "localOpen")
+                    changeDialogRealmData.shared.updateDialogOpen(isOpen: self.isLocalOpen, dialogID: dia.id)
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    
+                    return
                 }
             }
+            
+            if self.newDialogFromContact == 0 { return }
+        }
+
+        let dialog = ChatDialog(dialogID: nil, type: .private)
+        dialog.occupantIDs = [NSNumber(value: self.newDialogFromContact)]  // an ID of opponent
+
+        Request.createDialog(dialog, successBlock: { (dialog) in
+            changeDialogRealmData.shared.fetchDialogs(completion: { _ in
+                UserDefaults.standard.set(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id, forKey: "selectedDialogID")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    print("opening new dialog: \(self.newDialogID) & \(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id ?? "")")
+                    self.selectedDialogID = UserDefaults.standard.string(forKey: "selectedDialogID") ?? ""
+                    self.isLocalOpen = true
+                    UserDefaults.standard.set(self.isLocalOpen, forKey: "localOpen")
+                    changeDialogRealmData.shared.updateDialogOpen(isOpen: self.isLocalOpen, dialogID: self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id ?? "")
+                    self.newDialogFromContact = 0
+                }
+            })
+        }) { (error) in
+            //occu.removeAll()
+            UINotificationFeedbackGenerator().notificationOccurred(.error)
+            print("error making dialog: \(error.localizedDescription)")
         }
     }
     

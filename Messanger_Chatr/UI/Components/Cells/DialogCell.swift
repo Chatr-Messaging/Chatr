@@ -203,7 +203,7 @@ struct DialogCell: View {
                         .foregroundColor(.gray)
                         .fixedSize(horizontal: false, vertical: true)
 
-                    if let dialog = self.auth.selectedConnectyDialog, dialog.id != "", self.isOpen && (self.dialogModel.dialogType == "group" || self.dialogModel.dialogType == "public") && Chat.instance.isConnected {
+                    if let dialog = self.auth.selectedConnectyDialog, dialog.id != "", self.isOpen, (self.dialogModel.dialogType == "group" || self.dialogModel.dialogType == "public"), Chat.instance.isConnected {
                         if self.isJoining {
                             Text("joining chat...")
                                 .font(.footnote)
@@ -254,6 +254,7 @@ struct DialogCell: View {
                 }
             }.sheet(isPresented: self.$openGroupProfile, onDismiss: {
                 guard let diaOpen = UserDefaults.standard.string(forKey: "openingDialogId"), diaOpen != self.dialogModel.id, diaOpen != "" else {
+                    self.loadSelectedDialog()
                     return
                 }
 
@@ -490,6 +491,70 @@ struct DialogCell: View {
                 }
             }
         })
+    }
+
+    func loadSelectedDialog() {
+        guard self.openNewDialogID != 0 else { return }
+
+        for dia in self.auth.dialogs.results.filter({ $0.isDeleted != true }) {
+            for occu in dia.occupentsID {
+                if occu == self.openNewDialogID && dia.dialogType == "private" {
+                    //Success Finding local dialog
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        self.isOpen = false
+                        UserDefaults.standard.set(false, forKey: "localOpen")
+                        changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
+
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
+                            print("the current one is: \(self.dialogModel.id) and now the new one: \(dia.id)")
+                            self.selectedDialogID = dia.id
+                            UserDefaults.standard.set(dia.id, forKey: "selectedDialogID")
+                            self.openNewDialogID = 0
+                            self.isOpen = true
+                            UserDefaults.standard.set(true, forKey: "localOpen")
+                            changeDialogRealmData.shared.updateDialogOpen(isOpen: true, dialogID: dia.id)
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            UserDefaults.standard.set("", forKey: "openingDialogId")
+                        }
+                    }
+
+                    return
+                }
+            }
+            
+            if self.openNewDialogID == 0 { return }
+        }
+
+        let dialog = ChatDialog(dialogID: nil, type: .private)
+        dialog.occupantIDs = [NSNumber(value: self.openNewDialogID)]  // an ID of opponent
+
+        Request.createDialog(dialog, successBlock: { (dialog) in
+            changeDialogRealmData.shared.fetchDialogs(completion: { _ in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    self.isOpen = false
+                    UserDefaults.standard.set(false, forKey: "localOpen")
+                    changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
+
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
+                        let newId = self.auth.dialogs.filterDia(text: "").filter { $0.isDeleted != true }.last?.id ?? ""
+                        print("the current one is: \(self.dialogModel.id) and now the new one: \(newId)")
+                        UserDefaults.standard.set(newId, forKey: "selectedDialogID")
+                        self.selectedDialogID = newId
+                        self.openNewDialogID = 0
+                        self.isOpen = true
+                        UserDefaults.standard.set(true, forKey: "localOpen")
+                        changeDialogRealmData.shared.updateDialogOpen(isOpen: true, dialogID: newId)
+                        self.openNewDialogID = 0
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        UserDefaults.standard.set("", forKey: "openingDialogId")
+                    }
+                }
+            })
+        }) { (error) in
+            //occu.removeAll()
+            UINotificationFeedbackGenerator().notificationOccurred(.error)
+            print("error making dialog: \(error.localizedDescription)")
+        }
     }
 }
 

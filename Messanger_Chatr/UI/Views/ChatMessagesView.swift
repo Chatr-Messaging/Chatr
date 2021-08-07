@@ -101,6 +101,7 @@ struct ChatMessagesView: View {
     @Binding var hasAttachment: Bool
     @Binding var newDialogFromSharedContact: Int
     @Binding var isKeyboardActionOpen: Bool
+    @Binding var isHomeDialogOpen: Bool
     @State private var delayViewMessages: Bool = false
     @State private var firstScroll: Bool = true
     @State private var isLoadingMore: Bool = false
@@ -235,7 +236,7 @@ struct ChatMessagesView: View {
                                     if messagePosition == .right { Spacer() }
                                     let hasPrevious = self.hasPrevious(index: message)
                                     
-                                    ContainerBubble(viewModel: self.viewModel, newDialogFromSharedContact: self.$newDialogFromSharedContact, isPriorWider: self.isPriorWider(index: message), message: currentMessages[message], messagePosition: messagePosition, hasPrior: hasPrevious, namespace: self.namespace)
+                                    ContainerBubble(viewModel: self.viewModel, newDialogFromSharedContact: self.$newDialogFromSharedContact, dialogID: self.$dialogID, isHomeDialogOpen: self.$isHomeDialogOpen, isPriorWider: self.isPriorWider(index: message), message: currentMessages[message], messagePosition: messagePosition, hasPrior: hasPrevious, namespace: self.namespace)
                                         .environmentObject(self.auth)
                                         .fixedSize(horizontal: false, vertical: true)
                                         .padding(.horizontal, 25)

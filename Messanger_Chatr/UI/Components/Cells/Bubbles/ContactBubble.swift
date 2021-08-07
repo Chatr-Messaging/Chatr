@@ -15,6 +15,8 @@ struct ContactBubble: View {
     @EnvironmentObject var auth: AuthModel
     @ObservedObject var viewModel: ChatMessageViewModel
     @Binding var chatContact: Int
+    @Binding var openDialogId: String
+    @Binding var isHomeDialogOpen: Bool
     @State var showContact: Bool = false
     var message: MessageStruct
     @State var messagePosition: messagePosition
@@ -160,7 +162,7 @@ struct ContactBubble: View {
                     .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.5) : Color.clear, lineWidth: 2.5))
                     .sheet(isPresented: self.$showContact, onDismiss: {
                         if self.chatContact != 0 && self.chatContact != self.message.senderID {
-                           print("need to open Chat view!!222 \(chatContact)")
+                            self.loadSelectedDialog()
                         }
                     }) {
                         NavigationView {
@@ -225,6 +227,66 @@ struct ContactBubble: View {
                     }
                 }
             }
+        }
+    }
+    
+    func loadSelectedDialog() {
+        guard self.chatContact != 0 else { return }
+
+        for dia in self.auth.dialogs.results.filter({ $0.isDeleted != true }) {
+            for occu in dia.occupentsID {
+                if occu == self.chatContact && dia.dialogType == "private" {
+                    //Success Finding local dialog
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                        self.isHomeDialogOpen = false
+                        UserDefaults.standard.set(false, forKey: "localOpen")
+                        changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? self.auth.selectedConnectyDialog?.id ?? "")
+
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
+                            print("the current one is:  and now the new one: \(dia.id)")
+                            self.openDialogId = dia.id
+                            UserDefaults.standard.set(dia.id, forKey: "selectedDialogID")
+                            self.chatContact = 0
+                            self.isHomeDialogOpen = true
+                            changeDialogRealmData.shared.updateDialogOpen(isOpen: true, dialogID: dia.id)
+                            UserDefaults.standard.set(true, forKey: "localOpen")
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        }
+                    }
+
+                    return
+                }
+            }
+            
+            if self.chatContact == 0 { return }
+        }
+
+        let dialog = ChatDialog(dialogID: nil, type: .private)
+        dialog.occupantIDs = [NSNumber(value: self.chatContact)]  // an ID of opponent
+
+        Request.createDialog(dialog, successBlock: { (dialog) in
+            changeDialogRealmData.shared.fetchDialogs(completion: { _ in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    self.isHomeDialogOpen = false
+                    UserDefaults.standard.set(false, forKey: "localOpen")
+                    changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? self.auth.selectedConnectyDialog?.id ?? "")
+
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
+                        print("the current one jklis: and now the new one:")
+                        self.openDialogId = dialog.id ?? ""
+                        UserDefaults.standard.set(dialog.id ?? "", forKey: "selectedDialogID")
+                        self.chatContact = 0
+                        self.isHomeDialogOpen = true
+                        changeDialogRealmData.shared.updateDialogOpen(isOpen: true, dialogID: dialog.id ?? "")
+                        UserDefaults.standard.set(true, forKey: "localOpen")
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    }
+                }
+            })
+        }) { (error) in
+            //occu.removeAll()
+            UINotificationFeedbackGenerator().notificationOccurred(.error)
+            print("error making dialog: \(error.localizedDescription)")
         }
     }
 }

@@ -274,7 +274,10 @@ class PersistenceManager: ObservableObject {
                     return privateAvatarUrl ?? ""
                 }
             }
+        } else if let avatarz = usersID.avatar {
+            return avatarz
         }
+    
         return nil
     }
     

@@ -19,6 +19,8 @@ struct ContainerBubble: View {
     @EnvironmentObject var auth: AuthModel
     @StateObject var viewModel: ChatMessageViewModel
     @Binding var newDialogFromSharedContact: Int
+    @Binding var dialogID: String
+    @Binding var isHomeDialogOpen: Bool
     var isPriorWider: Bool
     @State var message: MessageStruct
     @State var messagePosition: messagePosition
@@ -76,10 +78,10 @@ struct ContainerBubble: View {
                             AttachmentBubble(viewModel: self.viewModel, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior, player: self.$player, totalDuration: self.$totalDuration, namespace: self.namespace)
                                 .environmentObject(self.auth)
                         } else if self.message.contactID != 0 {
-                            ContactBubble(viewModel: self.viewModel, chatContact: self.$newDialogFromSharedContact, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior, namespace: self.namespace)
+                            ContactBubble(viewModel: self.viewModel, chatContact: self.$newDialogFromSharedContact, openDialogId: self.$dialogID, isHomeDialogOpen: self.$isHomeDialogOpen, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior, namespace: self.namespace)
                                 .environmentObject(self.auth)
                         } else if self.message.channelID != "" && self.message.messageState != .deleted {
-                            ChannelBubble(viewModel: self.viewModel, dialogId: self.message.channelID, hasPrior: self.hasPrior)
+                            ChannelBubble(viewModel: self.viewModel, openDialogId: self.$dialogID, isHomeDialogOpen: self.$isHomeDialogOpen, dialogId: self.message.channelID, hasPrior: self.hasPrior)
                                 .environmentObject(self.auth)
                         } else if self.message.longitude != 0 && self.message.latitude != 0 {
                             LocationBubble(viewModel: self.viewModel, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior, namespace: self.namespace)

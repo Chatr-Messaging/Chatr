@@ -208,23 +208,9 @@ struct NewConversationView: View {
                             .padding(.top, 25)
 
                             self.styleBuilder(content: {
-                                ForEach(self.auth.contacts.filterContact(text: self.searchText).filter({ $0.isMyContact == true }).sorted { $0.fullName < $1.fullName }.filter({ $0.id != UserDefaults.standard.integer(forKey: "currentUserID") && $0.fullName != "No Name" }), id: \.self) { contact in
+                                ForEach(self.auth.contacts.filterContact(text: self.searchText).filter({ $0.isMyContact == true && $0.id != UserDefaults.standard.integer(forKey: "currentUserID") && $0.fullName != "No Name" }).sorted { $0.fullName < $1.fullName }, id: \.self) { contact in
                                     VStack(alignment: .trailing, spacing: 0) {
-                                        ContactRealmCell(selectedContact: self.$selectedContact, contact: contact)
-                                            .animation(.spring(response: 0.15, dampingFraction: 0.60, blendDuration: 0))
-                                            .padding(.horizontal)
-                                            .padding(.vertical, 10)
-                                            .contentShape(Rectangle())
-                                            .onTapGesture {
-                                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                                                if self.selectedContact.contains(contact.id) {
-                                                    self.selectedContact.removeAll(where: { $0 == contact.id })
-                                                } else if self.forwardContact && self.selectedContact.count >= 1 {
-                                                    UINotificationFeedbackGenerator().notificationOccurred(.error)
-                                                } else {
-                                                    self.selectedContact.append(contact.id)
-                                                }
-                                            }
+                                        ContactRealmCell(selectedContact: self.$selectedContact, forwardContact: self.$forwardContact, contact: contact)
 
                                         if self.auth.contacts.filterContact(text: self.searchText).sorted { $0.fullName < $1.fullName }.last != contact {
                                             Divider()
@@ -361,15 +347,11 @@ struct NewConversationView: View {
             .navigationBarTitle(self.usedAsNew ? (self.navigationPrivate ? (self.selectedContact.count > 0 ? self.selectedContact.count > Constants.maxNumberGroupOccu ? "Max Reached" : "New Chat \(self.selectedContact.count)" : "New Chat") : "New Public Chat") : self.forwardContact ? "Forward Contact" : "Add Contact", displayMode: .inline)
             .onAppear() {
                 Request.registeredUsersFromAddressBook(withUdid: UIDevice.current.identifierForVendor?.uuidString, isCompact: false, successBlock: { (users) in
-                    for i in users {
-                        let config = Realm.Configuration(schemaVersion: 1)
-                        do {
-                            let realm = try Realm(configuration: config)
-                            if (realm.object(ofType: ContactStruct.self, forPrimaryKey: i.id) == nil) && i.id != Session.current.currentUserID {
+                    DispatchQueue.main.async {
+                        for i in users {
+                            if !self.auth.contacts.results.contains(where: { $0.id == i.id || $0.id == UserDefaults.standard.integer(forKey: "currentUserID") }) {
                                 self.regristeredAddressBook.append(i)
                             }
-                        } catch {
-                            print(error.localizedDescription)
                         }
                     }
                 })

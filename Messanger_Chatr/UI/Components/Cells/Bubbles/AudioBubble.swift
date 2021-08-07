@@ -26,9 +26,69 @@ struct BarView: View {
     }
 }
 
+struct AudioIndicatorView: View {
+    var messageRight: Bool = false
+    @Binding var isPlaying: Bool
+    @State var timer = Timer.publish(every: 0.2, on: .main, in: .common).autoconnect()
+    @State private var yScaleIndicator1: CGFloat = 5
+    @State private var yScaleIndicator2: CGFloat = 5
+    @State private var yScaleIndicator3: CGFloat = 5
+    @State private var yScaleIndicator4: CGFloat = 5
+    @State private var yScaleIndicator5: CGFloat = 5
+    @State private var yScaleIndicator6: CGFloat = 5
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 2) {
+           RoundedRectangle(cornerRadius: 1)
+                .frame(width: 3, height: self.yScaleIndicator1)
+                .foregroundColor(self.messageRight ? .white : .primary)
+                //.scaleEffect(x: 1, y: self.yScaleIndicator1 ? Double.random(in: 0.6...0.92) : 1.0, anchor: .center)
+                .animation(Animation.easeInOut(duration: 0.2))
+            
+            RoundedRectangle(cornerRadius: 1)
+                 .frame(width: 3, height: self.yScaleIndicator2)
+                 .foregroundColor(self.messageRight ? .white : .primary)
+                 //.scaleEffect(x: 1, y: self.yScaleIndicator2 ? Double.random(in: 0.6...0.92) : 1.0, anchor: .center)
+                 .animation(Animation.easeInOut(duration: 0.2))
+            
+            RoundedRectangle(cornerRadius: 1)
+                 .frame(width: 3, height: self.yScaleIndicator3)
+                 .foregroundColor(self.messageRight ? .white : .primary)
+                 //.scaleEffect(x: 1, y: self.yScaleIndicator3 ? Double.random(in: 0.6...0.92) : 1.0, anchor: .center)
+                 .animation(Animation.easeInOut(duration: 0.2))
+            
+            RoundedRectangle(cornerRadius: 1)
+                 .frame(width: 3, height: self.yScaleIndicator4)
+                 .foregroundColor(self.messageRight ? .white : .primary)
+                 //.scaleEffect(x: 1, y: self.yScaleIndicator4 ? Double.random(in: 0.6...0.92) : 1.0, anchor: .center)
+                 .animation(Animation.easeInOut(duration: 0.2))
+            
+            RoundedRectangle(cornerRadius: 1)
+                 .frame(width: 3, height: self.yScaleIndicator5)
+                 .foregroundColor(self.messageRight ? .white : .primary)
+                 //.scaleEffect(x: 1, y: self.yScaleIndicator5 ? Double.random(in: 0.6...0.92) : 1.0, anchor: .center)
+                 .animation(Animation.easeInOut(duration: 0.2))
+            
+            RoundedRectangle(cornerRadius: 1)
+                 .frame(width: 3, height: self.yScaleIndicator6)
+                 .foregroundColor(self.messageRight ? .white : .primary)
+                 //.scaleEffect(x: 1, y: self.yScaleIndicator6 ? Double.random(in: 0.6...0.92) : 1.0, anchor: .center)
+                 .animation(Animation.easeInOut(duration: 0.2))
+        }.onReceive(self.timer) { time in
+            guard self.isPlaying else { return }
+
+            self.yScaleIndicator1 = CGFloat.random(in: 5..<18)
+            self.yScaleIndicator2 = CGFloat.random(in: 5..<18)
+            self.yScaleIndicator3 = CGFloat.random(in: 5..<18)
+            self.yScaleIndicator4 = CGFloat.random(in: 5..<18)
+            self.yScaleIndicator5 = CGFloat.random(in: 5..<18)
+            self.yScaleIndicator6 = CGFloat.random(in: 5..<18)
+        }
+    }
+}
+
 struct AudioBubble: View {
     @ObservedObject var viewModel: ChatMessageViewModel
-    @ObservedObject private var visualize = AudioVisualizeObserver(numberOfSamples: 8)
     @State var message: MessageStruct
     @State var messageRight: Bool = false
     @State var audioKey: String = ""
@@ -66,13 +126,10 @@ struct AudioBubble: View {
                     if self.isPlayingAudio {
                         self.viewModel.audio.stopAudioRecording()
                         self.timer.upstream.connect().cancel()
-                        self.visualize.stopObservingViz()
                         self.isPlayingAudio = false
                         print("stop playing")
                      } else {
-                         //self.playAudio()
                          self.timer = Timer.publish(every: 0.2, on: .main, in: .common).autoconnect()
-                         self.visualize.startObservingViz()
                          self.loadAudio(fileId: self.audioKey)
                          print("stop??? lolll playing")
                      }
@@ -96,7 +153,6 @@ struct AudioBubble: View {
                         guard self.viewModel.audio.playingBubbleId == self.message.id.description else {
                             print("not the correct cell to play from: \(self.message.id.description)")
                             self.isPlayingAudio = false
-                            self.visualize.stopObservingViz()
                             self.timer.upstream.connect().cancel()
 
                             return
@@ -114,11 +170,7 @@ struct AudioBubble: View {
                         self.audioProgress = CGFloat(self.viewModel.audio.audioPlayer.currentTime / self.viewModel.audio.audioPlayer.duration) * CGFloat(Constants.screenWidth * 0.4)
                     }
 
-                HStack(spacing: 2) {
-                    ForEach(visualize.soundSamples, id: \.self) { level in
-                        BarView(value: self.normalizeSoundLevel(level: level), messageRight: self.messageRight)
-                    }
-                }
+                AudioIndicatorView(messageRight: self.messageRight, isPlaying: self.$isPlayingAudio)
             }.padding(.horizontal)
             .padding(.vertical, 10)
             .frame(width: Constants.screenWidth * 0.4)
@@ -131,7 +183,6 @@ struct AudioBubble: View {
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
         .shadow(color: self.messageRight ? Color.blue.opacity(0.15) : Color.black.opacity(0.15), radius: 6, x: 0, y: 6)
         .onAppear {
-            self.visualize.viewModel = self.viewModel
         }
     }
     
