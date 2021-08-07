@@ -16,6 +16,7 @@ struct DiscoverFeaturedCell: View, Identifiable {
     let id = UUID()
     @Binding var dismissView: Bool
     @Binding var showPinDetails: String
+    @Binding var openNewDialogID: Int
     @State var dialogModel: PublicDialogModel = PublicDialogModel()
     @State private var actionState: Bool = false
     @State var isEditGroupOpen: Bool = false
@@ -23,7 +24,6 @@ struct DiscoverFeaturedCell: View, Identifiable {
     @State var isMember: Bool = false
     @State var isMoreOpen: Bool = false
     @State var shareGroup: Bool = false
-    @State var openNewDialogID: Int = 0
     @State var selectedContact: [Int] = []
     @State var newDialogID: String = ""
 

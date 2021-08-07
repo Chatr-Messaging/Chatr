@@ -65,6 +65,7 @@ struct VisitContactView: View {
                 //MARK: Action Buttons
                 actionButtonView(viewModel: self.viewModel, contact: self.$contact, quickSnapViewState: self.$quickSnapViewState, contactRelationship: self.$contactRelationship, newMessage: self.$newMessage, dismissView: self.$dismissView)
                     .padding(.vertical, 15)
+                    .padding(.bottom, 15)
 
                 //MARK: Social Section
                 if self.contact.facebook != "" || self.contact.twitter != "" || self.contact.instagramAccessToken != "" {
@@ -1124,7 +1125,7 @@ struct actionButtonView: View {
     @State var showRemoveRequest: Bool = false
     
     var body: some View {
-        HStack(spacing: self.contactRelationship == .contact ? 60 : 30) {
+        HStack(spacing: self.contactRelationship == .contact ? 75 : 30) {
             Spacer()
             
             if self.contact.isMessagingPrivate == false && self.contactRelationship != .unknown && self.contact.id != UserDefaults.standard.integer(forKey: "currentUserID") {
@@ -1137,7 +1138,7 @@ struct actionButtonView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 38, height: 26)
-                        .background(RoundedRectangle(cornerRadius: 15, style: .circular).frame(width: 54, height: 54).foregroundColor(Constants.baseBlue).shadow(color: Color.blue.opacity(0.4), radius: 10, x: 0, y: 6))
+                        .background(RoundedRectangle(cornerRadius: 15, style: .circular).frame(width: 58, height: 58).foregroundColor(Constants.baseBlue).shadow(color: Color.blue.opacity(0.4), radius: 10, x: 0, y: 6))
                 }.buttonStyle(ClickButtonStyle())
                 .padding(.vertical, 8)
             }
@@ -1152,7 +1153,7 @@ struct actionButtonView: View {
                         .scaledToFit()
                         .foregroundColor(.white)
                         .frame(width: 36, height: 24)
-                        .background(RoundedRectangle(cornerRadius: 15, style: .circular).frame(width: 54, height: 54).foregroundColor(.purple).shadow(color: Color.purple.opacity(0.45), radius: 10, x: 0, y: 6))
+                        .background(RoundedRectangle(cornerRadius: 15, style: .circular).frame(width: 58, height: 58).foregroundColor(.purple).shadow(color: Color.purple.opacity(0.45), radius: 10, x: 0, y: 6))
                 }.buttonStyle(ClickButtonStyle())
             } else if self.contactRelationship == .notContact && self.contact.id != UserDefaults.standard.integer(forKey: "currentUserID") {
                 Button(action: {

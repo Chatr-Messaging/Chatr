@@ -15,12 +15,12 @@ struct PublicDialogDiscoverCell: View {
     @EnvironmentObject var auth: AuthModel
     @Binding var dismissView: Bool
     @Binding var showPinDetails: String
+    @Binding var openNewDialogID: Int
     @State var dialogData: PublicDialogModel = PublicDialogModel()
     @State var isLast: Bool = false
     @State private var actionState: Bool = false
     @State var isEditGroupOpen: Bool = false
     @State var canEditGroup: Bool = false
-    @State var openNewDialogID: Int = 0
     @State var isJoined: Bool = false
     @State var isMember: Bool = false
 

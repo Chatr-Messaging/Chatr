@@ -13,6 +13,7 @@ struct MorePublicListView: View {
     @ObservedObject var viewModel: DiscoverViewModel
     @Binding var dismissView: Bool
     @Binding var showPinDetails: String
+    @Binding var openNewDialogID: Int
     @State var tagsCount: Int = 0
     @State var tagId: String = "tagName"
     @State var dialogData: [PublicDialogModel] = []
@@ -38,7 +39,7 @@ struct MorePublicListView: View {
                         self.styleBuilder(content: {
                             ForEach(self.dialogData.indices, id: \.self) { id in
                                 VStack(alignment: .trailing, spacing: 0) {
-                                    PublicDialogDiscoverCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, dialogData: self.dialogData[id], isLast: self.dialogData[id].id == self.dialogData.last?.id)
+                                    PublicDialogDiscoverCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, openNewDialogID: self.$openNewDialogID, dialogData: self.dialogData[id], isLast: self.dialogData[id].id == self.dialogData.last?.id)
                                         .environmentObject(self.auth)
                                 }
                             }

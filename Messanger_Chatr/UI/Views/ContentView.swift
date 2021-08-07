@@ -61,6 +61,8 @@ struct HomeView: View {
                 if !self.auth.preventDismissal {
                     Text("")
                         .onAppear(perform: {
+                            ChatrApp.connect()
+
                             if self.auth.profile.results.first?.isLocalAuthOn ?? false {
                                 self.auth.isLoacalAuth = true
                                 let context = LAContext()
@@ -130,6 +132,9 @@ struct HomeView: View {
         .onOpenURL { url in
             let link = url.absoluteString
             print("opened from URL!! :D \(link)")
+        }
+        .onAppear {
+            self.auth.configureFirebaseStateDidChange()
         }
     }
 }
@@ -334,10 +339,12 @@ struct mainHomeList: View {
                                 self.loadPublicDialog(diaId: diaId)
                             } else if let diaId = UserDefaults.standard.string(forKey: "openingDialogId"), !diaId.isEmpty {
                                 self.loadPublicDialog(diaId: diaId)
+                            } else {
+                                self.loadSelectedDialog()
                             }
                         }) {
                             NavigationView {
-                                DiscoverView(removeDoneBtn: false, dismissView: self.$isDiscoverOpen, showPinDetails: self.$showPinDetails)
+                                DiscoverView(removeDoneBtn: false, dismissView: self.$isDiscoverOpen, showPinDetails: self.$showPinDetails, openNewDialogID: self.$newDialogFromContact)
                                     .environmentObject(self.auth)
                                     .navigationBarTitle("Discover", displayMode: .automatic)
                                     .background(Color("bgColor")
@@ -501,10 +508,10 @@ struct mainHomeList: View {
                                 self.disableDialog = false
                             }
                         }
-//                        .onAppear {
-//                            UserDefaults.standard.set(false, forKey: "localOpen")
-//                            self.isLocalOpen = false
-//                        }
+                        .onAppear {
+                            UserDefaults.standard.set(false, forKey: "localOpen")
+                            self.isLocalOpen = false
+                        }
                         
                         if self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.count >= 3 {
                             FooterInformation()

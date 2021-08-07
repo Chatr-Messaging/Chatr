@@ -18,6 +18,7 @@ struct DiscoverView: View {
     var removeDoneBtn: Bool = true
     @Binding var dismissView: Bool
     @Binding var showPinDetails: String
+    @Binding var openNewDialogID: Int
     @State var searchText: String = ""
     @State var outputSearchText: String = ""
     @State var bannerDataArray: [PublicDialogModel] = []
@@ -119,7 +120,7 @@ struct DiscoverView: View {
                             ForEach(self.grandSearchData.indices, id: \.self) { id in
                                 VStack(alignment: .trailing, spacing: 0) {
                                     if id <= 14 {
-                                        PublicDialogDiscoverCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, dialogData: self.grandSearchData[id], isLast: id == 4)
+                                        PublicDialogDiscoverCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, openNewDialogID: self.$openNewDialogID, dialogData: self.grandSearchData[id], isLast: id == 4)
                                             .environmentObject(self.auth)
                                     }
                                 }
@@ -206,7 +207,7 @@ struct DiscoverView: View {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 0) {
                                     ForEach(self.bannerDataArray.indices, id: \.self) { index in
-                                        DiscoverFeaturedCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, dialogModel: self.bannerDataArray[index])
+                                        DiscoverFeaturedCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, openNewDialogID: self.$openNewDialogID, dialogModel: self.bannerDataArray[index])
                                             .environmentObject(self.auth)
                                             .frame(width: Constants.screenWidth * 0.68)
                                             .id(self.bannerDataArray[index].id)
@@ -243,7 +244,7 @@ struct DiscoverView: View {
                                 ForEach(self.topDialogsData.indices, id: \.self) { id in
                                     VStack(alignment: .trailing, spacing: 0) {
                                         if id <= 4 {
-                                            PublicDialogDiscoverCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, dialogData: self.topDialogsData[id], isLast: id == 4)
+                                            PublicDialogDiscoverCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, openNewDialogID: self.$openNewDialogID, dialogData: self.topDialogsData[id], isLast: id == 4)
                                                 .environmentObject(self.auth)
                                                 .id(self.topDialogsData[id].id)
                                         }
@@ -318,7 +319,7 @@ struct DiscoverView: View {
                                     VStack(alignment: .trailing, spacing: 0) {
                                         if id <= 4 {
                                          //Public dialog cell
-                                            PublicDialogDiscoverCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, dialogData: self.recentDialogsData[id], isLast: id == 4 || self.recentDialogsData[id].id == self.recentDialogsData.last?.id)
+                                            PublicDialogDiscoverCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, openNewDialogID: self.$openNewDialogID, dialogData: self.recentDialogsData[id], isLast: id == 4 || self.recentDialogsData[id].id == self.recentDialogsData.last?.id)
                                                 .environmentObject(self.auth)
                                                 .id(self.recentDialogsData[id].id)
                                         }
@@ -431,7 +432,7 @@ struct DiscoverView: View {
     }
     
     func moreDetails(tagId: String?, viewState: morePublicListRelationship) -> some View {
-        MorePublicListView(viewModel: self.viewModel, dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, tagsCount: 0, tagId: tagId ?? "", viewState: viewState)
+        MorePublicListView(viewModel: self.viewModel, dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, openNewDialogID: self.$openNewDialogID, tagsCount: 0, tagId: tagId ?? "", viewState: viewState)
             .environmentObject(self.auth)
     }
     
