@@ -102,6 +102,8 @@ struct ChatMessagesView: View {
     @Binding var newDialogFromSharedContact: Int
     @Binding var isKeyboardActionOpen: Bool
     @Binding var isHomeDialogOpen: Bool
+    @Binding var isDetailOpen: Bool
+    @Binding var detailMessageModel: MessageStruct
     @State private var delayViewMessages: Bool = false
     @State private var firstScroll: Bool = true
     @State private var isLoadingMore: Bool = false
@@ -235,8 +237,8 @@ struct ChatMessagesView: View {
                                 HStack() {
                                     if messagePosition == .right { Spacer() }
                                     let hasPrevious = self.hasPrevious(index: message)
-                                    
-                                    ContainerBubble(viewModel: self.viewModel, newDialogFromSharedContact: self.$newDialogFromSharedContact, dialogID: self.$dialogID, isHomeDialogOpen: self.$isHomeDialogOpen, isPriorWider: self.isPriorWider(index: message), message: currentMessages[message], messagePosition: messagePosition, hasPrior: hasPrevious, namespace: self.namespace)
+                                                                        
+                                    ContainerBubble(viewModel: self.viewModel, newDialogFromSharedContact: self.$newDialogFromSharedContact, dialogID: self.$dialogID, isHomeDialogOpen: self.$isHomeDialogOpen, isDetailOpen: self.$isDetailOpen, detailMessageModel: self.$detailMessageModel, isPriorWider: self.isPriorWider(index: message), message: currentMessages[message], messagePosition: messagePosition, hasPrior: hasPrevious, namespace: self.namespace)
                                         .environmentObject(self.auth)
                                         .fixedSize(horizontal: false, vertical: true)
                                         .padding(.horizontal, 25)
@@ -256,7 +258,7 @@ struct ChatMessagesView: View {
                                         //if  {
                                         self.firstScroll = false
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.275) {
-                                            reader.scrollTo(currentMessages.last?.id, anchor: .bottom)
+                                            reader.scrollTo(self.currentMessages.last?.id, anchor: .bottom)
                                             print("scrolllling2222 is nowwww \(message)")
                                             //self.permissionToScroll = true
                                         }

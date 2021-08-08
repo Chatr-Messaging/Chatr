@@ -15,6 +15,8 @@ struct VideoControlBubble: View {
     @Binding var play: Bool
     @Binding var totalDuration: Double
     @Binding var videoDownload: CGFloat
+    @Binding var isDetailOpen: Bool
+    @Binding var detailMessageModel: MessageStruct
     @State var message: MessageStruct
     @State var mute: Bool = true
     @State var progressBar: CGFloat = 1.0
@@ -81,11 +83,11 @@ struct VideoControlBubble: View {
                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                     self.player.pause()
                     self.play = false
-                    self.viewModel.message = self.message
+                    self.detailMessageModel = self.message
                     self.viewModel.player = self.player
                     self.viewModel.playVideoo = true
                     withAnimation {
-                        self.viewModel.isDetailOpen.toggle()
+                        self.isDetailOpen.toggle()
                     }
                 }, label: {
                     Image(systemName: self.viewModel.isDetailOpen ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right")

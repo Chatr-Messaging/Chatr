@@ -179,6 +179,8 @@ struct mainHomeList: View {
     @State var isKeyboardActionOpen: Bool = false
     @State var isTopCardOpen: Bool = false
     @State var isDiscoverOpen: Bool = false
+    @State var isDetailOpen: Bool = false
+    @State var detailMessageModel: MessageStruct = MessageStruct()
     @State var quickSnapViewState: QuickSnapViewingState = .closed
     @State var selectedQuickSnapContact: ContactStruct = ContactStruct()
     @Namespace var namespace
@@ -240,7 +242,7 @@ struct mainHomeList: View {
                                 self.showPinDetails = ""
                                 if let msg = self.auth.messages.selectedDialog(dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").filter({ $0.id == msgId }).first {
                                     self.messageViewModel.message = msg
-                                    self.messageViewModel.isDetailOpen = true
+                                    self.isDetailOpen = true
 //                                    if msg.imageType == "video/mov" {
 //                                        self.messageViewModel.loadVideo(fileId: msg.image, completion: { })
 //                                    }
@@ -525,7 +527,7 @@ struct mainHomeList: View {
                 }.overlay(
                     //MARK: Chat Messages View
                     GeometryReader { geo in
-                        ChatMessagesView(viewModel: self.messageViewModel, activeView: self.$activeView, keyboardChange: self.$keyboardHeight, dialogID: self.$selectedDialogID, textFieldHeight: self.$textFieldHeight, keyboardDragState: self.$keyboardDragState, hasAttachment: self.$hasAttachments, newDialogFromSharedContact: self.$newDialogFromSharedContact, isKeyboardActionOpen: self.$isKeyboardActionOpen, isHomeDialogOpen: self.$isLocalOpen, namespace: self.namespace)
+                        ChatMessagesView(viewModel: self.messageViewModel, activeView: self.$activeView, keyboardChange: self.$keyboardHeight, dialogID: self.$selectedDialogID, textFieldHeight: self.$textFieldHeight, keyboardDragState: self.$keyboardDragState, hasAttachment: self.$hasAttachments, newDialogFromSharedContact: self.$newDialogFromSharedContact, isKeyboardActionOpen: self.$isKeyboardActionOpen, isHomeDialogOpen: self.$isLocalOpen, isDetailOpen: self.$isDetailOpen, detailMessageModel: self.$detailMessageModel, namespace: self.namespace)
                             .environmentObject(self.auth)
                             //.position(x: UIScreen.main.bounds.size.width / 2, y: self.activeView.height)
                             .frame(width: Constants.screenWidth, height: Constants.screenHeight - (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 127 : 91) : 201), alignment: .bottom)
@@ -652,8 +654,8 @@ struct mainHomeList: View {
                         */
                 }
 
-                if self.messageViewModel.isDetailOpen {
-                    BubbleDetailView(viewModel: self.messageViewModel, namespace: self.namespace, newDialogFromSharedContact: self.$newDialogFromSharedContact)
+                if self.isDetailOpen {
+                    BubbleDetailView(viewModel: self.messageViewModel, namespace: self.namespace, newDialogFromSharedContact: self.$newDialogFromSharedContact, isDetailOpen: self.$isDetailOpen, message: self.$detailMessageModel)
                         .environmentObject(self.auth)
                         .frame(width: Constants.screenWidth, height: Constants.screenHeight, alignment: .center)
                         .zIndex(2)

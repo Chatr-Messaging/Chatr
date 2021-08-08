@@ -23,6 +23,8 @@ struct BubbleDetailView: View {
     @StateObject var imagePicker = KeyboardCardViewModel()
     var namespace: Namespace.ID
     @Binding var newDialogFromSharedContact: Int
+    @Binding var isDetailOpen: Bool
+    @Binding var message: MessageStruct
     @State var subText: String = ""
     @State var height: CGFloat = 50
     @State var cardDrag = CGSize.zero
@@ -77,13 +79,13 @@ struct BubbleDetailView: View {
                                 self.showContentActions = false
                             }
                             
-                            if self.viewModel.message.imageType == "video/mov" {
+                            if self.message.imageType == "video/mov" {
                                 self.viewModel.player.pause()
                             }
 
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                                 withAnimation {
-                                    self.viewModel.isDetailOpen = false
+                                    self.isDetailOpen = false
                                 }
                             }
                         }) {
@@ -103,10 +105,10 @@ struct BubbleDetailView: View {
                     }
 
                     //Message Content View
-                    if self.viewModel.message.image != "" {
+                    if self.message.image != "" {
                         //Attachment
-                        if self.viewModel.message.imageType == "image/gif" && self.viewModel.message.messageState != .deleted {
-                            AnimatedImage(url: URL(string: self.viewModel.message.image))
+                        if self.message.imageType == "image/gif" && self.message.messageState != .deleted {
+                            AnimatedImage(url: URL(string: self.message.image))
                                 .resizable()
                                 .placeholder {
                                     VStack {
@@ -121,10 +123,10 @@ struct BubbleDetailView: View {
                                 .cornerRadius(showContentActions ? (!self.repliesOpen ? (self.cardDrag.height > 0 ? self.cardDrag.height / 8 : 0) : 0) : 15)
                                 .pinchToZoom()
                                 .fixedSize(horizontal: false, vertical: true)
-                                .matchedGeometryEffect(id: self.viewModel.message.id.description + "gif", in: namespace)
+                                .matchedGeometryEffect(id: self.message.id.description + "gif", in: namespace)
                                 .zIndex(4)
-                        } else if self.viewModel.message.imageType == "image/png" && self.viewModel.message.messageState != .deleted {
-                            WebImage(url: URL(string: self.viewModel.message.image))
+                        } else if self.message.imageType == "image/png" && self.message.messageState != .deleted {
+                            WebImage(url: URL(string: self.message.image))
                                 .resizable()
                                 .placeholder {
                                     VStack {
@@ -139,12 +141,12 @@ struct BubbleDetailView: View {
                                 .cornerRadius(showContentActions ? (!self.repliesOpen ? (self.cardDrag.height > 0 ? self.cardDrag.height / 8 : 0) : 0) : 15)
                                 .pinchToZoom()
                                 .fixedSize(horizontal: false, vertical: true)
-                                .matchedGeometryEffect(id: self.viewModel.message.id.description + "png", in: namespace)
+                                .matchedGeometryEffect(id: self.message.id.description + "png", in: namespace)
                                 .zIndex(4)
-                        } else if self.viewModel.message.imageType == "video/mov" && self.viewModel.message.messageState != .deleted {
+                        } else if self.message.imageType == "video/mov" && self.message.messageState != .deleted {
                             ZStack(alignment: .center) {
                                 DetailVideoPlayer(viewModel: self.viewModel)
-                                    .matchedGeometryEffect(id: self.viewModel.message.id.description + "mov", in: namespace)
+                                    .matchedGeometryEffect(id: self.message.id.description + "mov", in: namespace)
                                     .frame(width: self.viewModel.videoSize.width, height: self.viewModel.videoSize.height)
                                     .frame(maxWidth: Constants.screenWidth - 20, alignment: .center)
                                     .cornerRadius(showContentActions ? (!self.repliesOpen ? (self.cardDrag.height > 0 ? self.cardDrag.height / 8 : 0) : 0) : 15)
@@ -186,41 +188,41 @@ struct BubbleDetailView: View {
                                 }
                             }
                         }
-                    } else if self.viewModel.message.contactID != 0 {
+                    } else if self.message.contactID != 0 {
                         //contact
-                    } else if self.viewModel.message.longitude != 0 && self.viewModel.message.latitude != 0 {
+                    } else if self.message.longitude != 0 && self.message.latitude != 0 {
                         //location
-                        Map(coordinateRegion: $region, interactionModes: MapInteractionModes.all, showsUserLocation: true, userTrackingMode: $userTrackingMode, annotationItems: [MyAnnotationItem(coordinate: CLLocationCoordinate2D(latitude: self.viewModel.message.latitude, longitude: self.viewModel.message.longitude))]) { marker in
+                        Map(coordinateRegion: $region, interactionModes: MapInteractionModes.all, showsUserLocation: true, userTrackingMode: $userTrackingMode, annotationItems: [MyAnnotationItem(coordinate: CLLocationCoordinate2D(latitude: self.message.latitude, longitude: self.message.longitude))]) { marker in
                             MapPin(coordinate: marker.coordinate)
                         }.frame(height: CGFloat(Constants.screenHeight * (self.replies.count == 0 ? 0.58 : self.replies.count == 1 ? 0.53 : 0.43)))
                         .cornerRadius(showContentActions ? (!self.repliesOpen ? (self.cardDrag.height > 0 ? self.cardDrag.height / 8 : 0) : 0) : 15)
-                        .matchedGeometryEffect(id: self.viewModel.message.id.description + "map", in: namespace)
+                        .matchedGeometryEffect(id: self.message.id.description + "map", in: namespace)
                         .onAppear() {
-                            self.region.center.latitude = self.viewModel.message.latitude
-                            self.region.center.longitude = self.viewModel.message.longitude
+                            self.region.center.latitude = self.message.latitude
+                            self.region.center.longitude = self.message.longitude
                         }
                     } else {
                         //Text
-                        if self.viewModel.message.text.containsEmoji && self.viewModel.message.text.count <= 4 {
-                            Text(self.viewModel.message.text)
+                        if self.message.text.containsEmoji && self.message.text.count <= 4 {
+                            Text(self.message.text)
                                 .font(.system(size: 66))
                                 .padding(.vertical, 15)
                                 .offset(x: self.messagePosition == .right ? -10 : 10, y: -5)
                                 .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 5)
-                                .matchedGeometryEffect(id: self.viewModel.message.id.description + "text", in: namespace)
+                                .matchedGeometryEffect(id: self.message.id.description + "text", in: namespace)
                         } else {
-                            LinkedText(self.viewModel.message.text, messageRight: self.messagePosition == .right, messageState: self.viewModel.message.messageState)
+                            LinkedText(self.message.text, messageRight: self.messagePosition == .right, messageState: self.message.messageState)
                                 .padding(.vertical, 15)
                                 .padding(.horizontal, 40)
-                                .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.viewModel.message.messageState == .error ? Color.red.opacity(0.8) : Color.clear, lineWidth: 1.5))
-                                .matchedGeometryEffect(id: self.viewModel.message.id.description + "text", in: namespace)
+                                .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.8) : Color.clear, lineWidth: 1.5))
+                                .matchedGeometryEffect(id: self.message.id.description + "text", in: namespace)
                         }
                     }
 
                     //Footer Section
                     VStack() {
                         //MARK: Video Player Controls
-                        if self.viewModel.message.image != "" && self.viewModel.message.imageType == "video/mov" && self.viewModel.message.messageState != .deleted{
+                        if self.message.image != "" && self.message.imageType == "video/mov" && self.message.messageState != .deleted{
                             HStack(spacing: 10) {
                                 Button(action: {
                                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
@@ -248,11 +250,11 @@ struct BubbleDetailView: View {
 
                         //MARK: Interaction Btns
                         HStack(spacing: 10) {
-                            if self.viewModel.message.messageState != .error {
+                            if self.message.messageState != .error {
                                 Button(action: {
                                     if self.messagePosition == .left {
                                         UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                        self.viewModel.likeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", message: self.viewModel.message, completion: { like in
+                                        self.viewModel.likeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", message: self.message, completion: { like in
                                             self.viewModel.isDetailOpen = true
                                             self.hasUserLiked = like
                                         })
@@ -266,7 +268,7 @@ struct BubbleDetailView: View {
                                             .scaledToFit()
                                             .frame(width: 22, height: 22, alignment: .center)
 
-                                        Text("\(self.viewModel.message.likedId.count)")
+                                        Text("\(self.message.likedId.count)")
                                             .font(.subheadline)
                                             .fontWeight(.semibold)
                                             .foregroundColor(self.hasUserLiked ? .white : .primary)
@@ -278,7 +280,7 @@ struct BubbleDetailView: View {
                                 Button(action: {
                                     if self.messagePosition == .left {
                                         UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                        self.viewModel.dislikeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", message: self.viewModel.message, completion: { dislike in
+                                        self.viewModel.dislikeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", message: self.message, completion: { dislike in
                                             self.viewModel.isDetailOpen = true
                                             self.hasUserDisliked = dislike
                                         })
@@ -292,7 +294,7 @@ struct BubbleDetailView: View {
                                             .scaledToFit()
                                             .frame(width: 22, height: 22, alignment: .center)
 
-                                        Text("\(self.viewModel.message.dislikedId.count)")
+                                        Text("\(self.message.dislikedId.count)")
                                             .font(.subheadline)
                                             .fontWeight(.semibold)
                                             .foregroundColor(self.hasUserDisliked ? .white : .primary)
@@ -304,9 +306,9 @@ struct BubbleDetailView: View {
                                 Spacer()
                                 
                                 //openMapForPlace button
-                                if self.viewModel.message.longitude != 0 && self.viewModel.message.latitude != 0 {
+                                if self.message.longitude != 0 && self.message.latitude != 0 {
                                     Button(action: {
-                                        self.openMapForPlace(longitude: self.viewModel.message.longitude, latitude: self.viewModel.message.latitude)
+                                        self.openMapForPlace(longitude: self.message.longitude, latitude: self.message.latitude)
                                     }, label: {
                                         Text("open  maps")
                                             .font(.subheadline)
@@ -318,12 +320,12 @@ struct BubbleDetailView: View {
                                 }
 
                                 Menu {
-                                    if self.viewModel.message.messageState != .error {
+                                    if self.message.messageState != .error {
                                         Button(action: {
                                             if messagePosition == .right {
                                                 if let dialog = self.auth.selectedConnectyDialog {
                                                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                                    self.viewModel.trashMessage(connectyDialog: dialog, messageId: self.viewModel.message.id , completion: {
+                                                    self.viewModel.trashMessage(connectyDialog: dialog, messageId: self.message.id , completion: {
                                                         print("delete button")
                                                         self.viewModel.isDetailOpen = false
                                                     })
@@ -337,11 +339,11 @@ struct BubbleDetailView: View {
                                                 .foregroundColor(.red)
                                         }
 
-                                        if self.viewModel.message.imageType == "image/gif" || self.viewModel.message.imageType == "image/png" {
+                                        if self.message.imageType == "image/gif" || self.message.imageType == "image/png" {
                                             Button(action: {
                                                 self.saveImage()
                                             }) {
-                                                Label(self.viewModel.message.imageType == "image/gif" ? "Save GIF" : "Save Image", systemImage: "square.and.arrow.down")
+                                                Label(self.message.imageType == "image/gif" ? "Save GIF" : "Save Image", systemImage: "square.and.arrow.down")
                                             }
                                         }
 
@@ -349,14 +351,14 @@ struct BubbleDetailView: View {
                                             Button(action: {
                                                 self.pinMessage()
                                             }) {
-                                                Label(!self.viewModel.message.isPinned ? "Pin" : "Unpin", systemImage: "pin")
+                                                Label(!self.message.isPinned ? "Pin" : "Unpin", systemImage: "pin")
                                             }
                                         }
 
-                                        if self.viewModel.message.contactID == 0 && self.viewModel.message.longitude == 0 && self.viewModel.message.latitude == 0 && self.viewModel.message.imageType == "" {
+                                        if self.message.contactID == 0 && self.message.longitude == 0 && self.message.latitude == 0 && self.message.imageType == "" {
                                             Button(action: {
                                                 UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                                UIPasteboard.general.setValue(self.viewModel.message.text, forPasteboardType: kUTTypePlainText as String)
+                                                UIPasteboard.general.setValue(self.message.text, forPasteboardType: kUTTypePlainText as String)
 
                                                 self.auth.notificationtext = "Successfully copied message"
                                                 NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
@@ -365,9 +367,9 @@ struct BubbleDetailView: View {
                                             }
                                         }
 
-                                        if self.viewModel.message.longitude != 0 && self.viewModel.message.latitude != 0 {
+                                        if self.message.longitude != 0 && self.message.latitude != 0 {
                                             Button(action: {
-                                                let copyText = "longitude: " + "\(self.viewModel.message.longitude)" + "\n" + "latitude: " + "\(self.viewModel.message.latitude)"
+                                                let copyText = "longitude: " + "\(self.message.longitude)" + "\n" + "latitude: " + "\(self.message.latitude)"
 
                                                 UINotificationFeedbackGenerator().notificationOccurred(.success)
                                                 UIPasteboard.general.setValue(copyText, forPasteboardType: kUTTypePlainText as String)
@@ -404,7 +406,7 @@ struct BubbleDetailView: View {
                         }.padding(.horizontal, 10)
 
                         HStack {
-                            if self.viewModel.message.isPinned {
+                            if self.message.isPinned {
                                 Image(systemName: "pin.fill")
                                     .resizable()
                                     .scaledToFit()
@@ -414,13 +416,13 @@ struct BubbleDetailView: View {
                                     .foregroundColor(.secondary)
                             }
 
-                            Text("sent " + self.viewModel.dateFormatTimeExtended(date: self.viewModel.message.date))
+                            Text("sent " + self.viewModel.dateFormatTimeExtended(date: self.message.date))
                                 .font(.caption)
                                 .foregroundColor(.secondary)
 
                             Spacer()
                             if self.auth.selectedConnectyDialog?.type == .group || self.auth.selectedConnectyDialog?.type == .public {
-                                Text("\(self.viewModel.message.readIDs.count) seen")
+                                Text("\(self.message.readIDs.count) seen")
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                             }
@@ -450,41 +452,46 @@ struct BubbleDetailView: View {
             .zIndex(3)
             .rotation3DEffect(.degrees(!self.repliesOpen ? -Double(self.cardDrag.height > 20 ? ((self.cardDrag.height - 20) / 8 > 8 ? 8 : (self.cardDrag.height - 20) / 8) : 0) : 0), axis: (x: 1, y: 0, z: 0))
             .simultaneousGesture(DragGesture().onChanged { value in
-                if self.viewModel.message.longitude == 0 && self.viewModel.message.latitude == 0 && self.viewModel.isDetailOpen {
-                    if self.viewModel.playVideoo {
-                        withAnimation {
-                            self.viewModel.playVideoo = false
-                        }
-                        self.viewModel.pause()
-                    }
-                    self.cardDrag.height = value.translation.height / 2
-                    if !self.repliesOpen && self.replies.count > 0 && value.translation.height < -105 {
-                        withAnimation {
-                            self.repliesOpen = true
-                        }
-                    } else if self.repliesOpen && value.translation.height > 80 {
-                        withAnimation {
-                            self.repliesOpen = false
-                        }
-                    }
+                guard self.message.longitude == 0 && self.message.latitude == 0 && self.isDetailOpen else {
+                    return
+                }
 
-                    if self.keyboardChange != 0 {
-                        UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
+                if self.viewModel.playVideoo {
+                    withAnimation {
+                        self.viewModel.playVideoo = false
+                    }
+                    self.viewModel.pause()
+                }
+                self.cardDrag.height = value.translation.height / 2
+                if !self.repliesOpen && self.replies.count > 0 && value.translation.height < -105 {
+                    withAnimation {
+                        self.repliesOpen = true
+                    }
+                } else if self.repliesOpen && value.translation.height > 80 {
+                    withAnimation {
+                        self.repliesOpen = false
                     }
                 }
+
+                if self.keyboardChange != 0 {
+                    UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
+                }
+                
             }.onEnded { valueEnd in
-                if self.viewModel.message.longitude == 0 && self.viewModel.message.latitude == 0 && self.viewModel.isDetailOpen {
-                    if self.cardDrag.height > 60 && !self.repliesOpen {
-                        self.cardDrag = .zero
-                        withAnimation {
-                            self.viewModel.isDetailOpen = false
-                        }
-                        UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
-                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                    } else {
-                        self.cardDrag = .zero
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                guard self.message.longitude == 0 && self.message.latitude == 0 && self.isDetailOpen else {
+                    return
+                }
+                
+                if self.cardDrag.height > 60 && !self.repliesOpen {
+                    self.cardDrag = .zero
+                    withAnimation {
+                        self.isDetailOpen = false
                     }
+                    UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
+                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                } else {
+                    self.cardDrag = .zero
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 }
             })
 
@@ -548,7 +555,7 @@ struct BubbleDetailView: View {
                             }
                         }
                     }
-                }.frame(maxHeight: self.replies.count > 0 ? (self.replies.count > 1 ? Constants.screenHeight : Constants.screenHeight * 0.35) : (self.viewModel.message.imageType != "" ? Constants.screenHeight * 0.2 : Constants.screenHeight * 0.28))
+                }.frame(maxHeight: self.replies.count > 0 ? (self.replies.count > 1 ? Constants.screenHeight : Constants.screenHeight * 0.35) : (self.message.imageType != "" ? Constants.screenHeight * 0.2 : Constants.screenHeight * 0.28))
                 .coordinateSpace(name: "replyScroll")
                 .opacity(!self.repliesOpen ? Double((300 - self.cardDrag.height) / 300) : 1)
                 .offset(y: showContentActions ? (self.cardDrag.height > 0 ? self.cardDrag.height / 4 : 0) : 0)
@@ -617,9 +624,9 @@ struct BubbleDetailView: View {
         .onAppear() {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.55) {
                 UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
-                self.hasUserLiked = self.viewModel.message.likedId.contains(self.auth.profile.results.first?.id ?? 0)
-                self.hasUserDisliked = self.viewModel.message.dislikedId.contains(self.auth.profile.results.first?.id ?? 0)
-                self.messagePosition = UInt(self.viewModel.message.senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? .right : .left
+                self.hasUserLiked = self.message.likedId.contains(self.auth.profile.results.first?.id ?? 0)
+                self.hasUserDisliked = self.message.dislikedId.contains(self.auth.profile.results.first?.id ?? 0)
+                self.messagePosition = UInt(self.message.senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? .right : .left
 
                 self.viewModel.fetchUser()
                 self.observeInteractions()
@@ -632,7 +639,11 @@ struct BubbleDetailView: View {
     }
     
     func observeInteractions() {
-        let msg = Database.database().reference().child("Dialogs").child(self.viewModel.message.dialogID).child(self.viewModel.message.id)
+        guard self.message.dialogID != "", self.message.id != "" else {
+            return
+        }
+
+        let msg = Database.database().reference().child("Dialogs").child(self.message.dialogID).child(self.message.id)
         let profileID = self.auth.profile.results.first?.id ?? 0
 
         msg.observe(.childAdded, with: { snapAdded in
@@ -641,11 +652,11 @@ struct BubbleDetailView: View {
             for child in snapAdded.children {
                 let childSnap = child as! DataSnapshot
                 if typeLike == "likes" {
-                    changeMessageRealmData.shared.updateMessageLikeAdded(messageID: self.viewModel.message.id, userID: Int(childSnap.key) ?? 0)
-                    self.hasUserLiked = self.viewModel.message.likedId.contains(profileID)
+                    changeMessageRealmData.shared.updateMessageLikeAdded(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
+                    self.hasUserLiked = self.message.likedId.contains(profileID)
                 } else if typeLike == "dislikes" {
-                    changeMessageRealmData.shared.updateMessageDislikeAdded(messageID: self.viewModel.message.id, userID: Int(childSnap.key) ?? 0)
-                    self.hasUserDisliked = self.viewModel.message.dislikedId.contains(profileID)
+                    changeMessageRealmData.shared.updateMessageDislikeAdded(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
+                    self.hasUserDisliked = self.message.dislikedId.contains(profileID)
                 }
             }
         })
@@ -656,18 +667,22 @@ struct BubbleDetailView: View {
             for child in snapRemoved.children {
                 let childSnap = child as! DataSnapshot
                 if typeLike == "likes" {
-                    changeMessageRealmData.shared.updateMessageLikeRemoved(messageID: self.viewModel.message.id, userID: Int(childSnap.key) ?? 0)
-                    self.hasUserLiked = self.viewModel.message.likedId.contains(profileID)
+                    changeMessageRealmData.shared.updateMessageLikeRemoved(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
+                    self.hasUserLiked = self.message.likedId.contains(profileID)
                 } else if typeLike == "dislikes" {
-                    changeMessageRealmData.shared.updateMessageDislikeRemoved(messageID: self.viewModel.message.id, userID: Int(childSnap.key) ?? 0)
-                    self.hasUserDisliked = self.viewModel.message.dislikedId.contains(profileID)
+                    changeMessageRealmData.shared.updateMessageDislikeRemoved(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
+                    self.hasUserDisliked = self.message.dislikedId.contains(profileID)
                 }
             }
         })
     }
     
     func observeReplies() {
-        let msg = Database.database().reference().child("Dialogs").child(self.viewModel.message.dialogID).child(self.viewModel.message.id).child("replies")
+        guard self.message.dialogID != "", self.message.id != "" else {
+            return
+        }
+
+        let msg = Database.database().reference().child("Dialogs").child(self.message.dialogID).child(self.message.id).child("replies")
 
         msg.observe(.childAdded, with: { snapAdded in
             guard let dict = snapAdded.value as? [String: Any] else { return }
@@ -716,13 +731,13 @@ struct BubbleDetailView: View {
     }
 
     func pinMessage() {
-        self.viewModel.pinMessage(message: self.viewModel.message, completion: { added in
+        self.viewModel.pinMessage(message: self.message, completion: { added in
             if !added {
-                changeDialogRealmData.shared.removeDialogPin(messageId: self.viewModel.message.id, dialogID: self.viewModel.message.dialogID)
+                changeDialogRealmData.shared.removeDialogPin(messageId: self.message.id, dialogID: self.message.dialogID)
                 auth.notificationtext = "Removed pined message"
                 NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
             } else {
-                changeDialogRealmData.shared.addDialogPin(messageId: self.viewModel.message.id, dialogID: self.viewModel.message.dialogID)
+                changeDialogRealmData.shared.addDialogPin(messageId: self.message.id, dialogID: self.message.dialogID)
                 auth.notificationtext = "Successfully pined message"
                 NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
             }
@@ -730,7 +745,7 @@ struct BubbleDetailView: View {
     }
     
     func saveImage() {
-        if let imageData = SDImageCache.shared.imageFromMemoryCache(forKey: self.viewModel.message.image)?.pngData() {
+        if let imageData = SDImageCache.shared.imageFromMemoryCache(forKey: self.message.image)?.pngData() {
             //use image
             PHPhotoLibrary.shared().performChanges({
                 let request = PHAssetCreationRequest.forAsset()

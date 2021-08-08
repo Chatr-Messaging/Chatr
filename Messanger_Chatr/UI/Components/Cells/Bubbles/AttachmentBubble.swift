@@ -21,6 +21,8 @@ struct Resultz: Decodable {
 struct AttachmentBubble: View {
     @EnvironmentObject var auth: AuthModel
     @ObservedObject var viewModel: ChatMessageViewModel
+    @Binding var isDetailOpen: Bool
+    @Binding var detailMessageModel: MessageStruct
     @State var message: MessageStruct
     @State var messagePosition: messagePosition
     var hasPrior: Bool = false
@@ -113,7 +115,7 @@ struct AttachmentBubble: View {
                                 }.opacity(self.videoDownloadProgress == 0.0 || self.videoDownloadProgress == 1.0 ? 0 : 1)
                                 .padding(30)
 
-                                VideoControlBubble(viewModel: self.viewModel, player: self.$player, play: self.$play, totalDuration: self.$totalDuration, videoDownload: self.$videoDownloadProgress, message: self.message, messagePositionRight: messagePosition == .right)
+                                VideoControlBubble(viewModel: self.viewModel, player: self.$player, play: self.$play, totalDuration: self.$totalDuration, videoDownload: self.$videoDownloadProgress, isDetailOpen: self.$isDetailOpen, detailMessageModel: self.$detailMessageModel, message: self.message, messagePositionRight: messagePosition == .right)
 
                                 if self.message.messageState == .error {
                                     RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.5) : Color.clear, lineWidth: 5)

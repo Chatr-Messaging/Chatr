@@ -21,6 +21,8 @@ struct ContainerBubble: View {
     @Binding var newDialogFromSharedContact: Int
     @Binding var dialogID: String
     @Binding var isHomeDialogOpen: Bool
+    @Binding var isDetailOpen: Bool
+    @Binding var detailMessageModel: MessageStruct
     var isPriorWider: Bool
     @State var message: MessageStruct
     @State var messagePosition: messagePosition
@@ -75,7 +77,7 @@ struct ContainerBubble: View {
                     ZStack(alignment: self.messagePosition == .left ? .trailing : .leading) {
                         
                         if self.message.image != "" || self.message.uploadMediaId != "" {
-                            AttachmentBubble(viewModel: self.viewModel, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior, player: self.$player, totalDuration: self.$totalDuration, namespace: self.namespace)
+                            AttachmentBubble(viewModel: self.viewModel, isDetailOpen: self.$isDetailOpen, detailMessageModel: self.$detailMessageModel, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior, player: self.$player, totalDuration: self.$totalDuration, namespace: self.namespace)
                                 .environmentObject(self.auth)
                         } else if self.message.contactID != 0 {
                             ContactBubble(viewModel: self.viewModel, chatContact: self.$newDialogFromSharedContact, openDialogId: self.$dialogID, isHomeDialogOpen: self.$isHomeDialogOpen, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior, namespace: self.namespace)
@@ -120,6 +122,7 @@ struct ContainerBubble: View {
                             .background(RoundedRectangle(cornerRadius: 20).foregroundColor(.black).shadow(color: Color.black.opacity(0.75), radius: 5, x: 0, y: 2.5).opacity(0.5))
                             .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.black, lineWidth: 1).opacity(0.6))
                             .offset(x: messagePosition == .right ? (self.replyCount > 1 ? -55 : -40) : (self.replyCount > 1 ? 55 : 40))
+                            .buttonStyle(ClickButtonStyle())
                         }
                     }.padding(.bottom, self.hasPrior ? 0 : 10)
                     .padding(.top, (self.message.likedId.count != 0 || self.message.dislikedId.count != 0) && (self.isPriorWider) ? 22 : 0)
@@ -146,13 +149,13 @@ struct ContainerBubble: View {
                         }
                     }
                     .onTapGesture(count: 1) {
-                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                         self.openReplyDetailView()
                     }
                     .gesture(combined)
                     .onChange(of: self.showInteractions) { _ in
                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                    }.onAppear() {
+                    }
+                    .onAppear() {
                         self.observeInteractions()
                         if self.messagePosition == .right {
                             if self.message.imageType == "image/gif" || self.message.imageType == "image/png" || self.message.imageType == "video/mov" {
@@ -501,16 +504,22 @@ struct ContainerBubble: View {
     }
     
     func openReplyDetailView() {
-        guard self.message.messageState != .isTyping && self.message.messageState != .error else { return }
-   
+        guard self.message.messageState != .isTyping && self.message.messageState != .error else {
+            UINotificationFeedbackGenerator().notificationOccurred(.error)
+
+            return
+        }
+
+        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+
         print("trying to open details")
         if self.message.imageType == "video/mov" {
             self.player.pause()
             self.viewModel.player = self.player
         }
 
-        self.viewModel.message = self.message
-        self.viewModel.isDetailOpen = true
+        self.detailMessageModel = self.message
+        self.isDetailOpen = true
     }
 
     func pinMessage() {
