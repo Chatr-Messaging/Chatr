@@ -41,15 +41,17 @@ struct ContactRequestCell: View {
                         .clipShape(Circle())
                         .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 8)
                 } else {
-                    Circle()
-                        .frame(width: 45, height: 45, alignment: .center)
-                        .foregroundColor(Color("bgColor"))
-                        .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 5)
+                    ZStack {
+                        Circle()
+                            .frame(width: 45, height: 45, alignment: .center)
+                            .foregroundColor(Color("bgColor"))
+                            .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 5)
 
-                    Text("".firstLeters(text: self.contact.fullName))
-                        .font(.system(size: 24))
-                        .fontWeight(.bold)
-                        .foregroundColor(.secondary)
+                        Text("".firstLeters(text: self.contact.fullName))
+                            .font(.system(size: 24))
+                            .fontWeight(.bold)
+                            .foregroundColor(.secondary)
+                    }
                 }
                 
                 VStack(alignment: .leading) {
