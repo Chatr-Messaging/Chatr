@@ -654,6 +654,7 @@ struct mainHomeList: View {
                         */
                 }
 
+                //MARK: Bubble Detail View
                 if self.isDetailOpen {
                     BubbleDetailView(viewModel: self.messageViewModel, namespace: self.namespace, newDialogFromSharedContact: self.$newDialogFromSharedContact, isDetailOpen: self.$isDetailOpen, message: self.$detailMessageModel)
                         .environmentObject(self.auth)

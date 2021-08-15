@@ -523,6 +523,7 @@ struct ContainerBubble: View {
         }
 
         self.detailMessageModel = self.message
+        self.viewModel.message = self.message
         self.isDetailOpen = true
     }
 

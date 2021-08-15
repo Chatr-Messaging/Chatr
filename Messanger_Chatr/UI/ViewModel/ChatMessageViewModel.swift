@@ -195,10 +195,13 @@ class ChatMessageViewModel: ObservableObject {
         })
     }
     
-    func sendReply(text: String, name: String, completion: @escaping () -> Void) {
-        guard message.senderID != 0, message.dialogID != "" else { return }
+    func sendReply(text: String, name: String, messagez: MessageStruct, completion: @escaping () -> Void) {
+        guard messagez.senderID != 0, messagez.dialogID != "" else {
+            print("the sender id or dialog is is not there...")
+            return
+        }
 
-        let msg = Database.database().reference().child("Dialogs").child(message.dialogID).child(message.id).child("replies")
+        let msg = Database.database().reference().child("Dialogs").child(messagez.dialogID).child(messagez.id).child("replies")
         let newPostId = msg.childByAutoId().key
         let newPostReference = msg.child(newPostId ?? "no post id")
         
@@ -210,7 +213,7 @@ class ChatMessageViewModel: ObservableObject {
         let utcTimeZoneStr = formatter.string(from: date)
         
         newPostReference.updateChildValues(["fromId" : "\(UserDefaults.standard.integer(forKey: "currentUserID"))", "text" : text, "timestamp" : utcTimeZoneStr])
-        self.sendPushNoti(userIDs: [NSNumber(value: self.message.senderID)], title: "Reply", message: "\(name) replied \"\(text)\" to your message.")
+        self.sendPushNoti(userIDs: [NSNumber(value: messagez.senderID)], title: "\(name) Replied", message: text)
 
         DispatchQueue.main.async {
             completion()

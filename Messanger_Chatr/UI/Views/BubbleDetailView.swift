@@ -523,13 +523,13 @@ struct BubbleDetailView: View {
                                         self.repliesOpen.toggle()
                                     }
                                 }) {
-                                    Text(!self.repliesOpen ? "show more" : "show less")
+                                    Text(self.repliesOpen ? "show less" : "show more")
                                         .font(.caption)
                                         .foregroundColor(.secondary)
                                 }
                             }
                         } else if self.showContentActions {
-                            Text("no replies")
+                            Text("empty replies")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                                 .padding(.vertical, self.replies.isEmpty ? 40 : 0)
@@ -565,7 +565,7 @@ struct BubbleDetailView: View {
                             }
                         }
                     }
-                }.frame(maxHeight: self.replies.count > 0 ? (self.replies.count > 1 ? Constants.screenHeight : Constants.screenHeight * 0.35) : (self.message.imageType != "" ? Constants.screenHeight * 0.2 : Constants.screenHeight * 0.28))
+                }.frame(maxHeight: self.replies.count > 0 ? (self.replies.count >= 3 && self.repliesOpen ? Constants.screenHeight : Constants.screenHeight * 0.35) : (self.message.imageType != "" ? Constants.screenHeight * 0.2 : Constants.screenHeight * 0.28))
                 .coordinateSpace(name: "replyScroll")
                 .opacity(!self.repliesOpen ? Double((300 - self.cardDrag.height) / 300) : 1)
                 .offset(y: showContentActions ? (self.cardDrag.height > 0 ? self.cardDrag.height / 4 : 0) : 0)
@@ -596,7 +596,7 @@ struct BubbleDetailView: View {
                                 Spacer()
                                 Button(action: {
                                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                    self.viewModel.sendReply(text: self.mainReplyText, name: self.auth.profile.results.last?.fullName ?? "A user", completion: {
+                                    self.viewModel.sendReply(text: self.mainReplyText, name: self.auth.profile.results.last?.fullName ?? "A user", messagez: self.message, completion: {
                                         self.mainReplyText = ""
                                         self.height = 0
                                     })
