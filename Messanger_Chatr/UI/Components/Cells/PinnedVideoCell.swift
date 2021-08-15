@@ -18,7 +18,7 @@ struct PinnedVideoCell: View {
     @State var videoDuration: Double = 0.0
 
     var storage: Cache.Storage<String, Data>? = {
-        return try? Cache.Storage(diskConfig: DiskConfig(name: "DiskCache"), memoryConfig: MemoryConfig(expiry: .date(Calendar.current.date(byAdding: .day, value: 4, to: Date()) ?? Date()), countLimit: 10, totalCostLimit: 10), transformer: TransformerFactory.forData())
+        return try? Cache.Storage(diskConfig: DiskConfig(name: "DiskCache"), memoryConfig: MemoryConfig(expiry: .date(Calendar.current.date(byAdding: .day, value: 4, to: Date()) ?? Date()), countLimit: 10, totalCostLimit: 50), transformer: TransformerFactory.forData())
     }()
 
     var body: some View {

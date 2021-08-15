@@ -35,6 +35,7 @@ struct Constants {
     static let uploadcarePublicKey = "58ae497bf7dad52e4a35"
     static let uploadcareSecretKey = "709171e4d5148528c64f"
     static let uploadcareBaseUrl = "https://ucarecdn.com/"
+    static let uploadcareBaseVideoUrl = "https://api.uploadcare.com/files/"
     static let uploadcareStandardTransform = "/-/preview/-/quality/smart_retina/-/format/auto/"
     static let uploadcare45x45Transform = "/-/resize/45x45/-/stretch/off/"
     static let uploadcare50x50Transform = "/-/resize/50x50/-/stretch/off/"

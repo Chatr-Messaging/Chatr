@@ -13,6 +13,7 @@ import Firebase
 import RealmSwift
 import AVKit
 import Cache
+import Uploadcare
 
 struct Resultz: Decodable {
     var encoded: Data
@@ -35,7 +36,7 @@ struct AttachmentBubble: View {
     let storageFirebase = Storage.storage()
 
     var storage: Cache.Storage<String, Data>? = {
-        return try? Cache.Storage(diskConfig: DiskConfig(name: "DiskCache"), memoryConfig: MemoryConfig(expiry: .date(Calendar.current.date(byAdding: .day, value: 4, to: Date()) ?? Date()), countLimit: 10, totalCostLimit: 10), transformer: TransformerFactory.forData())
+        return try? Cache.Storage(diskConfig: DiskConfig(name: "DiskCache"), memoryConfig: MemoryConfig(expiry: .date(Calendar.current.date(byAdding: .day, value: 4, to: Date()) ?? Date()), countLimit: 10, totalCostLimit: 50), transformer: TransformerFactory.forData())
     }()
 
     var body: some View {
@@ -159,8 +160,7 @@ struct AttachmentBubble: View {
                         }
                 }
             } else if self.message.imageType == "audio/m4a" && self.message.messageState != .deleted {
-                AudioBubble(viewModel: self.viewModel, message: self.message, messageRight: self.messagePosition == .right, audioKey: self.message.image)
-                //Text("my audio message")
+                AudioBubble(viewModel: self.viewModel, message: self.message, namespace: self.namespace, messageRight: self.messagePosition == .right)
             }
         }
     }
@@ -168,6 +168,7 @@ struct AttachmentBubble: View {
     func loadVideo(fileId: String, completion: @escaping () -> Void) {
         DispatchQueue.main.async {
             do {
+                print("loading video id: \(fileId)")
                 let result = try storage?.entry(forKey: fileId)
                 let playerItem = CachingPlayerItem(data: result?.object ?? Data(), mimeType: "video/mp4", fileExtension: "mp4")
 
@@ -185,23 +186,88 @@ struct AttachmentBubble: View {
 //                }
                 
                 //FIX ME: Need to streaming or worst case download the video
-                
-                Request.downloadFile(withUID: fileId, progressBlock: { (progress) in
-                    print("the progress of the download is: \(progress)")
-                    self.videoDownloadProgress = CGFloat(progress)
-                }, successBlock: { data in
-                    let playerItem = CachingPlayerItem(data: data as Data, mimeType: "video/mp4", fileExtension: "mp4")
-                    self.player = AVPlayer(playerItem: playerItem)
 
-                    self.storage?.async.setObject(data, forKey: fileId, completion: { test in
-                        print("the testtt data is: \(test)")
-                    })
-                    //self.storage?
-                    completion()
-                }, errorBlock: { error in
-                    print("the error videoo is: \(String(describing: error.localizedDescription))")
-                    completion()
-                })
+                print("failed so im about to download the file: \(fileId)")
+                guard let fileUrl = URL(string: fileId) else {
+                    print("the filId filed to be a URL...")
+                    return
+                }
+
+                URLSession.shared.downloadTask(with: fileUrl) { (tempFileUrl, response, error) in
+                    
+                    // 4
+                    if let tempLocalUrl = tempFileUrl {
+                        print("the temp local url is: \(tempLocalUrl)")
+                        do {
+                            let data = try Data(contentsOf: tempLocalUrl)
+                            let playerItem = CachingPlayerItem(data: data as Data, mimeType: "video/mp4", fileExtension: "mp4")
+                            self.player = AVPlayer(playerItem: playerItem)
+                            
+                            print("downloaded the file now! \(self.player.currentItem?.asset.duration) && \(data.debugDescription)")
+
+                            self.storage?.async.setObject(data, forKey: fileId, completion: { test in
+                                print("the testtt data is: \(test)")
+                                completion()
+                            })
+                        } catch {
+                            print("error getting downloaded data...")
+                            completion()
+                        }
+                    }
+                }.resume()
+                
+                
+//                let sessionConfig = URLSessionConfiguration.default
+//                let session = URLSession(configuration: sessionConfig)
+//                var request = URLRequest(url: fileUrl)
+//                request.httpMethod = "GET"
+//
+//                let task = session.downloadTask(with: request) { (tempLocalUrl, response, error) in
+//                    if let tempLocalUrl = tempLocalUrl, error == nil {
+//                        // Success
+//                        if let statusCode = (response as? HTTPURLResponse)?.statusCode {
+//                            print("Success: \(statusCode)")
+//                        }
+//
+//                        do {
+//                            let data = try Data(contentsOf: tempLocalUrl)
+//                            let playerItem = CachingPlayerItem(data: data as Data, mimeType: "video/mp4", fileExtension: "mp4")
+//                            self.player = AVPlayer(playerItem: playerItem)
+//
+//                            print("downloaded the file now! \(self.player.currentItem?.asset.duration)")
+//
+//                            self.storage?.async.setObject(data, forKey: fileId, completion: { test in
+//                                print("the testtt data is: \(test)")
+//                                completion()
+//                            })
+//                        } catch {
+//                            print("error getting downloaded data...")
+//                            completion()
+//                        }
+//
+//                    } else {
+//                        print("Failure: %@", error?.localizedDescription);
+//                        completion()
+//                    }
+//                }
+//                task.resume()
+//
+//                Request.downloadFile(withUID: fileId, progressBlock: { (progress) in
+//                    print("the progress of the download is: \(progress)")
+//                    self.videoDownloadProgress = CGFloat(progress)
+//                }, successBlock: { data in
+//                    let playerItem = CachingPlayerItem(data: data as Data, mimeType: "video/mp4", fileExtension: "mp4")
+//                    self.player = AVPlayer(playerItem: playerItem)
+//
+//                    self.storage?.async.setObject(data, forKey: fileId, completion: { test in
+//                        print("the testtt data is: \(test)")
+//                    })
+//                    //self.storage?
+//                    completion()
+//                }, errorBlock: { error in
+//                    print("the error videoo is: \(String(describing: error.localizedDescription))")
+//                    completion()
+//                })
             }
         }
     }

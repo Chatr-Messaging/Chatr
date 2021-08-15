@@ -9,6 +9,7 @@
 import SwiftUI
 import RealmSwift
 import SDWebImageSwiftUI
+import Cache
 
 struct storageView: View {
     @EnvironmentObject var auth: AuthModel
@@ -18,7 +19,11 @@ struct storageView: View {
     //@State var removeContactsData: Bool = false
     //@State var removeMessagesData: Bool = false
     //@State var removeQuickSnapsData: Bool = false
-
+    
+    var storage: Cache.Storage<String, Data>? = {
+        return try? Cache.Storage(diskConfig: DiskConfig(name: "DiskCache"), memoryConfig: MemoryConfig(expiry: .date(Calendar.current.date(byAdding: .day, value: 4, to: Date()) ?? Date()), countLimit: 100, totalCostLimit: 1000), transformer: TransformerFactory.forData())
+    }()
+    
     var body: some View {
         VStack {
             ScrollView(.vertical, showsIndicators: false) {
@@ -66,17 +71,17 @@ struct storageView: View {
                             
                         }.padding(.vertical, 15)
                     }.background(Color("buttonColor"))
-                    .clipShape(RoundedRectangle(cornerRadius: 25, style: .circular))
-                    .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
-                    .padding(.horizontal)
+                        .clipShape(RoundedRectangle(cornerRadius: 25, style: .circular))
+                        .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
+                        .padding(.horizontal)
                     
                     HStack(alignment: .center) {
-                        Text("1 megabyte recommended limit. you are not required to modify or delete data.")
+                        Text("1 megabyte recommended limit. some data is required to stay such as security settings, contacts, messages, etc.")
                             .font(.caption)
                             .fontWeight(.none)
                             .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
-                    }.padding(.horizontal, 40)
+                            .multilineTextAlignment(.leading)
+                    }.padding(.horizontal)
                     .padding(.bottom, 20)
                     
                     //MARK: Delete Data Section
@@ -95,20 +100,24 @@ struct storageView: View {
                         VStack {
                             Button(action: {
                                 self.loadingClearData = true
-                                SDImageCache.shared.clearMemory()
-                                SDImageCache.shared.clearDisk(onCompletion: nil)
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
-                                    UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                    self.loadingClearData = false
-                                    self.clearData = true
-                                }
+                                
+                                SDImageCache.shared.clearDisk(onCompletion: {
+                                    SDImageCache.shared.clearMemory()
+                                    storage?.async.removeAll() { result in
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
+                                            UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                            self.loadingClearData = false
+                                            self.clearData = true
+                                        }
+                                    }
+                                })
                             }) {
                                 HStack {
-                                    Text(self.loadingClearData ? self.clearData ? "Cleaned Data" : "Cleaning..." : "Clean All Data")
+                                    Text(self.loadingClearData ? "Cleaning..." : self.clearData ? "Cleaned Data" : "Clean All Data")
                                         .font(.none)
                                         .fontWeight(.none)
                                         .foregroundColor(!self.loadingClearData ? .primary : .secondary)
-
+                                    
                                     Spacer()
                                     Image(systemName: self.clearData ? "checkmark" : "chevron.right")
                                         .resizable()
@@ -118,131 +127,131 @@ struct storageView: View {
                                         .foregroundColor(.secondary)
                                 }.padding(.all)
                             }.buttonStyle(changeBGButtonStyle())
-                            .disabled(self.clearData ? true : false)
-                       
+                                .disabled(self.clearData ? true : false)
+                            
                             /*
-                            VStack {
-                                Button(action: {
-                                    print("delete all Dialog data")
-                                    changeDialogRealmData.shared.removeAllDialogs()
-                                    self.removeDialogData = true
-                                }) {
-                                    HStack {
-                                        Text(self.removeDialogData ? "Removed" : "Remove Dialog Data")
-                                            .font(.none)
-                                            .fontWeight(.none)
-                                            .foregroundColor(!self.removeDialogData ? .primary : .secondary)
-
-                                        Spacer()
-                                        Image(systemName: "chevron.right")
-                                            .resizable()
-                                            .font(Font.title.weight(.bold))
-                                            .scaledToFit()
-                                            .frame(width: 7, height: 15, alignment: .center)
-                                            .foregroundColor(.secondary)
-                                    }.padding(.horizontal)
-                                    .contentShape(Rectangle())
-                                }.buttonStyle(PlainButtonStyle())
-                                .disabled(self.removeDialogData ? true : false)
-
-                                Divider()
-                                    .frame(width: Constants.screenWidth - 50)
-                                    .offset(x: 10)
-                            }.padding(.vertical, 5)
-                            
-                            //MARK: Contacts Section
-                            VStack {
-                                Button(action: {
-                                    print("delete all Contacts data")
-                                    changeContactsRealmData.shared.removeAllContacts()
-                                    self.removeContactsData = true
-                                }) {
-                                    HStack {
-                                        Text(self.removeContactsData ? "Removed" : "Remove Contact Data")
-                                            .font(.none)
-                                            .fontWeight(.none)
-                                            .foregroundColor(!self.removeContactsData ? .primary : .secondary)
-
-                                        Spacer()
-                                        Image(systemName: "chevron.right")
-                                            .resizable()
-                                            .font(Font.title.weight(.bold))
-                                            .scaledToFit()
-                                            .frame(width: 7, height: 15, alignment: .center)
-                                            .foregroundColor(.secondary)
-                                    }.padding(.horizontal)
-                                    .contentShape(Rectangle())
-                                }.buttonStyle(PlainButtonStyle())
-                                .disabled(self.removeContactsData ? true : false)
-
-                                Divider()
-                                    .frame(width: Constants.screenWidth - 50)
-                                    .offset(x: 10)
-                            }.padding(.vertical, 5)
-                            
-                            //MARK: Messages Section
-                            VStack {
-                                Button(action: {
-                                    print("delete all Message data")
-                                    changeMessageRealmData.shared.removeAllMessages(completion: { _ in })
-                                    self.removeMessagesData = true
-                                }) {
-                                    HStack {
-                                        Text(self.removeMessagesData ? "Removed" : "Remove Contact Data")
-                                            .font(.none)
-                                            .fontWeight(.none)
-                                            .foregroundColor(!self.removeMessagesData ? .primary : .secondary)
-
-                                        Spacer()
-                                        Image(systemName: "chevron.right")
-                                            .resizable()
-                                            .font(Font.title.weight(.bold))
-                                            .scaledToFit()
-                                            .frame(width: 7, height: 15, alignment: .center)
-                                            .foregroundColor(.secondary)
-                                    }.padding(.horizontal)
-                                    .contentShape(Rectangle())
-                                }.buttonStyle(PlainButtonStyle())
-                                .disabled(self.removeMessagesData ? true : false)
-
-                                Divider()
-                                    .frame(width: Constants.screenWidth - 50)
-                                    .offset(x: 10)
-                            }.padding(.vertical, 5)
-                            
-                            //MARK: Quick Snap Section
-                            VStack {
-                                Button(action: {
-                                    print("delete all Quick Snap data")
-                                    changeQuickSnapsRealmData.shared.removeAllQuickSnaps()
-                                    self.removeQuickSnapsData = true
-                                }) {
-                                    HStack {
-                                        Text(self.removeQuickSnapsData ? "Removed" : "Remove Quick Snap Data")
-                                            .font(.none)
-                                            .fontWeight(.none)
-                                            .foregroundColor(!self.removeQuickSnapsData ? .primary : .secondary)
-
-                                        Spacer()
-                                        Image(systemName: "chevron.right")
-                                            .resizable()
-                                            .font(Font.title.weight(.bold))
-                                            .scaledToFit()
-                                            .frame(width: 7, height: 15, alignment: .center)
-                                            .foregroundColor(.secondary)
-                                    }.padding(.horizontal)
-                                    .contentShape(Rectangle())
-                                }.buttonStyle(PlainButtonStyle())
-                                .disabled(self.removeQuickSnapsData ? true : false)
-                            }.padding(.vertical, 5)
-                            */
+                             VStack {
+                             Button(action: {
+                             print("delete all Dialog data")
+                             changeDialogRealmData.shared.removeAllDialogs()
+                             self.removeDialogData = true
+                             }) {
+                             HStack {
+                             Text(self.removeDialogData ? "Removed" : "Remove Dialog Data")
+                             .font(.none)
+                             .fontWeight(.none)
+                             .foregroundColor(!self.removeDialogData ? .primary : .secondary)
+                             
+                             Spacer()
+                             Image(systemName: "chevron.right")
+                             .resizable()
+                             .font(Font.title.weight(.bold))
+                             .scaledToFit()
+                             .frame(width: 7, height: 15, alignment: .center)
+                             .foregroundColor(.secondary)
+                             }.padding(.horizontal)
+                             .contentShape(Rectangle())
+                             }.buttonStyle(PlainButtonStyle())
+                             .disabled(self.removeDialogData ? true : false)
+                             
+                             Divider()
+                             .frame(width: Constants.screenWidth - 50)
+                             .offset(x: 10)
+                             }.padding(.vertical, 5)
+                             
+                             //MARK: Contacts Section
+                             VStack {
+                             Button(action: {
+                             print("delete all Contacts data")
+                             changeContactsRealmData.shared.removeAllContacts()
+                             self.removeContactsData = true
+                             }) {
+                             HStack {
+                             Text(self.removeContactsData ? "Removed" : "Remove Contact Data")
+                             .font(.none)
+                             .fontWeight(.none)
+                             .foregroundColor(!self.removeContactsData ? .primary : .secondary)
+                             
+                             Spacer()
+                             Image(systemName: "chevron.right")
+                             .resizable()
+                             .font(Font.title.weight(.bold))
+                             .scaledToFit()
+                             .frame(width: 7, height: 15, alignment: .center)
+                             .foregroundColor(.secondary)
+                             }.padding(.horizontal)
+                             .contentShape(Rectangle())
+                             }.buttonStyle(PlainButtonStyle())
+                             .disabled(self.removeContactsData ? true : false)
+                             
+                             Divider()
+                             .frame(width: Constants.screenWidth - 50)
+                             .offset(x: 10)
+                             }.padding(.vertical, 5)
+                             
+                             //MARK: Messages Section
+                             VStack {
+                             Button(action: {
+                             print("delete all Message data")
+                             changeMessageRealmData.shared.removeAllMessages(completion: { _ in })
+                             self.removeMessagesData = true
+                             }) {
+                             HStack {
+                             Text(self.removeMessagesData ? "Removed" : "Remove Contact Data")
+                             .font(.none)
+                             .fontWeight(.none)
+                             .foregroundColor(!self.removeMessagesData ? .primary : .secondary)
+                             
+                             Spacer()
+                             Image(systemName: "chevron.right")
+                             .resizable()
+                             .font(Font.title.weight(.bold))
+                             .scaledToFit()
+                             .frame(width: 7, height: 15, alignment: .center)
+                             .foregroundColor(.secondary)
+                             }.padding(.horizontal)
+                             .contentShape(Rectangle())
+                             }.buttonStyle(PlainButtonStyle())
+                             .disabled(self.removeMessagesData ? true : false)
+                             
+                             Divider()
+                             .frame(width: Constants.screenWidth - 50)
+                             .offset(x: 10)
+                             }.padding(.vertical, 5)
+                             
+                             //MARK: Quick Snap Section
+                             VStack {
+                             Button(action: {
+                             print("delete all Quick Snap data")
+                             changeQuickSnapsRealmData.shared.removeAllQuickSnaps()
+                             self.removeQuickSnapsData = true
+                             }) {
+                             HStack {
+                             Text(self.removeQuickSnapsData ? "Removed" : "Remove Quick Snap Data")
+                             .font(.none)
+                             .fontWeight(.none)
+                             .foregroundColor(!self.removeQuickSnapsData ? .primary : .secondary)
+                             
+                             Spacer()
+                             Image(systemName: "chevron.right")
+                             .resizable()
+                             .font(Font.title.weight(.bold))
+                             .scaledToFit()
+                             .frame(width: 7, height: 15, alignment: .center)
+                             .foregroundColor(.secondary)
+                             }.padding(.horizontal)
+                             .contentShape(Rectangle())
+                             }.buttonStyle(PlainButtonStyle())
+                             .disabled(self.removeQuickSnapsData ? true : false)
+                             }.padding(.vertical, 5)
+                             */
                             
                         }
                     }.background(Color("buttonColor"))
-                    .clipShape(RoundedRectangle(cornerRadius: 15, style: .circular))
-                    .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
-                    .padding(.horizontal)
-                    .padding(.bottom, 5)
+                        .clipShape(RoundedRectangle(cornerRadius: 15, style: .circular))
+                        .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
+                        .padding(.horizontal)
+                        .padding(.bottom, 5)
                     
                     HStack(alignment: .center) {
                         Text("cleaning data filters out old & unused data.")
@@ -252,18 +261,20 @@ struct storageView: View {
                             .multilineTextAlignment(.center)
                         Spacer()
                     }.padding(.horizontal, 20)
-                    .padding(.bottom, 20)
+                        .padding(.bottom, 20)
                     
                     Spacer()
                     
                     FooterInformation()
                         .padding(.vertical, 50)
                 }.padding(.top, 110)
-                .frame(width: Constants.screenWidth)
+                    .frame(width: Constants.screenWidth)
             }.navigationBarTitle("Data & Storage", displayMode: .automatic)
-            .background(Color("bgColor"))
-            .edgesIgnoringSafeArea(.all)
-        }
+                .background(Color("bgColor"))
+                .edgesIgnoringSafeArea(.all)
+        }.onAppear(perform: {
+            print("the total local space is: \(self.getUsedSpace()) && \(self.checkRealmFileSize())")
+        })
     }
     
     func checkRealmFileSize() -> Double {
@@ -271,7 +282,7 @@ struct storageView: View {
             do {
                 let attributes = try FileManager.default.attributesOfItem(atPath:realmPath)
                 if let fileSize = attributes[FileAttributeKey.size] as? Double {
-
+                    
                     print(fileSize)
                     return fileSize
                 }
@@ -285,8 +296,22 @@ struct storageView: View {
     
     func checkRealmFileMBSize() -> Double {
         var number = Double()
-        number = self.checkRealmFileSize() / 1000000
+        number = (self.checkRealmFileSize() + self.getUsedSpace()) / 1000000
         
         return number
+    }
+    
+    
+    func getUsedSpace() -> Double {
+        do {
+            let attributes = try FileManager.default.attributesOfFileSystem(forPath: NSHomeDirectory())
+            if let fileSize = attributes[FileAttributeKey.size] as? Double {
+                return fileSize
+            } else {
+                return 0
+            }
+        } catch {
+            return 0
+        }
     }
 }

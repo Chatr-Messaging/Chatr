@@ -46,7 +46,7 @@ struct ContainerBubble: View {
     var namespace: Namespace.ID
 
     var storage: Cache.Storage<String, Data>? = {
-        return try? Cache.Storage(diskConfig: DiskConfig(name: "DiskCache"), memoryConfig: MemoryConfig(expiry: .date(Calendar.current.date(byAdding: .day, value: 4, to: Date()) ?? Date()), countLimit: 10, totalCostLimit: 10), transformer: TransformerFactory.forData())
+        return try? Cache.Storage(diskConfig: DiskConfig(name: "DiskCache"), memoryConfig: MemoryConfig(expiry: .date(Calendar.current.date(byAdding: .day, value: 4, to: Date()) ?? Date()), countLimit: 10, totalCostLimit: 50), transformer: TransformerFactory.forData())
     }()
 
     var body: some View {
@@ -516,6 +516,10 @@ struct ContainerBubble: View {
         if self.message.imageType == "video/mov" {
             self.player.pause()
             self.viewModel.player = self.player
+        } else if self.message.imageType == "audio/m4a" {
+            self.viewModel.audio.audioPlayer.pause()
+            self.viewModel.audio.isPlayingAudio = false
+            print("it is a audio m4a.. pausing: \(self.message.id)")
         }
 
         self.detailMessageModel = self.message

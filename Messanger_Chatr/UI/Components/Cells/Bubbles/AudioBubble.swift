@@ -28,6 +28,7 @@ struct BarView: View {
 
 struct AudioIndicatorView: View {
     var messageRight: Bool = false
+    var isBlue: Bool = false
     @Binding var isPlaying: Bool
     @State var timer = Timer.publish(every: 0.2, on: .main, in: .common).autoconnect()
     @State private var yScaleIndicator1: CGFloat = 5
@@ -41,37 +42,37 @@ struct AudioIndicatorView: View {
         HStack(alignment: .center, spacing: 2) {
            RoundedRectangle(cornerRadius: 1)
                 .frame(width: 3, height: self.yScaleIndicator1)
-                .foregroundColor(self.messageRight ? .white : .primary)
+                .foregroundColor(self.isBlue ? .blue : self.messageRight ? .white : .primary)
                 //.scaleEffect(x: 1, y: self.yScaleIndicator1 ? Double.random(in: 0.6...0.92) : 1.0, anchor: .center)
                 .animation(Animation.easeInOut(duration: 0.2))
             
             RoundedRectangle(cornerRadius: 1)
                  .frame(width: 3, height: self.yScaleIndicator2)
-                 .foregroundColor(self.messageRight ? .white : .primary)
+                 .foregroundColor(self.isBlue ? .blue : self.messageRight ? .white : .primary)
                  //.scaleEffect(x: 1, y: self.yScaleIndicator2 ? Double.random(in: 0.6...0.92) : 1.0, anchor: .center)
                  .animation(Animation.easeInOut(duration: 0.2))
             
             RoundedRectangle(cornerRadius: 1)
                  .frame(width: 3, height: self.yScaleIndicator3)
-                 .foregroundColor(self.messageRight ? .white : .primary)
+                 .foregroundColor(self.isBlue ? .blue : self.messageRight ? .white : .primary)
                  //.scaleEffect(x: 1, y: self.yScaleIndicator3 ? Double.random(in: 0.6...0.92) : 1.0, anchor: .center)
                  .animation(Animation.easeInOut(duration: 0.2))
             
             RoundedRectangle(cornerRadius: 1)
                  .frame(width: 3, height: self.yScaleIndicator4)
-                 .foregroundColor(self.messageRight ? .white : .primary)
+                 .foregroundColor(self.isBlue ? .blue : self.messageRight ? .white : .primary)
                  //.scaleEffect(x: 1, y: self.yScaleIndicator4 ? Double.random(in: 0.6...0.92) : 1.0, anchor: .center)
                  .animation(Animation.easeInOut(duration: 0.2))
             
             RoundedRectangle(cornerRadius: 1)
                  .frame(width: 3, height: self.yScaleIndicator5)
-                 .foregroundColor(self.messageRight ? .white : .primary)
+                 .foregroundColor(self.isBlue ? .blue : self.messageRight ? .white : .primary)
                  //.scaleEffect(x: 1, y: self.yScaleIndicator5 ? Double.random(in: 0.6...0.92) : 1.0, anchor: .center)
                  .animation(Animation.easeInOut(duration: 0.2))
             
             RoundedRectangle(cornerRadius: 1)
                  .frame(width: 3, height: self.yScaleIndicator6)
-                 .foregroundColor(self.messageRight ? .white : .primary)
+                 .foregroundColor(self.isBlue ? .blue : self.messageRight ? .white : .primary)
                  //.scaleEffect(x: 1, y: self.yScaleIndicator6 ? Double.random(in: 0.6...0.92) : 1.0, anchor: .center)
                  .animation(Animation.easeInOut(duration: 0.2))
         }.onReceive(self.timer) { time in
@@ -90,35 +91,22 @@ struct AudioIndicatorView: View {
 struct AudioBubble: View {
     @ObservedObject var viewModel: ChatMessageViewModel
     @State var message: MessageStruct
+    var namespace: Namespace.ID
     @State var messageRight: Bool = false
-    @State var audioKey: String = ""
     @State var audioProgress: CGFloat = 0
     @State var isPlayingAudio: Bool = false
     @State var durationString: String = "0:00"
-    @State var recordingsList: [Recording] = []
     @State var timer = Timer.publish(every: 0.2, on: .main, in: .common).autoconnect()
-    @State var time = 0
-
-    @State var audioPlayer: AVAudioPlayer = AVAudioPlayer()
-    @State var player: AVPlayer = AVPlayer()
-    
-    private func normalizeSoundLevel(level: Float) -> CGFloat {
-        let level = max(0.2, CGFloat(level) + 10) / 2 // between 0.1 and 25
-        print("the normal sound level is: \(level)")
-        
-        return CGFloat(level) // scaled to max at 300 (our height of our bar)
-    }
     
     var storage: Cache.Storage<String, Data>? = {
-        return try? Cache.Storage(diskConfig: DiskConfig(name: "DiskCache"), memoryConfig: MemoryConfig(expiry: .date(Calendar.current.date(byAdding: .day, value: 4, to: Date()) ?? Date()), countLimit: 10, totalCostLimit: 10), transformer: TransformerFactory.forData())
+        return try? Cache.Storage(diskConfig: DiskConfig(name: "DiskCache"), memoryConfig: MemoryConfig(expiry: .date(Calendar.current.date(byAdding: .day, value: 4, to: Date()) ?? Date()), countLimit: 10, totalCostLimit: 50), transformer: TransformerFactory.forData())
     }()
 
     var body: some View {
         ZStack(alignment: .leading) {
             RoundedRectangle(cornerRadius: 0)
                 .frame(width: self.audioProgress)
-                .foregroundColor(Color("bgColor_opposite"))
-                .opacity(0.35)
+                .foregroundColor(Color("bgColor_opposite").opacity(0.25))
 
             HStack(alignment: .center, spacing: 5) {
                 Button(action: {
@@ -130,17 +118,16 @@ struct AudioBubble: View {
                         print("stop playing")
                      } else {
                          self.timer = Timer.publish(every: 0.2, on: .main, in: .common).autoconnect()
-                         self.loadAudio(fileId: self.audioKey)
+                         self.loadAudio(fileId: self.message.image)
                          print("stop??? lolll playing")
                      }
                 }) {
-                    Image(systemName: self.isPlayingAudio ? "pause.fill" : "play.fill")
+                    Image(systemName: self.isPlayingAudio ? "pause.circle.fill" : "play.circle.fill")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(width: 18, height: 20, alignment: .center)
+                        .frame(width: 32, height: 32, alignment: .center)
                         .font(Font.title.weight(.regular))
                         .foregroundColor(self.messageRight ? .white : .blue)
-                        .padding(.leading, 5)
                 }
                 
                 Text(self.durationString)
@@ -148,7 +135,7 @@ struct AudioBubble: View {
                     .font(.subheadline)
                     .fontWeight(.semibold)
                     .frame(width: 40)
-                    .padding(.horizontal, 5)
+                    .padding(.trailing, 5)
                     .onReceive(self.timer) { time in
                         guard self.viewModel.audio.playingBubbleId == self.message.id.description else {
                             print("not the correct cell to play from: \(self.message.id.description)")
@@ -157,13 +144,6 @@ struct AudioBubble: View {
 
                             return
                         }
-
-//                        if self.viewModel.audio.audioPlayer.currentTime >= self.viewModel.audio.audioPlayer.duration {
-//                            print("doneeee")
-//                            self.isPlayingAudio = false
-//                            self.timer.upstream.connect().cancel()
-//                            self.visualize.stopObservingViz()
-//                        }
 
                         print("the time is: \(time) for: \(self.message.id.description)")
                         self.durationString = self.viewModel.audio.getTotalPlaybackDurationString()
@@ -182,8 +162,7 @@ struct AudioBubble: View {
             gradient: Gradient(colors: [Color("buttonColor"), Color("buttonColor_darker")]), startPoint: .top, endPoint: .bottom))
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
         .shadow(color: self.messageRight ? Color.blue.opacity(0.15) : Color.black.opacity(0.15), radius: 6, x: 0, y: 6)
-        .onAppear {
-        }
+        .matchedGeometryEffect(id: self.message.id.description + "audio", in: namespace)
     }
     
     func loadAudio(fileId: String) {
@@ -238,97 +217,97 @@ struct AudioBubble: View {
         }
     }
     
-    func updateMessageVideoURL(messageId: String, localUrl: String) {
-        let config = Realm.Configuration(schemaVersion: 1)
+//    func updateMessageVideoURL(messageId: String, localUrl: String) {
+//        let config = Realm.Configuration(schemaVersion: 1)
         //let storage = Storage.storage()
 
-        do {
-            let realm = try Realm(configuration: config)
-            if let realmContact = realm.object(ofType: MessageStruct.self, forPrimaryKey: messageId) {
-                if realmContact.localAttachmentPath == "" {
-                    do {
-                        try realm.safeWrite {
-                            realmContact.localAttachmentPath = localUrl
-                            realm.add(realmContact, update: .all)
-                        }
-                    } catch {
-                        print(error.localizedDescription)
-                    }
+//        do {
+//            let realm = try Realm(configuration: config)
+//            if let realmContact = realm.object(ofType: MessageStruct.self, forPrimaryKey: messageId) {
+//                if realmContact.localAttachmentPath == "" {
+//                    do {
+//                        try realm.safeWrite {
+//                            realmContact.localAttachmentPath = localUrl
+//                            realm.add(realmContact, update: .all)
+//                        }
+//                    } catch {
+//                        print(error.localizedDescription)
+//                    }
 //                    let videoReference = storage.reference().child("messageVideo").child(fileId)
 //                    videoReference.downloadURL { url, error in
 //
 //                    }
-                }
-            }
-        } catch {
-            print(error.localizedDescription)
-        }
-    }
+//                }
+//            }
+//        } catch {
+//            print(error.localizedDescription)
+//        }
+//    }
     
-    func fetchAudioRecording(completion: @escaping () -> (Void)) {
-        self.viewModel.audio.recordingsList.removeAll()
-        
-        let documentDirectory = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)[0]
+//    func fetchAudioRecording(completion: @escaping () -> (Void)) {
+//        self.viewModel.audio.recordingsList.removeAll()
+//
+//        let documentDirectory = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)[0]
+//
+//        let folderString = documentDirectory.appending("/dialog_audioMsg/\(self.audioKey)/\(self.audioKey).m4a")
+//        let folderUrl = URL(fileURLWithPath: folderString)
+//
+//        let recording = Recording(fileURL: folderUrl, createdAt: self.getCreationDate(for: folderUrl))
+//        print("contents: \(folderString)")
+//        self.viewModel.audio.recordingsList.append(recording)
+//
+//        print("the recording count is: \(self.viewModel.audio.recordingsList.count)")
+//
+//        completion()
+//    }
 
-        let folderString = documentDirectory.appending("/dialog_audioMsg/\(self.audioKey)/\(self.audioKey).m4a")
-        let folderUrl = URL(fileURLWithPath: folderString)
-
-        let recording = Recording(fileURL: folderUrl, createdAt: self.getCreationDate(for: folderUrl))
-        print("contents: \(folderString)")
-        self.viewModel.audio.recordingsList.append(recording)
-
-        print("the recording count is: \(self.viewModel.audio.recordingsList.count)")
-
-        completion()
-    }
-
-    func stopAudio() {
-        DispatchQueue.main.async {
-            self.isPlayingAudio = false
-
-            guard self.viewModel.audio.audioPlayer.isPlaying else { return }
-
-            self.viewModel.audio.audioPlayer.pause()
-        }
-    }
+//    func stopAudio() {
+//        DispatchQueue.main.async {
+//            self.isPlayingAudio = false
+//
+//            guard self.viewModel.audio.audioPlayer.isPlaying else { return }
+//
+//            self.viewModel.audio.audioPlayer.pause()
+//        }
+//    }
     
-    func playAudio() {
+    //func playAudio() {
         //DispatchQueue.main.async {
             //if let recording = self.viewModel.audio.recordingsList.first {
-        do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, policy: .default, options: .defaultToSpeaker)
-        } catch {
-            
-        }
+//        do {
+//            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, policy: .default, options: .defaultToSpeaker)
+//        } catch {
+//
+//        }
 
-        print("trying to play")
-        self.viewModel.audio.audioPlayer = self.audioPlayer
+        //print("trying to play")
+        //self.viewModel.audio.audioPlayer = self.audioPlayer
         //self.timer = Timer.publish(every: 0.2, on: .main, in: .common).autoconnect()
         //self.audioPlayer.delegate = self
         //self.audioPlayer.prepareToPlay()
-        self.viewModel.audio.audioPlayer.play()
-        self.viewModel.audio.isPlayingAudio = true
+        //self.viewModel.audio.audioPlayer.play()
+        //self.viewModel.audio.isPlayingAudio = true
                 //}
         //}
-    }
+    //}
     
-    func prepAudio() {
-        guard let recording = self.recordingsList.first else { return }
-
-        do {
-            self.audioPlayer = try AVAudioPlayer(contentsOf: recording.fileURL)
-            self.audioPlayer.prepareToPlay()
-         } catch {
-            print("Error preping audio")
-         }
-    }
+//    func prepAudio() {
+//        guard let recording = self.recordingsList.first else { return }
+//
+//        do {
+//            self.audioPlayer = try AVAudioPlayer(contentsOf: recording.fileURL)
+//            self.audioPlayer.prepareToPlay()
+//         } catch {
+//            print("Error preping audio")
+//         }
+//    }
     
-    func getCreationDate(for file: URL) -> Date {
+    //func getCreationDate(for file: URL) -> Date {
 //        if let attributes = try? FileManager.default.attributesOfItem(atPath: file.path) as [FileAttributeKey: Any],
 //            let creationDate = attributes[FileAttributeKey.creationDate] as? Date {
 //            return creationDate
 //        } else {
-            return Date()
+            //return Date()
         //}
-    }
+    //}
 }

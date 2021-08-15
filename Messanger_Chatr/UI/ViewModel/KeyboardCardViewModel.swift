@@ -44,10 +44,9 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
     @Published var imageData: [UIImage] = []
     @Published var videoData: [AVAsset] = []
     @Published var pastedImages: [UIImage] = []
-    var auth: AuthModel = AuthModel()
 
     var storage: Cache.Storage<String, Data>? = {
-        return try? Cache.Storage(diskConfig: DiskConfig(name: "DiskCache"), memoryConfig: MemoryConfig(expiry: .date(Calendar.current.date(byAdding: .day, value: 4, to: Date()) ?? Date()), countLimit: 10, totalCostLimit: 10), transformer: TransformerFactory.forData())
+        return try? Cache.Storage(diskConfig: DiskConfig(name: "DiskCache"), memoryConfig: MemoryConfig(expiry: .date(Calendar.current.date(byAdding: .day, value: 4, to: Date()) ?? Date()), countLimit: 50, totalCostLimit: 100), transformer: TransformerFactory.forData())
     }()
     
     private lazy var uploadcare = Uploadcare(withPublicKey: Constants.uploadcarePublicKey, secretKey: Constants.uploadcareSecretKey)
@@ -160,7 +159,7 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
                     print("success uploading direct video. Here is the data: " + "\(fileId)")
                     
                     DispatchQueue.main.async {
-                        self.storage?.async.setObject(videoData, forKey: Constants.uploadcareBaseUrl + fileId, completion: { test in
+                        self.storage?.async.setObject(videoData, forKey: Constants.uploadcareBaseVideoUrl + fileId, completion: { test in
                             print("the testtt data is: \(test)")
                             
                             self.selectedVideos[foundMediaIndex].uploadId = fileId
@@ -171,6 +170,25 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
                                 }
                             } else {
                                 print("error can send not allowed yet. video Here is the id: " + "\(fileId)")
+                                
+                                
+                               
+                                
+                                let semaphore = DispatchSemaphore(value: 0)
+                                
+                                self.uploadcare.uploadAPI.fileInfo(withFileId: fileId) { (info, error) in
+                                    defer {
+                                        semaphore.signal()
+                                    }
+                                    
+                                    if let error = error {
+                                        print("the error pulling video id is: " + "\(error)")
+                                        return
+                                    }
+                                    
+                                    print("the file info pulled from video id is: " + "\(info)")
+                                }
+                                semaphore.wait()
                             }
                         })
                     }
@@ -256,7 +274,7 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
             }
             
             let attachmentz = ChatAttachment()
-            attachmentz["videoURL"] = Constants.uploadcareBaseUrl + uploadedId + Constants.uploadcareStandardVideoTransform
+            attachmentz["videoURL"] = uploadedId
             attachmentz.type = "video/mov"
             
             let occupants = auth.selectedConnectyDialog?.occupantIDs ?? []

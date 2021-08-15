@@ -81,6 +81,9 @@ struct BubbleDetailView: View {
                             
                             if self.message.imageType == "video/mov" {
                                 self.viewModel.player.pause()
+                            } else if self.message.imageType == "audio/m4a" {
+                                self.viewModel.audio.audioPlayer.pause()
+                                self.viewModel.audio.isPlayingAudio = false
                             }
 
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
@@ -146,10 +149,10 @@ struct BubbleDetailView: View {
                         } else if self.message.imageType == "video/mov" && self.message.messageState != .deleted {
                             ZStack(alignment: .center) {
                                 DetailVideoPlayer(viewModel: self.viewModel)
-                                    .matchedGeometryEffect(id: self.message.id.description + "mov", in: namespace)
                                     .frame(width: self.viewModel.videoSize.width, height: self.viewModel.videoSize.height)
                                     .frame(maxWidth: Constants.screenWidth - 20, alignment: .center)
                                     .cornerRadius(showContentActions ? (!self.repliesOpen ? (self.cardDrag.height > 0 ? self.cardDrag.height / 8 : 0) : 0) : 15)
+                                    .matchedGeometryEffect(id: self.message.id.description + "mov", in: namespace)
                                     .pinchToZoom()
                                     .onTapGesture {
                                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
@@ -187,6 +190,13 @@ struct BubbleDetailView: View {
                                     .zIndex(1)
                                 }
                             }
+                        } else if self.message.imageType == "audio/m4a" && self.message.messageState != .deleted {
+                            //audio
+                            AudioDetailView(viewModel: self.viewModel, message: self.message, namespace: self.namespace)
+                                .frame(width: Constants.screenWidth * 0.8, height: 180)
+                                .onAppear() {
+                                    print("audio view detail oping: \(self.message.id)")
+                                }
                         }
                     } else if self.message.contactID != 0 {
                         //contact

@@ -238,6 +238,7 @@
 		053AC4B6251982550036946E /* AttachmentBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentBubble.swift; sourceTree = "<group>"; };
 		053D33F12393C97B00CEE03E /* DismissGuardian.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DismissGuardian.swift; sourceTree = "<group>"; };
 		053D33F32394511300CEE03E /* BlurView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlurView.swift; sourceTree = "<group>"; };
+		053F9E9926C8DB4F00EC1A35 /* AudioDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioDetailView.swift; sourceTree = "<group>"; };
 		0542311326869E6400DF65C4 /* miniHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = miniHeader.swift; sourceTree = "<group>"; };
 		054CAB7325AA6DF700DD3F7C /* InstagramApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramApi.swift; sourceTree = "<group>"; };
 		054CAB7825AA6E1F00DD3F7C /* InstagramTestUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramTestUser.swift; sourceTree = "<group>"; };
@@ -527,6 +528,7 @@
 				05B463BC2667257D007EDCEA /* DiscoverFeaturedCell.swift */,
 				0525E4C425ECC4440086EB54 /* MessageReplyCell.swift */,
 				05786B5726499F83001554CA /* PinnedVideoCell.swift */,
+				053F9E9926C8DB4F00EC1A35 /* AudioDetailView.swift */,
 				059D1C5325D63A7600A7FB96 /* Bubbles */,
 				05DD2D4125C9D44900B1ACB7 /* LinkedText.swift */,
 			);
@@ -1107,6 +1109,7 @@
 				0568B54E25C645790054E934 /* ScanQRView.swift in Sources */,
 				05196DD924EE25FD0026B9A7 /* SyncAddressBook.swift in Sources */,
 				05D466D8263F7CE20015B61D /* PinnedSectionView.swift in Sources */,
+				053F9E9A26C8DB4F00EC1A35 /* AudioDetailView.swift in Sources */,
 				05B463BB2661656B007EDCEA /* ImageNetworkManager.swift in Sources */,
 				0599798A24D5468E00969318 /* TextBubble.swift in Sources */,
 				05196DD624ED90510026B9A7 /* NewConversationView.swift in Sources */,

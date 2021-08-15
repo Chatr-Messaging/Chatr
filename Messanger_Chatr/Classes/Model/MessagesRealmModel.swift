@@ -799,7 +799,7 @@ class changeMessageRealmData {
     func sendVideoMessage(id: String, dialog: DialogStruct, videoId: String, occupentID: [NSNumber]) {
         let attachment = ChatAttachment()
         attachment.type = "video/mov"
-        attachment["videoURL"] = Constants.uploadcareBaseUrl + videoId + Constants.uploadcareStandardTransform
+        attachment["videoURL"] = videoId
 
         let pDialog = ChatDialog(dialogID: dialog.id, type: dialog.dialogType == "public" ? .public : occupentID.count > 2 ? .group : .private)
         pDialog.occupantIDs = occupentID
