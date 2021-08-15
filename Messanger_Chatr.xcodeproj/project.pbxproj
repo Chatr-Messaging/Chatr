@@ -33,6 +33,7 @@
 		053AC4B7251982560036946E /* AttachmentBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053AC4B6251982550036946E /* AttachmentBubble.swift */; };
 		053D33F22393C97B00CEE03E /* DismissGuardian.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053D33F12393C97B00CEE03E /* DismissGuardian.swift */; };
 		053D33F42394511400CEE03E /* BlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053D33F32394511300CEE03E /* BlurView.swift */; };
+		053F9E9A26C8DB4F00EC1A35 /* AudioDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053F9E9926C8DB4F00EC1A35 /* AudioDetailView.swift */; };
 		0542311426869E6400DF65C4 /* miniHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0542311326869E6400DF65C4 /* miniHeader.swift */; };
 		054CAB7425AA6DF700DD3F7C /* InstagramApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054CAB7325AA6DF700DD3F7C /* InstagramApi.swift */; };
 		054CAB7925AA6E1F00DD3F7C /* InstagramTestUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054CAB7825AA6E1F00DD3F7C /* InstagramTestUser.swift */; };
