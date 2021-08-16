@@ -169,8 +169,8 @@ struct AttachmentBubble: View {
         DispatchQueue.main.async {
             do {
                 print("loading video id: \(fileId)")
-                let result = try storage?.entry(forKey: fileId)
-                let playerItem = CachingPlayerItem(data: result?.object ?? Data(), mimeType: "video/mp4", fileExtension: "mp4")
+                let result = try storage?.entry(forKey: Constants.uploadcareBaseVideoUrl + fileId)
+                let playerItem = CachingPlayerItem(data: result?.object ?? Data(), mimeType: "video/mov", fileExtension: "mov")
 
                 self.player = AVPlayer(playerItem: playerItem)
 
@@ -188,34 +188,6 @@ struct AttachmentBubble: View {
                 //FIX ME: Need to streaming or worst case download the video
 
                 print("failed so im about to download the file: \(fileId)")
-                guard let fileUrl = URL(string: fileId) else {
-                    print("the filId filed to be a URL...")
-                    return
-                }
-
-                URLSession.shared.downloadTask(with: fileUrl) { (tempFileUrl, response, error) in
-                    
-                    // 4
-                    if let tempLocalUrl = tempFileUrl {
-                        print("the temp local url is: \(tempLocalUrl)")
-                        do {
-                            let data = try Data(contentsOf: tempLocalUrl)
-                            let playerItem = CachingPlayerItem(data: data as Data, mimeType: "video/mp4", fileExtension: "mp4")
-                            self.player = AVPlayer(playerItem: playerItem)
-                            
-                            print("downloaded the file now! \(self.player.currentItem?.asset.duration) && \(data.debugDescription)")
-
-                            self.storage?.async.setObject(data, forKey: fileId, completion: { test in
-                                print("the testtt data is: \(test)")
-                                completion()
-                            })
-                        } catch {
-                            print("error getting downloaded data...")
-                            completion()
-                        }
-                    }
-                }.resume()
-                
                 
 //                let sessionConfig = URLSessionConfiguration.default
 //                let session = URLSession(configuration: sessionConfig)
@@ -252,22 +224,22 @@ struct AttachmentBubble: View {
 //                }
 //                task.resume()
 //
-//                Request.downloadFile(withUID: fileId, progressBlock: { (progress) in
-//                    print("the progress of the download is: \(progress)")
-//                    self.videoDownloadProgress = CGFloat(progress)
-//                }, successBlock: { data in
-//                    let playerItem = CachingPlayerItem(data: data as Data, mimeType: "video/mp4", fileExtension: "mp4")
-//                    self.player = AVPlayer(playerItem: playerItem)
-//
-//                    self.storage?.async.setObject(data, forKey: fileId, completion: { test in
-//                        print("the testtt data is: \(test)")
-//                    })
-//                    //self.storage?
-//                    completion()
-//                }, errorBlock: { error in
-//                    print("the error videoo is: \(String(describing: error.localizedDescription))")
-//                    completion()
-//                })
+                Request.downloadFile(withUID: fileId, progressBlock: { (progress) in
+                    print("the progress of the download is: \(progress)")
+                    self.videoDownloadProgress = CGFloat(progress)
+                }, successBlock: { data in
+                    let playerItem = CachingPlayerItem(data: data as Data, mimeType: "video/mov", fileExtension: "mov")
+                    self.player = AVPlayer(playerItem: playerItem)
+
+                    self.storage?.async.setObject(data, forKey: Constants.uploadcareBaseVideoUrl + fileId, completion: { test in
+                        print("the testtt data is: \(test)")
+                    })
+                    //self.storage?
+                    completion()
+                }, errorBlock: { error in
+                    print("the error videoo is: \(String(describing: error.localizedDescription))")
+                    completion()
+                })
             }
         }
     }

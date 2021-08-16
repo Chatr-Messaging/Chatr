@@ -28,6 +28,7 @@ struct KeyboardMediaAsset: Hashable, Identifiable {
     var image: UIImage
     var progress: CGFloat = 0.0
     var uploadId: String?
+    var placeholderId: String?
     var canSend: Bool = false
 }
 
@@ -133,9 +134,36 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
     
     func uploadSelectedVideo(vid: KeyboardMediaAsset, auth: AuthModel) {
         DispatchQueue.global(qos: .utility).async {
-            guard vid.uploadId == nil, vid.progress == 0.0, let foundMediaIndex = self.selectedVideos.firstIndex(of: vid), let assz = vid.asset as? AVURLAsset, let videoData = try? Data(contentsOf: assz.url) else { return }
+            guard vid.uploadId == nil, vid.progress == 0.0, let foundMediaIndex = self.selectedVideos.firstIndex(of: vid), let assz = vid.asset as? AVURLAsset, let videoData = try? Data(contentsOf: assz.url, options: [.alwaysMapped , .uncached]) else { return }
             
             let filename = vid.id + assz.url.lastPathComponent
+            
+            Request.uploadFile(with: videoData, fileName: filename, contentType: "video/mov", isPublic: true, progressBlock: { (progress) in
+                DispatchQueue.main.async {
+                    self.selectedVideos[foundMediaIndex].progress = CGFloat(progress)
+                    print("the progress uploading the video is: \(progress * 100)%")
+                }
+            }, successBlock: { (blob) in
+                DispatchQueue.main.async {
+                    guard let blobUid = blob.uid else { return }
+                    
+                    self.storage?.async.setObject(videoData, forKey: Constants.uploadcareBaseVideoUrl + blobUid, completion: { test in
+                        print("the testtt data is: \(test)")
+                        
+                        self.selectedVideos[foundMediaIndex].uploadId = blobUid
+                        if self.selectedVideos[foundMediaIndex].canSend {
+                            print("sending message now. Here is the id: " + "\(blobUid)")
+                            DispatchQueue.main.async {
+                                self.sendVideoMessage(auth: auth)
+                            }
+                        } else {
+                            print("error can send not allowed yet. video Here is the id: " + "\(blobUid)")
+                        }
+                    })
+                }
+            })
+            
+            /*
             let semaphore = DispatchSemaphore(value: 0)
             
             DispatchQueue.main.async {
@@ -158,44 +186,13 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
                     }
                     print("success uploading direct video. Here is the data: " + "\(fileId)")
                     
-                    DispatchQueue.main.async {
-                        self.storage?.async.setObject(videoData, forKey: Constants.uploadcareBaseVideoUrl + fileId, completion: { test in
-                            print("the testtt data is: \(test)")
-                            
-                            self.selectedVideos[foundMediaIndex].uploadId = fileId
-                            if self.selectedVideos[foundMediaIndex].canSend {
-                                print("sending message now. Here is the id: " + "\(fileId)")
-                                DispatchQueue.main.async {
-                                    self.sendVideoMessage(auth: auth)
-                                }
-                            } else {
-                                print("error can send not allowed yet. video Here is the id: " + "\(fileId)")
-                                
-                                
-                               
-                                
-                                let semaphore = DispatchSemaphore(value: 0)
-                                
-                                self.uploadcare.uploadAPI.fileInfo(withFileId: fileId) { (info, error) in
-                                    defer {
-                                        semaphore.signal()
-                                    }
-                                    
-                                    if let error = error {
-                                        print("the error pulling video id is: " + "\(error)")
-                                        return
-                                    }
-                                    
-                                    print("the file info pulled from video id is: " + "\(info)")
-                                }
-                                semaphore.wait()
-                            }
-                        })
-                    }
+     
                 }
             }
             
             semaphore.wait()
+            
+            */
         }
     }
     
