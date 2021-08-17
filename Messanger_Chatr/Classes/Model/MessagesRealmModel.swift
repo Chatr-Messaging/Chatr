@@ -35,6 +35,8 @@ class MessageStruct : Object, Identifiable {
     @objc dynamic var needsTimestamp: Bool = false
     @objc dynamic var uploadMediaId: String = ""
     @objc dynamic var uploadProgress: Double = 0.0
+    @objc dynamic var placeholderVideoImg: String = ""
+    @objc dynamic var mediaRatio: Double = 0.0
     @objc dynamic var status = messageStatus.sending.rawValue
     var messageState: messageStatus {
         get { return messageStatus(rawValue: status) ?? .delivered }
@@ -230,6 +232,16 @@ class changeMessageRealmData {
                                     foundMessage.imageType = attach.type ?? ""
                                     print("the video is: \(String(describing: attach.type)) && \(videoUrl)")
                                 }
+                                
+                                if let placeholderId = attach.customParameters["placeholderURL"], foundMessage.placeholderVideoImg != "\(placeholderId)" {
+                                    foundMessage.placeholderVideoImg = "\(placeholderId)"
+                                    print("the placeholder id is: \(placeholderId)")
+                                }
+
+                                if let ratio = attach.customParameters["mediaRatio"], foundMessage.mediaRatio != Double("\(ratio)") {
+                                    foundMessage.mediaRatio = Double("\(ratio)") ?? 0.0
+                                    print("the media ratio is: \(Double("\(ratio)"))")
+                                }
                             }
                         }
                         
@@ -321,6 +333,16 @@ class changeMessageRealmData {
                                 newData.image = "\(videoUrl)"
                                 newData.imageType = attach.type ?? ""
                                 print("the video is: \(attach.type) && \(videoUrl)")
+                            }
+
+                            if let placeholderId = attach.customParameters["placeholderURL"] {
+                                newData.placeholderVideoImg = "\(placeholderId)"
+                                print("the placeholder id is: \(placeholderId)")
+                            }
+
+                            if let ratio = attach.customParameters["mediaRatio"] {
+                                newData.mediaRatio = Double("\(ratio)") ?? 0.0
+                                print("the media ratio is: \(Double("\(ratio)"))")
                             }
                         }
                     }
@@ -454,6 +476,16 @@ class changeMessageRealmData {
                                 foundMessage.imageType = attach.type ?? ""
                                 print("the video is: \(String(describing: attach.type)) && \(videoUrl)")
                             }
+                            
+                            if let placeholderId = attach.customParameters["placeholderURL"], foundMessage.placeholderVideoImg != "\(placeholderId)" {
+                                foundMessage.placeholderVideoImg = "\(placeholderId)"
+                                print("the placeholder id is: \(placeholderId)")
+                            }
+
+                            if let ratio = attach.customParameters["mediaRatio"], foundMessage.mediaRatio != Double("\(ratio)") {
+                                foundMessage.mediaRatio = Double("\(ratio)") ?? 0.0
+                                print("the media ratio is: \(Double("\(ratio)"))")
+                            }
                         }
                     }
                     
@@ -538,6 +570,16 @@ class changeMessageRealmData {
                             newData.image = "\(videoUrl)"
                             newData.imageType = attach.type ?? ""
                             print("the video is: \(newData.image) && \(videoUrl)")
+                        }
+                        
+                        if let placeholderId = attach.customParameters["placeholderURL"] {
+                            newData.placeholderVideoImg = "\(placeholderId)"
+                            print("the placeholder id is: \(placeholderId)")
+                        }
+
+                        if let ratio = attach.customParameters["mediaRatio"] {
+                            newData.mediaRatio = Double("\(ratio)") ?? 0.0
+                            print("the media ratio is: \(Double("\(ratio)"))")
                         }
                     }
                 }

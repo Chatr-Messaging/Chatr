@@ -29,6 +29,7 @@ struct KeyboardMediaAsset: Hashable, Identifiable {
     var progress: CGFloat = 0.0
     var uploadId: String?
     var placeholderId: String?
+    var mediaRatio: Double?
     var canSend: Bool = false
 }
 
@@ -80,7 +81,7 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
                     
                     DispatchQueue.main.async {
                         self.selectedPhotos[foundMediaIndex].uploadId = fileId
-                        print("success uploading direct file. Here is the data: " + "\(fileId)")
+                        print("success uploading direct file.xxxx Here is the data: " + "\(fileId)")
                     }
                 }
 
@@ -105,18 +106,21 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
                 defer {
                     semaphore.signal()
                 }
-                
-                if let error = error {
-                    print("the error uploading direct files: " + error.debugDescription)
-                }
 
-                guard let uploadData = resultDictionary, let fileId = uploadData.first?.value else {
-                    return
-                }
-                
                 DispatchQueue.main.async {
+                    if let error = error {
+                        print("the error uploading direct files: " + error.debugDescription)
+                    }
+
+                    guard let uploadData = resultDictionary, let fileId = uploadData.first?.value else {
+                        return
+                    }
+                
+                    let imageRatio = media.image.size.height / media.image.size.width
+                
                     self.selectedPhotos[foundMediaIndex].uploadId = fileId
-                    print("success uploading direct file. Here is the data: " + "\(fileId)")
+                    self.selectedVideos[foundMediaIndex].mediaRatio = imageRatio
+                    print("success uploading direct file. 4353543545Here is the data: " + "\(fileId) && ratio: \(imageRatio)")
                     if self.selectedPhotos[foundMediaIndex].canSend {
                         print("sending message now. Here is the id: " + "\(fileId)")
                         DispatchQueue.main.async {
@@ -196,11 +200,56 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
         }
     }
     
+    func uploadVideoImage(media: KeyboardMediaAsset, auth: AuthModel) {
+        DispatchQueue.global(qos: .utility).async {
+            guard let foundMediaIndex = self.selectedVideos.firstIndex(of: media), let data = media.image.jpegData(compressionQuality: 1.0) else { return }
+            
+            let filename = "\(media.id)_videoImage_" + Date().description.replacingOccurrences(of: " ", with: "")
+            let semaphore = DispatchSemaphore(value: 0)
+            
+            self.uploadcare.uploadAPI.upload(files: [filename: data], store: .doNotStore, { (progress) in
+                DispatchQueue.main.async {
+                    print("the upload video image progress is: \(progress)")
+                }
+            }) { (resultDictionary, error) in
+                defer {
+                    semaphore.signal()
+                }
+                
+                if let error = error {
+                    print("the error uploading direct files: " + error.debugDescription)
+                }
+
+                guard let uploadData = resultDictionary, let fileId = uploadData.first?.value else {
+                    return
+                }
+                
+                let imageRatio = media.image.size.height / media.image.size.width
+                
+                DispatchQueue.main.async {
+                    self.selectedVideos[foundMediaIndex].placeholderId = fileId
+                    self.selectedVideos[foundMediaIndex].mediaRatio = imageRatio
+                    print("success uploading direct file. Here is the data: " + "\(fileId) &&s ratio: \(imageRatio)")
+                    if self.selectedVideos[foundMediaIndex].canSend {
+                        print("sending message now. Here is the id: " + "\(fileId)")
+                        DispatchQueue.main.async {
+                            self.sendVideoMessage(auth: auth)
+                        }
+                    } else {
+                        print("error can send not allowed yet. Here is the id: " + "\(fileId)")
+                    }
+                }
+            }
+
+            semaphore.wait()
+        }
+    }
+    
     func sendPhotoMessage(attachment: KeyboardMediaAsset, auth: AuthModel, completion: @escaping () -> Void) {
         guard let selectedDialog = auth.dialogs.results.filter("id == %@", UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").first else { return }
         
         print("running through photo: \(attachment.id)")
-        guard let uploadedId = attachment.uploadId else {
+        guard let uploadedId = attachment.uploadId, let ratio = attachment.mediaRatio else {
             if let index = self.selectedPhotos.firstIndex(of: attachment) {
                 print("had the save for after upload: \(attachment.id)")
                 self.selectedPhotos[index].canSend = true
@@ -227,6 +276,7 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
         
         let attachmentz = ChatAttachment()
         attachmentz["imageURL"] = Constants.uploadcareBaseUrl + uploadedId + Constants.uploadcareStandardTransform
+        attachmentz["mediaRatio"] = "\(ratio)"
         attachmentz.type = "image/png"
         
         let occupants = auth.selectedConnectyDialog?.occupantIDs ?? []
@@ -261,7 +311,7 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
 
         for attachment in self.selectedVideos {
             print("running through video: \(attachment.id)")
-            guard let uploadedId = attachment.uploadId else {
+            guard let uploadedId = attachment.uploadId, let placeholderId = attachment.placeholderId, let ratio = attachment.mediaRatio else {
                 if let index = self.selectedVideos.firstIndex(of: attachment) {
                     print("had the save for after upload: \(attachment.id)")
                     self.selectedVideos[index].canSend = true
@@ -272,6 +322,8 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
             
             let attachmentz = ChatAttachment()
             attachmentz["videoURL"] = uploadedId
+            attachmentz["placeholderURL"] = placeholderId
+            attachmentz["mediaRatio"] = "\(ratio)"
             attachmentz.type = "video/mov"
             
             let occupants = auth.selectedConnectyDialog?.occupantIDs ?? []
@@ -463,6 +515,7 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
                                 let newMedia = KeyboardMediaAsset(asset: videoUrl, image: image)
                                 self.selectedVideos.append(newMedia)
                                 self.videoData.append(videoUrl)
+                                self.uploadVideoImage(media: newMedia, auth: auth)
                                 self.uploadSelectedVideo(vid: newMedia, auth: auth)
 
                                 completion()

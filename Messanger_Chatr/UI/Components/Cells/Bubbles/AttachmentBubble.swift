@@ -76,28 +76,48 @@ struct AttachmentBubble: View {
                         }.padding(.vertical, 100)
                     }.aspectRatio(contentMode: .fit)
                     .clipShape(CustomGIFShape())
-                    .frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75)), alignment: self.messagePosition == .right ? .trailing : .leading)
-                    .frame(maxHeight: CGFloat(Constants.screenHeight * 0.75))
+                    //.frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75)), alignment: self.messagePosition == .right ? .trailing : .leading)
+                    //.frame(maxHeight: CGFloat(Constants.screenHeight * 0.75))
+                    .frame(width: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75)), alignment: self.messagePosition == .right ? .trailing : .leading)
+                    .frame(height: CGFloat(self.message.mediaRatio * (Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75))))
                     .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 14)
                     .padding(.bottom, self.hasPrior ? 0 : 4)
                     .offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
                     .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.8) : Color.clear, lineWidth: 3).offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0))
                     .matchedGeometryEffect(id: self.message.id.description + "png", in: namespace)
             } else if self.message.imageType == "video/mov" && self.message.messageState != .deleted {
-                ZStack() {
+                ZStack(alignment: .center) {
                     //VideoPlayer(player: self.player)
                     PlayerView(player: self.$player, totalDuration: self.$totalDuration)
                         .edgesIgnoringSafeArea(.all)
                         //.transition(.asymmetric(insertion: AnyTransition.scale.animation(.easeInOut(duration: 0.15)), removal: AnyTransition.identity))
-                        .background(Color("bgColor"))
+                        .background(
+                            WebImage(url: URL(string: Constants.uploadcareBaseUrl + self.message.placeholderVideoImg + Constants.uploadcareStandardTransform))
+                                .resizable()
+                                .placeholder {
+                                    VStack {
+                                        Image(systemName: "video.fill")
+                                            .padding(.bottom, 5)
+                                        Text("loading...")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }.padding(.vertical, 100)
+                                }.aspectRatio(contentMode: .fit)
+                                .clipShape(CustomGIFShape())
+                                .frame(width: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75)), alignment: self.messagePosition == .right ? .trailing : .leading)
+                                .frame(height: CGFloat(self.message.mediaRatio * (Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75))))
+                        )
                         .clipShape(CustomGIFShape())
-                        .frame(width: self.videoSize.width, height: self.videoSize.height)
-                        .frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75)), alignment: self.messagePosition == .right ? .trailing : .leading)
-                        .frame(minHeight: self.videoSize.height == 0 ? CGFloat(Constants.screenHeight * 0.4) : 140, maxHeight: self.videoSize.height == 0 ? CGFloat(Constants.screenHeight * 0.4) : CGFloat(Constants.screenHeight * 0.75))
+                        //.frame(width: self.videoSize.width, height: self.videoSize.height)
+                        //.frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75)), alignment: self.messagePosition == .right ? .trailing : .leading)
+                        //.frame(minHeight: self.videoSize.height == 0 ? CGFloat(Constants.screenHeight * 0.4) : 140, maxHeight: self.videoSize.height == 0 ? CGFloat(Constants.screenHeight * 0.4) : CGFloat(Constants.screenHeight * 0.75))
+                        .frame(width: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75)), alignment: self.messagePosition == .right ? .trailing : .leading)
+                        .frame(height: CGFloat(self.message.mediaRatio * (Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75))))
                         .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 14)
                         .padding(.bottom, self.hasPrior ? 0 : 4)
                         .offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
                         .matchedGeometryEffect(id: self.message.id.description + "mov", in: namespace)
+
                         .overlay(
                             ZStack {
                                 ZStack {
@@ -140,22 +160,23 @@ struct AttachmentBubble: View {
                                     self.player.play()
                                 }
 
-                                self.player.addPeriodicTimeObserver(forInterval: CMTime(seconds: 0.1, preferredTimescale: 600), queue: nil) { time in
+                                self.player.addPeriodicTimeObserver(forInterval: CMTime(seconds: 0.2, preferredTimescale: 600), queue: nil) { time in
                                     guard let item = self.player.currentItem else { return }
 
                                     self.totalDuration = item.duration.seconds - item.currentTime().seconds
                                 }
 
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
-                                    if let videoAssetTrack = self.player.currentItem?.asset.tracks(withMediaType: AVMediaType.video).first {
-                                        let naturalSize = videoAssetTrack.naturalSize.applying(videoAssetTrack.preferredTransform)
-                                        let width = abs(naturalSize.width) > UIScreen.main.bounds.width * 0.75 ? UIScreen.main.bounds.width * 0.75 : abs(naturalSize.width)
-                                        //let heightRatio = abs(naturalSize.height) * (abs(naturalSize.height) / width)
-                                        let height = width * (abs(naturalSize.height) / abs(naturalSize.width))
-                                        let rect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: width, height: height))
-                                        self.videoSize = rect.size
-                                    }
-                                }
+                                //DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+//                                    if let videoAssetTrack = self.player.currentItem?.asset.tracks(withMediaType: AVMediaType.video).first {
+//                                        let naturalSize = videoAssetTrack.naturalSize.applying(videoAssetTrack.preferredTransform)
+//                                        let width = abs(naturalSize.width) > UIScreen.main.bounds.width * 0.75 ? UIScreen.main.bounds.width * 0.75 : abs(naturalSize.width)
+//                                        let heightRatio = abs(naturalSize.height) * (abs(naturalSize.height) / width)
+//                                        let height = width * (abs(naturalSize.height) / abs(naturalSize.width))
+//                                        let rect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: width, height: height))
+//
+//                                        self.videoSize = rect.size
+//                                    }
+                                //}
                             })
                         }
                 }
@@ -176,54 +197,8 @@ struct AttachmentBubble: View {
 
                 completion()
             } catch {
-//                self.uploadcare.copyFileToLocalStorage(source: fileId) { (response, error) in
-//                    if let error = error {
-//                        print(error)
-//                        return
-//                    }
-//                    print("the responce to load video is: ")
-//                    print(response ?? "")
-//                }
-                
-                //FIX ME: Need to streaming or worst case download the video
-
                 print("failed so im about to download the file: \(fileId)")
-                
-//                let sessionConfig = URLSessionConfiguration.default
-//                let session = URLSession(configuration: sessionConfig)
-//                var request = URLRequest(url: fileUrl)
-//                request.httpMethod = "GET"
-//
-//                let task = session.downloadTask(with: request) { (tempLocalUrl, response, error) in
-//                    if let tempLocalUrl = tempLocalUrl, error == nil {
-//                        // Success
-//                        if let statusCode = (response as? HTTPURLResponse)?.statusCode {
-//                            print("Success: \(statusCode)")
-//                        }
-//
-//                        do {
-//                            let data = try Data(contentsOf: tempLocalUrl)
-//                            let playerItem = CachingPlayerItem(data: data as Data, mimeType: "video/mp4", fileExtension: "mp4")
-//                            self.player = AVPlayer(playerItem: playerItem)
-//
-//                            print("downloaded the file now! \(self.player.currentItem?.asset.duration)")
-//
-//                            self.storage?.async.setObject(data, forKey: fileId, completion: { test in
-//                                print("the testtt data is: \(test)")
-//                                completion()
-//                            })
-//                        } catch {
-//                            print("error getting downloaded data...")
-//                            completion()
-//                        }
-//
-//                    } else {
-//                        print("Failure: %@", error?.localizedDescription);
-//                        completion()
-//                    }
-//                }
-//                task.resume()
-//
+
                 Request.downloadFile(withUID: fileId, progressBlock: { (progress) in
                     print("the progress of the download is: \(progress)")
                     self.videoDownloadProgress = CGFloat(progress)
@@ -234,7 +209,7 @@ struct AttachmentBubble: View {
                     self.storage?.async.setObject(data, forKey: Constants.uploadcareBaseVideoUrl + fileId, completion: { test in
                         print("the testtt data is: \(test)")
                     })
-                    //self.storage?
+                    
                     completion()
                 }, errorBlock: { error in
                     print("the error videoo is: \(String(describing: error.localizedDescription))")
