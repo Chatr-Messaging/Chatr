@@ -343,9 +343,9 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
                         changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .error)
                     } else {
                         print("Success sending attachment to ConnectyCube server!")
-                        if let index = self.selectedVideos.firstIndex(of: attachment), let storeId = self.selectedVideos[index].uploadId {
+                        self.storeUploadMedia(id: placeholderId)
+                        if let index = self.selectedVideos.firstIndex(of: attachment) {
                             self.selectedVideos.remove(at: index)
-                            self.storeUploadMedia(id: storeId)
                         }
                     }
                 })
@@ -354,21 +354,14 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
     }
 
     func storeUploadMedia(id: String) {
-        print("<------ testRESTStoreFile ------>")
-        //let semaphore = DispatchSemaphore(value: 0)
-
         uploadcare.storeFile(withUUID: id) { (response, error) in
-
             if let error = error {
                 print("the error chcing ios: \(error)")
-                //semaphore.resume()
                 return
             }
             print("success storing sent media!")
             print(response ?? "")
-            //semaphore.resume()
         }
-        //semaphore.wait()
     }
     
     func openImagePicker(completion: @escaping () -> Void) {

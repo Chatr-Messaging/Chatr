@@ -108,16 +108,12 @@ struct AttachmentBubble: View {
                                 .frame(height: CGFloat(self.message.mediaRatio * (Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75))))
                         )
                         .clipShape(CustomGIFShape())
-                        //.frame(width: self.videoSize.width, height: self.videoSize.height)
-                        //.frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75)), alignment: self.messagePosition == .right ? .trailing : .leading)
-                        //.frame(minHeight: self.videoSize.height == 0 ? CGFloat(Constants.screenHeight * 0.4) : 140, maxHeight: self.videoSize.height == 0 ? CGFloat(Constants.screenHeight * 0.4) : CGFloat(Constants.screenHeight * 0.75))
                         .frame(width: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75)), alignment: self.messagePosition == .right ? .trailing : .leading)
                         .frame(height: CGFloat(self.message.mediaRatio * (Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75))))
                         .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 14)
                         .padding(.bottom, self.hasPrior ? 0 : 4)
                         .offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
                         .matchedGeometryEffect(id: self.message.id.description + "mov", in: namespace)
-
                         .overlay(
                             ZStack {
                                 ZStack {
@@ -132,6 +128,7 @@ struct AttachmentBubble: View {
                                         .frame(width: 20, height: 20)
                                         .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 0)
                                         .rotationEffect(.init(degrees: -90))
+                                        .rotation3DEffect(Angle(degrees: 180), axis: (x: 1, y: 0, z: 0))
                                         .animation(Animation.linear(duration: 0.1))
                                 }.opacity(self.videoDownloadProgress == 0.0 || self.videoDownloadProgress == 1.0 ? 0 : 1)
                                 .padding(30)

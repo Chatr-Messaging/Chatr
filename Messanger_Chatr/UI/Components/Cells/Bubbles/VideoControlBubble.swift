@@ -43,7 +43,7 @@ struct VideoControlBubble: View {
                     .zIndex(1)
 
                     Spacer()
-                    if self.totalDuration > 25.0 {
+                    if let currentItemz = self.player.currentItem, currentItemz.duration > CMTime(seconds: 20.0, preferredTimescale: 600) {
                         Text(self.getTotalDurationString())
                             .font(.subheadline)
                             .fontWeight(.semibold)

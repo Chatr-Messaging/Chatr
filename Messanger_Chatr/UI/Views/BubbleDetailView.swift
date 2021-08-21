@@ -149,8 +149,9 @@ struct BubbleDetailView: View {
                         } else if self.message.imageType == "video/mov" && self.message.messageState != .deleted {
                             ZStack(alignment: .center) {
                                 DetailVideoPlayer(viewModel: self.viewModel)
-                                    .frame(width: self.viewModel.videoSize.width, height: self.viewModel.videoSize.height)
-                                    .frame(maxWidth: Constants.screenWidth - 20, alignment: .center)
+                                    //.frame(maxWidth: CGFloat(Constants.screenWidth - 20), alignment: .center)
+                                    //.frame(width: CGFloat(Constants.screenWidth - 20), alignment: self.messagePosition == .right ? .trailing : .leading)
+                                    //frame(height: CGFloat(self.message.mediaRatio * (Constants.screenWidth - 20)))
                                     .cornerRadius(showContentActions ? (!self.repliesOpen ? (self.cardDrag.height > 0 ? self.cardDrag.height / 8 : 0) : 0) : 15)
                                     .matchedGeometryEffect(id: self.message.id.description + "mov", in: namespace)
                                     .pinchToZoom()
