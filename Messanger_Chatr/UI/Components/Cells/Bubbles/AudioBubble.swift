@@ -154,6 +154,9 @@ struct AudioBubble: View {
             }.padding(.horizontal)
             .padding(.vertical, 10)
             .frame(width: Constants.screenWidth * 0.4)
+            .onDisappear {
+                self.viewModel.audio.playingBubbleId = ""
+            }
         }
         //.transition(AnyTransition.scale)
         .background(self.messageRight ? LinearGradient(

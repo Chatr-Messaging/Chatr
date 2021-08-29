@@ -176,6 +176,10 @@ struct AttachmentBubble: View {
                                 //}
                             })
                         }
+                        .onDisappear {
+                            self.play = false
+                            self.pause()
+                        }
                 }
             } else if self.message.imageType == "audio/m4a" && self.message.messageState != .deleted {
                 AudioBubble(viewModel: self.viewModel, message: self.message, namespace: self.namespace, messageRight: self.messagePosition == .right)
