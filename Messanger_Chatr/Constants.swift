@@ -203,7 +203,7 @@ extension String {
             //if is your message
             switch message.messageState {
             case .sending:
-                return "sent"
+                return "sending"
             case .delivered:
                 return "sent"
             case .read:

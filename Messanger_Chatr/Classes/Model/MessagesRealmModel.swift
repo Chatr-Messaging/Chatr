@@ -611,20 +611,27 @@ class changeMessageRealmData {
         let message = ChatMessage.markable()
         message.markable = true
         message.text = text
-        let pDialog = ChatDialog(dialogID: dialog.id, type: dialog.dialogType == "public" ? .public : occupentID.count > 2 ? .group : .private)
-        pDialog.occupantIDs = occupentID
+        message.senderID = Session.current.currentUserID
+        message.dialogID = dialog.id
+        message.createdAt = Date()
+        message.deliveredIDs = []
         
-        pDialog.send(message) { (error) in
-            self.insertMessage(message, completion: {
-                if error != nil {
-                    print("error sending message: \(String(describing: error?.localizedDescription))")
-                    self.updateMessageState(messageID: message.id ?? "", messageState: .error)
-                } else {
-                    print("Success sending message to ConnectyCube server!")
-                    //ChatrApp.auth.acceptScrolls = true
+        self.insertMessage(message, completion: {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                let pDialog = ChatDialog(dialogID: dialog.id, type: dialog.dialogType == "public" ? .public : occupentID.count > 2 ? .group : .private)
+                pDialog.occupantIDs = occupentID
+                
+                pDialog.send(message) { (error) in
+                    if error != nil {
+                        print("error sending message: \(String(describing: error?.localizedDescription))")
+                        self.updateMessageState(messageID: message.id ?? "", messageState: .error)
+                    } else {
+                        print("Success sending message to ConnectyCube server!")
+                        self.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
+                    }
                 }
-            })
-        }
+            }
+        })
     }
     
     func sendContactMessage(dialog: DialogStruct, contactID: [Int], occupentID: [NSNumber]) {
@@ -636,20 +643,25 @@ class changeMessageRealmData {
             message.markable = true
             message.text = "Shared contact"
             message.attachments = [attachment]
+            message.senderID = Session.current.currentUserID
+            message.dialogID = dialog.id
+            message.createdAt = Date()
+            message.deliveredIDs = []
             
             let pDialog = ChatDialog(dialogID: dialog.id, type: dialog.dialogType == "public" ? .public : occupentID.count > 2 ? .group : .private)
             pDialog.occupantIDs = occupentID
             
-            pDialog.send(message) { (error) in
-                self.insertMessage(message, completion: {
+            self.insertMessage(message, completion: {
+                pDialog.send(message) { (error) in
                     if error != nil {
                         print("error sending message: \(String(describing: error?.localizedDescription))")
                         self.updateMessageState(messageID: message.id ?? "", messageState: .error)
                     } else {
                         print("Success sending message to ConnectyCube server!")
+                        self.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
                     }
-                })
-            }
+                }
+            })
         }
     }
     
@@ -673,6 +685,7 @@ class changeMessageRealmData {
                         self.updateMessageState(messageID: message.id ?? "", messageState: .error)
                     } else {
                         print("Success sending message to ConnectyCube server!")
+                        self.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
                     }
                 })
             }
@@ -699,6 +712,7 @@ class changeMessageRealmData {
                     self.updateMessageState(messageID: message.id ?? "", messageState: .error)
                 } else {
                     print("Success sending message to ConnectyCube server!")
+                    self.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
                 }
             })
         }
@@ -732,6 +746,7 @@ class changeMessageRealmData {
                             self.updateMessageState(messageID: message.id ?? "", messageState: .error)
                         } else {
                             print("Success sending attachment to ConnectyCube server!")
+                            self.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
                         }
                     })
                 }
@@ -763,6 +778,7 @@ class changeMessageRealmData {
                         self.updateMessageState(messageID: message.id ?? "", messageState: .error)
                     } else {
                         print("Success sending attachment to ConnectyCube server!")
+                        self.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
                     }
                 })
             }
@@ -802,6 +818,7 @@ class changeMessageRealmData {
                             self.updateMessageState(messageID: message.id ?? "", messageState: .error)
                         } else {
                             print("Success sending attachment to ConnectyCube server!")
+                            self.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
                         }
                     })
                 }
@@ -858,6 +875,7 @@ class changeMessageRealmData {
                     self.updateMessageState(messageID: message.id ?? "", messageState: .error)
                 } else {
                     print("Success sending video to ConnectyCube server!")
+                    self.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
                 }
             })
         }

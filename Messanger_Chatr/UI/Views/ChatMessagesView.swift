@@ -298,7 +298,7 @@ struct ChatMessagesView: View {
 //                                        }
 //                                    }
                                 
-                            }.transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(Animation.easeOut(duration: 0.35)), removal: AnyTransition.move(edge: .bottom).animation(Animation.easeOut(duration: 0.35))))
+                            }.transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(Animation.easeOut(duration: 0.35)), removal: AnyTransition.move(edge: .bottom).combined(with: AnyTransition.opacity).animation(Animation.easeOut(duration: 0.35))))
                             .contentShape(Rectangle())
                         }.background(GeometryReader { fullView in
                             Color.clear.preference(key: ViewOffsetKey.self,

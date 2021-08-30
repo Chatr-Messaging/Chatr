@@ -157,7 +157,7 @@ struct MainBody: View {
 
             PhoneNumberView(continuePt1: $continuePt1, text: self.$text, textArea: self.$textArea)
                 .environmentObject(self.auth)
-                .frame(minHeight: 240, idealHeight: 260, maxHeight: 270, alignment: .center)
+                //.frame(minHeight: 240, idealHeight: 260, maxHeight: 270, alignment: .center)
                 .frame(minWidth: 240, idealWidth: 320, maxWidth: 400)
                 .background(BlurView(style: .systemThinMaterial))
                 .cornerRadius(30)
@@ -663,26 +663,47 @@ struct PhoneNumberView: View {
     @Binding var textArea: String
     @State var doneSucess = false
     @State private var loadAni = false
+    @State private var openTerms = false
 
     var body: some View {
-        VStack() {
+        VStack(alignment: .center) {
             Text("Phone Number")
                 .font(.system(size: 28))
                 .fontWeight(.bold)
                 .multilineTextAlignment(.center)
                 .foregroundColor(Color.primary)
                 .padding(.top, 25)
-                .padding([.trailing, .leading], 30)
+                .padding(.bottom, 2.5)
+                .padding(.horizontal, 30)
 
-            Text("By entering your phone number you are agreeing to our Terms of Service & Privacy Policy.")
-                .font(.system(size: 12))
-                .font(.footnote)
-                .foregroundColor(Color.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.top, 5)
-                .padding(.horizontal)
-            Spacer()
-            
+            Button(action: {
+                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                self.openTerms.toggle()
+            }) {
+                Text("By entering your phone number you are agreeing to our Terms of Service & Privacy Policy.")
+                    .font(.system(size: 12))
+                    .font(.footnote)
+                    .foregroundColor(Color.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+            }.buttonStyle(ClickMiniButtonStyle())
+            .padding(.bottom, 10)
+            .sheet(isPresented: $openTerms) {
+                NavigationView {
+                    TermsView(mainText: Constants.termsOfService)
+                        .navigationBarItems(leading:
+                            Button(action: {
+                                withAnimation {
+                                    self.openTerms.toggle()
+                                }
+                            }) {
+                                Text("Done")
+                                    .foregroundColor(.primary)
+                                    .fontWeight(.medium)
+                            })
+                }
+            }
+                        
             HStack {
                 TextField("", text: $textArea)
                     .keyboardType(.numberPad)
@@ -709,8 +730,6 @@ struct PhoneNumberView: View {
                 .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 5)
                 
             }.padding(.horizontal, 25)
-
-            Spacer()
             
             if auth.verifyPhoneNumberStatus == .success {
                Text("Success")
@@ -721,6 +740,8 @@ struct PhoneNumberView: View {
                     .trim(from: 0, to: 0.8)
                     .stroke(Color.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                     .frame(width: 25, height: 25)
+                    .padding(.vertical, 10)
+                    .padding(.bottom, 30)
                     .rotationEffect(.init(degrees: self.loadAni ? 360 : 0))
                     .animation(Animation.linear(duration: 0.55).repeatForever(autoreverses: false))
                     .onAppear(perform: ({
@@ -730,82 +751,86 @@ struct PhoneNumberView: View {
                 Text("error, please try again")
                     .font(.footnote)
                     .padding(.horizontal, 25)
+                    .padding(.vertical, 2)
+                    .padding(.bottom, self.text.count >= 5 ? 0 : 10)
                     .foregroundColor(Color.secondary)
                     .onAppear {
                         UINotificationFeedbackGenerator().notificationOccurred(.error)
                         self.continuePt1 = true
                     }
-                if !self.text.isEmpty {
+                
+                if self.text.count >= 5 {
                     Button(action: {
-                        self.auth.sendVerificationNumber(numberText: self.textArea + self.text)
-                    }) {
-                        Text("Submit")
-                            .fontWeight(.semibold)
-                            .padding(20)
-                            .foregroundColor(Color.white)
-                    }.buttonStyle(MainButtonStyleDeselected())
-                    .frame(height: 40)
-                    .padding(.horizontal, 45)
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                       self.auth.sendVerificationNumber(numberText: self.textArea + self.text)
+                   }) {
+                        HStack(alignment: .center, spacing: 10) {
+                            Text("Verify")
+                                .fontWeight(.semibold)
+                                .foregroundColor(.white)
+                            
+                            Image(systemName: "arrow.right")
+                                .resizable()
+                                .scaledToFit()
+                                .font(Font.title.weight(.semibold))
+                                .foregroundColor(.white)
+                                .frame(width: 20, height: 18, alignment: .center)
+                        }.padding(.horizontal)
+                    }.buttonStyle(MainButtonStyle())
+                    .padding(.horizontal)
+                    .padding(.bottom)
                     .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
                 }
-            } else if auth.verifyPhoneNumberStatus == .undefined {
+            } else if auth.verifyPhoneNumberStatus == .undefined || auth.verifyPhoneNumberStatus == .error {
                 if self.text.count >= 5 {
-                    HStack() {
-                        Spacer()
-                        Button(action: {
-                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                           self.auth.sendVerificationNumber(numberText: self.textArea + self.text)
-                       }) {
-                            HStack(alignment: .center, spacing: 10) {
-                                Text("Verify")
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.white)
-                                
-                                Image(systemName: "arrow.right")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .font(Font.title.weight(.semibold))
-                                    .foregroundColor(.white)
-                                    .frame(width: 20, height: 18, alignment: .center)
-                            }.padding(.horizontal, 15)
-                        }.buttonStyle(MainButtonStyle())
-                        .frame(width: 160)
-                        .offset(x: -10)
-                        .padding(.trailing)
-                        .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
-                    }
-                } else {                    
-                    HStack() {
-                        Spacer()
-                        Button(action: {
-                            UINotificationFeedbackGenerator().notificationOccurred(.error)
-                       }) {
-                            HStack(alignment: .center, spacing: 10) {
-                                Text("Verify")
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.secondary)
-                                
-                                Image(systemName: "arrow.right")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .font(Font.title.weight(.medium))
-                                    .foregroundColor(.secondary)
-                                    .frame(width: 20, height: 18, alignment: .center)
-                            }.padding(.horizontal, 15)
-                        }.buttonStyle(MainButtonStyleDeselected())
-                        .frame(width: 160)
-                        .offset(x: -10)
-                        .padding(.trailing)
-                    }
+                    Button(action: {
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                       self.auth.sendVerificationNumber(numberText: self.textArea + self.text)
+                   }) {
+                        HStack(alignment: .center, spacing: 10) {
+                            Text("Verify")
+                                .fontWeight(.semibold)
+                                .foregroundColor(.white)
+                            
+                            Image(systemName: "arrow.right")
+                                .resizable()
+                                .scaledToFit()
+                                .font(Font.title.weight(.semibold))
+                                .foregroundColor(.white)
+                                .frame(width: 20, height: 18, alignment: .center)
+                        }.padding(.horizontal)
+                    }.buttonStyle(MainButtonStyle())
+                    .padding(.horizontal)
+                    .padding(.vertical, 5)
+                    .padding(.bottom)
+                    .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
+                } else {
+                    Button(action: {
+                        UINotificationFeedbackGenerator().notificationOccurred(.error)
+                   }) {
+                        HStack(alignment: .center, spacing: 10) {
+                            Text("Verify")
+                                .fontWeight(.semibold)
+                                .foregroundColor(.secondary)
+                            
+                            Image(systemName: "arrow.right")
+                                .resizable()
+                                .scaledToFit()
+                                .font(Font.title.weight(.medium))
+                                .foregroundColor(.secondary)
+                                .frame(width: 20, height: 18, alignment: .center)
+                        }.padding(.horizontal)
+                    }.buttonStyle(MainButtonStyleDeselected())
+                    .padding(.horizontal)
+                    .padding(.vertical, 5)
+                    .padding(.bottom)
                 }
             } else {
               Text("Verify")
                   .fontWeight(.medium)
-                  .padding(20)
+                  .padding(.horizontal , 20)
                   .foregroundColor(Color.white)
           }
-            
-            Spacer()
         }
     }
 }
