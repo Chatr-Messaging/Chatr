@@ -67,9 +67,9 @@ struct DetailVideoPlayer: UIViewControllerRepresentable {
         DispatchQueue.main.async {
             if let videoAssetTrack = self.viewModel.player.currentItem?.asset.tracks(withMediaType: AVMediaType.video).first {
                 let naturalSize = videoAssetTrack.naturalSize.applying(videoAssetTrack.preferredTransform)
-                let height3 = abs(naturalSize.width) > UIScreen.main.bounds.width ? UIScreen.main.bounds.width : abs(naturalSize.width)
-                let width3 = (height3 * abs(naturalSize.width) / abs(naturalSize.height))
-                let mainRect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: width3, height: height3))
+                let height3 = abs(naturalSize.width) > UIScreen.main.bounds.width - 20 ? UIScreen.main.bounds.width - 20 : abs(naturalSize.width)
+                //let width3 = (height3 * abs(naturalSize.width) / abs(naturalSize.height))
+                let mainRect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: (Constants.screenWidth - 20), height: height3))
 
                 self.viewModel.player.isMuted = false
                 self.viewModel.player.play()

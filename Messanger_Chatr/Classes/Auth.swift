@@ -117,6 +117,7 @@ class AuthModel: NSObject, ObservableObject {
     @ObservedObject var messages = MessagesRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(MessageStruct.self))
     @ObservedObject var addressBook = AddressBookRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(AddressBookStruct.self))
     
+    @Published var userHasiOS15: Bool = false
     var anyCancellable: AnyCancellable? = nil
     var anyCancellable1: AnyCancellable? = nil
     var authStateDidChangeListenerHandle: AuthStateDidChangeListenerHandle?

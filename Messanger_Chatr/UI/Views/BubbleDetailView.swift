@@ -20,7 +20,7 @@ import MapKit
 struct BubbleDetailView: View {
     @EnvironmentObject var auth: AuthModel
     @ObservedObject var viewModel: ChatMessageViewModel
-    @StateObject var imagePicker = KeyboardCardViewModel()
+    @ObservedObject var imagePicker = KeyboardCardViewModel()
     var namespace: Namespace.ID
     @Binding var newDialogFromSharedContact: Int
     @Binding var isDetailOpen: Bool
@@ -58,18 +58,30 @@ struct BubbleDetailView: View {
                             .clipShape(Circle())
                             .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 0)
 
-                        VStack(alignment: .leading) {
+                        VStack(alignment: .leading, spacing: 2.5) {
                             Text(viewModel.contact.fullName)
                                 .foregroundColor(.primary)
                                 .font(.none)
                                 .fontWeight(.medium)
                                 .lineLimit(1)
                             
-                            Text("last online \(viewModel.contact.lastOnline.getElapsedInterval(lastMsg: "moments")) ago")
-                                .font(.caption)
-                                .fontWeight(.regular)
-                                .foregroundColor(.secondary)
-                                .multilineTextAlignment(.leading)
+                            HStack(alignment: .center) {
+                                if self.message.isPinned {
+                                    Image(systemName: "pin.fill")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .rotationEffect(.degrees(-45))
+                                        .frame(width: 14, height: 14, alignment: .center)
+                                        .offset(y: 2)
+                                        .foregroundColor(.secondary)
+                                }
+
+                                Text("sent " + self.viewModel.dateFormatTimeExtended(date: self.message.date))
+                                    .font(.caption)
+                                    .fontWeight(.regular)
+                                    .foregroundColor(.secondary)
+                                    .multilineTextAlignment(.leading)
+                            }
                         }
 
                         Spacer()
@@ -150,7 +162,7 @@ struct BubbleDetailView: View {
                             ZStack(alignment: .center) {
                                 DetailVideoPlayer(viewModel: self.viewModel)
                                     //.frame(maxWidth: CGFloat(Constants.screenWidth - 20), alignment: .center)
-                                    //.frame(width: CGFloat(Constants.screenWidth - 20), alignment: self.messagePosition == .right ? .trailing : .leading)
+                                    //.frame(width: CGFloat(Constants.screenWidth - 20))
                                     //frame(height: CGFloat(self.message.mediaRatio * (Constants.screenWidth - 20)))
                                     .cornerRadius(showContentActions ? (!self.repliesOpen ? (self.cardDrag.height > 0 ? self.cardDrag.height / 8 : 0) : 0) : 15)
                                     .matchedGeometryEffect(id: self.message.id.description + "mov", in: namespace)
@@ -173,7 +185,7 @@ struct BubbleDetailView: View {
                                         self.viewModel.playVideoo ? self.viewModel.playVideo() : self.viewModel.pause()
                                     }) {
                                         ZStack {
-                                            BlurView(style: .systemUltraThinMaterial)
+                                            BlurView(style: .systemUltraThinMaterialDark)
                                                 .frame(width: 60, height: 60)
                                                 .clipShape(Circle())
 
@@ -330,6 +342,12 @@ struct BubbleDetailView: View {
                                     }).buttonStyle(interactionDefaultButtonStyle())
                                 }
 
+                                if self.auth.selectedConnectyDialog?.type == .group || self.auth.selectedConnectyDialog?.type == .public {
+                                    Text("\(self.message.readIDs.count) seen")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+
                                 Menu {
                                     if self.message.messageState != .error {
                                         Button(action: {
@@ -415,29 +433,6 @@ struct BubbleDetailView: View {
                                 }).buttonStyle(ClickButtonStyle())
                             }
                         }.padding(.horizontal, 10)
-
-                        HStack {
-                            if self.message.isPinned {
-                                Image(systemName: "pin.fill")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .rotationEffect(.degrees(-45))
-                                    .frame(width: 14, height: 14, alignment: .center)
-                                    .offset(y: 2)
-                                    .foregroundColor(.secondary)
-                            }
-
-                            Text("sent " + self.viewModel.dateFormatTimeExtended(date: self.message.date))
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-
-                            Spacer()
-                            if self.auth.selectedConnectyDialog?.type == .group || self.auth.selectedConnectyDialog?.type == .public {
-                                Text("\(self.message.readIDs.count) seen")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                        }.padding(.horizontal, 15)
                     }
                     .opacity(showContentActions ? Double((200 - self.cardDrag.height) / 200) : 0)
                     .offset(y: showContentActions ? (self.cardDrag.height > 0 ? -(self.cardDrag.height / 4) : 0) : -60)
@@ -639,6 +634,7 @@ struct BubbleDetailView: View {
                 self.hasUserDisliked = self.message.dislikedId.contains(self.auth.profile.results.first?.id ?? 0)
                 self.messagePosition = UInt(self.message.senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? .right : .left
 
+                self.viewModel.message = self.message
                 self.viewModel.fetchUser()
                 self.observeInteractions()
                 self.observeReplies()

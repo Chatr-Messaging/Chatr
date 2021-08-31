@@ -17,8 +17,9 @@ struct VideoControlBubble: View {
     @Binding var videoDownload: CGFloat
     @Binding var isDetailOpen: Bool
     @Binding var detailMessageModel: MessageStruct
+    @Binding var mute: Bool
+    @Binding var playingVideoId: String
     @State var message: MessageStruct
-    @State var mute: Bool = true
     @State var progressBar: CGFloat = 1.0
     var messagePositionRight: Bool
 
@@ -30,6 +31,7 @@ struct VideoControlBubble: View {
                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                         self.mute.toggle()
                         self.player.isMuted = self.mute
+                        self.viewModel.preferenceVideoMute = self.mute
                     }, label: {
                         Image(systemName: self.mute ? "speaker.slash.fill" : "speaker.wave.2.fill")
                             .resizable()
@@ -48,10 +50,17 @@ struct VideoControlBubble: View {
                             .font(.subheadline)
                             .fontWeight(.semibold)
                             .foregroundColor(.white)
-                            .padding(5)
+                            .padding(8)
                             .background(BlurView(style: .systemUltraThinMaterialDark).cornerRadius(7.5))
                             .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 0)
                             .padding(.trailing, 7.5)
+                            .onChange(of: self.totalDuration) { _ in
+                                guard self.playingVideoId == self.message.id.description else {
+                                    self.pause()
+
+                                    return
+                                }
+                            }
                     } else if self.totalDuration != 0.0 {
                         ZStack {
                             Circle()
@@ -72,6 +81,12 @@ struct VideoControlBubble: View {
                         .overlay(RoundedRectangle(cornerRadius: 7.5).stroke(Color.black.opacity(0.15), lineWidth: 2))
                         .padding(.trailing, 7.5)
                         .onChange(of: self.totalDuration) { newValue in
+                            guard self.playingVideoId == self.message.id.description else {
+                                self.pause()
+
+                                return
+                            }
+
                             self.progressBar = CGFloat(newValue / (player.currentItem?.duration.seconds ?? 1))
                         }
                     }
@@ -84,6 +99,7 @@ struct VideoControlBubble: View {
                     self.player.pause()
                     self.play = false
                     self.detailMessageModel = self.message
+                    self.playingVideoId = self.message.id.description
                     self.viewModel.player = self.player
                     self.viewModel.playVideoo = true
                     withAnimation {
@@ -137,7 +153,7 @@ struct VideoControlBubble: View {
     }
     
     func getTotalDurationString() -> String {
-        guard !(self.totalDuration.isNaN || self.totalDuration.isInfinite) else { return "" }
+        guard !(self.totalDuration.isNaN || self.totalDuration.isInfinite) else { return "0:00" }
 
         let m = Int(abs(self.totalDuration) / 60)
         let s = Int(self.totalDuration.truncatingRemainder(dividingBy: 60))
@@ -151,10 +167,20 @@ struct VideoControlBubble: View {
             currentItem?.seek(to: .zero, completionHandler: nil)
         }
 
-        player.play()
+        if self.mute, !self.viewModel.preferenceVideoMute {
+            self.mute = false
+            self.player.isMuted = false
+        } else if self.viewModel.preferenceVideoMute {
+            self.mute = true
+            self.player.isMuted = true
+        }
+
+        self.playingVideoId = message.id.description
+        self.player.play()
     }
 
     func pause() {
-        player.pause()
+        self.player.pause()
+        self.play = false
     }
 }

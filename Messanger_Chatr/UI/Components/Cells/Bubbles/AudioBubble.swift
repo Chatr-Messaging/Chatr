@@ -171,6 +171,7 @@ struct AudioBubble: View {
     func loadAudio(fileId: String) {
         DispatchQueue.main.async {
             guard self.viewModel.audio.playingBubbleId != self.message.id.description else {
+                self.viewModel.audio.audioPlayer.prepareToPlay()
                 self.viewModel.audio.audioPlayer.play()
                 self.isPlayingAudio = true
 
@@ -185,6 +186,7 @@ struct AudioBubble: View {
                 if let objectData = result?.object {
                     self.viewModel.audio.audioPlayer = try AVAudioPlayer(data: objectData)
                     print("got it and now going to play it222")
+                    self.viewModel.audio.audioPlayer.prepareToPlay()
                     self.viewModel.audio.audioPlayer.play()
                     self.isPlayingAudio = true
                     print("successfully added cached audio data \(String(describing: result?.object))")

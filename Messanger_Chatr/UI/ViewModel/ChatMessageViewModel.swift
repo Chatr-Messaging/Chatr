@@ -29,6 +29,7 @@ class ChatMessageViewModel: ObservableObject {
     @Published var playVideoo: Bool = true
     @Published var totalMessageCount: Int = -1
     @Published var unreadMessageCount: Int = 0
+    @Published var preferenceVideoMute: Bool = false
 
     func loadDialog(auth: AuthModel, dialogId: String, completion: @escaping () -> Void) {
         let extRequest : [String: String] = ["sort_desc" : "lastMessageDate"]

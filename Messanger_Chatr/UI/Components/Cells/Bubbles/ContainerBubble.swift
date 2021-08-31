@@ -17,12 +17,13 @@ import Cache
 
 struct ContainerBubble: View {
     @EnvironmentObject var auth: AuthModel
-    @StateObject var viewModel: ChatMessageViewModel
+    @ObservedObject var viewModel: ChatMessageViewModel
     @Binding var newDialogFromSharedContact: Int
     @Binding var dialogID: String
     @Binding var isHomeDialogOpen: Bool
     @Binding var isDetailOpen: Bool
     @Binding var detailMessageModel: MessageStruct
+    @Binding var playingVideoId: String
     var isPriorWider: Bool
     @State var message: MessageStruct
     @State var messagePosition: messagePosition
@@ -77,7 +78,7 @@ struct ContainerBubble: View {
                     ZStack(alignment: self.messagePosition == .left ? .trailing : .leading) {
                         
                         if self.message.image != "" || self.message.uploadMediaId != "" {
-                            AttachmentBubble(viewModel: self.viewModel, isDetailOpen: self.$isDetailOpen, detailMessageModel: self.$detailMessageModel, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior, player: self.$player, totalDuration: self.$totalDuration, namespace: self.namespace)
+                            AttachmentBubble(viewModel: self.viewModel, isDetailOpen: self.$isDetailOpen, detailMessageModel: self.$detailMessageModel, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior, player: self.$player, totalDuration: self.$totalDuration, playingVideoId: self.$playingVideoId, namespace: self.namespace)
                                 .environmentObject(self.auth)
                         } else if self.message.contactID != 0 {
                             ContactBubble(viewModel: self.viewModel, chatContact: self.$newDialogFromSharedContact, openDialogId: self.$dialogID, isHomeDialogOpen: self.$isHomeDialogOpen, message: self.message, messagePosition: messagePosition, hasPrior: self.hasPrior, namespace: self.namespace)

@@ -825,7 +825,7 @@ struct KeyboardCardView: View {
 //MARK: Message Text Field
 struct ResizableTextField : UIViewRepresentable {
     @EnvironmentObject var auth: AuthModel
-    @StateObject var imagePicker: KeyboardCardViewModel
+    @ObservedObject var imagePicker: KeyboardCardViewModel
     @Binding var height: CGFloat
     @Binding var text: String
     var isMessageView: Bool?

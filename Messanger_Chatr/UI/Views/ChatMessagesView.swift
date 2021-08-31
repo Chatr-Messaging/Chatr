@@ -113,6 +113,8 @@ struct ChatMessagesView: View {
     @State private var scrollToId: String = ""
     @State private var maxMessageCount: Int = -1
     @State private var scrollViewHeight: CGFloat = 0
+    @State private var scrollBuffer: CGFloat = 0
+    @State var playingVideoId = ""
     var namespace: Namespace.ID
     let keyboard = KeyboardObserver()
     let pageShowCount = 10
@@ -238,14 +240,14 @@ struct ChatMessagesView: View {
                                     if messagePosition == .right { Spacer() }
                                     let hasPrevious = self.hasPrevious(index: message)
                                                                         
-                                    ContainerBubble(viewModel: self.viewModel, newDialogFromSharedContact: self.$newDialogFromSharedContact, dialogID: self.$dialogID, isHomeDialogOpen: self.$isHomeDialogOpen, isDetailOpen: self.$isDetailOpen, detailMessageModel: self.$detailMessageModel, isPriorWider: self.isPriorWider(index: message), message: currentMessages[message], messagePosition: messagePosition, hasPrior: hasPrevious, namespace: self.namespace)
+                                    ContainerBubble(viewModel: self.viewModel, newDialogFromSharedContact: self.$newDialogFromSharedContact, dialogID: self.$dialogID, isHomeDialogOpen: self.$isHomeDialogOpen, isDetailOpen: self.$isDetailOpen, detailMessageModel: self.$detailMessageModel, playingVideoId: self.$playingVideoId, isPriorWider: self.isPriorWider(index: message), message: currentMessages[message], messagePosition: messagePosition, hasPrior: hasPrevious, namespace: self.namespace)
                                         .environmentObject(self.auth)
                                         .fixedSize(horizontal: false, vertical: true)
                                         .padding(.horizontal, 25)
                                         .padding(.trailing, messagePosition != .right ? 40 : 0)
                                         .padding(.leading, messagePosition == .right ? 40 : 0)
                                         .padding(.bottom, hasPrevious ? -6 : 10)
-                                        //.padding(.bottom, notLast ? 0 : self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 110 : 0) + 32)
+                                        .padding(.bottom, self.auth.userHasiOS15 ? 0 : currentMessages[message].id != currentMessages.last?.id ? 0 : self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 110 : 0) + 32)
                                         .resignKeyboardOnDragGesture()
                                         .id(currentMessages[message].id)
 
@@ -325,14 +327,26 @@ struct ChatMessagesView: View {
                                     }
                                 }
                         })
-                        .onPreferenceChange(ViewOffsetKey.self) {
+                        .onPreferenceChange(ViewOffsetKey.self) { scrollOffsetz in
                             guard self.activeView.height == 0 else {
                                 print("dragging down dialog cell...")
                                 return
                             }
+                            
+                            //pause video if scrolling too much & is playing video
+                            if self.playingVideoId != "" {
+                                self.scrollBuffer = self.scrollBuffer == 0 ? scrollOffsetz : self.scrollBuffer
+                                print("caught the video playing and scrolling \(self.scrollBuffer)")
+                                
+                                if (scrollOffsetz > self.scrollBuffer + 200) || (scrollOffsetz < self.scrollBuffer - 200) {
+                                    print("susses reset the videooo \(self.scrollBuffer)")
+                                    self.playingVideoId = ""
+                                    self.scrollBuffer = 0
+                                }
+                            }
 
-                            print("the offset is: \($0)")
-                            if $0 < -60 && !firstScroll, !self.isLoadingMore, self.permissionLoadMore {
+                            print("the offset is: \(scrollOffsetz) && \(self.playingVideoId)")
+                            if scrollOffsetz < -60 && !firstScroll, !self.isLoadingMore, self.permissionLoadMore {
                                 self.isLoadingMore = true
                                 self.permissionLoadMore = false
                                 //$0 > self.scrollViewHeight && self.minPagination != currentMessages.count {
@@ -398,6 +412,12 @@ struct ChatMessagesView: View {
                             }
                         }
                         .onAppear {
+                            if #available(iOS 15.0, *) {
+                                self.auth.userHasiOS15 = true
+                            } else {
+                                self.auth.userHasiOS15 = false
+                            }
+                            
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
                                 keyboard.observe { (event) in
                                     guard !self.viewModel.isDetailOpen else { return }

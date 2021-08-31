@@ -29,7 +29,9 @@ struct AttachmentBubble: View {
     var hasPrior: Bool = false
     @Binding var player: AVPlayer
     @State var play: Bool = false
+    @State var videoMute: Bool = true
     @Binding var totalDuration: Double
+    @Binding var playingVideoId: String
     @State var videoSize: CGSize = CGSize.zero
     @State var videoDownloadProgress: CGFloat = 0.0
     var namespace: Namespace.ID
@@ -133,7 +135,7 @@ struct AttachmentBubble: View {
                                 }.opacity(self.videoDownloadProgress == 0.0 || self.videoDownloadProgress == 1.0 ? 0 : 1)
                                 .padding(30)
 
-                                VideoControlBubble(viewModel: self.viewModel, player: self.$player, play: self.$play, totalDuration: self.$totalDuration, videoDownload: self.$videoDownloadProgress, isDetailOpen: self.$isDetailOpen, detailMessageModel: self.$detailMessageModel, message: self.message, messagePositionRight: messagePosition == .right)
+                            VideoControlBubble(viewModel: self.viewModel, player: self.$player, play: self.$play, totalDuration: self.$totalDuration, videoDownload: self.$videoDownloadProgress, isDetailOpen: self.$isDetailOpen, detailMessageModel: self.$detailMessageModel, mute: self.$videoMute, playingVideoId: self.$playingVideoId, message: self.message, messagePositionRight: messagePosition == .right)
 
                                 if self.message.messageState == .error {
                                     RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.5) : Color.clear, lineWidth: 5)
@@ -226,10 +228,20 @@ struct AttachmentBubble: View {
             currentItem?.seek(to: .zero, completionHandler: nil)
         }
         
+        if self.videoMute, !self.viewModel.preferenceVideoMute {
+            self.videoMute = false
+            self.player.isMuted = false
+        } else if self.viewModel.preferenceVideoMute {
+            self.videoMute = true
+            self.player.isMuted = true
+        }
+
+        self.playingVideoId = message.id.description
         self.player.play()
     }
 
     func pause() {
-        player.pause()
+        self.player.pause()
+        self.play = false
     }
 }
