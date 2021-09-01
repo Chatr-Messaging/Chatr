@@ -38,7 +38,7 @@ struct DiscoverView: View {
     @State var style = StaggeredGridStyle(.horizontal, tracks: .fixed(35), spacing: 8)
 
     var body: some View {
-        if UserDefaults.standard.bool(forKey: "discoverAgree") || self.isShowingWelcome {
+        if !UserDefaults.standard.bool(forKey: "discoverAgree") || self.isShowingWelcome {
         ScrollView(.vertical, showsIndicators: true) {
             VStack(alignment: .center) {
                 //SEARCH BAR

@@ -176,7 +176,7 @@ struct ContactListView : View {
     func discoverViewFunc() -> some View {
         DiscoverView(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, openNewDialogID: self.$openNewDialogID)
             .environmentObject(self.auth)
-            .navigationBarTitle(UserDefaults.standard.bool(forKey: "discoverAgree") ? "Discover" : "Terms", displayMode: .automatic)
+            .navigationBarTitle("Discover", displayMode: .automatic)
             .background(Color("bgColor")
             .edgesIgnoringSafeArea(.all))
     }

@@ -350,7 +350,7 @@ struct mainHomeList: View {
                             NavigationView {
                                 DiscoverView(removeDoneBtn: false, dismissView: self.$isDiscoverOpen, showPinDetails: self.$showPinDetails, openNewDialogID: self.$newDialogFromContact)
                                     .environmentObject(self.auth)
-                                    .navigationBarTitle(UserDefaults.standard.bool(forKey: "discoverAgree") ? "Discover" : "Terms", displayMode: .automatic)
+                                    .navigationBarTitle("Discover", displayMode: .automatic)
                                     .background(Color("bgColor")
                                     .edgesIgnoringSafeArea(.all))
                             }

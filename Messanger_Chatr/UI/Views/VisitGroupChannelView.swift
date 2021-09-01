@@ -62,7 +62,7 @@ struct VisitGroupChannelView: View {
             }
 
             VStack(spacing: 0) {
-                ScrollView(.vertical, showsIndicators: true) {
+                ScrollView(.vertical, showsIndicators: false) {
                     //MARK: Top Profile
                     topGroupHeaderView(dialogModel: self.$dialogModel, groupOccUserAvatar: self.$groupOccUserAvatar, isProfileImgOpen: self.$isProfileImgOpen, isEditGroupOpen: self.$isEditGroupOpen, publicTags: self.$publicTags, showMoreAdmins: self.$showMoreAdmins, reportCount: self.publicDialogModel.reportCount ?? 0)
                         .environmentObject(self.auth)
@@ -1054,8 +1054,8 @@ struct topGroupHeaderView: View {
                                         .fontWeight(.medium)
                                         .padding(.vertical, 3)
                                         .padding(.horizontal, 10)
-                                        .foregroundColor(Color("disabledButton"))
-                                        .background(RoundedRectangle(cornerRadius: 7).stroke(Color("interactions_selected"), lineWidth: 2.5).background(Color("interactions_selected").opacity(0.3)).cornerRadius(7))
+                                        .foregroundColor(Color("bgColor_opposite"))
+                                        .background(RoundedRectangle(cornerRadius: 7).stroke(Color("interactions_selected").opacity(0.5), lineWidth: 2.5).background(Color("interactions_selected").opacity(0.3)).cornerRadius(7))
                                         .lineLimit(1)
                                         .fixedSize()
                                 }).buttonStyle(ClickButtonStyle())
