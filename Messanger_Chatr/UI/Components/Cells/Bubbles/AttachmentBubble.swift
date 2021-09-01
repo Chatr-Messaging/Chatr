@@ -132,7 +132,10 @@ struct AttachmentBubble: View {
                                         .rotationEffect(.init(degrees: -90))
                                         .rotation3DEffect(Angle(degrees: 180), axis: (x: 1, y: 0, z: 0))
                                         .animation(Animation.linear(duration: 0.1))
-                                }.opacity(self.videoDownloadProgress == 0.0 || self.videoDownloadProgress == 1.0 ? 0 : 1)
+                                }
+                                .padding(4)
+                                .background(BlurView(style: .systemUltraThinMaterialDark).cornerRadius(7.5))
+                                .opacity(self.videoDownloadProgress == 0.0 || self.videoDownloadProgress == 1.0 ? 0 : 1)
                                 .padding(30)
 
                             VideoControlBubble(viewModel: self.viewModel, player: self.$player, play: self.$play, totalDuration: self.$totalDuration, videoDownload: self.$videoDownloadProgress, isDetailOpen: self.$isDetailOpen, detailMessageModel: self.$detailMessageModel, mute: self.$videoMute, playingVideoId: self.$playingVideoId, message: self.message, messagePositionRight: messagePosition == .right)
@@ -153,6 +156,7 @@ struct AttachmentBubble: View {
                         .onAppear {
                             self.loadVideo(fileId: self.message.image, completion: {
                                 self.player.isMuted = true
+                                self.play = false
 
                                 NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: self.player.currentItem, queue: .main) { _ in
                                     self.player.seek(to: CMTime.zero)

@@ -45,12 +45,13 @@ struct VideoControlBubble: View {
                     .zIndex(1)
 
                     Spacer()
-                    if let currentItemz = self.player.currentItem, currentItemz.duration > CMTime(seconds: 20.0, preferredTimescale: 600) {
+                    if let currentItemz = self.player.currentItem, self.totalDuration != 0.0, currentItemz.duration > CMTime(seconds: 20.0, preferredTimescale: 600) {
                         Text(self.getTotalDurationString())
                             .font(.subheadline)
                             .fontWeight(.semibold)
                             .foregroundColor(.white)
-                            .padding(8)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
                             .background(BlurView(style: .systemUltraThinMaterialDark).cornerRadius(7.5))
                             .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 0)
                             .padding(.trailing, 7.5)
