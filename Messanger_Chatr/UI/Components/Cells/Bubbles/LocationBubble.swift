@@ -56,8 +56,10 @@ struct LocationBubble: View {
             }
         }
         .onAppear() {
-            self.region.center.latitude = self.message.latitude
-            self.region.center.longitude = self.message.longitude
+            DispatchQueue.main.async {
+                self.region.center.latitude = self.message.latitude
+                self.region.center.longitude = self.message.longitude
+            }
         }
     }
     

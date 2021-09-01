@@ -217,16 +217,18 @@ struct addNewContactView: View {
                     }
                 }.padding(.top, 60)
                 .onAppear() {
-                    Request.registeredUsersFromAddressBook(withUdid: UIDevice.current.identifierForVendor?.uuidString, isCompact: false, successBlock: { (users) in
-                        self.regristeredAddressBook.removeAll()
-                        for i in users {
-                            DispatchQueue.main.async {
-                                if self.isUserNotContact(id: i.id) && i.id != Session.current.currentUserID {
-                                    self.regristeredAddressBook.append(i)
+                    DispatchQueue.main.async {
+                        Request.registeredUsersFromAddressBook(withUdid: UIDevice.current.identifierForVendor?.uuidString, isCompact: false, successBlock: { (users) in
+                            self.regristeredAddressBook.removeAll()
+                            for i in users {
+                                DispatchQueue.main.async {
+                                    if self.isUserNotContact(id: i.id) && i.id != Session.current.currentUserID {
+                                        self.regristeredAddressBook.append(i)
+                                    }
                                 }
                             }
-                        }
-                    })
+                        })
+                    }
                 }
             }.navigationBarTitle("Add Contact", displayMode: .inline)
             .background(Color("bgColor"))

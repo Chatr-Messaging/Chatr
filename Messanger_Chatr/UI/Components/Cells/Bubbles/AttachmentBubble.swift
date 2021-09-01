@@ -154,33 +154,35 @@ struct AttachmentBubble: View {
                             self.play ? self.playVideo() : self.pause()
                         }
                         .onAppear {
-                            self.loadVideo(fileId: self.message.image, completion: {
-                                self.player.isMuted = true
-                                self.play = false
+                            DispatchQueue.main.async {
+                                self.loadVideo(fileId: self.message.image, completion: {
+                                    self.player.isMuted = true
+                                    self.play = false
 
-                                NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: self.player.currentItem, queue: .main) { _ in
-                                    self.player.seek(to: CMTime.zero)
-                                    self.player.play()
-                                }
+                                    NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: self.player.currentItem, queue: .main) { _ in
+                                        self.player.seek(to: CMTime.zero)
+                                        self.player.play()
+                                    }
 
-                                self.player.addPeriodicTimeObserver(forInterval: CMTime(seconds: 0.2, preferredTimescale: 600), queue: nil) { time in
-                                    guard let item = self.player.currentItem else { return }
+                                    self.player.addPeriodicTimeObserver(forInterval: CMTime(seconds: 0.2, preferredTimescale: 600), queue: nil) { time in
+                                        guard let item = self.player.currentItem else { return }
 
-                                    self.totalDuration = item.duration.seconds - item.currentTime().seconds
-                                }
+                                        self.totalDuration = item.duration.seconds - item.currentTime().seconds
+                                    }
 
-                                //DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
-//                                    if let videoAssetTrack = self.player.currentItem?.asset.tracks(withMediaType: AVMediaType.video).first {
-//                                        let naturalSize = videoAssetTrack.naturalSize.applying(videoAssetTrack.preferredTransform)
-//                                        let width = abs(naturalSize.width) > UIScreen.main.bounds.width * 0.75 ? UIScreen.main.bounds.width * 0.75 : abs(naturalSize.width)
-//                                        let heightRatio = abs(naturalSize.height) * (abs(naturalSize.height) / width)
-//                                        let height = width * (abs(naturalSize.height) / abs(naturalSize.width))
-//                                        let rect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: width, height: height))
-//
-//                                        self.videoSize = rect.size
-//                                    }
-                                //}
-                            })
+                                    //DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+    //                                    if let videoAssetTrack = self.player.currentItem?.asset.tracks(withMediaType: AVMediaType.video).first {
+    //                                        let naturalSize = videoAssetTrack.naturalSize.applying(videoAssetTrack.preferredTransform)
+    //                                        let width = abs(naturalSize.width) > UIScreen.main.bounds.width * 0.75 ? UIScreen.main.bounds.width * 0.75 : abs(naturalSize.width)
+    //                                        let heightRatio = abs(naturalSize.height) * (abs(naturalSize.height) / width)
+    //                                        let height = width * (abs(naturalSize.height) / abs(naturalSize.width))
+    //                                        let rect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: width, height: height))
+    //
+    //                                        self.videoSize = rect.size
+    //                                    }
+                                    //}
+                                })
+                            }
                         }
                         .onDisappear {
                             self.play = false

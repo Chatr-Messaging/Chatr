@@ -105,8 +105,9 @@ struct ContactsView: View {
                                                 .foregroundColor(.primary)
                                                 .multilineTextAlignment(.leading)
                                                 .onAppear() {
-                                                    self.fullName = self.auth.profile.results.first?.fullName ?? "Chatr User"
-                                                        //ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self)).results.first?.fullName ?? "Chatr User"
+                                                    DispatchQueue.main.async {
+                                                        self.fullName = self.auth.profile.results.first?.fullName ?? "Chatr User"
+                                                    }
                                                 }
                                         }.offset(y: self.auth.subscriptionStatus == .subscribed ? 3 : 0)
                                         
@@ -165,22 +166,24 @@ struct ContactsView: View {
                                 }
                             }.onAppear {
                                 //discover is always on...
-                                if self.contactBannerDataArray.count < 4 {
-                                    self.contactBannerDataArray.append(ContactBannerData(titleBold: "Discover", title: "Channels", subtitleImage: "magnifyingglass", subtitle: "Join your favorite public groups", imageMain: "contactsBanner", gradientBG: "discoverBackground"))
-                                    
-                                    self.contactBannerDataArray.append(ContactBannerData(titleBold: "Chatr", title: "Premium", subtitleImage: "arrow.up.right", subtitle: "Upgrade to", imageMain: "shieldWide", gradientBG: "preimumBackground"))
-                                    
-                                    self.contactBannerDataArray.append(ContactBannerData(titleBold: "Sync", title: "Address Book", subtitleImage: "text.book.closed", subtitle: "Connect with existing contacts", imageMain: "addressBook", gradientBG: "sendQuickSnapBackground"))
-                                    
-                                    self.contactBannerDataArray.append(ContactBannerData(titleBold: "Send", title: "Quick Snaps", subtitleImage: "paperplane.fill", subtitle: "Send moments to your contacts", imageMain: "quickSnapBanner", gradientBG: "syncAddressBackground"))
-                                    
-                                    self.bannerCount = self.contactBannerDataArray.count
+                                DispatchQueue.main.async {
+                                    if self.contactBannerDataArray.count < 4 {
+                                        self.contactBannerDataArray.append(ContactBannerData(titleBold: "Discover", title: "Channels", subtitleImage: "magnifyingglass", subtitle: "Join your favorite public groups", imageMain: "contactsBanner", gradientBG: "discoverBackground"))
+                                        
+                                        self.contactBannerDataArray.append(ContactBannerData(titleBold: "Chatr", title: "Premium", subtitleImage: "arrow.up.right", subtitle: "Upgrade to", imageMain: "shieldWide", gradientBG: "preimumBackground"))
+                                        
+                                        self.contactBannerDataArray.append(ContactBannerData(titleBold: "Sync", title: "Address Book", subtitleImage: "text.book.closed", subtitle: "Connect with existing contacts", imageMain: "addressBook", gradientBG: "sendQuickSnapBackground"))
+                                        
+                                        self.contactBannerDataArray.append(ContactBannerData(titleBold: "Send", title: "Quick Snaps", subtitleImage: "paperplane.fill", subtitle: "Send moments to your contacts", imageMain: "quickSnapBanner", gradientBG: "syncAddressBackground"))
+                                        
+                                        self.bannerCount = self.contactBannerDataArray.count
 
-                                    if self.auth.subscriptionStatus != .notSubscribed {
-                                        self.bannerCount -= 1
-                                    }
-                                    if AddressBookRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(AddressBookStruct.self)).results.count != 0 {
-                                        self.bannerCount -= 1
+                                        if self.auth.subscriptionStatus != .notSubscribed {
+                                            self.bannerCount -= 1
+                                        }
+                                        if AddressBookRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(AddressBookStruct.self)).results.count != 0 {
+                                            self.bannerCount -= 1
+                                        }
                                     }
                                 }
                             }
@@ -665,8 +668,9 @@ struct ContactsView: View {
                     })
             }.navigationViewStyle(StackNavigationViewStyle())
             .onAppear {
-                self.userPhoneNumber = UserDefaults.standard.string(forKey: "phoneNumber")?.format(phoneNumber: String(UserDefaults.standard.string(forKey: "phoneNumber")?.dropFirst().dropFirst() ?? "+1 (123) 456-6789")) ?? "+1 (123) 456-6789"
-                //print("the Chat contacts count: \(String(describing: Chat.instance.contactList?.contacts.count)) & Realm Contacts count: \(self.auth.contacts.results.count)")
+                DispatchQueue.main.async {
+                    self.userPhoneNumber = UserDefaults.standard.string(forKey: "phoneNumber")?.format(phoneNumber: String(UserDefaults.standard.string(forKey: "phoneNumber")?.dropFirst().dropFirst() ?? "+1 (123) 456-6789")) ?? "+1 (123) 456-6789"
+                }
             }
             
             //MARK: Quick Snap View

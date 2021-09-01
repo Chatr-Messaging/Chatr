@@ -167,13 +167,15 @@ struct NewConversationView: View {
                                                 .padding(.vertical, 10)
                                                 .contentShape(Rectangle())
                                                 .onTapGesture {
-                                                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                                                    if self.selectedContact.contains(Int(searchedContact.id)) {
-                                                        self.selectedContact.removeAll(where: { $0 == searchedContact.id })
-                                                    } else if self.forwardContact && self.selectedContact.count >= 1 {
-                                                        UINotificationFeedbackGenerator().notificationOccurred(.error)
-                                                    } else {
-                                                        self.selectedContact.append(Int(searchedContact.id))
+                                                    DispatchQueue.main.async {
+                                                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                                                        if self.selectedContact.contains(Int(searchedContact.id)) {
+                                                            self.selectedContact.removeAll(where: { $0 == searchedContact.id })
+                                                        } else if self.forwardContact && self.selectedContact.count >= 1 {
+                                                            UINotificationFeedbackGenerator().notificationOccurred(.error)
+                                                        } else {
+                                                            self.selectedContact.append(Int(searchedContact.id))
+                                                        }
                                                     }
                                                 }
 
@@ -250,13 +252,15 @@ struct NewConversationView: View {
                                             .padding(.vertical, 10)
                                             .contentShape(Rectangle())
                                             .onTapGesture {
-                                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                                                if self.selectedContact.contains(Int(result.id)) {
-                                                    self.selectedContact.removeAll(where: { $0 == result.id })
-                                                } else if self.forwardContact && self.selectedContact.count >= 1 {
-                                                    UINotificationFeedbackGenerator().notificationOccurred(.error)
-                                                } else {
-                                                    self.selectedContact.append(Int(result.id))
+                                                DispatchQueue.main.async {
+                                                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                                                    if self.selectedContact.contains(Int(result.id)) {
+                                                        self.selectedContact.removeAll(where: { $0 == result.id })
+                                                    } else if self.forwardContact && self.selectedContact.count >= 1 {
+                                                        UINotificationFeedbackGenerator().notificationOccurred(.error)
+                                                    } else {
+                                                        self.selectedContact.append(Int(result.id))
+                                                    }
                                                 }
                                             }
 
@@ -346,15 +350,17 @@ struct NewConversationView: View {
             )
             .navigationBarTitle(self.usedAsNew ? (self.navigationPrivate ? (self.selectedContact.count > 0 ? self.selectedContact.count > Constants.maxNumberGroupOccu ? "Max Reached" : "New Chat \(self.selectedContact.count)" : "New Chat") : "New Public Chat") : self.forwardContact ? "Forward Contact" : "Add Contact", displayMode: .inline)
             .onAppear() {
-                Request.registeredUsersFromAddressBook(withUdid: UIDevice.current.identifierForVendor?.uuidString, isCompact: false, successBlock: { (users) in
-                    DispatchQueue.main.async {
-                        for i in users {
-                            if !self.auth.contacts.results.contains(where: { $0.id == i.id || $0.id == UserDefaults.standard.integer(forKey: "currentUserID") }) {
-                                self.regristeredAddressBook.append(i)
+                DispatchQueue.main.async {
+                    Request.registeredUsersFromAddressBook(withUdid: UIDevice.current.identifierForVendor?.uuidString, isCompact: false, successBlock: { (users) in
+                        DispatchQueue.main.async {
+                            for i in users {
+                                if !self.auth.contacts.results.contains(where: { $0.id == i.id || $0.id == UserDefaults.standard.integer(forKey: "currentUserID") }) {
+                                    self.regristeredAddressBook.append(i)
+                                }
                             }
                         }
-                    }
-                })
+                    })
+                }
             }
         }.background(Color("bgColor"))
         .edgesIgnoringSafeArea(.all)

@@ -354,144 +354,146 @@ struct VisitGroupChannelView: View {
             }
         }.background(Color("bgColor"))
         .onAppear() {
-            self.showProfile = false
-            if self.viewState == .fromDiscover {
-                let config = Realm.Configuration(schemaVersion: 1)
-                do {
-                    let realm = try Realm(configuration: config)
-                    if let foundDialog = realm.object(ofType: DialogStruct.self, forPrimaryKey: self.publicDialogModel.id ?? self.fromSharedPublicDialog) {
-                        self.dialogRelationship = !foundDialog.isDeleted ? .subscribed : .notSubscribed
+            DispatchQueue.main.async {
+                self.showProfile = false
+                if self.viewState == .fromDiscover {
+                    let config = Realm.Configuration(schemaVersion: 1)
+                    do {
+                        let realm = try Realm(configuration: config)
+                        if let foundDialog = realm.object(ofType: DialogStruct.self, forPrimaryKey: self.publicDialogModel.id ?? self.fromSharedPublicDialog) {
+                            self.dialogRelationship = !foundDialog.isDeleted ? .subscribed : .notSubscribed
 
-                        try realm.safeWrite ({
+                            try realm.safeWrite ({
+                                if let name = self.publicDialogModel.name {
+                                    foundDialog.fullName = name
+                                }
+                                
+                                if let description = self.publicDialogModel.description {
+                                    foundDialog.bio = description
+                                }
+                                
+                                if let avatar = self.publicDialogModel.avatar {
+                                    foundDialog.avatar = avatar
+                                }
+                                
+                                if let coverPhoto = self.publicDialogModel.coverPhoto {
+                                    foundDialog.coverPhoto = coverPhoto
+                                }
+                                
+                                if let owner = self.publicDialogModel.owner {
+                                    foundDialog.owner = owner
+                                }
+                                
+                                if let memCount = self.publicDialogModel.memberCount, memCount != 0 {
+                                    foundDialog.publicMemberCount = memCount
+                                }
+                                self.dialogModel = foundDialog
+
+                                realm.add(foundDialog, update: .all)
+                                
+                                print("ccomon nowww: founddd \(self.dialogModel.dialogType == "public") && \(self.dialogModel.id) && \(fromSharedPublicDialog)")
+                            })
+                        } else {
+                            self.dialogRelationship = .notSubscribed
+                            let dialog = DialogStruct()
+
+                            dialog.id = self.publicDialogModel.id ?? self.fromSharedPublicDialog
+                            dialog.dialogType = "public"
+                            dialog.isDeleted = true
+                            
                             if let name = self.publicDialogModel.name {
-                                foundDialog.fullName = name
+                                dialog.fullName = name
                             }
                             
                             if let description = self.publicDialogModel.description {
-                                foundDialog.bio = description
+                                dialog.bio = description
                             }
                             
                             if let avatar = self.publicDialogModel.avatar {
-                                foundDialog.avatar = avatar
+                                dialog.avatar = avatar
                             }
                             
                             if let coverPhoto = self.publicDialogModel.coverPhoto {
-                                foundDialog.coverPhoto = coverPhoto
+                                dialog.coverPhoto = coverPhoto
                             }
                             
                             if let owner = self.publicDialogModel.owner {
-                                foundDialog.owner = owner
+                                dialog.owner = owner
                             }
-                            
-                            if let memCount = self.publicDialogModel.memberCount, memCount != 0 {
-                                foundDialog.publicMemberCount = memCount
+
+                            if let memCount = self.publicDialogModel.memberCount {
+                                dialog.publicMemberCount = memCount
                             }
-                            self.dialogModel = foundDialog
+                            self.dialogModel = dialog
 
-                            realm.add(foundDialog, update: .all)
-                            
-                            print("ccomon nowww: founddd \(self.dialogModel.dialogType == "public") && \(self.dialogModel.id) && \(fromSharedPublicDialog)")
-                        })
-                    } else {
-                        self.dialogRelationship = .notSubscribed
-                        let dialog = DialogStruct()
-
-                        dialog.id = self.publicDialogModel.id ?? self.fromSharedPublicDialog
-                        dialog.dialogType = "public"
-                        dialog.isDeleted = true
-                        
-                        if let name = self.publicDialogModel.name {
-                            dialog.fullName = name
+                            try realm.safeWrite ({
+                                realm.add(dialog, update: .all)
+                            })
                         }
-                        
-                        if let description = self.publicDialogModel.description {
-                            dialog.bio = description
-                        }
-                        
-                        if let avatar = self.publicDialogModel.avatar {
-                            dialog.avatar = avatar
-                        }
-                        
-                        if let coverPhoto = self.publicDialogModel.coverPhoto {
-                            dialog.coverPhoto = coverPhoto
-                        }
-                        
-                        if let owner = self.publicDialogModel.owner {
-                            dialog.owner = owner
-                        }
-
-                        if let memCount = self.publicDialogModel.memberCount {
-                            dialog.publicMemberCount = memCount
-                        }
-                        self.dialogModel = dialog
-
-                        try realm.safeWrite ({
-                            realm.add(dialog, update: .all)
-                        })
+                    } catch { self.dialogRelationship = .notSubscribed }
+                } else if self.viewState == .fromDialogCell {
+                    //NEED to specify self.dialogRelationship state here, if used
+                    if self.dialogModel.dialogType == "group" {
+                        self.dialogRelationship = .group
                     }
-                } catch { self.dialogRelationship = .notSubscribed }
-            } else if self.viewState == .fromDialogCell {
-                //NEED to specify self.dialogRelationship state here, if used
-                if self.dialogModel.dialogType == "group" {
-                    self.dialogRelationship = .group
+                } else if self.viewState == .fromDynamicLink {
+                    //NEED to specify self.dialogRelationship state here
+                } else if self.viewState == .fromSharedMessage {
+                    //not used
+                    //NEED to specify self.dialogRelationship state here, if used
+                } else if self.viewState == .unknown {
+                    //not used
+                    //NEED to specify self.dialogRelationship state here, if used
                 }
-            } else if self.viewState == .fromDynamicLink {
-                //NEED to specify self.dialogRelationship state here
-            } else if self.viewState == .fromSharedMessage {
-                //not used
-                //NEED to specify self.dialogRelationship state here, if used
-            } else if self.viewState == .unknown {
-                //not used
-                //NEED to specify self.dialogRelationship state here, if used
-            }
-            
-            if self.dialogModel.dialogType == "public" {
-                if !self.dialogModelMembers.contains(where: { $0 == self.dialogModel.owner }) && self.dialogModel.owner != 0 {
-                    self.dialogModelMembers.append(self.dialogModel.owner)
-                }
-
-                for i in self.dialogModel.adminID {
-                    if !self.dialogModelMembers.contains(where: { $0 == i }) {
-                        self.dialogModelMembers.append(i)
+                
+                if self.dialogModel.dialogType == "public" {
+                    if !self.dialogModelMembers.contains(where: { $0 == self.dialogModel.owner }) && self.dialogModel.owner != 0 {
+                        self.dialogModelMembers.append(self.dialogModel.owner)
                     }
-                }
-                self.dialogModelAdmins = self.dialogModel.occupentsID.filter { $0 != 0 && $0 != self.dialogModel.owner }
-            } else if self.dialogModel.dialogType == "group" {
-                if !self.dialogModelAdmins.contains(where: { $0 == self.dialogModel.owner }) && self.dialogModel.owner != 0 {
-                    self.dialogModelAdmins.append(self.dialogModel.owner)
-                }
 
-                for i in self.dialogModel.adminID {
-                    if !self.dialogModelAdmins.contains(where: { $0 == i }) {
-                        self.dialogModelAdmins.append(i)
+                    for i in self.dialogModel.adminID {
+                        if !self.dialogModelMembers.contains(where: { $0 == i }) {
+                            self.dialogModelMembers.append(i)
+                        }
                     }
-                }
-                self.dialogModelMembers = self.dialogModel.occupentsID.filter { $0 != 0 }
-            }
-            
-            self.isOwner = self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? true : false
-            self.isAdmin = self.dialogModel.adminID.contains(UserDefaults.standard.integer(forKey: "currentUserID")) ? true : false
-            //UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")
-            self.canEditGroup = self.isOwner || self.isAdmin
-            self.currentUserIsPowerful = self.isOwner || self.isAdmin ? true : false
-            
-            if self.dialogModel.dialogType == "public" && self.dialogModel.id != "" {                
-                self.observeFirebase()
-                self.observePublicDialogMembers()
-                self.observePinnedMessages(dialogId: self.dialogModel.id)
-            } else if self.dialogModel.dialogType == "group" && self.dialogModel.id != "" {
-                self.observePinnedMessages(dialogId: self.dialogModel.id)
-            }
-            
-            if self.dialogRelationship == .subscribed {
-                self.loadNotifications()
-            }
-            
-            NotificationCenter.default.addObserver(forName: NSNotification.Name("NotificationAlert"), object: nil, queue: .main) { (_) in
-                self.showAlert.toggle()
-            }
+                    self.dialogModelAdmins = self.dialogModel.occupentsID.filter { $0 != 0 && $0 != self.dialogModel.owner }
+                } else if self.dialogModel.dialogType == "group" {
+                    if !self.dialogModelAdmins.contains(where: { $0 == self.dialogModel.owner }) && self.dialogModel.owner != 0 {
+                        self.dialogModelAdmins.append(self.dialogModel.owner)
+                    }
 
-            self.fromSharedPublicDialog = ""
+                    for i in self.dialogModel.adminID {
+                        if !self.dialogModelAdmins.contains(where: { $0 == i }) {
+                            self.dialogModelAdmins.append(i)
+                        }
+                    }
+                    self.dialogModelMembers = self.dialogModel.occupentsID.filter { $0 != 0 }
+                }
+                
+                self.isOwner = self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? true : false
+                self.isAdmin = self.dialogModel.adminID.contains(UserDefaults.standard.integer(forKey: "currentUserID")) ? true : false
+                //UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")
+                self.canEditGroup = self.isOwner || self.isAdmin
+                self.currentUserIsPowerful = self.isOwner || self.isAdmin ? true : false
+                
+                if self.dialogModel.dialogType == "public" && self.dialogModel.id != "" {
+                    self.observeFirebase()
+                    self.observePublicDialogMembers()
+                    self.observePinnedMessages(dialogId: self.dialogModel.id)
+                } else if self.dialogModel.dialogType == "group" && self.dialogModel.id != "" {
+                    self.observePinnedMessages(dialogId: self.dialogModel.id)
+                }
+                
+                if self.dialogRelationship == .subscribed {
+                    self.loadNotifications()
+                }
+                
+                NotificationCenter.default.addObserver(forName: NSNotification.Name("NotificationAlert"), object: nil, queue: .main) { (_) in
+                    self.showAlert.toggle()
+                }
+
+                self.fromSharedPublicDialog = ""
+            }
         }
     }
     

@@ -375,47 +375,49 @@ struct DiscoverView: View {
                     .opacity(!self.grandSearchData.isEmpty ? 0 : 1)
             }
             .onAppear {
-                if self.bannerDataArray.isEmpty {
-                    self.viewModel.observeFeaturedDialogs({ dialog in
-                        if dialog.banned == false, !self.bannerDataArray.contains(where: { $0.id == dialog.id }) {
-                            self.bannerDataArray.append(dialog)
-                        }
-                    }, isHiddenIndicator: { hide in
-                        self.isDataLoading = hide ?? false
-                    })
-                }
-                
-                if self.topDialogsData.isEmpty {
-                    self.viewModel.observeTopDialogs(kPagination: 6, loadMore: false, completion: { dia in
-                        if dia.banned == false, !self.topDialogsData.contains(where: { $0.id == dia.id }) {
-                            self.topDialogsData.append(dia)
-                        }
-                    }, isHiddenIndicator: { hide in
-                        self.topDialogsData.sort(by: { $0.memberCount ?? 0 > $1.memberCount ?? 0 })
-                        self.isDataLoading = hide ?? false
-                    })
-                }
-
-                if self.recentDialogsData.isEmpty {
-                    self.viewModel.observeRecentDialogs(kPagination: 6, loadMore: false, completion: { dia in
-                        if dia.banned == false, !self.recentDialogsData.contains(where: { $0.id == dia.id }) {
-                            self.recentDialogsData.append(dia)
-                        }
-                    }, isHiddenIndicator: { hide in
-                        self.recentDialogsData.sort(by: { $0.creationOrder ?? 0 > $1.creationOrder ?? 0 })
-                        self.isDataLoading = hide ?? false
-                    })
-                }
-
-                if self.dialogTags.isEmpty {
-                    self.viewModel.loadTags(completion: { tags in
-                        for tag in tags {
-                            if !self.dialogTags.contains(where: { $0.title == tag.title }) {
-                                self.dialogTags = tags
-                                self.isDataLoading = false
+                DispatchQueue.main.async {
+                    if self.bannerDataArray.isEmpty {
+                        self.viewModel.observeFeaturedDialogs({ dialog in
+                            if dialog.banned == false, !self.bannerDataArray.contains(where: { $0.id == dialog.id }) {
+                                self.bannerDataArray.append(dialog)
                             }
-                        }
-                    })
+                        }, isHiddenIndicator: { hide in
+                            self.isDataLoading = hide ?? false
+                        })
+                    }
+                    
+                    if self.topDialogsData.isEmpty {
+                        self.viewModel.observeTopDialogs(kPagination: 6, loadMore: false, completion: { dia in
+                            if dia.banned == false, !self.topDialogsData.contains(where: { $0.id == dia.id }) {
+                                self.topDialogsData.append(dia)
+                            }
+                        }, isHiddenIndicator: { hide in
+                            self.topDialogsData.sort(by: { $0.memberCount ?? 0 > $1.memberCount ?? 0 })
+                            self.isDataLoading = hide ?? false
+                        })
+                    }
+
+                    if self.recentDialogsData.isEmpty {
+                        self.viewModel.observeRecentDialogs(kPagination: 6, loadMore: false, completion: { dia in
+                            if dia.banned == false, !self.recentDialogsData.contains(where: { $0.id == dia.id }) {
+                                self.recentDialogsData.append(dia)
+                            }
+                        }, isHiddenIndicator: { hide in
+                            self.recentDialogsData.sort(by: { $0.creationOrder ?? 0 > $1.creationOrder ?? 0 })
+                            self.isDataLoading = hide ?? false
+                        })
+                    }
+
+                    if self.dialogTags.isEmpty {
+                        self.viewModel.loadTags(completion: { tags in
+                            for tag in tags {
+                                if !self.dialogTags.contains(where: { $0.title == tag.title }) {
+                                    self.dialogTags = tags
+                                    self.isDataLoading = false
+                                }
+                            }
+                        })
+                    }
                 }
             }
         }.resignKeyboardOnDragGesture()

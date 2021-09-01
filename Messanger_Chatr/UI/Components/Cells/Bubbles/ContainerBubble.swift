@@ -157,38 +157,40 @@ struct ContainerBubble: View {
                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                     }
                     .onAppear() {
-                        self.observeInteractions()
-                        if self.messagePosition == .right {
-                            if self.message.imageType == "image/gif" || self.message.imageType == "image/png" || self.message.imageType == "video/mov" {
-                                self.reactions.append("save")
-                            } else {
-                                self.reactions.append("reply")
-                            }
-
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
-                                guard let dialog = self.auth.selectedConnectyDialog, let admins = dialog.adminsIDs, (admins.contains(NSNumber(value: UserDefaults.standard.integer(forKey: "currentUserID"))) || dialog.userID == UserDefaults.standard.integer(forKey: "currentUserID")), (dialog.type == .group || dialog.type == .public) else {
-                                    self.reactions.append("copy")
-                                    self.reactions.append("trash")
-
-                                    return
-                                }
-
-                                if !self.message.isPinned {
-                                    self.reactions.append("pin")
-                                    self.reactions.append("trash")
+                        DispatchQueue.main.async {
+                            self.observeInteractions()
+                            if self.messagePosition == .right {
+                                if self.message.imageType == "image/gif" || self.message.imageType == "image/png" || self.message.imageType == "video/mov" {
+                                    self.reactions.append("save")
                                 } else {
-                                    self.reactions.append("unpin")
-                                    self.reactions.append("trash")
+                                    self.reactions.append("reply")
                                 }
-                            }
-                        } else {
-                            self.reactions.append("like")
-                            self.reactions.append("dislike")
-                            self.reactions.append("reply")
-                            if self.message.imageType == "image/gif" || self.message.imageType == "image/png" || self.message.imageType == "video/mov" {
-                                self.reactions.append("save")
+
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
+                                    guard let dialog = self.auth.selectedConnectyDialog, let admins = dialog.adminsIDs, (admins.contains(NSNumber(value: UserDefaults.standard.integer(forKey: "currentUserID"))) || dialog.userID == UserDefaults.standard.integer(forKey: "currentUserID")), (dialog.type == .group || dialog.type == .public) else {
+                                        self.reactions.append("copy")
+                                        self.reactions.append("trash")
+
+                                        return
+                                    }
+
+                                    if !self.message.isPinned {
+                                        self.reactions.append("pin")
+                                        self.reactions.append("trash")
+                                    } else {
+                                        self.reactions.append("unpin")
+                                        self.reactions.append("trash")
+                                    }
+                                }
                             } else {
-                                self.reactions.append("copy")
+                                self.reactions.append("like")
+                                self.reactions.append("dislike")
+                                self.reactions.append("reply")
+                                if self.message.imageType == "image/gif" || self.message.imageType == "image/png" || self.message.imageType == "video/mov" {
+                                    self.reactions.append("save")
+                                } else {
+                                    self.reactions.append("copy")
+                                }
                             }
                         }
                     }.zIndex(self.showInteractions ? 1 : 0)
@@ -365,23 +367,25 @@ struct ContainerBubble: View {
                     .zIndex(2)
             }
         }.onAppear() {
-            self.viewModel.getUserAvatar(senderId: self.message.senderID, compleation: { (url, fullName, _) in
-                if url == "self" || fullName == "self" {
-                    self.avatar = self.auth.profile.results.first?.avatar ?? ""
-                    self.fullName = self.auth.profile.results.first?.fullName ?? ""
-                } else {
-                    self.avatar = url
-                    self.fullName = fullName
-                }
-            })
+            DispatchQueue.main.async {
+                self.viewModel.getUserAvatar(senderId: self.message.senderID, compleation: { (url, fullName, _) in
+                    if url == "self" || fullName == "self" {
+                        self.avatar = self.auth.profile.results.first?.avatar ?? ""
+                        self.fullName = self.auth.profile.results.first?.fullName ?? ""
+                    } else {
+                        self.avatar = url
+                        self.fullName = fullName
+                    }
+                })
 
-            self.hasUserLiked = self.message.likedId.contains(self.auth.profile.results.first?.id ?? 0)
-            self.hasUserDisliked = self.message.dislikedId.contains(self.auth.profile.results.first?.id ?? 0)
+                self.hasUserLiked = self.message.likedId.contains(self.auth.profile.results.first?.id ?? 0)
+                self.hasUserDisliked = self.message.dislikedId.contains(self.auth.profile.results.first?.id ?? 0)
 
-            self.viewModel.fetchReplyCount(message: self.message, completion: { count in
-                print("the total reply count is: \(count)")
-                self.replyCount = count
-            })
+                self.viewModel.fetchReplyCount(message: self.message, completion: { count in
+                    print("the total reply count is: \(count)")
+                    self.replyCount = count
+                })
+            }
         }
     }
 

@@ -223,15 +223,17 @@ struct ChannelBubble: View {
                 }
             }
         }.onAppear() {
-            self.observeFirebaseChannel()
-            
-            let config = Realm.Configuration(schemaVersion: 1)
-            do {
-                let realm = try Realm(configuration: config)
-                if let foundDialog = realm.object(ofType: DialogStruct.self, forPrimaryKey: self.dialogId), !foundDialog.isDeleted {
-                    self.isMember = true
-                }
-            } catch { }
+            DispatchQueue.main.async {
+                self.observeFirebaseChannel()
+                
+                let config = Realm.Configuration(schemaVersion: 1)
+                do {
+                    let realm = try Realm(configuration: config)
+                    if let foundDialog = realm.object(ofType: DialogStruct.self, forPrimaryKey: self.dialogId), !foundDialog.isDeleted {
+                        self.isMember = true
+                    }
+                } catch { }
+            }
         }
     }
     

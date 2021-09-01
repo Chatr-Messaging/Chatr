@@ -536,166 +536,168 @@ struct VisitContactView: View {
                 .environmentObject(self.auth)
                 .disabled(self.quickSnapViewState != .closed ? false : true)
         }.onAppear() {
-            NotificationCenter.default.addObserver(forName: NSNotification.Name("NotificationAlert"), object: nil, queue: .main) { (_) in
-                self.receivedNotification.toggle()
-            }
-            
-            if self.viewState == .fromSearch {
-                let config = Realm.Configuration(schemaVersion: 1)
-                do {
-                    let realm = try Realm(configuration: config)
-                    if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: self.connectyContact.id != 0 ? Int(self.connectyContact.id) : self.contact.id) {
-                        if foundContact.isMyContact {
-                            self.contact = foundContact
-                            self.contactWebsiteUrl = self.contact.website
-                            if foundContact.instagramAccessToken != "" && foundContact.instagramId != 0 {
-                                self.viewModel.loadInstagramImages(testUser: InstagramTestUser(access_token: foundContact.instagramAccessToken, user_id: foundContact.instagramId))
-                            }
-                            if self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") {
-                                self.contactRelationship = .unknown
-                            } else if self.contact.id != 0 {
-                                self.contactRelationship = .contact
-                            }
-                        } else {
-                            self.contactRelationship = .notContact
-                            
-                            for i in Chat.instance.contactList?.pendingApproval ?? [] {
-                                if i.userID == self.connectyContact.id {
-                                    self.contactRelationship = .pendingRequest
-                                    break
-                                }
-                            }
-                            
-                            guard let profile = self.auth.profile.results.first else {
-                                return
-                            }
-
-                            if profile.contactRequests.contains(where: { $0 == self.contact.id }) {
-                                self.contactRelationship = .pendingRequestForYou
-                            }
-                        }
-                    } else {
-                        //not in realm and not a contact - check if pending
-                        self.pullNonContact()
-                    }
-                } catch { }
-            } else if self.viewState == .fromContacts {
-                self.contactRelationship = .contact
-                changeContactsRealmData.shared.observeFirebaseContact(contactID: self.contact.id)
-                if self.contact.instagramAccessToken != "" && self.contact.instagramId != 0 {
-                    self.viewModel.loadInstagramImages(testUser: InstagramTestUser(access_token: self.contact.instagramAccessToken, user_id: self.contact.instagramId))
-                }
-                self.contactWebsiteUrl = self.contact.website
-            } else if self.viewState == .fromRequests {
-                print("shuld have everything already...")
-                if self.contact.instagramAccessToken != "" && self.contact.instagramId != 0 {
-                    self.viewModel.loadInstagramImages(testUser: InstagramTestUser(access_token: self.contact.instagramAccessToken, user_id: self.contact.instagramId))
-                }
-                self.contactWebsiteUrl = self.contact.website
-            } else if self.viewState == .fromGroupDialog {
-                if self.contact.instagramAccessToken != "" && self.contact.instagramId != 0 {
-                    self.viewModel.loadInstagramImages(testUser: InstagramTestUser(access_token: self.contact.instagramAccessToken, user_id: self.contact.instagramId))
+            DispatchQueue.main.async {
+                NotificationCenter.default.addObserver(forName: NSNotification.Name("NotificationAlert"), object: nil, queue: .main) { (_) in
+                    self.receivedNotification.toggle()
                 }
                 
-                let config = Realm.Configuration(schemaVersion: 1)
-                do {
-                    let realm = try Realm(configuration: config)
-                    if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: self.contact.id) {
-                        self.contactRelationship = foundContact.isMyContact ? .contact : .notContact
-                        self.contactWebsiteUrl = foundContact.website
-                    }
-                    
-                    if self.contactRelationship == .notContact || (self.contactRelationship == .unknown && self.auth.profile.results.first?.id != self.contact.id) {
-                        self.pullNonContact()
-                    }
-                } catch {
-                    print("error catching realm error")
-                }
-            }
-            else if self.viewState == .fromDynamicLink {
-                if self.auth.dynamicLinkContactID != 0 {
+                if self.viewState == .fromSearch {
                     let config = Realm.Configuration(schemaVersion: 1)
                     do {
                         let realm = try Realm(configuration: config)
-                        if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: self.auth.dynamicLinkContactID) {
+                        if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: self.connectyContact.id != 0 ? Int(self.connectyContact.id) : self.contact.id) {
                             if foundContact.isMyContact {
                                 self.contact = foundContact
                                 self.contactWebsiteUrl = self.contact.website
                                 if foundContact.instagramAccessToken != "" && foundContact.instagramId != 0 {
                                     self.viewModel.loadInstagramImages(testUser: InstagramTestUser(access_token: foundContact.instagramAccessToken, user_id: foundContact.instagramId))
                                 }
-                                
                                 if self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") {
                                     self.contactRelationship = .unknown
-                                } else {
+                                } else if self.contact.id != 0 {
                                     self.contactRelationship = .contact
                                 }
-                                self.auth.dynamicLinkContactID = 0
-                            }
-                        } else {
-                            Request.users(withIDs: [NSNumber(value: self.auth.dynamicLinkContactID)], paginator: Paginator.limit(1, skip: 0), successBlock: { (paginator, users) in
-                                for use in users {
-                                    if use.id == self.auth.dynamicLinkContactID {
-                                        self.connectyContact = use
-                                        self.contactWebsiteUrl = use.website ?? ""
-                                        if self.connectyContact.id == UserDefaults.standard.integer(forKey: "currentUserID") {
-                                            self.contactRelationship = .unknown
-                                        } else {
-                                            self.contactRelationship = .notContact
-                                        }
-                                        
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                            for i in Chat.instance.contactList?.pendingApproval ?? [] {
-                                                if i.userID == self.connectyContact.id {
-                                                    self.contactRelationship = .pendingRequest
-                                                    break
-                                                }
-                                            }
-
-                                            if let profile = self.auth.profile.results.first {
-                                                if profile.contactRequests.contains(where: { $0 == self.contact.id }) {
-                                                    self.contactRelationship = .pendingRequestForYou
-                                                }
-                                            }
-                                        }
-
-                                        changeContactsRealmData.shared.observeFirebaseContactReturn(contactID: Int(self.connectyContact.id), completion: { firebaseContact in
-                                            let newContact = ContactStruct()
-                                            newContact.id = Int(self.connectyContact.id)
-                                            newContact.fullName = self.connectyContact.fullName ?? ""
-                                            newContact.phoneNumber = self.connectyContact.phone ?? ""
-                                            newContact.lastOnline = self.connectyContact.lastRequestAt ?? Date()
-                                            newContact.createdAccount = self.connectyContact.createdAt ?? Date()
-                                            newContact.avatar = self.connectyContact.avatar ?? PersistenceManager.shared.getCubeProfileImage(usersID: self.connectyContact) ?? ""
-                                            newContact.bio = firebaseContact.bio
-                                            newContact.facebook = firebaseContact.facebook
-                                            newContact.twitter = firebaseContact.twitter
-                                            newContact.instagramAccessToken = firebaseContact.instagramAccessToken
-                                            newContact.instagramId = firebaseContact.instagramId
-                                            newContact.isPremium = firebaseContact.isPremium
-                                            newContact.emailAddress = self.connectyContact.email ?? "empty email address"
-                                            newContact.website = self.connectyContact.website ?? "empty website"
-                                            newContact.isInfoPrivate = firebaseContact.isInfoPrivate
-                                            newContact.isMessagingPrivate = firebaseContact.isMessagingPrivate
-
-                                            self.contact = newContact
-                                            if newContact.instagramAccessToken != "" && newContact.instagramId != 0 {
-                                                self.viewModel.loadInstagramImages(testUser: InstagramTestUser(access_token: newContact.instagramAccessToken, user_id: newContact.instagramId))
-                                            }
-                                            
-                                            print("the contact is now: \(self.contact)")
-                                            self.auth.dynamicLinkContactID = 0
-                                        })
-                                        
+                            } else {
+                                self.contactRelationship = .notContact
+                                
+                                for i in Chat.instance.contactList?.pendingApproval ?? [] {
+                                    if i.userID == self.connectyContact.id {
+                                        self.contactRelationship = .pendingRequest
                                         break
                                     }
                                 }
-                            }) { (error) in
-                                print("error pulling user from connectycube: \(error.localizedDescription)")
+                                
+                                guard let profile = self.auth.profile.results.first else {
+                                    return
+                                }
+
+                                if profile.contactRequests.contains(where: { $0 == self.contact.id }) {
+                                    self.contactRelationship = .pendingRequestForYou
+                                }
                             }
+                        } else {
+                            //not in realm and not a contact - check if pending
+                            self.pullNonContact()
+                        }
+                    } catch { }
+                } else if self.viewState == .fromContacts {
+                    self.contactRelationship = .contact
+                    changeContactsRealmData.shared.observeFirebaseContact(contactID: self.contact.id)
+                    if self.contact.instagramAccessToken != "" && self.contact.instagramId != 0 {
+                        self.viewModel.loadInstagramImages(testUser: InstagramTestUser(access_token: self.contact.instagramAccessToken, user_id: self.contact.instagramId))
+                    }
+                    self.contactWebsiteUrl = self.contact.website
+                } else if self.viewState == .fromRequests {
+                    print("shuld have everything already...")
+                    if self.contact.instagramAccessToken != "" && self.contact.instagramId != 0 {
+                        self.viewModel.loadInstagramImages(testUser: InstagramTestUser(access_token: self.contact.instagramAccessToken, user_id: self.contact.instagramId))
+                    }
+                    self.contactWebsiteUrl = self.contact.website
+                } else if self.viewState == .fromGroupDialog {
+                    if self.contact.instagramAccessToken != "" && self.contact.instagramId != 0 {
+                        self.viewModel.loadInstagramImages(testUser: InstagramTestUser(access_token: self.contact.instagramAccessToken, user_id: self.contact.instagramId))
+                    }
+                    
+                    let config = Realm.Configuration(schemaVersion: 1)
+                    do {
+                        let realm = try Realm(configuration: config)
+                        if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: self.contact.id) {
+                            self.contactRelationship = foundContact.isMyContact ? .contact : .notContact
+                            self.contactWebsiteUrl = foundContact.website
+                        }
+                        
+                        if self.contactRelationship == .notContact || (self.contactRelationship == .unknown && self.auth.profile.results.first?.id != self.contact.id) {
+                            self.pullNonContact()
                         }
                     } catch {
                         print("error catching realm error")
+                    }
+                }
+                else if self.viewState == .fromDynamicLink {
+                    if self.auth.dynamicLinkContactID != 0 {
+                        let config = Realm.Configuration(schemaVersion: 1)
+                        do {
+                            let realm = try Realm(configuration: config)
+                            if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: self.auth.dynamicLinkContactID) {
+                                if foundContact.isMyContact {
+                                    self.contact = foundContact
+                                    self.contactWebsiteUrl = self.contact.website
+                                    if foundContact.instagramAccessToken != "" && foundContact.instagramId != 0 {
+                                        self.viewModel.loadInstagramImages(testUser: InstagramTestUser(access_token: foundContact.instagramAccessToken, user_id: foundContact.instagramId))
+                                    }
+                                    
+                                    if self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") {
+                                        self.contactRelationship = .unknown
+                                    } else {
+                                        self.contactRelationship = .contact
+                                    }
+                                    self.auth.dynamicLinkContactID = 0
+                                }
+                            } else {
+                                Request.users(withIDs: [NSNumber(value: self.auth.dynamicLinkContactID)], paginator: Paginator.limit(1, skip: 0), successBlock: { (paginator, users) in
+                                    for use in users {
+                                        if use.id == self.auth.dynamicLinkContactID {
+                                            self.connectyContact = use
+                                            self.contactWebsiteUrl = use.website ?? ""
+                                            if self.connectyContact.id == UserDefaults.standard.integer(forKey: "currentUserID") {
+                                                self.contactRelationship = .unknown
+                                            } else {
+                                                self.contactRelationship = .notContact
+                                            }
+                                            
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                                for i in Chat.instance.contactList?.pendingApproval ?? [] {
+                                                    if i.userID == self.connectyContact.id {
+                                                        self.contactRelationship = .pendingRequest
+                                                        break
+                                                    }
+                                                }
+
+                                                if let profile = self.auth.profile.results.first {
+                                                    if profile.contactRequests.contains(where: { $0 == self.contact.id }) {
+                                                        self.contactRelationship = .pendingRequestForYou
+                                                    }
+                                                }
+                                            }
+
+                                            changeContactsRealmData.shared.observeFirebaseContactReturn(contactID: Int(self.connectyContact.id), completion: { firebaseContact in
+                                                let newContact = ContactStruct()
+                                                newContact.id = Int(self.connectyContact.id)
+                                                newContact.fullName = self.connectyContact.fullName ?? ""
+                                                newContact.phoneNumber = self.connectyContact.phone ?? ""
+                                                newContact.lastOnline = self.connectyContact.lastRequestAt ?? Date()
+                                                newContact.createdAccount = self.connectyContact.createdAt ?? Date()
+                                                newContact.avatar = self.connectyContact.avatar ?? PersistenceManager.shared.getCubeProfileImage(usersID: self.connectyContact) ?? ""
+                                                newContact.bio = firebaseContact.bio
+                                                newContact.facebook = firebaseContact.facebook
+                                                newContact.twitter = firebaseContact.twitter
+                                                newContact.instagramAccessToken = firebaseContact.instagramAccessToken
+                                                newContact.instagramId = firebaseContact.instagramId
+                                                newContact.isPremium = firebaseContact.isPremium
+                                                newContact.emailAddress = self.connectyContact.email ?? "empty email address"
+                                                newContact.website = self.connectyContact.website ?? "empty website"
+                                                newContact.isInfoPrivate = firebaseContact.isInfoPrivate
+                                                newContact.isMessagingPrivate = firebaseContact.isMessagingPrivate
+
+                                                self.contact = newContact
+                                                if newContact.instagramAccessToken != "" && newContact.instagramId != 0 {
+                                                    self.viewModel.loadInstagramImages(testUser: InstagramTestUser(access_token: newContact.instagramAccessToken, user_id: newContact.instagramId))
+                                                }
+                                                
+                                                print("the contact is now: \(self.contact)")
+                                                self.auth.dynamicLinkContactID = 0
+                                            })
+                                            
+                                            break
+                                        }
+                                    }
+                                }) { (error) in
+                                    print("error pulling user from connectycube: \(error.localizedDescription)")
+                                }
+                            }
+                        } catch {
+                            print("error catching realm error")
+                        }
                     }
                 }
             }
