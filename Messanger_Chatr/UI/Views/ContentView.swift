@@ -257,7 +257,7 @@ struct mainHomeList: View {
                         }
 
                         // MARK: "Message" Title
-                        HomeMessagesTitle(isLocalOpen: self.$isLocalOpen, contacts: self.$showContacts, newChat: self.$showNewChat, selectedContacts: self.$selectedContacts)
+                        HomeMessagesTitle(isLocalOpen: self.$isLocalOpen, contacts: self.$showContacts, newChat: self.$showNewChat)
                             .frame(height: 50)
                             .environmentObject(self.auth)
                             .padding(.bottom)

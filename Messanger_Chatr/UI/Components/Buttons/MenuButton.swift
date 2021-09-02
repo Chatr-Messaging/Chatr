@@ -14,7 +14,6 @@ import LocalAuthentication
 struct MenuBtn: View {
     @State var alertNum = 0
     @Binding var showNewChat : Bool
-    @Binding var selectedContacts: [Int]
 
     var body: some View {
         Button(action: {

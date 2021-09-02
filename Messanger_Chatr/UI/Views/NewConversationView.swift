@@ -78,8 +78,8 @@ struct NewConversationView: View {
                     }.padding(.horizontal)
                     .background(
                         RoundedRectangle(cornerRadius: 12)
-                            .padding(.vertical, -3.5)
-                            .padding(.horizontal, -11)
+                            .padding(.vertical, -3)
+                            .padding(.horizontal, -10)
                             .foregroundColor(Color("pendingBtnColor"))
                     )
                     .padding(.top, 25) //don't touch this or switch up the padding... there for a reason
@@ -158,7 +158,7 @@ struct NewConversationView: View {
                             .padding(.top, 25)
 
                             self.styleBuilder(content: {
-                                ForEach(self.grandUsers, id: \.self) { searchedContact in
+                                ForEach(self.grandUsers, id: \.id) { searchedContact in
                                     if searchedContact.id != Session.current.currentUserID {
                                         VStack(alignment: .trailing, spacing: 0) {
                                             ContactCell(user: searchedContact, selectedContact: self.$selectedContact)
@@ -244,7 +244,7 @@ struct NewConversationView: View {
                             .padding(.top, 25)
                             
                             self.styleBuilder(content: {
-                                ForEach(self.regristeredAddressBook, id: \.self) { result in
+                                ForEach(self.regristeredAddressBook, id: \.id) { result in
                                     VStack(alignment: .trailing, spacing: 0) {
                                         ContactCell(user: result, selectedContact: self.$selectedContact)
                                             .animation(.spring(response: 0.15, dampingFraction: 0.60, blendDuration: 0))
@@ -295,7 +295,7 @@ struct NewConversationView: View {
                             .padding(.top, 25)
                             
                             self.styleBuilder(content: {
-                                ForEach(self.auth.addressBook.filterAddressBook(text: self.searchText).sorted { $0.name < $1.name }, id: \.self) { result in
+                                ForEach(self.auth.addressBook.filterAddressBook(text: self.searchText).sorted { $0.name < $1.name }, id: \.phone) { result in
                                     VStack(alignment: .trailing, spacing: 0) {
                                         SelectableAddressBookContact(addressBook: result)
                                             .animation(.spring(response: 0.15, dampingFraction: 0.60, blendDuration: 0))

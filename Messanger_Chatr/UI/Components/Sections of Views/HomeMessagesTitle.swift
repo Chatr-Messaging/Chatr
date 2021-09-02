@@ -14,7 +14,6 @@ struct HomeMessagesTitle: View {
     @Binding var isLocalOpen: Bool
     @Binding var contacts: Bool
     @Binding var newChat: Bool
-    @Binding var selectedContacts: [Int]
 
     var body: some View {
         HStack(alignment: .bottom) {
@@ -28,7 +27,7 @@ struct HomeMessagesTitle: View {
             ContactsBtn(showContacts: self.$contacts)
                 .offset(x: -5)
 
-            MenuBtn(showNewChat: self.$newChat, selectedContacts: self.$selectedContacts)
+            MenuBtn(showNewChat: self.$newChat)
         }
         .padding(.horizontal)
     }
