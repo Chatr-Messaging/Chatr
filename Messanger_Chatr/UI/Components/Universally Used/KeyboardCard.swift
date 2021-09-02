@@ -404,16 +404,18 @@ struct KeyboardCardView: View {
                     
                     //MARK: Send Button
                     Button(action: {
-                        guard self.contentAvailable else {
+                        guard self.contentAvailable, let selectedDialog = self.auth.dialogs.results.filter("id == %@", UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").first else {
                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             return
                         }
 
-                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                        self.isKeyboardActionOpen = false
-                        self.showImagePicker = false
-
-                        if let selectedDialog = self.auth.dialogs.results.filter("id == %@", UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").first {
+                        DispatchQueue.main.async {
+                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                            withAnimation {
+                                self.isKeyboardActionOpen = false
+                                self.showImagePicker = false
+                            }
+                            
                             if let connDia = self.auth.selectedConnectyDialog {
                                 connDia.sendUserStoppedTyping()
                             }
@@ -453,12 +455,14 @@ struct KeyboardCardView: View {
                             if self.mainText.count > 0 {
                                 changeMessageRealmData.shared.sendMessage(dialog: selectedDialog, text: self.mainText, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                             }
+                            
+                            self.checkAttachments()
+                            withAnimation {
+                                self.mainText = ""
+                                self.height = 38
+                            }
+                            UserDefaults.standard.setValue(self.mainText, forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText")
                         }
-                        
-                        self.checkAttachments()
-                        self.mainText = ""
-                        self.height = 38
-                        UserDefaults.standard.setValue(self.mainText, forKey: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "" + "typedText")
                     }, label: {
                         Image(systemName: "paperplane.fill")
                             .resizable()
@@ -790,7 +794,9 @@ struct KeyboardCardView: View {
     }
     
     func checkAttachments() {
-        self.hasAttachments = !self.imagePicker.selectedPhotos.isEmpty || !self.imagePicker.selectedVideos.isEmpty || !self.gifData.isEmpty || self.enableLocation || !self.imagePicker.pastedImages.isEmpty
+        withAnimation {
+            self.hasAttachments = !self.imagePicker.selectedPhotos.isEmpty || !self.imagePicker.selectedVideos.isEmpty || !self.gifData.isEmpty || self.enableLocation || !self.imagePicker.pastedImages.isEmpty
+        }
     }
     
     func formatVideoDuration(second: TimeInterval) -> String {

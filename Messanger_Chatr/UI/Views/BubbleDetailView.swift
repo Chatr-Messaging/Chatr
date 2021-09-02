@@ -207,9 +207,6 @@ struct BubbleDetailView: View {
                             //audio
                             AudioDetailView(viewModel: self.viewModel, message: self.message, namespace: self.namespace)
                                 .frame(width: Constants.screenWidth * 0.8, height: 180)
-                                .onAppear() {
-                                    print("audio view detail oping: \(self.message.id)")
-                                }
                         }
                     } else if self.message.contactID != 0 {
                         //contact

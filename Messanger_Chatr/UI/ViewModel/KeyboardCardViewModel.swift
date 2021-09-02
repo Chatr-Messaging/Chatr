@@ -119,7 +119,7 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
                     let imageRatio = media.image.size.height / media.image.size.width
                 
                     self.selectedPhotos[foundMediaIndex].uploadId = fileId
-                    self.selectedVideos[foundMediaIndex].mediaRatio = imageRatio
+                    self.selectedPhotos[foundMediaIndex].mediaRatio = imageRatio
                     print("success uploading direct file. 4353543545Here is the data: " + "\(fileId) && ratio: \(imageRatio)")
                     if self.selectedPhotos[foundMediaIndex].canSend {
                         print("sending message now. Here is the id: " + "\(fileId)")
@@ -296,6 +296,7 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
                     completion()
                 } else {
                     print("Success sending attachment to ConnectyCube server!")
+                    changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
                     if let index = self.selectedPhotos.firstIndex(of: attachment), let storeId = self.selectedPhotos[index].uploadId {
                         self.selectedPhotos.remove(at: index)
                         self.storeUploadMedia(id: storeId)
@@ -347,6 +348,7 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
                         if let index = self.selectedVideos.firstIndex(of: attachment) {
                             self.selectedVideos.remove(at: index)
                         }
+                        changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
                     }
                 })
             }

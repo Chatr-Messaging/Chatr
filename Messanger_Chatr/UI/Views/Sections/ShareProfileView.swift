@@ -471,6 +471,7 @@ struct ShareProfileView: View {
                                changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .error)
                            } else {
                                print("Success sending message to ConnectyCube server!")
+                               changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
                            }
                        })
                    }

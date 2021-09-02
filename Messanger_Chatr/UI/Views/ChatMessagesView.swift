@@ -255,27 +255,29 @@ struct ChatMessagesView: View {
                                 }.background(Color.clear)
                                 .onAppear {
 //                                        //print("the adding mesg id is: \(currentMessages[message].id) but the on i am looking for is: \(currentMessages[(pageShowCount * self.scrollPage) + self.pageShowCount].id) at index: \((pageShowCount * self.scrollPage) - self.pageShowCount)")
-                                    if self.firstScroll, currentMessages[message].id == currentMessages.last?.id, self.scrollViewHeight > Constants.screenHeight * 0.8 {
-//                                            print("called on appear: \(message)")
-                                        //if  {
-                                        self.firstScroll = false
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.275) {
-                                            reader.scrollTo(self.currentMessages.last?.id, anchor: .bottom)
-                                            print("scrolllling2222 is nowwww \(message)")
-                                            //self.permissionToScroll = true
-                                        }
-                                        //} //else if self.scrollViewHeight > Constants.screenHeight * 0.8 && self.permissionLoadMore {
-//                                                print("scrolllling is nowwww \(self.scrollViewHeight) ** \(Constants.screenHeight * 0.8)")
-//                                                withAnimation(Animation.easeOut(duration: 0.25)) {
-//                                                    reader.scrollTo(currentMessages[message].id, anchor: .bottom)
-//                                                }
-//                                            }
-                                    } else if self.scrollToId == currentMessages[message].id {
-                                        self.permissionToScroll = false
-                                        self.scrollToId = ""
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                                            withAnimation(Animation.easeOut(duration: 0.25)) {
-                                                reader.scrollTo(currentMessages[message].id, anchor: .top)
+                                    DispatchQueue.main.async {
+                                        if self.firstScroll, currentMessages[message].id == currentMessages.last?.id, self.scrollViewHeight > Constants.screenHeight * 0.8 {
+    //                                            print("called on appear: \(message)")
+                                            //if  {
+                                            self.firstScroll = false
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.275) {
+                                                reader.scrollTo(self.currentMessages.last?.id, anchor: .bottom)
+                                                print("scrolllling2222 is nowwww \(message)")
+                                                //self.permissionToScroll = true
+                                            }
+                                            //} //else if self.scrollViewHeight > Constants.screenHeight * 0.8 && self.permissionLoadMore {
+    //                                                print("scrolllling is nowwww \(self.scrollViewHeight) ** \(Constants.screenHeight * 0.8)")
+    //                                                withAnimation(Animation.easeOut(duration: 0.25)) {
+    //                                                    reader.scrollTo(currentMessages[message].id, anchor: .bottom)
+    //                                                }
+    //                                            }
+                                        } else if self.scrollToId == currentMessages[message].id {
+                                            self.permissionToScroll = false
+                                            self.scrollToId = ""
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                                withAnimation(Animation.easeOut(duration: 0.25)) {
+                                                    reader.scrollTo(currentMessages[message].id, anchor: .top)
+                                                }
                                             }
                                         }
                                     }
