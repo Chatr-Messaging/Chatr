@@ -237,20 +237,24 @@ struct DialogCell: View {
                 }
             }.onTapGesture {
                 if isOpen {
-                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                    if self.dialogModel.dialogType == "private" {
-                        self.openContactProfile.toggle()
-                    } else if self.dialogModel.dialogType == "group" || self.dialogModel.dialogType == "public" {
-                        self.openGroupProfile.toggle()
+                    DispatchQueue.main.async {
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                        if self.dialogModel.dialogType == "private" {
+                            self.openContactProfile.toggle()
+                        } else if self.dialogModel.dialogType == "group" || self.dialogModel.dialogType == "public" {
+                            self.openGroupProfile.toggle()
+                        }
                     }
                 } else {
-                    changeDialogRealmData.shared.updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
-                    self.isOpen = true
-                    self.selectedDialogID = self.dialogModel.id
+                    DispatchQueue.main.async {
+                        changeDialogRealmData.shared.updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
+                        self.isOpen = true
+                        self.selectedDialogID = self.dialogModel.id
 
-                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                    UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")
-                    UserDefaults.standard.set(true, forKey: "localOpen")
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                        UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")
+                        UserDefaults.standard.set(true, forKey: "localOpen")
+                    }
                 }
             }.sheet(isPresented: self.$openGroupProfile, onDismiss: {
                 guard let diaOpen = UserDefaults.standard.string(forKey: "openingDialogId"), diaOpen != self.dialogModel.id, diaOpen != "" else {

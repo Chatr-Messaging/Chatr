@@ -113,7 +113,7 @@ class ChatMessageViewModel: ObservableObject {
     }
     
     func updateDialogMessageCount(dialogId: String, completion: @escaping () -> Void) {
-        Request.countOfMessages(forDialogID: dialogId, extendedRequest: ["" : ""], successBlock: { count in
+        Request.countOfMessages(forDialogID: dialogId, extendedRequest: ["sort_desc" : "lastMessageDate"], successBlock: { count in
             self.totalMessageCount = Int(count)
             print("the total message count is: \(Int(count))")
             Request.totalUnreadMessageCountForDialogs(withIDs: Set([dialogId]), successBlock: { (unread, directory) in

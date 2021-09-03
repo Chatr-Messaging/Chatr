@@ -196,51 +196,42 @@ class changeMessageRealmData {
                                     foundMessage.imageType = type
                                 }
                                 
-                                if let imagePram = attach.customParameters as? [String: String], let imagePram = imagePram["imageURL"], foundMessage.image != imagePram {
-                                    foundMessage.image = imagePram
-                                    print("the shared image is: \(foundMessage.image)")
-                                }
-                                
-                                if let imageUploadPram = attach.customParameters as? [String: String], let imageUploadId = imageUploadPram["uploadId"], foundMessage.image != imageUploadId {
-                                    foundMessage.uploadMediaId = imageUploadId
-                                    foundMessage.imageType = "image/png"
-                                    print("the upload media id is: \(foundMessage.uploadMediaId)")
-                                }
-                                
-                                if let contactIDPram = attach.customParameters as? [String: String], let contactId = Int(contactIDPram["contactID"] ?? ""), foundMessage.contactID != contactId {
-                                    foundMessage.contactID = contactId
-                                    print("the shared contact ID is: \(foundMessage.contactID)")
-                                }
-                                
-                                if let channelIDParam = attach.customParameters as? [String: String], let channelId = channelIDParam["channelID"], foundMessage.channelID != channelId {
-                                    foundMessage.channelID = channelId
-                                    print("the shared channel ID is: \(foundMessage.channelID)")
-                                }
-                                
-                                if let longitude = attach.customParameters["longitude"], foundMessage.longitude != Double("\(longitude)") ?? 0 {
-                                    foundMessage.longitude = Double("\(longitude)") ?? 0
-                                    print("the shared longitude ID is: \(foundMessage.longitude) && \(longitude)")
-                                }
-                                
-                                if let latitude = attach.customParameters["latitude"], foundMessage.latitude != Double("\(latitude)") ?? 0 {
-                                    foundMessage.latitude = Double("\(latitude)") ?? 0
-                                    print("the shared latitude is: \(foundMessage.latitude) && \(latitude)")
-                                }
-                                
-                                if let videoUrl = attach.customParameters["videoURL"], foundMessage.image != "\(videoUrl)" {
-                                    foundMessage.image = "\(videoUrl)"
-                                    foundMessage.imageType = attach.type ?? ""
-                                    print("the video is: \(String(describing: attach.type)) && \(videoUrl)")
-                                }
-                                
-                                if let placeholderId = attach.customParameters["placeholderURL"], foundMessage.placeholderVideoImg != "\(placeholderId)" {
-                                    foundMessage.placeholderVideoImg = "\(placeholderId)"
-                                    print("the placeholder id is: \(placeholderId)")
-                                }
+                                if let imagePram = attach.customParameters as? [String: String] {
+                                    if let img = imagePram["imageURL"], foundMessage.image != img {
+                                        foundMessage.image = img
+                                    }
+                                    
+                                    if let imageUploadId = imagePram["uploadId"], foundMessage.image != imageUploadId {
+                                        foundMessage.uploadMediaId = imageUploadId
+                                    }
+                                    
+                                    if let contactId = Int(imagePram["contactID"] ?? ""), foundMessage.contactID != contactId {
+                                        foundMessage.contactID = contactId
+                                    }
+                                    
+                                    if let channelId = imagePram["channelID"], foundMessage.channelID != channelId {
+                                        foundMessage.channelID = channelId
+                                    }
+                                    
+                                    if let longitude = imagePram["longitude"], foundMessage.longitude != Double("\(longitude)") ?? 0 {
+                                        foundMessage.longitude = Double("\(longitude)") ?? 0
+                                    }
+                                    
+                                    if let latitude = imagePram["latitude"], foundMessage.latitude != Double("\(latitude)") ?? 0 {
+                                        foundMessage.latitude = Double("\(latitude)") ?? 0
+                                    }
+                                    
+                                    if let videoUrl = imagePram["videoURL"], foundMessage.image != "\(videoUrl)" {
+                                        foundMessage.image = "\(videoUrl)"
+                                    }
+                                    
+                                    if let placeholderId = imagePram["placeholderURL"], foundMessage.placeholderVideoImg != "\(placeholderId)" {
+                                        foundMessage.placeholderVideoImg = "\(placeholderId)"
+                                    }
 
-                                if let ratio = attach.customParameters["mediaRatio"], foundMessage.mediaRatio != Double("\(ratio)") {
-                                    foundMessage.mediaRatio = Double("\(ratio)") ?? 0.0
-                                    print("the media ratio is: \(Double("\(ratio)"))")
+                                    if let ratio = imagePram["mediaRatio"], foundMessage.mediaRatio != Double("\(ratio)") {
+                                        foundMessage.mediaRatio = Double("\(ratio)") ?? 0.0
+                                    }
                                 }
                             }
                         }
@@ -298,51 +289,45 @@ class changeMessageRealmData {
                         for attach in attachments {
                             //image/video attachment
                             if let imagePram = attach.customParameters as? [String: String] {
-                                newData.image = imagePram["imageURL"] ?? ""
-                                newData.imageType = attach.type ?? ""
-                                print("the shared image is: \(newData.image) && type: \(newData.imageType)")
-                            }
-                            
-                            if let imageUploadPram = attach.customParameters as? [String: String] {
-                                newData.uploadMediaId = imageUploadPram["uploadId"] ?? ""
-                                newData.imageType = "image/png"
-                                print("the upload media id is: \(newData.uploadMediaId)")
-                            }
-                            
-                            if let contactID = attach.customParameters as? [String: String] {
-                                newData.contactID = Int(contactID["contactID"] ?? "") ?? 0
-                                print("the shared contact ID is: \(newData.contactID)")
-                            }
-                            
-                            if let contactID = attach.customParameters as? [String: String] {
-                                newData.channelID = contactID["channelID"] ?? ""
-                                print("the shared channel ID is: \(newData.channelID)")
-                            }
-                            
-                            if let longitude = attach.customParameters["longitude"] {
-                                newData.longitude = Double("\(longitude)") ?? 0
-                                print("the shared longitude ID is: \(newData.longitude) && \(longitude)")
-                            }
-                            
-                            if let latitude = attach.customParameters["latitude"] {
-                                newData.latitude = Double("\(latitude)") ?? 0
-                                print("the shared latitude is: \(newData.latitude) && \(latitude)")
-                            }
-                            
-                            if let videoUrl = attach.customParameters["videoURL"] {
-                                newData.image = "\(videoUrl)"
-                                newData.imageType = attach.type ?? ""
-                                print("the video is: \(attach.type) && \(videoUrl)")
-                            }
+                                if let typez = attach.type {
+                                    newData.imageType = typez
+                                }
 
-                            if let placeholderId = attach.customParameters["placeholderURL"] {
-                                newData.placeholderVideoImg = "\(placeholderId)"
-                                print("the placeholder id is: \(placeholderId)")
-                            }
+                                if let imagez = imagePram["imageURL"] {
+                                    newData.image = imagez
+                                }
 
-                            if let ratio = attach.customParameters["mediaRatio"] {
-                                newData.mediaRatio = Double("\(ratio)") ?? 0.0
-                                print("the media ratio is: \(Double("\(ratio)"))")
+                                if let imageUploadPram = imagePram["uploadId"] {
+                                    newData.uploadMediaId = imageUploadPram
+                                }
+
+                                if let contactID = imagePram["contactID"] {
+                                    newData.contactID = Int(contactID) ?? 0
+                                }
+
+                                if let channelId = imagePram["channelID"] {
+                                    newData.channelID = channelId
+                                }
+
+                                if let longitude = imagePram["longitude"] {
+                                    newData.longitude = Double("\(longitude)") ?? 0
+                                }
+
+                                if let latitude = imagePram["latitude"] {
+                                    newData.latitude = Double("\(latitude)") ?? 0
+                                }
+                                
+                                if let videoUrl = imagePram["videoURL"] {
+                                    newData.image = "\(videoUrl)"
+                                }
+
+                                if let placeholderId = imagePram["placeholderURL"] {
+                                    newData.placeholderVideoImg = "\(placeholderId)"
+                                }
+
+                                if let ratio = imagePram["mediaRatio"] {
+                                    newData.mediaRatio = Double("\(ratio)") ?? 0.0
+                                }
                             }
                         }
                     }
@@ -440,51 +425,43 @@ class changeMessageRealmData {
                                 foundMessage.imageType = type
                             }
                             
-                            if let imagePram = attach.customParameters as? [String: String], let imagePram = imagePram["imageURL"], foundMessage.image != imagePram {
-                                foundMessage.image = imagePram
-                                print("the shared image is: \(foundMessage.image)")
-                            }
-                            
-                            if let imageUploadPram = attach.customParameters as? [String: String], let imageUploadId = imageUploadPram["uploadId"], foundMessage.image != imageUploadId {
-                                foundMessage.uploadMediaId = imageUploadId
-                                foundMessage.imageType = "image/png"
-                                print("the upload media id is: \(foundMessage.uploadMediaId)")
-                            }
-                            
-                            if let contactIDPram = attach.customParameters as? [String: String], let contactId = Int(contactIDPram["contactID"] ?? ""), foundMessage.contactID != contactId {
-                                foundMessage.contactID = contactId
-                                print("the shared contact ID is: \(foundMessage.contactID)")
-                            }
-                            
-                            if let channelIDParam = attach.customParameters as? [String: String], let channelId = channelIDParam["channelID"], foundMessage.channelID != channelId {
-                                foundMessage.channelID = channelId
-                                print("the shared channel ID is: \(foundMessage.channelID)")
-                            }
-                            
-                            if let longitude = attach.customParameters["longitude"], foundMessage.longitude != Double("\(longitude)") ?? 0 {
-                                foundMessage.longitude = Double("\(longitude)") ?? 0
-                                print("the shared longitude ID is: \(foundMessage.longitude) && \(longitude)")
-                            }
-                            
-                            if let latitude = attach.customParameters["latitude"], foundMessage.latitude != Double("\(latitude)") ?? 0 {
-                                foundMessage.latitude = Double("\(latitude)") ?? 0
-                                print("the shared latitude is: \(foundMessage.latitude) && \(latitude)")
-                            }
-                            
-                            if let videoUrl = attach.customParameters["videoURL"], foundMessage.image != "\(videoUrl)" {
-                                foundMessage.image = "\(videoUrl)"
-                                foundMessage.imageType = attach.type ?? ""
-                                print("the video is: \(String(describing: attach.type)) && \(videoUrl)")
-                            }
-                            
-                            if let placeholderId = attach.customParameters["placeholderURL"], foundMessage.placeholderVideoImg != "\(placeholderId)" {
-                                foundMessage.placeholderVideoImg = "\(placeholderId)"
-                                print("the placeholder id is: \(placeholderId)")
-                            }
+                            if let imagePram = attach.customParameters as? [String: String] {
+                                if let imagePramz = imagePram["imageURL"], foundMessage.image != imagePramz {
+                                    foundMessage.image = imagePramz
+                                }
+                                
+                                if let imageUploadId = imagePram["uploadId"], foundMessage.image != imageUploadId {
+                                    foundMessage.uploadMediaId = imageUploadId
+                                }
+                                
+                                if let contactId = Int(imagePram["contactID"] ?? ""), foundMessage.contactID != contactId {
+                                    foundMessage.contactID = contactId
+                                }
+                                
+                                if let channelId = imagePram["channelID"], foundMessage.channelID != channelId {
+                                    foundMessage.channelID = channelId
+                                }
 
-                            if let ratio = attach.customParameters["mediaRatio"], foundMessage.mediaRatio != Double("\(ratio)") {
-                                foundMessage.mediaRatio = Double("\(ratio)") ?? 0.0
-                                print("the media ratio is: \(Double("\(ratio)"))")
+                                if let longitude = imagePram["longitude"], foundMessage.longitude != Double("\(longitude)") ?? 0 {
+                                    foundMessage.longitude = Double("\(longitude)") ?? 0
+                                }
+
+                                if let latitude = imagePram["latitude"], foundMessage.latitude != Double("\(latitude)") ?? 0 {
+                                    foundMessage.latitude = Double("\(latitude)") ?? 0
+                                }
+
+                                if let videoUrl = imagePram["videoURL"], foundMessage.image != "\(videoUrl)" {
+                                    foundMessage.image = "\(videoUrl)"
+                                    foundMessage.imageType = attach.type ?? ""
+                                }
+
+                                if let placeholderId = imagePram["placeholderURL"], foundMessage.placeholderVideoImg != "\(placeholderId)" {
+                                    foundMessage.placeholderVideoImg = "\(placeholderId)"
+                                }
+
+                                if let ratio = imagePram["mediaRatio"], foundMessage.mediaRatio != Double("\(ratio)") {
+                                    foundMessage.mediaRatio = Double("\(ratio)") ?? 0.0
+                                }
                             }
                         }
                     }
@@ -509,7 +486,7 @@ class changeMessageRealmData {
                     newData.deliveredIDs.append(Int(truncating: deliv))
                 }
                             
-                //case delivered, sending, read, isTyping, editied, deleted, error
+                //case delivered, sending, read, isTyping, edited, deleted, error
                 if object.deliveredIDs?.count ?? 0 > 1 {
                     newData.messageState = .delivered
                 } else {
@@ -535,51 +512,45 @@ class changeMessageRealmData {
                     for attach in attachments {
                         //image/video attachment
                         if let imagePram = attach.customParameters as? [String: String] {
-                            newData.image = imagePram["imageURL"] ?? ""
-                            newData.imageType = attach.type ?? ""
-                            print("the shared image is: \(newData.image) && type: \(newData.imageType)")
-                        }
+                            if let typez = attach.type {
+                                newData.imageType = typez
+                            }
 
-                        if let imageUploadPram = attach.customParameters as? [String: String] {
-                            newData.uploadMediaId = imageUploadPram["uploadId"] ?? ""
-                            newData.imageType = "image/png"
-                            print("the upload media id is: \(newData.uploadMediaId)")
-                        }
-                        
-                        if let contactID = attach.customParameters as? [String: String] {
-                            newData.contactID = Int(contactID["contactID"] ?? "") ?? 0
-                            print("the shared contact ID is: \(newData.contactID)")
-                        }
-                        
-                        if let contactID = attach.customParameters as? [String: String] {
-                            newData.channelID = contactID["channelID"] ?? ""
-                            print("the shared channel ID is: \(newData.channelID)")
-                        }
-                        
-                        if let longitude = attach.customParameters["longitude"] {
-                            newData.longitude = Double("\(longitude)") ?? 0
-                            print("the shared longitude ID is: \(newData.longitude) & \(longitude)")
-                        }
-                        
-                        if let latitude = attach.customParameters["latitude"] {
-                            newData.latitude = Double("\(latitude)") ?? 0
-                            print("the shared latitude is: \(newData.latitude) && \(latitude)")
-                        }
+                            if let imagez = imagePram["imageURL"] {
+                                newData.image = imagez
+                            }
+                            
+                            if let imageUploadPram = imagePram["uploadId"] {
+                                newData.uploadMediaId = imageUploadPram
+                            }
+                            
+                            if let contactID = imagePram["contactID"] {
+                                newData.contactID = Int(contactID) ?? 0
+                            }
+                            
+                            if let channelId = imagePram["channelID"] {
+                                newData.channelID = channelId
+                            }
 
-                        if let videoUrl = attach.customParameters["videoURL"] {
-                            newData.image = "\(videoUrl)"
-                            newData.imageType = attach.type ?? ""
-                            print("the video is: \(newData.image) && \(videoUrl)")
-                        }
-                        
-                        if let placeholderId = attach.customParameters["placeholderURL"] {
-                            newData.placeholderVideoImg = "\(placeholderId)"
-                            print("the placeholder id is: \(placeholderId)")
-                        }
+                            if let longitude = imagePram["longitude"] {
+                                newData.longitude = Double("\(longitude)") ?? 0
+                            }
+                            
+                            if let latitude = imagePram["latitude"] {
+                                newData.latitude = Double("\(latitude)") ?? 0
+                            }
 
-                        if let ratio = attach.customParameters["mediaRatio"] {
-                            newData.mediaRatio = Double("\(ratio)") ?? 0.0
-                            print("the media ratio is: \(Double("\(ratio)"))")
+                            if let videoUrl = imagePram["videoURL"] {
+                                newData.image = "\(videoUrl)"
+                            }
+                            
+                            if let placeholderId = imagePram["placeholderURL"] {
+                                newData.placeholderVideoImg = "\(placeholderId)"
+                            }
+
+                            if let ratio = imagePram["mediaRatio"] {
+                                newData.mediaRatio = Double("\(ratio)") ?? 0.0
+                            }
                         }
                     }
                 }
@@ -701,12 +672,16 @@ class changeMessageRealmData {
         message.markable = true
         message.text = "Current location"
         message.attachments = [attachment]
+        message.senderID = Session.current.currentUserID
+        message.dialogID = dialog.id
+        message.createdAt = Date()
+        message.deliveredIDs = []
         
         let pDialog = ChatDialog(dialogID: dialog.id, type: dialog.dialogType == "public" ? .public : occupentID.count > 2 ? .group : .private)
         pDialog.occupantIDs = occupentID
         
-        pDialog.send(message) { (error) in
-            self.insertMessage(message, completion: {
+        self.insertMessage(message, completion: {
+            pDialog.send(message) { (error) in
                 if error != nil {
                     print("error sending message: \(String(describing: error?.localizedDescription))")
                     self.updateMessageState(messageID: message.id ?? "", messageState: .error)
@@ -714,8 +689,8 @@ class changeMessageRealmData {
                     print("Success sending message to ConnectyCube server!")
                     self.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
                 }
-            })
-        }
+            }
+        })
     }
     
     func sendAudioAttachment(dialog: DialogStruct, audioURL: URL, occupentID: [NSNumber]) {
@@ -770,9 +745,13 @@ class changeMessageRealmData {
             let message = ChatMessage()
             message.text = "GIF attachment"
             message.attachments = [attachmentz]
+            message.senderID = Session.current.currentUserID
+            message.dialogID = dialog.id
+            message.createdAt = Date()
+            message.deliveredIDs = []
             
-            pDialog.send(message) { (error) in
-                self.insertMessage(message, completion: {
+            self.insertMessage(message, completion: {
+                pDialog.send(message) { (error) in
                     if error != nil {
                         print("error sending attachment: \(String(describing: error?.localizedDescription))")
                         self.updateMessageState(messageID: message.id ?? "", messageState: .error)
@@ -780,8 +759,8 @@ class changeMessageRealmData {
                         print("Success sending attachment to ConnectyCube server!")
                         self.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
                     }
-                })
-            }
+                }
+            })
         }
     }
     
