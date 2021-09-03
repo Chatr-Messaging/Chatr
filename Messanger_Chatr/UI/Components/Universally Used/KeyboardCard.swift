@@ -497,9 +497,9 @@ struct KeyboardCardView: View {
                             } else {
                                 PHPhotoLibrary.requestAuthorization({ statusz in
                                     if statusz == .authorized{
-                                      DispatchQueue.main.async(execute: {
+                                      DispatchQueue.main.async {
                                           self.showImagePicker.toggle()
-                                      })
+                                      }
                                     } else {
                                         UINotificationFeedbackGenerator().notificationOccurred(.error)
                                     }
@@ -587,17 +587,19 @@ struct KeyboardCardView: View {
                         Button(action: {
                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
 
-                            self.imagePicker.checkLocationPermission()
-                            if self.imagePicker.locationPermission {
-                                self.region.center.longitude = self.imagePicker.locationManager.location?.coordinate.longitude ?? 0
-                                self.region.center.latitude = self.imagePicker.locationManager.location?.coordinate.latitude ?? 0
-                                
-                                withAnimation {
-                                    self.enableLocation.toggle()
+                            DispatchQueue.main.async {
+                                self.imagePicker.checkLocationPermission()
+                                if self.imagePicker.locationPermission {
+                                    self.region.center.longitude = self.imagePicker.locationManager.location?.coordinate.longitude ?? 0
+                                    self.region.center.latitude = self.imagePicker.locationManager.location?.coordinate.latitude ?? 0
+                                    
+                                    withAnimation {
+                                        self.enableLocation.toggle()
+                                    }
+                                    self.checkAttachments()
+                                } else {
+                                    self.imagePicker.requestLocationPermission()
                                 }
-                                self.checkAttachments()
-                            } else {
-                                self.imagePicker.requestLocationPermission()
                             }
                         }, label: {
                             Image(systemName: self.enableLocation ? "location.fill" : "location")

@@ -121,19 +121,19 @@ struct AttachmentBubble: View {
                                 ZStack {
                                     Circle()
                                         .stroke(Color.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
-                                        .frame(width: 20, height: 20)
+                                        .frame(width: 26, height: 26)
                                         .opacity(0.35)
 
                                     Circle()
                                         .trim(from: 1.0 - self.videoDownloadProgress, to: 1.0)
                                         .stroke(Color.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
-                                        .frame(width: 20, height: 20)
+                                        .frame(width: 26, height: 26)
                                         .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 0)
                                         .rotationEffect(.init(degrees: -90))
                                         .rotation3DEffect(Angle(degrees: 180), axis: (x: 1, y: 0, z: 0))
                                         .animation(Animation.linear(duration: 0.1))
                                 }
-                                .padding(4)
+                                .padding(8)
                                 .background(BlurView(style: .systemUltraThinMaterialDark).cornerRadius(7.5))
                                 .opacity(self.videoDownloadProgress == 0.0 || self.videoDownloadProgress == 1.0 ? 0 : 1)
                                 .padding(30)

@@ -66,18 +66,18 @@ struct VideoControlBubble: View {
                         ZStack {
                             Circle()
                                 .stroke(Color.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
-                                .frame(width: 25, height: 25)
+                                .frame(width: 18, height: 18)
                                 .opacity(0.35)
 
                             Circle()
                                 .trim(from: 0.0, to: self.progressBar)
                                 .stroke(Color.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
-                                .frame(width: 25, height: 25)
+                                .frame(width: 18, height: 18)
                                 .rotationEffect(.init(degrees: 90))
                                 .rotation3DEffect(Angle(degrees: 180), axis: (x: 1, y: 0, z: 0))
                                 .animation(Animation.linear(duration: 0.1))
-                        }
-                        .background(BlurView(style: .systemUltraThinMaterialDark).frame(width: 30, height: 30).cornerRadius(7.5))
+                        }.padding(7.5)
+                        .background(BlurView(style: .systemUltraThinMaterialDark).cornerRadius(7.5))
                         .overlay(RoundedRectangle(cornerRadius: 7.5).stroke(Color.black.opacity(0.15), lineWidth: 2))
                         .padding(.trailing, 7.5)
                         .onChange(of: self.totalDuration) { newValue in

@@ -161,39 +161,43 @@ class ChatMessageViewModel: ObservableObject {
     func likeMessage(from userId: Int, name: String, message: MessageStruct, completion: @escaping (Bool) -> Void) {
         guard message.senderID != 0, message.dialogID != "" else { return }
 
-        let msg = Database.database().reference().child("Dialogs").child(message.dialogID).child(message.id).child("likes")
+        DispatchQueue.main.async {
+            let msg = Database.database().reference().child("Dialogs").child(message.dialogID).child(message.id).child("likes")
 
-        msg.observeSingleEvent(of: .value, with: { snapshot in
-            if snapshot.childSnapshot(forPath: "\(userId)").exists() {
-                msg.child("\(userId)").removeValue()
+            msg.observeSingleEvent(of: .value, with: { snapshot in
+                if snapshot.childSnapshot(forPath: "\(userId)").exists() {
+                    msg.child("\(userId)").removeValue()
 
-                completion(false)
-            } else {
-                msg.updateChildValues(["\(userId)" : "\(Date())"])
-                self.sendPushNoti(userIDs: [NSNumber(value: message.senderID)], title: "Liked Message", message: "👍 \(name) liked your message \"\(message.text)\"")
+                    completion(false)
+                } else {
+                    msg.updateChildValues(["\(userId)" : "\(Date())"])
+                    self.sendPushNoti(userIDs: [NSNumber(value: message.senderID)], title: "Liked Message", message: "👍 \(name) liked your message \"\(message.text)\"")
 
-                completion(true)
-            }
-        })
+                    completion(true)
+                }
+            })
+        }
     }
     
     func dislikeMessage(from userId: Int, name: String, message: MessageStruct, completion: @escaping (Bool) -> Void) {
         guard message.senderID != 0, message.dialogID != "" else { return }
 
-        let msg = Database.database().reference().child("Dialogs").child(message.dialogID).child(message.id).child("dislikes")
+        DispatchQueue.main.async {
+            let msg = Database.database().reference().child("Dialogs").child(message.dialogID).child(message.id).child("dislikes")
 
-        msg.observeSingleEvent(of: .value, with: { snapshot in
-            if snapshot.childSnapshot(forPath: "\(userId)").exists() {
-                msg.child("\(userId)").removeValue()
+            msg.observeSingleEvent(of: .value, with: { snapshot in
+                if snapshot.childSnapshot(forPath: "\(userId)").exists() {
+                    msg.child("\(userId)").removeValue()
 
-                completion(false)
-            } else {
-                msg.updateChildValues(["\(userId)" : "\(Date())"])
-                self.sendPushNoti(userIDs: [NSNumber(value: message.senderID)], title: "Disliked Message", message: "👎 \(name) disliked your message \"\(message.text)\"")
-                
-                completion(true)
-            }
-        })
+                    completion(false)
+                } else {
+                    msg.updateChildValues(["\(userId)" : "\(Date())"])
+                    self.sendPushNoti(userIDs: [NSNumber(value: message.senderID)], title: "Disliked Message", message: "👎 \(name) disliked your message \"\(message.text)\"")
+                    
+                    completion(true)
+                }
+            })
+        }
     }
     
     func sendReply(text: String, name: String, messagez: MessageStruct, completion: @escaping () -> Void) {

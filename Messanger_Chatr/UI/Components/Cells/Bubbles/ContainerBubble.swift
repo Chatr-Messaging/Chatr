@@ -183,14 +183,15 @@ struct ContainerBubble: View {
                                     }
                                 }
                             } else {
-                                self.reactions.append("like")
-                                self.reactions.append("dislike")
-                                self.reactions.append("reply")
                                 if self.message.imageType == "image/gif" || self.message.imageType == "image/png" || self.message.imageType == "video/mov" {
                                     self.reactions.append("save")
                                 } else {
                                     self.reactions.append("copy")
                                 }
+
+                                self.reactions.append("reply")
+                                self.reactions.append("dislike")
+                                self.reactions.append("like")
                             }
                         }
                     }.zIndex(self.showInteractions ? 1 : 0)
@@ -200,11 +201,13 @@ struct ContainerBubble: View {
                         if self.message.dislikedId.count > 0 && !self.viewModel.isDetailOpen {
                             Button(action: {
                                 if self.messagePosition == .left {
-                                    UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                    self.viewModel.message = self.message
-                                    self.viewModel.dislikeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", message: self.message, completion: { dislike in
-                                        self.hasUserDisliked = dislike
-                                    })
+                                    DispatchQueue.main.async {
+                                        UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                        self.viewModel.message = self.message
+                                        self.viewModel.dislikeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", message: self.message, completion: { dislike in
+                                            self.hasUserDisliked = dislike
+                                        })
+                                    }
                                 }
                             }, label: {
                                 HStack(spacing: self.message.dislikedId.count > 1 ? 2 : 0) {
@@ -236,11 +239,13 @@ struct ContainerBubble: View {
                         if self.message.likedId.count > 0 && !self.viewModel.isDetailOpen {
                             Button(action: {
                                 if self.messagePosition == .left {
-                                    UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                    self.viewModel.message = self.message
-                                    self.viewModel.likeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", message: self.message, completion: { like in
-                                        self.hasUserLiked = like
-                                    })
+                                    DispatchQueue.main.async {
+                                        UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                        self.viewModel.message = self.message
+                                        self.viewModel.likeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", message: self.message, completion: { like in
+                                            self.hasUserLiked = like
+                                        })
+                                    }
                                 }
                             }, label: {
                                 HStack(spacing: self.message.likedId.count > 1 ? 2 : 0) {
@@ -426,25 +431,31 @@ struct ContainerBubble: View {
     }
     
     func onEndedInteraction(value: DragGesture.Value) {
-        if self.message.messageState != .isTyping && self.message.messageState != .error {
+        DispatchQueue.main.async {
+            guard self.message.messageState != .isTyping && self.message.messageState != .error else { return }
+
             withAnimation(Animation.linear) { self.showInteractions = false }
             
             if interactionSelected == "like" {
-                UINotificationFeedbackGenerator().notificationOccurred(.success)
-                self.viewModel.message = self.message
-                self.viewModel.likeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", message: self.message, completion: { like in
-                    withAnimation(Animation.easeOut(duration: 0.5).delay(0.8)) {
-                        self.hasUserLiked = like
-                    }
-                })
+                DispatchQueue.main.async {
+                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                    self.viewModel.message = self.message
+                    self.viewModel.likeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", message: self.message, completion: { like in
+                        withAnimation(Animation.easeOut(duration: 0.5).delay(0.8)) {
+                            self.hasUserLiked = like
+                        }
+                    })
+                }
             } else if interactionSelected == "dislike" {
-                UINotificationFeedbackGenerator().notificationOccurred(.success)
-                self.viewModel.message = self.message
-                self.viewModel.dislikeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", message: self.message, completion: { dislike in
-                    withAnimation(Animation.easeOut(duration: 0.5).delay(0.8)) {
-                        self.hasUserDisliked = dislike
-                    }
-                })
+                DispatchQueue.main.async {
+                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                    self.viewModel.message = self.message
+                    self.viewModel.dislikeMessage(from: self.auth.profile.results.last?.id ?? 0, name: self.auth.profile.results.last?.fullName ?? "A user", message: self.message, completion: { dislike in
+                        withAnimation(Animation.easeOut(duration: 0.5).delay(0.8)) {
+                            self.hasUserDisliked = dislike
+                        }
+                    })
+                }
             } else if interactionSelected == "copy" {
                 self.copyMessage()
             } else if interactionSelected == "reply" {
@@ -514,22 +525,23 @@ struct ContainerBubble: View {
 
             return
         }
-
         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
 
-        print("trying to open details")
-        if self.message.imageType == "video/mov" {
-            self.player.pause()
-            self.viewModel.player = self.player
-        } else if self.message.imageType == "audio/m4a" {
-            self.viewModel.audio.audioPlayer.pause()
-            self.viewModel.audio.isPlayingAudio = false
-            print("it is a audio m4a.. pausing: \(self.message.id)")
-        }
+        DispatchQueue.main.async {
+            if self.message.imageType == "video/mov" {
+                self.player.pause()
+                self.viewModel.player = self.player
+            } else if self.message.imageType == "audio/m4a" {
+                self.viewModel.audio.audioPlayer.pause()
+                self.viewModel.audio.isPlayingAudio = false
+            }
 
-        self.detailMessageModel = self.message
-        self.viewModel.message = self.message
-        self.isDetailOpen = true
+            self.detailMessageModel = self.message
+            self.viewModel.message = self.message
+            withAnimation {
+                self.isDetailOpen = true
+            }
+        }
     }
 
     func pinMessage() {
