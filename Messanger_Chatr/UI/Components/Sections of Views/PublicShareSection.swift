@@ -51,7 +51,7 @@ struct PublicShareSection: View {
                             .frame(width: 20, height: 20, alignment: .center)
                             .padding(.trailing, 5)
                         
-                        Text("Share Chat")
+                        Text("Share Channel")
                             .font(.none)
                             .fontWeight(.none)
                             .foregroundColor(.primary)
@@ -86,7 +86,7 @@ struct PublicShareSection: View {
                         .frame(width: 20, height: 20, alignment: .center)
                         .padding(.trailing, 5)
                     
-                    Text("Forward Chat")
+                    Text("Forward Channel")
                         .font(.none)
                         .fontWeight(.none)
                         .foregroundColor(.primary)

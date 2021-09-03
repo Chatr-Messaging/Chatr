@@ -144,7 +144,7 @@ struct KeyboardCardView: View {
                                         .padding(.top, 10)
                                 }).buttonStyle(ClickMiniButtonStyle())
                                 .background(Color.clear)
-                                .transition(AnyTransition.asymmetric(insertion: AnyTransition.move(edge: .top).animation(.easeOut(duration: 0.2)), removal: AnyTransition.move(edge: .top).animation(.easeOut(duration: 0.2))))
+                                .transition(AnyTransition.asymmetric(insertion: AnyTransition.move(edge: .top).animation(.easeOut(duration: 0.2)), removal: AnyTransition.move(edge: .top).combined(with: .opacity).animation(.easeOut(duration: 0.2))))
                             }.onAppear() {
                                 self.region.span = MKCoordinateSpan(latitudeDelta: 0.25, longitudeDelta: 0.25)
                             }
@@ -177,7 +177,7 @@ struct KeyboardCardView: View {
                                                 .frame(width: 24, height: 24, alignment: .center)
                                                 .foregroundColor(.primary)
                                         }).background(Color.clear)
-                                    }.transition(.asymmetric(insertion: AnyTransition.move(edge: .top).animation(.spring()), removal: AnyTransition.move(edge: .top).animation(.easeOut(duration: 0.2))))
+                                    }.transition(.asymmetric(insertion: AnyTransition.move(edge: .top).animation(.spring()), removal: AnyTransition.move(edge: .top).combined(with: .opacity).animation(.easeOut(duration: 0.2))))
                                 }.animation(.spring(response: 0.3, dampingFraction: 0.75, blendDuration: 0))
                             }
                         }
@@ -208,7 +208,7 @@ struct KeyboardCardView: View {
                                                 .frame(width: 24, height: 24, alignment: .center)
                                                 .foregroundColor(.primary)
                                         }).background(Color.clear)
-                                    }.transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(.spring()), removal: AnyTransition.move(edge: .bottom).animation(.easeOut(duration: 0.2))))
+                                    }.transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(.spring()), removal: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.easeOut(duration: 0.2))))
                                 }.animation(.spring(response: 0.3, dampingFraction: 0.75, blendDuration: 0))
                             }
                         }
@@ -260,7 +260,7 @@ struct KeyboardCardView: View {
                                         }).background(Color.clear)
                                         .opacity(self.imagePicker.selectedPhotos[img].canSend ? 0 : 1)
                                     }.id(self.imagePicker.selectedPhotos[img].id)
-                                    .transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(.spring()), removal: AnyTransition.move(edge: .bottom).animation(.easeOut(duration: 0.2))))
+                                        .transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(.spring()), removal: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.easeOut(duration: 0.2))))
                                 }.animation(.spring(response: 0.3, dampingFraction: 0.75, blendDuration: 0))
                             }
                         }
