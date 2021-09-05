@@ -57,7 +57,6 @@ struct AttachmentBubble: View {
                         }
                     }.aspectRatio(contentMode: .fill)
                     .clipShape(CustomGIFShape())
-                    //.frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75)), alignment: self.messagePosition == .right ? .trailing : .leading)
                     .frame(minHeight: 100, maxHeight: CGFloat(Constants.screenHeight * 0.75))
                     .padding(.bottom, self.hasPrior ? 0 : 4)
                     .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 14)
@@ -78,8 +77,6 @@ struct AttachmentBubble: View {
                         }.padding(.vertical, 100)
                     }.aspectRatio(contentMode: .fit)
                     .clipShape(CustomGIFShape())
-                    //.frame(minWidth: 100, maxWidth: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75)), alignment: self.messagePosition == .right ? .trailing : .leading)
-                    //.frame(maxHeight: CGFloat(Constants.screenHeight * 0.75))
                     .frame(width: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75)), alignment: self.messagePosition == .right ? .trailing : .leading)
                     .frame(height: CGFloat(self.message.mediaRatio * (Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75))))
                     .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 14)
