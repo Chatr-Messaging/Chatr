@@ -103,6 +103,7 @@ struct ChatMessagesView: View {
     @Binding var isKeyboardActionOpen: Bool
     @Binding var isHomeDialogOpen: Bool
     @Binding var isDetailOpen: Bool
+    @Binding var emptyQuickSnaps: Bool
     @Binding var detailMessageModel: MessageStruct
     @State private var delayViewMessages: Bool = false
     @State private var firstScroll: Bool = true
@@ -114,6 +115,7 @@ struct ChatMessagesView: View {
     @State private var maxMessageCount: Int = -1
     @State private var scrollViewHeight: CGFloat = 0
     @State private var scrollBuffer: CGFloat = 0
+    @State private var scrollLocationPercent: Double = 0.0
     @State var playingVideoId = ""
     var namespace: Namespace.ID
     let keyboard = KeyboardObserver()
@@ -306,14 +308,13 @@ struct ChatMessagesView: View {
                                 }.transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).combined(with: AnyTransition.opacity).animation(Animation.easeOut(duration: 0.35)), removal: AnyTransition.move(edge: .bottom).combined(with: AnyTransition.opacity).animation(Animation.easeOut(duration: 0.35))))
                                 .contentShape(Rectangle())
                             }.background(GeometryReader { fullView in
-                                Color.clear.preference(key: ViewOffsetKey.self,
-                                    value: -fullView.frame(in: .named("scroll")).origin.y)
+                                Color.clear.preference(key: ViewOffsetKey.self, value: -fullView.frame(in: .named("scroll")).origin.y)
                                     .onAppear {
                                         //DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                                         //If the 10 to show is not enough then show another page
                                             self.scrollViewHeight = fullView.size.height
                                             UserDefaults.standard.set(fullView.size.height, forKey: "messageViewScrollHeight")
-                                            print("the view height on appear: \(self.scrollViewHeight) ** \(Constants.screenHeight * 0.7)")
+                                            print("the view height on appear: \(self.scrollViewHeight) ** \(Constants.screenHeight)")
                                             if self.scrollViewHeight < Constants.screenHeight * 0.8, self.maxPagination != 0, self.scrollPage <= 1 {
                                                 print("added another scroll pageee")
                                                 //self.scrollToId = currentMessages.last?.id ?? ""
@@ -322,7 +323,7 @@ struct ChatMessagesView: View {
                                         //}
                                     }
                                     .onChange(of: fullView.size.height) { value in
-                                        print("the view height isss: \(value) && \(Constants.screenHeight * 0.6)")
+                                        print("the view height isss: \(value) && \(Constants.screenHeight * 0.7)")
                                         self.scrollViewHeight = value
                                         UserDefaults.standard.set(value, forKey: "messageViewScrollHeight")
                                         if self.scrollViewHeight < Constants.screenHeight * 0.8, self.maxPagination != 0, self.scrollPage <= 1 {
@@ -330,10 +331,14 @@ struct ChatMessagesView: View {
                                             //self.scrollToId = currentMessages.last?.id ?? ""
                                             self.scrollPage += 2
                                         }
+                                        
+                                        if self.maxMessageCount != self.currentMessages.count {
+                                            self.maxMessageCount = self.currentMessages.count
+                                        }
                                     }
                             })
                             .onChange(of: self.isKeyboardActionOpen) { keyboardOpen in
-                                if keyboardOpen, UserDefaults.standard.integer(forKey: "messageViewScrollHeight") > Int(Constants.screenHeight * 0.7) {
+                                if keyboardOpen, self.scrollLocationPercent <= 1.1, UserDefaults.standard.integer(forKey: "messageViewScrollHeight") > Int(Constants.screenHeight * 0.7) {
                                     withAnimation(Animation.easeOut(duration: 0.25).delay(0.35)) {
                                         reader.scrollTo(self.currentMessages.last?.id, anchor: .bottom)
                                     }
@@ -344,6 +349,8 @@ struct ChatMessagesView: View {
                                     print("dragging down dialog cell...")
                                     return
                                 }
+                                
+                                self.scrollLocationPercent = CGFloat(self.scrollViewHeight) / (scrollOffsetz + (Constants.screenHeight - (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 127 : 91) : 201)))
                                 
                                 //pause video if scrolling too much & is playing video
                                 if self.playingVideoId != "" {
@@ -357,8 +364,9 @@ struct ChatMessagesView: View {
                                     }
                                 }
 
-                                print("the offset is: \(scrollOffsetz) && \(self.playingVideoId)")
-                                if scrollOffsetz < -60 && !firstScroll, !self.isLoadingMore, self.permissionLoadMore {
+                                print("the offset is: \(self.scrollLocationPercent) && \(self.scrollViewHeight) && nowww: \(scrollOffsetz + (Constants.screenHeight - (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 127 : 91) : 201))) ** \(scrollOffsetz)")
+                                
+                                if scrollOffsetz < -60, !firstScroll, !self.isLoadingMore, self.permissionLoadMore {
                                     self.isLoadingMore = true
                                     self.permissionLoadMore = false
                                     //$0 > self.scrollViewHeight && self.minPagination != currentMessages.count {
@@ -438,15 +446,17 @@ struct ChatMessagesView: View {
                                         
                                         switch event.type {
                                         case .willShow:
-                                            UIView.animate(withDuration: event.duration, delay: 0.0, options: [event.options], animations: {
-                                                self.keyboardChange = keyboardFrameEnd.height - 10
-                                                reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
-                                            }, completion: nil)
-                                           
+                                            self.keyboardChange = keyboardFrameEnd.height - 10
+
+                                            if self.scrollLocationPercent <= 1.1 {
+                                                withAnimation(.easeOut) {
+                                                    reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
+                                                }
+                                            }
                                         case .willHide:
-                                            UIView.animate(withDuration: event.duration, delay: 0.0, options: [event.options], animations: {
+                                            withAnimation(.easeOut) {
                                                 self.keyboardChange = 0
-                                            }, completion: nil)
+                                            }
 
                                         default:
                                             break
