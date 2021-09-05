@@ -248,7 +248,7 @@ struct ChatMessagesView: View {
                                             .padding(.trailing, messagePosition != .right ? 40 : 0)
                                             .padding(.leading, messagePosition == .right ? 40 : 0)
                                             .padding(.bottom, hasPrevious ? -6 : 10)
-                                            .padding(.bottom, self.auth.userHasiOS15 ? 0 : currentMessages[message].id != currentMessages.last?.id ? 0 : self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 110 : 0) + 32)
+                                            .padding(.bottom, self.auth.userHasiOS15 ? 0 : currentMessages[message].id != currentMessages.last?.id ? 0 : self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 110 : 0) + (self.isKeyboardActionOpen ? 80 : 0) + 32)
                                             .resignKeyboardOnDragGesture()
                                             .id(currentMessages[message].id)
 
@@ -332,6 +332,13 @@ struct ChatMessagesView: View {
                                         }
                                     }
                             })
+                            .onChange(of: self.isKeyboardActionOpen) { keyboardOpen in
+                                if keyboardOpen, UserDefaults.standard.integer(forKey: "messageViewScrollHeight") > Int(Constants.screenHeight * 0.7) {
+                                    withAnimation(Animation.easeOut(duration: 0.25).delay(0.35)) {
+                                        reader.scrollTo(self.currentMessages.last?.id, anchor: .bottom)
+                                    }
+                                }
+                            }
                             .onPreferenceChange(ViewOffsetKey.self) { scrollOffsetz in
                                 guard self.activeView.height == 0 else {
                                     print("dragging down dialog cell...")

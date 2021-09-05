@@ -505,6 +505,7 @@ struct mainHomeList: View {
                             //self.isLocalOpen = isOpen
                             if !isOpen {
                                 self.isLocalOpen = false
+                                self.isKeyboardActionOpen = false
                             }
 
                             self.disableDialog = true
