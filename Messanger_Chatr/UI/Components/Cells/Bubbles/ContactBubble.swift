@@ -156,7 +156,7 @@ struct ContactBubble: View {
                         //.clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
                         //.contentShape(RoundedRectangle(cornerRadius: 20, style: .circular))
                     })
-                    .padding(.bottom, self.hasPrior ? 0 : 4)
+                    .padding(.bottom, self.hasPrior ? 0 : 2)
                     .buttonStyle(highlightedButtonStyle())
                     .shadow(color: Color.black.opacity(0.15), radius: 12, x: 0, y: 14)
                     .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.5) : Color.clear, lineWidth: 2.5))

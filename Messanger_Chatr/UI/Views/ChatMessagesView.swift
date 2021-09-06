@@ -256,6 +256,8 @@ struct ChatMessagesView: View {
 
                                         if messagePosition == .left { Spacer() }
                                     }.background(Color.clear)
+                                    .transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).combined(with: AnyTransition.opacity).animation(Animation.easeOut(duration: 0.35)), removal: AnyTransition.move(edge: .bottom).combined(with: AnyTransition.opacity).animation(Animation.easeInOut(duration: 0.35))))
+                                    .contentShape(Rectangle())
                                     .onAppear {
     //                                        //print("the adding mesg id is: \(currentMessages[message].id) but the on i am looking for is: \(currentMessages[(pageShowCount * self.scrollPage) + self.pageShowCount].id) at index: \((pageShowCount * self.scrollPage) - self.pageShowCount)")
                                         DispatchQueue.main.async {
@@ -277,10 +279,14 @@ struct ChatMessagesView: View {
                                             } else if self.scrollToId == currentMessages[message].id {
                                                 self.permissionToScroll = false
                                                 self.scrollToId = ""
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                                                    withAnimation(Animation.easeOut(duration: 0.25)) {
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                                                    withAnimation(Animation.easeInOut(duration: 0.35).delay(0.25)) {
                                                         reader.scrollTo(currentMessages[message].id, anchor: .top)
                                                     }
+                                                }
+                                            } else if !self.firstScroll, currentMessages[message].id == currentMessages.last?.id, self.scrollLocationPercent <= 1.3 {
+                                                withAnimation(Animation.easeInOut(duration: 0.35)) {
+                                                    reader.scrollTo(currentMessages.last?.id, anchor: .bottom)
                                                 }
                                             }
                                         }
@@ -305,8 +311,7 @@ struct ChatMessagesView: View {
     //                                        }
     //                                    }
                                     
-                                }.transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).combined(with: AnyTransition.opacity).animation(Animation.easeOut(duration: 0.35)), removal: AnyTransition.move(edge: .bottom).combined(with: AnyTransition.opacity).animation(Animation.easeOut(duration: 0.35))))
-                                .contentShape(Rectangle())
+                                }
                             }.background(GeometryReader { fullView in
                                 Color.clear.preference(key: ViewOffsetKey.self, value: -fullView.frame(in: .named("scroll")).origin.y)
                                     .onAppear {
@@ -338,8 +343,17 @@ struct ChatMessagesView: View {
                                     }
                             })
                             .onChange(of: self.isKeyboardActionOpen) { keyboardOpen in
+                                //Keyboard action drawer or the paperclip button
                                 if keyboardOpen, self.scrollLocationPercent <= 1.1, UserDefaults.standard.integer(forKey: "messageViewScrollHeight") > Int(Constants.screenHeight * 0.7) {
                                     withAnimation(Animation.easeOut(duration: 0.25).delay(0.35)) {
+                                        reader.scrollTo(self.currentMessages.last?.id, anchor: .bottom)
+                                    }
+                                }
+                            }
+                            .onChange(of: self.textFieldHeight) { kHeight in
+                                //Keyboard text field height
+                                if kHeight != 38, self.scrollLocationPercent <= 1.1, UserDefaults.standard.integer(forKey: "messageViewScrollHeight") > Int(Constants.screenHeight * 0.7) {
+                                    withAnimation(Animation.easeOut(duration: 0.25)) {
                                         reader.scrollTo(self.currentMessages.last?.id, anchor: .bottom)
                                     }
                                 }
@@ -438,6 +452,15 @@ struct ChatMessagesView: View {
                                     self.auth.userHasiOS15 = false
                                 }
                                 
+                                //Scroll to bottom notification
+                                NotificationCenter.default.addObserver(forName: NSNotification.Name("scrollToLastId"), object: nil, queue: .main) { (_) in
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                                        withAnimation(.easeOut) {
+                                            reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
+                                        }
+                                    }
+                                }
+
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                                     keyboard.observe { (event) in
                                         guard !self.viewModel.isDetailOpen else { return }

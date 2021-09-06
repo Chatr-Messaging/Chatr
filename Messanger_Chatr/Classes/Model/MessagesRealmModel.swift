@@ -113,12 +113,13 @@ class changeMessageRealmData {
         //For the 'skip' paginator... you need to get to total unread count & if greater than ~10 apply unread count
         //No need to scroll to bottom. When you hit the bottom, load ~10 more or so.
         Request.messages(withDialogID: dialogID, extendedRequest: extRequest, paginator: Paginator.limit(UInt(currentCount + 20), skip: 0), successBlock: { (messages, _) in
-            self.insertMessages(messages, completion: { })
+            self.insertMessages(messages, completion: {
+                completion(true)
+            })
         }){ (error) in
             print("eror getting messages: \(error.localizedDescription)")
+            completion(false)
         }
-
-        completion(true)
     }
     
     func insertMessages<T>(_ objects: [T], completion: @escaping () -> Void) where T: ChatMessage {
@@ -588,7 +589,10 @@ class changeMessageRealmData {
         message.deliveredIDs = []
         
         self.insertMessage(message, completion: {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            NotificationCenter.default.post(name: NSNotification.Name("scrollToLastId"), object: nil)
+
+            //Wait for animation to play before making network request
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.15) {
                 let pDialog = ChatDialog(dialogID: dialog.id, type: dialog.dialogType == "public" ? .public : occupentID.count > 2 ? .group : .private)
                 pDialog.occupantIDs = occupentID
                 
@@ -623,13 +627,17 @@ class changeMessageRealmData {
             pDialog.occupantIDs = occupentID
             
             self.insertMessage(message, completion: {
-                pDialog.send(message) { (error) in
-                    if error != nil {
-                        print("error sending message: \(String(describing: error?.localizedDescription))")
-                        self.updateMessageState(messageID: message.id ?? "", messageState: .error)
-                    } else {
-                        print("Success sending message to ConnectyCube server!")
-                        self.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
+                NotificationCenter.default.post(name: NSNotification.Name("scrollToLastId"), object: nil)
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.15) {
+                    pDialog.send(message) { (error) in
+                        if error != nil {
+                            print("error sending message: \(String(describing: error?.localizedDescription))")
+                            self.updateMessageState(messageID: message.id ?? "", messageState: .error)
+                        } else {
+                            print("Success sending message to ConnectyCube server!")
+                            self.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
+                        }
                     }
                 }
             })
@@ -645,21 +653,29 @@ class changeMessageRealmData {
             message.markable = true
             message.text = "Shared channel"
             message.attachments = [attachment]
+            message.senderID = Session.current.currentUserID
+            message.dialogID = dialog.id
+            message.createdAt = Date()
+            message.deliveredIDs = []
             
             let pDialog = ChatDialog(dialogID: dialog.id, type: occupentID.count > 2 ? .group : .private)
             pDialog.occupantIDs = occupentID
             
-            pDialog.send(message) { (error) in
-                self.insertMessage(message, completion: {
-                    if error != nil {
-                        print("error sending message: \(String(describing: error?.localizedDescription))")
-                        self.updateMessageState(messageID: message.id ?? "", messageState: .error)
-                    } else {
-                        print("Success sending message to ConnectyCube server!")
-                        self.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
+            self.insertMessage(message, completion: {
+                NotificationCenter.default.post(name: NSNotification.Name("scrollToLastId"), object: nil)
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.15) {
+                    pDialog.send(message) { (error) in
+                        if error != nil {
+                            print("error sending message: \(String(describing: error?.localizedDescription))")
+                            self.updateMessageState(messageID: message.id ?? "", messageState: .error)
+                        } else {
+                            print("Success sending message to ConnectyCube server!")
+                            self.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
+                        }
                     }
-                })
-            }
+                }
+            })
         }
     }
     
@@ -681,13 +697,17 @@ class changeMessageRealmData {
         pDialog.occupantIDs = occupentID
         
         self.insertMessage(message, completion: {
-            pDialog.send(message) { (error) in
-                if error != nil {
-                    print("error sending message: \(String(describing: error?.localizedDescription))")
-                    self.updateMessageState(messageID: message.id ?? "", messageState: .error)
-                } else {
-                    print("Success sending message to ConnectyCube server!")
-                    self.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
+            NotificationCenter.default.post(name: NSNotification.Name("scrollToLastId"), object: nil)
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.15) {
+                pDialog.send(message) { (error) in
+                    if error != nil {
+                        print("error sending message: \(String(describing: error?.localizedDescription))")
+                        self.updateMessageState(messageID: message.id ?? "", messageState: .error)
+                    } else {
+                        print("Success sending message to ConnectyCube server!")
+                        self.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
+                    }
                 }
             }
         })
@@ -717,6 +737,8 @@ class changeMessageRealmData {
                 
                 pDialog.send(message) { (error) in
                     self.insertMessage(message, completion: {
+                        NotificationCenter.default.post(name: NSNotification.Name("scrollToLastId"), object: nil)
+
                         if error != nil {
                             self.updateMessageState(messageID: message.id ?? "", messageState: .error)
                         } else {
@@ -751,13 +773,17 @@ class changeMessageRealmData {
             message.deliveredIDs = []
             
             self.insertMessage(message, completion: {
-                pDialog.send(message) { (error) in
-                    if error != nil {
-                        print("error sending attachment: \(String(describing: error?.localizedDescription))")
-                        self.updateMessageState(messageID: message.id ?? "", messageState: .error)
-                    } else {
-                        print("Success sending attachment to ConnectyCube server!")
-                        self.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
+                NotificationCenter.default.post(name: NSNotification.Name("scrollToLastId"), object: nil)
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.15) {
+                    pDialog.send(message) { (error) in
+                        if error != nil {
+                            print("error sending attachment: \(String(describing: error?.localizedDescription))")
+                            self.updateMessageState(messageID: message.id ?? "", messageState: .error)
+                        } else {
+                            print("Success sending attachment to ConnectyCube server!")
+                            self.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
+                        }
                     }
                 }
             })
@@ -765,6 +791,8 @@ class changeMessageRealmData {
     }
     
     func sendPhotoAttachment(dialog: DialogStruct, attachmentImages: [UIImage], occupentID: [NSNumber]) {
+        //NOTE: FUNC IS NOT USED
+        
         for attachment in attachmentImages {
             let data = attachment.jpegData(compressionQuality: 1.0)
             
@@ -792,6 +820,8 @@ class changeMessageRealmData {
                 pDialog.send(message) { (error) in
                     print("SENT image...")
                     self.insertMessage(message, completion: {
+                        NotificationCenter.default.post(name: NSNotification.Name("scrollToLastId"), object: nil)
+
                         if error != nil {
                             print("error sending attachment: \(String(describing: error?.localizedDescription))")
                             self.updateMessageState(messageID: message.id ?? "", messageState: .error)
@@ -846,18 +876,26 @@ class changeMessageRealmData {
         message.markable = true
         message.text = "Video attachment"
         message.attachments = [attachment]
+        message.senderID = Session.current.currentUserID
+        message.dialogID = dialog.id
+        message.createdAt = Date()
+        message.deliveredIDs = []
 
-        pDialog.send(message) { (error) in
-            self.insertMessage(message, completion: {
-                if error != nil {
-                    print("error sending attachment: \(String(describing: error?.localizedDescription))")
-                    self.updateMessageState(messageID: message.id ?? "", messageState: .error)
-                } else {
-                    print("Success sending video to ConnectyCube server!")
-                    self.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
+        self.insertMessage(message, completion: {
+            NotificationCenter.default.post(name: NSNotification.Name("scrollToLastId"), object: nil)
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.15) {
+                pDialog.send(message) { (error) in
+                    if error != nil {
+                        print("error sending attachment: \(String(describing: error?.localizedDescription))")
+                        self.updateMessageState(messageID: message.id ?? "", messageState: .error)
+                    } else {
+                        print("Success sending video to ConnectyCube server!")
+                        self.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
+                    }
                 }
-            })
-        }
+            }
+        })
     }
     
     func saveVideoInDocumentsDirectory(withAsset asset: AVAsset, completion: @escaping (_ url: URL?,_ error: Error?) -> Void) {

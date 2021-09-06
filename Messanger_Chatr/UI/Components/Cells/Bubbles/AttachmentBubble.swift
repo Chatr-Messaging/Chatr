@@ -43,7 +43,7 @@ struct AttachmentBubble: View {
 
     var body: some View {
         ZStack() {
-            if self.message.imageType == "image/gif" && self.message.messageState != .deleted {
+            if self.message.imageType == "image/gif", self.message.messageState != .deleted {
                 AnimatedImage(url: URL(string: self.message.image))
                     .resizable()
                     .placeholder {
@@ -60,11 +60,11 @@ struct AttachmentBubble: View {
                     .frame(minHeight: 100, maxHeight: CGFloat(Constants.screenHeight * 0.75))
                     .padding(.bottom, self.hasPrior ? 0 : 4)
                     .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 14)
-                    .padding(.bottom, self.hasPrior ? 0 : 4)
+                    //.padding(.bottom, self.hasPrior ? 0 : 4)
                     //.offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
                     .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.5) : Color.clear, lineWidth: 5).offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0))
                     .matchedGeometryEffect(id: self.message.id.description + "gif", in: namespace)
-            } else if self.message.imageType == "image/png" && self.message.messageState != .deleted {
+            } else if self.message.imageType == "image/png", self.message.messageState != .deleted {
                 WebImage(url: URL(string: self.message.image))
                     .resizable()
                     .placeholder {
@@ -78,13 +78,14 @@ struct AttachmentBubble: View {
                     }.aspectRatio(contentMode: .fit)
                     .clipShape(CustomGIFShape())
                     .frame(width: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75)), alignment: self.messagePosition == .right ? .trailing : .leading)
-                    .frame(height: CGFloat(self.message.mediaRatio * (Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75))))
+                    .frame(idealHeight: CGFloat(self.message.mediaRatio * (Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75))))
+                    .frame(maxHeight: Constants.screenHeight * 0.6)
                     .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 14)
                     .padding(.bottom, self.hasPrior ? 0 : 4)
                     .offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
                     .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.8) : Color.clear, lineWidth: 3).offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0))
                     .matchedGeometryEffect(id: self.message.id.description + "png", in: namespace)
-            } else if self.message.imageType == "video/mov" && self.message.messageState != .deleted {
+            } else if self.message.imageType == "video/mov", self.message.messageState != .deleted {
                 ZStack(alignment: .center) {
                     //VideoPlayer(player: self.player)
                     PlayerView(player: self.$player, totalDuration: self.$totalDuration)
@@ -186,7 +187,7 @@ struct AttachmentBubble: View {
                             self.pause()
                         }
                 }
-            } else if self.message.imageType == "audio/m4a" && self.message.messageState != .deleted {
+            } else if self.message.imageType == "audio/m4a", self.message.messageState != .deleted {
                 AudioBubble(viewModel: self.viewModel, message: self.message, namespace: self.namespace, messageRight: self.messagePosition == .right)
             }
         }

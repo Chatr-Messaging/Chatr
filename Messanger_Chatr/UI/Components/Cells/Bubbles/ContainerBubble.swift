@@ -302,6 +302,7 @@ struct ContainerBubble: View {
                         .offset(y: 4)
                         .multilineTextAlignment(messagePosition == .right ? .trailing : .leading)
                         .opacity(self.hasPrior ? 0 : 1)
+                        //.transition(.asymmetric(insertion: AnyTransition.move(edge: messagePosition == .right ? .trailing : .leading).combined(with: AnyTransition.opacity).animation(Animation.easeOut(duration: 0.45)), removal: AnyTransition.move(edge: messagePosition == .right ? .leading : .trailing).combined(with: AnyTransition.opacity).animation(Animation.easeInOut(duration: 0.45))))
 
                     if messagePosition == .left {
                         if self.message.isPinned {
