@@ -345,7 +345,7 @@ struct ChatMessagesView: View {
                             .onChange(of: self.isKeyboardActionOpen) { keyboardOpen in
                                 //Keyboard action drawer or the paperclip button
                                 if keyboardOpen, self.scrollLocationPercent <= 1.1, UserDefaults.standard.integer(forKey: "messageViewScrollHeight") > Int(Constants.screenHeight * 0.7) {
-                                    withAnimation(Animation.easeOut(duration: 0.25).delay(0.35)) {
+                                    withAnimation(Animation.easeOut(duration: 0.25)) {
                                         reader.scrollTo(self.currentMessages.last?.id, anchor: .bottom)
                                     }
                                 }
