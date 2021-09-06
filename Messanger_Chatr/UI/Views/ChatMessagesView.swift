@@ -358,6 +358,14 @@ struct ChatMessagesView: View {
                                     }
                                 }
                             }
+                            .onChange(of: self.hasAttachment) { hasAttach in
+                                //Keyboard pending media
+                                if hasAttach, self.scrollLocationPercent <= 1.1, UserDefaults.standard.integer(forKey: "messageViewScrollHeight") > Int(Constants.screenHeight * 0.7) {
+                                    withAnimation(Animation.easeOut(duration: 0.25)) {
+                                        reader.scrollTo(self.currentMessages.last?.id, anchor: .bottom)
+                                    }
+                                }
+                            }
                             .onPreferenceChange(ViewOffsetKey.self) { scrollOffsetz in
                                 guard self.activeView.height == 0 else {
                                     print("dragging down dialog cell...")
