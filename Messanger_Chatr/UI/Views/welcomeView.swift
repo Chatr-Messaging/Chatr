@@ -740,9 +740,9 @@ struct PhoneNumberView: View {
                     .trim(from: 0, to: 0.8)
                     .stroke(Color.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                     .frame(width: 25, height: 25)
+                    .rotationEffect(.init(degrees: self.loadAni ? 360 : 0))
                     .padding(.vertical, 10)
                     .padding(.bottom, 30)
-                    .rotationEffect(.init(degrees: self.loadAni ? 360 : 0))
                     .animation(Animation.linear(duration: 0.55).repeatForever(autoreverses: false))
                     .onAppear(perform: ({
                         self.loadAni.toggle()

@@ -32,11 +32,15 @@ class MessageStruct : Object, Identifiable {
     @objc dynamic var imageType: String = ""
     @objc dynamic var hadDelay: Bool = false
     @objc dynamic var isPinned: Bool = false
-    @objc dynamic var needsTimestamp: Bool = false
     @objc dynamic var uploadMediaId: String = ""
     @objc dynamic var uploadProgress: Double = 0.0
     @objc dynamic var placeholderVideoImg: String = ""
     @objc dynamic var mediaRatio: Double = 0.0
+    @objc dynamic var positionRight: Bool = true
+    @objc dynamic var hasPrevious: Bool = false
+    @objc dynamic var needsTimestamp: Bool = false
+    @objc dynamic var isPriorWider: Bool = false
+    @objc dynamic var isHeader: Bool = false
     @objc dynamic var status = messageStatus.sending.rawValue
     var messageState: messageStatus {
         get { return messageStatus(rawValue: status) ?? .delivered }
@@ -84,7 +88,7 @@ class MessagesRealmModel<Element>: ObservableObject where Element: RealmSwift.Re
     
     func selectedDialog(dialogID: String) -> Results<Element> {
         if dialogID == "" {
-            return results.filter("status != %@", messageStatus.deleted.rawValue).filter("status != %@", messageStatus.deleted.rawValue).sorted(byKeyPath: "date", ascending: true)
+            return results.filter("status != %@", messageStatus.deleted.rawValue).sorted(byKeyPath: "date", ascending: true)
         } else {
             return results.filter("dialogID == %@", dialogID).filter("status != %@", messageStatus.removedTyping.rawValue).filter("status != %@", messageStatus.deleted.rawValue).sorted(byKeyPath: "date", ascending: true)
         }
@@ -99,7 +103,9 @@ class changeMessageRealmData {
         let extRequest : [String: String] = ["sort_desc" : "date_sent", "mark_as_read" : "0"]
         Request.messages(withDialogID: dialogID, extendedRequest: extRequest, paginator: Paginator.limit(UInt(limit), skip: UInt(skip)), successBlock: { (messages, _) in
             self.insertMessages(messages, completion: {
-                completion(true)
+                self.checkSurroundingValues(dialogId: dialogID, completion: {
+                    completion(true)
+                })
             })
         }){ (error) in
             print("error getting messages: \(error.localizedDescription)")
@@ -145,6 +151,11 @@ class changeMessageRealmData {
                         
                         if foundMessage.senderID != Int(object.senderID) {
                             foundMessage.senderID = Int(object.senderID)
+                        }
+                        
+                        let positionz = Int(object.senderID) == UserDefaults.standard.integer(forKey: "currentUserID")
+                        if foundMessage.positionRight != positionz {
+                            foundMessage.positionRight = positionz
                         }
                         
                         if let readz = object.readIDs {
@@ -247,6 +258,8 @@ class changeMessageRealmData {
                     newData.dialogID = object.dialogID ?? ""
                     newData.date = object.dateSent ?? Date()
                     newData.senderID = Int(object.senderID)
+                    newData.positionRight = Int(object.senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? true : false
+
                     for read in object.readIDs ?? [] {
                         if !newData.readIDs.contains(Int(truncating: read)) {
                             newData.readIDs.append(Int(truncating: read))
@@ -376,6 +389,11 @@ class changeMessageRealmData {
                         foundMessage.senderID = Int(object.senderID)
                     }
                     
+                    let positionz = Int(object.senderID) == UserDefaults.standard.integer(forKey: "currentUserID")
+                    if foundMessage.positionRight != positionz {
+                        foundMessage.positionRight = positionz
+                    }
+                    
                     if let readz = object.readIDs {
                         for read in readz {
                             if !foundMessage.readIDs.contains(Int(truncating: read)) {
@@ -468,9 +486,12 @@ class changeMessageRealmData {
                     }
                     
                     realm.add(foundMessage, update: .all)
-                    DispatchQueue.main.async {
-                        completion()
-                    }
+                    
+                    self.checkSingleSurroundingValues(message: foundMessage, completion: {
+                        DispatchQueue.main.async {
+                            completion()
+                        }
+                    })
                 })
             } else {
                 let newData = MessageStruct()
@@ -479,7 +500,8 @@ class changeMessageRealmData {
                 newData.dialogID = object.dialogID ?? ""
                 newData.date = object.dateSent ?? Date()
                 newData.senderID = Int(object.senderID)
-                
+                newData.positionRight = Int(object.senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? true : false
+
                 for read in object.readIDs ?? [] {
                     newData.readIDs.append(Int(truncating: read))
                 }
@@ -558,9 +580,12 @@ class changeMessageRealmData {
 
                 try realm.write({
                     realm.add(newData, update: .all)
-                    DispatchQueue.main.async {
-                        completion()
-                    }
+                    
+                    self.checkSingleSurroundingValues(message: newData, completion: {
+                        DispatchQueue.main.async {
+                            completion()
+                        }
+                    })
                 })
             }
             //else {
@@ -574,6 +599,96 @@ class changeMessageRealmData {
         } catch {
             print(error.localizedDescription)
             DispatchQueue.main.async {
+                completion()
+            }
+        }
+    }
+    
+    func checkSurroundingValues(dialogId: String, completion: @escaping () -> (Void)) {
+        let config = Realm.Configuration(schemaVersion: 1)
+        do {
+            let realm = try! Realm(configuration: config)
+            let messages = realm.objects(MessageStruct.self)
+            let filteredMessages =  messages.filter("dialogID == %@", dialogId).filter("status != %@", messageStatus.removedTyping.rawValue).sorted(byKeyPath: "date", ascending: true)
+
+            for (indexz, i) in filteredMessages.enumerated() {
+                if let foundMessage = realm.object(ofType: MessageStruct.self, forPrimaryKey: i.id) {
+                    let hasPrevious = i.id != filteredMessages.last?.id ? (filteredMessages[indexz + 1].senderID == i.senderID && filteredMessages[indexz + 1].date <= i.date.addingTimeInterval(86400) ? true : false) : false
+                    let needsTimestamp = i.id != filteredMessages.first?.id ? (i.messageState != .isTyping && i.date >= filteredMessages[indexz - 1].date.addingTimeInterval(86400) ? true : false) : false
+                    let isPriorWider = i.id != filteredMessages.first?.id ? (i.senderID == filteredMessages[indexz - 1].senderID && (i.date >= filteredMessages[indexz - 1].date.addingTimeInterval(86400) ? false : true) && i.bubbleWidth > filteredMessages[indexz - 1].bubbleWidth ? false : true) : true
+                    let isHeader = i.id == filteredMessages.first?.id
+
+                    try? realm.safeWrite({
+                        if foundMessage.hasPrevious != hasPrevious {
+                            foundMessage.hasPrevious = hasPrevious
+                        }
+                        
+                        if foundMessage.needsTimestamp != needsTimestamp {
+                            foundMessage.needsTimestamp = needsTimestamp
+                        }
+
+                        if foundMessage.isPriorWider != isPriorWider {
+                            foundMessage.isPriorWider = isPriorWider
+                        }
+                        
+                        if foundMessage.isHeader != isHeader {
+                            foundMessage.isHeader = isHeader
+                        }
+                        
+                        realm.add(foundMessage, update: .all)
+                    })
+                }
+            }
+            
+            completion()
+        }
+    }
+    
+    func checkSingleSurroundingValues(message: MessageStruct, completion: @escaping () -> (Void)) {
+        let config = Realm.Configuration(schemaVersion: 1)
+        do {
+            let realm = try! Realm(configuration: config)
+            let messages = realm.objects(MessageStruct.self)
+            let filteredMessages =  messages.filter("dialogID == %@", message.dialogID).filter("status != %@", messageStatus.removedTyping.rawValue).sorted(byKeyPath: "date", ascending: true)
+            
+            if let foundMessage = realm.object(ofType: MessageStruct.self, forPrimaryKey: message.id), let currentIndex = filteredMessages.firstIndex(of: message) {
+                
+                try? realm.safeWrite({
+                    if filteredMessages.indices.contains(currentIndex - 1) {
+                        let futureMsgIndex: MessageStruct = filteredMessages[currentIndex - 1]
+                        let needsTimestamp = message.id != filteredMessages.first?.id ? (message.messageState != .isTyping && message.date >= futureMsgIndex.date.addingTimeInterval(86400) ? true : false) : false
+                        let isPriorWider = message.id != filteredMessages.first?.id ? (message.senderID == futureMsgIndex.senderID && (message.date >= futureMsgIndex.date.addingTimeInterval(86400) ? false : true) && message.bubbleWidth > futureMsgIndex.bubbleWidth ? false : true) : true
+                        
+                        if foundMessage.needsTimestamp != needsTimestamp {
+                            foundMessage.needsTimestamp = needsTimestamp
+                        }
+                        
+                        if foundMessage.isPriorWider != isPriorWider {
+                            foundMessage.isPriorWider = isPriorWider
+                        }
+                    }
+
+                    if filteredMessages.indices.contains(currentIndex + 1) {
+                        let previousMsgIndex = filteredMessages[currentIndex + 1]
+                        
+                        let hasPrevious = message.id != filteredMessages.last?.id ? (previousMsgIndex.senderID == message.senderID && previousMsgIndex.date <= message.date.addingTimeInterval(86400) ? true : false) : false
+                        
+                        if foundMessage.hasPrevious != hasPrevious {
+                            foundMessage.hasPrevious = hasPrevious
+                        }
+                    }
+                    
+                    let isHeader = foundMessage.id == filteredMessages.first?.id
+
+                    if foundMessage.isHeader != isHeader {
+                        foundMessage.isHeader = isHeader
+                    }
+
+                    realm.add(foundMessage, update: .all)
+                })
+
+                completion()
+            } else {
                 completion()
             }
         }

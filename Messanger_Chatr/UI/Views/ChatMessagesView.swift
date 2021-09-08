@@ -167,7 +167,6 @@ struct ChatMessagesView: View {
     }
 
     var body: some View {
-        //let currentMessages = self.auth.messages.selectedDialog(dialogID: self.dialogID)
 
         if UserDefaults.standard.bool(forKey: "localOpen") {
             ReversedScrollView(.vertical) {
@@ -185,35 +184,29 @@ struct ChatMessagesView: View {
                     if self.delayViewMessages {
                         ScrollViewReader { reader in
                             VStack(alignment: .center) {
-                                //Spacer()
                                 ForEach(self.maxPagination ..< self.currentMessages.count, id: \.self) { message in
-                                    let messagePosition: messagePosition = UInt(currentMessages[message].senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? .right : .left
-                                    let topMsg = currentMessages[message].id == currentMessages.first?.id && currentMessages.count >= self.maxMessageCount
+                                    if currentMessages[message].isHeader, self.currentMessages.count >= self.maxMessageCount {
+                                        Text("Beginning of Chat")
+                                            .font(.subheadline)
+                                            .fontWeight(.medium)
+                                            .foregroundColor(.primary)
+                                            .padding(.top, 2.5)
+                                            .padding(.horizontal, 40)
+                                        
+                                        Text("created \(self.viewModel.dateFormatTime(date: changeDialogRealmData.shared.getRealmDialog(dialogId: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").createdAt))")
+                                            .font(.caption)
+                                            .fontWeight(.regular)
+                                            .foregroundColor(.secondary)
+                                            .multilineTextAlignment(.center)
+                                            .offset(y: 2)
 
-                                    if topMsg {
-                                        VStack {
-                                            Text("Beginning of Chat")
-                                                .font(.subheadline)
-                                                .fontWeight(.medium)
-                                                .foregroundColor(.primary)
-                                                .padding(.top, 2.5)
-                                                .padding(.horizontal, 40)
-                                            
-                                            Text("created \(self.viewModel.dateFormatTime(date: changeDialogRealmData.shared.getRealmDialog(dialogId: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").createdAt))")
-                                                .font(.caption)
-                                                .fontWeight(.regular)
-                                                .foregroundColor(.secondary)
-                                                .multilineTextAlignment(.center)
-                                                .offset(y: 2)
-
-                                            Divider()
-                                                .padding(.top, 5)
-                                                .padding(.bottom)
-                                                .padding(.horizontal, 30)
-                                        }
+                                        Divider()
+                                            .padding(.top, 5)
+                                            .padding(.bottom)
+                                            .padding(.horizontal, 30)
                                     }
                                     
-                                    if needsTimestamp(index: message) {
+                                    if currentMessages[message].needsTimestamp {
                                         Text("\(self.viewModel.dateFormatTime(date: currentMessages[message].date))")
                                             .font(.caption)
                                             .fontWeight(.semibold)
@@ -224,93 +217,65 @@ struct ChatMessagesView: View {
                                     }
 
                                     if self.isLoadingMore && !firstScroll && self.maxPagination != 0 && message == self.maxPagination {
-                                        VStack(alignment: .center) {
-                                            Circle()
-                                                .trim(from: 0, to: 0.8)
-                                                .stroke(Color.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
-                                                .frame(width: 20, height: 20)
-                                                .animation(Animation.linear(duration: 0.55).repeatForever(autoreverses: false))
-                                                .rotation3DEffect(Angle(degrees: 180), axis: (x: 1, y: 0, z: 0))
-                                                .rotationEffect(.degrees(self.isLoadingMore ? 360 : 0))
+                                        Circle()
+                                            .trim(from: 0, to: 0.8)
+                                            .stroke(Color.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                                            .frame(width: 20, height: 20)
+                                            .animation(Animation.linear(duration: 0.55).repeatForever(autoreverses: false))
+                                            .rotation3DEffect(Angle(degrees: 180), axis: (x: 1, y: 0, z: 0))
+                                            .rotationEffect(.degrees(self.isLoadingMore ? 360 : 0))
 
-                                            Text("loading more...")
-                                                .font(.caption)
-                                                .foregroundColor(.secondary)
-                                        }
+                                        Text("loading more...")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
                                     }
 
-                                    HStack() {
-                                        if messagePosition == .right { Spacer() }
-                                        let hasPrevious = self.hasPrevious(index: message)
-                                                                            
-                                        ContainerBubble(viewModel: self.viewModel, newDialogFromSharedContact: self.$newDialogFromSharedContact, dialogID: self.$dialogID, isHomeDialogOpen: self.$isHomeDialogOpen, isDetailOpen: self.$isDetailOpen, detailMessageModel: self.$detailMessageModel, playingVideoId: self.$playingVideoId, isPriorWider: self.isPriorWider(index: message), message: currentMessages[message], messagePosition: messagePosition, hasPrior: hasPrevious, namespace: self.namespace)
-                                            .environmentObject(self.auth)
-                                            .fixedSize(horizontal: false, vertical: true)
-                                            .padding(.horizontal, 25)
-                                            .padding(.trailing, messagePosition != .right ? 40 : 0)
-                                            .padding(.leading, messagePosition == .right ? 40 : 0)
-                                            .padding(.bottom, hasPrevious ? -6 : 10)
-                                            .padding(.bottom, self.auth.userHasiOS15 ? 0 : currentMessages[message].id != currentMessages.last?.id ? 0 : self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 110 : 0) + (self.isKeyboardActionOpen ? 80 : 0) + 32)
-                                            .resignKeyboardOnDragGesture()
-                                            .id(currentMessages[message].id)
-
-                                        if messagePosition == .left { Spacer() }
-                                    }.background(Color.clear)
-                                    .transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).combined(with: AnyTransition.opacity).animation(Animation.easeOut(duration: 0.35)), removal: AnyTransition.move(edge: .bottom).combined(with: AnyTransition.opacity).animation(Animation.easeInOut(duration: 0.35))))
-                                    .contentShape(Rectangle())
-                                    .onAppear {
-    //                                        //print("the adding mesg id is: \(currentMessages[message].id) but the on i am looking for is: \(currentMessages[(pageShowCount * self.scrollPage) + self.pageShowCount].id) at index: \((pageShowCount * self.scrollPage) - self.pageShowCount)")
-                                        DispatchQueue.main.async {
-                                            if self.firstScroll, currentMessages[message].id == currentMessages.last?.id, UserDefaults.standard.integer(forKey: "messageViewScrollHeight") > Int(Constants.screenHeight * 0.7) {
-        //                                            print("called on appear: \(message)")
-                                                //if  {
-                                                self.firstScroll = false
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.275) {
-                                                    reader.scrollTo(self.currentMessages.last?.id, anchor: .bottom)
-                                                    print("scrolllling2222 is nowwww \(message)")
-                                                    //self.permissionToScroll = true
-                                                }
-                                                //} //else if self.scrollViewHeight > Constants.screenHeight * 0.8 && self.permissionLoadMore {
-        //                                                print("scrolllling is nowwww \(self.scrollViewHeight) ** \(Constants.screenHeight * 0.8)")
-        //                                                withAnimation(Animation.easeOut(duration: 0.25)) {
-        //                                                    reader.scrollTo(currentMessages[message].id, anchor: .bottom)
-        //                                                }
-        //                                            }
-                                            } else if self.scrollToId == currentMessages[message].id {
-                                                self.permissionToScroll = false
-                                                self.scrollToId = ""
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                                                    withAnimation(Animation.easeInOut(duration: 0.35).delay(0.25)) {
-                                                        reader.scrollTo(currentMessages[message].id, anchor: .top)
+                                    ContainerBubble(viewModel: self.viewModel, newDialogFromSharedContact: self.$newDialogFromSharedContact, dialogID: self.$dialogID, isHomeDialogOpen: self.$isHomeDialogOpen, isDetailOpen: self.$isDetailOpen, detailMessageModel: self.$detailMessageModel, playingVideoId: self.$playingVideoId, isPriorWider: currentMessages[message].isPriorWider, message: currentMessages[message], messagePosition: currentMessages[message].positionRight ? .right : .left, hasPrior: currentMessages[message].hasPrevious, namespace: self.namespace)
+                                        .environmentObject(self.auth)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                        .padding(.horizontal, 25)
+                                        .padding(.trailing, !currentMessages[message].positionRight ? 40 : 0)
+                                        .padding(.leading, currentMessages[message].positionRight ? 40 : 0)
+                                        .padding(.bottom, currentMessages[message].hasPrevious ? -6 : 10)
+                                        .padding(.bottom, self.auth.userHasiOS15 ? 0 : currentMessages[message].id != currentMessages.last?.id ? 0 : self.keyboardChange + (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) + (self.hasAttachment ? 110 : 0) + (self.isKeyboardActionOpen ? 80 : 0) + 32)
+                                        .resignKeyboardOnDragGesture()
+                                        .id(currentMessages[message].id)
+                                        .background(Color.clear)
+                                        .transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).combined(with: AnyTransition.opacity).animation(Animation.easeOut(duration: 0.35)), removal: AnyTransition.move(edge: .bottom).combined(with: AnyTransition.opacity).animation(Animation.easeInOut(duration: 0.35))))
+                                        .contentShape(Rectangle())
+                                        .onAppear {
+        //                                        //print("the adding mesg id is: \(currentMessages[message].id) but the on i am looking for is: \(currentMessages[(pageShowCount * self.scrollPage) + self.pageShowCount].id) at index: \((pageShowCount * self.scrollPage) - self.pageShowCount)")
+                                            DispatchQueue.main.async {
+                                                if self.firstScroll, currentMessages[message].id == currentMessages.last?.id, UserDefaults.standard.integer(forKey: "messageViewScrollHeight") > Int(Constants.screenHeight * 0.7) {
+            //                                            print("called on appear: \(message)")
+                                                    //if  {
+                                                    self.firstScroll = false
+                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.275) {
+                                                        reader.scrollTo(self.currentMessages.last?.id, anchor: .bottom)
+                                                        print("scrolllling2222 is nowwww \(message)")
+                                                        //self.permissionToScroll = true
                                                     }
-                                                }
-                                            } else if !self.firstScroll, currentMessages[message].id == currentMessages.last?.id, self.scrollLocationPercent <= 1.3 {
-                                                withAnimation(Animation.easeInOut(duration: 0.35)) {
-                                                    reader.scrollTo(currentMessages.last?.id, anchor: .bottom)
+                                                    //} //else if self.scrollViewHeight > Constants.screenHeight * 0.8 && self.permissionLoadMore {
+            //                                                print("scrolllling is nowwww \(self.scrollViewHeight) ** \(Constants.screenHeight * 0.8)")
+            //                                                withAnimation(Animation.easeOut(duration: 0.25)) {
+            //                                                    reader.scrollTo(currentMessages[message].id, anchor: .bottom)
+            //                                                }
+            //                                            }
+                                                } else if self.scrollToId == currentMessages[message].id {
+                                                    self.permissionToScroll = false
+                                                    self.scrollToId = ""
+                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                                                        withAnimation(Animation.easeInOut(duration: 0.35).delay(0.25)) {
+                                                            reader.scrollTo(currentMessages[message].id, anchor: .top)
+                                                        }
+                                                    }
+                                                } else if !self.firstScroll, currentMessages[message].id == currentMessages.last?.id, self.scrollLocationPercent <= 1.3 {
+                                                    withAnimation(Animation.easeInOut(duration: 0.35)) {
+                                                        reader.scrollTo(currentMessages.last?.id, anchor: .bottom)
+                                                    }
                                                 }
                                             }
                                         }
-    //
-    //                                        if self.scrollToId == currentMessages[message].id {
-    //                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-    //                                                //reader.scrollTo(currentMessages[message].id, anchor: .top)
-    //                                                self.scrollToId = ""
-    //                                            }
-    //                                        }
-                                    }
-    //                                    .onDisappear {
-    //                                        guard let prevIndex = currentMessages.firstIndex(of: currentMessages[message - 1]) else {
-    //                                            return
-    //                                        }
-    //
-    //                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-    //                                            withAnimation(Animation.easeOut(duration: 0.30)) {
-    //                                                //reader.scrollTo(currentMessages[prevIndex].id, anchor: .bottom)
-    //                                            }
-    //                                            self.scrollToId = ""
-    //                                        }
-    //                                    }
-                                    
                                 }
                             }.background(GeometryReader { fullView in
                                 Color.clear.preference(key: ViewOffsetKey.self, value: -fullView.frame(in: .named("scroll")).origin.y)
@@ -345,7 +310,7 @@ struct ChatMessagesView: View {
                             .onChange(of: self.isKeyboardActionOpen) { keyboardOpen in
                                 //Keyboard action drawer or the paperclip button
                                 if keyboardOpen, self.scrollLocationPercent <= 1.1, UserDefaults.standard.integer(forKey: "messageViewScrollHeight") > Int(Constants.screenHeight * 0.7) {
-                                    withAnimation(Animation.easeOut(duration: 0.25)) {
+                                    withAnimation(Animation.easeOut(duration: 0.35)) {
                                         reader.scrollTo(self.currentMessages.last?.id, anchor: .bottom)
                                     }
                                 }
@@ -353,7 +318,7 @@ struct ChatMessagesView: View {
                             .onChange(of: self.textFieldHeight) { kHeight in
                                 //Keyboard text field height
                                 if kHeight != 38, self.scrollLocationPercent <= 1.1, UserDefaults.standard.integer(forKey: "messageViewScrollHeight") > Int(Constants.screenHeight * 0.7) {
-                                    withAnimation(Animation.easeOut(duration: 0.25)) {
+                                    withAnimation(Animation.easeOut(duration: 0.35)) {
                                         reader.scrollTo(self.currentMessages.last?.id, anchor: .bottom)
                                     }
                                 }
@@ -361,7 +326,7 @@ struct ChatMessagesView: View {
                             .onChange(of: self.hasAttachment) { hasAttach in
                                 //Keyboard pending media
                                 if hasAttach, self.scrollLocationPercent <= 1.1, UserDefaults.standard.integer(forKey: "messageViewScrollHeight") > Int(Constants.screenHeight * 0.7) {
-                                    withAnimation(Animation.easeOut(duration: 0.25)) {
+                                    withAnimation(Animation.easeOut(duration: 0.35)) {
                                         reader.scrollTo(self.currentMessages.last?.id, anchor: .bottom)
                                     }
                                 }
@@ -549,30 +514,6 @@ struct ChatMessagesView: View {
             }
         }
     }
-
-    //FIX ME: Should try to add this logic to the Realm DB message model
-    func hasPrevious(index: Int) -> Bool {
-        let result = self.auth.messages.selectedDialog(dialogID: self.dialogID)
-        print("has previous")
-        
-        return result[index].id != result.last?.id ? (result[index + 1].senderID == result[index].senderID && result[index + 1].date <= result[index].date.addingTimeInterval(86400) ? true : false) : false
-    }
-
-    //FIX ME: Should try to add this logic to the Realm DB message model
-    func needsTimestamp(index: Int) -> Bool {
-        let result = self.auth.messages.selectedDialog(dialogID: self.dialogID)
-        print("needsTimestamp")
-
-        return result[index] != result.first ? (result[index].messageState != .isTyping && result[index].date >= result[index - 1].date.addingTimeInterval(86400) ? true : false) : false
-    }
-    
-    //FIX ME: Should try to add this logic to the Realm DB message model
-    func isPriorWider(index: Int) -> Bool {
-        let result = self.auth.messages.selectedDialog(dialogID: self.dialogID)
-        print("isPriorWider")
-
-        return result[index] != result.first ? (result[index].senderID == result[index - 1].senderID && (result[index].date >= result[index - 1].date.addingTimeInterval(86400) ? false : true) && result[index].bubbleWidth > result[index - 1].bubbleWidth ? false : true) : true //- (result[index].dislikedId.count >= 1 && result[index].likedId.count >= 1 ? 48 : 16)
-    }
     
     func loadUnreadMessages() {
         //Need to come back when the total count request works
@@ -586,10 +527,6 @@ struct ChatMessagesView: View {
                 })
             }
         })
-    }
-    
-    func loadMoreMessages() {
-        
     }
     
     func observePinnedMessages() {

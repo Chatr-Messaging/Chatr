@@ -64,6 +64,7 @@ struct AttachmentBubble: View {
                     //.offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
                     .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.5) : Color.clear, lineWidth: 5).offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0))
                     .matchedGeometryEffect(id: self.message.id.description + "gif", in: namespace)
+                    .resignKeyboardOnDragGesture()
             } else if self.message.imageType == "image/png", self.message.messageState != .deleted {
                 WebImage(url: URL(string: self.message.image))
                     .resizable()
@@ -85,6 +86,7 @@ struct AttachmentBubble: View {
                     .offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
                     .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.8) : Color.clear, lineWidth: 3).offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0))
                     .matchedGeometryEffect(id: self.message.id.description + "png", in: namespace)
+                    .resignKeyboardOnDragGesture()
             } else if self.message.imageType == "video/mov", self.message.messageState != .deleted {
                 ZStack(alignment: .center) {
                     //VideoPlayer(player: self.player)
@@ -142,7 +144,7 @@ struct AttachmentBubble: View {
                                     RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.5) : Color.clear, lineWidth: 5)
                                         .offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
                                 }
-                            }
+                            }.resignKeyboardOnDragGesture()
                         )
                         .onTapGesture {
                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
@@ -189,6 +191,7 @@ struct AttachmentBubble: View {
                 }
             } else if self.message.imageType == "audio/m4a", self.message.messageState != .deleted {
                 AudioBubble(viewModel: self.viewModel, message: self.message, namespace: self.namespace, messageRight: self.messagePosition == .right)
+                    .resignKeyboardOnDragGesture()
             }
         }
     }
