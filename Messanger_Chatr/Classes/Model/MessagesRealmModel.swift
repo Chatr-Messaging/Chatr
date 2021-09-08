@@ -658,6 +658,7 @@ class changeMessageRealmData {
                         let futureMsgIndex: MessageStruct = filteredMessages[currentIndex - 1]
                         let needsTimestamp = message.id != filteredMessages.first?.id ? (message.messageState != .isTyping && message.date >= futureMsgIndex.date.addingTimeInterval(86400) ? true : false) : false
                         let isPriorWider = message.id != filteredMessages.first?.id ? (message.senderID == futureMsgIndex.senderID && (message.date >= futureMsgIndex.date.addingTimeInterval(86400) ? false : true) && message.bubbleWidth > futureMsgIndex.bubbleWidth ? false : true) : true
+                        let previousNeedsUpdatedhasPrevious = futureMsgIndex.id != filteredMessages.last?.id ? (futureMsgIndex.senderID == message.senderID && message.date <= futureMsgIndex.date.addingTimeInterval(86400) ? true : false) : false
                         
                         if foundMessage.needsTimestamp != needsTimestamp {
                             foundMessage.needsTimestamp = needsTimestamp
@@ -665,6 +666,13 @@ class changeMessageRealmData {
                         
                         if foundMessage.isPriorWider != isPriorWider {
                             foundMessage.isPriorWider = isPriorWider
+                        }
+                        
+                        if futureMsgIndex.hasPrevious != previousNeedsUpdatedhasPrevious, let foundPreviousMessage = realm.object(ofType: MessageStruct.self, forPrimaryKey: futureMsgIndex.id) {
+                                try? realm.safeWrite({
+                                    foundPreviousMessage.hasPrevious = previousNeedsUpdatedhasPrevious
+                                    realm.add(foundPreviousMessage, update: .all)
+                                })
                         }
                     }
 

@@ -1212,8 +1212,8 @@ struct welcomeBackView: View {
                                 .stroke(Color.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                                 .frame(width: 25, height: 25)
                                 .rotationEffect(.init(degrees: self.loadAni ? 360 : 0))
-                                .padding(.trailing)
                                 .animation(Animation.linear(duration: 0.75).repeatForever(autoreverses: false))
+                                .padding(.trailing)
                                 .onAppear(perform: ({
                                     self.loadAni.toggle()
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 3.5) {

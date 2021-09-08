@@ -270,8 +270,10 @@ struct ChatMessagesView: View {
                                                         }
                                                     }
                                                 } else if !self.firstScroll, currentMessages[message].id == currentMessages.last?.id, self.scrollLocationPercent <= 1.3 {
-                                                    withAnimation(Animation.easeInOut(duration: 0.35)) {
-                                                        reader.scrollTo(currentMessages.last?.id, anchor: .bottom)
+                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                                                        withAnimation(Animation.easeInOut(duration: 0.4)) {
+                                                            reader.scrollTo(currentMessages.last?.id, anchor: .bottom)
+                                                        }
                                                     }
                                                 }
                                             }
