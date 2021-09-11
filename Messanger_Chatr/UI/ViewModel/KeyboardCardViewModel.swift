@@ -22,6 +22,12 @@ enum LibraryStatus {
     case limited
 }
 
+struct GIFMediaAsset: Hashable, Identifiable {
+    var id = UUID().uuidString
+    var url: String
+    var mediaRatio: CGFloat
+}
+
 struct KeyboardMediaAsset: Hashable, Identifiable {
     var id = UUID().uuidString
     var asset: AVAsset?
@@ -255,21 +261,6 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
                 self.selectedPhotos[index].canSend = true
             }
             completion()
-//                let chatAttachment = ChatAttachment()
-//                chatAttachment["uploadId"] = attachment.id
-//
-//                let message = ChatMessage()
-//                message.text = "Uploading image attachment..."
-//                message.attachments = [chatAttachment]
-//                message.dialogID = dialog.id
-//                message.senderID = UInt(UserDefaults.standard.integer(forKey: "currentUserID"))
-//
-//                changeMessageRealmData.shared.insertMessage(message, completion: {
-//                    print("successfully added local message while its uploading!!")
-//                    guard let idz = message.id, let localMedia = self.selectedPhotos.firstIndex(of: attachment) else { return }
-//
-//                    self.selectedPhotos[localMedia].preparedMessageId = idz.description
-//                })
             
             return
         }

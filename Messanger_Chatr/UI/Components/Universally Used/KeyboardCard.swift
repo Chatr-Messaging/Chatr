@@ -29,7 +29,7 @@ struct KeyboardCardView: View {
     @Binding var isKeyboardActionOpen: Bool
     @State var selectedContacts: [Int] = []
     @State var newDialogID: String = ""
-    @State var gifData: [String] = []
+    @State var gifData: [GIFMediaAsset] = []
     @State var photoData: [UIImage] = []
     @State var videoData: [AVAsset] = []
     @State var enableLocation: Bool = false
@@ -41,6 +41,7 @@ struct KeyboardCardView: View {
     @State var isShareChannelOpen: Bool = false
     @State var isVisiting: String = UserDefaults.standard.string(forKey: "visitingDialogId") ?? ""
     @State var gifURL: String = ""
+    @State var gifRatio: CGFloat = 0.0
     @State private var inputImage: UIImage? = nil
     @State private var userTrackingMode: MapUserTrackingMode = .follow
     @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 25.7617, longitude: 80.1918), span: MKCoordinateSpan(latitudeDelta: 10, longitudeDelta: 10))
@@ -153,22 +154,21 @@ struct KeyboardCardView: View {
                         //MARK: GIPHY Section
                         if !self.gifData.isEmpty {
                             HStack {
-                                ForEach(self.gifData.indices, id: \.self) { url in
+                                ForEach(self.gifData.indices, id: \.self) { gifIndex in
                                     ZStack(alignment: .topLeading) {
-                                        AnimatedImage(url: URL(string: self.gifData[url]))
+                                        AnimatedImage(url: URL(string: self.gifData[gifIndex].url))
                                             .resizable()
                                             .placeholder{ Image(systemName: "photo.on.rectangle.angled") }
                                             .indicator(.activity)
+                                            .frame(width: self.gifData[gifIndex].mediaRatio * 90, height: 90)
                                             .scaledToFill()
-                                            .frame(height: 90)
-                                            .frame(minWidth: 65, maxWidth: Constants.screenWidth * 0.4)
                                             .cornerRadius(10)
                                             .padding(.leading, 10)
                                             .padding(.top, 10)
                                         
                                         Button(action: {
                                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                            self.gifData.remove(at: url)
+                                            self.gifData.remove(at: gifIndex)
                                             self.checkAttachments()
                                         }, label: {
                                             Image(systemName: "xmark.circle.fill")
@@ -428,7 +428,7 @@ struct KeyboardCardView: View {
                             }
 
                             if !self.gifData.isEmpty {
-                                changeMessageRealmData.shared.sendGIFAttachment(dialog: selectedDialog, attachmentStrings: self.gifData.reversed(), occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
+                                changeMessageRealmData.shared.sendGIFAttachment(dialog: selectedDialog, GIFAssets: self.gifData.reversed(), occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
 
                                 withAnimation {
                                     self.gifData.removeAll()
@@ -544,14 +544,15 @@ struct KeyboardCardView: View {
                         }).frame(width: Constants.screenWidth / 5.5, height: 65)
                         .buttonStyle(keyboardButtonStyle())
                         .sheet(isPresented: self.$presentGIF, onDismiss: {
-                            guard gifURL != "", !self.gifData.contains(self.gifURL) else { return }
-                            print("the adding gif url is: \(gifURL.description)")
+                            guard gifURL != "", self.gifRatio != 0.0, !self.gifData.contains(where: { $0.url == self.gifURL }) else { return }
+                            print("the adding gif url is: \(gifURL.description) and ratio: \(self.gifRatio)")
 
-                            self.gifData.append(gifURL)
+                            self.gifData.append(GIFMediaAsset(url: self.gifURL, mediaRatio: self.gifRatio))
                             self.checkAttachments()
                             self.gifURL = ""
+                            self.gifRatio = 0.0
                         }) {
-                            GIFController(url: self.$gifURL, present: self.$presentGIF)
+                            GIFController(url: self.$gifURL, present: self.$presentGIF, ratio: self.$gifRatio)
                         }
                         
                         Button(action: {

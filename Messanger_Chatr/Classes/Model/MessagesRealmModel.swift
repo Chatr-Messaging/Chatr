@@ -878,12 +878,13 @@ class changeMessageRealmData {
         }
     }
 
-    func sendGIFAttachment(dialog: DialogStruct, attachmentStrings: [String], occupentID: [NSNumber]) {
-        for attachment in attachmentStrings {
+    func sendGIFAttachment(dialog: DialogStruct, GIFAssets: [GIFMediaAsset], occupentID: [NSNumber]) {
+        for attachment in GIFAssets {
             let attachmentz = ChatAttachment()
             attachmentz.type = "image/gif"
-            attachmentz["imageURL"] = attachment
-            
+            attachmentz["imageURL"] = attachment.url
+            attachmentz["mediaRatio"] = "\(attachment.mediaRatio)"
+
             let pDialog = ChatDialog(dialogID: dialog.id, type: dialog.dialogType == "public" ? .public : occupentID.count > 2 ? .group : .private)
             pDialog.occupantIDs = occupentID
             

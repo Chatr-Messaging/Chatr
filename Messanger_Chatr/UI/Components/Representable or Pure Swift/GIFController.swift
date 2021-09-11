@@ -13,6 +13,7 @@ import GiphyCoreSDK
 struct GIFController : UIViewControllerRepresentable {
     @Binding var url: String
     @Binding var present: Bool
+    @Binding var ratio: CGFloat
     
     func makeCoordinator() -> Coordinator {
         return GIFController.Coordinator(parent: self)
@@ -43,6 +44,7 @@ struct GIFController : UIViewControllerRepresentable {
         func didSelectMedia(giphyViewController: GiphyViewController, media: GPHMedia) {
             let url = media.url(rendition: .fixedHeightDownsampled, fileType: .mp4)
             parent.url = url ?? ""
+            parent.ratio = media.aspectRatio
             parent.present.toggle()
         }
         

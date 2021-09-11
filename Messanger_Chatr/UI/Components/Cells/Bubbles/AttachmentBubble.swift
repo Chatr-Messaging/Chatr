@@ -56,13 +56,14 @@ struct AttachmentBubble: View {
                                 .foregroundColor(.secondary)
                         }
                     }.aspectRatio(contentMode: .fill)
+                    //.frame(width: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75)), alignment: self.messagePosition == .right ? .trailing : .leading)
+                    .frame(width: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75)), height: CGFloat((Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75)) / self.message.mediaRatio))
                     .clipShape(CustomGIFShape())
-                    .frame(minHeight: 100, maxHeight: CGFloat(Constants.screenHeight * 0.75))
-                    .padding(.bottom, self.hasPrior ? 0 : 4)
                     .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 14)
                     //.padding(.bottom, self.hasPrior ? 0 : 4)
                     //.offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
                     .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.5) : Color.clear, lineWidth: 5).offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0))
+                    .padding(.bottom, self.hasPrior ? 0 : 4)
                     .matchedGeometryEffect(id: self.message.id.description + "gif", in: namespace)
                     .resignKeyboardOnDragGesture()
             } else if self.message.imageType == "image/png", self.message.messageState != .deleted {
@@ -80,13 +81,12 @@ struct AttachmentBubble: View {
                     .clipShape(CustomGIFShape())
                     .frame(width: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75)), alignment: self.messagePosition == .right ? .trailing : .leading)
                     .frame(idealHeight: CGFloat(self.message.mediaRatio * (Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75))))
-                    .frame(maxHeight: Constants.screenHeight * 0.6)
+                    .frame(maxHeight: Constants.screenHeight * 0.75)
                     .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 14)
                     .padding(.bottom, self.hasPrior ? 0 : 4)
                     .offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
                     .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.8) : Color.clear, lineWidth: 3).offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0))
                     .matchedGeometryEffect(id: self.message.id.description + "png", in: namespace)
-                    .resignKeyboardOnDragGesture()
             } else if self.message.imageType == "video/mov", self.message.messageState != .deleted {
                 ZStack(alignment: .center) {
                     //VideoPlayer(player: self.player)
@@ -144,7 +144,7 @@ struct AttachmentBubble: View {
                                     RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.5) : Color.clear, lineWidth: 5)
                                         .offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
                                 }
-                            }.resignKeyboardOnDragGesture()
+                            }
                         )
                         .onTapGesture {
                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
@@ -193,7 +193,7 @@ struct AttachmentBubble: View {
                 AudioBubble(viewModel: self.viewModel, message: self.message, namespace: self.namespace, messageRight: self.messagePosition == .right)
                     .resignKeyboardOnDragGesture()
             }
-        }
+        }.resignKeyboardOnDragGesture()
     }
     
     func loadVideo(fileId: String, completion: @escaping () -> Void) {
