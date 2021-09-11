@@ -221,8 +221,7 @@ struct KeyboardCardView: View {
                                         Image(uiImage: self.imagePicker.selectedPhotos[img].image)
                                             .resizable()
                                             .scaledToFill()
-                                            .frame(height: 90)
-                                            .frame(minWidth: 70, maxWidth: Constants.screenWidth * 0.4)
+                                            .frame(width: 90 * self.imagePicker.selectedPhotos[img].mediaRatio , height: 90)
                                             .overlay(
                                                 ZStack(alignment: .center) {
                                                     BlurView(style: .systemUltraThinMaterial).animation(.easeInOut)
@@ -273,8 +272,7 @@ struct KeyboardCardView: View {
                                         Image(uiImage: self.imagePicker.selectedVideos[vid].image)
                                             .resizable()
                                             .scaledToFill()
-                                            .frame(height: 90)
-                                            .frame(minWidth: 85, maxWidth: Constants.screenWidth * 0.4)
+                                            .frame(width: 90 * self.imagePicker.selectedPhotos[img].mediaRatio , height: 90)
                                             .overlay(
                                                 ZStack(alignment: .center) {
                                                     BlurView(style: .systemUltraThinMaterial).animation(.easeInOut)

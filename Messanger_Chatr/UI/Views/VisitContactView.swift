@@ -131,7 +131,8 @@ struct VisitContactView: View {
                 }
                 
                 //MARK: Info Section
-                miniHeader(title: "INFO:")
+                miniHeader(title: "INFO:", doubleIndent: false)
+                    .padding(.horizontal, 10)
                 
                 self.viewModel.styleBuilder(content: {
                     VStack(alignment: .trailing, spacing: 0) {
@@ -251,7 +252,8 @@ struct VisitContactView: View {
                 }).padding(.bottom, 10)
 
                 //MARK: Action Section
-                miniHeader(title: "ACTIONS:")
+                miniHeader(title: "ACTIONS:", doubleIndent: false)
+                    .padding(.horizontal, 10)
                 
                 self.viewModel.styleBuilder(content: {
                     //QR Code button
@@ -379,7 +381,8 @@ struct VisitContactView: View {
                 }
                 
                 //MARK: More Section
-                miniHeader(title: "MORE:")
+                miniHeader(title: "MORE:", doubleIndent: false)
+                    .padding(.horizontal, 10)
                 
                 self.viewModel.styleBuilder(content: {
                     Button(action: {
@@ -884,7 +887,7 @@ struct topHeaderContactView: View {
             .offset(y: 50)
             .zIndex(2)
             
-            self.viewModel.styleBuilder(content: {
+            self.viewModel.styleBuilderHeader(content: {
                 HStack(alignment: .top) {
                     Spacer()
                     VStack(alignment: .center) {
@@ -916,7 +919,7 @@ struct topHeaderContactView: View {
                                 Text(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? "your profile" : (self.contact.isOnline ? "online now" : "last online \(contact.lastOnline.getElapsedInterval(lastMsg: "moments")) ago"))
                                     .font(.subheadline)
                                     .fontWeight(.none)
-                                    .background(self.contact.isInfoPrivate ? Color.secondary : Color.clear)
+                                    .background(self.contact.isInfoPrivate && self.contact.id != UserDefaults.standard.integer(forKey: "currentUserID") ? Color.secondary : Color.clear)
                                     .foregroundColor(self.contact.isInfoPrivate ? Color.clear : self.contact.isOnline ? Color.green : Color.secondary)
                                     .multilineTextAlignment(.leading)
                                     .offset(y: contact.isPremium ? -3 : 0)
@@ -958,13 +961,14 @@ struct topHeaderContactView: View {
                                     }).buttonStyle(ClickButtonStyle())
                                     .offset(y: 2.5)
                                 }
-                            }.padding(.top, 1)
+                            }.padding(.top, 2)
+                            .padding(.bottom, 10)
                             .offset(x: self.contact.isMyContact ? 10 : 0)
                         }
                         
                         //MARK: Social Buttons
                         if self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") || !self.contact.isInfoPrivate || self.contact.isMyContact {
-                            HStack(alignment: .center, spacing: 10) {
+                            HStack(alignment: .center, spacing: 20) {
                                 if self.contact.facebook != "" {
                                     Button(action: {
                                         if !self.contact.isInfoPrivate || self.contact.isMyContact {
@@ -975,29 +979,13 @@ struct topHeaderContactView: View {
                                             UINotificationFeedbackGenerator().notificationOccurred(.error)
                                         }
                                     }) {
-                                        HStack(alignment: .center, spacing: 2.5) {
-                                            Image("facebookIcon")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 12, height: 12, alignment: .center)
-
-                                            Text("@\(self.contact.facebook.lowercased())")
-                                                .font(.caption)
-                                                .fontWeight(.medium)
-                                                .lineLimit(1)
-                                                .background(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? Color.clear : !self.contact.isInfoPrivate || self.contact.isMyContact ? Color.clear : Color.secondary)
-                                                .foregroundColor(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? .secondary : !self.contact.isInfoPrivate || self.contact.isMyContact ? self.contact.facebook == "" ? .gray : .secondary : .clear)
-                                            
-                                            Image(systemName: "chevron.right")
-                                                .resizable()
-                                                .font(Font.title.weight(.medium))
-                                                .scaledToFit()
-                                                .frame(width: 5, height: 12, alignment: .center)
-                                                .foregroundColor(.secondary)
-                                                .padding(.leading, 6)
-                                        }.padding(2.5)
-                                        .padding(.horizontal, 5)
-                                        .background(RoundedRectangle(cornerRadius: 6).stroke(Color.secondary, lineWidth: 0.75).background(Color("buttonColor")))
+                                        Image("facebookIcon")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 20, height: 20, alignment: .center)
+                                            .padding(6)
+                                            .background(RoundedRectangle(cornerRadius: 8).stroke(Color.secondary.opacity(0.4), lineWidth: 1.4).frame(width: 32, height: 32).background(Color.secondary.opacity(0.1)))
+                                            .cornerRadius(8)
                                     }.buttonStyle(ClickButtonStyle())
                                 }
                                 
@@ -1011,29 +999,13 @@ struct topHeaderContactView: View {
                                             UINotificationFeedbackGenerator().notificationOccurred(.error)
                                         }
                                     }) {
-                                        HStack(alignment: .center, spacing: 2.5) {
-                                            Image("twitterIcon")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 12, height: 12, alignment: .center)
-
-                                            Text("@\(self.contact.twitter)")
-                                                .font(.caption)
-                                                .fontWeight(.medium)
-                                                .lineLimit(1)
-                                                .background(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? Color.clear : !self.contact.isInfoPrivate || self.contact.isMyContact ? Color.clear : Color.secondary)
-                                                .foregroundColor(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? .secondary : !self.contact.isInfoPrivate || self.contact.isMyContact ? self.contact.twitter == "" ? .gray : .secondary : .clear)
-
-                                            Image(systemName: "chevron.right")
-                                                .resizable()
-                                                .font(Font.title.weight(.medium))
-                                                .scaledToFit()
-                                                .frame(width: 5, height: 12, alignment: .center)
-                                                .foregroundColor(.secondary)
-                                                .padding(.leading, 6)
-                                        }.padding(2.5)
-                                            .padding(.horizontal, 5)
-                                            .background(RoundedRectangle(cornerRadius: 6).stroke(Color.secondary, lineWidth: 0.75).background(Color("buttonColor")))
+                                        Image("twitterIcon")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 20, height: 20, alignment: .center)
+                                            .padding(6)
+                                            .background(RoundedRectangle(cornerRadius: 8).stroke(Color.secondary.opacity(0.4), lineWidth: 1.4).frame(width: 32, height: 32).background(Color.secondary.opacity(0.1)))
+                                            .cornerRadius(8)
                                     }.buttonStyle(ClickButtonStyle())
                                 }
                                 
@@ -1047,29 +1019,13 @@ struct topHeaderContactView: View {
                                             UINotificationFeedbackGenerator().notificationOccurred(.error)
                                         }
                                     }) {
-                                        HStack(alignment: .center) {
-                                            Image("instagramIcon")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 12, height: 12, alignment: .center)
-
-                                            Text("@\(self.viewModel.username)")
-                                                .font(.caption)
-                                                .fontWeight(.medium)
-                                                .lineLimit(1)
-                                                .background(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? Color.clear : !self.contact.isInfoPrivate || self.contact.isMyContact ? Color.clear : Color.secondary)
-                                                .foregroundColor(self.contact.id == UserDefaults.standard.integer(forKey: "currentUserID") ? .secondary : !self.contact.isInfoPrivate || self.contact.isMyContact ? self.contact.facebook == "" ? .gray : .secondary : .clear)
-
-                                            Image(systemName: "chevron.right")
-                                                .resizable()
-                                                .font(Font.title.weight(.medium))
-                                                .scaledToFit()
-                                                .frame(width: 5, height: 12, alignment: .center)
-                                                .foregroundColor(.secondary)
-                                                .padding(.leading, 6)
-                                        }.padding(2.5)
-                                        .padding(.horizontal, 5)
-                                        .background(RoundedRectangle(cornerRadius: 6).stroke(Color.secondary, lineWidth: 0.75).background(Color("buttonColor")))
+                                        Image("instagramIcon")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 20, height: 20, alignment: .center)
+                                            .padding(6)
+                                            .background(RoundedRectangle(cornerRadius: 8).stroke(Color.secondary.opacity(0.4), lineWidth: 1.4).frame(width: 32, height: 32).background(Color.secondary.opacity(0.1)))
+                                            .cornerRadius(8)
                                     }.buttonStyle(ClickButtonStyle())
                                 }
                             }
@@ -1128,7 +1084,7 @@ struct actionButtonView: View {
     @State var showRemoveRequest: Bool = false
     
     var body: some View {
-        HStack(spacing: self.contactRelationship == .contact ? 75 : 30) {
+        HStack(spacing: self.contactRelationship == .contact ? 54 : 30) {
             Spacer()
             
             if self.contact.isMessagingPrivate == false && self.contactRelationship != .unknown && self.contact.id != UserDefaults.standard.integer(forKey: "currentUserID") {
@@ -1137,13 +1093,21 @@ struct actionButtonView: View {
                     self.newMessage = self.contact.id
                     self.dismissView.toggle()
                 }) {
-                    Image("ChatBubble")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 38, height: 26)
-                        .background(RoundedRectangle(cornerRadius: 15, style: .circular).frame(width: 58, height: 58).foregroundColor(Constants.baseBlue).shadow(color: Color.blue.opacity(0.4), radius: 10, x: 0, y: 6))
+                    HStack(alignment: .center, spacing: 10) {
+                        Image("ChatBubble")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 38, height: 26)
+                        
+                        if self.contactRelationship == .contact {
+                            Text("Chat")
+                                .font(.system(size: 20))
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                        }
+                    }.background(RoundedRectangle(cornerRadius: 15, style: .circular).frame(width: self.contactRelationship == .contact ? 145 : 58, height: 58).foregroundColor(Constants.baseBlue).shadow(color: Color.blue.opacity(0.4), radius: 10, x: 0, y: 6))
                 }.buttonStyle(ClickButtonStyle())
-                .padding(.vertical, 8)
+                .padding(.vertical, 6)
             }
 
             if self.contactRelationship == .contact && self.contact.id != UserDefaults.standard.integer(forKey: "currentUserID") {
@@ -1174,10 +1138,10 @@ struct actionButtonView: View {
                             .padding(3)
                         
                         Text("Add Contact")
-                            .font(.none)
-                            .fontWeight(.semibold)
+                            .font(.system(size: 20))
+                            .fontWeight(.bold)
                             .foregroundColor(.white)
-                    }.padding(.all, 12)
+                    }.padding(.all, 15)
                     .padding(.horizontal, 5)
                     .background(Constants.baseBlue)
                     .cornerRadius(15)
@@ -1197,10 +1161,10 @@ struct actionButtonView: View {
                             .padding(3)
                         
                         Text("Pending...")
-                            .font(.none)
-                            .fontWeight(.semibold)
+                            .font(.system(size: 20))
+                            .fontWeight(.bold)
                             .foregroundColor(.secondary)
-                    }.padding(.all, 12)
+                    }.padding(.all, 15)
                     .padding(.horizontal, 5)
                     .background(Color("buttonColor"))
                 }.cornerRadius(15)
@@ -1228,11 +1192,6 @@ struct actionButtonView: View {
                         })
                     }) {
                         HStack(alignment: .center) {
-                            Text("Accept")
-                                .font(.none)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.white)
-
                             Image(systemName: "checkmark")
                                 .resizable()
                                 .scaledToFit()
@@ -1240,7 +1199,12 @@ struct actionButtonView: View {
                                 .frame(width: 22, height: 20, alignment: .center)
                                 .foregroundColor(.white)
                                 .padding(3)
-                        }.padding(.all, 12)
+                            
+                            Text("Accept")
+                                .font(.system(size: 20))
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                        }.padding(.all, 15)
                         .padding(.horizontal, 5)
                         .background(Constants.baseBlue)
                         .cornerRadius(15)
@@ -1258,7 +1222,7 @@ struct actionButtonView: View {
                             .scaledToFit()
                             .frame(width: 24, height: 24, alignment: .center)
                             .foregroundColor(Color.white)
-                            .padding(.all, 12)
+                            .padding(.all, 15)
                             .background(Color("alertRed"))
                             .cornerRadius(15)
                             .shadow(color: Color("alertRed").opacity(0.30), radius: 8, x: 0, y: 8)

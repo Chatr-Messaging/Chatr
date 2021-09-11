@@ -193,7 +193,7 @@ struct AttachmentBubble: View {
                 AudioBubble(viewModel: self.viewModel, message: self.message, namespace: self.namespace, messageRight: self.messagePosition == .right)
                     .resignKeyboardOnDragGesture()
             }
-        }.resignKeyboardOnDragGesture()
+        }
     }
     
     func loadVideo(fileId: String, completion: @escaping () -> Void) {

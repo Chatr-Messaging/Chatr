@@ -43,7 +43,7 @@ struct ChannelBubble: View {
                         .aspectRatio(contentMode: .fill)
                         .frame(height: 100)
                         .clipped()
-                        .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.05)), removal: AnyTransition.identity))
+                        //.transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.05)), removal: AnyTransition.identity))
                         //.cornerRadius(12.5)
                         .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 4)
 

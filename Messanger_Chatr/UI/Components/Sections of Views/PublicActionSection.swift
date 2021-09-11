@@ -67,12 +67,13 @@ struct PublicActionSection: View {
                         .frame(width: 38, height: 26)
 
                     if self.dialogRelationship == .subscribed {
-                        Text("Messages")
-                            .font(.none)
-                            .fontWeight(.semibold)
+                        Text("Chat")
+                            .font(.system(size: 20))
+                            .fontWeight(.bold)
                             .foregroundColor(.white)
                     }
-                }.padding(.all, self.dialogRelationship != .notSubscribed ? 12 : 0)
+                }.padding(.horizontal, 7.5)
+                .padding(.all, self.dialogRelationship != .notSubscribed ? 15 : 0)
                 .padding(.horizontal, self.dialogRelationship != .notSubscribed ? 5 : 0)
                 .background(RoundedRectangle(cornerRadius: 15, style: .circular).frame(minWidth: 54).frame(height: 54).foregroundColor(Constants.baseBlue).shadow(color: Color.blue.opacity(0.4), radius: 10, x: 0, y: 6))
             }.buttonStyle(ClickButtonStyle())
@@ -119,10 +120,10 @@ struct PublicActionSection: View {
                             .padding(2.5)
                         
                         Text("Join Channel")
-                            .font(.none)
-                            .fontWeight(.semibold)
+                            .font(.system(size: 20))
+                            .fontWeight(.bold)
                             .foregroundColor(.white)
-                    }.padding(.all, 12)
+                    }.padding(.all, 15)
                     .padding(.horizontal, 5)
                     .background(self.dialogRelationship == .error ? Color("alertRed") : Constants.baseBlue)
                     .cornerRadius(15)

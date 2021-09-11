@@ -136,7 +136,6 @@ struct BubbleDetailView: View {
                                 }//.frame(maxHeight: Constants.screenHeight * 0.85, alignment: .center)
                                 .aspectRatio(contentMode: .fit)
                                 .cornerRadius(showContentActions ? (!self.repliesOpen ? (self.cardDrag.height > 0 ? self.cardDrag.height / 8 : 0) : 0) : 15)
-                                .frame(height: Constants.screenWidth / self.message.mediaRatio)
                                 .frame(maxHeight: Constants.screenHeight * 0.6)
                                 .pinchToZoom()
                                 .fixedSize(horizontal: false, vertical: true)

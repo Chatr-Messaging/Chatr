@@ -434,6 +434,40 @@ struct ProfileView: View {
                 
                 VStack(alignment: .center) {
                     VStack(spacing: 0) {
+                        //More About Chatr
+                        NavigationLink(destination: AboutChatrView()) {
+                            VStack(alignment: .trailing, spacing: 0) {
+                                HStack {
+                                    Image("AboutIcon")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .foregroundColor(Color.primary)
+                                        .frame(width: 32, height: 32, alignment: .center)
+                                        .padding(.trailing, 5)
+                                    
+                                    Text("About Chatr")
+                                        .font(.none)
+                                        .fontWeight(.none)
+                                        .foregroundColor(.primary)
+
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .resizable()
+                                        .font(Font.title.weight(.bold))
+                                        .scaledToFit()
+                                        .frame(width: 7, height: 15, alignment: .center)
+                                        .foregroundColor(.secondary)
+                                }.padding(.horizontal)
+                                .padding(.vertical, 8)
+                            
+                                Divider()
+                                    .frame(width: Constants.screenWidth - 95)
+                            }
+                        }.buttonStyle(changeBGButtonStyle())
+                        .simultaneousGesture(TapGesture()
+                            .onEnded { _ in
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                            })
                         
                         //Help & Support
                         Button(action: {
@@ -507,41 +541,6 @@ struct ProfileView: View {
                                     .frame(width: Constants.screenWidth - 95)
                             }
                         }.buttonStyle(changeBGButtonStyle())
-                        
-                        //More About Chatr
-                        NavigationLink(destination: AboutChatrView()) {
-                            VStack(alignment: .trailing, spacing: 0) {
-                                HStack {
-                                    Image("AboutIcon")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .foregroundColor(Color.primary)
-                                        .frame(width: 32, height: 32, alignment: .center)
-                                        .padding(.trailing, 5)
-                                    
-                                    Text("About Chatr")
-                                        .font(.none)
-                                        .fontWeight(.none)
-                                        .foregroundColor(.primary)
-
-                                    Spacer()
-                                    Image(systemName: "chevron.right")
-                                        .resizable()
-                                        .font(Font.title.weight(.bold))
-                                        .scaledToFit()
-                                        .frame(width: 7, height: 15, alignment: .center)
-                                        .foregroundColor(.secondary)
-                                }.padding(.horizontal)
-                                .padding(.vertical, 8)
-                            
-                                Divider()
-                                    .frame(width: Constants.screenWidth - 95)
-                            }
-                        }.buttonStyle(changeBGButtonStyle())
-                        .simultaneousGesture(TapGesture()
-                            .onEnded { _ in
-                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                            })
                         
                         //Advanced Profile
                         NavigationLink(destination: advancedView(dimissView: self.$dimissView).environmentObject(self.auth)) {

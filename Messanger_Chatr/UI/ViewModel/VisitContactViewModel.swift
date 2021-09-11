@@ -230,4 +230,14 @@ class VisitContactViewModel: ObservableObject {
         .padding(.horizontal)
         .padding(.bottom, 5)
     }
+    
+    func styleBuilderHeader<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .center, spacing: 0) {
+            content()
+        }.background(Color("buttonColor"))
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
+        .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
+        .padding(.horizontal)
+        .padding(.bottom, 5)
+    }
 }

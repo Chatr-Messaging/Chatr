@@ -14,7 +14,7 @@ import ConnectyCube
 
 struct DialogCell: View {
     @EnvironmentObject var auth: AuthModel
-    @State var dialogModel: DialogStruct = DialogStruct()
+    @State var dialogModel: DialogStruct
     @State var privateDialogContact: ContactStruct = ContactStruct()
     @State var connectyContact: User = User()
     @State var groupOccUserAvatar: [String] = []
