@@ -46,9 +46,8 @@ struct AttachmentBubble: View {
             if self.message.imageType == "image/gif", self.message.messageState != .deleted {
                 AnimatedImage(url: URL(string: self.message.image))
                     .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    //.frame(width: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75)), alignment: self.messagePosition == .right ? .trailing : .leading)
-                    .frame(width: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75)), height: CGFloat((Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75)) / self.message.mediaRatio))
+                    .frame(width: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75)), height: CGFloat((Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75)) / (self.message.mediaRatio != 0.0 ? self.message.mediaRatio : 1.0)))
+                    .scaledToFit()
                     .clipShape(CustomGIFShape())
                     .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 14)
                     //.padding(.bottom, self.hasPrior ? 0 : 4)

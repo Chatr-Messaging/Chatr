@@ -178,7 +178,7 @@ struct ChannelBubble: View {
                     }
                 }
                 .frame(minHeight: 220, maxHeight: 245)
-                .frame(width: Constants.screenWidth * 0.60 + 40)
+                .frame(width: Constants.screenWidth * 0.75)
             }
             .padding(.bottom, self.hasPrior ? 0 : 4)
             .shadow(color: Color.black.opacity(0.15), radius: 12, x: 0, y: 14)

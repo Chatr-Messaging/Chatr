@@ -43,32 +43,28 @@ struct PinnedSectionView: View {
                                     //GIF
                                     AnimatedImage(url: URL(string: messagez.image))
                                         .resizable()
-                                        .placeholder {
-                                            VStack {
+                                        .frame(width: 98 * (messagez.mediaRatio != 0.0 ? messagez.mediaRatio : 1.0), height: 98)
+                                        .aspectRatio(contentMode: .fit)
+                                        .background(VStack {
                                                 Image(systemName: "photo.on.rectangle.angled")
                                                     .padding(.bottom, 5)
-
                                                 Text("loading GIF...")
                                                     .font(.caption)
                                                     .foregroundColor(.secondary)
-                                            }
-                                        }
-                                        .frame(width: 98 * (messagez.mediaRatio != 0.0 ? messagez.mediaRatio : 1.0), height: 98)
-                                        .aspectRatio(contentMode: .fit)
+                                            })
                                 } else if messagez.imageType == "image/png" {
                                     //Image
                                     WebImage(url: URL(string: messagez.image))
                                         .resizable()
-                                        .placeholder {
-                                            VStack {
+                                        .frame(width: CGFloat(98 / (messagez.mediaRatio != 0.0 ? messagez.mediaRatio : 1.0)), height: 98)
+                                        .aspectRatio(contentMode: .fit)
+                                        .background(VStack {
                                                 Image(systemName: "photo.on.rectangle.angled")
                                                     .padding(.bottom, 5)
                                                 Text("loading image...")
                                                     .font(.caption)
                                                     .foregroundColor(.secondary)
-                                            }.padding(.vertical)
-                                        }.aspectRatio(contentMode: .fit)
-                                        .frame(maxHeight: 98)
+                                            }.padding(.vertical))
                                 } else if messagez.imageType == "video/mov" {
                                     PinnedVideoCell(videoUrl: messagez.image)
                                 }
@@ -86,7 +82,7 @@ struct PinnedSectionView: View {
                             } else {
                                 TextBubble(message: messagez, messagePosition: .right, namespace: self.namespace, isPinned: true)
                                     .frame(width: CGFloat(messagez.bubbleWidth + 10), height: 98)
-                                    .padding(.horizontal)
+                                    .padding(.horizontal, 2)
                                     .background(Color("buttonColor").opacity(0.5))
                             }
                             

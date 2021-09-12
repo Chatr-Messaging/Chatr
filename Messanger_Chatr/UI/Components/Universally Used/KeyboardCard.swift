@@ -160,7 +160,7 @@ struct KeyboardCardView: View {
                                             .resizable()
                                             .indicator(.activity)
                                             .frame(width: self.gifData[gifIndex].mediaRatio * 90, height: 90)
-                                            .scaledToFill()
+                                            .scaledToFit()
                                             .background(Image(systemName: "photo.on.rectangle.angled"))
                                             .cornerRadius(10)
                                             .padding(.leading, 10)
@@ -221,8 +221,7 @@ struct KeyboardCardView: View {
                                         Image(uiImage: self.imagePicker.selectedPhotos[img].image)
                                             .resizable()
                                             .scaledToFill()
-                                            .frame(height: 90)
-                                            .frame(minWidth: 70, maxWidth: Constants.screenWidth * 0.4)
+                                            .frame(width: CGFloat(90 / (self.imagePicker.selectedPhotos[img].mediaRatio ?? 1.0)), height: 90)
                                             .overlay(
                                                 ZStack(alignment: .center) {
                                                     BlurView(style: .systemUltraThinMaterial).animation(.easeInOut)
@@ -273,8 +272,7 @@ struct KeyboardCardView: View {
                                         Image(uiImage: self.imagePicker.selectedVideos[vid].image)
                                             .resizable()
                                             .scaledToFill()
-                                            .frame(height: 90)
-                                            .frame(minWidth: 85, maxWidth: Constants.screenWidth * 0.4)
+                                            .frame(width: CGFloat(90 / (self.imagePicker.selectedVideos[vid].mediaRatio ?? 1.0)), height: 90)
                                             .overlay(
                                                 ZStack(alignment: .center) {
                                                     BlurView(style: .systemUltraThinMaterial).animation(.easeInOut)

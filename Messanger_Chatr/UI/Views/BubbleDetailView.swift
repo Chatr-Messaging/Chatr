@@ -125,21 +125,19 @@ struct BubbleDetailView: View {
                         if self.message.imageType == "image/gif" && self.message.messageState != .deleted {
                             AnimatedImage(url: URL(string: self.message.image))
                                 .resizable()
-                                .placeholder {
-                                    VStack {
-                                        Image(systemName: "photo.on.rectangle.angled")
-                                            .padding(.bottom, 5)
-                                        Text("loading GIF...")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                    }
-                                }//.frame(maxHeight: Constants.screenHeight * 0.85, alignment: .center)
+                                .frame(width: Constants.screenWidth - 20, height: (Constants.screenWidth - 20) / (self.message.mediaRatio != 0.0 ? self.message.mediaRatio : 1.0))
                                 .aspectRatio(contentMode: .fit)
                                 .cornerRadius(showContentActions ? (!self.repliesOpen ? (self.cardDrag.height > 0 ? self.cardDrag.height / 8 : 0) : 0) : 15)
-                                .frame(maxHeight: Constants.screenHeight * 0.6)
                                 .pinchToZoom()
                                 .fixedSize(horizontal: false, vertical: true)
                                 .matchedGeometryEffect(id: self.message.id.description + "gif", in: namespace)
+                                .background(VStack {
+                                    Image(systemName: "photo.on.rectangle.angled")
+                                        .padding(.bottom, 5)
+                                    Text("loading GIF...")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                })
                                 .zIndex(4)
                         } else if self.message.imageType == "image/png" && self.message.messageState != .deleted {
                             WebImage(url: URL(string: self.message.image))
