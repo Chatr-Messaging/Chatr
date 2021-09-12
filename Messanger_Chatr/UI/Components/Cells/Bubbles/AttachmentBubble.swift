@@ -46,16 +46,7 @@ struct AttachmentBubble: View {
             if self.message.imageType == "image/gif", self.message.messageState != .deleted {
                 AnimatedImage(url: URL(string: self.message.image))
                     .resizable()
-                    .placeholder {
-                        VStack {
-                            Image(systemName: "photo.on.rectangle.angled")
-                                .padding(.bottom, 5)
-
-                            Text("loading GIF...")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                    }.aspectRatio(contentMode: .fill)
+                    .aspectRatio(contentMode: .fill)
                     //.frame(width: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75)), alignment: self.messagePosition == .right ? .trailing : .leading)
                     .frame(width: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75)), height: CGFloat((Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75)) / self.message.mediaRatio))
                     .clipShape(CustomGIFShape())
@@ -63,21 +54,22 @@ struct AttachmentBubble: View {
                     //.padding(.bottom, self.hasPrior ? 0 : 4)
                     //.offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
                     .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.5) : Color.clear, lineWidth: 5).offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0))
+                    .background(
+                        VStack {
+                            Image(systemName: "photo.on.rectangle.angled")
+                                .padding(.bottom, 5)
+                            Text("loading GIF...")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    )
                     .padding(.bottom, self.hasPrior ? 0 : 4)
                     .matchedGeometryEffect(id: self.message.id.description + "gif", in: namespace)
                     .resignKeyboardOnDragGesture()
             } else if self.message.imageType == "image/png", self.message.messageState != .deleted {
                 WebImage(url: URL(string: self.message.image))
                     .resizable()
-                    .placeholder {
-                        VStack {
-                            Image(systemName: "photo.on.rectangle.angled")
-                                .padding(.bottom, 5)
-                            Text("loading image...")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }.padding(.vertical, 100)
-                    }.aspectRatio(contentMode: .fit)
+                    .aspectRatio(contentMode: .fit)
                     .clipShape(CustomGIFShape())
                     .frame(width: CGFloat(Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75)), alignment: self.messagePosition == .right ? .trailing : .leading)
                     .frame(idealHeight: CGFloat(self.message.mediaRatio * (Constants.screenWidth * (self.message.messageState == .error ? 0.65 : 0.75))))
@@ -86,6 +78,15 @@ struct AttachmentBubble: View {
                     .padding(.bottom, self.hasPrior ? 0 : 4)
                     .offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0)
                     .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(self.message.messageState == .error ? Color.red.opacity(0.8) : Color.clear, lineWidth: 3).offset(x: self.hasPrior ? (self.messagePosition == .right ? -5 : 5) : 0))
+                    .background(
+                        VStack {
+                            Image(systemName: "photo.on.rectangle.angled")
+                                .padding(.bottom, 5)
+                            Text("loading image...")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    )
                     .matchedGeometryEffect(id: self.message.id.description + "png", in: namespace)
             } else if self.message.imageType == "video/mov", self.message.messageState != .deleted {
                 ZStack(alignment: .center) {

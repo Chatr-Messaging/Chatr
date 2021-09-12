@@ -157,7 +157,7 @@ struct ContainerBubble: View {
                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                     }
                     .onAppear() {
-                        DispatchQueue.main.async {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                             self.observeInteractions()
                             if self.messagePosition == .right {
                                 if self.message.imageType == "image/gif" || self.message.imageType == "image/png" || self.message.imageType == "video/mov" {

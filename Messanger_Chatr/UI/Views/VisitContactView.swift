@@ -1105,7 +1105,7 @@ struct actionButtonView: View {
                                 .fontWeight(.bold)
                                 .foregroundColor(.white)
                         }
-                    }.background(RoundedRectangle(cornerRadius: 15, style: .circular).frame(width: self.contactRelationship == .contact ? 145 : 58, height: 58).foregroundColor(Constants.baseBlue).shadow(color: Color.blue.opacity(0.4), radius: 10, x: 0, y: 6))
+                    }.background(RoundedRectangle(cornerRadius: 17, style: .circular).frame(width: self.contactRelationship == .contact ? 145 : 58, height: 58).foregroundColor(Constants.baseBlue).shadow(color: Color.blue.opacity(0.4), radius: 10, x: 0, y: 6))
                 }.buttonStyle(ClickButtonStyle())
                 .padding(.vertical, 6)
             }
@@ -1120,7 +1120,7 @@ struct actionButtonView: View {
                         .scaledToFit()
                         .foregroundColor(.white)
                         .frame(width: 36, height: 24)
-                        .background(RoundedRectangle(cornerRadius: 15, style: .circular).frame(width: 58, height: 58).foregroundColor(.purple).shadow(color: Color.purple.opacity(0.45), radius: 10, x: 0, y: 6))
+                        .background(RoundedRectangle(cornerRadius: 17, style: .circular).frame(width: 58, height: 58).foregroundColor(.purple).shadow(color: Color.purple.opacity(0.45), radius: 10, x: 0, y: 6))
                 }.buttonStyle(ClickButtonStyle())
             } else if self.contactRelationship == .notContact && self.contact.id != UserDefaults.standard.integer(forKey: "currentUserID") {
                 Button(action: {
@@ -1144,7 +1144,7 @@ struct actionButtonView: View {
                     }.padding(.all, 15)
                     .padding(.horizontal, 5)
                     .background(Constants.baseBlue)
-                    .cornerRadius(15)
+                    .cornerRadius(17)
                     .shadow(color: Color.blue.opacity(0.30), radius: 8, x: 0, y: 8)
                 }.buttonStyle(ClickButtonStyle())
             } else if self.contactRelationship == .pendingRequest && self.contact.id != UserDefaults.standard.integer(forKey: "currentUserID") {
@@ -1167,7 +1167,7 @@ struct actionButtonView: View {
                     }.padding(.all, 15)
                     .padding(.horizontal, 5)
                     .background(Color("buttonColor"))
-                }.cornerRadius(15)
+                }.cornerRadius(17)
                 .buttonStyle(ClickButtonStyle())
                 .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 8)
                 .actionSheet(isPresented: self.$showRemoveRequest) {
@@ -1207,7 +1207,7 @@ struct actionButtonView: View {
                         }.padding(.all, 15)
                         .padding(.horizontal, 5)
                         .background(Constants.baseBlue)
-                        .cornerRadius(15)
+                        .cornerRadius(17)
                         .shadow(color: Color.blue.opacity(0.30), radius: 8, x: 0, y: 8)
                     }
 
@@ -1224,7 +1224,7 @@ struct actionButtonView: View {
                             .foregroundColor(Color.white)
                             .padding(.all, 15)
                             .background(Color("alertRed"))
-                            .cornerRadius(15)
+                            .cornerRadius(17)
                             .shadow(color: Color("alertRed").opacity(0.30), radius: 8, x: 0, y: 8)
                     }
                 }

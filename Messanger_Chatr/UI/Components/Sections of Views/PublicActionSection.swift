@@ -75,7 +75,7 @@ struct PublicActionSection: View {
                 }.padding(.horizontal, 7.5)
                 .padding(.all, self.dialogRelationship != .notSubscribed ? 15 : 0)
                 .padding(.horizontal, self.dialogRelationship != .notSubscribed ? 5 : 0)
-                .background(RoundedRectangle(cornerRadius: 15, style: .circular).frame(minWidth: 54).frame(height: 54).foregroundColor(Constants.baseBlue).shadow(color: Color.blue.opacity(0.4), radius: 10, x: 0, y: 6))
+                .background(RoundedRectangle(cornerRadius: 17, style: .circular).frame(minWidth: 54).frame(height: 54).foregroundColor(Constants.baseBlue).shadow(color: Color.blue.opacity(0.4), radius: 10, x: 0, y: 6))
             }.buttonStyle(ClickButtonStyle())
 
             if self.dialogRelationship == .notSubscribed || self.dialogRelationship == .error {
@@ -126,7 +126,7 @@ struct PublicActionSection: View {
                     }.padding(.all, 15)
                     .padding(.horizontal, 5)
                     .background(self.dialogRelationship == .error ? Color("alertRed") : Constants.baseBlue)
-                    .cornerRadius(15)
+                    .cornerRadius(17)
                     .shadow(color: Color.blue.opacity(0.30), radius: 8, x: 0, y: 8)
                 }.buttonStyle(ClickButtonStyle())
             }
@@ -160,7 +160,7 @@ struct PublicActionSection: View {
                     .scaledToFit()
                     .foregroundColor(Color.primary)
                     .frame(width: 38, height: 26)
-                    .background(RoundedRectangle(cornerRadius: 15, style: .circular).frame(width: 54, height: 54).foregroundColor(Color("buttonColor")).shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 6))
+                    .background(RoundedRectangle(cornerRadius: 17, style: .circular).frame(width: 54, height: 54).foregroundColor(Color("buttonColor")).shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 6))
             }.buttonStyle(ClickButtonStyle())
             .onTapGesture {
                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()

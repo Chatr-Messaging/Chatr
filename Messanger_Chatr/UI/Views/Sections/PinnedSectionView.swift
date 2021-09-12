@@ -55,9 +55,6 @@ struct PinnedSectionView: View {
                                         }
                                         .frame(width: 98 * (messagez.mediaRatio != 0.0 ? messagez.mediaRatio : 1.0), height: 98)
                                         .aspectRatio(contentMode: .fit)
-                                        .onAppear() {
-                                            print("the pin message is: \(messagez.mediaRatio)")
-                                        }
                                 } else if messagez.imageType == "image/png" {
                                     //Image
                                     WebImage(url: URL(string: messagez.image))

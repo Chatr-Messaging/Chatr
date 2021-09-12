@@ -245,35 +245,32 @@ struct ChatMessagesView: View {
                                         .contentShape(Rectangle())
                                         .onAppear {
         //                                        //print("the adding mesg id is: \(currentMessages[message].id) but the on i am looking for is: \(currentMessages[(pageShowCount * self.scrollPage) + self.pageShowCount].id) at index: \((pageShowCount * self.scrollPage) - self.pageShowCount)")
-                                            DispatchQueue.main.async {
-                                                if self.firstScroll, currentMessages[message].id == currentMessages.last?.id, UserDefaults.standard.integer(forKey: "messageViewScrollHeight") > Int(Constants.screenHeight * 0.7) {
-            //                                            print("called on appear: \(message)")
-                                                    //if  {
-                                                    self.firstScroll = false
-                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.275) {
-                                                        reader.scrollTo(self.currentMessages.last?.id, anchor: .bottom)
-                                                        print("scrolllling2222 is nowwww \(message)")
-                                                        //self.permissionToScroll = true
+                                            if self.firstScroll, currentMessages[message].id == currentMessages.last?.id, UserDefaults.standard.integer(forKey: "messageViewScrollHeight") > Int(Constants.screenHeight * 0.7) {
+        //                                            print("called on appear: \(message)")
+                                                //if  {
+                                                self.firstScroll = false
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                                    reader.scrollTo(self.currentMessages.last?.id, anchor: .bottom)
+                                                    //self.permissionToScroll = true
+                                                }
+                                                //} //else if self.scrollViewHeight > Constants.screenHeight * 0.8 && self.permissionLoadMore {
+        //                                                print("scrolllling is nowwww \(self.scrollViewHeight) ** \(Constants.screenHeight * 0.8)")
+        //                                                withAnimation(Animation.easeOut(duration: 0.25)) {
+        //                                                    reader.scrollTo(currentMessages[message].id, anchor: .bottom)
+        //                                                }
+        //                                            }
+                                            } else if self.scrollToId == currentMessages[message].id {
+                                                self.permissionToScroll = false
+                                                self.scrollToId = ""
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
+                                                    withAnimation(Animation.easeInOut(duration: 0.35)) {
+                                                        reader.scrollTo(currentMessages[message].id, anchor: .top)
                                                     }
-                                                    //} //else if self.scrollViewHeight > Constants.screenHeight * 0.8 && self.permissionLoadMore {
-            //                                                print("scrolllling is nowwww \(self.scrollViewHeight) ** \(Constants.screenHeight * 0.8)")
-            //                                                withAnimation(Animation.easeOut(duration: 0.25)) {
-            //                                                    reader.scrollTo(currentMessages[message].id, anchor: .bottom)
-            //                                                }
-            //                                            }
-                                                } else if self.scrollToId == currentMessages[message].id {
-                                                    self.permissionToScroll = false
-                                                    self.scrollToId = ""
-                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                                                        withAnimation(Animation.easeInOut(duration: 0.35).delay(0.25)) {
-                                                            reader.scrollTo(currentMessages[message].id, anchor: .top)
-                                                        }
-                                                    }
-                                                } else if !self.firstScroll, currentMessages[message].id == currentMessages.last?.id, self.scrollLocationPercent <= 1.3 {
-                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                                                        withAnimation(Animation.easeInOut(duration: 0.4)) {
-                                                            reader.scrollTo(currentMessages.last?.id, anchor: .bottom)
-                                                        }
+                                                }
+                                            } else if !self.firstScroll, currentMessages[message].id == currentMessages.last?.id, self.scrollLocationPercent <= 1.3 {
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                                                    withAnimation(Animation.easeInOut(duration: 0.4)) {
+                                                        reader.scrollTo(currentMessages.last?.id, anchor: .bottom)
                                                     }
                                                 }
                                             }

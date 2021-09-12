@@ -158,10 +158,10 @@ struct KeyboardCardView: View {
                                     ZStack(alignment: .topLeading) {
                                         AnimatedImage(url: URL(string: self.gifData[gifIndex].url))
                                             .resizable()
-                                            .placeholder{ Image(systemName: "photo.on.rectangle.angled") }
                                             .indicator(.activity)
                                             .frame(width: self.gifData[gifIndex].mediaRatio * 90, height: 90)
                                             .scaledToFill()
+                                            .background(Image(systemName: "photo.on.rectangle.angled"))
                                             .cornerRadius(10)
                                             .padding(.leading, 10)
                                             .padding(.top, 10)
@@ -221,7 +221,8 @@ struct KeyboardCardView: View {
                                         Image(uiImage: self.imagePicker.selectedPhotos[img].image)
                                             .resizable()
                                             .scaledToFill()
-                                            .frame(width: 90 * self.imagePicker.selectedPhotos[img].mediaRatio , height: 90)
+                                            .frame(height: 90)
+                                            .frame(minWidth: 70, maxWidth: Constants.screenWidth * 0.4)
                                             .overlay(
                                                 ZStack(alignment: .center) {
                                                     BlurView(style: .systemUltraThinMaterial).animation(.easeInOut)
@@ -272,7 +273,8 @@ struct KeyboardCardView: View {
                                         Image(uiImage: self.imagePicker.selectedVideos[vid].image)
                                             .resizable()
                                             .scaledToFill()
-                                            .frame(width: 90 * self.imagePicker.selectedPhotos[img].mediaRatio , height: 90)
+                                            .frame(height: 90)
+                                            .frame(minWidth: 85, maxWidth: Constants.screenWidth * 0.4)
                                             .overlay(
                                                 ZStack(alignment: .center) {
                                                     BlurView(style: .systemUltraThinMaterial).animation(.easeInOut)
