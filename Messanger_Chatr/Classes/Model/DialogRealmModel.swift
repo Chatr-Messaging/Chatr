@@ -87,7 +87,7 @@ class changeDialogRealmData {
     func fetchDialogs(completion: @escaping (Bool) -> ()) {
         let extRequest : [String: String] = ["sort_desc" : "lastMessageDate"]
 
-        Request.dialogs(with: Paginator.limit(100, skip: 0), extendedRequest: extRequest, successBlock: { (dialogs, usersIDs, paginator) in
+        Request.dialogs(with: Paginator.limit(500, skip: 0), extendedRequest: extRequest, successBlock: { (dialogs, usersIDs, paginator) in
             self.insertDialogs(dialogs) {
                 let config = Realm.Configuration(schemaVersion: 1)
                 do {

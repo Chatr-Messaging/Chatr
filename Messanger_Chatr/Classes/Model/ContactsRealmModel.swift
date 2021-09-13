@@ -244,7 +244,7 @@ class changeContactsRealmData {
                 contactUsers.append(NSNumber(value: contact.userID))
             }
             if contactUsers.count != 0 {
-                Request.users(withIDs: contactUsers, paginator: Paginator.limit(300, skip: 0), successBlock: { (paginator, users) in
+                Request.users(withIDs: contactUsers, paginator: Paginator.limit(500, skip: 0), successBlock: { (paginator, users) in
                     for user in users {
                         //print("users pulled from Connecty Cube: \(String(describing: user.fullName)) & \(String(describing: user.phone))")
                         let config = Realm.Configuration(schemaVersion: 1)
@@ -370,7 +370,7 @@ class changeContactsRealmData {
     
     func getDialogContacts(occuIDs: [NSNumber], completion: @escaping ([String]) -> ()) {
         var avitarURLs: [String] = []
-        Request.users(withIDs: occuIDs, paginator: Paginator.limit(100, skip: 0), successBlock: { (paginator, users) in
+        Request.users(withIDs: occuIDs, paginator: Paginator.limit(500, skip: 0), successBlock: { (paginator, users) in
             for user in users {
                 avitarURLs.append(user.avatar ?? PersistenceManager.shared.getCubeProfileImage(usersID: user) ?? "")
             }

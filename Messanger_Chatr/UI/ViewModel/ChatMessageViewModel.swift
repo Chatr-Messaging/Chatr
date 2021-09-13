@@ -40,7 +40,7 @@ class ChatMessageViewModel: ObservableObject {
             })
         }) { (error) in
             print("error fetching the dialog: \(error.localizedDescription)")
-            Request.dialogs(with: Paginator.limit(100, skip: 0), extendedRequest: extRequest, successBlock: { (dialogs, usersIDs, paginator) in
+            Request.dialogs(with: Paginator.limit(500, skip: 0), extendedRequest: extRequest, successBlock: { (dialogs, usersIDs, paginator) in
                 for dialog in dialogs {
                     if dialog.id == dialogId {
                         self.syncLoadFoundDialog(dialog: dialog, auth: auth, dialogId: dialogId, completion: {
