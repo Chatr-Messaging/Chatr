@@ -125,7 +125,7 @@ struct BubbleDetailView: View {
                         if self.message.imageType == "image/gif" && self.message.messageState != .deleted {
                             AnimatedImage(url: URL(string: self.message.image))
                                 .resizable()
-                                .frame(width: Constants.screenWidth - 20, height: (Constants.screenWidth - 20) / (self.message.mediaRatio != 0.0 ? self.message.mediaRatio : 1.0))
+                                .frame(width: Constants.screenWidth, height: Constants.screenWidth / (self.message.mediaRatio != 0.0 ? self.message.mediaRatio : 1.0))
                                 .aspectRatio(contentMode: .fit)
                                 .cornerRadius(showContentActions ? (!self.repliesOpen ? (self.cardDrag.height > 0 ? self.cardDrag.height / 8 : 0) : 0) : 15)
                                 .pinchToZoom()
