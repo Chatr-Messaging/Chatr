@@ -147,6 +147,7 @@
 		05C93BDB25145EF10059D1AA /* VisitGroupChannelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C93BDA25145EF10059D1AA /* VisitGroupChannelView.swift */; };
 		05C93BDD251578100059D1AA /* DialogContactCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C93BDC251578100059D1AA /* DialogContactCell.swift */; };
 		05CE07ED2529930300F09754 /* NotificationSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05CE07EC2529930300F09754 /* NotificationSection.swift */; };
+		05D09F6D26F05A4100D0EA72 /* EmptyMessagesSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05D09F6C26F05A4100D0EA72 /* EmptyMessagesSection.swift */; };
 		05D466D6263F7B050015B61D /* Grid in Frameworks */ = {isa = PBXBuildFile; productRef = 05D466D5263F7B050015B61D /* Grid */; };
 		05D466D8263F7CE20015B61D /* PinnedSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05D466D7263F7CE20015B61D /* PinnedSectionView.swift */; };
 		05D466E02640919B0015B61D /* PHAssetPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05D466DF2640919B0015B61D /* PHAssetPicker.swift */; };
@@ -344,6 +345,7 @@
 		05C93BDA25145EF10059D1AA /* VisitGroupChannelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitGroupChannelView.swift; sourceTree = "<group>"; };
 		05C93BDC251578100059D1AA /* DialogContactCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogContactCell.swift; sourceTree = "<group>"; };
 		05CE07EC2529930300F09754 /* NotificationSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSection.swift; sourceTree = "<group>"; };
+		05D09F6C26F05A4100D0EA72 /* EmptyMessagesSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyMessagesSection.swift; sourceTree = "<group>"; };
 		05D466D7263F7CE20015B61D /* PinnedSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedSectionView.swift; sourceTree = "<group>"; };
 		05D466DF2640919B0015B61D /* PHAssetPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PHAssetPicker.swift; sourceTree = "<group>"; };
 		05D8A8DB2502CB3A00D53BE2 /* MailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailView.swift; sourceTree = "<group>"; };
@@ -472,6 +474,7 @@
 				056B98AC24C90250003F7FBA /* HomeMessagesTitle.swift */,
 				056B989424C8F76B003F7FBA /* HomeUserInfoHeader.swift */,
 				05A62392260303AB00A2BF40 /* HomeBannerCard.swift */,
+				05D09F6C26F05A4100D0EA72 /* EmptyMessagesSection.swift */,
 				058E760B261C2518008578E3 /* NewPublicConversationSection.swift */,
 				056BCC612654B6FC006DD302 /* PublicActionSection.swift */,
 				05390F61267C656C001C5720 /* PublicShareSection.swift */,
@@ -1127,6 +1130,7 @@
 				05C93BDB25145EF10059D1AA /* VisitGroupChannelView.swift in Sources */,
 				05BCE40D250B4EA400E29F39 /* HighlightedContactCell.swift in Sources */,
 				05224113265F627C007E3D72 /* MorePublicListView.swift in Sources */,
+				05D09F6D26F05A4100D0EA72 /* EmptyMessagesSection.swift in Sources */,
 				05D8A8DC2502CB3A00D53BE2 /* MailView.swift in Sources */,
 				055AEE382512EC9500F35B8F /* EditProfileView.swift in Sources */,
 				050582FF24DA5F9600CBD4AC /* MessagesRealmModel.swift in Sources */,

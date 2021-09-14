@@ -171,17 +171,22 @@ struct ChatMessagesView: View {
         if UserDefaults.standard.bool(forKey: "localOpen") {
             ReversedScrollView(.vertical) {
                 LazyVStack(alignment: .center) {
-                    Text(self.maxMessageCount == 0 ? "no messages found" : maxMessageCount == -1 ? "loading messages..." : "")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .frame(width: 160)
-                        .padding(.all, self.maxMessageCount >= 1 && self.delayViewMessages ? 0 : 20)
-                        .padding(.vertical, self.maxMessageCount >= 1 ? 0 : 80)
-                        //.offset(y: self.maxMessageCount >= 1 && self.delayViewMessages ? 0 : 40)
-                        .opacity(self.maxMessageCount >= 1 && self.delayViewMessages ? 0 : 1)
-                    
+
                     //CUSTOM MESSAGE BUBBLE:
                     if self.delayViewMessages {
+                        if self.maxMessageCount == 0 {
+                            EmptyMessagesSection(messageCount: self.$maxMessageCount)
+                                .environmentObject(self.auth)
+                                .shadow(color: Color("buttonShadow").opacity(0.8), radius: 15, x: 0, y: 8)
+                                .padding(.bottom, Constants.screenHeight * 0.3)
+                        } else if self.maxMessageCount == -1 {
+                            Text("loading messages...")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .frame(width: 160)
+                                .padding(.bottom, Constants.screenHeight * 0.3)
+                        }
+                        
                         ScrollViewReader { reader in
                             VStack(alignment: .center) {
                                 ForEach(self.maxPagination ..< self.currentMessages.count, id: \.self) { message in
