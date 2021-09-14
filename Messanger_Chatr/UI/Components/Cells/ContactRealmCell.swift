@@ -11,34 +11,20 @@ import ConnectyCube
 import SDWebImageSwiftUI
 
 struct ContactRealmCell: View {
-    @Binding var selectedContact: [Int]
-    @Binding var forwardContact: Bool
     var contact: ContactStruct
-    @State var isSelected: Bool = false
+    var isSelected: Bool
+    var action: () -> Void
 
     var body: some View {
-        Button(action: {
-            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-            if self.selectedContact.contains(contact.id) {
-                self.selectedContact.removeAll(where: { $0 == contact.id })
-                self.isSelected = false
-            } else if self.forwardContact && self.selectedContact.count >= 1 {
-                self.isSelected = false
-                UINotificationFeedbackGenerator().notificationOccurred(.error)
-            } else {
-                self.selectedContact.append(contact.id)
-                self.isSelected.toggle()
-            }
-            
-        }, label: {
+        Button(action: self.action) {
             HStack(alignment: .center) {
                 ZStack(alignment: .center) {
-                    Circle()
-                        .frame(width: 35, height: 35, alignment: .center)
-                        .foregroundColor(Color("bgColor"))
+//                    Circle()
+//                        .frame(width: 45, height: 45, alignment: .center)
+//                        .foregroundColor(Color("bgColor"))
                     
-                    if let avitarURL = self.contact.avatar, avitarURL != "" {
-                        WebImage(url: URL(string: avitarURL))
+                    if let avatarUrl = self.contact.avatar, avatarUrl != "" {
+                        WebImage(url: URL(string: avatarUrl))
                             .resizable()
                             .placeholder{ Image("empty-profile").resizable().frame(width: 45, height: 45, alignment: .center).scaledToFill() }
                             .indicator(.activity)
@@ -59,23 +45,23 @@ struct ContactRealmCell: View {
                             .foregroundColor(.secondary)
                     }
                     
-                    Image(systemName: "star.circle.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 15, height: 15)
-                        .foregroundColor(.yellow)
-                        .background(Color.black.opacity(0.5))
-                        .cornerRadius(7.5)
-                        .opacity(contact.isFavourite ? 1 : 0)
-                        .offset(x: -18, y: 18)
-                        .shadow(color: Color.black.opacity(0.15), radius: 2, x: 0, y: 2)
-                    
-                    RoundedRectangle(cornerRadius: 5)
-                        .frame(width: 10, height: 10)
-                        .foregroundColor(.green)
-                        .overlay(Circle().stroke(Color("bgColor"), lineWidth: 2))
-                        .opacity(contact.isOnline ? 1 : 0)
-                        .offset(x: 16, y: 16)
+//                    Image(systemName: "star.circle.fill")
+//                        .resizable()
+//                        .scaledToFit()
+//                        .frame(width: 15, height: 15)
+//                        .foregroundColor(.yellow)
+//                        .background(Color.black.opacity(0.5))
+//                        .cornerRadius(7.5)
+//                        .opacity(self.contact.isFavourite ? 1 : 0)
+//                        .offset(x: -18, y: 18)
+//                        .shadow(color: Color.black.opacity(0.15), radius: 2, x: 0, y: 2)
+//
+//                    RoundedRectangle(cornerRadius: 5)
+//                        .frame(width: 10, height: 10)
+//                        .foregroundColor(.green)
+//                        .overlay(Circle().stroke(Color("bgColor"), lineWidth: 2))
+//                        .opacity(self.contact.isOnline ? 1 : 0)
+//                        .offset(x: 16, y: 16)
                     
     //                Text("".firstLeters(text: self.$user.name))
     //                    .font(.system(size: 14))
@@ -107,6 +93,6 @@ struct ContactRealmCell: View {
                 .padding(.horizontal)
                 .padding(.vertical, 10)
                 .contentShape(Rectangle())
-        }).buttonStyle(changeBGButtonStyle())
+        }.buttonStyle(changeBGButtonStyle())
     }
 }

@@ -207,17 +207,17 @@ struct ChatMessagesView: View {
                                     }
                                     
                                     if self.isLoadingMore && !firstScroll && self.maxPagination != 0 && message == self.maxPagination {
-                                        Circle()
-                                            .trim(from: 0, to: 0.8)
-                                            .stroke(Color.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
-                                            .frame(width: 20, height: 20)
-                                            .animation(Animation.linear(duration: 0.55).repeatForever(autoreverses: false))
-                                            .rotation3DEffect(Angle(degrees: 180), axis: (x: 1, y: 0, z: 0))
-                                            .rotationEffect(.degrees(self.isLoadingMore ? 360 : 0))
-
+//                                        Circle()
+//                                            .trim(from: 0, to: 0.8)
+//                                            .stroke(Color.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+//                                            .frame(width: 20, height: 20)
+//                                            .rotation3DEffect(Angle(degrees: 180), axis: (x: 1, y: 0, z: 0))
+//                                            .rotationEffect(.init(degrees: self.isLoadingMore ? 360 : 0))
+//                                            .animation(Animation.linear(duration: 0.55).repeatForever(autoreverses: false))
                                         Text("loading more...")
                                             .font(.caption)
                                             .foregroundColor(.secondary)
+                                            .padding(.vertical, 15)
                                     }
                                     
                                     if currentMessages[message].needsTimestamp {

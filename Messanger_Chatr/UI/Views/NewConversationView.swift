@@ -36,6 +36,10 @@ struct NewConversationView: View {
     //@ObservedObject var profile = ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self))
     //@ObservedObject var addressBook = AddressBookRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(AddressBookStruct.self))
     //@ObservedObject var dialogs = DialogRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(DialogStruct.self))
+    
+    var contacts: [ContactStruct] {
+        return self.auth.contacts.filterContact(text: self.searchText, ascending: true).filter({ $0.isMyContact == true && $0.id != UserDefaults.standard.integer(forKey: "currentUserID") && $0.fullName != "No Name" })
+    }
 
     var body: some View {
         NavigationView {
@@ -190,7 +194,7 @@ struct NewConversationView: View {
                         }
 
                         //MARK: Contacts Section
-                        if self.auth.contacts.filterContact(text: self.searchText).filter({ $0.isMyContact == true }).count != 0 {
+                        if self.contacts.count != 0 {
                             HStack {
                                 VStack(alignment: .leading) {
                                     Text("Contacts:")
@@ -199,7 +203,7 @@ struct NewConversationView: View {
                                         .foregroundColor(.primary)
                                         .multilineTextAlignment(.leading)
 
-                                    Text(Chat.instance.contactList?.contacts.count == 1 ? "\(Chat.instance.contactList?.contacts.count ?? 0) CONTACT" : "\(self.auth.contacts.filterContact(text: self.searchText).filter({ $0.id != UserDefaults.standard.integer(forKey: "currentUserID") && $0.fullName != "No Name" && $0.isMyContact == true }).count) CONTACTS")
+                                    Text(self.contacts.count == 1 ? "\(self.contacts.count) CONTACT" : "\(self.contacts.count) CONTACTS")
                                         .font(.caption)
                                         .foregroundColor(.secondary)
                                         .multilineTextAlignment(.leading)
@@ -208,20 +212,31 @@ struct NewConversationView: View {
                             }.padding(.horizontal)
                             .padding(.horizontal)
                             .padding(.top, 25)
+                        }
 
-                            self.styleBuilder(content: {
-                                ForEach(self.auth.contacts.filterContact(text: self.searchText).filter({ $0.isMyContact == true && $0.id != UserDefaults.standard.integer(forKey: "currentUserID") && $0.fullName != "No Name" }).sorted { $0.fullName < $1.fullName }, id: \.self) { contact in
-                                    VStack(alignment: .trailing, spacing: 0) {
-                                        ContactRealmCell(selectedContact: self.$selectedContact, forwardContact: self.$forwardContact, contact: contact)
-
-                                        if self.auth.contacts.filterContact(text: self.searchText).sorted { $0.fullName < $1.fullName }.last != contact {
-                                            Divider()
-                                                .frame(width: Constants.screenWidth - 100)
+                        self.styleBuilder(content: {
+                            ForEach(self.contacts.indices, id: \.self) { i in
+                                VStack(alignment: .trailing, spacing: 0) {
+                                    ContactRealmCell(contact: self.contacts[i], isSelected: self.selectedContact.contains(self.contacts[i].id) && !(self.forwardContact && self.selectedContact.count >= 1)) {
+                                        if self.selectedContact.contains(self.contacts[i].id) {
+                                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                            self.selectedContact.removeAll(where: { $0 == self.contacts[i].id })
+                                        } else if self.forwardContact && self.selectedContact.count >= 1 {
+                                            UINotificationFeedbackGenerator().notificationOccurred(.error)
+                                        } else {
+                                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                            self.selectedContact.append(Int(self.contacts[i].id))
                                         }
                                     }
+
+                                    if self.contacts.last?.id != self.contacts[i].id {
+                                        Divider()
+                                            .frame(width: Constants.screenWidth - 100)
+                                    }
                                 }
-                            })
-                        }
+                            }
+                        })
+                        
 
                         //MARK: Regristered Section
                         if self.regristeredAddressBook.count != 0 {
@@ -316,7 +331,7 @@ struct NewConversationView: View {
                         }
                         
                         //MARK: FOOTER
-                        FooterInformation(middleText: self.auth.addressBook.results.count + self.regristeredAddressBook.count + self.auth.contacts.results.count == 1 ? "\(self.auth.addressBook.results.count + self.regristeredAddressBook.count + self.auth.contacts.results.count) total contact above" : "\(self.auth.addressBook.results.count + self.regristeredAddressBook.count + self.auth.contacts.results.count) total contacts above")
+                        FooterInformation(middleText: self.auth.addressBook.results.count + self.regristeredAddressBook.count + self.contacts.count == 1 ? "\(self.auth.addressBook.results.count + self.regristeredAddressBook.count + self.contacts.count) total contact above" : "\(self.auth.addressBook.results.count + self.regristeredAddressBook.count + self.contacts.count) total contacts above")
                             .padding(.vertical, 35)
                     }.frame(width: Constants.screenWidth)
 
@@ -350,7 +365,7 @@ struct NewConversationView: View {
             )
             .navigationBarTitle(self.usedAsNew ? (self.navigationPrivate ? (self.selectedContact.count > 0 ? self.selectedContact.count > Constants.maxNumberGroupOccu ? "Max Reached" : "New Chat \(self.selectedContact.count)" : "New Chat") : "New Public Chat") : self.forwardContact ? "Forward Contact" : "Add Contact", displayMode: .inline)
             .onAppear() {
-                DispatchQueue.main.async {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     Request.registeredUsersFromAddressBook(withUdid: UIDevice.current.identifierForVendor?.uuidString, isCompact: false, successBlock: { (users) in
                         DispatchQueue.main.async {
                             for i in users {
@@ -490,7 +505,7 @@ struct NewConversationView: View {
     }
 
     func canCreate() -> Bool {
-        if self.navigationPrivate && self.selectedContact.count != 0 {
+        if self.navigationPrivate && self.selectedContact.count != 0 && self.selectedContact.count < Constants.maxNumberGroupOccu {
             return true
         } else if self.selectedTags.count != 0 && self.groupName.count != 0 && self.description.count != 0 && self.inputImageUrl != nil && self.inputCoverImageUrl != nil && !self.creatingDialog {
             return true

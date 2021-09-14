@@ -48,7 +48,7 @@ struct ChannelBubble: View {
                         .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 4)
 
                     VStack(alignment: .center, spacing: 2) {
-                        HStack(alignment: .bottom, spacing: 15) {
+                        HStack(alignment: .bottom, spacing: 10) {
                             WebImage(url: URL(string: self.dialogModel.avatar))
                                 .resizable()
                                 .placeholder{ Image("empty-profile").resizable().frame(width: 70, height: 70, alignment: .center).scaledToFill() }
@@ -84,7 +84,7 @@ struct ChannelBubble: View {
                                 .fontWeight(.regular)
                                 .foregroundColor(Color.primary)
                                 .multilineTextAlignment(.leading)
-                                .padding(.top, 5)
+                                .padding(.top, 8)
                                 .padding(.leading)
                                 .padding(.horizontal, 5)
                                 .lineLimit(2)

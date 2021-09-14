@@ -63,11 +63,11 @@ class ContactsRealmModel<Element>: ObservableObject where Element: RealmSwift.Re
         token.invalidate()
     }
     
-    func filterContact(text: String) -> Results<Element> {
+    func filterContact(text: String, ascending: Bool? = nil) -> Results<Element> {
         if text == "" {
-            return results.sorted(byKeyPath: "fullName", ascending: false)
+            return results.sorted(byKeyPath: "fullName", ascending: ascending ?? false)
         } else {
-            return results.filter("fullName CONTAINS %@", text).sorted(byKeyPath: "fullName", ascending: false)
+            return results.filter("fullName CONTAINS %@", text).sorted(byKeyPath: "fullName", ascending: ascending ?? false)
         }
     }
 }

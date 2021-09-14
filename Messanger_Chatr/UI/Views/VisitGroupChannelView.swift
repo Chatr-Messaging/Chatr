@@ -66,7 +66,7 @@ struct VisitGroupChannelView: View {
                     //MARK: Top Profile
                     topGroupHeaderView(dialogModel: self.$dialogModel, groupOccUserAvatar: self.$groupOccUserAvatar, isProfileImgOpen: self.$isProfileImgOpen, isEditGroupOpen: self.$isEditGroupOpen, publicTags: self.$publicTags, showMoreAdmins: self.$showMoreAdmins, reportCount: self.publicDialogModel.reportCount ?? 0)
                         .environmentObject(self.auth)
-                        .padding(.top, Constants.screenHeight * 0.15)
+                        .padding(.top, self.dialogModel.dialogType == "public" ? Constants.screenHeight * 0.15 : 40)
                         .padding(.bottom, self.dialogModel.dialogType == "public" ? 5 : 15)
                         .background(GeometryReader {
                             Color.clear.preference(key: ViewOffsetKey.self,
