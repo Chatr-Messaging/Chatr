@@ -178,7 +178,8 @@ struct ChatMessagesView: View {
                             EmptyMessagesSection(messageCount: self.$maxMessageCount)
                                 .environmentObject(self.auth)
                                 .shadow(color: Color("buttonShadow").opacity(0.8), radius: 15, x: 0, y: 8)
-                                .padding(.bottom, Constants.screenHeight * 0.3)
+                                .padding(.bottom, Constants.screenHeight * 0.2)
+                                .transition(.asymmetric(insertion: AnyTransition.move(edge: .top).animation(.interactiveSpring().delay(1.8)).combined(with: .opacity), removal: AnyTransition.move(edge: .bottom).animation(.easeInOut(duration: 0.25)).combined(with: .opacity)))
                         } else if self.maxMessageCount == -1 {
                             Text("loading messages...")
                                 .font(.subheadline)
@@ -442,6 +443,8 @@ struct ChatMessagesView: View {
                                 
                                 //Scroll to bottom notification
                                 NotificationCenter.default.addObserver(forName: NSNotification.Name("scrollToLastId"), object: nil, queue: .main) { (_) in
+                                    guard UserDefaults.standard.integer(forKey: "messageViewScrollHeight") > Int(Constants.screenHeight * 0.7) else { return }
+
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                                         withAnimation(.easeOut) {
                                             reader.scrollTo(currentMessages.last?.id ?? "", anchor: .bottom)
