@@ -179,7 +179,7 @@ struct ChatMessagesView: View {
                                 .environmentObject(self.auth)
                                 .shadow(color: Color("buttonShadow").opacity(0.8), radius: 15, x: 0, y: 8)
                                 .padding(.bottom, Constants.screenHeight * 0.2)
-                                .transition(.asymmetric(insertion: AnyTransition.move(edge: .top).animation(.interactiveSpring().delay(1.8)).combined(with: .opacity), removal: AnyTransition.move(edge: .bottom).animation(.easeInOut(duration: 0.25)).combined(with: .opacity)))
+                                .transition(.asymmetric(insertion: AnyTransition.move(edge: .top).animation(Animation.easeInOut(duration: 0.35).delay(4.8)), removal: AnyTransition.move(edge: .bottom).animation(.easeInOut(duration: 0.25)).combined(with: .opacity)))
                         } else if self.maxMessageCount == -1 {
                             Text("loading messages...")
                                 .font(.subheadline)
@@ -312,6 +312,7 @@ struct ChatMessagesView: View {
                                         
                                         if self.maxMessageCount != self.currentMessages.count {
                                             self.maxMessageCount = self.currentMessages.count
+                                            print("the new msg: \(self.maxMessageCount)")
                                         }
                                     }
                             })
@@ -496,12 +497,13 @@ struct ChatMessagesView: View {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                     self.delayViewMessages = true
                     self.scrollPage += 1
-                    self.maxMessageCount = self.currentMessages.count
-                    print("the dialog id is: \(dialogID)")
+                    self.maxMessageCount = self.currentMessages.count != 0 ? self.currentMessages.count : -1
+                    print("the dialog id is: \(dialogID) && \(self.maxMessageCount)")
                     
                     viewModel.loadDialog(auth: auth, dialogId: dialogID, completion: {
                         print("done loading dialogggg: \(dialogID) && \(self.viewModel.totalMessageCount) && \(currentMessages.count) &&& \(self.viewModel.unreadMessageCount)")
-                        self.maxMessageCount = self.viewModel.totalMessageCount
+                        print("the dialog id is:222 \(self.viewModel.totalMessageCount) &&: \(self.currentMessages.count)")
+                        self.maxMessageCount = self.currentMessages.count
                         
                         if self.viewModel.totalMessageCount > self.currentMessages.count || self.currentMessages.count == 0 || self.viewModel.totalMessageCount == 100 {
                             print("local and pulled do not match... pulling delta: \(self.viewModel.totalMessageCount) && \(self.currentMessages.count)")
