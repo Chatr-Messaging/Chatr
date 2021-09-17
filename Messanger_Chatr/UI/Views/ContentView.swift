@@ -18,31 +18,6 @@ import UserNotifications
 import SlideOverCard
 import ConfettiSwiftUI
 
-// MARK: Preview View
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ZStack {
-            if #available(iOS 14.0, *) {
-                mainHomeList()
-                    .background(Color("bgColor"))
-            } else {
-                // Fallback on earlier versions
-                OldHomeView()
-            }
-        }
-    }
-}
-
-// MARK: Old Home / eirlier than iOS 14
-struct OldHomeView: View {
-    @EnvironmentObject var auth: AuthModel
-
-    var body: some View {
-        ZStack {
-            Text("You are seeing 'OldHomeView' becuse you do not have iOS 14")
-        }
-    }
-}
 
 // MARK: Home / Starting Point
 @available(iOS 14.0, *)
@@ -93,27 +68,49 @@ struct HomeView: View {
                         }
                 }
             case .signedOut:
-                DismissGuardian(preventDismissal: $auth.preventDismissal, attempted: $auth.attempted) {
+                if #available(iOS 15.0, *) {
                     Button(action: {
                     }) {
                         Text("")
-                    }.sheet(isPresented: self.$loginIsPresented, content: {
+                    }.sheet(isPresented: self.$loginIsPresented, onDismiss: {
+                        self.auth.preventDismissal = false
+                        self.auth.verifyCodeStatusKeyboard = false
+                        self.auth.verifyPhoneStatusKeyboard = false
+                    }) {
                         welcomeView(presentView: self.$loginIsPresented)
                             .background(Color("bgColor"))
                             .edgesIgnoringSafeArea(.all)
                             .environmentObject(self.auth)
                             .disabled(self.auth.isUserAuthenticated == .signedOut ? false : true)
+                            .interactiveDismissDisabled(self.auth.preventDismissal)
                             .onAppear(perform: {
                                 self.auth.preventDismissal = true
                                 self.auth.verifyCodeStatus = .undefined
                                 self.auth.verifyPhoneNumberStatus = .undefined
                             })
-                            .onDisappear(perform: {
-                                self.auth.preventDismissal = false
-                                self.auth.verifyCodeStatusKeyboard = false
-                                self.auth.verifyPhoneStatusKeyboard = false
-                            })
-                    })
+                    }
+                } else {
+                    DismissGuardian(preventDismissal: $auth.preventDismissal, attempted: $auth.attempted) {
+                        Button(action: {
+                        }) {
+                            Text("")
+                        }.sheet(isPresented: self.$loginIsPresented, onDismiss: {
+                            self.auth.preventDismissal = false
+                            self.auth.verifyCodeStatusKeyboard = false
+                            self.auth.verifyPhoneStatusKeyboard = false
+                        }) {
+                            welcomeView(presentView: self.$loginIsPresented)
+                                .background(Color("bgColor"))
+                                .edgesIgnoringSafeArea(.all)
+                                .environmentObject(self.auth)
+                                .disabled(self.auth.isUserAuthenticated == .signedOut ? false : true)
+                                .onAppear(perform: {
+                                    self.auth.preventDismissal = true
+                                    self.auth.verifyCodeStatus = .undefined
+                                    self.auth.verifyPhoneNumberStatus = .undefined
+                                })
+                        }
+                    }
                 }
             case .error:
                 Text("There is an internal error.\n Please contact Chatr for help.")

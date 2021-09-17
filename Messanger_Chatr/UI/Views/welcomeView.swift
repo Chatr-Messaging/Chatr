@@ -1168,64 +1168,57 @@ struct welcomeBackView: View {
                     .foregroundColor(Color.primary)
                     .padding(.top, 25)
                     .padding([.trailing, .leading], 20)
-                
+
                 Spacer()
-                
-                ZStack {
-                    RoundedRectangle(cornerRadius: 20)
-                        .frame(height: 75)
-                        .frame(minWidth: 100)
-                        .padding(.all)
-                        .cornerRadius(10)
-                        .foregroundColor(Color("bgColor").opacity(0.45))
-                        .shadow(color: Color("buttonShadow"), radius: 8, x: 0, y: 5)
+                HStack(alignment: .center) {
+                    WebImage(url: URL(string: self.auth.profile.results.first?.avatar ?? ""))
+                        .resizable()
+                        .placeholder{ Image(systemName: "person.fill") }
+                        .indicator(.activity)
+                        .transition(.fade(duration: 0.25))
+                        .scaledToFill()
+                        .frame(width: 55, height: 55, alignment: .center)
+                        .clipShape(Circle())
+                        .padding(.leading)
                     
-                    HStack(alignment: .center) {
-                        WebImage(url: URL(string: self.auth.profile.results.first?.avatar ?? ""))
-                            .resizable()
-                            .placeholder{ Image(systemName: "person.fill") }
-                            .indicator(.activity)
-                            .transition(.fade(duration: 0.25))
-                            .scaledToFill()
-                            .frame(width: 55, height: 55, alignment: .center)
-                            .clipShape(Circle())
-                            .padding(.leading)
+                    VStack(alignment: .leading) {
+                        Text(self.auth.haveUserFullName == true ? self.auth.profile.results.first?.fullName ?? "Chatr User" : "Chatr User")
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.primary)
+                            .multilineTextAlignment(.leading)
                         
-                        VStack(alignment: .leading) {
-                            Text(self.auth.haveUserFullName == true ? self.auth.profile.results.first?.fullName ?? "Chatr User" : "Chatr User")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.primary)
-                                .multilineTextAlignment(.leading)
-                            
-                            Text(UserDefaults.standard.string(forKey: "phoneNumber")?.format(phoneNumber: String(UserDefaults.standard.string(forKey: "phoneNumber")?.dropFirst().dropFirst() ?? "+1 (123) 456-6789")) ?? "+1 (123) 456-6789")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                                .multilineTextAlignment(.leading)
-                        }
+                        Text(UserDefaults.standard.string(forKey: "phoneNumber")?.format(phoneNumber: String(UserDefaults.standard.string(forKey: "phoneNumber")?.dropFirst().dropFirst() ?? "+1 (123) 456-6789")) ?? "+1 (123) 456-6789")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.leading)
+                    }
+                    
+                    Spacer()
                         
-                        Spacer()
-                            
-                        if self.auth.haveUserFullName && self.auth.haveUserProfileImg {
-                            Circle()
-                                .trim(from: 0, to: 0.8)
-                                .stroke(Color.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
-                                .frame(width: 25, height: 25)
-                                .rotationEffect(.init(degrees: self.loadAni ? 360 : 0))
-                                .animation(Animation.linear(duration: 0.75).repeatForever(autoreverses: false))
-                                .padding(.trailing)
-                                .onAppear(perform: ({
-                                    self.loadAni.toggle()
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 3.5) {
-                                        if self.auth.isFirstTimeUser == false {
-                                            UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                        }
-                                        self.dismissView = true
+                    if self.auth.haveUserFullName && self.auth.haveUserProfileImg {
+                        Text("")
+                            .onAppear() {
+                                guard !self.loadAni else { return }
+
+                                self.loadAni = true
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 3.5) {
+                                    if self.auth.isFirstTimeUser == false {
+                                        UINotificationFeedbackGenerator().notificationOccurred(.success)
                                     }
-                                }))
-                        }
-                    }.padding(.all)
-                }
+                                    self.dismissView = true
+                                    self.loadAni = false
+                                }
+                            }
+                    }
+                }.padding(.all)
+                .background(RoundedRectangle(cornerRadius: 20)
+                            .frame(height: 75)
+                            .frame(minWidth: 100)
+                            .padding(.all)
+                            .cornerRadius(10)
+                            .foregroundColor(Color("bgColor").opacity(0.45))
+                            .shadow(color: Color("buttonShadow"), radius: 8, x: 0, y: 5))
                 
                 Text("Preparing your experience...")
                     .font(.caption)
