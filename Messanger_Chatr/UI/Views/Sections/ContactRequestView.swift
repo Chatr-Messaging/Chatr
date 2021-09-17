@@ -34,8 +34,8 @@ struct contactRequestView: View {
                     }
                     
                     LazyVStack(spacing: 0) {
-                        ForEach(self.auth.profile.results.first!.contactRequests, id: \.self) { contactRequestID in
-                            ContactRequestCell(dismissView: self.$dismissView, selectedNewDialog: self.$selectedNewDialog, contactID: Int(contactRequestID), contactRelationship: .pendingRequestForYou)
+                        ForEach(self.auth.profile.results.first!.contactRequests.indices, id: \.self) { contactRequestID in
+                            ContactRequestCell(dismissView: self.$dismissView, selectedNewDialog: self.$selectedNewDialog, contactID: Int(self.auth.profile.results.first!.contactRequests[contactRequestID]), contactRelationship: .pendingRequestForYou)
                                 .environmentObject(self.auth)
                             
                             if self.auth.profile.results.first?.contactRequests.last != contactRequestID {

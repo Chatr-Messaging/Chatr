@@ -17,6 +17,9 @@ struct QuickSnapsSection: View {
     @Binding var emptyQuickSnaps: Bool
     @Binding var isLocalOpen: Bool
     @State var preLoading: Bool = false
+    var quickSnapz: [ContactStruct] {
+        return self.auth.contacts.results.sorted(by: {$0.quickSnaps.count > $1.quickSnaps.count}).filter({ $0.hasQuickSnaped != false })
+    }
     
     var body: some View {
         ZStack() {
@@ -65,10 +68,10 @@ struct QuickSnapsSection: View {
                             
                             //Received List
                             HStack(spacing: 0) {
-                                ForEach(self.auth.contacts.results.sorted(by: {$0.quickSnaps.count > $1.quickSnaps.count}).filter({ $0.hasQuickSnaped != false }), id:\.self) { snap in
-                                    if snap.hasQuickSnaped {
-                                        QuickSnapCell(viewState: self.$viewState, quickSnap: snap, selectedQuickSnapContact: self.$selectedQuickSnapContact)
-                                            .offset(x: (self.auth.contacts.results.sorted(by: {$0.quickSnaps.count > $1.quickSnaps.count}).filter({ $0.hasQuickSnaped != false }).first != nil) ? -4 : 0)
+                                ForEach(self.quickSnapz.indices, id:\.self) { snap in
+                                    if self.quickSnapz[snap].hasQuickSnaped {
+                                        QuickSnapCell(viewState: self.$viewState, quickSnap: self.quickSnapz[snap], selectedQuickSnapContact: self.$selectedQuickSnapContact)
+                                            .offset(x: (self.quickSnapz.first != nil) ? -4 : 0)
                                     }
                                 }
                             }.padding(.leading, 5)

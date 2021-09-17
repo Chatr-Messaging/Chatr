@@ -50,10 +50,10 @@ struct WalkthroughData: Identifiable {
 }
 
 var WalkthroughDataArray = [
-    WalkthroughData(title: "Messaging \nReimagined", subtitle: "The most fun messaging experiance.\nSafe. Fun. & Free.", image: "WalkthroughImage1"),
-    WalkthroughData(title: "The Most Fun", subtitle: "Send contacts fun messages using GIF's, Photos, or Quick Snaps!", image: "WalkthroughImage2"),
-    WalkthroughData(title: "Fast & Reliable", subtitle: "Chatr uses the fastest servers to make it a seemless experiance", image: "WalkthroughImage3"),
-    WalkthroughData(title: "Your Contacts \nAre Waiting", subtitle: "Contacts that have regristered are \nwaiting to for you to say hello 👋", image: "WalkthroughImage4")
+    WalkthroughData(title: "Messaging \nReimagined", subtitle: "A completely new way to connect.\nSafe. Fun. & Free.", image: "WalkthroughImage1"),
+    WalkthroughData(title: "The Most Fun", subtitle: "Send fun messages using GIFs, photos, videos, audio, location, or quick snaps!", image: "WalkthroughImage2"),
+    WalkthroughData(title: "Fast & Reliable", subtitle: "Chatr uses the fast and secure servers to make it a seamless and safe experience", image: "WalkthroughImage3"),
+    WalkthroughData(title: "Your Contacts \nAre Waiting", subtitle: "What are you waiting for? \nYour registered contacts are \nwaiting to for you to say hello 👋", image: "WalkthroughImage4")
 ]
 
 // MARK: Main Home Body
@@ -136,7 +136,7 @@ struct MainBody: View {
                         }.padding(.horizontal, 10)
                      }.buttonStyle(MainButtonStyle())
                     .frame(maxWidth: 210)
-                    .overlay(RoundedRectangle(cornerRadius: 15).stroke(Color.white.opacity(0.125), lineWidth: 2.5))
+                    .overlay(RoundedRectangle(cornerRadius: 15).stroke(Color.white.opacity(0.12), lineWidth: 2.5))
                     .disabled(self.continuePermissions || self.continuePt1 ? true : false)
                     .shadow(color: Color("buttonShadow"), radius: 20, x: 0, y: 10)
                 }.padding(.horizontal, 25)
