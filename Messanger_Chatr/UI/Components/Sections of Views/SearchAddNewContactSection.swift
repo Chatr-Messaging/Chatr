@@ -184,12 +184,12 @@ struct SearchAddNewContactSection: View {
                     }
                 }
             }.animation(.spring(response: 0.25, dampingFraction: 0.70, blendDuration: 0))
-                .background(Color("buttonColor"))
-                .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
-                .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
-                .padding(.horizontal)
-                .padding(.top, self.isLoading || (self.outputSearchText.count > 0 && self.grandUsers.count == 0) ? 50 : 0)
-                .padding(.bottom, self.grandUsers.count > 0 && !self.isLoading ? 60 : 15)
+            .background(Color("buttonColor"))
+            .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
+            .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
+            .padding(.horizontal)
+            .padding(.top, self.isLoading || (self.outputSearchText.count > 0 && self.grandUsers.count == 0) ? 50 : 0)
+            .padding(.bottom, self.grandUsers.count > 0 && !self.isLoading ? 60 : 15)
         }
     }
     

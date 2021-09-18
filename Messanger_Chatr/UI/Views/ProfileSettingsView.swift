@@ -608,10 +608,14 @@ struct ProfileView: View {
                         .actionSheet(isPresented: self.$logoutActionSheet) {
                             ActionSheet(title: Text("Are you sure you want to log out?"), message: nil, buttons: [
                                 .destructive(Text("Log Out"), action: {
-                                    self.auth.preventDismissal = true
-                                    self.auth.isUserAuthenticated = .signedOut
                                     withAnimation {
                                         self.dimissView.toggle()
+                                    }
+                                    
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
+                                        self.auth.logOutFirebase(completion: {
+                                            self.auth.logOutConnectyCube()
+                                        })
                                     }
                                 }),
                                 .cancel()

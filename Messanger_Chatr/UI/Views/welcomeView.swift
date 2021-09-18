@@ -53,7 +53,7 @@ var WalkthroughDataArray = [
     WalkthroughData(title: "Messaging \nReimagined", subtitle: "A completely new way to connect.\nSafe. Fun. & Free.", image: "WalkthroughImage1"),
     WalkthroughData(title: "The Most Fun", subtitle: "Send fun messages using GIFs, photos, videos, audio, location, or quick snaps!", image: "WalkthroughImage2"),
     WalkthroughData(title: "Fast & Reliable", subtitle: "Chatr uses the fast and secure servers to make it a seamless and safe experience", image: "WalkthroughImage3"),
-    WalkthroughData(title: "Your Contacts \nAre Waiting", subtitle: "What are you waiting for? \nYour registered contacts are \nwaiting to for you to say hello 👋", image: "WalkthroughImage4")
+    WalkthroughData(title: "Your Contacts Are Waiting", subtitle: "What are you waiting for? \nYour registered contacts are \nwaiting to for you to say hello 👋", image: "WalkthroughImage4")
 ]
 
 // MARK: Main Home Body
@@ -251,10 +251,13 @@ struct MainBody: View {
 
 // MARK: Walkthrough Cell
 struct WalkthroughCell: View, Identifiable {
+    @Binding var page : Int
+    var cardIndex: Int
     let id = UUID()
     @State var title : String
     @State var subTitleText : String
     @State var imageName : String
+    @State var cardDrag = CGSize.zero
 
     var body: some View {
                 ZStack(alignment: .bottom) {
@@ -268,6 +271,7 @@ struct WalkthroughCell: View, Identifiable {
                         Text(self.title)
                             .font(.system(size: 30))
                             .fontWeight(.bold)
+                            .lineLimit(2)
                             .multilineTextAlignment(.center)
                             .foregroundColor(Color.primary.opacity(0.9))
                         
@@ -284,6 +288,10 @@ struct WalkthroughCell: View, Identifiable {
                             .cornerRadius(25)
                             .overlay(RoundedRectangle(cornerRadius: 25).stroke(Color("blurBorder"), lineWidth: 2.5))
                     ).shadow(color: Color("buttonShadow"), radius: 20, x: 0, y: 20)
+                    .opacity(cardIndex == page ? 1 : 0)
+                    .scaleEffect(cardIndex == page ? 1.0 : 0.0)
+                    .offset(y: cardIndex == page ? 0 : 60)
+                    .animation(.spring(response: 0.4, dampingFraction: 0.6, blendDuration: 0))
                 }.frame(width: Constants.screenWidth)
     }
 }
@@ -1330,11 +1338,11 @@ struct Carousel : UIViewRepresentable {
 struct ListView : View {
     @Binding var page : Int
     var walkthroughData = WalkthroughDataArray
-    
+
     var body: some View{
         HStack(spacing: 0){
-            ForEach(walkthroughData) { i in
-                WalkthroughCell(title: i.title, subTitleText: i.subtitle, imageName: i.image)
+            ForEach(walkthroughData.indices) { i in
+                WalkthroughCell(page: self.$page, cardIndex: i, title: walkthroughData[i].title, subTitleText: walkthroughData[i].subtitle, imageName: walkthroughData[i].image)
                     .frame(width: Constants.screenWidth)
                     .padding(.top)
                     .padding(.bottom, 100)

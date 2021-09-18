@@ -10,15 +10,6 @@
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
-	<key>UILaunchScreen</key>
-	<dict>
-		<key>UIColorName</key>
-		<string>LaunchScreenBackground</string>
-		<key>UIImageRespectsSafeAreaInsets</key>
-		<false/>
-		<key>UIImageName</key>
-		<string>LaunchImage</string>
-	</dict>
 	<key>CFBundleIconName</key>
 	<string>AppIcon</string>
 	<key>CFBundleIcons</key>
@@ -265,6 +256,15 @@
 		<string>processing</string>
 		<string>remote-notification</string>
 	</array>
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string>LaunchScreenBackground</string>
+		<key>UIImageName</key>
+		<string>LaunchImage</string>
+		<key>UIImageRespectsSafeAreaInsets</key>
+		<false/>
+	</dict>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchImage</string>
 	<key>UIRequiredDeviceCapabilities</key>
