@@ -490,7 +490,7 @@ class AuthModel: NSObject, ObservableObject {
         uploadcare.uploadAPI.upload(files: [filename: data], store: .store, { (progress) in
             DispatchQueue.main.async { [weak self] in
                 print("upload progress: \(progress * 100)%")
-                self?.avatarProgress = progress
+                self?.avatarProgress = CGFloat(progress)
             }
         }) { (resultDictionary, error) in
             defer {
@@ -519,7 +519,7 @@ class AuthModel: NSObject, ObservableObject {
 
         let onProgress: (Double)->Void = { (progress) in
             DispatchQueue.main.async { [weak self] in
-                self?.avatarProgress = progress
+                self?.avatarProgress = CGFloat(progress)
                 
 //                switch UIApplication.shared.applicationState {
 //                case .background:

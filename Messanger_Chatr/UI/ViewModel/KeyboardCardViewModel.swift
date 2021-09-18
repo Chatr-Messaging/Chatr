@@ -70,7 +70,7 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
                 
                 self.uploadcare.uploadAPI.upload(files: [filename: data], store: .store, { (progress) in
                     DispatchQueue.main.async {
-                        self.selectedPhotos[foundMediaIndex].progress = progress
+                        self.selectedPhotos[foundMediaIndex].progress = CGFloat(progress)
                     }
                 }) { (resultDictionary, error) in
                     defer {
@@ -125,7 +125,7 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
                     let imageRatio = media.image.size.height / media.image.size.width
                 
                     self.selectedPhotos[foundMediaIndex].uploadId = fileId
-                    self.selectedPhotos[foundMediaIndex].mediaRatio = imageRatio
+                    self.selectedPhotos[foundMediaIndex].mediaRatio = Double(imageRatio)
                     print("success uploading direct file. 4353543545Here is the data: " + "\(fileId) && ratio: \(imageRatio)")
                     if self.selectedPhotos[foundMediaIndex].canSend {
                         print("sending message now. Here is the id: " + "\(fileId)")
@@ -234,7 +234,7 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
                 
                 DispatchQueue.main.async {
                     self.selectedVideos[foundMediaIndex].placeholderId = fileId
-                    self.selectedVideos[foundMediaIndex].mediaRatio = imageRatio
+                    self.selectedVideos[foundMediaIndex].mediaRatio = Double(imageRatio)
                     print("success uploading direct file. Here is the data: " + "\(fileId) &&s ratio: \(imageRatio)")
                     if self.selectedVideos[foundMediaIndex].canSend {
                         print("sending message now. Here is the id: " + "\(fileId)")

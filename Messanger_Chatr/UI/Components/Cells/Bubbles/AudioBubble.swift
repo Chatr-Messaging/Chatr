@@ -20,7 +20,7 @@ struct BarView: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 5)
-                .fill(self.messageRight ? .white : .primary)
+                .fill(self.messageRight ? Color.white : Color.primary)
                 .frame(width: (60 - CGFloat(numberOfSamples) * 4) / CGFloat(numberOfSamples), height: value)
         }
     }

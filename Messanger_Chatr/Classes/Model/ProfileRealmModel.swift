@@ -260,8 +260,8 @@ class changeProfileRealmDate {
         if let data = usersID.customData?.data(using: .utf8) {
             if let customData = try? JSONSerialization.jsonObject(with: data, options: []) as? [String : String] {
                 
-                if let authSetting = customData["local_auth"] {
-                    print("the users Auth Setting is: \(String(describing: authSetting))")
+                if let authSetting = customData?["local_auth"] {
+                    //print("the users Auth Setting is: \(String(describing: authSetting))")
                     if authSetting == "true" {
                         return true
                     } else {

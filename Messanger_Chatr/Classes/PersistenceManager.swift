@@ -268,7 +268,7 @@ class PersistenceManager: ObservableObject {
     func getCubeProfileImage(usersID: ConnectyCube.User) -> String? {
         if let data = usersID.customData?.data(using: .utf8) {
             if let customData = try? JSONSerialization.jsonObject(with: data, options: []) as? [String : String] {
-                if let avatarUID = customData["avatar_uid"] {
+                if let avatarUID = customData?["avatar_uid"] {
                     let privateAvatarUrl = Blob.privateUrl(forFileUID: avatarUID)
 
                     return privateAvatarUrl ?? ""

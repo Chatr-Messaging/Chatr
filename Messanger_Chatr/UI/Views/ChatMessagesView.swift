@@ -346,7 +346,7 @@ struct ChatMessagesView: View {
                                     return
                                 }
                                 
-                                self.scrollLocationPercent = CGFloat(self.scrollViewHeight) / (scrollOffsetz + (Constants.screenHeight - (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 127 : 91) : 201)))
+                                self.scrollLocationPercent = Double(CGFloat(self.scrollViewHeight) / (scrollOffsetz + (Constants.screenHeight - (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 127 : 91) : 201))))
                                 
                                 //pause video if scrolling too much & is playing video
                                 if self.playingVideoId != "" {
