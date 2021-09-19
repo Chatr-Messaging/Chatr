@@ -264,7 +264,7 @@ struct ShareProfileView: View {
                                  self.hasCopiedUrl = true
                                  
                                  self.notiType = "success"
-                                 self.notiText = "Successfully copied channel URL"
+                                 self.notiText = "Copied channel URL"
                                  self.showAlert.toggle()
                              }
                          }) {

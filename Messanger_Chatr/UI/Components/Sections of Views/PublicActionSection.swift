@@ -242,7 +242,7 @@ struct PublicActionSection: View {
             
             UIPasteboard.general.setValue(url.absoluteString, forPasteboardType: kUTTypePlainText as String)
             self.notiType = "success"
-            self.notiText = "Successfully copied channel URL"
+            self.notiText = "Copied channel URL"
             self.showAlert.toggle()
         })
     }

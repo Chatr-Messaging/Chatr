@@ -386,7 +386,7 @@ struct BubbleDetailView: View {
                                                 UINotificationFeedbackGenerator().notificationOccurred(.success)
                                                 UIPasteboard.general.setValue(self.message.text, forPasteboardType: kUTTypePlainText as String)
 
-                                                self.auth.notificationtext = "Successfully copied message"
+                                                self.auth.notificationtext = "Copied message"
                                                 NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
                                             }) {
                                                 Label("Copy Text", systemImage: "doc.on.doc")
@@ -400,7 +400,7 @@ struct BubbleDetailView: View {
                                                 UINotificationFeedbackGenerator().notificationOccurred(.success)
                                                 UIPasteboard.general.setValue(copyText, forPasteboardType: kUTTypePlainText as String)
 
-                                                self.auth.notificationtext = "Successfully copied message"
+                                                self.auth.notificationtext = "Copied message"
                                                 NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
                                             }) {
                                                 Label("Copy Location", systemImage: "doc.on.doc")

@@ -512,7 +512,7 @@ struct ContainerBubble: View {
             UIPasteboard.general.setValue(self.message.text, forPasteboardType: kUTTypePlainText as String)
         }
 
-        auth.notificationtext = "Successfully copied message"
+        auth.notificationtext = "Copied message"
         NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
     }
 

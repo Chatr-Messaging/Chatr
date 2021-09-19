@@ -153,12 +153,12 @@ struct AudioBubble: View {
                 AudioIndicatorView(messageRight: self.messageRight, isPlaying: self.$isPlayingAudio)
             }.padding(.horizontal)
             .padding(.vertical, 10)
-            .frame(width: Constants.screenWidth * 0.4)
             .onDisappear {
                 self.viewModel.audio.playingBubbleId = ""
             }
         }
         //.transition(AnyTransition.scale)
+        .frame(width: Constants.screenWidth * 0.4)
         .background(self.messageRight ? LinearGradient(
         gradient: Gradient(colors: [Color(red: 46 / 255, green: 168 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)]),
         startPoint: .top, endPoint: .bottom) : LinearGradient(
