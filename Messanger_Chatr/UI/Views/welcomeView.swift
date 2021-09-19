@@ -298,7 +298,7 @@ struct WalkthroughCell: View, Identifiable {
                     ).shadow(color: Color("buttonShadow"), radius: 20, x: 0, y: 20)
                     .opacity(cardIndex == page ? 1 : 0)
                     .scaleEffect(cardIndex == page ? 1.0 : 0.0)
-                    .offset(y: cardIndex == page ? 60 : 60)
+                    .offset(y: cardIndex == page ? 0 : 60)
                     .animation(.spring(response: 0.4, dampingFraction: 0.6, blendDuration: 0))
                 }.frame(width: Constants.screenWidth)
     }
@@ -1352,8 +1352,6 @@ struct ListView : View {
             ForEach(walkthroughData.indices) { i in
                 WalkthroughCell(page: self.$page, cardIndex: i, title: walkthroughData[i].title, subTitleText: walkthroughData[i].subtitle, imageName: walkthroughData[i].image)
                     .frame(width: Constants.screenWidth)
-                    .padding(.top)
-                    .padding(.bottom, 100)
             }
         }
     }
