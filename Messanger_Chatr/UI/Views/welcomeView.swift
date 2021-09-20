@@ -50,7 +50,7 @@ struct WalkthroughData: Identifiable {
 
 var WalkthroughDataArray = [
     WalkthroughData(title: "Messaging \nReimagined", subtitle: "A completely new way to connect. \nFun, Safe, & Free."),
-    WalkthroughData(title: "Send Anything", subtitle: "Express yourself using photos, videos,  GIF's, stickers, audio, location, or quick snaps!"),
+    WalkthroughData(title: "Send Anything", subtitle: "Express yourself using photos, videos,  GIF's, stickers, audio, location, or snaps!"),
     WalkthroughData(title: "Fast & Reliable", subtitle: "Chatr uses fast and secure servers to make it a seamless and safe experience."),
     WalkthroughData(title: "Discover Channels", subtitle: "Discover topics and grow communities through public channels.")
 ]
@@ -1042,6 +1042,7 @@ struct AddInfoView: View {
                                     .scaledToFit()
                                     .font(Font.title.weight(.medium))
                                     .frame(width: 20, height: 18, alignment: .center)
+                                    .foregroundColor(.secondary)
                             }.padding(.horizontal, 15)
                         }.buttonStyle(MainButtonStyleDeselected())
                         .frame(width: 170)

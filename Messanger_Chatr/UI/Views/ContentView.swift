@@ -409,7 +409,7 @@ struct mainHomeList: View {
                                     .padding(.top, 15)
                                     .padding(.bottom, 2.5)
                                 
-                                Text("Start a new conversation \nor discover an existing group!")
+                                Text("Start a new conversation \nor discover an existing channel!")
                                     .font(.subheadline)
                                     .foregroundColor(.secondary)
                                     .lineLimit(3)
@@ -515,7 +515,7 @@ struct mainHomeList: View {
 //                            self.isLocalOpen = false
 //                        }
                         
-                        if self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.count >= 3 {
+                        if self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.count >= 3 || self.dialogs.results.filter { $0.isDeleted != true }.count == 0 {
                             FooterInformation()
                                 .padding(.top, 140)
                                 .padding(.bottom, 25)
