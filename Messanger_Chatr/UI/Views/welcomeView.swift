@@ -46,14 +46,13 @@ struct WalkthroughData: Identifiable {
     var id = UUID()
     var title: String
     var subtitle: String
-    var image: String
 }
 
 var WalkthroughDataArray = [
-    WalkthroughData(title: "Messaging \nReimagined", subtitle: "A completely new way to connect.\nSafe. Fun. & Free.", image: "WalkthroughImage1"),
-    WalkthroughData(title: "The Most Fun", subtitle: "Send fun messages using GIFs, photos, videos, audio, location, or quick snaps!", image: "WalkthroughImage2"),
-    WalkthroughData(title: "Fast & Reliable", subtitle: "Chatr uses the fast and secure servers to make it a seamless and safe experience", image: "WalkthroughImage3"),
-    WalkthroughData(title: "Your Contacts Are Waiting", subtitle: "What are you waiting for? \nYour registered contacts are \nwaiting to for you to say hello 👋", image: "WalkthroughImage4")
+    WalkthroughData(title: "Messaging \nReimagined", subtitle: "A completely new way to connect. \nFun, Safe, & Free."),
+    WalkthroughData(title: "Send Anything", subtitle: "Express yourself using photos, videos,  GIF's, stickers, audio, location, or quick snaps!"),
+    WalkthroughData(title: "Fast & Reliable", subtitle: "Chatr uses fast and secure servers to make it a seamless and safe experience."),
+    WalkthroughData(title: "Discover Channels", subtitle: "Discover topics and grow communities through public channels.")
 ]
 
 // MARK: Main Home Body
@@ -97,8 +96,8 @@ struct MainBody: View {
                         .scaledToFit()
                         .frame(width: 60, height: 60, alignment: .center)
                         .shadow(color: Color("buttonShadow"), radius: 20, x: 0, y: 10)
-                }.padding(.all, 30)
-                .padding(.top, 10)
+                }.padding(.horizontal, 30)
+                .padding(.top, 40)
 
                 Carousel(width: Constants.screenWidth, page: self.$pageIndex, scrollOffset: self.$scrollOffset, height: Constants.screenHeight - 250)
                     .disabled(self.continuePermissions || self.continuePt1 ? true : false)
@@ -256,51 +255,62 @@ struct WalkthroughCell: View, Identifiable {
     let id = UUID()
     @State var title : String
     @State var subTitleText : String
-    @State var imageName : String
     @State var cardDrag = CGSize.zero
 
     var body: some View {
-                ZStack(alignment: .bottom) {
-                    ZStack(alignment: cardIndex == 0 ? .leading : .center) {
-                        Image("walkthrough_" + "\(cardIndex + 1)" + "_top")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: cardIndex == 0 ? Constants.screenWidth - 10 : cardIndex == 3 ? Constants.screenWidth + 60 : Constants.screenWidth)
-                            .offset(x: cardIndex == 3 ? 60 : 0)
-                            .offset(y: -Constants.screenWidth / 2)
+        VStack(alignment: .center, spacing: -140) {
+            VStack(alignment: cardIndex == 0 ? .leading : cardIndex == 3 ? .trailing : .center, spacing: cardIndex == 0 ? -(Constants.screenWidth / 3.5) : cardIndex == 2 ? -(Constants.screenWidth / 3.1) : -(Constants.screenWidth / 4.1)) {
+                Image("walkthrough_" + "\(cardIndex + 1)" + "_top")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: cardIndex == 0 ? Constants.screenWidth - 10 : cardIndex == 3 ? Constants.screenWidth + 60 : Constants.screenWidth)
+                    .offset(x: cardIndex == 3 ? 60 : 0)
+                    .offset(y: cardIndex == 0 ? 20 : 0)
+                    .offset(y: Constants.screenWidth == 375 ? (cardIndex == 1 ? 10 : cardIndex == 2 ? 20 : cardIndex == 3 ? 35 : 0) : 0)
 
-                        Image("walkthrough_" + "\(cardIndex + 1)" + "_bottom")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: cardIndex != 2 ? Constants.screenWidth / 2.15 : Constants.screenWidth - 60)
+                    .onAppear() {
+                        print("the width is: \(Constants.screenWidth)")
                     }
+                    //.offset(y: page == cardIndex && cardIndex != 0 && cardIndex != 2 ? 10 : 0)
+                    //.animation(Animation.easeInOut(duration: 3.33).repeatForever(autoreverses: page == cardIndex ? true : false))
 
-                    VStack(alignment: .center, spacing: 10) {
-                        Text(self.title)
-                            .font(.system(size: 30))
-                            .fontWeight(.bold)
-                            .lineLimit(2)
-                            .multilineTextAlignment(.center)
-                            .foregroundColor(Color.primary.opacity(0.9))
-                        
-                        Text(self.subTitleText)
-                            .font(.subheadline)
-                            .foregroundColor(Color.primary.opacity(0.9))
-                            .multilineTextAlignment(.center)
-                    }.padding(.vertical, 15)
-                    .padding(.bottom, 10)
-                    .padding(.horizontal)
-                    .frame(minWidth: Constants.screenWidth / 2, maxWidth: Constants.screenWidth - 60, alignment: .center)
-                    .background(
-                        BlurView(style: .systemUltraThinMaterial)
-                            .cornerRadius(25)
-                            .overlay(RoundedRectangle(cornerRadius: 25).stroke(Color("blurBorder"), lineWidth: 2.5))
-                    ).shadow(color: Color("buttonShadow"), radius: 20, x: 0, y: 20)
-                    .opacity(cardIndex == page ? 1 : 0)
-                    .scaleEffect(cardIndex == page ? 1.0 : 0.0)
-                    .offset(y: cardIndex == page ? 0 : 60)
-                    .animation(.spring(response: 0.4, dampingFraction: 0.6, blendDuration: 0))
-                }.frame(width: Constants.screenWidth)
+                Image("walkthrough_" + "\(cardIndex + 1)" + "_bottom")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: cardIndex == 0 ? Constants.screenWidth / 1.8 : (cardIndex == 1 ? Constants.screenWidth / 1.05 : (cardIndex == 2 ? Constants.screenWidth * 1.25 : (cardIndex == 3 ? Constants.screenWidth / 1.8 : Constants.screenWidth - 60))))
+                    .offset(y: cardIndex == 0 ? 50 : 0)
+                    .offset(y: cardIndex == 1 ? 20 : 0)
+                    .offset(y: cardIndex == 3 ? -40 : 0)
+                    //.offset(x: cardIndex == 0 ? -20 : 0)
+            }
+
+            VStack(alignment: .center, spacing: 10) {
+                Text(self.title)
+                    .font(.system(size: 30))
+                    .fontWeight(.bold)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(Color.primary.opacity(0.9))
+                
+                Text(self.subTitleText)
+                    .font(.subheadline)
+                    .foregroundColor(Color.primary.opacity(0.9))
+                    .multilineTextAlignment(.center)
+            }.padding(.vertical, 15)
+            .padding(.bottom, 10)
+            .padding(.horizontal)
+            .frame(minWidth: Constants.screenWidth / 2, maxWidth: Constants.screenWidth - 60, alignment: .center)
+            .background(
+                BlurView(style: .systemUltraThinMaterial)
+                    .cornerRadius(25)
+                    .overlay(RoundedRectangle(cornerRadius: 25).stroke(Color("blurBorder"), lineWidth: 2.5))
+            ).shadow(color: Color("buttonShadow"), radius: 20, x: 0, y: 20)
+            .opacity(cardIndex == page ? 1 : 0)
+            .scaleEffect(cardIndex == page ? 1.0 : 0.0)
+            .offset(y: cardIndex == page ? 0 : 60)
+            .animation(.spring(response: 0.4, dampingFraction: 0.6, blendDuration: 0))
+        }.frame(width: Constants.screenWidth)
+        .padding(.bottom, Constants.screenWidth <= 375 ? 20 : 60)
     }
 }
 
@@ -1350,7 +1360,7 @@ struct ListView : View {
     var body: some View{
         HStack(spacing: 0){
             ForEach(walkthroughData.indices) { i in
-                WalkthroughCell(page: self.$page, cardIndex: i, title: walkthroughData[i].title, subTitleText: walkthroughData[i].subtitle, imageName: walkthroughData[i].image)
+                WalkthroughCell(page: self.$page, cardIndex: i, title: walkthroughData[i].title, subTitleText: walkthroughData[i].subtitle)
                     .frame(width: Constants.screenWidth)
             }
         }
