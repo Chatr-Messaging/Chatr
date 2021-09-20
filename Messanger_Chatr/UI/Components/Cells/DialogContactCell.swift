@@ -201,7 +201,7 @@ struct DialogContactCell: View {
                                 self.notiType = "success"
                                 self.notiText = ("Successfully removed \(self.contact.fullName) from the ") + (isPublic ? "channel" : "group chat")
                                 self.showAlert.toggle()
-                                self.auth.sendPushNoti(userIDs: [NSNumber(value: self.contact.id)], title: isPublic ? "Remove From Channel" : "Remove From Group", message: ("\(self.auth.profile.results.first?.fullName ?? "Chatr User") removed you from the ") + (isPublic ? "channel" : "group chat"))
+                                self.auth.sendPushNoti(userIDs: [NSNumber(value: self.contact.id)], title: isPublic ? "Removed From Channel" : "Removed From Group", message: ("\(self.auth.profile.results.first?.fullName ?? "Chatr User") removed you from the ") + (isPublic ? "channel" : "group chat"))
                             }
                         }) { (error) in
                             print("Error removing contact from dialog: \(error.localizedDescription)")
