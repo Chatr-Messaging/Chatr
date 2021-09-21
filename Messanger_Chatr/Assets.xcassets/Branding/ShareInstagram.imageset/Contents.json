@@ -1,15 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "WalkthroughImage4.png",
+      "filename" : "Instagram-share.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "Instagram-share@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "Instagram-share@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

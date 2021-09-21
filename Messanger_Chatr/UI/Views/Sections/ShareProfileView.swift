@@ -145,42 +145,42 @@ struct ShareProfileView: View {
                      HStack(alignment: .center, spacing: 25) {
                          Spacer()
 
-                         Button(action: {
-                             let photo = SCSDKSnapPhoto(imageUrl: URL(string: "https://homepages.cae.wisc.edu/~ece533/images/frymire.png")!)
-                             let snap = SCSDKPhotoSnapContent(snapPhoto: photo)
-                             let sticker = SCSDKSnapSticker(stickerImage: #imageLiteral(resourceName: "iconCoin"))
-                             snap.sticker = sticker
-                             snap.caption = "Add me on Chatr! It's a simple, fun, & secure messaging app we can use to message eachother for FREE! Download at: " + Constants.appStoreLink
-                             snap.attachmentUrl = self.shareURL
-                             
-                             SCSDKSnapAPI().startSending(snap, completionHandler: { error in
-                                 print("Shared \(self.shareURL)) on SnapChat.")
-                                 if let error = error {
-                                     print(error.localizedDescription)
-                                     UINotificationFeedbackGenerator().notificationOccurred(.error)
-                                 } else {
-                                     UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                 }
-                             })
-                         }) {
-                             VStack {
-                                 Image("snapchatIcon")
-                                     .resizable()
-                                     .scaledToFit()
-                                     .frame(width: 28, height: 26, alignment: .center)
-                                     .foregroundColor(.white)
-
-                                 Text("Snapchat")
-                                     .font(.caption)
-                                     .fontWeight(.medium)
-                                     .foregroundColor(.black)
-                                     .offset(y: -2)
-                             }.frame(width: 80, height: 60, alignment: .center)
-                             .background(Color(red: 255/255, green: 252/255, blue: 0/255, opacity: 1.0))
-                             .cornerRadius(12.5)
-                             .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 3)
-                             .shadow(color: Color(red: 255/255, green: 252/255, blue: 0/255, opacity: 0.3), radius: 20, x: 0, y: 10)
-                         }.buttonStyle(ClickButtonStyle())
+//                         Button(action: {
+//                             let photo = SCSDKSnapPhoto(imageUrl: URL(string: "https://homepages.cae.wisc.edu/~ece533/images/frymire.png")!)
+//                             let snap = SCSDKPhotoSnapContent(snapPhoto: photo)
+//                             let sticker = SCSDKSnapSticker(stickerImage: #imageLiteral(resourceName: "walkthrough_2_bottom"))
+//                             snap.sticker = sticker
+//                             snap.caption = "Add me on Chatr! It's a simple, fun, & secure messaging app we can use to message eachother for FREE! Download at: " + Constants.appStoreLink
+//                             snap.attachmentUrl = self.shareURL
+//
+//                             SCSDKSnapAPI().startSending(snap, completionHandler: { error in
+//                                 print("Shared \(self.shareURL)) on SnapChat.")
+//                                 if let error = error {
+//                                     print(error.localizedDescription)
+//                                     UINotificationFeedbackGenerator().notificationOccurred(.error)
+//                                 } else {
+//                                     UINotificationFeedbackGenerator().notificationOccurred(.success)
+//                                 }
+//                             })
+//                         }) {
+//                             VStack {
+//                                 Image("snapchatIcon")
+//                                     .resizable()
+//                                     .scaledToFit()
+//                                     .frame(width: 28, height: 26, alignment: .center)
+//                                     .foregroundColor(.white)
+//
+//                                 Text("Snapchat")
+//                                     .font(.caption)
+//                                     .fontWeight(.medium)
+//                                     .foregroundColor(.black)
+//                                     .offset(y: -2)
+//                             }.frame(width: 80, height: 60, alignment: .center)
+//                             .background(Color(red: 255/255, green: 252/255, blue: 0/255, opacity: 1.0))
+//                             .cornerRadius(12.5)
+//                             .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 3)
+//                             .shadow(color: Color(red: 255/255, green: 252/255, blue: 0/255, opacity: 0.3), radius: 20, x: 0, y: 10)
+//                         }.buttonStyle(ClickButtonStyle())
                          
                          Button(action: {
                              UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
@@ -192,12 +192,14 @@ struct ShareProfileView: View {
                                      .scaledToFit()
                                      .frame(width: 26, height: 26, alignment: .center)
                                      .foregroundColor(.white)
+                                     .offset(y: 2)
                                  
                                  Text("Instagram")
                                      .font(.caption)
                                      .fontWeight(.medium)
                                      .foregroundColor(.primary)
-                             }.frame(width: 80, height: 60, alignment: .center)
+                                     .offset(y: 2)
+                             }.frame(width: 100, height: 64, alignment: .center)
                              .background(Color("buttonColor"))
                              .cornerRadius(12.5)
                              .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 3)
@@ -213,12 +215,14 @@ struct ShareProfileView: View {
                                      .scaledToFit()
                                      .frame(width: 26, height: 26, alignment: .center)
                                      .foregroundColor(.white)
+                                     .offset(y: 2)
 
                                  Text("Scan QR")
                                      .font(.caption)
                                      .fontWeight(.medium)
                                      .foregroundColor(.white)
-                             }.frame(width: 80, height: 60, alignment: .center)
+                                     .offset(y: 2)
+                             }.frame(width: 100, height: 64, alignment: .center)
                              .background(Color.blue)
                              .cornerRadius(12.5)
                              .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
@@ -414,10 +418,10 @@ struct ShareProfileView: View {
     }
     
     func shareBackgroundImage() {
-        let image = UIImage(imageLiteralResourceName: "SoftChatBubbles_DarkWallpaper")
-        let sticker = UIImage(imageLiteralResourceName: "like")
+        let image = UIImage(imageLiteralResourceName: "ShareInstagram")
+        //let sticker = UIImage(imageLiteralResourceName: "like")
 
-        InstagramStories.Shared.post(bgImage: image, stickerImage: sticker, contentURL: self.shareURL)
+        InstagramStories.Shared.post(bgImage: image, contentURL: self.shareURL)
     }
 
     func forwardContact() {
