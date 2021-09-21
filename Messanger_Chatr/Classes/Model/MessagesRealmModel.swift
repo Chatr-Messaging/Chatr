@@ -1188,19 +1188,26 @@ class changeMessageRealmData {
                     try realm.safeWrite {
                         realmContact.messageState = .isTyping
                         realmContact.date = Date()
+                        realmContact.senderID = Int(userID) ?? 0
+                        realmContact.positionRight = false
                         realm.add(realmContact, update: .all)
+                        
+                        self.checkSingleSurroundingValues(message: realmContact, completion: {  })
                     }
                 }
             } else {
                 let newData = MessageStruct()
                 newData.id = userID
                 newData.senderID = Int(userID) ?? 0
+                newData.positionRight = false
                 newData.dialogID = dialogID
                 newData.date = Date()
                 newData.messageState = .isTyping
                 
                 try realm.safeWrite {
                     realm.add(newData, update: .all)
+                    
+                    self.checkSingleSurroundingValues(message: newData, completion: {  })
                 }
             }
         } catch {
