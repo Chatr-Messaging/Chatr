@@ -57,7 +57,7 @@ struct MembershipView: View {
             //MARK: List Section
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 20) {
-                    VStack(alignment: .leading, spacing: 20) {
+                    VStack(alignment: .leading, spacing: 25) {
                         Spacer()
                         
                         //Seal the Deal
@@ -139,33 +139,34 @@ struct MembershipView: View {
                         }
                         
                         //Discovered Storage
-                        HStack(alignment: .top) {
-                            Image(systemName: "person.2")
-                                .resizable()
-                                .scaledToFit()
-                                .font(Font.title.weight(.bold))
-                                .frame(width: 40, height: 40, alignment: .center)
-                                .foregroundColor(.white)
-                                .padding(.trailing, 15)
-                            
-                            VStack(alignment: .leading) {
-                                Text("Support a Startup")
-                                    .font(.headline)
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.white)
-                                    .shadow(color: Color.black.opacity(0.4), radius: 3, x: 0, y: 0)
-                                    .padding(.bottom, 0)
-                                
-                                Text("Supporting ensures this project lives on and features keep coming.")
-                                    .font(.subheadline)
-                                    .fontWeight(.medium)
-                                    .shadow(color: Color.black.opacity(0.25), radius: 3, x: 0, y: 0)
-                                    .foregroundColor(.white)
-                                    .opacity(0.8)
-                            }
-                        }
+//                        HStack(alignment: .top) {
+//                            Image(systemName: "person.2")
+//                                .resizable()
+//                                .scaledToFit()
+//                                .font(Font.title.weight(.bold))
+//                                .frame(width: 40, height: 40, alignment: .center)
+//                                .foregroundColor(.white)
+//                                .padding(.trailing, 15)
+//
+//                            VStack(alignment: .leading) {
+//                                Text("Support a Startup")
+//                                    .font(.headline)
+//                                    .fontWeight(.semibold)
+//                                    .foregroundColor(.white)
+//                                    .shadow(color: Color.black.opacity(0.4), radius: 3, x: 0, y: 0)
+//                                    .padding(.bottom, 0)
+//
+//                                Text("Supporting ensures this project lives on and features keep coming.")
+//                                    .font(.subheadline)
+//                                    .fontWeight(.medium)
+//                                    .shadow(color: Color.black.opacity(0.25), radius: 3, x: 0, y: 0)
+//                                    .foregroundColor(.white)
+//                                    .opacity(0.8)
+//                            }
+//                        }
                     }
                     //}.frame(maxHeight: Constants.screenHeight / 3 + 25, alignment: .center)
+                    .padding(.vertical)
                     
                     Spacer()
                     HStack(spacing: 10) {

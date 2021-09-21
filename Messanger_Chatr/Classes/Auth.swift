@@ -297,7 +297,7 @@ class AuthModel: NSObject, ObservableObject {
     }
 
     private func processInfo(info: Purchases.PurchaserInfo?) {
-        if info?.entitlements.all["Premium"]?.isActive != true {
+        if info?.entitlements.all["Premium"]?.isActive == true {
             print("has purchased")
             self.subscriptionStatus = .subscribed
             UserDefaults.standard.set(true, forKey: "premiumSubscriptionStatus")
