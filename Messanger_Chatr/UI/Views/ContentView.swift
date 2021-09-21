@@ -37,6 +37,7 @@ struct HomeView: View {
                     Text("")
                         .onAppear(perform: {
                             //ChatrApp.connect()
+                            self.auth.initIAPurchase()
 
                             if self.auth.profile.results.first?.isLocalAuthOn ?? false {
                                 self.auth.isLoacalAuth = true
@@ -182,7 +183,7 @@ struct mainHomeList: View {
     @State var selectedQuickSnapContact: ContactStruct = ContactStruct()
     @Namespace var namespace
     @ObservedObject var dialogs = DialogRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(DialogStruct.self))
-    let wallpaperNames = ["", "SoftChatBubbles_DarkWallpaper", "SoftPaperAirplane-Wallpaper", "oldHouseWallpaper", "nycWallpaper", "michaelAngelWallpaper"]
+    let wallpaperNames = ["", "SoftChatBubbles_DarkWallpaper", "SoftPaperAirplane-Wallpaper", "oldHouseWallpaper", "nycWallpaper", "michaelAngelWallpaper", "moonWallpaper", "patagoniaWallpaper", "oceanRocksWallpaper", "southAfricaWallpaper", "flowerWallpaper", "paintWallpaper"]
     
     var body: some View {
         ZStack {

@@ -38,7 +38,7 @@ struct MessageReplyCell: View {
                         self.viewModel.deleteReply(messageId: self.reply.id, completion: {
                             UINotificationFeedbackGenerator().notificationOccurred(.success)
 
-                            self.auth.notificationtext = "Successfully Deleted Reply"
+                            self.auth.notificationtext = "Deleted reply"
                             NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
                         })
                     }) {
@@ -51,7 +51,7 @@ struct MessageReplyCell: View {
                         self.viewModel.sendReplyReport(replyStruct: self.reply, name: self.auth.profile.results.last?.fullName ?? "A user", completion: {
                             UINotificationFeedbackGenerator().notificationOccurred(.success)
 
-                            self.auth.notificationtext = "Successfully Reported Reply"
+                            self.auth.notificationtext = "Reported reply"
                             NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
                         })
                     }) {

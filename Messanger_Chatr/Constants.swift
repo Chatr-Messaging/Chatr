@@ -42,7 +42,7 @@ struct Constants {
     static let uploadcare55x55Transform = "/-/resize/55x55/-/stretch/off/"
     static let uploadcareStandardVideoTransform = "/-/video/-/size/\(Constants.screenWidth * 0.65)x/-/quality/normal/"
 
-    static let projectVersion = "0.9989"
+    static let projectVersion = "1.0.0"
     static let appStoreLink = "https://bit.ly/35fMzUg"
 
     static let allowedHosts = [".com", ".me", ".org", ".io", ".edu", ".net", ".app", ".web", ".co", ".uk", ".us", ".gov", ".biz", ".info", ",jobs", ".ly", ".name", ".xyz"]

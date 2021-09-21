@@ -556,7 +556,7 @@ struct ContainerBubble: View {
             } else {
                 changeDialogRealmData.shared.addDialogPin(messageId: self.message.id, dialogID: self.message.dialogID)
                 self.reactions[1] = "unpin"
-                auth.notificationtext = "Successfully pined message"
+                auth.notificationtext = "Pined message"
                 NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
             }
         })
@@ -586,7 +586,7 @@ struct ContainerBubble: View {
                             UINotificationFeedbackGenerator().notificationOccurred(.error)
                         } else {
                             DispatchQueue.main.async {
-                                auth.notificationtext = "Successfully saved video"
+                                auth.notificationtext = "Saved video"
                                 NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
                             }
                             UINotificationFeedbackGenerator().notificationOccurred(.success)
@@ -609,7 +609,7 @@ struct ContainerBubble: View {
                         UINotificationFeedbackGenerator().notificationOccurred(.error)
                     } else {
                         DispatchQueue.main.async {
-                            auth.notificationtext = "Successfully saved image"
+                            auth.notificationtext = "Saved image"
                             NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
                         }
                         UINotificationFeedbackGenerator().notificationOccurred(.success)

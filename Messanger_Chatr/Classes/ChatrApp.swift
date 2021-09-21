@@ -63,7 +63,7 @@ extension ChatrApp {
                     changeContactsRealmData.shared.observeQuickSnaps()
                     changeProfileRealmDate.shared.observeFirebaseUser(with: Int(id))
                     joinInitOpenDialog()
-                    auth.initIAPurchase()
+                    //auth.initIAPurchase()
                 }
             }
         }

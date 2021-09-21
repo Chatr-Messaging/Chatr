@@ -159,7 +159,7 @@ struct PinnedSectionView: View {
                 NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
             } else {
                 changeDialogRealmData.shared.addDialogPin(messageId: message.id, dialogID: message.dialogID)
-                auth.notificationtext = "Successfully pined message"
+                auth.notificationtext = "Pined message"
                 NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
             }
         })

@@ -297,13 +297,13 @@ class AuthModel: NSObject, ObservableObject {
     }
 
     private func processInfo(info: Purchases.PurchaserInfo?) {
-        if info?.entitlements.all["Premium"]?.isActive == true {
-            print("has purched")
+        if info?.entitlements.all["Premium"]?.isActive != true {
+            print("has purchased")
             self.subscriptionStatus = .subscribed
             UserDefaults.standard.set(true, forKey: "premiumSubscriptionStatus")
             Database.database().reference().child("Users").child("\(Session.current.currentUserID)").updateChildValues(["isPremium" : true])
         } else {
-            print("has NOT purched: \(String(describing: info?.entitlements.all)) && \(String(describing: info?.entitlements.all["Premium"]?.isSandbox))")
+            print("has NOT purchased: \(String(describing: info?.entitlements.all)) && \(String(describing: info?.entitlements.all["Premium"]?.isSandbox))")
             self.subscriptionStatus = .notSubscribed
             UserDefaults.standard.set(false, forKey: "premiumSubscriptionStatus")
             Database.database().reference().child("Users").child("\(Session.current.currentUserID)").updateChildValues(["isPremium" : false])

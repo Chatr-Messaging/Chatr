@@ -716,7 +716,7 @@ struct KeyboardCardView: View {
                                     self.isVisiting = ""
                                 }
                                 UserDefaults.standard.set("", forKey: "visitingDialogId")
-                                self.auth.notificationtext = "Successfully joined channel"
+                                self.auth.notificationtext = "Joined channel"
                                 NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
                             })
                         }, onError: { err in

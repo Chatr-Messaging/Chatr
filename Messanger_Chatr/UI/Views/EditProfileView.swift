@@ -109,7 +109,7 @@ struct EditProfileView: View {
                                     self.auth.setUserAvatar(imageId: imageId, oldLink: self.auth.profile.results.first?.avatar ?? "", completion: { success in
                                         print("DONEEE SETTING UP URL! \(success)")
                                         UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                        auth.notificationtext = "Successfully updated profile image"
+                                        auth.notificationtext = "Updated profile image"
                                         NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
                                     })
                                 }

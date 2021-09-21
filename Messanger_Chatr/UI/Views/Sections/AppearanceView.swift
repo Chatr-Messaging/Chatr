@@ -46,9 +46,15 @@ struct appearanceView: View {
         WallpaperData(title: "Empty", image: "", selected: false, isPremium: false),
         WallpaperData(title: "Chat Bubbles", image: "SoftChatBubbles_DarkWallpaper", selected: false, isPremium: false),
         WallpaperData(title: "Paper Airplanes", image: "SoftPaperAirplane-Wallpaper", selected: false, isPremium: true),
-        WallpaperData(title: "Old House", image: "oldHouseWallpaper", selected: false, isPremium: true),
+        WallpaperData(title: "Night Sky", image: "oldHouseWallpaper", selected: false, isPremium: true),
         WallpaperData(title: "New York City", image: "nycWallpaper", selected: false, isPremium: true),
-        WallpaperData(title: "Michael Angelo", image: "michaelAngelWallpaper", selected: false, isPremium: true)
+        WallpaperData(title: "Michael Angelo", image: "michaelAngelWallpaper", selected: false, isPremium: true),
+        WallpaperData(title: "Moon", image: "moonWallpaper", selected: false, isPremium: true),
+        WallpaperData(title: "Patagonia", image: "patagoniaWallpaper", selected: false, isPremium: true),
+        WallpaperData(title: "Ocean Rocks", image: "oceanRocksWallpaper", selected: false, isPremium: true),
+        WallpaperData(title: "South Africa", image: "southAfricaWallpaper", selected: false, isPremium: true),
+        WallpaperData(title: "Flowers", image: "flowerWallpaper", selected: false, isPremium: true),
+        WallpaperData(title: "Paint", image: "paintWallpaper", selected: false, isPremium: true)
     ]
     
     let wallpaperLayout = [

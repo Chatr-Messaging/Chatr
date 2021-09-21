@@ -742,7 +742,7 @@ struct BubbleDetailView: View {
                 NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
             } else {
                 changeDialogRealmData.shared.addDialogPin(messageId: self.message.id, dialogID: self.message.dialogID)
-                auth.notificationtext = "Successfully pined message"
+                auth.notificationtext = "Pined message"
                 NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
             }
         })
@@ -759,7 +759,7 @@ struct BubbleDetailView: View {
                     print(error.localizedDescription)
                 } else {
                     DispatchQueue.main.async {
-                        auth.notificationtext = "Successfully saved image"
+                        auth.notificationtext = "Saved image"
                         NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
                     }
                     UINotificationFeedbackGenerator().notificationOccurred(.success)
