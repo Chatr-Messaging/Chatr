@@ -127,6 +127,7 @@ struct HomeView: View {
                 .disabled(self.auth.isUserAuthenticated == .signedIn ? false : true)
             
         }.background(Color("deadViewBG"))
+        .edgesIgnoringSafeArea(.all)
         .onOpenURL { url in
             let link = url.absoluteString
             print("opened from URL!! :D \(link)")

@@ -206,7 +206,7 @@ struct DiscoverView: View {
 
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 0) {
-                                    ForEach(self.bannerDataArray.indices, id: \.self) { index in
+                                    ForEach(self.bannerDataArray.indices.reversed(), id: \.self) { index in
                                         DiscoverFeaturedCell(dismissView: self.$dismissView, showPinDetails: self.$showPinDetails, openNewDialogID: self.$openNewDialogID, dialogModel: self.bannerDataArray[index])
                                             .environmentObject(self.auth)
                                             .frame(width: Constants.screenWidth * 0.68)
