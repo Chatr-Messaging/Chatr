@@ -82,7 +82,7 @@ struct KeyboardCardView: View {
                     }.buttonStyle(ClickButtonStyle())
                     .padding(.bottom, 4)
                     .sheet(isPresented: self.$isShareChannelOpen, onDismiss: {
-                        print("printz dismiss share dia")
+                        //print("printz dismiss share dia")
                     }) {
                         NavigationView() {
                             ShareProfileView(dimissView: self.$isShareChannelOpen, contactID: 0, dialogID: self.auth.selectedConnectyDialog?.id, contactFullName: self.auth.selectedConnectyDialog?.name ?? "", contactAvatar: self.auth.selectedConnectyDialog?.photo ?? "", isPublicDialog: true, totalMembers: 0).environmentObject(self.auth)
@@ -521,7 +521,6 @@ struct KeyboardCardView: View {
                                 let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: identifiers, options: nil)
 
                                 fetchResult.enumerateObjects { [self] (asset, index, _) in
-                                    print("rannn ayyy yooooooo")
                                     self.imagePicker.extractPreviewData(asset: asset, auth: self.auth, completion: {
                                         self.checkAttachments()
                                     })
@@ -543,7 +542,6 @@ struct KeyboardCardView: View {
                         .buttonStyle(keyboardButtonStyle())
                         .sheet(isPresented: self.$presentGIF, onDismiss: {
                             guard gifURL != "", self.gifRatio != 0.0, !self.gifData.contains(where: { $0.url == self.gifURL }) else { return }
-                            print("the adding gif url is: \(gifURL.description) and ratio: \(self.gifRatio)")
 
                             self.gifData.append(GIFMediaAsset(url: self.gifURL, mediaRatio: self.gifRatio))
                             self.checkAttachments()
@@ -705,7 +703,6 @@ struct KeyboardCardView: View {
                 */
             } else {
                 Button(action: {
-                    print("join ehhh")
                     Request.subscribeToPublicDialog(withID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "", successBlock: { dialogz in
                         changeDialogRealmData.shared.toggleFirebaseMemberCount(dialogId: dialogz.id ?? "", isJoining: true, totalCount: Int(dialogz.occupantsCount), onSuccess: { _ in
                             changeDialogRealmData.shared.insertDialogs([dialogz], completion: {
@@ -720,7 +717,6 @@ struct KeyboardCardView: View {
                                 NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
                             })
                         }, onError: { err in
-                            print("there is an error visiting the member count: \(String(describing: err))")
                             UINotificationFeedbackGenerator().notificationOccurred(.error)
                         })
                     }) { (error) in

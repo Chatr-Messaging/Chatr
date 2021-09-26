@@ -56,7 +56,6 @@ struct HighlightedContactCell: View {
                     
                     if self.contact.isMyContact {
                         Button(action: {
-                            print("Favourite tap")
                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             if self.contact.isFavourite {
                                 changeContactsRealmData.shared.updateContactFavouriteStatus(userID: UInt(self.contact.id), favourite: false)
@@ -121,7 +120,6 @@ struct HighlightedContactCell: View {
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                         self.quickSnapViewState = .camera
                         self.selectedQuickSnapContact = self.contact
-                        print("camera...")
                     }) {
                         Image("SnapIcon")
                             .resizable()

@@ -16,7 +16,7 @@ struct HomeBannerCard: View {
     var body: some View {
         ZStack(alignment: .topTrailing) {
             Button(action: {
-                print("discover more")
+                //print("discover more")
             }) {
                 Image("banner")
                     .resizable()

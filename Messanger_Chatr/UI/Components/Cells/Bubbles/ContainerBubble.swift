@@ -388,7 +388,6 @@ struct ContainerBubble: View {
                 self.hasUserDisliked = self.message.dislikedId.contains(self.auth.profile.results.first?.id ?? 0)
 
                 self.viewModel.fetchReplyCount(message: self.message, completion: { count in
-                    print("the total reply count is: \(count)")
                     self.replyCount = count
                 })
             }
@@ -406,7 +405,6 @@ struct ContainerBubble: View {
                 let y = value.translation.width
                 let c = value.startLocation.x
 
-                print("the y value is: \(y) start location: \(c) &&7 noww")
                 if message.messageState != .error {
                     if messagePosition == .right && (Int(Constants.screenWidth) / 2 - 50 > self.message.bubbleWidth || c > Constants.screenWidth / 2 - 75) {
                         self.dragLeftInteraction(y: y)
@@ -517,7 +515,7 @@ struct ContainerBubble: View {
     }
 
     func tryAgain() {
-        print("try again action")
+        //print("try again action")
     }
     
     func openReplyDetailView() {
@@ -546,7 +544,6 @@ struct ContainerBubble: View {
     }
 
     func pinMessage() {
-        print("the pinning message id is: \(self.message.id.description)")
         self.viewModel.pinMessage(message: self.message, completion: { added in
             if !added {
                 changeDialogRealmData.shared.removeDialogPin(messageId: self.message.id, dialogID: self.message.dialogID)
@@ -601,7 +598,6 @@ struct ContainerBubble: View {
                     request.addResource(with: .photo, data: imageData, options: nil)
                 }) { (success, error) in
                     if let error = error {
-                        print(error.localizedDescription)
                         DispatchQueue.main.async {
                             auth.notificationtext = "Error saving image"
                             NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
@@ -631,7 +627,6 @@ struct ContainerBubble: View {
                 if typeLike == "likes" {
                     changeMessageRealmData.shared.updateMessageLikeAdded(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
                     self.hasUserLiked = self.message.likedId.contains(profileID)
-                    print("liked added: contain: \(self.message.likedId.contains(profileID)) && my id: \(profileID)")
                 } else if typeLike == "dislikes" {
                     changeMessageRealmData.shared.updateMessageDislikeAdded(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
                     self.hasUserDisliked = self.message.dislikedId.contains(profileID)

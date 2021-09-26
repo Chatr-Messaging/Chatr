@@ -53,7 +53,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
-        print("scene did disconnect")
+        //print("scene did disconnect")
         // Called as the scene is being released by the system.
         // This occurs shortly after the scene enters the background, or when its session is discarded.
         // Release any resources associated with this scene that can be re-created the next time the scene connects.
@@ -62,12 +62,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
         if let incomingURL = userActivity.webpageURL {
-            print("have received incoming link!: \(incomingURL)")
             DynamicLinks.dynamicLinks().handleUniversalLink(incomingURL, completion: { (dynamicLink, error) in
-                guard error == nil else {
-                    print("found erre: \(String(describing: error?.localizedDescription))")
-                    return
-                }
+                guard error == nil else { return }
+
                 if let dynamicLink = dynamicLink {
                     self.environment.handleIncomingDynamicLink(dynamicLink)
                 }
@@ -76,7 +73,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     
     func sceneDidBecomeActive(_ scene: UIScene) {
-        print("scene did become active")
+        //print("scene did become active")
         //if self.environment.isUserAuthenticated == .signedIn {
             //changeContactsRealmData.shared.updateContacts(contactList: Chat.instance.contactList?.contacts ?? [], completion: { _ in })
 //            changeContactsRealmData.shared.observeQuickSnaps()
@@ -93,7 +90,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func sceneWillResignActive(_ scene: UIScene) {
-        print("scene will resign active")
+        //print("scene will resign active")
         if self.environment.isUserAuthenticated == .signedIn {
             if self.environment.profile.results.first?.isLocalAuthOn ?? false {
                 self.environment.isLoacalAuth = true
@@ -111,55 +108,45 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneWillEnterForeground(_ scene: UIScene) {
         // Called as the scene transitions from the background to the foreground.
         // Use this method to undo the changes made on entering the background.
-        print("scene will enter foreground \(Thread.isMainThread)")
+        //print("scene will enter foreground \(Thread.isMainThread)")
         self.environment.configureFirebaseStateDidChange()
 
-        //DispatchQueue.global(qos: .background).async {
-            if self.environment.isUserAuthenticated == .signedIn {
-                DispatchQueue.main.async {
-                    ChatrApp.connect()
-                    self.sendLocalAuth()
-                    UserDefaults.standard.set(Session.current.currentUserID, forKey: "currentUserID")
-                }
+        if self.environment.isUserAuthenticated == .signedIn {
+            DispatchQueue.main.async {
+                ChatrApp.connect()
+                self.sendLocalAuth()
+                UserDefaults.standard.set(Session.current.currentUserID, forKey: "currentUserID")
             }
-            
-            StoreReviewHelper.incrementAppOpenedCount()
-            StoreReviewHelper.checkAndAskForReview()
-        //}
+        }
+        
+        StoreReviewHelper.incrementAppOpenedCount()
+        StoreReviewHelper.checkAndAskForReview()
     }
     
     func sceneDidEnterBackground(_ scene: UIScene) {
-        //DispatchQueue.main.async {
-            print("scene did enter background")
-            if self.environment.isUserAuthenticated == .signedIn {
-                if let dialog = self.environment.selectedConnectyDialog {
-                    dialog.sendUserStoppedTyping()
-                }
-
-                self.badgeNum = 0
-                for dia in self.environment.dialogs.results.filter({ $0.isDeleted != true }) {
-                    badgeNum += dia.notificationCount
-                }
-                UIApplication.shared.applicationIconBadgeNumber = badgeNum + (self.environment.profile.results.first?.contactRequests.count ?? 0)
-                
-                //This causes a crash for some reason...not anymore because of print
-                Chat.instance.disconnect { (error) in
-                    print("chat instance did disconnect \(String(describing: error?.localizedDescription))")
-                }
+        //print("scene did enter background")
+        if self.environment.isUserAuthenticated == .signedIn {
+            if let dialog = self.environment.selectedConnectyDialog {
+                dialog.sendUserStoppedTyping()
             }
-        //}
+
+            self.badgeNum = 0
+            for dia in self.environment.dialogs.results.filter({ $0.isDeleted != true }) {
+                badgeNum += dia.notificationCount
+            }
+            UIApplication.shared.applicationIconBadgeNumber = badgeNum + (self.environment.profile.results.first?.contactRequests.count ?? 0)
+            
+            //This causes a crash for some reason...not anymore because of print
+            Chat.instance.disconnect { _ in }
+        }
         // Called as the scene transitions from the foreground to the background.
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.
     }
     
     private func sendLocalAuth() {
-        print("Scene AppDelegate Used")
-        guard self.environment.profile.results.first?.isLocalAuthOn == true else {
-            return
-        }
+        guard self.environment.profile.results.first?.isLocalAuthOn == true else { return }
 
-        print("Scene AppDelegate - Realm True")
         self.environment.isLoacalAuth = true
         let context = LAContext()
         var error: NSError?

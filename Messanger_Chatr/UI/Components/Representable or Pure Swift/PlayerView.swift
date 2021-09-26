@@ -93,7 +93,6 @@ struct DetailVideoPlayer: UIViewControllerRepresentable {
                     let m = Int(timeRemain / 60)
                     let s = Int(timeRemain.truncatingRemainder(dividingBy: 60))
                     self.viewModel.videoTimeText = String(format: "%d:%02d", arguments: [m, s])
-                    print("the total duration is: \(self.viewModel.videoTimeText)")
                 }
             }
         }

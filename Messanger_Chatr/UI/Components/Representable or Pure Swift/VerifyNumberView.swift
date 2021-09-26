@@ -14,12 +14,11 @@ struct VerifyNumberViewController: UIViewControllerRepresentable {
 
     func makeUIViewController(context: Context) -> VerifyUIViewController {
         let vc =  VerifyUIViewController()
-        print("\nmakeUIViewController \(vc)")
         return vc
     }
 
     func updateUIViewController(_ uiViewController: VerifyUIViewController, context: Context) {
-        print("updateUIViewController \(uiViewController)")
+        //print("updateUIViewController \(uiViewController)")
     }
 }
 
@@ -39,8 +38,7 @@ class VerifyUIViewController: UIViewController {
         //self.otpView.cursorColor = UIColor(named: "textColor")!
         //self.otpView.otpTextFieldBorderWidth = 2
         // self.otpView.becomeFirstResponder()
-        self.otpView.otpEnteredString = { pin in
-            print("The entered pin is \(pin)")
+        self.otpView.otpEnteredString = { _ in
             //self.authM.checkSecurityCode(securityCode: pin)
         }
         self.view.addSubview(self.otpView)
@@ -53,10 +51,9 @@ class VerifyUIViewController: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         self.otpView.removeFromSuperview()
-        print("viewWillDissapear \(self)")
     }
 
     deinit {
-        print("DEINIT \(self)")
+        //print("DEINIT \(self)")
     }
 }

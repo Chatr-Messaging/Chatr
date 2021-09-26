@@ -76,10 +76,6 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
                     defer {
                         semaphore.signal()
                     }
-                    
-                    if let error = error {
-                        print("the error uploading direct files: " + error.debugDescription)
-                    }
 
                     guard let uploadData = resultDictionary, let fileId = uploadData.first?.value else {
                         return
@@ -87,7 +83,6 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
                     
                     DispatchQueue.main.async {
                         self.selectedPhotos[foundMediaIndex].uploadId = fileId
-                        print("success uploading direct file.xxxx Here is the data: " + "\(fileId)")
                     }
                 }
 
@@ -105,7 +100,6 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
             
             self.uploadcare.uploadAPI.upload(files: [filename: data], store: .doNotStore, { (progress) in
                 DispatchQueue.main.async {
-                    print("the upload progress is: \(progress)")
                     self.selectedPhotos[foundMediaIndex].progress = CGFloat(progress)
                 }
             }) { (resultDictionary, error) in
@@ -114,10 +108,6 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
                 }
 
                 DispatchQueue.main.async {
-                    if let error = error {
-                        print("the error uploading direct files: " + error.debugDescription)
-                    }
-
                     guard let uploadData = resultDictionary, let fileId = uploadData.first?.value else {
                         return
                     }
@@ -126,14 +116,11 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
                 
                     self.selectedPhotos[foundMediaIndex].uploadId = fileId
                     self.selectedPhotos[foundMediaIndex].mediaRatio = Double(imageRatio)
-                    print("success uploading direct file. 4353543545Here is the data: " + "\(fileId) && ratio: \(imageRatio)")
+
                     if self.selectedPhotos[foundMediaIndex].canSend {
-                        print("sending message now. Here is the id: " + "\(fileId)")
                         DispatchQueue.main.async {
                             self.sendPhotoMessage(attachment: self.selectedPhotos[foundMediaIndex], auth: auth, completion: {  })
                         }
-                    } else {
-                        print("error can send not allowed yet. Here is the id: " + "\(fileId)")
                     }
                 }
             }
@@ -151,23 +138,18 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
             Request.uploadFile(with: videoData, fileName: filename, contentType: "video/mov", isPublic: true, progressBlock: { (progress) in
                 DispatchQueue.main.async {
                     self.selectedVideos[foundMediaIndex].progress = CGFloat(progress)
-                    print("the progress uploading the video is: \(progress * 100)%")
                 }
             }, successBlock: { (blob) in
                 DispatchQueue.main.async {
                     guard let blobUid = blob.uid else { return }
                     
                     self.storage?.async.setObject(videoData, forKey: Constants.uploadcareBaseVideoUrl + blobUid, completion: { test in
-                        print("the testtt data is: \(test)")
                         
                         self.selectedVideos[foundMediaIndex].uploadId = blobUid
                         if self.selectedVideos[foundMediaIndex].canSend {
-                            print("sending message now. Here is the id: " + "\(blobUid)")
                             DispatchQueue.main.async {
                                 self.sendVideoMessage(auth: auth)
                             }
-                        } else {
-                            print("error can send not allowed yet. video Here is the id: " + "\(blobUid)")
                         }
                     })
                 }
@@ -213,19 +195,15 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
             let filename = "\(media.id)_videoImage_" + Date().description.replacingOccurrences(of: " ", with: "")
             let semaphore = DispatchSemaphore(value: 0)
             
-            self.uploadcare.uploadAPI.upload(files: [filename: data], store: .doNotStore, { (progress) in
-                DispatchQueue.main.async {
-                    print("the upload video image progress is: \(progress)")
-                }
+            self.uploadcare.uploadAPI.upload(files: [filename: data], store: .doNotStore, { _ in
+//                DispatchQueue.main.async {
+//                    print("the upload video image progress is: \(progress)")
+//                }
             }) { (resultDictionary, error) in
                 defer {
                     semaphore.signal()
                 }
                 
-                if let error = error {
-                    print("the error uploading direct files: " + error.debugDescription)
-                }
-
                 guard let uploadData = resultDictionary, let fileId = uploadData.first?.value else {
                     return
                 }
@@ -235,14 +213,11 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
                 DispatchQueue.main.async {
                     self.selectedVideos[foundMediaIndex].placeholderId = fileId
                     self.selectedVideos[foundMediaIndex].mediaRatio = Double(imageRatio)
-                    print("success uploading direct file. Here is the data: " + "\(fileId) &&s ratio: \(imageRatio)")
+
                     if self.selectedVideos[foundMediaIndex].canSend {
-                        print("sending message now. Here is the id: " + "\(fileId)")
                         DispatchQueue.main.async {
                             self.sendVideoMessage(auth: auth)
                         }
-                    } else {
-                        print("error can send not allowed yet. Here is the id: " + "\(fileId)")
                     }
                 }
             }
@@ -254,10 +229,8 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
     func sendPhotoMessage(attachment: KeyboardMediaAsset, auth: AuthModel, completion: @escaping () -> Void) {
         guard let selectedDialog = auth.dialogs.results.filter("id == %@", UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").first else { return }
         
-        print("running through photo: \(attachment.id)")
         guard let uploadedId = attachment.uploadId, let ratio = attachment.mediaRatio else {
             if let index = self.selectedPhotos.firstIndex(of: attachment) {
-                print("had the save for after upload: \(attachment.id)")
                 self.selectedPhotos[index].canSend = true
             }
             completion()
@@ -279,14 +252,11 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
         message.attachments = [attachmentz]
         
         pDialog.send(message) { (error) in
-            print("SENT image...")
             changeMessageRealmData.shared.insertMessage(message, completion: {
                 if error != nil {
-                    print("error sending attachment: \(String(describing: error?.localizedDescription))")
                     changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .error)
                     completion()
                 } else {
-                    print("Success sending attachment to ConnectyCube server!")
                     changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
                     if let index = self.selectedPhotos.firstIndex(of: attachment), let storeId = self.selectedPhotos[index].uploadId {
                         self.selectedPhotos.remove(at: index)
@@ -302,10 +272,8 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
         guard let selectedDialog = auth.dialogs.results.filter("id == %@", UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").first else { return }
 
         for attachment in self.selectedVideos {
-            print("running through video: \(attachment.id)")
             guard let uploadedId = attachment.uploadId, let placeholderId = attachment.placeholderId, let ratio = attachment.mediaRatio else {
                 if let index = self.selectedVideos.firstIndex(of: attachment) {
-                    print("had the save for after upload: \(attachment.id)")
                     self.selectedVideos[index].canSend = true
                 }
 
@@ -328,13 +296,10 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
             message.attachments = [attachmentz]
             
             pDialog.send(message) { (error) in
-                print("SENT video...")
                 changeMessageRealmData.shared.insertMessage(message, completion: {
                     if error != nil {
-                        print("error sending attachment: \(String(describing: error?.localizedDescription))")
                         changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .error)
                     } else {
-                        print("Success sending attachment to ConnectyCube server!")
                         self.storeUploadMedia(id: placeholderId)
                         if let index = self.selectedVideos.firstIndex(of: attachment) {
                             self.selectedVideos.remove(at: index)
@@ -347,14 +312,7 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
     }
 
     func storeUploadMedia(id: String) {
-        uploadcare.storeFile(withUUID: id) { (response, error) in
-            if let error = error {
-                print("the error chcing ios: \(error)")
-                return
-            }
-            print("success storing sent media!")
-            print(response ?? "")
-        }
+        uploadcare.storeFile(withUUID: id) { (_, _) in }
     }
     
     func openImagePicker(completion: @escaping () -> Void) {
@@ -403,7 +361,7 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
     }
         
     func photoLibraryDidChange(_ changeInstance: PHChange) {
-        print("photo library did change! \(changeInstance)")
+        //print("photo library did change! \(changeInstance)")
     }
 //    func photoLibraryDidChange(_ changeInstance: PHChange) {
 //        guard let _ = allPhotos else { return }
@@ -526,16 +484,13 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
         if CLLocationManager.locationServicesEnabled() {
             switch manager.authorizationStatus {
                 case .notDetermined, .restricted, .denied:
-                    print("No access to location")
                     self.locationPermission = false
                 case .authorizedAlways, .authorizedWhenInUse:
-                    print("Access location true")
                     self.locationPermission = true
                 @unknown default:
                 break
             }
         } else {
-            print("Location services are not enabled")
             self.locationPermission = false
         }
     }

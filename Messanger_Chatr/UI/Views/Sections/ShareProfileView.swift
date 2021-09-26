@@ -383,13 +383,9 @@ struct ShareProfileView: View {
         
         let recipeIDQueryItem = URLQueryItem(name: self.isPublicDialog ? "publicDialogID" : "contactID", value: self.isPublicDialog ? self.dialogID ?? "" : self.contactID?.description ?? "")
         components.queryItems = [recipeIDQueryItem]
-        
-        print("I am sharing this new link: \(String(describing: components.url?.absoluteString))")
-        
-        guard let shareLink = DynamicLinkComponents.init(link: (components.url ?? URL(string: ""))!, domainURIPrefix: "https://chatrmessaging.page.link") else {
-            print("can't make FDL componcets")
-            return
-        }
+                
+        guard let shareLink = DynamicLinkComponents.init(link: (components.url ?? URL(string: ""))!, domainURIPrefix: "https://chatrmessaging.page.link") else { return }
+
         if let myBundleId = Bundle.main.bundleIdentifier {
             shareLink.iOSParameters = DynamicLinkIOSParameters(bundleID: myBundleId)
         }
@@ -397,21 +393,14 @@ struct ShareProfileView: View {
         shareLink.socialMetaTagParameters?.title = "\(self.contactFullName)'s Profile"
         shareLink.socialMetaTagParameters?.descriptionText = "\(self.contactFullName) shared their contact with you!"
         shareLink.socialMetaTagParameters?.imageURL = URL(string: self.contactAvatar)
-        
-        let longurl = shareLink.url
-        print("the long dynamic link is: \(String(describing: longurl?.absoluteString))")
-        
+
         shareLink.shorten(completion: { (url, warnings, error) in
-            if error != nil {
-                print("oh no we have an error: \(String(describing: error?.localizedDescription))")
-            }
-            if let warnings = warnings {
-                for warning in warnings {
-                    print("FDL warning: \(warning)")
-                }
-            }
+//            if let warnings = warnings {
+//                for warning in warnings {
+//                    print("FDL warning: \(warning)")
+//                }
+//            }
             guard let url = url else { return }
-            print("I have a short URL to share: \(url.absoluteString)")
             self.shareURL = url.absoluteString
             self.foundUser = true
         })
@@ -429,7 +418,6 @@ struct ShareProfileView: View {
             if dialog.dialogType == "private" {
                 for id in dialog.occupentsID {
                     if id != self.auth.profile.results.first?.id {
-                        print("the user ID is: \(id)")
                         //replace below with selected contact id:
                         if self.selectedContact.contains(id) {
                             if let selectedDialog = self.auth.dialogs.results.filter("id == %@", dialog.id).first {
@@ -471,17 +459,13 @@ struct ShareProfileView: View {
                    dialog.send(message) { (error) in
                        changeMessageRealmData.shared.insertMessage(message, completion: {
                            if error != nil {
-                               print("error sending message: \(String(describing: error?.localizedDescription))")
                                changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .error)
                            } else {
-                               print("Success sending message to ConnectyCube server!")
                                changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
                            }
                        })
                    }
-                }) { (error) in
-                    print("error making dialog: \(error.localizedDescription)")
-                }
+                })
 
                 changeDialogRealmData.shared.fetchDialogs(completion: { _ in
                     self.selectedContact.removeAll()

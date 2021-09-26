@@ -109,8 +109,7 @@ class changeDialogRealmData {
                 }
             }
 
-        }) { (error) in
-            print("Error in fetching dialogs... error: \(error.localizedDescription)")
+        }) { _ in
             DispatchQueue.main.async {
                 completion(false)
             }
@@ -212,7 +211,6 @@ class changeDialogRealmData {
                     })
                 }
             } catch {
-                print(error.localizedDescription)
                 DispatchQueue.main.async {
                     completion()
                 }
@@ -427,9 +425,7 @@ class changeDialogRealmData {
                     realm.add(dialogResult, update: .all)
                 }
             })
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
 
     func addDialogPin(messageId: String, dialogID: String) {
@@ -450,9 +446,7 @@ class changeDialogRealmData {
                     realm.add(messageResult, update: .all)
                 }
             })
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
 
     func removeDialogPin(messageId: String, dialogID: String) {
@@ -472,9 +466,7 @@ class changeDialogRealmData {
                     }
                 }
             })
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
     
     func updateDialogMembersType(canType: Bool, dialogID: String) {
@@ -486,12 +478,9 @@ class changeDialogRealmData {
                     dialogResult.canMembersType = canType
                     
                     realm.add(dialogResult, update: .all)
-                    print("Successfully updated or adjusted Dialog! \(String(describing: dialogResult.canMembersType))")
                 }
             })
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
 
     func updateDialogDelete(isDelete: Bool, dialogID: String) {
@@ -503,12 +492,9 @@ class changeDialogRealmData {
                     dialogResult.isDeleted = isDelete
                     
                     realm.add(dialogResult, update: .all)
-                    print("Successfully deleted or adjusted Dialog! \(String(describing: dialogResult.isDeleted))")
                 }
             })
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
     
     func updateDialogTypedText(text: String, dialogID: String) {
@@ -521,9 +507,7 @@ class changeDialogRealmData {
                     realm.add(dialogResult, update: .all)
                 })
             }
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
     
     func updateDialogNameDescription(name: String, description: String, membersType: Bool, dialogID: String) {
@@ -538,9 +522,7 @@ class changeDialogRealmData {
                 dialogResult?.canMembersType = membersType
                 realm.add(dialogResult!, update: .all)
             })
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
 
     func updateDialogAvatar(avatar: String, dialogID: String) {
@@ -553,9 +535,7 @@ class changeDialogRealmData {
                 dialogResult?.avatar = avatar
                 realm.add(dialogResult!, update: .all)
             })
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
 
     func updateDialogCoverPhoto(coverPhoto: String, dialogID: String) {
@@ -568,9 +548,7 @@ class changeDialogRealmData {
                 dialogResult?.coverPhoto = coverPhoto
                 realm.add(dialogResult!, update: .all)
             })
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
     
     func getRealmDialog(dialogId: String) -> DialogStruct {
@@ -580,9 +558,7 @@ class changeDialogRealmData {
             if let dialogResult = realm.object(ofType: DialogStruct.self, forPrimaryKey: dialogId) {
                 return dialogResult
             }
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
         return DialogStruct()
     }
     
@@ -592,11 +568,9 @@ class changeDialogRealmData {
                 self.updateDialogDelete(isDelete: true, dialogID: dialogID)
                 changeDialogRealmData.shared.removeFirebaseAdmin(dialogId: dialogID, adminId: NSNumber(value: UserDefaults.standard.integer(forKey: "currentUserID")), onSuccess: { _ in }, onError: { _ in })
             }, onError: { err in
-                print("error deleting public: \(String(describing: err)) for dialog: \(dialogID)")
                 self.updateDialogDelete(isDelete: true, dialogID: dialogID)
             })
-        }) { (error) in
-            print("error deleting dialog: \(error.localizedDescription) for dialog: \(dialogID)")
+        }) { _ in
             self.updateDialogDelete(isDelete: true, dialogID: dialogID)
         }
     }
@@ -616,11 +590,7 @@ class changeDialogRealmData {
                 self.updateDialogDelete(isDelete: true, dialogID: dialogID)
                 self.removePublicMemberRealmDialog(memberId: UserDefaults.standard.integer(forKey: "currentUserID"), dialogId: dialogID)
                 changeDialogRealmData.shared.removeFirebaseAdmin(dialogId: dialogID, adminId: NSNumber(value: UserDefaults.standard.integer(forKey: "currentUserID")), onSuccess: { _ in }, onError: { _ in })
-            }, onError: { err in
-                print("error deleting public: \(String(describing: err)) for dialog: \(dialogID)")
-            })
-        }, errorBlock: { error in
-            print("error deleting public: \(error.localizedDescription) for dialog: \(dialogID)")
+            }, onError: { _ in })
         })
     }
     
@@ -638,9 +608,7 @@ class changeDialogRealmData {
                     })
                 }
             }
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
     
     func addPublicMemberCountRealmDialog(count: Int, dialogId: String) {
@@ -655,9 +623,7 @@ class changeDialogRealmData {
                     realm.add(dialogResult, update: .all)
                 })
             }
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
     
     func removeAllDialogs() {

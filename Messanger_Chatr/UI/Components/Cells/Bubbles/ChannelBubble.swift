@@ -157,9 +157,7 @@ struct ChannelBubble: View {
                         }
                     }
                     .padding(.top, 70)
-                    .sheet(isPresented: self.$shareGroup, onDismiss: {
-                        print("printz dismiss share dia")
-                    }) {
+                    .sheet(isPresented: self.$shareGroup) {
                         NavigationView() {
                             ShareProfileView(dimissView: self.$shareGroup, contactID: 0, dialogID: dialogId, contactFullName: self.dialogModel.fullName, contactAvatar: self.dialogModel.avatar, isPublicDialog: true, totalMembers: self.dialogModel.publicMemberCount).environmentObject(self.auth)
                                 .navigationTitle("Share Channel")
@@ -183,14 +181,10 @@ struct ChannelBubble: View {
             .shadow(color: Color.black.opacity(0.15), radius: 12, x: 0, y: 14)
             .buttonStyle(highlightedButtonStyle())
             .sheet(isPresented: self.$showChannel, onDismiss: {
-                   print("need to open Chat view!!3333")
-                
                 if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), diaId != "" {
                     self.loadPublicDialog(diaId: diaId)
-                    print("come omnnnnoww: \(diaId)")
                 } else if let diaId2 = UserDefaults.standard.string(forKey: "openingDialogId"), diaId2 != "" {
                     self.loadPublicDialog(diaId: diaId2)
-                    print("come omnnnnoww22: \(diaId2)")
                 } else {
                     self.loadSelectedDialog()
                 }
@@ -369,15 +363,10 @@ struct ChannelBubble: View {
     }
     
     func loadPublicDialog(diaId: String) {
-        print("laoding pub dia: \(diaId) ** \(UserDefaults.standard.string(forKey: "selectedDialogID") ?? "") && \(self.dialogId)")
-        guard diaId != UserDefaults.standard.string(forKey: "selectedDialogID") ?? "", diaId != "" else {
-            print("laoding pub dia faileddd")
-            return
-        }
+        guard diaId != UserDefaults.standard.string(forKey: "selectedDialogID") ?? "", diaId != "" else { return }
 
         UserDefaults.standard.set(false, forKey: "localOpen")
         changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "")
-        print("going onto selected dia: \(UserDefaults.standard.string(forKey: "selectedDialogID") ?? "")")
             
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
             self.openDialogId = diaId
@@ -402,7 +391,6 @@ struct ChannelBubble: View {
                         changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? self.auth.selectedConnectyDialog?.id ?? "")
 
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
-                            print("the current one is: \(self.dialogModel.id) and now the new one: \(dia.id)")
                             self.openDialogId = dia.id
                             UserDefaults.standard.set(dia.id, forKey: "selectedDialogID")
                             self.openNewDialogID = 0
@@ -431,7 +419,6 @@ struct ChannelBubble: View {
                     changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? self.auth.selectedConnectyDialog?.id ?? "")
 
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
-                        print("the current one is: \(self.dialogModel.id) and now the new one:")
                         self.openDialogId = dialog.id ?? ""
                         UserDefaults.standard.set(dialog.id ?? "", forKey: "selectedDialogID")
                         self.openNewDialogID = 0
@@ -442,10 +429,9 @@ struct ChannelBubble: View {
                     }
                 }
             })
-        }) { (error) in
+        }) { _ in
             //occu.removeAll()
             UINotificationFeedbackGenerator().notificationOccurred(.error)
-            print("error making dialog: \(error.localizedDescription)")
         }
     }
 }

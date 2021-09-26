@@ -109,11 +109,7 @@ struct addNewContactView: View {
 
                                                           event.message = jsonString
 
-                                                          Request.createEvent(event, successBlock: {(events) in
-                                                            print("sent push notification to user")
-                                                          }, errorBlock: {(error) in
-                                                            print("error in sending push noti: \(error.localizedDescription)")
-                                                          })
+                                                          Request.createEvent(event, successBlock: { _ in }, errorBlock: { _ in })
                                                         }
                                                     }
                                                 }

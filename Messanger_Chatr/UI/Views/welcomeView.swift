@@ -267,10 +267,6 @@ struct WalkthroughCell: View, Identifiable {
                     .offset(x: cardIndex == 3 ? 60 : 0)
                     .offset(y: cardIndex == 0 ? 20 : 0)
                     .offset(y: Constants.screenWidth == 375 ? (cardIndex == 1 ? 10 : cardIndex == 2 ? 20 : cardIndex == 3 ? 35 : 0) : 0)
-
-                    .onAppear() {
-                        print("the width is: \(Constants.screenWidth)")
-                    }
                     //.offset(y: page == cardIndex && cardIndex != 0 && cardIndex != 2 ? 10 : 0)
                     //.animation(Animation.easeInOut(duration: 3.33).repeatForever(autoreverses: page == cardIndex ? true : false))
 
@@ -441,16 +437,13 @@ struct PermissionsView: View {
                         if CLLocationManager.locationServicesEnabled() {
                             switch locationManager.authorizationStatus {
                                 case .notDetermined, .restricted, .denied:
-                                    print("No access to location")
                                     self.locationPermission = false
                                 case .authorizedAlways, .authorizedWhenInUse:
-                                    print("Access location true")
                                     self.locationPermission = true
                                 @unknown default:
                                 break
                             }
                         } else {
-                            print("Location services are not enabled")
                             self.locationPermission = false
                         }
                     })
@@ -477,11 +470,9 @@ struct PermissionsView: View {
                     
                     Button(action: {
                         if self.notificationPermission == false {
-                            print("allow access to noit")
-                            if #available(iOS 10, *) {                                
+                            if #available(iOS 10, *) {
                                 UNUserNotificationCenter.current().requestAuthorization(options: [.badge, .alert, .sound, .carPlay], completionHandler: { (granted, error) in
                                     if error == nil {
-                                        print("error with notification permissions")
                                         DispatchQueue.main.async(execute: {
                                             UIApplication.shared.registerForRemoteNotifications()
                                         })
@@ -668,13 +659,10 @@ struct PermissionsView: View {
     func checkNotiPermission() {
         UNUserNotificationCenter.current().getNotificationSettings(completionHandler: { (settings) in
             if settings.authorizationStatus == .notDetermined {
-                print("Noti permission is .notDermined")
                 self.notificationPermission = false
             } else if settings.authorizationStatus == .denied {
-                print("Noti permission is .denied")
                 self.notificationPermission = false
             } else if settings.authorizationStatus == .authorized {
-                print("Noti permission is .auth")
                 self.notificationPermission = true
             }
         })
@@ -1131,9 +1119,7 @@ struct AddProfileImageView: View {
                             }
 
                             self.auth.uploadFile(imageUrl, completionHandler: { imageId in
-                                self.auth.setUserAvatar(imageId: imageId, oldLink: "", completion: { success in
-                                    print("DONEEE SETTING UP URL! \(success)")
-                                })
+                                self.auth.setUserAvatar(imageId: imageId, oldLink: "", completion: { _ in })
                             })
                         }
                     }

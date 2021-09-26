@@ -59,10 +59,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
             }
             
             self.session.commitConfiguration()
-        }
-        catch{
-            print(error.localizedDescription)
-        }
+        } catch { }
     }
     
     func shutDownCamera() {
@@ -122,9 +119,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
             
             let captureDeviceInput1 = try AVCaptureDeviceInput(device: currentCaptureDevice!)
             session.addInput(captureDeviceInput1)
-        }catch{
-            print(error.localizedDescription)
-        }
+        } catch{  }
     }
     
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {

@@ -326,7 +326,7 @@ struct VisitGroupChannelView: View {
                         .gesture(DragGesture(minimumDistance: self.isProfileImgOpen ? 0 : Constants.screenHeight).onChanged { value in
                             guard value.translation.height < 175 else { return }
                             guard value.translation.height > -175 else { return }
-                            print("height: \(value.translation.height)")
+
                             if self.isProfileImgOpen {
                                 self.profileViewSize = value.translation
                             }
@@ -390,8 +390,6 @@ struct VisitGroupChannelView: View {
                                 self.dialogModel = foundDialog
 
                                 realm.add(foundDialog, update: .all)
-                                
-                                print("ccomon nowww: founddd \(self.dialogModel.dialogType == "public") && \(self.dialogModel.id) && \(fromSharedPublicDialog)")
                             })
                         } else {
                             self.dialogRelationship = .notSubscribed
@@ -498,8 +496,6 @@ struct VisitGroupChannelView: View {
     }
     
     func observeFirebase() {
-        print("did we get to the observeFirebase? :\(dialogModel.id)")
-        
         let user = Database.database().reference().child("Marketplace").child("public_dialogs").child("\(self.dialogModel.id)")
         user.observeSingleEvent(of: .value, with: { (snapshot: DataSnapshot) in
             if let dict = snapshot.value as? [String: Any] {
@@ -705,12 +701,10 @@ struct VisitGroupChannelView: View {
 
     func observePublicDialogMembers() {
         Request.occupants(forPublicDialogID: self.dialogModel.id, paginator: Paginator.limit(6, skip: 0), successBlock: { (users, pagin) in
-            print("successfully pulled memebers for pagin: \(pagin)")
             changeDialogRealmData.shared.insertPublicDialogMembers(dialogId: self.dialogModel.id, users: users, completion: {
                 self.insertLocalAdmins()
             })
-        }, errorBlock: { err in
-            print("error pulling public dialog members: \(err)")
+        }, errorBlock: { _ in
             self.insertLocalAdmins()
         })
     }
@@ -754,8 +748,6 @@ struct VisitGroupChannelView: View {
     }
 
     func observePinnedMessages(dialogId: String) {
-        print("the observePinnedMessages isss: \(dialogId)")
-
         let msg = Database.database().reference().child("Dialogs").child(dialogId).child("pinned")
 
         msg.observe(.childAdded, with: { snapAdded in
@@ -765,8 +757,6 @@ struct VisitGroupChannelView: View {
         msg.observe(.childRemoved, with: { snapRemoved in
             changeDialogRealmData.shared.removeDialogPin(messageId: snapRemoved.key, dialogID: self.dialogModel.id)
         })
-
-        print("the count of pinned messages are: \(self.dialogModel.pinMessages.count) for: \(dialogId)")
     }
     
     func toggleNotifications() {
@@ -778,7 +768,6 @@ struct VisitGroupChannelView: View {
             self.notiText = "Successfully turned notifications \(result ? "on" : "off")"
             self.showAlert.toggle()
         }, errorBlock: { error in
-            print("error setting notifications: \(error.localizedDescription)")
             self.notificationsOn.toggle()
             UINotificationFeedbackGenerator().notificationOccurred(.error)
             self.notiType = "error"
@@ -803,7 +792,6 @@ struct VisitGroupChannelView: View {
             changeDialogRealmData.shared.deletePrivateConnectyDialog(dialogID: self.dialogModel.id, isOwner: self.isOwner)
         }
         UINotificationFeedbackGenerator().notificationOccurred(.success)
-        print("done deleting dialog: \(self.dialogModel.id)")
     }
     
     func reportPublicDialog() {
@@ -833,7 +821,6 @@ struct VisitGroupChannelView: View {
             Request.addAdminsToDialog(withID: self.dialogModel.id, adminsUserIDs: occu, successBlock: { (updatedDialog) in
                 changeDialogRealmData.shared.addFirebaseAdmins(dialogId: updatedDialog.id ?? "", adminIds: updatedDialog.adminsIDs ?? [], onSuccess: { _ in
                     changeDialogRealmData.shared.insertDialogs([updatedDialog]) {
-                        print("Success adding contact as admin!")
                         UINotificationFeedbackGenerator().notificationOccurred(.success)
                         for i in self.selectedNewMembers {
                             if !self.dialogModel.occupentsID.contains(i) {
@@ -861,11 +848,9 @@ struct VisitGroupChannelView: View {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                     self.showAlert = true
                 }
-                print("error adding members to dialog: \(error.localizedDescription)")
             }
         } else {
             let updateParameters = UpdateChatDialogParameters()
-            print("adding new user to group!: \(occu.count)")
             updateParameters.occupantsIDsToAdd = occu
             
             Request.updateDialog(withID: self.dialogModel.id, update: updateParameters, successBlock: { (updatedDialog) in
@@ -896,7 +881,6 @@ struct VisitGroupChannelView: View {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                     self.showAlert = true
                 }
-                print("error adding members to dialog: \(error.localizedDescription)")
             }
         }
     }

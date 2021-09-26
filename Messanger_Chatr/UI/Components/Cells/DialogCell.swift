@@ -226,7 +226,6 @@ struct DialogCell: View {
                             .onAppear() {
                                 self.isJoining = true
                                 dialog.join(completionBlock: { val in
-                                    print("done join dia logggg: \(val) && \(!dialog.isJoined())")
                                     self.isJoining = !dialog.isJoined()
                                 })
                             }
@@ -268,7 +267,6 @@ struct DialogCell: View {
                     changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
 
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
-                        print("the current one is: \(self.dialogModel.id) and now the new one: \(diaOpen)")
                         UserDefaults.standard.set(diaOpen, forKey: "selectedDialogID")
                         self.selectedDialogID = diaOpen
                         self.isOpen = true
@@ -512,7 +510,6 @@ struct DialogCell: View {
                         changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
 
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
-                            print("the current one is: \(self.dialogModel.id) and now the new one: \(dia.id)")
                             self.selectedDialogID = dia.id
                             UserDefaults.standard.set(dia.id, forKey: "selectedDialogID")
                             self.openNewDialogID = 0
@@ -543,7 +540,6 @@ struct DialogCell: View {
 
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
                         let newId = self.auth.dialogs.filterDia(text: "").filter { $0.isDeleted != true }.last?.id ?? ""
-                        print("the current one is: \(self.dialogModel.id) and now the new one: \(newId)")
                         UserDefaults.standard.set(newId, forKey: "selectedDialogID")
                         self.selectedDialogID = newId
                         self.openNewDialogID = 0
@@ -559,7 +555,6 @@ struct DialogCell: View {
         }) { (error) in
             //occu.removeAll()
             UINotificationFeedbackGenerator().notificationOccurred(.error)
-            print("error making dialog: \(error.localizedDescription)")
         }
     }
 }

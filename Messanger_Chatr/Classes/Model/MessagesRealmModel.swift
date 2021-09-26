@@ -107,8 +107,7 @@ class changeMessageRealmData {
                     completion(true)
                 })
             })
-        }){ (error) in
-            print("error getting messages: \(error.localizedDescription)")
+        }) { _ in
             completion(false)
         }
     }
@@ -123,7 +122,6 @@ class changeMessageRealmData {
                 completion(true)
             })
         }){ (error) in
-            print("eror getting messages: \(error.localizedDescription)")
             completion(false)
         }
     }
@@ -358,9 +356,7 @@ class changeMessageRealmData {
 //                        completion()
 //                    })
 //                }
-            } catch {
-                print(error.localizedDescription)
-            }
+            } catch {  }
         })
         DispatchQueue.main.async {
             completion()
@@ -597,7 +593,6 @@ class changeMessageRealmData {
                 //                })
             //}
         } catch {
-            print(error.localizedDescription)
             DispatchQueue.main.async {
                 completion()
             }
@@ -721,10 +716,8 @@ class changeMessageRealmData {
                 
                 pDialog.send(message) { (error) in
                     if error != nil {
-                        print("error sending message: \(String(describing: error?.localizedDescription))")
                         self.updateMessageState(messageID: message.id ?? "", messageState: .error)
                     } else {
-                        print("Success sending message to ConnectyCube server!")
                         self.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
                     }
                 }
@@ -755,10 +748,8 @@ class changeMessageRealmData {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.15) {
                     pDialog.send(message) { (error) in
                         if error != nil {
-                            print("error sending message: \(String(describing: error?.localizedDescription))")
                             self.updateMessageState(messageID: message.id ?? "", messageState: .error)
                         } else {
-                            print("Success sending message to ConnectyCube server!")
                             self.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
                         }
                     }
@@ -790,10 +781,8 @@ class changeMessageRealmData {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.15) {
                     pDialog.send(message) { (error) in
                         if error != nil {
-                            print("error sending message: \(String(describing: error?.localizedDescription))")
                             self.updateMessageState(messageID: message.id ?? "", messageState: .error)
                         } else {
-                            print("Success sending message to ConnectyCube server!")
                             self.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
                         }
                     }
@@ -825,10 +814,8 @@ class changeMessageRealmData {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.15) {
                 pDialog.send(message) { (error) in
                     if error != nil {
-                        print("error sending message: \(String(describing: error?.localizedDescription))")
                         self.updateMessageState(messageID: message.id ?? "", messageState: .error)
                     } else {
-                        print("Success sending message to ConnectyCube server!")
                         self.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
                     }
                 }
@@ -843,9 +830,8 @@ class changeMessageRealmData {
                                fileName: "\(UserDefaults.standard.integer(forKey: "currentUserID"))\(dialog.id)\(dialog.fullName)\(Date()).m4a",
                                contentType: "audio/m4a",
                                isPublic: true,
-                               progressBlock: { (progress) in
+                               progressBlock: { _ in
                                 //Update UI with upload progress
-                                print("upload progress is: \(progress)")
             }, successBlock: { (blob) in
                 let attachment = ChatAttachment()
                 attachment.type = "audio/m4a"
@@ -865,17 +851,12 @@ class changeMessageRealmData {
                         if error != nil {
                             self.updateMessageState(messageID: message.id ?? "", messageState: .error)
                         } else {
-                            print("Success sending attachment to ConnectyCube server!")
                             self.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
                         }
                     })
                 }
-            }) { (error) in
-                print("there is an error uploading audio attachment: \(error.localizedDescription)")
-            }
-        } catch {
-            print("error setting url data")
-        }
+            })
+        } catch {  }
     }
 
     func sendGIFAttachment(dialog: DialogStruct, GIFAssets: [GIFMediaAsset], occupentID: [NSNumber]) {
@@ -902,10 +883,8 @@ class changeMessageRealmData {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.15) {
                     pDialog.send(message) { (error) in
                         if error != nil {
-                            print("error sending attachment: \(String(describing: error?.localizedDescription))")
                             self.updateMessageState(messageID: message.id ?? "", messageState: .error)
                         } else {
-                            print("Success sending attachment to ConnectyCube server!")
                             self.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
                         }
                     }
@@ -920,16 +899,13 @@ class changeMessageRealmData {
         for attachment in attachmentImages {
             let data = attachment.jpegData(compressionQuality: 1.0)
             
-            print("about to upload image... && \(data?.count)")
             Request.uploadFile(with: data!,
                                fileName: "\(UserDefaults.standard.integer(forKey: "currentUserID"))\(dialog.id)\(dialog.fullName)\(Date()).png",
                                contentType: "image/png",
                                isPublic: true,
                                progressBlock: { (progress) in
                                 //Update UI with upload progress
-                                print("upload progress is: \(progress)")
             }, successBlock: { (blob) in
-                print("DONE upload image...")
                 let attachment = ChatAttachment()
                 attachment.type = "image/png"
                 attachment.id = blob.uid
@@ -942,22 +918,17 @@ class changeMessageRealmData {
                 message.attachments = [attachment]
                 
                 pDialog.send(message) { (error) in
-                    print("SENT image...")
                     self.insertMessage(message, completion: {
                         NotificationCenter.default.post(name: NSNotification.Name("scrollToLastId"), object: nil)
 
                         if error != nil {
-                            print("error sending attachment: \(String(describing: error?.localizedDescription))")
                             self.updateMessageState(messageID: message.id ?? "", messageState: .error)
                         } else {
-                            print("Success sending attachment to ConnectyCube server!")
                             self.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
                         }
                     })
                 }
-            }) { (error) in
-                print("there is an error uploading attachment: \(error.localizedDescription)")
-            }
+            })
         }
     }
 
@@ -975,8 +946,8 @@ class changeMessageRealmData {
                                            fileName: "\(UserDefaults.standard.integer(forKey: "currentUserID"))\(dialog.id)\(dialog.fullName)\(Date()).mov",
                                            contentType: "video/mov",
                                            isPublic: true,
-                                           progressBlock: { (progress) in
-                                            print("the upload progress is: \(progress)")
+                                           progressBlock: { _ in
+                            
                         }, successBlock: { (blob) in
                             self.sendVideoMessage(id: newVideIdString, dialog: dialog, videoId: blob.uid ?? "", occupentID: occupentID)
                         }) { (error) in
@@ -1011,10 +982,8 @@ class changeMessageRealmData {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.15) {
                 pDialog.send(message) { (error) in
                     if error != nil {
-                        print("error sending attachment: \(String(describing: error?.localizedDescription))")
                         self.updateMessageState(messageID: message.id ?? "", messageState: .error)
                     } else {
-                        print("Success sending video to ConnectyCube server!")
                         self.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
                     }
                 }
@@ -1031,9 +1000,8 @@ class changeMessageRealmData {
             try manager.createDirectory(at: outputURL, withIntermediateDirectories: true, attributes: nil)
             let name = NSUUID().uuidString
             outputURL = outputURL.appendingPathComponent("\(name).mp4")
-        } catch let error {
-            print(error.localizedDescription)
-        }
+        } catch  {  }
+
         //Remove existing file
         _ = try? manager.removeItem(at: outputURL)
         
@@ -1044,15 +1012,12 @@ class changeMessageRealmData {
         exportSession.exportAsynchronously {
             switch exportSession.status {
             case .completed:
-                print("exported at \(outputURL)")
                 completion(outputURL, exportSession.error)
                 
             case .failed:
-                print("failed \(exportSession.error?.localizedDescription ?? "")")
                 completion(nil, exportSession.error)
                 
             case .cancelled:
-                print("cancelled \(exportSession.error?.localizedDescription ?? "")")
                 completion(nil, exportSession.error)
                 
             default: break
@@ -1072,9 +1037,7 @@ class changeMessageRealmData {
                     }
                 }
             }
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
     
     func updateMessageDislikeRemoved(messageID: String, userID: Int) {
@@ -1089,9 +1052,7 @@ class changeMessageRealmData {
                     realm.add(realmContact, update: .all)
                 }
             }
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
         
     func updateMessageLikeAdded(messageID: String, userID: Int) {
@@ -1106,9 +1067,7 @@ class changeMessageRealmData {
                     }
                 }
             }
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
     
     func updateMessageLikeRemoved(messageID: String, userID: Int) {
@@ -1123,9 +1082,7 @@ class changeMessageRealmData {
                     realm.add(realmContact, update: .all)
                 }
             }
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
     
     func updateMessageState(messageID: String, messageState: messageStatus) {
@@ -1141,9 +1098,7 @@ class changeMessageRealmData {
                     }
                 }
             }
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
 
     func updateMessageImageUrl(messageID: String, url: String) {
@@ -1157,9 +1112,7 @@ class changeMessageRealmData {
                     realm.add(realmContact, update: .all)
                 }
             }
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
 
     func updateMessageMediaProgress(messageID: String, progress: Double) {
@@ -1173,9 +1126,7 @@ class changeMessageRealmData {
                     realm.add(realmContact, update: .all)
                 }
             }
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
     
     func addTypingMessage(userID: String, dialogID: String) {
@@ -1210,9 +1161,7 @@ class changeMessageRealmData {
                     self.checkSingleSurroundingValues(message: newData, completion: {  })
                 }
             }
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
     
     func removeTypingMessage(userID: String, dialogID: String) {
@@ -1226,9 +1175,7 @@ class changeMessageRealmData {
                     realm.add(typingMessage, update: .all)
                 }
             }
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
 
     func updateBubbleWidth(messageId: String, width: Int) {
@@ -1244,9 +1191,7 @@ class changeMessageRealmData {
                     }
                 }
             }
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
 
     func updateMessageDelayState(messageID: String, messageDelayed: Bool) {
@@ -1262,9 +1207,7 @@ class changeMessageRealmData {
                     }
                 }
             }
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
     
     func removeAllMessages(completion: @escaping (Bool) -> ()) {

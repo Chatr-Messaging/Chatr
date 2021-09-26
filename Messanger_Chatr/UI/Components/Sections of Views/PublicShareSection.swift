@@ -133,7 +133,7 @@ struct PublicShareSection: View {
             if dialog.dialogType == "private" {
                 for id in dialog.occupentsID {
                     if id != self.auth.profile.results.first?.id {
-                        print("the user ID is: \(id)")
+                        //print("the user ID is: \(id)")
                         //replace below with selected contact id:
                         if self.selectedContact.contains(id) {
                             if let selectedDialog = self.auth.dialogs.results.filter("id == %@", dialog.id).first {
@@ -175,17 +175,13 @@ struct PublicShareSection: View {
                    dialog.send(message) { (error) in
                        changeMessageRealmData.shared.insertMessage(message, completion: {
                            if error != nil {
-                               print("error sending message: \(String(describing: error?.localizedDescription))")
                                changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .error)
                            } else {
-                               print("Success sending message to ConnectyCube server!")
                                changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
                            }
                        })
                    }
-                }) { (error) in
-                    print("error making dialog: \(error.localizedDescription)")
-                }
+                }) { _ in }
 
                 changeDialogRealmData.shared.fetchDialogs(completion: { _ in
                     self.selectedContact.removeAll()

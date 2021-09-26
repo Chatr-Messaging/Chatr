@@ -128,10 +128,10 @@ struct HomeView: View {
             
         }.background(Color("deadViewBG"))
         .edgesIgnoringSafeArea(.all)
-        .onOpenURL { url in
-            let link = url.absoluteString
-            print("opened from URL!! :D \(link)")
-        }
+        //.onOpenURL { url in
+            //let link = url.absoluteString
+            //print("opened from URL!! :D \(link)")
+        //}
 //        .onAppear {
 //            //self.auth.configureFirebaseStateDidChange()
 //        }
@@ -282,9 +282,8 @@ struct mainHomeList: View {
                                     .background(Color("bgColor"))
                                     .edgesIgnoringSafeArea(.all)
                             }
-                            .onChange(of: self.newDialogFromSharedContact) { newValue in
+                            .onChange(of: self.newDialogFromSharedContact) { _ in
                                 if self.newDialogFromSharedContact != 0 {
-                                    print("the contact id trying to message is: \(newDialogFromSharedContact)")
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
                                         self.loadSelectedDialog()
                                     }
@@ -337,7 +336,6 @@ struct mainHomeList: View {
                                 .environmentObject(self.auth)
                         }
                         .sheet(isPresented: self.$isDiscoverOpen, onDismiss: {
-                            print("dismiss discover vieww")
                             if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), !diaId.isEmpty {
                                 self.loadPublicDialog(diaId: diaId)
                             } else if let diaId = UserDefaults.standard.string(forKey: "openingDialogId"), !diaId.isEmpty {
@@ -439,7 +437,6 @@ struct mainHomeList: View {
                                 .padding(.bottom, 5)
                                 
                                 Button(action: {
-                                    print("the screen is: \(Constants.screenWidth)")
                                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                     self.isDiscoverOpen.toggle()
                                 }) {
@@ -500,7 +497,6 @@ struct mainHomeList: View {
                         }
                         .disabled(self.disableDialog)
                         .onChange(of: UserDefaults.standard.bool(forKey: "localOpen")) { isOpen in
-                            print("is local open?? :\(isOpen)")
                             //self.isLocalOpen = isOpen
                             if !isOpen {
                                 self.isLocalOpen = false
@@ -570,10 +566,9 @@ struct mainHomeList: View {
                             }
                         }.onChange(of: self.auth.visitPublicDialogProfile) { newValue in
                             if newValue {
-                                print("did I make it this far lolll: \(newValue)")
-                                if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), !diaId.isEmpty {
-                                    print("helooo we here: \(diaId) && \(self.auth.dynamicLinkPublicDialogID)")
-                                }
+//                                if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), !diaId.isEmpty {
+//                                    print("helooo we here: \(diaId) && \(self.auth.dynamicLinkPublicDialogID)")
+//                                }
 
                                 self.showSharedPublicDialog.toggle()
                                 self.auth.visitPublicDialogProfile = false
@@ -708,7 +703,6 @@ struct mainHomeList: View {
             changeDialogRealmData.shared.fetchDialogs(completion: { _ in
                 UserDefaults.standard.set(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id, forKey: "selectedDialogID")
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                    print("opening new dialog: \(self.newDialogID) & \(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.last?.id ?? "")")
                     self.selectedDialogID = UserDefaults.standard.string(forKey: "selectedDialogID") ?? ""
                     self.isLocalOpen = true
                     UserDefaults.standard.set(self.isLocalOpen, forKey: "localOpen")
@@ -716,10 +710,9 @@ struct mainHomeList: View {
                     self.newDialogFromContact = 0
                 }
             })
-        }) { (error) in
+        }) { _ in
             //occu.removeAll()
             UINotificationFeedbackGenerator().notificationOccurred(.error)
-            print("error making dialog: \(error.localizedDescription)")
         }
     }
     

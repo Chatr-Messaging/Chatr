@@ -23,7 +23,6 @@ class EditProfileViewModel: ObservableObject {
                 return InstagramTestUser(access_token: foundContact.instagramAccessToken, user_id: foundContact.instagramId)
             }
         } catch {
-            print(error.localizedDescription)
             return InstagramTestUser(access_token: "", user_id: 0)
         }
         return InstagramTestUser(access_token: "", user_id: 0)

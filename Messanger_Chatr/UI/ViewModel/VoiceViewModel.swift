@@ -42,9 +42,7 @@ class VoiceViewModel: NSObject , ObservableObject , AVAudioPlayerDelegate {
             self.audioPlayer.prepareToPlay()
             self.audioPlayer.play()
             self.isPlayingAudio = true
-         } catch {
-            print("Error playing audio")
-         }
+         } catch {  }
     }
     
     func prepAudio() {
@@ -53,9 +51,7 @@ class VoiceViewModel: NSObject , ObservableObject , AVAudioPlayerDelegate {
         do {
             self.audioPlayer = try AVAudioPlayer(contentsOf: recording.fileURL)
             self.audioPlayer.prepareToPlay()
-         } catch {
-            print("Error preping audio")
-         }
+         } catch {  }
     }
     
     func stopAudioRecording() {
@@ -70,9 +66,7 @@ class VoiceViewModel: NSObject , ObservableObject , AVAudioPlayerDelegate {
         do {
             try recordingSession.setCategory(.playAndRecord, mode: .default)
             try recordingSession.setActive(true)
-        } catch {
-            print("Can not setup the Recording")
-        }
+        } catch {  }
 
         let path = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         let fileFolder = path.appendingPathComponent("voiceMessageRecordings")
@@ -99,9 +93,7 @@ class VoiceViewModel: NSObject , ObservableObject , AVAudioPlayerDelegate {
             self.audioRecorder.record()
             self.isRecording = true
             self.timer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
-        } catch {
-            print("Failed to Setup the Recording")
-        }
+        } catch {  }
     }
 
     func stopRecording() {
@@ -122,19 +114,16 @@ class VoiceViewModel: NSObject , ObservableObject , AVAudioPlayerDelegate {
         let folderURL = documentDirectory.appendingPathComponent("voiceMessageRecordings")
 
         do {
-            print("fetching contents: \(folderURL.absoluteString)")
             let directoryContents = try fileManager.contentsOfDirectory(at: folderURL.absoluteURL, includingPropertiesForKeys: nil)
 
             for audio in directoryContents {
                 let recording = Recording(fileURL: audio, createdAt: getCreationDate(for: audio.absoluteURL))
-                print("contents: \(audio)")
                 recordingsList.append(recording)
             }
         } catch { }
 
         recordingsList.sort(by: { $0.createdAt.compare($1.createdAt) == .orderedAscending})
 
-        print("the recording count is: \(recordingsList.count)")
         guard let firstRecording = self.recordingsList.first else { return }
 
         completion(firstRecording)
@@ -148,17 +137,13 @@ class VoiceViewModel: NSObject , ObservableObject , AVAudioPlayerDelegate {
         
         do {
             for audio in self.recordingsList {
-                print("trying to remove: \(audio.fileURL)")
                 try fileManager.removeItem(at: audio.fileURL)
                 if let index = self.recordingsList.firstIndex(where: { $0.fileURL == audio.fileURL }) {
                     self.recordingsList.remove(at: index)
                     self.time = 0
                 }
-                print("the recording count is nowww: \(recordingsList.count)")
             }
-        } catch {
-            print("Error while enumerating files \(destinationPath.path) &&  \(error.localizedDescription)")
-        }
+        } catch {  }
     }
     
     func getCreationDate(for file: URL) -> Date {
@@ -189,7 +174,6 @@ class VoiceViewModel: NSObject , ObservableObject , AVAudioPlayerDelegate {
     //MARK: Delegate
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
         if flag {
-            print("Audio player finished playing")
             self.stopAudioRecording()
             self.time = 0
         }

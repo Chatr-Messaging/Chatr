@@ -31,11 +31,9 @@ struct PullToRefreshIndicator: View {
                         .padding(.bottom, 75)
                         //.offset(y: -geometry.frame(in: .global).minY + 158)
                         .onAppear {
-                            //print("opacity: \(Double((geometry.frame(in: .global).minY - self.startLocation) / 15))")
                             //self.preLoading = true
                             if self.startLocation == .zero {
                                 self.startLocation = geometry.frame(in: .global).minY
-                                print("pull to refresh is: \(geometry.frame(in: .global).minY)")
                             }
                             UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
                         }
@@ -57,11 +55,9 @@ struct PullToRefreshIndicator: View {
 //                        }
 //                }
             }.onAppear {
-                print("opacity: \(Double((geometry.frame(in: .global).minY - self.startLocation) / 5))")
                 if self.startLocation == .zero {
                     self.startLocation = geometry.frame(in: .global).minY
                     self.preLoading = true
-                    print("pull to refresh222 is: \(geometry.frame(in: .global).minY) && \(self.startLocation)")
                 }
             }
         }.animation(nil)

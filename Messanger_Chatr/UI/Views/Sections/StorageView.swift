@@ -272,9 +272,7 @@ struct storageView: View {
             }.navigationBarTitle("Data & Storage", displayMode: .automatic)
                 .background(Color("bgColor"))
                 .edgesIgnoringSafeArea(.all)
-        }.onAppear(perform: {
-            print("the total local space is: \(self.getUsedSpace()) && \(self.checkRealmFileSize())")
-        })
+        }
     }
     
     func checkRealmFileSize() -> Double {
@@ -283,13 +281,9 @@ struct storageView: View {
                 let attributes = try FileManager.default.attributesOfItem(atPath:realmPath)
                 if let fileSize = attributes[FileAttributeKey.size] as? Double {
                     
-                    print(fileSize)
                     return fileSize
                 }
-            }
-            catch (let error) {
-                print("FileManager Error: \(error)")
-            }
+            } catch {  }
         }
         return Double()
     }

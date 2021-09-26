@@ -27,12 +27,9 @@ struct ScanQRView: View {
                     if self.foundUser == false {
                         UINotificationFeedbackGenerator().notificationOccurred(.success)
                         self.foundUser = true
-                        //print("BarCodeType =",$0.type.rawValue, "Value =",$0.value)
-                        
-                        //print("have received incoming link!: \(String(describing: $0.value))")
+
                         DynamicLinks.dynamicLinks().handleUniversalLink((URL(string: String(describing: $0.value)) ?? URL(string: ""))!, completion: { (dynamicLink, error) in
                             guard error == nil else {
-                                print("found erre: \(String(describing: error?.localizedDescription))")
                                 return
                             }
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2.25) {

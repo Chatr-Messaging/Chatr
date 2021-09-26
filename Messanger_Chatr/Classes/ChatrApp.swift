@@ -27,12 +27,10 @@ extension ChatrApp {
         DispatchQueue.main.async {
             guard let user = auth.profile.results.first, !Chat.instance.isConnected && !Chat.instance.isConnecting else { return }
 
-            print("\(Thread.current.isMainThread) logged in with: \(user.fullName) && \(user.id)")
             Chat.instance.addDelegate(ChatrApp.auth)
             Purchases.shared.identify("\(user.id)") { (_, _) in }
             if Session.current.tokenHasExpired {
                 users.login(completion: {
-                    print("done re-logging in.")
                     if auth.visitContactProfile == false {
                         chatInstanceConnect(id: UInt(user.id))
                     }
@@ -47,18 +45,13 @@ extension ChatrApp {
         DispatchQueue.main.async {
             guard !Chat.instance.isConnected && !Chat.instance.isConnecting else { return }
             
-            print("the session token is: \(Session.current.tokenHasExpired) &&&& \(Session.current.sessionDetails?.token ?? "")")
             Chat.instance.connect(withUserID: id, password: Session.current.sessionDetails?.token ?? "") { (error) in
                 if error != nil {
-                    print("there is an error connecting to session! \(String(describing: error?.localizedDescription)) user id: \(id)")
                     users.login(completion: {
                         changeContactsRealmData.shared.observeQuickSnaps()
                         changeProfileRealmDate.shared.observeFirebaseUser(with: Int(id))
                     })
-                } else {
-                    //print("\(Thread.current.isMainThread) Success joining session! the current user: \(String(describing: Session.current.currentUser?.fullName)) && expirationSate: \(String(describing: Session.current.sessionDetails?.createdAt))")
-                    print("Success joining session! the created at: \(String(describing: Session.current.sessionDetails))")
-                    
+                } else {                    
                     changeDialogRealmData.shared.fetchDialogs(completion: { _ in })
                     changeContactsRealmData.shared.observeQuickSnaps()
                     changeProfileRealmDate.shared.observeFirebaseUser(with: Int(id))

@@ -20,7 +20,6 @@ class Users: NSObject {
         //user.password = Session.current.sessionDetails!.token'
         Auth.auth().currentUser?.getIDTokenResult(completion: { idToken, error in
             if error != nil {
-                print("the error getting the id token: \(error.debugDescription)")
                 DispatchQueue.main.async {
                     completion()
                 }
@@ -31,15 +30,11 @@ class Users: NSObject {
                         UserDefaults.standard.set(userPulled.id, forKey: "currentUserID")
                         changeProfileRealmDate.shared.updateProfile(userPulled, completion: {
                             ChatrApp.chatInstanceConnect(id: userPulled.id)
-                            print("success updating the profile and all... \(String(describing: userPulled.fullName))")
 
                             DispatchQueue.main.async {
                                 completion()
                             }
                         })
-                    }, errorBlock: { error in
-                        //ChatrApp.connect()
-                        print("error logging into ConnectyCube: \(error.localizedDescription)")
                     })
                 }
             }

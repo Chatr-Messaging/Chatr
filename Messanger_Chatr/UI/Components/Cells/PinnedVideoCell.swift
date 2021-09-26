@@ -62,13 +62,6 @@ struct PinnedVideoCell: View {
                 let result = try storage?.entry(forKey: fileId)
                 let playerItem = CachingPlayerItem(data: result?.object ?? Data(), mimeType: "video/mp4", fileExtension: "mp4")
 
-//                if let duration = AVPlayer(playerItem: playerItem).currentItem?.asset.duration.seconds {
-//                    DispatchQueue.main.async {
-//                        print("the duration for thsi vido: \(duration)")
-//                        self.videoDuration = duration
-//                    }
-//                }
-
                 AVPlayer(playerItem: playerItem).currentItem?.asset.generateThumbnail { image in
                     DispatchQueue.main.async {
                         guard let image = image else { return }
@@ -79,7 +72,6 @@ struct PinnedVideoCell: View {
                 completion()
             } catch {
                 Request.downloadFile(withUID: fileId, progressBlock: { (progress) in
-                    print("the progress of the download is: \(progress)")
                     self.videoDownloadProgress = CGFloat(progress)
                 }, successBlock: { data in
                     self.storage?.async.setObject(data, forKey: fileId, completion: { result in
@@ -87,8 +79,7 @@ struct PinnedVideoCell: View {
                     })
 
                     completion()
-                }, errorBlock: { error in
-                    print("the error video is: \(String(describing: error.localizedDescription))")
+                }, errorBlock: { _ in
                     completion()
                 })
             }
@@ -111,9 +102,7 @@ struct PinnedVideoCell: View {
                     self.videoImage = image
                 }
             }
-        } catch {
-            print("the error setting the video image is: \(String(describing: error.localizedDescription))")
-        }
+        } catch {  }
     }
     
     func formatVideoDuration(second: Int) -> String {

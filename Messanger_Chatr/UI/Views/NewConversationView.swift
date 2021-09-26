@@ -122,7 +122,6 @@ struct NewConversationView: View {
                                     .lineLimit(1)
                                     .keyboardType(.webSearch)
                                     .onChange(of: self.searchText) { value in
-                                        print("the value is: \(value)")
                                         if self.searchText.count >= 3 && self.allowOnlineSearch {
                                             self.grandSeach(searchText: self.searchText)
                                         } else {
@@ -392,9 +391,7 @@ struct NewConversationView: View {
                         }
                     })
                 }
-            }) { (error) in
-                print("error searching for name user \(error.localizedDescription)")
-            }
+            })
             
             Request.users(withPhoneNumbers: [searchText], paginator: Paginator.limit(5, skip: 0), successBlock: { (paginator, users) in
                 for i in users {
@@ -405,9 +402,7 @@ struct NewConversationView: View {
                         }
                     })
                 }
-            }) { (error) in
-                print("error searching for phone number user \(error.localizedDescription)")
-            }
+            })
         }
     }
     
@@ -468,7 +463,6 @@ struct NewConversationView: View {
                     Request.createDialog(dialog, successBlock: { (dialog) in
                         changeDialogRealmData.shared.fetchDialogs(completion: { _ in
                             for i in self.selectedTags {
-                                print("the selected tags is: \(i.title)")
                                 databaseRef.child("tags").child(i.title).child("dialogs").setValue([dialog.id : true])
                             }
                             
@@ -490,7 +484,6 @@ struct NewConversationView: View {
                             })
                         })
                     }) { (error) in
-                        print("the error creating profile dialog...\(error.localizedDescription)")
                         UINotificationFeedbackGenerator().notificationOccurred(.error)
                         self.creatingDialog = false
                     }

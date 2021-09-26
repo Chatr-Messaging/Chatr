@@ -181,8 +181,6 @@ class SomeCustomeUIViewController: UIViewController {
         //self.textField.delegate = self as? UITextFieldDelegate
         //self.textField.addTarget(self, action: #selector(self.textFieldDidChange(_:)), for: UIControl.Event.editingChanged)
         self.view.addSubview(self.textField)
-        
-        print("default regin is: \(self.textField.defaultRegion)")
     }
     
     @objc func textFieldDidChange(_ textField2: PhoneNumberTextField) {
@@ -213,11 +211,10 @@ class SomeCustomeUIViewController: UIViewController {
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        print("viewWillDissapear \(self)")
     }
 
     deinit {
-        print("DEINIT \(self)")
+        //print("DEINIT \(self)")
     }
 }
 

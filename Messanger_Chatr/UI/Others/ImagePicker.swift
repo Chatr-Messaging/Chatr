@@ -29,9 +29,8 @@ struct ImagePicker: UIViewControllerRepresentable {
         }
 
         func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-            let identifiers = results.compactMap(\.assetIdentifier)
-            let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: identifiers, options: nil)
-            print("the fetchedresult is now: \(fetchResult.count)")
+            //let identifiers = results.compactMap(\.assetIdentifier)
+            //let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: identifiers, options: nil)
         }
 
         func imagePickerController(_ picker: UIImagePickerController,
@@ -41,11 +40,10 @@ struct ImagePicker: UIViewControllerRepresentable {
             switch mediaType {
             case kUTTypeImage:
                 image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage
-                print("Selected media is image \(image)")
 
             case kUTTypeMovie:
-                let videoUrl = info[UIImagePickerController.InfoKey.mediaURL] as! URL
-                print("Selected media is video: \(videoUrl.absoluteString)")
+                //let videoUrl = info[UIImagePickerController.InfoKey.mediaURL] as! URL
+                print("video type")
 
             default:
                 print("unknown/unusable type")

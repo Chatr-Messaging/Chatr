@@ -115,12 +115,9 @@ class changeContactsRealmData {
 
                                             try realm.safeWrite ({
                                                 realm.add(newData, update: .all)
-                                                print("Succsessfuly added new quick snap to realm! \(newData.fromUserID)")
                                             })
                                         } 
-                                    } catch {
-                                        print(error.localizedDescription)
-                                    }
+                                    } catch {  }
                                 }
                             })
                             
@@ -133,18 +130,13 @@ class changeContactsRealmData {
                                             //Check snapChild.value is = 1 aka TRUE and then add to realm
                                             if String(describing: snapChild.value) == "Optional(1)" {
                                                 oldData.quickSnaps.append(snapChild.key)
-                                                print("contacts does NOT contain a TRUE quick snap!!!")
                                             }
-                                        } else {
-                                            print("contacts DOES contain quick snap id.")
                                         }
                                         oldData.hasQuickSnaped = true
                                         realm.add(oldData, update: .all)
                                     })
                                 }
-                            } catch {
-                                print(error.localizedDescription)
-                            }
+                            } catch {  }
                         })
                     })
                 }
@@ -160,7 +152,6 @@ class changeContactsRealmData {
                 do {
                     let realm = try Realm(configuration: config)
                     if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: contactID) {
-                        //print("Contact FOUND in Realm: \(snapshot.key) anddd contacts faceID? : \(String(describing: dict["faceID"] as? Bool))")
                         try realm.safeWrite ({
                             if let bio = dict["bio"] as? String, foundContact.bio != bio {
                                 foundContact.bio = bio
@@ -191,7 +182,6 @@ class changeContactsRealmData {
                             })
                         })
                     } else {
-                        print("Contact NOT in Realm: \(snapshot.key)")
                         let newData = ContactStruct()
                         newData.id = Int(snapshot.key) ?? 0
                         newData.bio = dict["bio"] as? String ?? ""
@@ -206,15 +196,12 @@ class changeContactsRealmData {
                             realm.add(newData, update: .all)
                         })
                     }
-                } catch {
-                    print(error.localizedDescription)
-                }
+                } catch {  }
             }
         })
     }
     
     func observeFirebaseContactReturn(contactID: Int, completion: @escaping (ContactStruct) -> ()) {
-        print("starting observe firebase CONTACT! return")
         let user = Database.database().reference().child("Users").child("\(contactID)")
         user.observeSingleEvent(of: .value, with: { (snapshot: DataSnapshot) in
             if let dict = snapshot.value as? [String: Any] {
@@ -246,7 +233,6 @@ class changeContactsRealmData {
             if contactUsers.count != 0 {
                 Request.users(withIDs: contactUsers, paginator: Paginator.limit(500, skip: 0), successBlock: { (paginator, users) in
                     for user in users {
-                        //print("users pulled from Connecty Cube: \(String(describing: user.fullName)) & \(String(describing: user.phone))")
                         let config = Realm.Configuration(schemaVersion: 1)
                         do {
                             let realm = try Realm(configuration: config)
@@ -286,7 +272,6 @@ class changeContactsRealmData {
                                     self.observeFirebaseContact(contactID: foundContact.id)
                                 })
                             } else {
-                                print("Contact NOT in Realm: \(user.id)")
                                 let newData = ContactStruct()
                                 newData.id = Int(user.id)
                                 newData.fullName = user.fullName ?? "empty name"
@@ -306,16 +291,12 @@ class changeContactsRealmData {
                                 try realm.safeWrite ({
                                     realm.add(newData, update: .all)
                                     self.observeFirebaseContact(contactID: newData.id)
-                                    print("Succsessfuly added new contact to realm! \(newData.fullName)")
                                 })
                             }
-                        } catch {
-                            print(error.localizedDescription)
-                        }
+                        } catch {  }
                     }
                     completion(true)
-                }) { (error) in
-                    print("error pulling connecty users: \(error.localizedDescription)")
+                }) { _ in
                     completion(true)
                 }
             }
@@ -328,9 +309,9 @@ class changeContactsRealmData {
             let realm = try Realm(configuration: config)
             for i in realm.objects(ContactStruct.self) {
                 if let user = Chat.instance.contactList?.contacts.first(where: { $0.userID == i.id }) {
-                    print("running through contact: \(String(describing: user.userID))")
+                    //print("running through contact: \(String(describing: user.userID))")
                 } else {
-                    print("DELETING contact: \(String(describing: i.id))")
+                    //print("DELETING contact: \(String(describing: i.id))")
                     try realm.safeWrite ({
                         i.isMyContact = false
                         realm.add(i, update: .all)
@@ -345,7 +326,6 @@ class changeContactsRealmData {
             DispatchQueue.main.async {
                 completion()
             }
-            print(error.localizedDescription)
         }
     }
     
@@ -364,7 +344,6 @@ class changeContactsRealmData {
             }
         } catch {
             completion(true)
-            print(error.localizedDescription)
         }
     }
     
@@ -418,7 +397,6 @@ class changeContactsRealmData {
                             realm.add(foundContact, update: .all)
                         })
                     } else {
-                        print("Contact NOT in Realm: \(user.id)")
                         let newData = ContactStruct()
                         newData.id = Int(user.id)
                         newData.fullName = user.fullName ?? "empty name"
@@ -435,12 +413,9 @@ class changeContactsRealmData {
                             
                         try realm.safeWrite ({
                             realm.add(newData, update: .all)
-                            print("Succsessfuly added new contact to realm! \(newData.fullName)")
-                            
                         })
                     }
                 } catch {
-                    print(error.localizedDescription)
                     completion(false)
                 }
             }
@@ -453,17 +428,13 @@ class changeContactsRealmData {
             let realm = try Realm(configuration: config)
             if let realmContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: userID) {
                 //Contact is in Realm...
-                print("Contact is in Realm: \(realmContact.fullName)")
                 try realm.safeWrite ({
                     realmContact.isOnline = isOnline
                     realmContact.lastOnline = Date()
                     realm.add(realmContact, update: .all)
-                    print("Succsessfuly updated online status to realm! \(isOnline)")
                 })
             }
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
     
     func updateContactFavouriteStatus(userID: UInt, favourite: Bool) {
@@ -477,9 +448,7 @@ class changeContactsRealmData {
                     realm.add(realmContact, update: .all)
                 })
             }
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
     
     func updateContactHasQuickSnap(userID: [Int], hasQuickSnap: Bool) {
@@ -496,9 +465,7 @@ class changeContactsRealmData {
                         })
                     }
                 }
-            } catch {
-                print(error.localizedDescription)
-            }
+            } catch {  }
         }
     }
 
@@ -509,9 +476,8 @@ class changeContactsRealmData {
             if let profileResult = realm.object(ofType: ContactStruct.self, forPrimaryKey: userID) {
                 return profileResult
             }
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
+
         return nil
     }
     
