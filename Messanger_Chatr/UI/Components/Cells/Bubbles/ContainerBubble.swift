@@ -597,7 +597,7 @@ struct ContainerBubble: View {
                     let request = PHAssetCreationRequest.forAsset()
                     request.addResource(with: .photo, data: imageData, options: nil)
                 }) { (success, error) in
-                    if let error = error {
+                    if error != nil {
                         DispatchQueue.main.async {
                             auth.notificationtext = "Error saving image"
                             NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
