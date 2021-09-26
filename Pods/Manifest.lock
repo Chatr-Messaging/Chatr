@@ -398,7 +398,6 @@ PODS:
     - nanopb/encode (= 2.30908.0)
   - nanopb/decode (2.30908.0)
   - nanopb/encode (2.30908.0)
-  - netfox (1.19.0)
   - PhoneNumberKit (3.3.3):
     - PhoneNumberKit/PhoneNumberKitCore (= 3.3.3)
     - PhoneNumberKit/UIKit (= 3.3.3)
@@ -437,7 +436,6 @@ DEPENDENCIES:
   - FirebaseFirestore
   - FirebaseStorage
   - Giphy (from `https://s3.amazonaws.com/sdk.mobile.giphy.com/SDK/2.0.3/Giphy.podspec`)
-  - netfox
   - PhoneNumberKit
   - Purchases
   - SDWebImageSwiftUI
@@ -473,7 +471,6 @@ SPEC REPOS:
     - leveldb-library
     - libwebp
     - nanopb
-    - netfox
     - PhoneNumberKit
     - PINCache
     - PINOperation
@@ -518,7 +515,6 @@ SPEC CHECKSUMS:
   leveldb-library: 50c7b45cbd7bf543c81a468fe557a16ae3db8729
   libwebp: e90b9c01d99205d03b6bb8f2c8c415e5a4ef66f0
   nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96
-  netfox: efeec1d23406df6cd605212f09a40957bb5654eb
   PhoneNumberKit: 4ce83273551c4d2ae10b7361162f4283dd02835f
   PINCache: 7a8fc1a691173d21dbddbf86cd515de6efa55086
   PINOperation: 00c935935f1e8cf0d1e2d6b542e75b88fc3e5e20
@@ -530,6 +526,6 @@ SPEC CHECKSUMS:
   SnapSDK: 222857226700e1373a186da658c619a79dfa40c8
   SROTPView: 81b761c6e72f0a1a0b8c77b0046e13a54d4dcaa9
 
-PODFILE CHECKSUM: 8b7dd1003ede758cdc19adf924e10a69a5d4bae0
+PODFILE CHECKSUM: 0ec79093e732d15240d57ebd25a77d36b8b62431
 
 COCOAPODS: 1.10.2
