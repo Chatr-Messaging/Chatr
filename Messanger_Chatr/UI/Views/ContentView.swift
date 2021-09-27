@@ -462,6 +462,7 @@ struct mainHomeList: View {
                                 }
                                 .buttonStyle(ClickButtonStyle())
                             }.offset(y: Constants.screenWidth < 375 ? 60 : 10)
+                            .offset(y: self.emptyQuickSnaps ? 0 : 100)
                         }
                         
                         //MARK: Main Dialog Cells
