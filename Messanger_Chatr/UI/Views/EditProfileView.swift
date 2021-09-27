@@ -272,6 +272,8 @@ struct EditProfileView: View {
                                     .font(.none)
                                     .foregroundColor(self.errorEmail ? .red : .primary)
                                     .textCase(.lowercase)
+                                    .autocapitalization(.none)
+                                    .disableAutocorrection(true)
                                     .keyboardType(.emailAddress)
                                     .onChange(of: self.emailText) { _ in
                                         self.didSave = false
@@ -304,6 +306,9 @@ struct EditProfileView: View {
                                     .font(.none)
                                     .foregroundColor(.primary)
                                     .textCase(.lowercase)
+                                    .autocapitalization(.none)
+                                    .disableAutocorrection(true)
+                                    .keyboardType(.webSearch)
                                     .onChange(of: self.websiteText) { _ in
                                         self.didSave = false
                                     }
@@ -471,13 +476,16 @@ struct EditProfileView: View {
                         self.loadingSave = true
                         let updateParameters = UpdateUserParameters()
                         updateParameters.fullName = self.fullNameText
-                        updateParameters.website = self.websiteText
+                        updateParameters.website = self.websiteText.contains("http://") ? self.websiteText.lowercased() : "http://" + self.websiteText.lowercased()
+                        self.websiteText = updateParameters.website ?? ""
+
                         if changeProfileRealmDate.shared.isValidEmail(self.emailText) {
                             updateParameters.email = self.emailText
                             self.errorEmail = false
                         } else {
                             self.errorEmail = true
                         }
+
                         Request.updateCurrentUser(updateParameters, successBlock: { (user) in
                             changeProfileRealmDate.shared.updateProfile(user, completion: {
                                 Database.database().reference().child("Users").child("\(UserDefaults.standard.integer(forKey: "currentUserID"))").updateChildValues(["bio" : self.bioText, "facebook" : self.facebookText, "twitter" : self.twitterText])

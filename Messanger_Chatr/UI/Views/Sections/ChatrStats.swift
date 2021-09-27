@@ -45,7 +45,7 @@ struct ChatrStats: View {
 
                                 Spacer()
                                 if self.userCount != UserDefaults.standard.integer(forKey: "chatrUserStats") {
-                                    Text("+\(UserDefaults.standard.integer(forKey: "chatrUserStats"))")
+                                    Text("+\(self.userCount - UserDefaults.standard.integer(forKey: "chatrUserStats"))")
                                         .fontWeight(.medium)
                                         .foregroundColor(.green)
                                         .offset(x: 2)
@@ -96,7 +96,7 @@ struct ChatrStats: View {
 
                                 Spacer()
                                 if self.quickSnapCount != UserDefaults.standard.integer(forKey: "chatrQuickSnapsStats") {
-                                    Text("+\(UserDefaults.standard.integer(forKey: "chatrQuickSnapsStats"))")
+                                    Text("+\(self.quickSnapCount - UserDefaults.standard.integer(forKey: "chatrQuickSnapsStats"))")
                                         .fontWeight(.medium)
                                         .foregroundColor(.green)
                                         .offset(x: 2)
