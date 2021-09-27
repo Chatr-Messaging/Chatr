@@ -56,7 +56,7 @@ struct HighlightedContactCell: View {
                     
                     if self.contact.isMyContact {
                         Button(action: {
-                            print("Favourite tap")
+                            print("Favorite tap")
                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             if self.contact.isFavourite {
                                 changeContactsRealmData.shared.updateContactFavouriteStatus(userID: UInt(self.contact.id), favourite: false)
@@ -71,7 +71,7 @@ struct HighlightedContactCell: View {
                                 .foregroundColor( self.contact.isFavourite ? .yellow : .secondary)
                                 .shadow(color: Color.black.opacity(self.contact.isFavourite ? 0.15 : 0.0), radius: 2, x: 0, y: 2)
                         }.buttonStyle(ClickButtonStyle())
-                        .padding(.horizontal)
+                        .padding(.horizontal, 10)
                     }
                 }
                 

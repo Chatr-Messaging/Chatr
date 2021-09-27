@@ -69,7 +69,7 @@ struct PublicActionSection: View {
                     if self.dialogRelationship == .subscribed {
                         Text("Chat")
                             .font(.system(size: 20))
-                            .fontWeight(.bold)
+                            .fontWeight(.semibold)
                             .foregroundColor(.white)
                     }
                 }.padding(.horizontal, 7.5)
@@ -121,8 +121,9 @@ struct PublicActionSection: View {
                         
                         Text("Join Channel")
                             .font(.system(size: 20))
-                            .fontWeight(.bold)
+                            .fontWeight(.semibold)
                             .foregroundColor(.white)
+                            .padding(.trailing, 2.5)
                     }.padding(.all, 15)
                     .padding(.horizontal, 5)
                     .background(self.dialogRelationship == .error ? Color("alertRed") : Constants.baseBlue)
