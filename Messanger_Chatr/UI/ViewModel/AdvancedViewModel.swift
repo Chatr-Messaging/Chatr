@@ -59,17 +59,28 @@ class AdvancedViewModel: ObservableObject {
     func checkLocationPermission() {
         let manager = CLLocationManager()
         
-        if CLLocationManager.locationServicesEnabled() {
-            switch manager.authorizationStatus {
-                case .notDetermined, .restricted, .denied:
+        DispatchQueue.main.async {
+            if CLLocationManager.locationServicesEnabled() {
+                switch manager.authorizationStatus {
+                    case .notDetermined, .restricted, .denied:
+                        print("No access to location")
+                        DispatchQueue.main.async {
+                            self.locationPermission = false
+                        }
+                    case .authorizedAlways, .authorizedWhenInUse:
+                        print("Access location true")
+                        DispatchQueue.main.async {
+                            self.locationPermission = true
+                        }
+                    @unknown default:
+                    break
+                }
+            } else {
+                print("Location services are not enabled")
+                DispatchQueue.main.async {
                     self.locationPermission = false
-                case .authorizedAlways, .authorizedWhenInUse:
-                    self.locationPermission = true
-                @unknown default:
-                break
+                }
             }
-        } else {
-            self.locationPermission = false
         }
     }
     
