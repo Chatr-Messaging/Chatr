@@ -63,12 +63,10 @@ class AdvancedViewModel: ObservableObject {
             if CLLocationManager.locationServicesEnabled() {
                 switch manager.authorizationStatus {
                     case .notDetermined, .restricted, .denied:
-                        print("No access to location")
                         DispatchQueue.main.async {
                             self.locationPermission = false
                         }
                     case .authorizedAlways, .authorizedWhenInUse:
-                        print("Access location true")
                         DispatchQueue.main.async {
                             self.locationPermission = true
                         }
