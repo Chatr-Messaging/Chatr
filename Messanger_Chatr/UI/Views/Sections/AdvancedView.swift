@@ -378,7 +378,8 @@ struct advancedView: View {
                                             }
                                         }
                                     }.padding(.horizontal)
-                                    .padding(.vertical, 12.5)
+                                    .padding(.vertical, 15)
+
                                     Divider()
                                         .frame(width: Constants.screenWidth - 80)
                                 }
@@ -390,22 +391,24 @@ struct advancedView: View {
                                 Database.database().reference().child("Users").child("\(Session.current.currentUserID)").updateChildValues(["instagramId" : ""])
                                 self.instagramReset = false
                             }) {
-                                HStack(alignment: .center) {
-                                    Text(self.instagramReset ? "Unauthorize Instagram" : "Instagram Disabled")
-                                        .foregroundColor(!self.instagramReset ? .secondary : .primary)
+                                VStack(alignment: .trailing, spacing: 0) {
+                                    HStack(alignment: .center) {
+                                        Text(self.instagramReset ? "Unauthorize Instagram" : "Instagram Disabled")
+                                            .foregroundColor(!self.instagramReset ? .secondary : .primary)
+                                        
+                                        Spacer()
+                                        Image(systemName: "chevron.right")
+                                            .resizable()
+                                            .font(Font.title.weight(.bold))
+                                            .scaledToFit()
+                                            .frame(width: 7, height: 15, alignment: .center)
+                                            .foregroundColor(.secondary)
+                                    }.padding(.horizontal)
+                                    .padding(.vertical, 15)
                                     
-                                    Spacer()
-                                    Image(systemName: "chevron.right")
-                                        .resizable()
-                                        .font(Font.title.weight(.bold))
-                                        .scaledToFit()
-                                        .frame(width: 7, height: 15, alignment: .center)
-                                        .foregroundColor(.secondary)
-                                }.padding(.horizontal)
-                                .padding(.vertical, 12.5)
-                                
-                                Divider()
-                                    .frame(width: Constants.screenWidth - 80)
+                                    Divider()
+                                        .frame(width: Constants.screenWidth - 80)
+                                }
                             }.buttonStyle(changeBGButtonStyle())
                             .disabled(!self.instagramReset ? true : false)
                             .onAppear {
@@ -419,22 +422,24 @@ struct advancedView: View {
                                 self.auth.restorePurchase()
                                 self.diabaleRestoreSub.toggle()
                             }) {
-                                HStack(alignment: .center) {
-                                    Text(self.diabaleRestoreSub ? "Restored Subscriptions" : "Restore Subscriptions")
-                                        .foregroundColor(self.diabaleRestoreSub ? .secondary : .primary)
+                                VStack(alignment: .trailing, spacing: 0) {
+                                    HStack(alignment: .center) {
+                                        Text(self.diabaleRestoreSub ? "Restored Subscriptions" : "Restore Subscriptions")
+                                            .foregroundColor(self.diabaleRestoreSub ? .secondary : .primary)
+                                        
+                                        Spacer()
+                                        Image(systemName: "chevron.right")
+                                            .resizable()
+                                            .font(Font.title.weight(.bold))
+                                            .scaledToFit()
+                                            .frame(width: 7, height: 15, alignment: .center)
+                                            .foregroundColor(.secondary)
+                                    }.padding(.horizontal)
+                                    .padding(.vertical, 15)
                                     
-                                    Spacer()
-                                    Image(systemName: "chevron.right")
-                                        .resizable()
-                                        .font(Font.title.weight(.bold))
-                                        .scaledToFit()
-                                        .frame(width: 7, height: 15, alignment: .center)
-                                        .foregroundColor(.secondary)
-                                }.padding(.horizontal)
-                                .padding(.vertical, 12.5)
-                                
-                                Divider()
-                                    .frame(width: Constants.screenWidth - 80)
+                                    Divider()
+                                        .frame(width: Constants.screenWidth - 80)
+                                }
                             }.buttonStyle(changeBGButtonStyle())
                             .disabled(self.diabaleRestoreSub ? true : false)
                             
@@ -455,7 +460,7 @@ struct advancedView: View {
                                         .frame(width: 7, height: 15, alignment: .center)
                                         .foregroundColor(.secondary)
                                 }.padding(.horizontal)
-                                .padding(.vertical, 12.5)
+                                .padding(.vertical, 15)
                             }.buttonStyle(changeBGButtonStyle())
                             .disabled(self.deleteAccount ? true : false)
                             .actionSheet(isPresented: $showDeleteAccountSheet) {
