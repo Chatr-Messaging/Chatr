@@ -783,7 +783,7 @@ struct VisitContactView: View {
             newContact.phoneNumber = self.viewState == .fromGroupDialog ? self.contact.phoneNumber : self.connectyContact.phone ?? ""
             newContact.lastOnline = self.viewState == .fromGroupDialog ? self.contact.lastOnline : self.connectyContact.lastRequestAt ?? Date()
             newContact.createdAccount = self.viewState == .fromGroupDialog ? self.contact.createdAccount : self.connectyContact.createdAt ?? Date()
-            newContact.avatar = self.contact.avatar
+            newContact.avatar = self.connectyContact.avatar ?? self.contact.avatar
             newContact.bio = firebaseContact.bio
             newContact.facebook = firebaseContact.facebook
             newContact.twitter = firebaseContact.twitter

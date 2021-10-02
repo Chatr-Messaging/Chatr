@@ -70,7 +70,7 @@ struct HighlightedContactCell: View {
                                 .foregroundColor( self.contact.isFavourite ? .yellow : .secondary)
                                 .shadow(color: Color.black.opacity(self.contact.isFavourite ? 0.15 : 0.0), radius: 2, x: 0, y: 2)
                         }.buttonStyle(ClickButtonStyle())
-                        .padding(.horizontal)
+                        .padding(.horizontal, 10)
                     }
                 }
                 

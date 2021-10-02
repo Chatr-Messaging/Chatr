@@ -32,7 +32,7 @@ struct ProfileView: View {
     @State var openPremium: Bool = false
     @State var helpsupport: Bool = false
     @State var logoutActionSheet: Bool = false
-    @State var chatrLink: String = "https://www.chatr-messaging.com/"
+    @State var chatrLink: String = "https://www.chatr-messaging.com/faq"
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: true) {

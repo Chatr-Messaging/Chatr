@@ -54,12 +54,12 @@ struct MorePublicListView: View {
                             .padding(.top, 180)
                             .padding(.bottom, 10)
                         
-                        Text("No Chatter")
+                        Text("No Chatr")
                             .font(.title)
                             .fontWeight(.bold)
                             .foregroundColor(.primary)
                         
-                        Text(self.viewState == .tags ? "No found public dialogs for this tag. 🤔\nPlease explore other tags or check your connection." : "No found public dialogs. 🤔\nPlease try again or check your connection.")
+                        Text(self.viewState == .tags ? "No found public channels for this tag. 🤔\nPlease explore other tags or check your connection." : "No found public dialogs. 🤔\nPlease try again or check your connection.")
                             .font(.subheadline)
                             .fontWeight(.none)
                             .foregroundColor(.secondary)

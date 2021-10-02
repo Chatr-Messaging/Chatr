@@ -72,6 +72,7 @@ struct QuickSnapsSection: View {
                                     if self.quickSnapz[snap].hasQuickSnaped {
                                         QuickSnapCell(viewState: self.$viewState, quickSnap: self.quickSnapz[snap], selectedQuickSnapContact: self.$selectedQuickSnapContact)
                                             .offset(x: (self.quickSnapz.first != nil) ? -4 : 0)
+                                            .id(self.quickSnapz[snap].id)
                                     }
                                 }
                             }.padding(.leading, 5)

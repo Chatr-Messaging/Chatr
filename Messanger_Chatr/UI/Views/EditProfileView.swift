@@ -476,7 +476,7 @@ struct EditProfileView: View {
                         self.loadingSave = true
                         let updateParameters = UpdateUserParameters()
                         updateParameters.fullName = self.fullNameText
-                        updateParameters.website = self.websiteText.contains("http://") ? self.websiteText.lowercased() : "http://" + self.websiteText.lowercased()
+                        updateParameters.website = self.websiteText.isEmpty ? "" : self.websiteText.contains("http://") ? self.websiteText.lowercased() : "http://" + self.websiteText.lowercased()
                         self.websiteText = updateParameters.website ?? ""
 
                         if changeProfileRealmDate.shared.isValidEmail(self.emailText) {
@@ -492,6 +492,10 @@ struct EditProfileView: View {
                                 UINotificationFeedbackGenerator().notificationOccurred(.success)
                                 self.loadingSave = false
                                 self.didSave = true
+                                
+                                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                auth.notificationtext = "Updated profile"
+                                NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
                             })
                         }) { (error) in
                             UINotificationFeedbackGenerator().notificationOccurred(.error)
