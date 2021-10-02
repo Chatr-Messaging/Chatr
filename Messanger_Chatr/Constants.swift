@@ -21,7 +21,7 @@ struct Constants {
     static let quickSnapBtnSize = CGFloat(52)
     static let avitarSize = CGFloat(55)
     static let smallAvitarSize = CGFloat(30)
-    static let maxNumberGroupOccu = 10
+    static let maxNumberGroupOccu = 30
     static let maxNumberEarlyAdopters = 1000
 
     static let screenWidth = UIScreen.main.bounds.width
@@ -43,7 +43,7 @@ struct Constants {
     static let uploadcareStandardVideoTransform = "/-/video/-/size/\(Constants.screenWidth * 0.65)x/-/quality/normal/"
 
     static let projectVersion = "1.0.0"
-    static let appStoreLink = "https://bit.ly/35fMzUg"
+    static let appStoreLink = "https://apple.co/3kZBVtL"
 
     static let allowedHosts = [".com", ".me", ".org", ".io", ".edu", ".net", ".app", ".web", ".co", ".uk", ".us", ".gov", ".biz", ".info", ",jobs", ".ly", ".name", ".xyz"]
 

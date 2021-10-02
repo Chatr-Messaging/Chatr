@@ -214,23 +214,23 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Chatr needs to access the camera to send pictures.</string>
+	<string>Chatr needs to access the camera to send pictures through quick snaps.</string>
 	<key>NSContactsUsageDescription</key>
-	<string>Chatr needs access to your contacts.</string>
+	<string>Chatr needs access to your contacts to find other registered users.</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>Chatr needs to ensure it is you.</string>
+	<string>Chatr needs to ensure it is you when you are locked out.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Chatr needs your location.</string>
+	<string>Chatr uses your location to send your current location through a message.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Chatr needs your location.</string>
+	<string>Chatr uses your location to send your current location through a message.</string>
 	<key>NSLocationUsageDescription</key>
-	<string>Chatr needs your location.</string>
+	<string>Chatr uses your location to send your current location through a message.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Chatr needs your location.</string>
+	<string>Chatr uses your location to send your current location through a message.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Chatr needs to use the microphone to send audio messages.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Chatr needs the photo use.</string>
+	<string>Chatr needs access to photo library  to set an avatar and to send photos and videos.</string>
 	<key>SCSDKClientId</key>
 	<string>a84dd344-dc21-4f34-ae38-7ac9047a65b7</string>
 	<key>UIApplicationSceneManifest</key>
