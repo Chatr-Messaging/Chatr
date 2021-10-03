@@ -1126,7 +1126,7 @@ struct actionButtonView: View {
                             .padding(3)
                         
                         Text("Add Contact")
-                            .font(.system(size: 20))
+                            .font(.system(size: 18))
                             .fontWeight(.semibold)
                             .foregroundColor(.white)
                             .padding(.trailing, 3)
@@ -1150,7 +1150,7 @@ struct actionButtonView: View {
                             .padding(3)
                         
                         Text("Pending...")
-                            .font(.system(size: 20))
+                            .font(.system(size: 18))
                             .fontWeight(.semibold)
                             .foregroundColor(.secondary)
                             .padding(.trailing, 2)
@@ -1191,7 +1191,7 @@ struct actionButtonView: View {
                                 .padding(3)
                             
                             Text("Accept")
-                                .font(.system(size: 20))
+                                .font(.system(size: 18))
                                 .fontWeight(.semibold)
                                 .foregroundColor(.white)
                                 .padding(.trailing, 5)
