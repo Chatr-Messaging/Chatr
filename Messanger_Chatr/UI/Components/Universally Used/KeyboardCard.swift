@@ -930,26 +930,27 @@ struct ResizableTextField : UIViewRepresentable {
         }
 
         func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-            if self.parent.isMessageView ?? true {
-                let pasteboard = UIPasteboard.general
-                
-                if text == pasteboard.string && pasteboard.hasImages {
-                    if let images = pasteboard.images {
-                        for image in images {
-                            withAnimation {
-                                self.parent.imagePicker.pastedImages.append(image)
-                            }
-                        }
-                    }
-                    
-                    return false
+            guard self.parent.isMessageView ?? true else {
+                    return true
                 }
 
-                return true
-            } else {
-                return true
+                let pasteboard = UIPasteboard.general
+
+                guard pasteboard.hasImages, text == pasteboard.string, let images = pasteboard.images else {
+                    return true
+                }
+
+                for image in images {
+                    withAnimation {
+                        let newMedia = KeyboardMediaAsset(image: image)
+                        self.parent.imagePicker.selectedPhotos.append(newMedia)
+                        self.parent.imagePicker.imageData.append(image)
+                        self.parent.imagePicker.uploadSelectedImage(media: newMedia, auth: self.parent.auth)
+                    }
+                }
+
+                return false
             }
-        }
     }
 }
 

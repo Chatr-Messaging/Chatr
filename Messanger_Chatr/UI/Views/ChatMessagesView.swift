@@ -118,7 +118,7 @@ struct ChatMessagesView: View {
     @State private var scrollLocationPercent: Double = 0.0
     @State var playingVideoId = ""
     var namespace: Namespace.ID
-    let keyboard = KeyboardObserver()
+    var keyboard = KeyboardObserver()
     let pageShowCount = 10
     //let count = self.auth.messages.selectedDialog(dialogID: self.dialogID).count
     var tempPagination: Int {
@@ -349,18 +349,24 @@ struct ChatMessagesView: View {
                                 self.scrollLocationPercent = Double(CGFloat(self.scrollViewHeight) / (scrollOffsetz + (Constants.screenHeight - (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 127 : 91) : 201))))
                                 
                                 //pause video if scrolling too much & is playing video
-                                if self.playingVideoId != "" {
+                                if self.playingVideoId != "" || self.keyboard.state == .shown {
                                     self.scrollBuffer = self.scrollBuffer == 0 ? scrollOffsetz : self.scrollBuffer
-                                    print("caught the video playing and scrolling \(self.scrollBuffer)")
+                                    print("caught the video playing or keyboard showing and scrolling \(self.scrollBuffer) && \(self.keyboardChange) && \(self.scrollLocationPercent)")
                                     
-                                    if (scrollOffsetz > self.scrollBuffer + 200) || (scrollOffsetz < self.scrollBuffer - 200) {
+                                    if self.playingVideoId != "", ((scrollOffsetz > self.scrollBuffer + 200) || (scrollOffsetz < self.scrollBuffer - 200)) {
                                         print("susses reset the videooo \(self.scrollBuffer)")
                                         self.playingVideoId = ""
                                         self.scrollBuffer = 0
                                     }
+                                    
+                                    if self.keyboard.state == .shown, ((scrollOffsetz > self.scrollBuffer + 400) || (scrollOffsetz < self.scrollBuffer - 20)) {
+                                        print("dismissing the keyboard: \(scrollOffsetz) && \(self.scrollBuffer + 20)")
+                                        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                                        self.scrollBuffer = 0
+                                    }
                                 }
 
-                                print("the offset is: \(self.scrollLocationPercent) && \(self.scrollViewHeight) && nowww: \(scrollOffsetz + (Constants.screenHeight - (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 127 : 91) : 201))) ** \(scrollOffsetz)")
+                                print("the offset is: \(self.keyboard.state) && \(self.scrollLocationPercent) && \(self.scrollViewHeight) && nowww: \(scrollOffsetz + (Constants.screenHeight - (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 127 : 91) : 201))) ** \(scrollOffsetz)")
                                 
                                 print("the blocker iss: \(self.firstScroll) ** \(self.isLoadingMore) ** \(self.permissionLoadMore)")
                                 
