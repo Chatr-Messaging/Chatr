@@ -49,7 +49,7 @@ struct WalkthroughData: Identifiable {
 }
 
 var WalkthroughDataArray = [
-    WalkthroughData(title: "Messaging \nReimagined", subtitle: "A completely new way to connect. \nFun, Safe, & Free."),
+    WalkthroughData(title: "Messaging \nReimagined", subtitle: "A completely new way to connect. \nFun, Simple, & Secure."),
     WalkthroughData(title: "Send Anything", subtitle: "Express yourself using photos, videos,  GIF's, stickers, audio, location, or snaps!"),
     WalkthroughData(title: "Fast & Reliable", subtitle: "Chatr uses fast and secure servers to make it a seamless and safe experience."),
     WalkthroughData(title: "Discover Channels", subtitle: "Discover topics and grow communities through public channels.")
@@ -241,7 +241,8 @@ struct MainBody: View {
                 .offset(x: self.auth.verifyPhoneNumberStatus == .success ? -50 : 0)
                 .offset(x: self.auth.haveUserFullName == true && self.auth.haveUserProfileImg == true && self.auth.isFirstTimeUser == false && self.auth.verifyCodeStatus == .success ? -50 : 0)
                 .offset(x: self.continuePt4 || (self.auth.haveUserProfileImg == false && self.auth.verifyCodeStatus == .success) ? -50 : 0)
-                .frame(width: Constants.screenWidth * 3.5, alignment: .leading)
+                .frame(width: Constants.screenWidth * 4, height: Constants.screenHeight , alignment: .leading)
+                .blur(radius: 8)
                 .animation(.spring(response: 0.6, dampingFraction: 0.45, blendDuration: 0.4))
                 .zIndex(-1)
         )

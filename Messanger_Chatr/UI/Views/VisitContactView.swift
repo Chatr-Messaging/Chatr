@@ -1043,15 +1043,19 @@ struct topHeaderContactView: View {
                             Image(systemName: "star.fill")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 20, height: 20, alignment: .center)
+                                .frame(width: 16, height: 16, alignment: .center)
                                 .foregroundColor( self.contact.isFavourite ? .yellow : .gray)
-                                .shadow(color: Color.black.opacity(self.contact.isFavourite ? 0.15 : 0.0), radius: 2, x: 0, y: 2)
+                                .padding(10)
+                                .background(Circle().stroke(Color.secondary.opacity(0.4), lineWidth: 1.2).frame(width: 32, height: 32).background(Color.secondary.opacity(0.1)))
                         }.buttonStyle(ClickButtonStyle())
+                        .cornerRadius(16)
+                        .clipped()
+                        .shadow(color: Color.black.opacity(self.contact.isFavourite ? 0.15 : 0.0), radius: 2, x: 0, y: 2)
                     } else {
                         Spacer()
                     }
-                }.padding(.horizontal)
-                .padding(.vertical, 15)
+                }
+                .padding(10)
             }).zIndex(1)
         }
     }
