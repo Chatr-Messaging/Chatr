@@ -103,7 +103,7 @@ struct ChannelBubble: View {
                                         }
                                         changeDialogRealmData.shared.insertDialogs([dialogz], completion: {
                                             changeDialogRealmData.shared.updateDialogDelete(isDelete: false, dialogID: dialogz.id ?? "")
-                                            self.auth.sendPushNoti(userIDs: [NSNumber(value: dialogz.userID)], title: "New Member joined \(dialogz.name ?? "no name")", message: "\(self.auth.profile.results.first?.fullName ?? "No Name") joined your channel \(dialogz.name ?? "no name")")
+                                            self.auth.sendPushNoti(userIDs: [NSNumber(value: dialogz.userID)], title: "\(self.auth.profile.results.first?.fullName ?? "New Member") joined \(dialogz.name ?? "no name")", message: "\(self.auth.profile.results.first?.fullName ?? "New Member") has joined your channel \(dialogz.name ?? "no name")")
                                         })
                                     }, onError: { _ in
                                         UINotificationFeedbackGenerator().notificationOccurred(.error)

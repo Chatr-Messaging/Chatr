@@ -90,7 +90,7 @@ struct PublicActionSection: View {
                                     self.dialogRelationship = .subscribed
                                     self.dialogModelAdmins.append(UserDefaults.standard.integer(forKey: "currentUserID"))
                                 }
-                                self.auth.sendPushNoti(userIDs: [NSNumber(value: self.dialogModel.owner)], title: "New Member joined \(dialogz.name ?? "no name")", message: "\(self.auth.profile.results.first?.fullName ?? "No Name") joined your channel \(self.dialogModel.fullName)")
+                                self.auth.sendPushNoti(userIDs: [NSNumber(value: self.dialogModel.owner)], title: "\(self.auth.profile.results.first?.fullName ?? "New Member") joined \(dialogz.name ?? "your channel")", message: "\(self.auth.profile.results.first?.fullName ?? "New Member") has joined your channel \(self.dialogModel.fullName)")
                                 self.notiType = "success"
                                 self.notiText = "Successfully joined \(dialogModel.fullName)"
                                 self.showAlert.toggle()
