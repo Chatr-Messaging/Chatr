@@ -322,16 +322,13 @@ struct ChatMessagesView: View {
                                 //pause video if scrolling too much & is playing video
                                 if self.playingVideoId != "" || self.keyboard.state == .shown {
                                     self.scrollBuffer = self.scrollBuffer == 0 ? scrollOffsetz : self.scrollBuffer
-                                    print("caught the video playing or keyboard showing and scrolling \(self.scrollBuffer) && \(self.keyboardChange) && \(self.scrollLocationPercent)")
                                     
                                     if self.playingVideoId != "", ((scrollOffsetz > self.scrollBuffer + 200) || (scrollOffsetz < self.scrollBuffer - 200)) {
-                                        print("susses reset the videooo \(self.scrollBuffer)")
                                         self.playingVideoId = ""
                                         self.scrollBuffer = 0
                                     }
                                     
                                     if self.keyboard.state == .shown, ((scrollOffsetz > self.scrollBuffer + 400) || (scrollOffsetz < self.scrollBuffer - 20)) {
-                                        print("dismissing the keyboard: \(scrollOffsetz) && \(self.scrollBuffer + 20)")
                                         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                                         self.scrollBuffer = 0
                                     }
