@@ -207,15 +207,23 @@ extension String {
             case .delivered:
                 return "sent"
             case .read:
-                if message.readIDs.count <= 2 {
-                    if message.readIDs.count == 1 && message.readIDs.first == UserDefaults.standard.integer(forKey: "currentUserID") {
-                        //groups/public auto see the message so there will always be one
+                if !isGroup {
+                    if message.readIDs.count == 1 {
                         return "sent"
                     } else {
                         return "read"
                     }
                 } else {
-                    return message.readIDs.count.description + " read"
+                    if message.readIDs.count <= 2 {
+                        if message.readIDs.count == 1, message.readIDs.first == UserDefaults.standard.integer(forKey: "currentUserID") {
+                            //groups/public auto see the message so there will always be one
+                            return "sent"
+                        } else {
+                            return "read"
+                        }
+                    } else {
+                        return message.readIDs.count.description + " read"
+                    }
                 }
             case .editied:
                 return "edited"

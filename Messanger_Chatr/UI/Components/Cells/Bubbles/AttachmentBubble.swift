@@ -64,7 +64,6 @@ struct AttachmentBubble: View {
                     )
                     .padding(.bottom, self.hasPrior ? 0 : 4)
                     .matchedGeometryEffect(id: self.message.id.description + "gif", in: namespace)
-                    .resignKeyboardOnDragGesture()
             } else if self.message.imageType == "image/png", self.message.messageState != .deleted {
                 WebImage(url: URL(string: self.message.image))
                     .resizable()
@@ -191,7 +190,6 @@ struct AttachmentBubble: View {
                 }
             } else if self.message.imageType == "audio/m4a", self.message.messageState != .deleted {
                 AudioBubble(viewModel: self.viewModel, message: self.message, namespace: self.namespace, messageRight: self.messagePosition == .right)
-                    .resignKeyboardOnDragGesture()
             }
         }
     }
