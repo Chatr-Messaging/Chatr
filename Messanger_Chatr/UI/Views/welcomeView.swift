@@ -695,7 +695,7 @@ struct PhoneNumberView: View {
                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                 self.openTerms.toggle()
             }) {
-                Text("By entering your phone number you are agreeing to our Terms of Service & Privacy Policy.")
+                Text("By submitting your phone number and using Chatr, you agree to our Terms of Service & Privacy Policy.")
                     .font(.system(size: 12))
                     .font(.footnote)
                     .foregroundColor(Color.secondary)
@@ -705,7 +705,7 @@ struct PhoneNumberView: View {
             .padding(.bottom, 10)
             .sheet(isPresented: $openTerms) {
                 NavigationView {
-                    TermsView(mainText: Constants.termsOfService)
+                    TermsView(markdown: Constants.termsOfServiceMarkdown, navTitle: "Terms of Service")
                         .navigationBarItems(leading:
                             Button(action: {
                                 withAnimation {

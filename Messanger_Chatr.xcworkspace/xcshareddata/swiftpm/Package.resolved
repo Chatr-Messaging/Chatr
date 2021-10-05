@@ -11,6 +11,15 @@
         }
       },
       {
+        "package": "AttributedText",
+        "repositoryURL": "https://github.com/gonzalezreal/AttributedText",
+        "state": {
+          "branch": null,
+          "revision": "c345033e22d5a1cd0e9fe0ec405cc809a8349586",
+          "version": "0.3.1"
+        }
+      },
+      {
         "package": "CarBode",
         "repositoryURL": "https://github.com/heart/CarBode-Barcode-Scanner-For-SwiftUI",
         "state": {
@@ -20,12 +29,39 @@
         }
       },
       {
+        "package": "combine-schedulers",
+        "repositoryURL": "https://github.com/pointfreeco/combine-schedulers",
+        "state": {
+          "branch": null,
+          "revision": "4cf088c29a20f52be0f2ca54992b492c54e0076b",
+          "version": "0.5.3"
+        }
+      },
+      {
         "package": "ConfettiSwiftUI",
         "repositoryURL": "https://github.com/simibac/ConfettiSwiftUI",
         "state": {
           "branch": null,
           "revision": "4aac70f5264e59dfed75d6f1c282bb147f101a49",
           "version": "0.2.1"
+        }
+      },
+      {
+        "package": "MarkdownUI",
+        "repositoryURL": "https://github.com/gonzalezreal/MarkdownUI",
+        "state": {
+          "branch": null,
+          "revision": "29d94710545952dd4c724cc2ca901848eef54ded",
+          "version": "0.5.2"
+        }
+      },
+      {
+        "package": "NetworkImage",
+        "repositoryURL": "https://github.com/gonzalezreal/NetworkImage",
+        "state": {
+          "branch": null,
+          "revision": "d45f014daf5c54ef73a7d8db87ac94b9bd3d31bd",
+          "version": "3.1.1"
         }
       },
       {
@@ -65,6 +101,24 @@
         }
       },
       {
+        "package": "cmark",
+        "repositoryURL": "https://github.com/SwiftDocOrg/swift-cmark.git",
+        "state": {
+          "branch": null,
+          "revision": "9c8096a23f44794bde297452d87c455fc4f76d42",
+          "version": "0.29.0+20210102.9c8096a"
+        }
+      },
+      {
+        "package": "SwiftCommonMark",
+        "repositoryURL": "https://github.com/gonzalezreal/SwiftCommonMark",
+        "state": {
+          "branch": null,
+          "revision": "ed60da54305c244d0f77bc8d08495e04161e96a4",
+          "version": "0.1.2"
+        }
+      },
+      {
         "package": "Grid",
         "repositoryURL": "https://github.com/spacenation/swiftui-grid.git",
         "state": {
@@ -89,6 +143,15 @@
           "branch": null,
           "revision": "b9314678cf946e8c02ae1dcaf4e07d6c9dd7712c",
           "version": "0.1.6"
+        }
+      },
+      {
+        "package": "xctest-dynamic-overlay",
+        "repositoryURL": "https://github.com/pointfreeco/xctest-dynamic-overlay",
+        "state": {
+          "branch": null,
+          "revision": "50a70a9d3583fe228ce672e8923010c8df2deddd",
+          "version": "0.2.1"
         }
       }
     ]
