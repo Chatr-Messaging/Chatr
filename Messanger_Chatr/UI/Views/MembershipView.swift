@@ -397,7 +397,7 @@ struct MembershipView: View {
                     .buttonStyle(PlainButtonStyle())
                     .sheet(isPresented: self.$openTerms, content: {
                         NavigationView {
-                            TermsView(mainText: Constants.termsOfService)
+                            TermsView(markdown: Constants.termsOfServiceMarkdown, navTitle: "Terms of Service")
                                 .navigationBarTitle("Terms of Service")
                                 .modifier(GroupedListModifier())
                                 .environmentObject(self.auth)

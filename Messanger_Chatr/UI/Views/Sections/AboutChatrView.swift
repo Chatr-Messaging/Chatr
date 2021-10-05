@@ -187,17 +187,54 @@ struct AboutChatrView: View {
                     }.padding(.top, 10)
                     
                     VStack(alignment: .center, spacing: 0) {
-                        NavigationLink(destination: TermsView(mainText: Constants.termsOfService)) {
+                        NavigationLink(destination: TermsView(markdown: Constants.eulaMarkdown, navTitle: "EULA Agreement")) {
                             VStack(alignment: .trailing, spacing: 0) {
                                 HStack {
-                                    Image(systemName: "books.vertical")
+                                    Image(systemName: "doc.text")
                                         .resizable()
                                         .scaledToFit()
                                         .foregroundColor(Color.primary)
                                         .frame(width: 20, height: 20, alignment: .center)
                                         .padding(.trailing, 5)
                                     
-                                    Text("Terms Of Service")
+                                    Text("EULA Agreement")
+                                        .font(.none)
+                                        .fontWeight(.none)
+                                        .foregroundColor(.primary)
+
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .resizable()
+                                        .font(Font.title.weight(.bold))
+                                        .scaledToFit()
+                                        .frame(width: 7, height: 15, alignment: .center)
+                                        .foregroundColor(.secondary)
+                                }.padding(.horizontal)
+                                .padding(.vertical, 15)
+                                
+                                Divider()
+                                    .frame(width: Constants.screenWidth - 80)
+                            }
+                        }.buttonStyle(changeBGButtonStyle())
+                        .simultaneousGesture(TapGesture()
+                            .onEnded { _ in
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                            })
+
+                        //NavigationView {
+                            //WebsiteView(websiteUrl: self.$websiteUrl)
+                        
+                        NavigationLink(destination: TermsView(markdown: Constants.privacyPolicyMarkdown, navTitle: "Privacy Policy")) {
+                            VStack(alignment: .trailing, spacing: 0) {
+                                HStack {
+                                    Image(systemName: "doc.text")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .foregroundColor(Color.primary)
+                                        .frame(width: 20, height: 20, alignment: .center)
+                                        .padding(.trailing, 5)
+                                    
+                                    Text("Privacy Policy")
                                         .font(.none)
                                         .fontWeight(.none)
                                         .foregroundColor(.primary)
@@ -220,18 +257,18 @@ struct AboutChatrView: View {
                             .onEnded { _ in
                                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                             })
-                        
-                        NavigationLink(destination: TermsView(mainText: Constants.EULAagreement)) {
+
+                        NavigationLink(destination: TermsView(markdown: Constants.termsOfServiceMarkdown, navTitle: "Terms of Service")) {
                             VStack(alignment: .trailing, spacing: 0) {
                                 HStack {
-                                    Image(systemName: "books.vertical")
+                                    Image(systemName: "doc.text")
                                         .resizable()
                                         .scaledToFit()
                                         .foregroundColor(Color.primary)
                                         .frame(width: 20, height: 20, alignment: .center)
                                         .padding(.trailing, 5)
                                     
-                                    Text("EULA Agreement")
+                                    Text("Terms of Service")
                                         .font(.none)
                                         .fontWeight(.none)
                                         .foregroundColor(.primary)
