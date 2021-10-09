@@ -164,6 +164,7 @@
 		05DB89D4238B851900D4581F /* Messanger_ChatrUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05DB89D3238B851900D4581F /* Messanger_ChatrUITests.swift */; };
 		05DB89E2238B854400D4581F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 05DB89E1238B854400D4581F /* GoogleService-Info.plist */; };
 		05DD2D4225C9D44900B1ACB7 /* LinkedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05DD2D4125C9D44900B1ACB7 /* LinkedText.swift */; };
+		05E14B282711562400465FFA /* AgoraUIKit_iOS in Frameworks */ = {isa = PBXBuildFile; productRef = 05E14B272711562400465FFA /* AgoraUIKit_iOS */; };
 		05E5B3292430747E00354C01 /* UserDialogs+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E5B3282430747E00354C01 /* UserDialogs+Extensions.swift */; };
 		05EA572724148BA100372F1A /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05EA572624148BA100372F1A /* Profile.swift */; };
 		05ECD98C25E0FA6800B5783A /* CacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05ECD98B25E0FA6800B5783A /* CacheManager.swift */; };
@@ -393,6 +394,7 @@
 			files = (
 				054E9B7725D22CF600365CE0 /* SlideOverCard in Frameworks */,
 				05C36C17252D62B90031CB3F /* PopupView in Frameworks */,
+				05E14B282711562400465FFA /* AgoraUIKit_iOS in Frameworks */,
 				05FF35C92536C03400886576 /* StoreKit.framework in Frameworks */,
 				055E516625ACDC0B003BE668 /* WKView in Frameworks */,
 				053892A7270BEA1700BF9EB3 /* MarkdownUI in Frameworks */,
@@ -882,6 +884,7 @@
 				05D466D5263F7B050015B61D /* Grid */,
 				05A7B8E126A7656F00BAEC59 /* Uploadcare */,
 				053892A6270BEA1700BF9EB3 /* MarkdownUI */,
+				05E14B272711562400465FFA /* AgoraUIKit_iOS */,
 			);
 			productName = Messanger_Chatr;
 			productReference = 05DB89AE238B851400D4581F /* Messanger_Chatr.app */;
@@ -965,6 +968,7 @@
 				05D466D4263F7B050015B61D /* XCRemoteSwiftPackageReference "swiftui-grid" */,
 				05A7B8E026A7656F00BAEC59 /* XCRemoteSwiftPackageReference "uploadcare-swift" */,
 				053892A5270BEA1600BF9EB3 /* XCRemoteSwiftPackageReference "MarkdownUI" */,
+				05E14B262711562400465FFA /* XCRemoteSwiftPackageReference "iOS-UIKit" */,
 			);
 			productRefGroup = 05DB89AF238B851400D4581F /* Products */;
 			projectDirPath = "";
@@ -1772,6 +1776,14 @@
 				minimumVersion = 1.1.0;
 			};
 		};
+		05E14B262711562400465FFA /* XCRemoteSwiftPackageReference "iOS-UIKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AgoraIO-Community/iOS-UIKit.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1828,6 +1840,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 05D466D4263F7B050015B61D /* XCRemoteSwiftPackageReference "swiftui-grid" */;
 			productName = Grid;
+		};
+		05E14B272711562400465FFA /* AgoraUIKit_iOS */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 05E14B262711562400465FFA /* XCRemoteSwiftPackageReference "iOS-UIKit" */;
+			productName = AgoraUIKit_iOS;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

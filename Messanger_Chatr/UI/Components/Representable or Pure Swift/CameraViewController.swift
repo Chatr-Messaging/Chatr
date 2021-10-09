@@ -6,8 +6,25 @@
 //  Copyright © 2020 Gaspard Rosay. All rights reserved.
 //
 
+import UIKit
 import AVFoundation
 import SwiftUI
+import AgoraUIKit_iOS
+
+struct AgoraVideo: UIViewRepresentable {
+    typealias UIViewType = AgoraVideoViewer
+
+    func makeUIView(context: Context) -> AgoraVideoViewer {
+        let agview = AgoraVideoViewer(connectionData: AgoraConnectionData(appId: "404feedfd57c4ed2a3b7e3d5780c5114", appToken: "006404feedfd57c4ed2a3b7e3d5780c5114IAAfjGAKg27oySoIq2rAZoeYgTqVvDFUEVIsSbLnG9g6MumVuToAAAAAEAB9PQWkGn5iYQEAAQAZfmJh"))
+        agview.join(channel: "testChannel1")
+        
+        return agview
+    }
+    
+    func updateUIView(_ uiView: AgoraVideoViewer, context: Context) {
+    
+    }
+}
 
 struct CameraViewController : UIViewRepresentable {
     @ObservedObject var camera: CameraViewModel
