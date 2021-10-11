@@ -1126,6 +1126,20 @@ struct actionButtonView: View {
                         .frame(width: 36, height: 24)
                         .background(RoundedRectangle(cornerRadius: 17, style: .circular).frame(width: 58, height: 58).foregroundColor(.purple).shadow(color: Color.purple.opacity(0.45), radius: 10, x: 0, y: 6))
                 }.buttonStyle(ClickButtonStyle())
+                
+                Button(action: {
+                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                    self.viewModel.getCallToken(channelName: "testChannelz", completion: { result in
+                        print("doneeeeeee: \(result)")
+                    })
+                }) {
+                    Image(systemName: "phone.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundColor(.black)
+                        .frame(width: 36, height: 24)
+                        .background(RoundedRectangle(cornerRadius: 17, style: .circular).frame(width: 58, height: 58).foregroundColor(.green).shadow(color: Color.green.opacity(0.45), radius: 10, x: 0, y: 6))
+                }.buttonStyle(ClickButtonStyle())
             } else if self.contactRelationship == .notContact && self.contact.id != UserDefaults.standard.integer(forKey: "currentUserID") {
                 Button(action: {
                     self.viewModel.addContact(contactRelationship: self.contactRelationship, contactId: self.contact.id, completion: { contactState in

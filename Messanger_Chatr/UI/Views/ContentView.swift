@@ -677,8 +677,8 @@ struct mainHomeList: View {
                         .environmentObject(self.auth)
                 }
             
-            AgoraVideo()
-                .frame(width: Constants.screenWidth, height: Constants.screenHeight, alignment: .center)
+            //AgoraVideo()
+                //.frame(width: Constants.screenWidth, height: Constants.screenHeight, alignment: .center)
             
             ConfettiCannon(counter: $counter, repetitions: 3, repetitionInterval: 0.2)
         }

@@ -11,6 +11,18 @@ import Combine
 import ConnectyCube
 import RealmSwift
 
+struct forecast: Codable {
+    var name: String?
+    var temp: Int?
+    var unit: String?
+    var description: String?
+}
+
+struct callToken: Codable {
+    var id: String?
+    var forecast: [forecast]?
+}
+
 class VisitContactViewModel: ObservableObject {
     private let instagramApi = InstagramApi.shared
     private var cancellables = Set<AnyCancellable>()
@@ -25,6 +37,34 @@ class VisitContactViewModel: ObservableObject {
         instagramApi.$username
             .assign(to: \.username, on: self)
             .store(in: &cancellables)
+    }
+    
+    func getCallToken(channelName: String, completion: @escaping(_ result : String) -> ()) {
+        let parameters: [String : String] = [
+            "channelName": channelName,
+            "userId": "\(UserDefaults.standard.integer(forKey: "currentUserID"))"
+        ]
+        
+        guard let httpBody = try? JSONSerialization.data(withJSONObject: parameters, options: []) else { return }
+        
+        var request = URLRequest(url: URL(string: "https://chatr-messaging.herokuapp.com/get_weather")!, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 10.0)
+        request.httpMethod = "POST"
+        request.setValue("Application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = httpBody
+        
+        let session = URLSession.shared
+        let dataTask = session.dataTask(with: request, completionHandler: { (data, response, error) -> Void in
+            guard let data = data else { return }
+            
+            do {
+                let res = try JSONDecoder().decode(callToken.self, from: data)
+                completion("done!")
+                print("done now:zz \(res)")
+            } catch {
+                print(error)
+            }
+        })
+        dataTask.resume()
     }
     
     func loadInstagramImages(testUser: InstagramTestUser) {
