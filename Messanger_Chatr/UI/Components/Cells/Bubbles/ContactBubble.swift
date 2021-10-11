@@ -181,7 +181,7 @@ struct ContactBubble: View {
                             self.contactRelationship = .contact
                         } else {
                             Request.users(withIDs: [NSNumber(value: self.message.contactID)], paginator: Paginator.limit(1, skip: 0), successBlock: { (paginator, users) in
-                                changeContactsRealmData.shared.observeFirebaseContactReturn(contactID: Int(users.first?.id ?? 0), completion: { contact in
+                                self.auth.contacts.observeFirebaseContactReturn(contactID: Int(users.first?.id ?? 0), completion: { contact in
                                     if let firstUser = users.first {
                                         let newContact = ContactStruct()
                                         newContact.id = Int(firstUser.id)
@@ -240,7 +240,7 @@ struct ContactBubble: View {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                         self.isHomeDialogOpen = false
                         UserDefaults.standard.set(false, forKey: "localOpen")
-                        changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? self.auth.selectedConnectyDialog?.id ?? "")
+                        self.auth.dialogs.updateDialogOpen(isOpen: false, dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? self.auth.selectedConnectyDialog?.id ?? "")
 
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
                             print("the current one is:  and now the new one: \(dia.id)")
@@ -248,7 +248,7 @@ struct ContactBubble: View {
                             UserDefaults.standard.set(dia.id, forKey: "selectedDialogID")
                             self.chatContact = 0
                             self.isHomeDialogOpen = true
-                            changeDialogRealmData.shared.updateDialogOpen(isOpen: true, dialogID: dia.id)
+                            self.auth.dialogs.updateDialogOpen(isOpen: true, dialogID: dia.id)
                             UserDefaults.standard.set(true, forKey: "localOpen")
                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                         }
@@ -265,11 +265,11 @@ struct ContactBubble: View {
         dialog.occupantIDs = [NSNumber(value: self.chatContact)]  // an ID of opponent
 
         Request.createDialog(dialog, successBlock: { (dialog) in
-            changeDialogRealmData.shared.fetchDialogs(completion: { _ in
+            self.auth.dialogs.fetchDialogs(completion: { _ in
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                     self.isHomeDialogOpen = false
                     UserDefaults.standard.set(false, forKey: "localOpen")
-                    changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? self.auth.selectedConnectyDialog?.id ?? "")
+                    self.auth.dialogs.updateDialogOpen(isOpen: false, dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? self.auth.selectedConnectyDialog?.id ?? "")
 
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
                         print("the current one jklis: and now the new one:")
@@ -277,7 +277,7 @@ struct ContactBubble: View {
                         UserDefaults.standard.set(dialog.id ?? "", forKey: "selectedDialogID")
                         self.chatContact = 0
                         self.isHomeDialogOpen = true
-                        changeDialogRealmData.shared.updateDialogOpen(isOpen: true, dialogID: dialog.id ?? "")
+                        self.auth.dialogs.updateDialogOpen(isOpen: true, dialogID: dialog.id ?? "")
                         UserDefaults.standard.set(true, forKey: "localOpen")
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     }

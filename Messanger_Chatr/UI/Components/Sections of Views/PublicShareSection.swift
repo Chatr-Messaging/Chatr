@@ -137,7 +137,7 @@ struct PublicShareSection: View {
                         //replace below with selected contact id:
                         if self.selectedContact.contains(id) {
                             if let selectedDialog = self.auth.dialogs.results.filter("id == %@", dialog.id).first {
-                                changeMessageRealmData.shared.sendPublicChannel(dialog: selectedDialog, contactID: [self.dialogModel.id], occupentID: [NSNumber(value: id), NSNumber(value: Int(self.auth.profile.results.first?.id ?? 0))])
+                                self.auth.messages.sendPublicChannel(dialog: selectedDialog, contactID: [self.dialogModel.id], occupentID: [NSNumber(value: id), NSNumber(value: Int(self.auth.profile.results.first?.id ?? 0))])
                                 
                                 if let index = self.selectedContact.firstIndex(of: id) {
                                     self.selectedContact.remove(at: index)
@@ -173,13 +173,13 @@ struct PublicShareSection: View {
                    message.attachments = [attachment]
                    
                    dialog.send(message) { (error) in
-                       changeMessageRealmData.shared.insertMessage(message, completion: {
+                       self.auth.messages.insertMessage(message, completion: {
                            if error != nil {
                                print("error sending message: \(String(describing: error?.localizedDescription))")
-                               changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .error)
+                               self.auth.messages.updateMessageState(messageID: message.id ?? "", messageState: .error)
                            } else {
                                print("Success sending message to ConnectyCube server!")
-                               changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
+                               self.auth.messages.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
                            }
                        })
                    }
@@ -187,7 +187,7 @@ struct PublicShareSection: View {
                     print("error making dialog: \(error.localizedDescription)")
                 }
 
-                changeDialogRealmData.shared.fetchDialogs(completion: { _ in
+                self.auth.dialogs.fetchDialogs(completion: { _ in
                     self.selectedContact.removeAll()
                     UINotificationFeedbackGenerator().notificationOccurred(.success)
                     self.notiType = "success"

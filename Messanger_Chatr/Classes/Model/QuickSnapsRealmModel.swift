@@ -46,9 +46,7 @@ class QuickSnapsRealmModel<Element>: ObservableObject where Element: RealmSwift.
     }
 }
 
-class changeQuickSnapsRealmData {
-    init() { }
-    static let shared = changeQuickSnapsRealmData()
+extension QuickSnapsRealmModel {
     
     func sendQuickSnap(image: Data, sendTo: [Int], completion: @escaping (Bool) -> Void) {
         uploadSnapToFirebaseStorage(data: image, onSuccess: { (snapImgUrl) in

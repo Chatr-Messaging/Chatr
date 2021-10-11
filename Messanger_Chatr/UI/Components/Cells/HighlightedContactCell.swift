@@ -10,6 +10,7 @@ import SwiftUI
 import SDWebImageSwiftUI
 
 struct HighlightedContactCell: View {
+    @EnvironmentObject var auth: AuthModel
     @Environment(\.presentationMode) var presentationMode
     @State var contact: ContactStruct = ContactStruct()
     @Binding var newMessage: Int
@@ -59,9 +60,9 @@ struct HighlightedContactCell: View {
                             print("Favorite tap")
                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             if self.contact.isFavourite {
-                                changeContactsRealmData.shared.updateContactFavouriteStatus(userID: UInt(self.contact.id), favourite: false)
+                                self.auth.contacts.updateContactFavouriteStatus(userID: UInt(self.contact.id), favourite: false)
                             } else {
-                                changeContactsRealmData.shared.updateContactFavouriteStatus(userID: UInt(self.contact.id), favourite: true)
+                                self.auth.contacts.updateContactFavouriteStatus(userID: UInt(self.contact.id), favourite: true)
                             }
                         }) {
                             Image(systemName: "star.fill")

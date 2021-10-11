@@ -199,7 +199,7 @@ struct ChatMessagesView: View {
                                             .padding(.top, 2.5)
                                             .padding(.horizontal, 40)
                                         
-                                        Text("created \(self.viewModel.dateFormatTime(date: changeDialogRealmData.shared.getRealmDialog(dialogId: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").createdAt))")
+                                        Text("created \(self.viewModel.dateFormatTime(date: self.auth.dialogs.getRealmDialog(dialogId: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").createdAt))")
                                             .font(.caption)
                                             .fontWeight(.regular)
                                             .foregroundColor(.secondary)
@@ -402,7 +402,7 @@ struct ChatMessagesView: View {
                                         //loading more from server
                                         print("local has more to fetch \(self.maxMessageCount) && \(self.viewModel.unreadMessageCount) && \(currentMessages.count) limit: \(pageShowCount * (self.scrollPage + 1)) skip: \(currentMessages.count)")
 
-                                        changeMessageRealmData.shared.getMessageUpdates(dialogID: self.dialogID, limit: pageShowCount * (self.scrollPage + 2), skip: currentMessages.count, completion: { _ in
+                                        self.auth.messages.getMessageUpdates(dialogID: self.dialogID, limit: pageShowCount * (self.scrollPage + 2), skip: currentMessages.count, completion: { _ in
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
                                                 
                                                 if self.maxMessageCount >= currentMessages.count {
@@ -513,7 +513,7 @@ struct ChatMessagesView: View {
                         
                         if self.viewModel.totalMessageCount > self.currentMessages.count || self.currentMessages.count == 0 || self.viewModel.totalMessageCount == 100 {
                             print("local and pulled do not match... pulling delta: \(self.viewModel.totalMessageCount) && \(self.currentMessages.count)")
-                            changeMessageRealmData.shared.getMessageUpdates(dialogID: dialogID, limit: pageShowCount * (self.scrollPage), skip: currentMessages.count - self.minPagination, completion: { done in
+                            self.auth.messages.getMessageUpdates(dialogID: dialogID, limit: pageShowCount * (self.scrollPage), skip: currentMessages.count - self.minPagination, completion: { done in
                                 DispatchQueue.main.async {
                                     
                                     print("STARTTT Load more From Empty view the load limit: \(pageShowCount * (self.scrollPage + 1)) and the skip:\(currentMessages.count - self.minPagination)...... the indexes are \(self.maxPagination).....< \(self.minPagination) anddddd nowww the scroll to index is: \(self.maxPagination + 1)")
@@ -548,7 +548,7 @@ struct ChatMessagesView: View {
             self.maxMessageCount = currentMessages.count
             self.viewModel.unreadMessageCount = Int(unread)
             if unread != 0 {
-                changeMessageRealmData.shared.getMessageUpdates(dialogID: self.dialogID, limit: currentMessages.count + Int(unread > 40 ? 40 : unread), skip: currentMessages.count - self.minPagination, completion: { _ in
+                self.auth.messages.getMessageUpdates(dialogID: self.dialogID, limit: currentMessages.count + Int(unread > 40 ? 40 : unread), skip: currentMessages.count - self.minPagination, completion: { _ in
                     self.maxMessageCount = currentMessages.count
                 })
             }
@@ -559,11 +559,11 @@ struct ChatMessagesView: View {
         let msg = Database.database().reference().child("Dialogs").child(self.dialogID).child("pinned")
 
         msg.observe(.childAdded, with: { snapAdded in
-            changeDialogRealmData.shared.addDialogPin(messageId: snapAdded.key, dialogID: self.dialogID)
+            self.auth.dialogs.addDialogPin(messageId: snapAdded.key, dialogID: self.dialogID)
         })
 
         msg.observe(.childRemoved, with: { snapRemoved in
-            changeDialogRealmData.shared.removeDialogPin(messageId: snapRemoved.key, dialogID: self.dialogID)
+            self.auth.dialogs.removeDialogPin(messageId: snapRemoved.key, dialogID: self.dialogID)
         })
     }
 }

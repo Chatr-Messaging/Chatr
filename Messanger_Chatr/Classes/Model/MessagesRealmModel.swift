@@ -95,9 +95,7 @@ class MessagesRealmModel<Element>: ObservableObject where Element: RealmSwift.Re
     }
 }
 
-class changeMessageRealmData {
-    init() { }
-    static let shared = changeMessageRealmData()
+extension MessagesRealmModel {
 
     func getMessageUpdates(dialogID: String, limit: Int, skip: Int, completion: @escaping (Bool) -> ()) {
         let extRequest : [String: String] = ["sort_desc" : "date_sent", "mark_as_read" : "0"]

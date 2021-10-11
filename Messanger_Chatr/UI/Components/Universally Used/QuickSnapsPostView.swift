@@ -13,7 +13,7 @@ import FirebaseDatabase
 import ConnectyCube
 
 struct QuickSnapsPostView: View {
-    @ObservedObject var quickSnapsRealm = QuickSnapsRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(QuickSnapsStruct.self))
+    @EnvironmentObject var auth: AuthModel
     @Binding var selectedQuickSnapContact: ContactStruct
     @Binding var viewState: QuickSnapViewingState
     @State var loadAni: Bool = false
@@ -41,7 +41,7 @@ struct QuickSnapsPostView: View {
                                 .clipShape(Circle())
                                 .shadow(color: Color.black.opacity(0.25), radius: 8, x: 0, y: 8)
                             
-                            if self.quickSnapsRealm.results.filter("id == %@", selectedQuickSnapContact.quickSnaps.first ?? "").count > 0 {
+                            if self.auth.quickSnaps.results.filter("id == %@", selectedQuickSnapContact.quickSnaps.first ?? "").count > 0 {
                                 Circle()
                                     .trim(from: 0, to: CGFloat(Double(self.timeRemaining) * 0.1))
                                     .stroke(Constants.snapPurpleGradient, style: StrokeStyle(lineWidth: 2, lineCap: .round))
@@ -88,7 +88,7 @@ struct QuickSnapsPostView: View {
                                     .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 0)
                             }
                             
-                            if let timeAgo = self.quickSnapsRealm.results.filter("id == %@", selectedQuickSnapContact.quickSnaps.first ?? "").sorted(by: { $0.sentDate.compare($1.sentDate) == .orderedDescending }).first?.sentDate.getElapsedInterval(lastMsg: "moments") {
+                            if let timeAgo = self.auth.quickSnaps.results.filter("id == %@", selectedQuickSnapContact.quickSnaps.first ?? "").sorted(by: { $0.sentDate.compare($1.sentDate) == .orderedDescending }).first?.sentDate.getElapsedInterval(lastMsg: "moments") {
                                 Text(timeAgo + " ago")
                                     .font(.footnote)
                                     .fontWeight(.regular)
@@ -121,7 +121,7 @@ struct QuickSnapsPostView: View {
                 //MARK: Viewing State
                 if self.viewState == .viewing {
                     //MARK: MAIN IMAGE
-                    if let image = self.quickSnapsRealm.results.filter("id == %@", selectedQuickSnapContact.quickSnaps.first ?? "").sorted(by: { $0.sentDate.compare($1.sentDate) == .orderedDescending }).first?.imageUrl {
+                    if let image = self.auth.quickSnaps.results.filter("id == %@", selectedQuickSnapContact.quickSnaps.first ?? "").sorted(by: { $0.sentDate.compare($1.sentDate) == .orderedDescending }).first?.imageUrl {
                         WebImage(url: URL(string: image))
                             .resizable()
                             .placeholder{
@@ -396,7 +396,7 @@ struct QuickSnapsPostView: View {
             let realm = try Realm(configuration: config)
             
             try? realm.write({
-                if let deleteFirst = (self.quickSnapsRealm.results.filter("id == %@", self.selectedQuickSnapContact.quickSnaps.first ?? "").sorted(by: { $0.sentDate.compare($1.sentDate) == .orderedDescending }).first) {
+                if let deleteFirst = (self.auth.quickSnaps.results.filter("id == %@", self.selectedQuickSnapContact.quickSnaps.first ?? "").sorted(by: { $0.sentDate.compare($1.sentDate) == .orderedDescending }).first) {
                     realm.delete(deleteFirst)
                 }
                 

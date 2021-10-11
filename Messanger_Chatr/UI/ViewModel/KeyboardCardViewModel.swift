@@ -52,6 +52,7 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
     @Published var imageData: [UIImage] = []
     @Published var videoData: [AVAsset] = []
     @Published var pastedImages: [UIImage] = []
+    var auth = AuthModel()
 
     var storage: Cache.Storage<String, Data>? = {
         return try? Cache.Storage(diskConfig: DiskConfig(name: "DiskCache"), memoryConfig: MemoryConfig(expiry: .date(Calendar.current.date(byAdding: .day, value: 4, to: Date()) ?? Date()), countLimit: 50, totalCostLimit: 100), transformer: TransformerFactory.forData())
@@ -280,14 +281,14 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
         
         pDialog.send(message) { (error) in
             print("SENT image...")
-            changeMessageRealmData.shared.insertMessage(message, completion: {
+            self.auth.messages.insertMessage(message, completion: {
                 if error != nil {
                     print("error sending attachment: \(String(describing: error?.localizedDescription))")
-                    changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .error)
+                    self.auth.messages.updateMessageState(messageID: message.id ?? "", messageState: .error)
                     completion()
                 } else {
                     print("Success sending attachment to ConnectyCube server!")
-                    changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
+                    self.auth.messages.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
                     if let index = self.selectedPhotos.firstIndex(of: attachment), let storeId = self.selectedPhotos[index].uploadId {
                         self.selectedPhotos.remove(at: index)
                         self.storeUploadMedia(id: storeId)
@@ -329,17 +330,17 @@ class KeyboardCardViewModel: NSObject, ObservableObject, PHPhotoLibraryChangeObs
             
             pDialog.send(message) { (error) in
                 print("SENT video...")
-                changeMessageRealmData.shared.insertMessage(message, completion: {
+                self.auth.messages.insertMessage(message, completion: {
                     if error != nil {
                         print("error sending attachment: \(String(describing: error?.localizedDescription))")
-                        changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .error)
+                        self.auth.messages.updateMessageState(messageID: message.id ?? "", messageState: .error)
                     } else {
                         print("Success sending attachment to ConnectyCube server!")
                         self.storeUploadMedia(id: placeholderId)
                         if let index = self.selectedVideos.firstIndex(of: attachment) {
                             self.selectedVideos.remove(at: index)
                         }
-                        changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
+                        self.auth.messages.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
                     }
                 })
             }

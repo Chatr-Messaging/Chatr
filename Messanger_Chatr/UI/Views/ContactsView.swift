@@ -207,6 +207,7 @@ struct ContactsView: View {
                                                 ForEach(self.auth.contacts.results.filter({ $0.isMyContact == true && $0.isOnline == true }), id: \.self) { savedContact in
                                                     NavigationLink(destination: VisitContactView(newMessage: self.$newDialogID, dismissView: self.$dismissView, viewState: .fromContacts, contact: savedContact).edgesIgnoringSafeArea(.all).environmentObject(self.auth)) {
                                                         HighlightedContactCell(contact: savedContact, newMessage: self.$newDialogID, dismissView: self.$dismissView, selectedQuickSnapContact: self.$selectedQuickSnapContact, quickSnapViewState: self.$quickSnapViewState)
+                                                            .environmentObject(self.auth)
                                                             .frame(width: 150, height: 150)
                                                             .animation(.spring(response: 0.45, dampingFraction: 0.70, blendDuration: 0))
                                                             .disabled(self.quickSnapViewState == .closed ? false : true)
@@ -233,6 +234,7 @@ struct ContactsView: View {
                                                 ForEach(self.auth.contacts.results.filter({ $0.isMyContact == true && $0.isFavourite == true && $0.isOnline == false }), id: \.self) { savedContact in
                                                     NavigationLink(destination: VisitContactView(newMessage: self.$newDialogID, dismissView: self.$dismissView, viewState: .fromContacts, contact: savedContact).edgesIgnoringSafeArea(.all).environmentObject(self.auth)) {
                                                         HighlightedContactCell(contact: savedContact, newMessage: self.$newDialogID, dismissView: self.$dismissView, selectedQuickSnapContact: self.$selectedQuickSnapContact, quickSnapViewState: self.$quickSnapViewState)
+                                                            .environmentObject(self.auth)
                                                             .frame(width: 150, height: 150)
                                                             .animation(.spring(response: 0.45, dampingFraction: 0.70, blendDuration: 0))
                                                             .disabled(self.quickSnapViewState == .closed ? false : true)  
@@ -259,6 +261,7 @@ struct ContactsView: View {
                                                 ForEach(self.auth.contacts.results.filter({ $0.isMyContact == true && $0.isFavourite == false && $0.isOnline == false && $0.hasQuickSnaped == true }), id: \.self) { savedContact in
                                                     NavigationLink(destination: VisitContactView(newMessage: self.$newDialogID, dismissView: self.$dismissView, viewState: .fromContacts, contact: savedContact).edgesIgnoringSafeArea(.all).environmentObject(self.auth)) {
                                                         HighlightedContactCell(contact: savedContact, newMessage: self.$newDialogID, dismissView: self.$dismissView, selectedQuickSnapContact: self.$selectedQuickSnapContact, quickSnapViewState: self.$quickSnapViewState)
+                                                            .environmentObject(self.auth)
                                                             .frame(width: 150, height: 150)
                                                             .animation(.spring(response: 0.45, dampingFraction: 0.70, blendDuration: 0))
                                                             .disabled(self.quickSnapViewState == .closed ? false : true)

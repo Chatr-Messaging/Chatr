@@ -460,7 +460,7 @@ struct EditProfileView: View {
                 }.padding(.top, 70)
                 .resignKeyboardOnDragGesture()
                 .onAppear {
-                    changeProfileRealmDate.shared.observeFirebaseUser(with: self.auth.profile.results.first?.id ?? 0)
+                    self.auth.profile.observeFirebaseUser(with: self.auth.profile.results.first?.id ?? 0)
                 }
             }.frame(height: Constants.screenHeight - 50 - self.keyboardHeight)
             .navigationBarTitle("Edit Profile", displayMode: .inline)
@@ -480,7 +480,7 @@ struct EditProfileView: View {
                         updateParameters.website = self.websiteText.isEmpty ? "" : self.websiteText.contains("http://") ? self.websiteText.lowercased() : "http://" + self.websiteText.lowercased()
                         self.websiteText = updateParameters.website ?? ""
 
-                        if changeProfileRealmDate.shared.isValidEmail(self.emailText) {
+                        if self.auth.profile.isValidEmail(self.emailText) {
                             updateParameters.email = self.emailText
                             self.errorEmail = false
                         } else {
@@ -488,7 +488,7 @@ struct EditProfileView: View {
                         }
 
                         Request.updateCurrentUser(updateParameters, successBlock: { (user) in
-                            changeProfileRealmDate.shared.updateProfile(user, completion: {
+                            self.auth.profile.updateProfile(user, completion: {
                                 Database.database().reference().child("Users").child("\(UserDefaults.standard.integer(forKey: "currentUserID"))").updateChildValues(["bio" : self.bioText, "facebook" : self.facebookText, "twitter" : self.twitterText])
                                 UINotificationFeedbackGenerator().notificationOccurred(.success)
                                 self.loadingSave = false

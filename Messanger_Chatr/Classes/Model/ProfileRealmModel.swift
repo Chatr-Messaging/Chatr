@@ -40,7 +40,6 @@ class ProfileStruct : Object {
 class ProfileRealmModel<Element>: ObservableObject where Element: RealmSwift.RealmCollectionValue {
     @Published var results: Results<Element>
     private var token: NotificationToken!
-    let messageApi = changeProfileRealmDate.shared
 
     init(results: Results<Element>) {
         self.results = results
@@ -94,9 +93,7 @@ class ProfileRealmModel<Element>: ObservableObject where Element: RealmSwift.Rea
     }
 }
 
-class changeProfileRealmDate {
-    init() { }
-    static let shared = changeProfileRealmDate()
+extension ProfileRealmModel {
     
     func observeFirebaseUser(with id: Int) {
         //let queue = DispatchQueue.init(label: "com.brandon.chatrFirebbase", qos: .utility)
@@ -271,31 +268,6 @@ class changeProfileRealmDate {
             }
         }
         return false
-    }
-    
-    func updateAddressBookSyncDate() {
-        let date = Date()
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.dateFormat = "MM-dd-yy"
-        formatter.timeZone = TimeZone(abbreviation: "UTC")
-        let utcTimeZoneStr = formatter.string(from: date)
-        
-        let config = Realm.Configuration(schemaVersion: 1)
-        do {
-            let realm = try Realm(configuration: config)
-            if let oldData = realm.object(ofType: ProfileStruct.self, forPrimaryKey: Session.current.currentUserID) {
-                try realm.safeWrite({
-                    oldData.lastAddressBookUpdate = utcTimeZoneStr
-                    
-                    realm.add(oldData, update: .all)
-                    
-                    Database.database().reference().child("Users").child("\(Session.current.currentUserID)").updateChildValues(["lastAddressBookUpload" : utcTimeZoneStr])
-                })
-            }
-        } catch {
-            
-        }
     }
 
     func removeAllProfile() {

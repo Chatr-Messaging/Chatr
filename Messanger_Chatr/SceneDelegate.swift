@@ -78,13 +78,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneDidBecomeActive(_ scene: UIScene) {
         print("scene did become active")
         //if self.environment.isUserAuthenticated == .signedIn {
-            //changeContactsRealmData.shared.updateContacts(contactList: Chat.instance.contactList?.contacts ?? [], completion: { _ in })
-//            changeContactsRealmData.shared.observeQuickSnaps()
-//            changeProfileRealmDate.shared.observeFirebaseUser()
+            //self.auth.contacts.updateContacts(contactList: Chat.instance.contactList?.contacts ?? [], completion: { _ in })
+//            self.auth.contacts.observeQuickSnaps()
+//            self.auth.profile.observeFirebaseUser()
             //ChatrApp.connect()
-//            changeDialogRealmData.shared.fetchDialogs(completion: { _ in
-//                changeContactsRealmData.shared.observeQuickSnaps()
-//                changeProfileRealmDate.shared.observeFirebaseUser()
+//            self.auth.dialogs.fetchDialogs(completion: { _ in
+//                self.auth.contacts.observeQuickSnaps()
+//                self.auth.profile.observeFirebaseUser()
 //                self.environment.initIAPurchase()
 //            })
         //}

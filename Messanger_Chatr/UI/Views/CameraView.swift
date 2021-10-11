@@ -13,6 +13,7 @@ import RealmSwift
 import SlideOverCard
 
 struct CameraView: View {
+    @EnvironmentObject var auth: AuthModel
     @StateObject var camera = CameraViewModel()
     var contact = ContactStruct()
     @Binding var cameraState: QuickSnapViewingState
@@ -260,7 +261,7 @@ struct CameraView: View {
                                         
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                                             self.sendQuickPic()
-                                            changeContactsRealmData.shared.updateContactHasQuickSnap(userID: self.selectedContacts, hasQuickSnap: true)
+                                            self.auth.contacts.updateContactHasQuickSnap(userID: self.selectedContacts, hasQuickSnap: true)
                                         }
                                         
                                     }) {
@@ -314,7 +315,7 @@ struct CameraView: View {
     }
     
     private func sendQuickPic() {
-        changeQuickSnapsRealmData.shared.sendQuickSnap(image: self.inputCameraRollImage != nil ? self.inputCameraRollImage?.pngData() ?? Data() : UIImage(data: self.camera.picData ?? Data())?.fixedOrientation()?.pngData() ?? Data(), sendTo: self.selectedContacts, completion: { result in
+        self.auth.quickSnaps.sendQuickSnap(image: self.inputCameraRollImage != nil ? self.inputCameraRollImage?.pngData() ?? Data() : UIImage(data: self.camera.picData ?? Data())?.fixedOrientation()?.pngData() ?? Data(), sendTo: self.selectedContacts, completion: { result in
             if result == false {
                 //error sending post
                 self.loadAni = false

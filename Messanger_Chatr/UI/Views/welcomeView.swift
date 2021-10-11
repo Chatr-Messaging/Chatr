@@ -1264,7 +1264,7 @@ struct welcomeBackView: View {
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                                     self.auth.preventDismissal = false
                                     self.auth.isUserAuthenticated = .signedIn
-                                    changeContactsRealmData.shared.observeQuickSnaps()
+                                    self.auth.contacts.observeQuickSnaps()
                                 }
                             }
                         }
