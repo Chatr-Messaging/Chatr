@@ -1,0 +1,160 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "Alamofire",
+        "repositoryURL": "https://github.com/Alamofire/Alamofire.git",
+        "state": {
+          "branch": null,
+          "revision": "f96b619bcb2383b43d898402283924b80e2c4bae",
+          "version": "5.4.3"
+        }
+      },
+      {
+        "package": "AttributedText",
+        "repositoryURL": "https://github.com/gonzalezreal/AttributedText",
+        "state": {
+          "branch": null,
+          "revision": "c345033e22d5a1cd0e9fe0ec405cc809a8349586",
+          "version": "0.3.1"
+        }
+      },
+      {
+        "package": "CarBode",
+        "repositoryURL": "https://github.com/heart/CarBode-Barcode-Scanner-For-SwiftUI",
+        "state": {
+          "branch": null,
+          "revision": "b4e39ab4d65e2795fb0f0a48940ac8bfd799c5f5",
+          "version": "2.2.2"
+        }
+      },
+      {
+        "package": "combine-schedulers",
+        "repositoryURL": "https://github.com/pointfreeco/combine-schedulers",
+        "state": {
+          "branch": null,
+          "revision": "4cf088c29a20f52be0f2ca54992b492c54e0076b",
+          "version": "0.5.3"
+        }
+      },
+      {
+        "package": "ConfettiSwiftUI",
+        "repositoryURL": "https://github.com/simibac/ConfettiSwiftUI",
+        "state": {
+          "branch": null,
+          "revision": "4aac70f5264e59dfed75d6f1c282bb147f101a49",
+          "version": "0.2.1"
+        }
+      },
+      {
+        "package": "MarkdownUI",
+        "repositoryURL": "https://github.com/gonzalezreal/MarkdownUI",
+        "state": {
+          "branch": null,
+          "revision": "29d94710545952dd4c724cc2ca901848eef54ded",
+          "version": "0.5.2"
+        }
+      },
+      {
+        "package": "NetworkImage",
+        "repositoryURL": "https://github.com/gonzalezreal/NetworkImage",
+        "state": {
+          "branch": null,
+          "revision": "d45f014daf5c54ef73a7d8db87ac94b9bd3d31bd",
+          "version": "3.1.1"
+        }
+      },
+      {
+        "package": "PopupView",
+        "repositoryURL": "https://github.com/exyte/PopupView.git",
+        "state": {
+          "branch": null,
+          "revision": "9948c76cfc57b12c87bfd0007ed64a5190cace85",
+          "version": "0.0.14"
+        }
+      },
+      {
+        "package": "Realm",
+        "repositoryURL": "https://github.com/realm/realm-cocoa.git",
+        "state": {
+          "branch": null,
+          "revision": "2dce752b48c3265c63ab04a8c66ddfdf9185f847",
+          "version": "5.5.2"
+        }
+      },
+      {
+        "package": "RealmCore",
+        "repositoryURL": "https://github.com/realm/realm-core",
+        "state": {
+          "branch": null,
+          "revision": "66d79b3c5213fb14d491c1b22193077b488d49a6",
+          "version": "6.2.4"
+        }
+      },
+      {
+        "package": "SlideOverCard",
+        "repositoryURL": "https://github.com/joogps/SlideOverCard.git",
+        "state": {
+          "branch": null,
+          "revision": "1e2ac4f7c3f7dbcd46b76e7b8cc8a91554c42abb",
+          "version": "1.2.6"
+        }
+      },
+      {
+        "package": "cmark",
+        "repositoryURL": "https://github.com/SwiftDocOrg/swift-cmark.git",
+        "state": {
+          "branch": null,
+          "revision": "9c8096a23f44794bde297452d87c455fc4f76d42",
+          "version": "0.29.0+20210102.9c8096a"
+        }
+      },
+      {
+        "package": "SwiftCommonMark",
+        "repositoryURL": "https://github.com/gonzalezreal/SwiftCommonMark",
+        "state": {
+          "branch": null,
+          "revision": "ed60da54305c244d0f77bc8d08495e04161e96a4",
+          "version": "0.1.2"
+        }
+      },
+      {
+        "package": "Grid",
+        "repositoryURL": "https://github.com/spacenation/swiftui-grid.git",
+        "state": {
+          "branch": null,
+          "revision": "623f995c6ee0e5a5ed0e104d142daeae67b0ec92",
+          "version": "1.1.0"
+        }
+      },
+      {
+        "package": "Uploadcare",
+        "repositoryURL": "https://github.com/uploadcare/uploadcare-swift.git",
+        "state": {
+          "branch": null,
+          "revision": "035fc3d6886166a00eae1bce9845a8f0a08bc542",
+          "version": "0.3.1"
+        }
+      },
+      {
+        "package": "WKView",
+        "repositoryURL": "https://github.com/rebeloper/WKView.git",
+        "state": {
+          "branch": null,
+          "revision": "b9314678cf946e8c02ae1dcaf4e07d6c9dd7712c",
+          "version": "0.1.6"
+        }
+      },
+      {
+        "package": "xctest-dynamic-overlay",
+        "repositoryURL": "https://github.com/pointfreeco/xctest-dynamic-overlay",
+        "state": {
+          "branch": null,
+          "revision": "50a70a9d3583fe228ce672e8923010c8df2deddd",
+          "version": "0.2.1"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
