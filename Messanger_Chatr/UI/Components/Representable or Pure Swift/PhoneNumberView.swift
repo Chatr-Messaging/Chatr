@@ -41,7 +41,7 @@ struct PhoneNumberTextFieldView: UIViewRepresentable {
     
     func updateUIView(_ uiView: PhoneNumberTextField, context: Context) {
         if isFirstResponder && !context.coordinator.didBecomeFirstResponder  {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 uiView.becomeFirstResponder()
                 context.coordinator.didBecomeFirstResponder = true
             }

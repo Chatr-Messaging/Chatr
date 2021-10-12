@@ -96,13 +96,13 @@ struct ChannelBubble: View {
                         if !self.isMember {
                             Button(action: {
                                 Request.subscribeToPublicDialog(withID: self.dialogModel.id, successBlock: { dialogz in
-                                    changeDialogRealmData.shared.toggleFirebaseMemberCount(dialogId: dialogz.id ?? "", isJoining: true, totalCount: Int(dialogz.occupantsCount), onSuccess: { _ in
+                                    self.auth.dialogs.toggleFirebaseMemberCount(dialogId: dialogz.id ?? "", isJoining: true, totalCount: Int(dialogz.occupantsCount), onSuccess: { _ in
                                         UINotificationFeedbackGenerator().notificationOccurred(.success)
                                         withAnimation {
                                             self.isMember = true
                                         }
-                                        changeDialogRealmData.shared.insertDialogs([dialogz], completion: {
-                                            changeDialogRealmData.shared.updateDialogDelete(isDelete: false, dialogID: dialogz.id ?? "")
+                                        self.auth.dialogs.insertDialogs([dialogz], completion: {
+                                            self.auth.dialogs.updateDialogDelete(isDelete: false, dialogID: dialogz.id ?? "")
                                             self.auth.sendPushNoti(userIDs: [NSNumber(value: dialogz.userID)], title: "\(self.auth.profile.results.first?.fullName ?? "New Member") joined \(dialogz.name ?? "no name")", message: "\(self.auth.profile.results.first?.fullName ?? "New Member") has joined your channel \(dialogz.name ?? "no name")")
                                         })
                                     }, onError: { _ in
@@ -366,13 +366,13 @@ struct ChannelBubble: View {
         guard diaId != UserDefaults.standard.string(forKey: "selectedDialogID") ?? "", diaId != "" else { return }
 
         UserDefaults.standard.set(false, forKey: "localOpen")
-        changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "")
+        self.auth.dialogs.updateDialogOpen(isOpen: false, dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "")
             
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
             self.openDialogId = diaId
             UserDefaults.standard.set(diaId, forKey: "selectedDialogID")
             UserDefaults.standard.set(true, forKey: "localOpen")
-            changeDialogRealmData.shared.updateDialogOpen(isOpen: true, dialogID: diaId)
+            self.auth.dialogs.updateDialogOpen(isOpen: true, dialogID: diaId)
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
             //UserDefaults.standard.set("", forKey: "openingDialogId")
         }
@@ -388,14 +388,14 @@ struct ChannelBubble: View {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                         self.isHomeDialogOpen = false
                         UserDefaults.standard.set(false, forKey: "localOpen")
-                        changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? self.auth.selectedConnectyDialog?.id ?? "")
+                        self.auth.dialogs.updateDialogOpen(isOpen: false, dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? self.auth.selectedConnectyDialog?.id ?? "")
 
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
                             self.openDialogId = dia.id
                             UserDefaults.standard.set(dia.id, forKey: "selectedDialogID")
                             self.openNewDialogID = 0
                             self.isHomeDialogOpen = true
-                            changeDialogRealmData.shared.updateDialogOpen(isOpen: true, dialogID: dia.id)
+                            self.auth.dialogs.updateDialogOpen(isOpen: true, dialogID: dia.id)
                             UserDefaults.standard.set(true, forKey: "localOpen")
                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                         }
@@ -412,18 +412,18 @@ struct ChannelBubble: View {
         dialog.occupantIDs = [NSNumber(value: self.openNewDialogID)]  // an ID of opponent
 
         Request.createDialog(dialog, successBlock: { (dialog) in
-            changeDialogRealmData.shared.fetchDialogs(completion: { _ in
+            self.auth.dialogs.fetchDialogs(completion: { _ in
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                     self.isHomeDialogOpen = false
                     UserDefaults.standard.set(false, forKey: "localOpen")
-                    changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? self.auth.selectedConnectyDialog?.id ?? "")
+                    self.auth.dialogs.updateDialogOpen(isOpen: false, dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? self.auth.selectedConnectyDialog?.id ?? "")
 
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
                         self.openDialogId = dialog.id ?? ""
                         UserDefaults.standard.set(dialog.id ?? "", forKey: "selectedDialogID")
                         self.openNewDialogID = 0
                         self.isHomeDialogOpen = true
-                        changeDialogRealmData.shared.updateDialogOpen(isOpen: true, dialogID: dialog.id ?? "")
+                        self.auth.dialogs.updateDialogOpen(isOpen: true, dialogID: dialog.id ?? "")
                         UserDefaults.standard.set(true, forKey: "localOpen")
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     }

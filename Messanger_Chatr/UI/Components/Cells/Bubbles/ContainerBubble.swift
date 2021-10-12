@@ -135,7 +135,7 @@ struct ContainerBubble: View {
                         })
                     .onPreferenceChange(SizePreferenceKey.self) { preferences in
                         if self.message.bubbleWidth != Int(preferences.width) {
-                            changeMessageRealmData.shared.updateBubbleWidth(messageId: self.message.id, width: Int(preferences.width))
+                            self.auth.messages.updateBubbleWidth(messageId: self.message.id, width: Int(preferences.width))
                         }
                     }
                     .onTapGesture(count: 2) {
@@ -546,12 +546,12 @@ struct ContainerBubble: View {
     func pinMessage() {
         self.viewModel.pinMessage(message: self.message, completion: { added in
             if !added {
-                changeDialogRealmData.shared.removeDialogPin(messageId: self.message.id, dialogID: self.message.dialogID)
+                self.auth.dialogs.removeDialogPin(messageId: self.message.id, dialogID: self.message.dialogID)
                 self.reactions[1] = "pin"
                 auth.notificationtext = "Removed pined message"
                 NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
             } else {
-                changeDialogRealmData.shared.addDialogPin(messageId: self.message.id, dialogID: self.message.dialogID)
+                self.auth.dialogs.addDialogPin(messageId: self.message.id, dialogID: self.message.dialogID)
                 self.reactions[1] = "unpin"
                 auth.notificationtext = "Pined message"
                 NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
@@ -625,10 +625,10 @@ struct ContainerBubble: View {
             for child in snapAdded.children {
                 let childSnap = child as! DataSnapshot
                 if typeLike == "likes" {
-                    changeMessageRealmData.shared.updateMessageLikeAdded(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
+                    self.auth.messages.updateMessageLikeAdded(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
                     self.hasUserLiked = self.message.likedId.contains(profileID)
                 } else if typeLike == "dislikes" {
-                    changeMessageRealmData.shared.updateMessageDislikeAdded(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
+                    self.auth.messages.updateMessageDislikeAdded(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
                     self.hasUserDisliked = self.message.dislikedId.contains(profileID)
                 }
             }
@@ -640,10 +640,10 @@ struct ContainerBubble: View {
             for child in snapRemoved.children {
                 let childSnap = child as! DataSnapshot
                 if typeLike == "likes" {
-                    changeMessageRealmData.shared.updateMessageLikeRemoved(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
+                    self.auth.messages.updateMessageLikeRemoved(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
                     self.hasUserLiked = self.message.likedId.contains(profileID)
                 } else if typeLike == "dislikes" {
-                    changeMessageRealmData.shared.updateMessageDislikeRemoved(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
+                    self.auth.messages.updateMessageDislikeRemoved(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
                     self.hasUserDisliked = self.message.dislikedId.contains(profileID)
                 }
             }

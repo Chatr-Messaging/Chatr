@@ -112,7 +112,7 @@ class changeAddressBookRealmData {
 
                 Request.uploadAddressBook(withUdid: UIDevice.current.identifierForVendor?.uuidString, addressBook: addressBook, force: false, successBlock: { (updates) in
                     DispatchQueue.main.async {
-                        changeProfileRealmDate.shared.updateAddressBookSyncDate()
+                        self.updateAddressBookSyncDate()
                         
                         completion(true)
                     }
@@ -120,6 +120,31 @@ class changeAddressBookRealmData {
                     completion(false)
                 }
             }
+        }
+    }
+
+    func updateAddressBookSyncDate() {
+        let date = Date()
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "MM-dd-yy"
+        formatter.timeZone = TimeZone(abbreviation: "UTC")
+        let utcTimeZoneStr = formatter.string(from: date)
+        
+        let config = Realm.Configuration(schemaVersion: 1)
+        do {
+            let realm = try Realm(configuration: config)
+            if let oldData = realm.object(ofType: ProfileStruct.self, forPrimaryKey: Session.current.currentUserID) {
+                try realm.safeWrite({
+                    oldData.lastAddressBookUpdate = utcTimeZoneStr
+                    
+                    realm.add(oldData, update: .all)
+                    
+                    Database.database().reference().child("Users").child("\(Session.current.currentUserID)").updateChildValues(["lastAddressBookUpload" : utcTimeZoneStr])
+                })
+            }
+        } catch {
+            
         }
     }
     

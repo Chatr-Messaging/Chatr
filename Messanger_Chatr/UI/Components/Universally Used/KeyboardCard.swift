@@ -126,273 +126,289 @@ struct KeyboardCardView: View {
 //                    }
                 }.padding(.top, 10)
             } else if self.isVisiting.isEmpty {
-                //MARK: Attachments Section
-                ReversedScrollView(.horizontal) {
-                    HStack(spacing: 8) {
-                        //MARK: Location Section
-                        if self.enableLocation {
-                            ZStack(alignment: .topLeading) {
-                                Button(action: {
-                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                    withAnimation(.easeOut(duration: 0.25)) {
-                                        self.enableLocation = false
-                                    }
-                                }, label: {
-                                    Map(coordinateRegion: $region, interactionModes: MapInteractionModes.all, showsUserLocation: true, userTrackingMode: $userTrackingMode)
-                                        .aspectRatio(contentMode: .fill)
-                                        .frame(width: 130, height: 90)
-                                        .cornerRadius(10)
-                                        .padding(.top, 10)
-                                }).buttonStyle(ClickMiniButtonStyle())
-                                .background(Color.clear)
-                                .transition(AnyTransition.asymmetric(insertion: AnyTransition.move(edge: .top).animation(.easeOut(duration: 0.2)), removal: AnyTransition.move(edge: .top).combined(with: .opacity).animation(.easeOut(duration: 0.2))))
-                            }.onAppear() {
-                                self.region.span = MKCoordinateSpan(latitudeDelta: 0.25, longitudeDelta: 0.25)
-                            }
-                        }
-                        
-                        //MARK: GIPHY Section
-                        if !self.gifData.isEmpty {
-                            HStack {
-                                ForEach(self.gifData.indices, id: \.self) { gifIndex in
-                                    ZStack(alignment: .topLeading) {
-                                        AnimatedImage(url: URL(string: self.gifData[gifIndex].url))
-                                            .resizable()
-                                            .indicator(.activity)
-                                            .frame(width: self.gifData[gifIndex].mediaRatio * 90, height: 90)
-                                            .scaledToFit()
-                                            .background(Image(systemName: "photo.on.rectangle.angled"))
-                                            .cornerRadius(10)
-                                            .padding(.leading, 10)
-                                            .padding(.top, 10)
-                                        
-                                        Button(action: {
-                                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                            self.gifData.remove(at: gifIndex)
-                                            self.checkAttachments()
-                                        }, label: {
-                                            Image(systemName: "xmark.circle.fill")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 24, height: 24, alignment: .center)
-                                                .foregroundColor(.primary)
-                                        }).background(Color.clear)
-                                    }.transition(.asymmetric(insertion: AnyTransition.move(edge: .top).animation(.spring()), removal: AnyTransition.move(edge: .top).combined(with: .opacity).animation(.easeOut(duration: 0.2))))
-                                }.animation(.spring(response: 0.3, dampingFraction: 0.75, blendDuration: 0))
-                            }
-                        }
-
-                        //MARK: Pasted Photo Section
-                        if !self.imagePicker.pastedImages.isEmpty {
-                            HStack {
-                                ForEach(self.imagePicker.pastedImages.indices, id: \.self) { index in
-                                    ZStack(alignment: .topLeading) {
-                                        Image(uiImage: self.imagePicker.pastedImages[index])
-                                            .resizable()
-                                            .scaledToFill()
-                                            .frame(height: 90)
-                                            .frame(minWidth: 70, maxWidth: Constants.screenWidth * 0.4)
-                                            .transition(.fade(duration: 0.05))
-                                            .cornerRadius(10)
-                                            .padding(.leading, 10)
-                                            .padding(.top, 10)
-
-                                        Button(action: {
-                                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                            self.imagePicker.pastedImages.remove(at: index)
-                                            self.checkAttachments()
-                                        }, label: {
-                                            Image(systemName: "xmark.circle.fill")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 24, height: 24, alignment: .center)
-                                                .foregroundColor(.primary)
-                                        }).background(Color.clear)
-                                    }.transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(.spring()), removal: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.easeOut(duration: 0.2))))
-                                }.animation(.spring(response: 0.3, dampingFraction: 0.75, blendDuration: 0))
-                            }
-                        }
-
-                        //MARK: Photo Section
-                        if !self.imagePicker.selectedPhotos.isEmpty {
-                            HStack {
-                                ForEach(self.imagePicker.selectedPhotos.indices, id: \.self) { img in
-                                    ZStack(alignment: .topLeading) {
-                                        Image(uiImage: self.imagePicker.selectedPhotos[img].image)
-                                            .resizable()
-                                            .scaledToFill()
-                                            .frame(width: CGFloat(90 / (self.imagePicker.selectedPhotos[img].mediaRatio ?? 1.0)), height: 90)
-                                            .overlay(
-                                                ZStack(alignment: .center) {
-                                                    BlurView(style: .systemUltraThinMaterial).animation(.easeInOut)
-
-                                                    Circle()
-                                                        .trim(from: 0, to: 1)
-                                                        .stroke(Color.primary.opacity(0.2), style: StrokeStyle(lineWidth: 2, lineCap: .round))
-                                                        .frame(width: 20, height: 20)
-                                                        .padding(4)
-                                                        .animation(.easeInOut)
-
-                                                    Circle()
-                                                        .trim(from: 0, to: self.imagePicker.selectedPhotos[img].progress)
-                                                        .stroke(Color.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
-                                                        .frame(width: 20, height: 20)
-                                                        .rotationEffect(.init(degrees: -90))
-                                                        .padding(4)
-                                                        .animation(.easeOut)
-                                            }.opacity(self.imagePicker.selectedPhotos[img].progress >= 1.0 || self.imagePicker.selectedPhotos[img].progress <= 0.0 ? 0 : 1)
-                                            )
-                                            .cornerRadius(14)
-                                            .padding(.leading, 10)
-                                            .padding(.top, 10)
-
-                                        Button(action: {
-                                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                            self.imagePicker.selectedPhotos.remove(at: img)
-                                            self.checkAttachments()
-                                        }, label: {
-                                            Image(systemName: "xmark.circle.fill")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 24, height: 24, alignment: .center)
-                                                .foregroundColor(.primary)
-                                        }).background(Color.clear)
-                                        .opacity(self.imagePicker.selectedPhotos[img].canSend ? 0 : 1)
-                                    }.id(self.imagePicker.selectedPhotos[img].id)
-                                        .transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(.spring()), removal: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.easeOut(duration: 0.2))))
-                                }.animation(.spring(response: 0.3, dampingFraction: 0.75, blendDuration: 0))
-                            }
-                        }
-
-                        //MARK: Video Section
-                        HStack {
-                            ForEach(self.imagePicker.selectedVideos.indices, id: \.self) { vid in
-                                ZStack(alignment: .topLeading) {
-                                    ZStack(alignment: .bottomLeading) {
-                                        Image(uiImage: self.imagePicker.selectedVideos[vid].image)
-                                            .resizable()
-                                            .scaledToFill()
-                                            .frame(width: CGFloat(90 / (self.imagePicker.selectedVideos[vid].mediaRatio ?? 1.0)), height: 90)
-                                            .overlay(
-                                                ZStack(alignment: .center) {
-                                                    BlurView(style: .systemUltraThinMaterial).animation(.easeInOut)
-
-                                                    Circle()
-                                                        .trim(from: 0, to: 1)
-                                                        .stroke(Color.primary.opacity(0.2), style: StrokeStyle(lineWidth: 2, lineCap: .round))
-                                                        .frame(width: 20, height: 20)
-                                                        .padding(4)
-                                                        .animation(.easeInOut)
-
-                                                    Circle()
-                                                        .trim(from: 0, to: self.imagePicker.selectedVideos[vid].progress)
-                                                        .stroke(Color.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
-                                                        .frame(width: 20, height: 20)
-                                                        .rotationEffect(.init(degrees: -90))
-                                                        .padding(4)
-                                                        .animation(.easeOut)
-                                            }.opacity(self.imagePicker.selectedVideos[vid].progress >= 1.0 || self.imagePicker.selectedVideos[vid].progress <= 0.0 ? 0 : 1)
-                                            )
-                                            .cornerRadius(14)
-                                        
-                                        HStack {
-                                            Image(systemName: "video.fill")
-                                                .font(.subheadline)
-                                                .foregroundColor(.white)
-
-//                                                Text("\(self.formatVideoDuration(second: self.imagePicker.selectedVideos[vid].asset?.duration ?? CMTime(seconds: 0.0, preferredTimescale: 100)))")
-//                                                    .font(.caption)
-//                                                    .fontWeight(.regular)
-//                                                    .foregroundColor(.white)
-                                        }.padding(5)
-                                        .background(BlurView(style: .systemThinMaterialDark).cornerRadius(5))
-                                        .offset(x: 5, y: -5)
-                                    }.padding(.leading, 10)
-                                    .padding(.top, 10)
-
-                                    Button(action: {
-                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                        self.imagePicker.selectedVideos.remove(at: vid)
-                                        self.checkAttachments()
-                                    }, label: {
-                                        Image(systemName: "xmark.circle.fill")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 24, height: 24, alignment: .center)
-                                            .foregroundColor(.primary)
-                                    }).background(Color.clear)
-                                    .opacity(self.imagePicker.selectedVideos[vid].canSend ? 0 : 1)
-                                }.id(self.imagePicker.selectedVideos[vid].id)
-                                .transition(transition)
-                            }.animation(.spring(response: 0.3, dampingFraction: 0.75, blendDuration: 0))
-                        }
-                    }
-                    .padding(.vertical, !self.imagePicker.selectedVideos.isEmpty || !self.imagePicker.selectedPhotos.isEmpty ? 5 : 0)
-                    .padding(.horizontal)
-                }.frame(height: self.hasAttachments ? 110 : 0)
-                .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 8)
-                .transition(transition)
                 
                 //MARK: Text Field & Send Btn
                 HStack(alignment: .bottom, spacing: 0) {
                     if !self.isRecordingAudio {
-                        HStack(alignment: .bottom, spacing: 0) {
-                            Button(action: {
-                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                withAnimation(Animation.spring(response: 0.35, dampingFraction: 0.65, blendDuration: 0), {
-                                    self.isKeyboardActionOpen.toggle()
-                                })
-                            }) {
-                                Image(systemName: self.isKeyboardActionOpen ? "xmark" : "paperclip")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: self.isKeyboardActionOpen ? 16 : 25, height: self.isKeyboardActionOpen ? 18 : 25, alignment: .center)
-                                    .font(Font.title.weight(.regular))
-                                    .foregroundColor(.secondary)
-                                    .padding(self.isKeyboardActionOpen ? 12.5 : 8)
-                                    .padding(.horizontal, 2)
-                            }.buttonStyle(changeBGPaperclipButtonStyle())
-                            .cornerRadius(self.height < 160 ? 12.5 : 17.5)
+                        VStack(spacing: 0) {
+                            
+                            //MARK: Attachments Section
+                            if self.hasAttachments {
+                                ReversedScrollView(.horizontal) {
+                                    HStack(spacing: 8) {
+                                        //MARK: Location Section
+                                        if self.enableLocation {
+                                            ZStack(alignment: .topLeading) {
+                                                Button(action: {
+                                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                                    withAnimation(.easeOut(duration: 0.25)) {
+                                                        self.enableLocation = false
+                                                    }
+                                                }, label: {
+                                                    Map(coordinateRegion: $region, interactionModes: MapInteractionModes.all, showsUserLocation: true, userTrackingMode: $userTrackingMode)
+                                                        .aspectRatio(contentMode: .fill)
+                                                        .frame(width: 130, height: 90)
+                                                        .cornerRadius(10)
+                                                        .padding(.top, 10)
+                                                }).buttonStyle(ClickMiniButtonStyle())
+                                                .background(Color.clear)
+                                                .transition(AnyTransition.asymmetric(insertion: AnyTransition.move(edge: .top).animation(.easeOut(duration: 0.2)), removal: AnyTransition.move(edge: .top).combined(with: .opacity).animation(.easeOut(duration: 0.2))))
+                                            }.onAppear() {
+                                                self.region.span = MKCoordinateSpan(latitudeDelta: 0.25, longitudeDelta: 0.25)
+                                            }
+                                        }
+                                        
+                                        //MARK: GIPHY Section
+                                        if !self.gifData.isEmpty {
+                                            HStack {
+                                                ForEach(self.gifData.indices, id: \.self) { gifIndex in
+                                                    ZStack(alignment: .topTrailing) {
+                                                        AnimatedImage(url: URL(string: self.gifData[gifIndex].url))
+                                                            .resizable()
+                                                            .indicator(.activity)
+                                                            .frame(width: self.gifData[gifIndex].mediaRatio * 90, height: 90)
+                                                            .scaledToFit()
+                                                            .background(Image(systemName: "photo.on.rectangle.angled"))
+                                                            .cornerRadius(10)
+                                                            .padding(.leading, 10)
+                                                            .padding(.top, 10)
+                                                        
+                                                        Button(action: {
+                                                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                                            self.gifData.remove(at: gifIndex)
+                                                            self.checkAttachments()
+                                                        }, label: {
+                                                            Image(systemName: "xmark.circle.fill")
+                                                                .resizable()
+                                                                .scaledToFit()
+                                                                .frame(width: 24, height: 24, alignment: .center)
+                                                                .foregroundColor(.primary)
+                                                                .padding(.vertical)
+                                                                .padding(.trailing, 5)
+                                                        }).background(Color.clear)
+                                                    }.transition(.asymmetric(insertion: AnyTransition.move(edge: .top).animation(.spring()), removal: AnyTransition.move(edge: .top).combined(with: .opacity).animation(.easeOut(duration: 0.2))))
+                                                }.animation(.spring(response: 0.3, dampingFraction: 0.75, blendDuration: 0))
+                                            }
+                                        }
 
-                            ResizableTextField(imagePicker: self.imagePicker, height: self.$height, text: self.$mainText)
-                                .environmentObject(self.auth)
-                                .frame(height: self.height < 175 ? self.height : 175)
-                                .padding(.trailing, 7.5)
-                                .offset(x: -5, y: -1)
+                                        //MARK: Pasted Photo Section
+                                        if !self.imagePicker.pastedImages.isEmpty {
+                                            HStack {
+                                                ForEach(self.imagePicker.pastedImages.indices, id: \.self) { index in
+                                                    ZStack(alignment: .topTrailing) {
+                                                        Image(uiImage: self.imagePicker.pastedImages[index])
+                                                            .resizable()
+                                                            .scaledToFill()
+                                                            .frame(height: 90)
+                                                            .frame(minWidth: 70, maxWidth: Constants.screenWidth * 0.4)
+                                                            .transition(.fade(duration: 0.05))
+                                                            .cornerRadius(10)
+                                                            .padding(.leading, 10)
+                                                            .padding(.top, 10)
 
-                            if self.mainText.count == 0 && !self.enableLocation && self.gifData.isEmpty && self.imagePicker.pastedImages.isEmpty && self.imagePicker.selectedVideos.isEmpty && self.imagePicker.selectedPhotos.isEmpty {
+                                                        Button(action: {
+                                                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                                            self.imagePicker.pastedImages.remove(at: index)
+                                                            self.checkAttachments()
+                                                        }, label: {
+                                                            Image(systemName: "xmark.circle.fill")
+                                                                .resizable()
+                                                                .scaledToFit()
+                                                                .frame(width: 24, height: 24, alignment: .center)
+                                                                .foregroundColor(.primary)
+                                                                .padding(.vertical)
+                                                                .padding(.trailing, 5)
+                                                        }).background(Color.clear)
+                                                    }.transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(.spring()), removal: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.easeOut(duration: 0.2))))
+                                                }.animation(.spring(response: 0.3, dampingFraction: 0.75, blendDuration: 0))
+                                            }
+                                        }
+
+                                        //MARK: Photo Section
+                                        if !self.imagePicker.selectedPhotos.isEmpty {
+                                            HStack {
+                                                ForEach(self.imagePicker.selectedPhotos.indices, id: \.self) { img in
+                                                    ZStack(alignment: .topTrailing) {
+                                                        Image(uiImage: self.imagePicker.selectedPhotos[img].image)
+                                                            .resizable()
+                                                            .scaledToFill()
+                                                            .frame(width: CGFloat(90 / (self.imagePicker.selectedPhotos[img].mediaRatio ?? 1.0)), height: 90)
+                                                            .overlay(
+                                                                ZStack(alignment: .center) {
+                                                                    BlurView(style: .systemUltraThinMaterial).animation(.easeInOut)
+
+                                                                    Circle()
+                                                                        .trim(from: 0, to: 1)
+                                                                        .stroke(Color.primary.opacity(0.2), style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                                                                        .frame(width: 20, height: 20)
+                                                                        .padding(4)
+                                                                        .animation(.easeInOut)
+
+                                                                    Circle()
+                                                                        .trim(from: 0, to: self.imagePicker.selectedPhotos[img].progress)
+                                                                        .stroke(Color.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                                                                        .frame(width: 20, height: 20)
+                                                                        .rotationEffect(.init(degrees: -90))
+                                                                        .padding(4)
+                                                                        .animation(.easeOut)
+                                                            }.opacity(self.imagePicker.selectedPhotos[img].progress >= 1.0 || self.imagePicker.selectedPhotos[img].progress <= 0.0 ? 0 : 1)
+                                                            )
+                                                            .cornerRadius(14)
+                                                            .padding(.leading, 10)
+                                                            .padding(.top, 10)
+
+                                                        Button(action: {
+                                                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                                            self.imagePicker.selectedPhotos.remove(at: img)
+                                                            self.checkAttachments()
+                                                        }, label: {
+                                                            Image(systemName: "xmark.circle.fill")
+                                                                .resizable()
+                                                                .scaledToFit()
+                                                                .frame(width: 24, height: 24, alignment: .center)
+                                                                .foregroundColor(.primary)
+                                                                .padding(.vertical)
+                                                                .padding(.trailing, 5)
+                                                        }).background(Color.clear)
+                                                        .opacity(self.imagePicker.selectedPhotos[img].canSend ? 0 : 1)
+                                                    }.id(self.imagePicker.selectedPhotos[img].id)
+                                                        .transition(.asymmetric(insertion: AnyTransition.move(edge: .bottom).animation(.spring()), removal: AnyTransition.move(edge: .bottom).combined(with: .opacity).animation(.easeOut(duration: 0.2))))
+                                                }.animation(.spring(response: 0.3, dampingFraction: 0.75, blendDuration: 0))
+                                            }
+                                        }
+
+                                        //MARK: Video Section
+                                        HStack {
+                                            ForEach(self.imagePicker.selectedVideos.indices, id: \.self) { vid in
+                                                ZStack(alignment: .topTrailing) {
+                                                    ZStack(alignment: .bottomLeading) {
+                                                        Image(uiImage: self.imagePicker.selectedVideos[vid].image)
+                                                            .resizable()
+                                                            .scaledToFill()
+                                                            .frame(width: CGFloat(90 / (self.imagePicker.selectedVideos[vid].mediaRatio ?? 1.0)), height: 90)
+                                                            .overlay(
+                                                                ZStack(alignment: .center) {
+                                                                    BlurView(style: .systemUltraThinMaterial).animation(.easeInOut)
+
+                                                                    Circle()
+                                                                        .trim(from: 0, to: 1)
+                                                                        .stroke(Color.primary.opacity(0.2), style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                                                                        .frame(width: 20, height: 20)
+                                                                        .padding(4)
+                                                                        .animation(.easeInOut)
+
+                                                                    Circle()
+                                                                        .trim(from: 0, to: self.imagePicker.selectedVideos[vid].progress)
+                                                                        .stroke(Color.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                                                                        .frame(width: 20, height: 20)
+                                                                        .rotationEffect(.init(degrees: -90))
+                                                                        .padding(4)
+                                                                        .animation(.easeOut)
+                                                            }.opacity(self.imagePicker.selectedVideos[vid].progress >= 1.0 || self.imagePicker.selectedVideos[vid].progress <= 0.0 ? 0 : 1)
+                                                            )
+                                                            .cornerRadius(14)
+                                                        
+                                                        HStack {
+                                                            Image(systemName: "video.fill")
+                                                                .font(.subheadline)
+                                                                .foregroundColor(.white)
+
+                //                                                Text("\(self.formatVideoDuration(second: self.imagePicker.selectedVideos[vid].asset?.duration ?? CMTime(seconds: 0.0, preferredTimescale: 100)))")
+                //                                                    .font(.caption)
+                //                                                    .fontWeight(.regular)
+                //                                                    .foregroundColor(.white)
+                                                        }.padding(5)
+                                                        .background(BlurView(style: .systemThinMaterialDark).cornerRadius(5))
+                                                        .offset(x: 5, y: -5)
+                                                    }.padding(.leading, 10)
+                                                    .padding(.top, 10)
+
+                                                    Button(action: {
+                                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                                        self.imagePicker.selectedVideos.remove(at: vid)
+                                                        self.checkAttachments()
+                                                    }, label: {
+                                                        Image(systemName: "xmark.circle.fill")
+                                                            .resizable()
+                                                            .scaledToFit()
+                                                            .frame(width: 24, height: 24, alignment: .center)
+                                                            .foregroundColor(.primary)
+                                                            .padding(.vertical)
+                                                            .padding(.trailing, 5)
+                                                    }).background(Color.clear)
+                                                    .opacity(self.imagePicker.selectedVideos[vid].canSend ? 0 : 1)
+                                                }.id(self.imagePicker.selectedVideos[vid].id)
+                                                .transition(transition)
+                                            }.animation(.spring(response: 0.3, dampingFraction: 0.75, blendDuration: 0))
+                                        }
+                                    }
+                                    .padding(.vertical, !self.imagePicker.selectedVideos.isEmpty || !self.imagePicker.selectedPhotos.isEmpty ? 5 : 0)
+                                    .padding(.horizontal)
+                                }.frame(height: 110)
+                                .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 6)
+                                .transition(transition)
+                            }
+
+                            HStack(alignment: .bottom, spacing: 0) {
                                 Button(action: {
                                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                    withAnimation(Animation.easeInOut(duration: 0.25)) {
-                                        self.isKeyboardActionOpen = false
-                                        self.isRecordingAudio = true
-                                    }
+                                    withAnimation(Animation.spring(response: 0.35, dampingFraction: 0.65, blendDuration: 0), {
+                                        self.isKeyboardActionOpen.toggle()
+                                    })
                                 }) {
-                                    Image(systemName: "mic.fill")
+                                    Image(systemName: self.isKeyboardActionOpen ? "xmark" : "paperclip")
                                         .resizable()
                                         .aspectRatio(contentMode: .fit)
-                                        .frame(width: 25, height: 22.5, alignment: .center)
+                                        .frame(width: self.isKeyboardActionOpen ? 16 : 25, height: self.isKeyboardActionOpen ? 18 : 25, alignment: .center)
                                         .font(Font.title.weight(.regular))
                                         .foregroundColor(.secondary)
-                                        .padding(10)
-                                        .padding(.horizontal, 2.5)
+                                        .padding(self.isKeyboardActionOpen ? 12.5 : 8)
+                                        .padding(.horizontal, 2)
+                                }.buttonStyle(changeBGPaperclipButtonStyle())
+                                .cornerRadius(self.height < 160 ? 25 : 17.5)
+
+                                ResizableTextField(imagePicker: self.imagePicker, height: self.$height, text: self.$mainText)
+                                    .environmentObject(self.auth)
+                                    .frame(height: self.height < 175 ? self.height : 175)
+                                    .padding(.trailing, 7.5)
+                                    .offset(x: -5, y: -1)
+
+                                if self.mainText.count == 0 && !self.enableLocation && self.gifData.isEmpty && self.imagePicker.pastedImages.isEmpty && self.imagePicker.selectedVideos.isEmpty && self.imagePicker.selectedPhotos.isEmpty {
+                                    Button(action: {
+                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                        withAnimation(Animation.easeInOut(duration: 0.25)) {
+                                            self.isKeyboardActionOpen = false
+                                            self.isRecordingAudio = true
+                                        }
+                                    }) {
+                                        Image(systemName: "mic.fill")
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fit)
+                                            .frame(width: 25, height: 22.5, alignment: .center)
+                                            .font(Font.title.weight(.regular))
+                                            .foregroundColor(.secondary)
+                                            .padding(10)
+                                            .padding(.horizontal, 2.5)
+                                    }
+                                    .buttonStyle(changeBGPaperclipButtonStyle())
+                                    .cornerRadius(12.5)
+                                    .padding(.trailing, 6.5)
                                 }
-                                .buttonStyle(changeBGPaperclipButtonStyle())
-                                .cornerRadius(12.5)
-                                .padding(.trailing, 6.5)
                             }
                         }.background(
-                            ZStack(alignment: .topLeading) {
-                                RoundedRectangle(cornerRadius: self.height < 160 ? 12.5 : 17.5)
-                                    .foregroundColor(Color("buttonColor"))
+                            ZStack(alignment: .bottomLeading) {
+                                RoundedRectangle(cornerRadius: self.height < 160 ? 25 : 17.5)
+                                    .foregroundColor(Color.clear)
+                                    //.opacity(0)
+                                    .overlay(RoundedRectangle(cornerRadius: 25).stroke(Color("lightGray"), lineWidth: 1.75))
                                     .padding(.trailing, 7.5)
-                                    .shadow(color: Color.black.opacity(self.mainText.count != 0 ? 0.1 : 0.15), radius: self.mainText.count != 0 ? 6 : 4, x: 0, y: self.mainText.count != 0 ? 6 : 2.5)
+                                    //.shadow(color: Color.black.opacity(self.mainText.count != 0 ? 0.1 : 0.15), radius: self.mainText.count != 0 ? 6 : 4, x: 0, y: self.mainText.count != 0 ? 6 : 2.5)
 
                                 Text("type message")
                                     .font(.system(size: 18))
                                     .padding(.vertical, 10)
                                     .padding(.leading, 45)
-                                    .foregroundColor(self.mainText.count == 0 && self.isOpen ? Color("lightGray") : .clear)
+                                    .foregroundColor(self.mainText.count == 0 && self.isOpen ? Color.secondary : .clear)
                             }
                         )
                     } else {
@@ -419,14 +435,14 @@ struct KeyboardCardView: View {
                             }
 
                             if !self.audio.recordingsList.isEmpty {
-                                changeMessageRealmData.shared.sendAudioAttachment(dialog: selectedDialog, audioURL: self.audio.recordingsList.first?.fileURL ?? URL(fileURLWithPath: ""), occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
+                                self.auth.messages.sendAudioAttachment(dialog: selectedDialog, audioURL: self.audio.recordingsList.first?.fileURL ?? URL(fileURLWithPath: ""), occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                                 self.audio.deleteAudioFile()
 
                                 return
                             }
 
                             if !self.gifData.isEmpty {
-                                changeMessageRealmData.shared.sendGIFAttachment(dialog: selectedDialog, GIFAssets: self.gifData.reversed(), occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
+                                self.auth.messages.sendGIFAttachment(dialog: selectedDialog, GIFAssets: self.gifData.reversed(), occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
 
                                 withAnimation {
                                     self.gifData.removeAll()
@@ -446,12 +462,12 @@ struct KeyboardCardView: View {
                             }
                             
                             if self.enableLocation {
-                                changeMessageRealmData.shared.sendLocationMessage(dialog: selectedDialog, longitude: self.region.center.longitude, latitude: self.region.center.latitude, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
+                                self.auth.messages.sendLocationMessage(dialog: selectedDialog, longitude: self.region.center.longitude, latitude: self.region.center.latitude, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                                 self.enableLocation = false
                             }
                             
                             if self.mainText.count > 0 {
-                                changeMessageRealmData.shared.sendMessage(dialog: selectedDialog, text: self.mainText, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
+                                self.auth.messages.sendMessage(dialog: selectedDialog, text: self.mainText, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                             }
                             
                             self.checkAttachments()
@@ -467,9 +483,10 @@ struct KeyboardCardView: View {
                             .frame(width: 22, height: 22)
                             .foregroundColor(self.contentAvailable ? .white : .secondary)
                             .padding(10)
-                            .background(self.contentAvailable ? LinearGradient(gradient: Gradient(colors: [Color(red: 46 / 255, green: 168 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom) : LinearGradient(gradient: Gradient(colors: [Color("buttonColor"), Color("buttonColor")]), startPoint: .top, endPoint: .bottom))
+                            .offset(x: -1)
+                            .background(self.contentAvailable ? LinearGradient(gradient: Gradient(colors: [Color(red: 46 / 255, green: 168 / 255, blue: 255 / 255, opacity: 1.0), Color(.sRGB, red: 31 / 255, green: 118 / 255, blue: 249 / 255, opacity: 1.0)]), startPoint: .top, endPoint: .bottom) : LinearGradient(gradient: Gradient(colors: [Color.clear, Color.clear]), startPoint: .top, endPoint: .bottom))
                             .clipShape(Circle())
-                            .shadow(color: Color.black.opacity(self.contentAvailable ? 0.15 : 0.1), radius: 4, x: 0, y: 3)
+                            .shadow(color: Color.black.opacity(self.contentAvailable ? 0.15 : 0.0), radius: 4, x: 0, y: 3)
                             .shadow(color: Color.blue.opacity(self.contentAvailable ? 0.25 : 0.0), radius: 10, x: 0, y: 6)
                             .scaleEffect(self.contentAvailable ? 1.06 : 1.0)
                             .animation(Animation.interactiveSpring())
@@ -569,7 +586,7 @@ struct KeyboardCardView: View {
                             if self.selectedContacts.count > 0 {
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                                     if let selectedDialog = self.auth.dialogs.results.filter("id == %@", UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").first {
-                                        changeMessageRealmData.shared.sendContactMessage(dialog: selectedDialog, contactID: self.selectedContacts, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
+                                        self.auth.messages.sendContactMessage(dialog: selectedDialog, contactID: self.selectedContacts, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
                                         withAnimation {
                                             self.selectedContacts.removeAll()
                                             self.isKeyboardActionOpen = false
@@ -704,10 +721,10 @@ struct KeyboardCardView: View {
             } else {
                 Button(action: {
                     Request.subscribeToPublicDialog(withID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "", successBlock: { dialogz in
-                        changeDialogRealmData.shared.toggleFirebaseMemberCount(dialogId: dialogz.id ?? "", isJoining: true, totalCount: Int(dialogz.occupantsCount), onSuccess: { _ in
-                            changeDialogRealmData.shared.insertDialogs([dialogz], completion: {
-                                changeDialogRealmData.shared.updateDialogDelete(isDelete: false, dialogID: dialogz.id ?? "")
-                                changeDialogRealmData.shared.addPublicMemberCountRealmDialog(count: Int(dialogz.occupantsCount), dialogId: dialogz.id ?? "")
+                        self.auth.dialogs.toggleFirebaseMemberCount(dialogId: dialogz.id ?? "", isJoining: true, totalCount: Int(dialogz.occupantsCount), onSuccess: { _ in
+                            self.auth.dialogs.insertDialogs([dialogz], completion: {
+                                self.auth.dialogs.updateDialogDelete(isDelete: false, dialogID: dialogz.id ?? "")
+                                self.auth.dialogs.addPublicMemberCountRealmDialog(count: Int(dialogz.occupantsCount), dialogId: dialogz.id ?? "")
                                 UINotificationFeedbackGenerator().notificationOccurred(.success)
                                 withAnimation {
                                     self.isVisiting = ""
@@ -738,8 +755,8 @@ struct KeyboardCardView: View {
             Spacer()
         }.frame(width: Constants.screenWidth)
         .background(BlurView(style: .systemUltraThinMaterial)) //Color("bgColor")
-        .cornerRadius(22)
-        .overlay(RoundedRectangle(cornerRadius: 22).stroke(Color("blurBorder"), lineWidth: 2.5))
+        .cornerRadius(25)
+        .overlay(RoundedRectangle(cornerRadius: 25).stroke(Color("blurBorder"), lineWidth: 2.5))
         .padding(.vertical, 2.5)
         .onChange(of: UserDefaults.standard.string(forKey: "visitingDialogId"), perform: { value in
             if value == "" {
@@ -807,7 +824,7 @@ struct KeyboardCardView: View {
     
     func observePublicMembersType() {
         guard let selectedDialog = self.auth.dialogs.results.filter("id == %@", UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").first, selectedDialog.dialogType == "public", !selectedDialog.adminID.contains(where: { $0 == UserDefaults.standard.integer(forKey: "currentUserID") }), selectedDialog.owner != UserDefaults.standard.integer(forKey: "currentUserID") else {
-            changeDialogRealmData.shared.updateDialogMembersType(canType: false, dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "")
+            self.auth.dialogs.updateDialogMembersType(canType: false, dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "")
             UserDefaults.standard.set(false, forKey: "disabledMessaging")
 
             return
@@ -817,7 +834,7 @@ struct KeyboardCardView: View {
         
         dia.observeSingleEvent(of: .value, with: { (snapshot: DataSnapshot) in
             if let dict = snapshot.value as? [String: Any] {
-                changeDialogRealmData.shared.updateDialogMembersType(canType: dict["canMembersType"] as? Bool ?? false, dialogID: selectedDialog.id)
+                self.auth.dialogs.updateDialogMembersType(canType: dict["canMembersType"] as? Bool ?? false, dialogID: selectedDialog.id)
                 UserDefaults.standard.set(!(dict["canMembersType"] as? Bool ?? false), forKey: "disabledMessaging")
             }
         })

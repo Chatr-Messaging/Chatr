@@ -72,9 +72,7 @@ class ContactsRealmModel<Element>: ObservableObject where Element: RealmSwift.Re
     }
 }
 
-class changeContactsRealmData {
-    init() { }
-    static let shared = changeContactsRealmData()
+extension ContactsRealmModel {
 
     func observeQuickSnaps() {
         //always looking at Users section

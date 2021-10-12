@@ -144,8 +144,8 @@ struct DialogContactCell: View {
                     .default(Text(self.isAdmin ? "Remove Admin" : "Add Admin")) {
                         if !self.isAdmin {
                             Request.addAdminsToDialog(withID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "", adminsUserIDs: [NSNumber(value: self.contact.id)], successBlock: { (updatedDialog) in
-                                changeDialogRealmData.shared.addFirebaseAdmins(dialogId: updatedDialog.id ?? "", adminIds: updatedDialog.adminsIDs ?? [], onSuccess: { _ in
-                                    changeDialogRealmData.shared.insertDialogs([updatedDialog]) {
+                                self.auth.dialogs.addFirebaseAdmins(dialogId: updatedDialog.id ?? "", adminIds: updatedDialog.adminsIDs ?? [], onSuccess: { _ in
+                                    self.auth.dialogs.insertDialogs([updatedDialog]) {
                                         self.isAdmin = true
                                         self.isOwner = false
                                         UINotificationFeedbackGenerator().notificationOccurred(.success)
@@ -163,8 +163,8 @@ struct DialogContactCell: View {
                             }
                         } else {
                             Request.removeAdminsFromDialog(withID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "", adminsUserIDs: [NSNumber(value: self.contact.id)], successBlock: { (updatedDialog) in
-                                changeDialogRealmData.shared.removeFirebaseAdmin(dialogId: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "", adminId: NSNumber(value: self.contact.id), onSuccess: { _ in
-                                    changeDialogRealmData.shared.insertDialogs([updatedDialog]) {
+                                self.auth.dialogs.removeFirebaseAdmin(dialogId: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "", adminId: NSNumber(value: self.contact.id), onSuccess: { _ in
+                                    self.auth.dialogs.insertDialogs([updatedDialog]) {
                                         self.isAdmin = false
                                         self.isOwner = false
                                         UINotificationFeedbackGenerator().notificationOccurred(.success)
@@ -188,10 +188,10 @@ struct DialogContactCell: View {
                         Request.updateDialog(withID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "", update: updateParameters, successBlock: { (updatedDialog) in
                             
                             if let id = updatedDialog.id, isPublic {
-                                changeDialogRealmData.shared.toggleFirebaseMemberCount(dialogId: id, isJoining: false, totalCount: nil, onSuccess: { _ in }, onError: { _ in })
+                                self.auth.dialogs.toggleFirebaseMemberCount(dialogId: id, isJoining: false, totalCount: nil, onSuccess: { _ in }, onError: { _ in })
                             }
                             
-                            changeDialogRealmData.shared.insertDialogs([updatedDialog]) {
+                            self.auth.dialogs.insertDialogs([updatedDialog]) {
                                 UINotificationFeedbackGenerator().notificationOccurred(.success)
                                 self.notiType = "success"
                                 self.notiText = ("Successfully removed \(self.contact.fullName) from the ") + (isPublic ? "channel" : "group chat")
@@ -225,7 +225,7 @@ struct DialogContactCell: View {
                 
                 if self.contact.id == 0 || self.contact.avatar == "" {
                     Request.users(withIDs: [NSNumber(value: self.contactID)], paginator: Paginator.limit(1, skip: 0), successBlock: { (paginator, users) in
-                        changeContactsRealmData.shared.observeFirebaseContactReturn(contactID: Int(users.first?.id ?? 0), completion: { contact in
+                        self.auth.contacts.observeFirebaseContactReturn(contactID: Int(users.first?.id ?? 0), completion: { contact in
                             if let firstUser = users.first {
                                 let newContact = ContactStruct()
                                 newContact.id = Int(firstUser.id)

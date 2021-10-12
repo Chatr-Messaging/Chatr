@@ -133,7 +133,7 @@ struct storageView: View {
                              VStack {
                              Button(action: {
                              print("delete all Dialog data")
-                             changeDialogRealmData.shared.removeAllDialogs()
+                             self.auth.dialogs.removeAllDialogs()
                              self.removeDialogData = true
                              }) {
                              HStack {
@@ -163,7 +163,7 @@ struct storageView: View {
                              VStack {
                              Button(action: {
                              print("delete all Contacts data")
-                             changeContactsRealmData.shared.removeAllContacts()
+                             self.auth.contacts.removeAllContacts()
                              self.removeContactsData = true
                              }) {
                              HStack {
@@ -193,7 +193,7 @@ struct storageView: View {
                              VStack {
                              Button(action: {
                              print("delete all Message data")
-                             changeMessageRealmData.shared.removeAllMessages(completion: { _ in })
+                             self.auth.messages.removeAllMessages(completion: { _ in })
                              self.removeMessagesData = true
                              }) {
                              HStack {

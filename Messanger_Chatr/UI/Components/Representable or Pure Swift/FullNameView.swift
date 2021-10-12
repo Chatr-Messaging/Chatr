@@ -27,6 +27,7 @@ struct FullNameFieldView: UIViewRepresentable {
         textField.font = .systemFont(ofSize: 20)
         textField.keyboardType = .default
         textField.spellCheckingType = .no
+        textField.autocorrectionType = .no
         textField.textAlignment = .center
         textField.autocapitalizationType = .words
         textField.backgroundColor = UIColor(named: "bgColor")

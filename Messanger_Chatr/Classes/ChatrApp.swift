@@ -30,7 +30,7 @@ extension ChatrApp {
             Chat.instance.addDelegate(ChatrApp.auth)
             Purchases.shared.identify("\(user.id)") { (_, _) in }
             if Session.current.tokenHasExpired {
-                users.login(completion: {
+                users.login(auth: auth, completion: {
                     if auth.visitContactProfile == false {
                         chatInstanceConnect(id: UInt(user.id))
                     }
@@ -47,14 +47,14 @@ extension ChatrApp {
             
             Chat.instance.connect(withUserID: id, password: Session.current.sessionDetails?.token ?? "") { (error) in
                 if error != nil {
-                    users.login(completion: {
-                        changeContactsRealmData.shared.observeQuickSnaps()
-                        changeProfileRealmDate.shared.observeFirebaseUser(with: Int(id))
+                    users.login(auth: auth, completion: {
+                        auth.contacts.observeQuickSnaps()
+                        auth.profile.observeFirebaseUser(with: Int(id))
                     })
                 } else {                    
-                    changeDialogRealmData.shared.fetchDialogs(completion: { _ in })
-                    changeContactsRealmData.shared.observeQuickSnaps()
-                    changeProfileRealmDate.shared.observeFirebaseUser(with: Int(id))
+                    auth.dialogs.fetchDialogs(completion: { _ in })
+                    auth.contacts.observeQuickSnaps()
+                    auth.profile.observeFirebaseUser(with: Int(id))
                     joinInitOpenDialog()
                     //auth.initIAPurchase()
                 }

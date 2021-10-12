@@ -701,7 +701,7 @@ struct VisitGroupChannelView: View {
 
     func observePublicDialogMembers() {
         Request.occupants(forPublicDialogID: self.dialogModel.id, paginator: Paginator.limit(6, skip: 0), successBlock: { (users, pagin) in
-            changeDialogRealmData.shared.insertPublicDialogMembers(dialogId: self.dialogModel.id, users: users, completion: {
+            self.auth.dialogs.insertPublicDialogMembers(dialogId: self.dialogModel.id, users: users, completion: {
                 self.insertLocalAdmins()
             })
         }, errorBlock: { _ in
@@ -751,11 +751,11 @@ struct VisitGroupChannelView: View {
         let msg = Database.database().reference().child("Dialogs").child(dialogId).child("pinned")
 
         msg.observe(.childAdded, with: { snapAdded in
-            changeDialogRealmData.shared.addDialogPin(messageId: snapAdded.key, dialogID: self.dialogModel.id)
+            self.auth.dialogs.addDialogPin(messageId: snapAdded.key, dialogID: self.dialogModel.id)
         })
 
         msg.observe(.childRemoved, with: { snapRemoved in
-            changeDialogRealmData.shared.removeDialogPin(messageId: snapRemoved.key, dialogID: self.dialogModel.id)
+            self.auth.dialogs.removeDialogPin(messageId: snapRemoved.key, dialogID: self.dialogModel.id)
         })
     }
     
@@ -779,7 +779,7 @@ struct VisitGroupChannelView: View {
     
     func destroyLeaveGroup() {
         UserDefaults.standard.set(false, forKey: "localOpen")
-        changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
+        self.auth.dialogs.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
         
         if self.dialogModel.dialogType == "public" && !self.isOwner {
             if let index = self.dialogModelAdmins.firstIndex(of: UserDefaults.standard.integer(forKey: "currentUserID")) {
@@ -787,15 +787,15 @@ struct VisitGroupChannelView: View {
             }
             self.dialogRelationship = .notSubscribed
             self.showingMoreSheet = false
-            changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: self.dialogModel.id, isOwner: self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID"))
+            self.auth.dialogs.unsubscribePublicConnectyDialog(dialogID: self.dialogModel.id, isOwner: self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID"))
         } else {
-            changeDialogRealmData.shared.deletePrivateConnectyDialog(dialogID: self.dialogModel.id, isOwner: self.isOwner)
+            self.auth.dialogs.deletePrivateConnectyDialog(dialogID: self.dialogModel.id, isOwner: self.isOwner)
         }
         UINotificationFeedbackGenerator().notificationOccurred(.success)
     }
     
     func reportPublicDialog() {
-        changeDialogRealmData.shared.reportFirebasePublicDialog(dialogId: self.dialogModel.id, onSuccess: { _ in
+        self.auth.dialogs.reportFirebasePublicDialog(dialogId: self.dialogModel.id, onSuccess: { _ in
             UINotificationFeedbackGenerator().notificationOccurred(.success)
             self.auth.sendPushNoti(userIDs: [NSNumber(value: self.dialogModel.owner)], title: "\(self.dialogModel.fullName) Reported", message: "\(self.auth.profile.results.first?.fullName ?? "Chatr User") reported your channel \(self.dialogModel.fullName)")
             self.notiType = "report"
@@ -819,8 +819,8 @@ struct VisitGroupChannelView: View {
         
         if self.dialogModel.dialogType == "public" {
             Request.addAdminsToDialog(withID: self.dialogModel.id, adminsUserIDs: occu, successBlock: { (updatedDialog) in
-                changeDialogRealmData.shared.addFirebaseAdmins(dialogId: updatedDialog.id ?? "", adminIds: updatedDialog.adminsIDs ?? [], onSuccess: { _ in
-                    changeDialogRealmData.shared.insertDialogs([updatedDialog]) {
+                self.auth.dialogs.addFirebaseAdmins(dialogId: updatedDialog.id ?? "", adminIds: updatedDialog.adminsIDs ?? [], onSuccess: { _ in
+                    self.auth.dialogs.insertDialogs([updatedDialog]) {
                         UINotificationFeedbackGenerator().notificationOccurred(.success)
                         for i in self.selectedNewMembers {
                             if !self.dialogModel.occupentsID.contains(i) {
@@ -854,7 +854,7 @@ struct VisitGroupChannelView: View {
             updateParameters.occupantsIDsToAdd = occu
             
             Request.updateDialog(withID: self.dialogModel.id, update: updateParameters, successBlock: { (updatedDialog) in
-                changeDialogRealmData.shared.insertDialogs([updatedDialog]) { }
+                self.auth.dialogs.insertDialogs([updatedDialog]) { }
                 UINotificationFeedbackGenerator().notificationOccurred(.success)
                 
                 for i in self.selectedNewMembers {

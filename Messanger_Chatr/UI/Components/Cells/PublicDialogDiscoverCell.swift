@@ -78,11 +78,11 @@ struct PublicDialogDiscoverCell: View {
                             Button(action: {
                                 if !self.isJoined {
                                     Request.subscribeToPublicDialog(withID: self.dialogData.id ?? "", successBlock: { dialogz in
-                                        changeDialogRealmData.shared.toggleFirebaseMemberCount(dialogId: dialogz.id ?? "", isJoining: true, totalCount: Int(dialogz.occupantsCount), onSuccess: { _ in
+                                        self.auth.dialogs.toggleFirebaseMemberCount(dialogId: dialogz.id ?? "", isJoining: true, totalCount: Int(dialogz.occupantsCount), onSuccess: { _ in
                                             UINotificationFeedbackGenerator().notificationOccurred(.success)
                                             self.isJoined = true
-                                            changeDialogRealmData.shared.insertDialogs([dialogz], completion: {
-                                                changeDialogRealmData.shared.updateDialogDelete(isDelete: false, dialogID: dialogz.id ?? "")
+                                            self.auth.dialogs.insertDialogs([dialogz], completion: {
+                                                self.auth.dialogs.updateDialogDelete(isDelete: false, dialogID: dialogz.id ?? "")
                                                 
                                                 self.dialogData.memberCount = Int(dialogz.occupantsCount)
                                                 self.auth.sendPushNoti(userIDs: [NSNumber(value: dialogz.userID)], title: "\(self.auth.profile.results.first?.fullName ?? "New Member") joined \(dialogz.name ?? "your channel")", message: "\(self.auth.profile.results.first?.fullName ?? "New Member") has joined your channel \(dialogz.name ?? "no name")")

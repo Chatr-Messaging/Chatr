@@ -58,7 +58,7 @@ struct EditGroupDialogView: View {
                                         let fullImgLink = Constants.uploadcareBaseUrl + coverId + Constants.uploadcareStandardTransform
 
                                         databaseRef.updateChildValues(["cover_photo" : "\(fullImgLink)"], withCompletionBlock: { (_,_) in
-                                            changeDialogRealmData.shared.updateDialogCoverPhoto(coverPhoto: "\(imageUrl)", dialogID: self.dialogModel.id)
+                                            self.auth.dialogs.updateDialogCoverPhoto(coverPhoto: "\(imageUrl)", dialogID: self.dialogModel.id)
                                             UINotificationFeedbackGenerator().notificationOccurred(.success)
                                         })
                                     }
@@ -447,7 +447,7 @@ struct EditGroupDialogView: View {
                 let databaseRef = Database.database().reference().child("Marketplace/public_dialogs").child(self.dialogModel.id)
 
                 databaseRef.updateChildValues(["canMembersType" : self.canMembersType, "description" : updatedDialog.dialogDescription ?? "", "name" : updatedDialog.name ?? "no name"], withCompletionBlock: { (_,_) in
-                    changeDialogRealmData.shared.updateDialogNameDescription(name: updatedDialog.name ?? "no name", description: updatedDialog.dialogDescription ?? "", membersType: self.canMembersType, dialogID: self.dialogModel.id)
+                    self.auth.dialogs.updateDialogNameDescription(name: updatedDialog.name ?? "no name", description: updatedDialog.dialogDescription ?? "", membersType: self.canMembersType, dialogID: self.dialogModel.id)
                     UINotificationFeedbackGenerator().notificationOccurred(.success)
                     self.loadingSave = false
                     self.didSave = true
@@ -467,7 +467,7 @@ struct EditGroupDialogView: View {
         Request.updateDialog(withID: self.dialogModel.id, update: parameters, successBlock: { (updatedDialog) in
             let databaseRef = Database.database().reference().child("Marketplace/public_dialogs").child(self.dialogModel.id)
             databaseRef.updateChildValues(["avatar" : updatedDialog.photo ?? avatarLink], withCompletionBlock: { (_,_) in
-                changeDialogRealmData.shared.updateDialogAvatar(avatar: updatedDialog.photo ?? avatarLink, dialogID: self.dialogModel.id)
+                self.auth.dialogs.updateDialogAvatar(avatar: updatedDialog.photo ?? avatarLink, dialogID: self.dialogModel.id)
                 completion(true)
             })
         }, errorBlock: { (error) in
@@ -486,7 +486,7 @@ struct EditGroupDialogView: View {
             parameters.photo = blob.uid
             let databaseRef = Database.database().reference().child("Marketplace").child(self.dialogModel.id)
             databaseRef.updateChildValues(["cover_photo" : blob.uid ?? ""], withCompletionBlock: { (_,_) in
-                changeDialogRealmData.shared.updateDialogCoverPhoto(coverPhoto: blob.uid ?? "", dialogID: self.dialogModel.id)
+                self.auth.dialogs.updateDialogCoverPhoto(coverPhoto: blob.uid ?? "", dialogID: self.dialogModel.id)
                 completion(true)
             })
         }) { (error) in

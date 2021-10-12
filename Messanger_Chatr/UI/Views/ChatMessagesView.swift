@@ -197,7 +197,7 @@ struct ChatMessagesView: View {
                                             .padding(.top, 2.5)
                                             .padding(.horizontal, 40)
                                         
-                                        Text("created \(self.viewModel.dateFormatTime(date: changeDialogRealmData.shared.getRealmDialog(dialogId: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").createdAt))")
+                                        Text("created \(self.viewModel.dateFormatTime(date: self.auth.dialogs.getRealmDialog(dialogId: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").createdAt))")
                                             .font(.caption)
                                             .fontWeight(.regular)
                                             .foregroundColor(.secondary)
@@ -361,7 +361,7 @@ struct ChatMessagesView: View {
                                         }
                                     } else {
                                         //loading more from server
-                                        changeMessageRealmData.shared.getMessageUpdates(dialogID: self.dialogID, limit: pageShowCount * (self.scrollPage + 2), skip: currentMessages.count, completion: { _ in
+                                        self.auth.messages.getMessageUpdates(dialogID: self.dialogID, limit: pageShowCount * (self.scrollPage + 2), skip: currentMessages.count, completion: { _ in
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
                                                 
                                                 if self.maxMessageCount >= currentMessages.count {
@@ -466,7 +466,7 @@ struct ChatMessagesView: View {
                         self.maxMessageCount = self.currentMessages.count
                         
                         if self.viewModel.totalMessageCount > self.currentMessages.count || self.currentMessages.count == 0 || self.viewModel.totalMessageCount == 100 {
-                            changeMessageRealmData.shared.getMessageUpdates(dialogID: dialogID, limit: pageShowCount * (self.scrollPage), skip: currentMessages.count - self.minPagination, completion: { _ in })
+                            self.auth.messages.getMessageUpdates(dialogID: dialogID, limit: pageShowCount * (self.scrollPage), skip: currentMessages.count - self.minPagination, completion: { _ in })
                         }
 
                         //self.loadUnreadMessages()
@@ -490,7 +490,7 @@ struct ChatMessagesView: View {
             self.maxMessageCount = currentMessages.count
             self.viewModel.unreadMessageCount = Int(unread)
             if unread != 0 {
-                changeMessageRealmData.shared.getMessageUpdates(dialogID: self.dialogID, limit: currentMessages.count + Int(unread > 40 ? 40 : unread), skip: currentMessages.count - self.minPagination, completion: { _ in
+                self.auth.messages.getMessageUpdates(dialogID: self.dialogID, limit: currentMessages.count + Int(unread > 40 ? 40 : unread), skip: currentMessages.count - self.minPagination, completion: { _ in
                     self.maxMessageCount = currentMessages.count
                 })
             }
@@ -501,11 +501,11 @@ struct ChatMessagesView: View {
         let msg = Database.database().reference().child("Dialogs").child(self.dialogID).child("pinned")
 
         msg.observe(.childAdded, with: { snapAdded in
-            changeDialogRealmData.shared.addDialogPin(messageId: snapAdded.key, dialogID: self.dialogID)
+            self.auth.dialogs.addDialogPin(messageId: snapAdded.key, dialogID: self.dialogID)
         })
 
         msg.observe(.childRemoved, with: { snapRemoved in
-            changeDialogRealmData.shared.removeDialogPin(messageId: snapRemoved.key, dialogID: self.dialogID)
+            self.auth.dialogs.removeDialogPin(messageId: snapRemoved.key, dialogID: self.dialogID)
         })
     }
 }

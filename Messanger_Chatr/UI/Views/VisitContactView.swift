@@ -64,6 +64,7 @@ struct VisitContactView: View {
 
                 //MARK: Action Buttons
                 actionButtonView(viewModel: self.viewModel, contact: self.$contact, quickSnapViewState: self.$quickSnapViewState, contactRelationship: self.$contactRelationship, newMessage: self.$newMessage, dismissView: self.$dismissView)
+                    .environmentObject(self.auth)
                     .padding(.vertical, 15)
                     .padding(.bottom, 15)
 
@@ -424,7 +425,7 @@ struct VisitContactView: View {
                             privateChatPrivacyItem.mutualBlock = true
                             let groupChatPrivacyItem = PrivacyItem.init(privacyType: .groupUserID, userID: UInt(self.contact.id), allow: false)
                             let privacyList = PrivacyList.init(name: "PrivacyList", items: [privateChatPrivacyItem, groupChatPrivacyItem])
-                            changeContactsRealmData.shared.deleteContact(contactID: self.contact.id, isMyContact: false, completion: { _ in })
+                            self.auth.contacts.deleteContact(contactID: self.contact.id, isMyContact: false, completion: { _ in })
                             Chat.instance.setPrivacyList(privacyList)
                             self.contactRelationship = .unknown
                         }), .cancel(Text("Done"))])
@@ -584,7 +585,7 @@ struct VisitContactView: View {
                     } catch { }
                 } else if self.viewState == .fromContacts {
                     self.contactRelationship = .contact
-                    changeContactsRealmData.shared.observeFirebaseContact(contactID: self.contact.id)
+                    self.auth.contacts.observeFirebaseContact(contactID: self.contact.id)
                     if self.contact.instagramAccessToken != "" && self.contact.instagramId != 0 {
                         self.viewModel.loadInstagramImages(testUser: InstagramTestUser(access_token: self.contact.instagramAccessToken, user_id: self.contact.instagramId))
                     }
@@ -659,7 +660,7 @@ struct VisitContactView: View {
                                                 }
                                             }
 
-                                            changeContactsRealmData.shared.observeFirebaseContactReturn(contactID: Int(self.connectyContact.id), completion: { firebaseContact in
+                                            self.auth.contacts.observeFirebaseContactReturn(contactID: Int(self.connectyContact.id), completion: { firebaseContact in
                                                 let newContact = ContactStruct()
                                                 newContact.id = Int(self.connectyContact.id)
                                                 newContact.fullName = self.connectyContact.fullName ?? ""
@@ -706,7 +707,7 @@ struct VisitContactView: View {
                         //replace below with selected contact id:
                         if self.selectedContact.contains(id) {
                             if let selectedDialog = self.auth.dialogs.results.filter("id == %@", dialog.id).first {
-                                changeMessageRealmData.shared.sendContactMessage(dialog: selectedDialog, contactID: [self.contact.id], occupentID: [NSNumber(value: id), NSNumber(value: Int(self.auth.profile.results.first?.id ?? 0))])
+                                self.auth.messages.sendContactMessage(dialog: selectedDialog, contactID: [self.contact.id], occupentID: [NSNumber(value: id), NSNumber(value: Int(self.auth.profile.results.first?.id ?? 0))])
                                 
                                 if let index = self.selectedContact.firstIndex(of: id) {
                                     self.selectedContact.remove(at: index)
@@ -739,17 +740,17 @@ struct VisitContactView: View {
                    message.attachments = [attachment]
                    
                    dialog.send(message) { (error) in
-                       changeMessageRealmData.shared.insertMessage(message, completion: {
+                       self.auth.messages.insertMessage(message, completion: {
                            if error != nil {
-                               changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .error)
+                               self.auth.messages.updateMessageState(messageID: message.id ?? "", messageState: .error)
                            } else {
-                               changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
+                               self.auth.messages.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
                            }
                        })
                    }
                 })
 
-                changeDialogRealmData.shared.fetchDialogs(completion: { _ in
+                self.auth.dialogs.fetchDialogs(completion: { _ in
                     self.selectedContact.removeAll()
                     self.auth.notificationtext = "Forwarded contact"
                     UINotificationFeedbackGenerator().notificationOccurred(.success)
@@ -776,7 +777,7 @@ struct VisitContactView: View {
             }
         }
         
-        changeContactsRealmData.shared.observeFirebaseContactReturn(contactID: self.connectyContact.id != 0 ? Int(self.connectyContact.id) : self.contact.id, completion: { firebaseContact in
+        self.auth.contacts.observeFirebaseContactReturn(contactID: self.connectyContact.id != 0 ? Int(self.connectyContact.id) : self.contact.id, completion: { firebaseContact in
             let newContact = ContactStruct()
             newContact.id = self.viewState == .fromGroupDialog ? self.contact.id : Int(self.connectyContact.id)
             newContact.fullName = self.viewState == .fromGroupDialog ? self.contact.fullName : self.connectyContact.fullName ?? ""
@@ -1063,6 +1064,7 @@ struct topHeaderContactView: View {
 
 //MARK: Action Button View
 struct actionButtonView: View {
+    @EnvironmentObject var auth: AuthModel
     @ObservedObject var viewModel: VisitContactViewModel
     @Binding var contact: ContactStruct
     @Binding var quickSnapViewState: QuickSnapViewingState
@@ -1164,7 +1166,7 @@ struct actionButtonView: View {
                     ActionSheet(title: Text("Are you sure you want to un-send your contact request?"), message: nil, buttons: [
                         .destructive(Text("Remove Request"), action: {
                             Chat.instance.removeUser(fromContactList: UInt(self.contact.id)) { (error) in
-                                changeContactsRealmData.shared.deleteContact(contactID: self.contact.id, isMyContact: false, completion: { _ in
+                                self.auth.contacts.deleteContact(contactID: self.contact.id, isMyContact: false, completion: { _ in
                                     self.contactRelationship = .notContact
                                 })
                             }

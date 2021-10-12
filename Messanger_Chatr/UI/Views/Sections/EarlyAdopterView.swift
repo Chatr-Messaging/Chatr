@@ -42,10 +42,10 @@ struct EarlyAdopterView: View {
                         })
                     }
 
-                Text("We understand this is a early version and the best is yet to come. We apreciate all feedback. \nEnjoy this free Icon!")
+                Text("Please understand this is an early version and the best is yet to come. All feedback is appreciated. \nEnjoy this free Icon!")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
-                    .padding(.horizontal)
+                    .padding(.horizontal, 5)
                     .multilineTextAlignment(.center)
                 
                 Image("AppIcon-Original-Dark")

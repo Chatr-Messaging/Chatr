@@ -88,7 +88,7 @@ struct EmptyMessagesSection: View {
             return
         }
         
-        changeMessageRealmData.shared.sendMessage(dialog: selectedDialog, text: text, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
+        self.auth.messages.sendMessage(dialog: selectedDialog, text: text, occupentID: self.auth.selectedConnectyDialog?.occupantIDs ?? [])
         self.messageCount += 1
         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
     }

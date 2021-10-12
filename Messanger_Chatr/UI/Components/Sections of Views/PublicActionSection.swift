@@ -31,10 +31,10 @@ struct PublicActionSection: View {
             Button(action: {
                 if self.dialogRelationship != .subscribed {
                     Request.subscribeToPublicDialog(withID: self.dialogModel.id, successBlock: { dialogz in
-                        changeDialogRealmData.shared.toggleFirebaseMemberCount(dialogId: dialogz.id ?? "", isJoining: true, totalCount: Int(dialogz.occupantsCount), onSuccess: { _ in
-                            changeDialogRealmData.shared.insertDialogs([dialogz], completion: {
-                                changeDialogRealmData.shared.updateDialogDelete(isDelete: false, dialogID: self.dialogModel.id)
-                                changeDialogRealmData.shared.addPublicMemberCountRealmDialog(count: Int(dialogz.occupantsCount), dialogId: self.dialogModel.id)
+                        self.auth.dialogs.toggleFirebaseMemberCount(dialogId: dialogz.id ?? "", isJoining: true, totalCount: Int(dialogz.occupantsCount), onSuccess: { _ in
+                            self.auth.dialogs.insertDialogs([dialogz], completion: {
+                                self.auth.dialogs.updateDialogDelete(isDelete: false, dialogID: self.dialogModel.id)
+                                self.auth.dialogs.addPublicMemberCountRealmDialog(count: Int(dialogz.occupantsCount), dialogId: self.dialogModel.id)
                                 UserDefaults.standard.set(self.dialogModel.id, forKey: "visitingDialogId")
                                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 self.dismissView.toggle()
@@ -80,10 +80,10 @@ struct PublicActionSection: View {
             if self.dialogRelationship == .notSubscribed || self.dialogRelationship == .error {
                 Button(action: {
                     Request.subscribeToPublicDialog(withID: self.dialogModel.id, successBlock: { dialogz in
-                        changeDialogRealmData.shared.toggleFirebaseMemberCount(dialogId: dialogz.id ?? "", isJoining: true, totalCount: Int(dialogz.occupantsCount), onSuccess: { _ in
-                            changeDialogRealmData.shared.insertDialogs([dialogz], completion: {
-                                changeDialogRealmData.shared.updateDialogDelete(isDelete: false, dialogID: dialogz.id ?? "")
-                                changeDialogRealmData.shared.addPublicMemberCountRealmDialog(count: Int(dialogz.occupantsCount), dialogId: dialogz.id ?? "")
+                        self.auth.dialogs.toggleFirebaseMemberCount(dialogId: dialogz.id ?? "", isJoining: true, totalCount: Int(dialogz.occupantsCount), onSuccess: { _ in
+                            self.auth.dialogs.insertDialogs([dialogz], completion: {
+                                self.auth.dialogs.updateDialogDelete(isDelete: false, dialogID: dialogz.id ?? "")
+                                self.auth.dialogs.addPublicMemberCountRealmDialog(count: Int(dialogz.occupantsCount), dialogId: dialogz.id ?? "")
                                 UINotificationFeedbackGenerator().notificationOccurred(.success)
                                 withAnimation {
                                     self.dialogRelationship = .subscribed
@@ -169,7 +169,7 @@ struct PublicActionSection: View {
     
     
     func reportPublicDialog() {
-        changeDialogRealmData.shared.reportFirebasePublicDialog(dialogId: self.dialogModel.id, onSuccess: { _ in
+        self.auth.dialogs.reportFirebasePublicDialog(dialogId: self.dialogModel.id, onSuccess: { _ in
             UINotificationFeedbackGenerator().notificationOccurred(.success)
             self.auth.sendPushNoti(userIDs: [NSNumber(value: self.dialogModel.owner)], title: "\(self.dialogModel.fullName) Reported", message: "\(self.auth.profile.results.first?.fullName ?? "Chatr User") reported your channel \(self.dialogModel.fullName)")
             self.notiType = "report"

@@ -154,11 +154,11 @@ struct PinnedSectionView: View {
     func pinMessage(message: MessageStruct) {
         self.pinMessage(message: message, completion: { added in
             if !added {
-                changeDialogRealmData.shared.removeDialogPin(messageId: message.id, dialogID: message.dialogID)
+                self.auth.dialogs.removeDialogPin(messageId: message.id, dialogID: message.dialogID)
                 auth.notificationtext = "Removed pined message"
                 NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
             } else {
-                changeDialogRealmData.shared.addDialogPin(messageId: message.id, dialogID: message.dialogID)
+                self.auth.dialogs.addDialogPin(messageId: message.id, dialogID: message.dialogID)
                 auth.notificationtext = "Pined message"
                 NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
             }

@@ -384,7 +384,7 @@ struct NewConversationView: View {
         if searchText != "" {
             Request.users(withFullName: searchText, paginator: Paginator.limit(20, skip: 0), successBlock: { (paginator, users) in
                 for i in users {
-                    changeContactsRealmData.shared.observeFirebaseContactReturn(contactID: Int(i.id), completion: { firebaseContact in
+                    self.auth.contacts.observeFirebaseContactReturn(contactID: Int(i.id), completion: { firebaseContact in
                         if !firebaseContact.isMessagingPrivate {
                             self.grandUsers.append(i)
                             self.grandUsers.removeDuplicates()
@@ -395,7 +395,7 @@ struct NewConversationView: View {
             
             Request.users(withPhoneNumbers: [searchText], paginator: Paginator.limit(5, skip: 0), successBlock: { (paginator, users) in
                 for i in users {
-                    changeContactsRealmData.shared.observeFirebaseContactReturn(contactID: Int(i.id), completion: { firebaseContact in
+                    self.auth.contacts.observeFirebaseContactReturn(contactID: Int(i.id), completion: { firebaseContact in
                         if !firebaseContact.isMessagingPrivate {
                             self.grandUsers.append(i)
                             self.grandUsers.removeDuplicates()
@@ -421,7 +421,7 @@ struct NewConversationView: View {
                         dialog.name = "\(self.auth.profile.results.first?.fullName ?? "Chatr User")'s Group Chat"
                     }
                     Request.createDialog(dialog, successBlock: { (dialog) in
-                        changeDialogRealmData.shared.fetchDialogs(completion: { _ in
+                        self.auth.dialogs.fetchDialogs(completion: { _ in
                             let title = dialog.type == .private ? "New Chat" : "New Group Chat"
                             let msg = dialog.type == .private ? "started a new chat with you" : "started a new group chat with you"
 
@@ -461,13 +461,13 @@ struct NewConversationView: View {
                     dialog.photo = Constants.uploadcareBaseUrl + avatarId + Constants.uploadcareStandardTransform
 
                     Request.createDialog(dialog, successBlock: { (dialog) in
-                        changeDialogRealmData.shared.fetchDialogs(completion: { _ in
+                        self.auth.dialogs.fetchDialogs(completion: { _ in
                             for i in self.selectedTags {
                                 databaseRef.child("tags").child(i.title).child("dialogs").setValue([dialog.id : true])
                             }
                             
                             self.auth.uploadFile(coverUrl, completionHandler: { coverPhotoId in
-                                changeDialogRealmData.shared.fetchTotalCountPublicDialogs(completion: { count in
+                                self.auth.dialogs.fetchTotalCountPublicDialogs(completion: { count in
                                     databaseRef.child("public_dialogs").child(dialog.id?.description ?? "").setValue(["avatar" : dialog.photo ?? Constants.uploadcareBaseUrl + avatarId + Constants.uploadcareStandardTransform, "banned" : false, "canMembersType" : false, "cover_photo" : Constants.uploadcareBaseUrl + coverPhotoId + Constants.uploadcareStandardTransform, "creation_order" : count + 1, "date_created" : Date().description, "description" : dialog.dialogDescription ?? "empty description", "memberCount" : 1, "members" : ["\(UserDefaults.standard.integer(forKey: "currentUserID"))" : true], "name" : dialog.name ?? self.groupName, "owner" : UserDefaults.standard.integer(forKey: "currentUserID")])
 
                                     self.description = ""

@@ -30,6 +30,7 @@ class ChatMessageViewModel: ObservableObject {
     @Published var totalMessageCount: Int = -1
     @Published var unreadMessageCount: Int = 0
     @Published var preferenceVideoMute: Bool = false
+    var auth = AuthModel()
 
     func loadDialog(auth: AuthModel, dialogId: String, completion: @escaping () -> Void) {
         let extRequest : [String: String] = ["sort_desc" : "lastMessageDate"]
@@ -61,13 +62,13 @@ class ChatMessageViewModel: ObservableObject {
         self.updateDialogMessageCount(dialogId: dialogId, completion: {
             dialog.onUserIsTyping = { (userID: UInt) in
                 if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
-                    changeMessageRealmData.shared.addTypingMessage(userID: String(userID), dialogID: dialogId)
+                    self.auth.messages.addTypingMessage(userID: String(userID), dialogID: dialogId)
                 }
             }
 
             dialog.onUserStoppedTyping = { (userID: UInt) in
                 if userID != UserDefaults.standard.integer(forKey: "currentUserID") {
-                    changeMessageRealmData.shared.removeTypingMessage(userID: String(userID), dialogID: dialogId)
+                    self.auth.messages.removeTypingMessage(userID: String(userID), dialogID: dialogId)
                 }
             }
 
@@ -319,7 +320,7 @@ class ChatMessageViewModel: ObservableObject {
             if error != nil {
                 UINotificationFeedbackGenerator().notificationOccurred(.error)
             } else {
-                changeMessageRealmData.shared.updateMessageState(messageID: messageId, messageState: .deleted)
+                self.auth.messages.updateMessageState(messageID: messageId, messageState: .deleted)
 
                 DispatchQueue.main.async {
                     completion()
@@ -377,7 +378,7 @@ class ChatMessageViewModel: ObservableObject {
                 self.contactRelationship = .contact
             } else {
                 Request.users(withIDs: [NSNumber(value: self.message.senderID)], paginator: Paginator.limit(1, skip: 0), successBlock: { (paginator, users) in
-                    changeContactsRealmData.shared.observeFirebaseContactReturn(contactID: Int(users.first?.id ?? 0), completion: { contact in
+                    self.auth.contacts.observeFirebaseContactReturn(contactID: Int(users.first?.id ?? 0), completion: { contact in
                         if let firstUser = users.first {
                             let newContact = ContactStruct()
                             newContact.id = Int(firstUser.id)

@@ -27,6 +27,7 @@ struct QuickSnapStartView: View {
             //MARK: Post View
             GeometryReader { geomotry in
                 QuickSnapsPostView(selectedQuickSnapContact: self.$selectedQuickSnapContact, viewState: self.$viewState, selectedContacts: self.$selectedContacts)
+                    .environmentObject(self.auth)
                     .frame(width: Constants.screenWidth, height: Constants.screenHeight, alignment: .center)
                     .clipShape(RoundedRectangle(cornerRadius: self.viewState == .viewing || self.viewState == .viewingOver  ? abs(self.postViewSize.height) : 150))
                     .offset(y: self.postViewSize.height / 2)
@@ -57,6 +58,7 @@ struct QuickSnapStartView: View {
             if self.auth.isUserAuthenticated == .signedIn {
                 GeometryReader { geomotry in
                     CameraView(cameraState: self.$viewState, cameraFocus: self.$cameraFoucsPoint, selectedQuickSnapContact: self.$selectedQuickSnapContact, selectedContacts: self.$selectedContacts)
+                        .environmentObject(self.auth)
                         .frame(width: Constants.screenWidth, height: Constants.screenHeight, alignment: .center)
                         .background(BlurView(style: .systemMaterialDark))
                         .opacity(self.viewState == .camera || self.viewState == .takenPic ? 1 : 0)
