@@ -196,7 +196,7 @@ class AuthModel: NSObject, ObservableObject {
                             completion(false)
                             return
                         } else {
-                            //Save ConnectyCube tokenID & loginto ConnectyCube then save & notify
+                            //Save ConnectyCube tokenID & log-into ConnectyCube then save & notify
                             //UserDefaults.standard.set(idToken, forKey: "tokenID")
                             Request.logIn(withFirebaseProjectID: Constants.FirebaseProjectID, accessToken: idToken ?? "", successBlock: { (user) in
                                 UserDefaults.standard.set(user.id, forKey: "currentUserID")
@@ -207,7 +207,7 @@ class AuthModel: NSObject, ObservableObject {
                                         self.haveUserFullName = true
                                     }
 
-                                    if user.avatar != "" || PersistenceManager.shared.getCubeProfileImage(usersID: user) != nil {
+                                    if user.avatar != nil {
                                         self.haveUserProfileImg = true
                                     }
                                 } else {
@@ -224,7 +224,7 @@ class AuthModel: NSObject, ObservableObject {
                                 }
 
                                 self.profile.updateProfile(user, completion: {
-                                    //Update Firebase Analitics log events by checking Firebase new user
+                                    //Update Firebase Analytics log events by checking Firebase new user
                                     Chat.instance.connect(withUserID: UInt(user.id), password: Session.current.sessionDetails?.token ?? "") { (error) in
                                         if error != nil {
                                             print("there is a error connecting to session! \(String(describing: error))")
@@ -586,7 +586,7 @@ class AuthModel: NSObject, ObservableObject {
                 let fileData = FileManager.default.contents(atPath: filePath.path),
                 let image = UIImage(data: fileData) {
                 if key == "userImage" {
-                    //self.avitarImg = image
+                    //self.avatarImg = image
                 }
                 return image
             } else {
