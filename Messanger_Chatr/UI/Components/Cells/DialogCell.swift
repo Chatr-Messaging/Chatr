@@ -69,7 +69,7 @@ struct DialogCell: View {
                                         self.selectedDialogID = self.dialogModel.id
                                         UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")
                                         UserDefaults.standard.set(true, forKey: "localOpen")
-                                        changeDialogRealmData.shared.updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
+                                        self.auth.dialogs.updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
                                     }
                                 }
                         
@@ -142,7 +142,7 @@ struct DialogCell: View {
                                         UserDefaults.standard.set(true, forKey: "localOpen")
 
                                         self.selectedDialogID = self.dialogModel.id
-                                        changeDialogRealmData.shared.updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
+                                        self.auth.dialogs.updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
                                     }
                                 }
                             }
@@ -247,7 +247,7 @@ struct DialogCell: View {
                     }
                 } else {
                     DispatchQueue.main.async {
-                        changeDialogRealmData.shared.updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
+                        self.auth.dialogs.updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
                         self.isOpen = true
                         self.selectedDialogID = self.dialogModel.id
 
@@ -265,7 +265,7 @@ struct DialogCell: View {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                     self.isOpen = false
                     UserDefaults.standard.set(false, forKey: "localOpen")
-                    changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
+                    self.auth.dialogs.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
 
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
                         print("the current one is: \(self.dialogModel.id) and now the new one: \(diaOpen)")
@@ -273,7 +273,7 @@ struct DialogCell: View {
                         self.selectedDialogID = diaOpen
                         self.isOpen = true
                         UserDefaults.standard.set(true, forKey: "localOpen")
-                        changeDialogRealmData.shared.updateDialogOpen(isOpen: true, dialogID: diaOpen)
+                        self.auth.dialogs.updateDialogOpen(isOpen: true, dialogID: diaOpen)
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                         UserDefaults.standard.set("", forKey: "openingDialogId")
                     }
@@ -336,7 +336,7 @@ struct DialogCell: View {
                             }
                         },
                         .destructive(Text(self.dialogModel.dialogType == "private" ? "Delete Dialog" : (self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? (self.dialogModel.dialogType == "public" ? "Destroy Channel" : "Destroy Group") : (self.dialogModel.dialogType == "public" ? (UserDefaults.standard.string(forKey: "visitingDialogId") != "" ? "Dismiss Channel" : "Leave Channel") : "Leave Group"))), action: {
-                            changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
+                            self.auth.dialogs.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
 
                             self.isOpen = false
                             self.openActionSheet = false
@@ -344,10 +344,10 @@ struct DialogCell: View {
                             
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                 if self.dialogModel.dialogType == "private" || self.dialogModel.dialogType == "group" {
-                                    changeDialogRealmData.shared.deletePrivateConnectyDialog(dialogID: self.dialogModel.id, isOwner: self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? true : false)
+                                    self.auth.dialogs.deletePrivateConnectyDialog(dialogID: self.dialogModel.id, isOwner: self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? true : false)
                                 } else if self.dialogModel.dialogType == "public" {
                                     UserDefaults.standard.set("", forKey: "visitingDialogId")
-                                    changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: self.dialogModel.id, isOwner: self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID"))
+                                    self.auth.dialogs.unsubscribePublicConnectyDialog(dialogID: self.dialogModel.id, isOwner: self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID"))
                                 }
                             }
                         }),
@@ -360,13 +360,13 @@ struct DialogCell: View {
                     UserDefaults.standard.set(false, forKey: "localOpen")
                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                     UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
-                    changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
+                    self.auth.dialogs.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
                     if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), diaId != "" {
-                        changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: diaId, isOwner: false)
+                        self.auth.dialogs.unsubscribePublicConnectyDialog(dialogID: diaId, isOwner: false)
                         UserDefaults.standard.set("", forKey: "visitingDialogId")
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
-                        changeDialogRealmData.shared.fetchDialogs(completion: { _ in })
+                        self.auth.dialogs.fetchDialogs(completion: { _ in })
                     }
                 }, label: {
                     Image(systemName: "chevron.down.circle")
@@ -472,7 +472,7 @@ struct DialogCell: View {
             for user in users {
                 if user.id == self.privateDialogContact.id {
                     self.connectyContact = user
-                    changeContactsRealmData.shared.observeFirebaseContactReturn(contactID: Int(user.id), completion: { firebaseContact in
+                    self.auth.contacts.observeFirebaseContactReturn(contactID: Int(user.id), completion: { firebaseContact in
                         let newContact = ContactStruct()
                         newContact.id = Int(self.connectyContact.id)
                         newContact.fullName = self.connectyContact.fullName ?? ""
@@ -509,7 +509,7 @@ struct DialogCell: View {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                         self.isOpen = false
                         UserDefaults.standard.set(false, forKey: "localOpen")
-                        changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
+                        self.auth.dialogs.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
 
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
                             print("the current one is: \(self.dialogModel.id) and now the new one: \(dia.id)")
@@ -518,7 +518,7 @@ struct DialogCell: View {
                             self.openNewDialogID = 0
                             self.isOpen = true
                             UserDefaults.standard.set(true, forKey: "localOpen")
-                            changeDialogRealmData.shared.updateDialogOpen(isOpen: true, dialogID: dia.id)
+                            self.auth.dialogs.updateDialogOpen(isOpen: true, dialogID: dia.id)
                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             UserDefaults.standard.set("", forKey: "openingDialogId")
                         }
@@ -535,11 +535,11 @@ struct DialogCell: View {
         dialog.occupantIDs = [NSNumber(value: self.openNewDialogID)]  // an ID of opponent
 
         Request.createDialog(dialog, successBlock: { (dialog) in
-            changeDialogRealmData.shared.fetchDialogs(completion: { _ in
+            self.auth.dialogs.fetchDialogs(completion: { _ in
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                     self.isOpen = false
                     UserDefaults.standard.set(false, forKey: "localOpen")
-                    changeDialogRealmData.shared.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
+                    self.auth.dialogs.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
 
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
                         let newId = self.auth.dialogs.filterDia(text: "").filter { $0.isDeleted != true }.last?.id ?? ""
@@ -549,7 +549,7 @@ struct DialogCell: View {
                         self.openNewDialogID = 0
                         self.isOpen = true
                         UserDefaults.standard.set(true, forKey: "localOpen")
-                        changeDialogRealmData.shared.updateDialogOpen(isOpen: true, dialogID: newId)
+                        self.auth.dialogs.updateDialogOpen(isOpen: true, dialogID: newId)
                         self.openNewDialogID = 0
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                         UserDefaults.standard.set("", forKey: "openingDialogId")

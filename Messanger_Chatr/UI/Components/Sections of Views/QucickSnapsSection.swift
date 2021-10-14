@@ -91,7 +91,7 @@ struct QuickSnapsSection: View {
                     .onAppear() {
                         if self.auth.isUserAuthenticated != .signedOut {
                             self.emptyQuickSnaps = true
-                            changeContactsRealmData.shared.updateContacts(contactList: Chat.instance.contactList?.contacts ?? [], completion: { _ in
+                            self.auth.contacts.updateContacts(contactList: Chat.instance.contactList?.contacts ?? [], completion: { _ in
                                 print("done refreshing quick snap contacts!... just in case")
                             })
                             print("empty quick snaps so try to refresh to double check: \(self.emptyQuickSnaps)")

@@ -11,7 +11,7 @@ import ConnectyCube
 import RealmSwift
 import Firebase
 
-class DialogStruct : Object {
+class DialogStruct : Object, Identifiable {
     @objc dynamic var id: String = ""
     @objc dynamic var fullName: String = "No Name"
     @objc dynamic var lastMessage: String = "no messages sent"
@@ -80,10 +80,8 @@ class DialogRealmModel<Element>: ObservableObject where Element: RealmSwift.Real
     }
 }
 
-class changeDialogRealmData {
-    init() { }
-    static let shared = changeDialogRealmData()
-
+extension DialogRealmModel {
+    
     func fetchDialogs(completion: @escaping (Bool) -> ()) {
         let extRequest : [String: String] = ["sort_desc" : "lastMessageDate"]
 
@@ -590,7 +588,7 @@ class changeDialogRealmData {
         Request.deleteDialogs(withIDs: Set<String>([dialogID]), forAllUsers: isOwner ? true : false, successBlock: { (deletedObjectsIDs, notFoundObjectsIDs, wrongPermissionsObjectsIDs) in
             self.toggleFirebaseMemberCount(dialogId: dialogID, isJoining: false, totalCount: nil, onSuccess: { _ in
                 self.updateDialogDelete(isDelete: true, dialogID: dialogID)
-                changeDialogRealmData.shared.removeFirebaseAdmin(dialogId: dialogID, adminId: NSNumber(value: UserDefaults.standard.integer(forKey: "currentUserID")), onSuccess: { _ in }, onError: { _ in })
+                self.removeFirebaseAdmin(dialogId: dialogID, adminId: NSNumber(value: UserDefaults.standard.integer(forKey: "currentUserID")), onSuccess: { _ in }, onError: { _ in })
             }, onError: { err in
                 print("error deleting public: \(String(describing: err)) for dialog: \(dialogID)")
                 self.updateDialogDelete(isDelete: true, dialogID: dialogID)
@@ -604,7 +602,7 @@ class changeDialogRealmData {
     func unsubscribePublicConnectyDialog(dialogID: String, isOwner: Bool) {
         Request.unsubscribeFromPublicDialog(withID: dialogID, successBlock: {
             if isOwner {
-                changeDialogRealmData.shared.removePublicFirebaseChild(dialogId: dialogID)
+                self.removePublicFirebaseChild(dialogId: dialogID)
                 self.updateDialogDelete(isDelete: true, dialogID: dialogID)
                 UserDefaults.standard.set(false, forKey: "localOpen")
                 
@@ -615,7 +613,7 @@ class changeDialogRealmData {
                 UserDefaults.standard.set(false, forKey: "localOpen")
                 self.updateDialogDelete(isDelete: true, dialogID: dialogID)
                 self.removePublicMemberRealmDialog(memberId: UserDefaults.standard.integer(forKey: "currentUserID"), dialogId: dialogID)
-                changeDialogRealmData.shared.removeFirebaseAdmin(dialogId: dialogID, adminId: NSNumber(value: UserDefaults.standard.integer(forKey: "currentUserID")), onSuccess: { _ in }, onError: { _ in })
+                self.removeFirebaseAdmin(dialogId: dialogID, adminId: NSNumber(value: UserDefaults.standard.integer(forKey: "currentUserID")), onSuccess: { _ in }, onError: { _ in })
             }, onError: { err in
                 print("error deleting public: \(String(describing: err)) for dialog: \(dialogID)")
             })

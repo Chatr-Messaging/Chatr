@@ -116,6 +116,7 @@ class AuthModel: NSObject, ObservableObject {
     @ObservedObject var dialogs = DialogRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(DialogStruct.self))
     @ObservedObject var messages = MessagesRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(MessageStruct.self))
     @ObservedObject var addressBook = AddressBookRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(AddressBookStruct.self))
+    @ObservedObject var quickSnaps = QuickSnapsRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(QuickSnapsStruct.self))
     
     @Published var userHasiOS15: Bool = false
     var anyCancellable: AnyCancellable? = nil
@@ -195,7 +196,7 @@ class AuthModel: NSObject, ObservableObject {
                             completion(false)
                             return
                         } else {
-                            //Save ConnectyCube tokenID & loginto ConnectyCube then save & notify
+                            //Save ConnectyCube tokenID & log-into ConnectyCube then save & notify
                             //UserDefaults.standard.set(idToken, forKey: "tokenID")
                             Request.logIn(withFirebaseProjectID: Constants.FirebaseProjectID, accessToken: idToken ?? "", successBlock: { (user) in
                                 UserDefaults.standard.set(user.id, forKey: "currentUserID")
@@ -206,7 +207,7 @@ class AuthModel: NSObject, ObservableObject {
                                         self.haveUserFullName = true
                                     }
 
-                                    if user.avatar != "" || PersistenceManager.shared.getCubeProfileImage(usersID: user) != nil {
+                                    if user.avatar != nil {
                                         self.haveUserProfileImg = true
                                     }
                                 } else {
@@ -222,8 +223,8 @@ class AuthModel: NSObject, ObservableObject {
                                     })
                                 }
 
-                                changeProfileRealmDate.shared.updateProfile(user, completion: {
-                                    //Update Firebase Analitics log events by checking Firebase new user
+                                self.profile.updateProfile(user, completion: {
+                                    //Update Firebase Analytics log events by checking Firebase new user
                                     Chat.instance.connect(withUserID: UInt(user.id), password: Session.current.sessionDetails?.token ?? "") { (error) in
                                         if error != nil {
                                             print("there is a error connecting to session! \(String(describing: error))")
@@ -363,7 +364,7 @@ class AuthModel: NSObject, ObservableObject {
         updateParameters.fullName = fullName
         Request.updateCurrentUser(updateParameters, successBlock: { (user) in
             //self.persistenceManager.setCubeProfile(user)
-            changeProfileRealmDate.shared.updateProfile(user, completion: {
+            self.profile.updateProfile(user, completion: {
                 //upload that data to firebase firestore
                 if let phoneNum = user.phone {
                     let reference = Firestore.firestore().collection("Profiles").document(phoneNum)
@@ -395,7 +396,7 @@ class AuthModel: NSObject, ObservableObject {
         parameters.avatar = Constants.uploadcareBaseUrl + imageId + Constants.uploadcareStandardTransform
 
         Request.updateCurrentUser(parameters, successBlock: { (user) in
-            changeProfileRealmDate.shared.updateProfile(user, completion: {
+            self.profile.updateProfile(user, completion: {
                 self.haveUserProfileImg = true
                 completion(true)
             })
@@ -585,7 +586,7 @@ class AuthModel: NSObject, ObservableObject {
                 let fileData = FileManager.default.contents(atPath: filePath.path),
                 let image = UIImage(data: fileData) {
                 if key == "userImage" {
-                    //self.avitarImg = image
+                    //self.avatarImg = image
                 }
                 return image
             } else {
@@ -638,11 +639,11 @@ class AuthModel: NSObject, ObservableObject {
         Request.logOut(successBlock: {
             print("success logging out of connecty cube")
             self.verifyPhoneNumberStatus = .undefined
-            changeProfileRealmDate.shared.removeAllProfile()
-            changeMessageRealmData.shared.removeAllMessages(completion: { _ in
-                changeDialogRealmData.shared.removeAllDialogs()
-                changeContactsRealmData.shared.removeAllContacts()
-                changeQuickSnapsRealmData.shared.removeAllQuickSnaps()
+            self.profile.removeAllProfile()
+            self.messages.removeAllMessages(completion: { _ in
+                self.dialogs.removeAllDialogs()
+                self.contacts.removeAllContacts()
+                self.quickSnaps.removeAllQuickSnaps()
             })
         }) { (error) in
             print("Error logging out of ConnectyCube: \(error.localizedDescription)")
@@ -801,7 +802,7 @@ extension AuthModel: ChatDelegate {
     
     func chatDidReceiveAcceptContactRequest(fromUser userID: UInt) {
         print("chat did receive ACCEPTED new Contact! userID: \(userID)")
-        changeContactsRealmData.shared.updateSingleRealmContact(userID: Int(userID), completion: { _ in })
+        self.contacts.updateSingleRealmContact(userID: Int(userID), completion: { _ in })
         self.profile.removeContactRequest(userID: userID)
     }
     
@@ -813,13 +814,13 @@ extension AuthModel: ChatDelegate {
     func chatContactListDidChange(_ contactList: ContactList) {
         print("contact list did change: \(contactList.contacts.count)")
         if contactList.contacts.count > 0 {
-            changeContactsRealmData.shared.updateContacts(contactList: contactList.contacts, completion: { _ in })
+            self.contacts.updateContacts(contactList: contactList.contacts, completion: { _ in })
         }
     }
     
     func chatDidReceiveContactItemActivity(_ userID: UInt, isOnline: Bool, status: String?) {
         print("contact list did receive new activity from: \(userID). Is online: \(isOnline). Status: \(String(describing: status))")
-        changeContactsRealmData.shared.updateContactOnlineStatus(userID: userID, isOnline: isOnline)
+        self.contacts.updateContactOnlineStatus(userID: userID, isOnline: isOnline)
     }
     
     func chatDidDeliverMessage(withID messageID: String, dialogID: String, toUserID userID: UInt) {
@@ -864,7 +865,7 @@ extension AuthModel: ChatDelegate {
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         if UserDefaults.standard.bool(forKey: "localOpen") {
             if (!message.removed) {
-                changeMessageRealmData.shared.insertMessage(message, completion: { })
+                self.messages.insertMessage(message, completion: { })
                 
                 if message.senderID != UserDefaults.standard.integer(forKey: "currentUserID") {
                     Chat.instance.read(message) { (error) in
@@ -873,43 +874,43 @@ extension AuthModel: ChatDelegate {
                 }
             }
         } else {
-            changeDialogRealmData.shared.fetchDialogs(completion: { _ in })
+            self.dialogs.fetchDialogs(completion: { _ in })
         }
 
         if (message.removed) {
-            changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .deleted)
+            self.messages.updateMessageState(messageID: message.id ?? "", messageState: .deleted)
         } else if (message.edited) {
-            changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .editied)
+            self.messages.updateMessageState(messageID: message.id ?? "", messageState: .editied)
         } else if (message.delayed) {
-            changeMessageRealmData.shared.updateMessageDelayState(messageID: message.id ?? "", messageDelayed: true)
+            self.messages.updateMessageDelayState(messageID: message.id ?? "", messageDelayed: true)
         }
     }
 
     func chatRoomDidReceive(_ message: ChatMessage, fromDialogID dialogID: String) {
         print("received new GROUP message: \(String(describing: message.text)) for dialogID: \(dialogID)")
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-        changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
+        self.messages.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
         if UserDefaults.standard.bool(forKey: "localOpen") {
             if (!message.removed) {
                 Chat.instance.read(message) { (error) in
-                    changeMessageRealmData.shared.insertMessage(message, completion: { })
+                    self.messages.insertMessage(message, completion: { })
                 }
             }
         } else {
-            changeDialogRealmData.shared.fetchDialogs(completion: { _ in })
+            self.dialogs.fetchDialogs(completion: { _ in })
         }
         if (message.removed) {
-            changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .deleted)
+            self.messages.updateMessageState(messageID: message.id ?? "", messageState: .deleted)
         } else if (message.edited) {
-            changeMessageRealmData.shared.updateMessageState(messageID: message.id ?? "", messageState: .editied)
+            self.messages.updateMessageState(messageID: message.id ?? "", messageState: .editied)
         } else if (message.delayed) {
-            changeMessageRealmData.shared.updateMessageDelayState(messageID: message.id ?? "", messageDelayed: true)
+            self.messages.updateMessageDelayState(messageID: message.id ?? "", messageDelayed: true)
         }
     }
     
     func chatDidReceivePresence(withStatus status: String, fromUser userID: Int) {
         print("chatDidReceivePresence: \(status)")
-        //changeContactsRealmData.shared.updateContactOnlineStatus(userID: userID, isOnline: isOnline)
+        //self.contacts.updateContactOnlineStatus(userID: userID, isOnline: isOnline)
     }
         
     //MARK: BLOCK LIST DELEGATE

@@ -92,13 +92,13 @@ struct DiscoverFeaturedCell: View, Identifiable {
                             if !self.isMember {
                                 Button(action: {
                                     Request.subscribeToPublicDialog(withID: self.dialogModel.id ?? "", successBlock: { dialogz in
-                                        changeDialogRealmData.shared.toggleFirebaseMemberCount(dialogId: dialogz.id ?? "", isJoining: true, totalCount: Int(dialogz.occupantsCount), onSuccess: { _ in
+                                        self.auth.dialogs.toggleFirebaseMemberCount(dialogId: dialogz.id ?? "", isJoining: true, totalCount: Int(dialogz.occupantsCount), onSuccess: { _ in
                                             UINotificationFeedbackGenerator().notificationOccurred(.success)
                                             withAnimation {
                                                 self.isMember = true
                                             }
-                                            changeDialogRealmData.shared.insertDialogs([dialogz], completion: {
-                                                changeDialogRealmData.shared.updateDialogDelete(isDelete: false, dialogID: dialogz.id ?? "")
+                                            self.auth.dialogs.insertDialogs([dialogz], completion: {
+                                                self.auth.dialogs.updateDialogDelete(isDelete: false, dialogID: dialogz.id ?? "")
                                                 self.auth.sendPushNoti(userIDs: [NSNumber(value: dialogz.userID)], title: "\(self.auth.profile.results.first?.fullName ?? "New Member") joined \(dialogz.name ?? "your dialog")", message: "\(self.auth.profile.results.first?.fullName ?? "New Member") has joined your channel \(dialogz.name ?? "no name")")
                                             })
                                         }, onError: { _ in
@@ -191,7 +191,7 @@ struct DiscoverFeaturedCell: View, Identifiable {
                         },
                         .destructive(Text(self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID") ? "Destroy Channel" : "Leave Channel")) {
                             self.isMember = false
-                    changeDialogRealmData.shared.unsubscribePublicConnectyDialog(dialogID: self.dialogModel.id ?? "", isOwner: self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID"))
+                    self.auth.dialogs.unsubscribePublicConnectyDialog(dialogID: self.dialogModel.id ?? "", isOwner: self.dialogModel.owner == UserDefaults.standard.integer(forKey: "currentUserID"))
                         },
                         .cancel()
                     ])

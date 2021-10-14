@@ -28,6 +28,7 @@ class VisitContactViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     @Published var igMedia: [InstagramMedia] = []
     @Published var username: String = ""
+    var auth = AuthModel()
     
     init() {
         instagramApi.$igMedia
@@ -225,7 +226,7 @@ class VisitContactViewModel: ObservableObject {
         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
         if contactRelationship == .contact {
             Chat.instance.removeUser(fromContactList: UInt(contactId)) { (error) in
-                changeContactsRealmData.shared.deleteContact(contactID: contactId, isMyContact: false, completion: { _ in
+                self.auth.contacts.deleteContact(contactID: contactId, isMyContact: false, completion: { _ in
                     completion(.notContact)
                 })
             }
