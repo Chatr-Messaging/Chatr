@@ -96,7 +96,7 @@ struct VisitGroupChannelView: View {
                             .environmentObject(self.auth)
                     }
 
-                    //MARK: Admin List Section
+                    //MARK: Public Members / Group Admin Section
                     HStack(alignment: .bottom) {
                         Text(self.dialogModel.dialogType == "public" ? "MEMBERS:" : "ADMINS:")
                             .font(.caption)
@@ -113,6 +113,7 @@ struct VisitGroupChannelView: View {
                         ForEach(self.dialogModelAdmins, id: \.self) { id in
                             DialogContactCell(showAlert: self.$showAlert, notiType: self.$notiType, notiText: self.$notiText, dismissView: self.$dismissView, openNewDialogID: self.$openNewDialogID, showProfile: self.$showProfile, contactID: Int(id), isAdmin: self.dialogModel.adminID.contains(Int(id)) ? true : false, isOwner: self.dialogModel.owner == id ? true : false, currentUserIsPowerful: self.$currentUserIsPowerful, isLast: self.dialogModelAdmins.last == id, isRemoving: self.$isRemoving, isPublic: self.dialogModel.dialogType == "public")
                                 .environmentObject(self.auth)
+                                .id(id)
 
                             if self.dialogModelAdmins.last != id {
                                 Divider()
@@ -162,7 +163,7 @@ struct VisitGroupChannelView: View {
                     .padding(.horizontal)
                     .padding(.bottom, !self.dialogModelAdmins.isEmpty ? 15 : 0)
 
-                    //MARK: Memebrs / Admins List Section
+                    //MARK: Public Admins / Group Members Section
                     HStack(alignment: .bottom) {
                         Text(self.dialogModel.dialogType == "public" ? "ADMINS:" : "\(self.dialogModel.occupentsID.count) CONTACTS:")
                             .font(.caption)
@@ -535,11 +536,11 @@ struct VisitGroupChannelView: View {
                                 }
                                 
                                 if self.dialogModel.dialogType == "public" {
-                                    if !self.dialogModelMembers.contains(where: { $0 == owner }) && owner != 0 {
+                                    if owner != 0, !self.dialogModelMembers.contains(where: { $0 == owner }) {
                                         self.dialogModelMembers.append(owner)
                                     }
                                 } else if self.dialogModel.dialogType == "group" {
-                                    if !self.dialogModelAdmins.contains(where: { $0 == owner }) && owner != 0 {
+                                    if owner != 0, !self.dialogModelAdmins.contains(where: { $0 == owner }) {
                                         self.dialogModelAdmins.append(owner)
                                     }
                                 }
@@ -581,7 +582,7 @@ struct VisitGroupChannelView: View {
 
                                         for admin in dict2 {
                                             if let key = Int(admin.key), Int(admin.key) != foundDialog.owner {
-                                                if !self.dialogModelAdmins.contains(key) {
+                                                if self.dialogModelAdmins.count <= 4, !self.dialogModelAdmins.contains(key) {
                                                     self.dialogModelAdmins.append(key)
                                                 }
                                                 
@@ -629,11 +630,11 @@ struct VisitGroupChannelView: View {
                             dialog.owner = owner
                             
                             if self.dialogModel.dialogType == "public" {
-                                if !self.dialogModelMembers.contains(where: { $0 == owner }) && owner != 0 {
+                                if owner != 0, !self.dialogModelMembers.contains(where: { $0 == owner }) {
                                     self.dialogModelMembers.append(owner)
                                 }
                             } else if self.dialogModel.dialogType == "group" {
-                                if !self.dialogModelAdmins.contains(where: { $0 == owner }) && owner != 0 {
+                                if owner != 0, !self.dialogModelAdmins.contains(where: { $0 == owner }) {
                                     self.dialogModelAdmins.append(owner)
                                 }
                             }
@@ -660,7 +661,7 @@ struct VisitGroupChannelView: View {
 
                                     for admin in dict2 {
                                         if let key = Int(admin.key), Int(admin.key) != dialog.owner {
-                                            if !self.dialogModelMembers.contains(key) {
+                                            if self.dialogModelAdmins.count <= 4, !self.dialogModelMembers.contains(key) {
                                                 self.dialogModelMembers.append(key)
                                             }
                                             
@@ -677,7 +678,7 @@ struct VisitGroupChannelView: View {
                                     for admin in dict2 {
                                         
                                         if let key = Int(admin.key), Int(admin.key) != dialog.owner {
-                                            if !self.dialogModelAdmins.contains(key) {
+                                            if self.dialogModelAdmins.count <= 4, !self.dialogModelAdmins.contains(key) {
                                                 self.dialogModelAdmins.append(key)
                                             }
                                             
@@ -717,7 +718,7 @@ struct VisitGroupChannelView: View {
     
     func insertLocalAdmins() {
         for id in self.dialogModel.occupentsID {
-            if !self.dialogModelAdmins.contains(where: { $0 == id }) && id != 0 && id != self.dialogModel.owner {
+            if self.dialogModelAdmins.count <= 4, !self.dialogModelAdmins.contains(where: { $0 == id }) && id != 0 && id != self.dialogModel.owner {
                 self.dialogModelAdmins.append(id)
                 
                 if self.dialogModelAdmins.count > 4 { break }
