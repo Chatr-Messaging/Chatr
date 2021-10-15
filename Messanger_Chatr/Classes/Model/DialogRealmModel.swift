@@ -11,7 +11,7 @@ import ConnectyCube
 import RealmSwift
 import Firebase
 
-class DialogStruct : Object, Identifiable {
+class DialogStruct : Object, ObjectKeyIdentifiable {
     @objc dynamic var id: String = ""
     @objc dynamic var fullName: String = "No Name"
     @objc dynamic var lastMessage: String = "no messages sent"

@@ -344,7 +344,9 @@ struct KeyboardCardView: View {
                                     }
                                     .padding(.vertical, !self.imagePicker.selectedVideos.isEmpty || !self.imagePicker.selectedPhotos.isEmpty ? 5 : 0)
                                     .padding(.horizontal)
-                                }.frame(height: 110)
+                                }
+                                .frame(height: 110)
+                                .padding(.trailing, 10)
                                 .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 6)
                                 .transition(transition)
                             }
@@ -359,12 +361,13 @@ struct KeyboardCardView: View {
                                     Image(systemName: self.isKeyboardActionOpen ? "xmark" : "paperclip")
                                         .resizable()
                                         .aspectRatio(contentMode: .fit)
-                                        .frame(width: self.isKeyboardActionOpen ? 16 : 25, height: self.isKeyboardActionOpen ? 18 : 25, alignment: .center)
+                                        .frame(width: self.isKeyboardActionOpen ? 18 : 25, height: self.isKeyboardActionOpen ? 18 : 25, alignment: .center)
                                         .font(Font.title.weight(.regular))
                                         .foregroundColor(.secondary)
                                         .padding(self.isKeyboardActionOpen ? 12.5 : 8)
-                                        .padding(.horizontal, 2)
-                                }.buttonStyle(changeBGPaperclipButtonStyle())
+                                }
+                                .padding(.horizontal, 2)
+                                .buttonStyle(changeBGPaperclipButtonStyle())
                                 .cornerRadius(self.height < 160 ? 25 : 17.5)
 
                                 ResizableTextField(imagePicker: self.imagePicker, height: self.$height, text: self.$mainText)

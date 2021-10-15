@@ -495,6 +495,8 @@ struct VisitGroupChannelView: View {
 
                 self.fromSharedPublicDialog = ""
             }
+        }.onDisappear() {
+            NotificationCenter.default.removeObserver(self, name: NSNotification.Name("NotificationAlert"), object: nil)
         }
     }
     

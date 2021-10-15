@@ -186,6 +186,7 @@ struct AttachmentBubble: View {
                         .onDisappear {
                             self.play = false
                             self.pause()
+                            NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: nil)
                         }
                 }
             } else if self.message.imageType == "audio/m4a", self.message.messageState != .deleted {

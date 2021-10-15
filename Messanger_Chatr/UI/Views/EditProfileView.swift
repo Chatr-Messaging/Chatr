@@ -529,6 +529,10 @@ struct EditProfileView: View {
                 NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { (_) in
                     self.keyboardHeight = 0
                 }
+            }.onDisappear() {
+                NotificationCenter.default.removeObserver(self, name: NSNotification.Name("NotificationAlert"), object: nil)
+                NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+                NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
             }
         }
     }
