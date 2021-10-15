@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/Alamofire/Alamofire.git",
         "state": {
           "branch": null,
-          "revision": "d120af1e8638c7da36c8481fd61a66c0c08dc4fc",
-          "version": "5.4.4"
+          "revision": "f96b619bcb2383b43d898402283924b80e2c4bae",
+          "version": "5.4.3"
         }
       },
       {
@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/heart/CarBode-Barcode-Scanner-For-SwiftUI",
         "state": {
           "branch": null,
-          "revision": "6167624ec47174900434f1c03dfa0b2dd5d19c0d",
-          "version": "2.2.3"
+          "revision": "b4e39ab4d65e2795fb0f0a48940ac8bfd799c5f5",
+          "version": "2.2.2"
         }
       },
       {
@@ -60,8 +60,8 @@
         "repositoryURL": "https://github.com/gonzalezreal/NetworkImage",
         "state": {
           "branch": null,
-          "revision": "04167e81ed89a14b5da9b856ead306b969bb5abd",
-          "version": "3.1.2"
+          "revision": "d45f014daf5c54ef73a7d8db87ac94b9bd3d31bd",
+          "version": "3.1.1"
         }
       },
       {
