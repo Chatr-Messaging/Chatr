@@ -119,7 +119,7 @@ struct HomeView: View {
                     .edgesIgnoringSafeArea(.all)
             }
             
-            mainHomeList()
+            ChatrBaseView()
                 .background(Color("bgColor"))
                 .environmentObject(self.auth)
                 .edgesIgnoringSafeArea(.all)
@@ -140,13 +140,12 @@ struct HomeView: View {
 
 // MARK: Main Home List
 @available(iOS 14.0, *)
-struct mainHomeList: View {
+struct ChatrBaseView: View {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @EnvironmentObject var auth: AuthModel
     @Environment(\.colorScheme) var colorScheme
     @ObservedObject var messageViewModel = ChatMessageViewModel()
     @ObservedObject var imagePicker = KeyboardCardViewModel()
-    @GestureState var isDragging = false
     @State var showContacts: Bool = false
     @State var showUserProfile: Bool = false
     @State var showNewChat: Bool = false
@@ -215,24 +214,6 @@ struct mainHomeList: View {
                                                 .environmentObject(self.auth)
                                                 .background(Color("bgColor"))
                                         }
-                                    }
-                                }.onAppear {
-                                    NotificationCenter.default.addObserver(forName: NSNotification.Name("NotificationAlert"), object: nil, queue: .main) { (_) in
-                                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                                        self.receivedNotification.toggle()
-                                    }
-                                    
-                                    if self.auth.isFirstTimeUser && UserDefaults.standard.bool(forKey: "isEarlyAdopter") {
-                                        self.isTopCardOpen = true
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                                            self.showWelcomeNewUser.toggle()
-                                            UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                                                self.counter += 1
-                                            }
-                                        }
-                                    } else if self.auth.isFirstTimeUser {
-                                        self.isTopCardOpen = true
                                     }
                                 }
                         }.frame(height: Constants.btnSize + 100)
@@ -576,9 +557,6 @@ struct mainHomeList: View {
                                 self.auth.visitPublicDialogProfile = false
                             }
                         }
-                        .onAppear {
-                            self.selectedDialogID = UserDefaults.standard.string(forKey: "selectedDialogID") ?? ""
-                        }
                         .sheet(isPresented: self.$showSharedPublicDialog, onDismiss: {
                             guard self.auth.dynamicLinkPublicDialogID == "" else {
                                 self.auth.dynamicLinkPublicDialogID = ""
@@ -674,6 +652,29 @@ struct mainHomeList: View {
                 }
             
             ConfettiCannon(counter: $counter, repetitions: 3, repetitionInterval: 0.2)
+        }.onAppear {
+            NotificationCenter.default.addObserver(forName: NSNotification.Name("NotificationAlert"), object: nil, queue: .main) { (_) in
+                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                self.receivedNotification.toggle()
+            }
+            
+            
+            if self.auth.isFirstTimeUser && UserDefaults.standard.bool(forKey: "isEarlyAdopter") {
+                self.isTopCardOpen = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                    self.showWelcomeNewUser.toggle()
+                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        self.counter += 1
+                    }
+                }
+            } else if self.auth.isFirstTimeUser {
+                self.isTopCardOpen = true
+            }
+            
+            self.selectedDialogID = UserDefaults.standard.string(forKey: "selectedDialogID") ?? ""
+        }.onDisappear() {
+            NotificationCenter.default.removeObserver(self, name: NSNotification.Name("NotificationAlert"), object: nil)
         }
     }
     

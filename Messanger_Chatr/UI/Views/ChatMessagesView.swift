@@ -441,6 +441,8 @@ struct ChatMessagesView: View {
                                         }
                                     }
                                 }
+                            }.onDisappear() {
+                                NotificationCenter.default.removeObserver(self, name: NSNotification.Name("scrollToLastId"), object: nil)
                             }
                         }
                     }

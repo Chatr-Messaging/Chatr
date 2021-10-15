@@ -696,6 +696,8 @@ struct VisitContactView: View {
                     }
                 }
             }
+        }.onDisappear() {
+            NotificationCenter.default.removeObserver(self, name: NSNotification.Name("NotificationAlert"), object: nil)
         }
     }
 

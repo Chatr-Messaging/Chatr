@@ -465,7 +465,6 @@ extension MessagesRealmModel {
 
                                 if let videoUrl = imagePram["videoURL"], foundMessage.image != "\(videoUrl)" {
                                     foundMessage.image = "\(videoUrl)"
-                                    foundMessage.imageType = attach.type ?? ""
                                 }
 
                                 if let placeholderId = imagePram["placeholderURL"], foundMessage.placeholderVideoImg != "\(placeholderId)" {
@@ -497,10 +496,19 @@ extension MessagesRealmModel {
                 newData.positionRight = Int(object.senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? true : false
 
                 for read in object.readIDs ?? [] {
-                    newData.readIDs.append(Int(truncating: read))
+                    if !newData.readIDs.contains(Int(truncating: read)) {
+                        newData.readIDs.append(Int(truncating: read))
+                    }
                 }
+                
+                if !newData.readIDs.contains(Int(Session.current.currentUserID)) {
+                    Chat.instance.read(object) { (error) in }
+                }
+
                 for deliv in object.deliveredIDs ?? [] {
-                    newData.deliveredIDs.append(Int(truncating: deliv))
+                    if !newData.deliveredIDs.contains(Int(truncating: deliv)) {
+                        newData.deliveredIDs.append(Int(truncating: deliv))
+                    }
                 }
                             
                 //case delivered, sending, read, isTyping, edited, deleted, error
@@ -708,7 +716,7 @@ extension MessagesRealmModel {
             NotificationCenter.default.post(name: NSNotification.Name("scrollToLastId"), object: nil)
 
             //Wait for animation to play before making network request
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.15) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                 let pDialog = ChatDialog(dialogID: dialog.id, type: dialog.dialogType == "public" ? .public : occupentID.count > 2 ? .group : .private)
                 pDialog.occupantIDs = occupentID
                 

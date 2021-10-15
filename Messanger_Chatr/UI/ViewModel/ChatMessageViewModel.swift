@@ -399,7 +399,7 @@ class ChatMessageViewModel: ObservableObject {
                             self.contact = newContact
                             self.contactRelationship = .notContact
 
-                            if ((self.profile.results.first?.contactRequests.contains(self.contact.id)) != nil) {
+                            if let firstProfile = self.profile.results.first, firstProfile.contactRequests.contains(self.contact.id) {
                                 self.contactRelationship = .pendingRequest
                             } else if Chat.instance.contactList?.pendingApproval.count ?? 0 > 0 {
                                 for con in Chat.instance.contactList?.pendingApproval ?? [] {
