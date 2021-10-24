@@ -49,6 +49,9 @@
 		054E9B8225D246C800365CE0 /* ConfettiSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 054E9B8125D246C800365CE0 /* ConfettiSwiftUI */; };
 		054E9B8325D246C800365CE0 /* ConfettiSwiftUI in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 054E9B8125D246C800365CE0 /* ConfettiSwiftUI */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		0554281725AFE7AD00B6D106 /* ChatrStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0554281625AFE7AD00B6D106 /* ChatrStats.swift */; };
+		055605082725318C0055EFDC /* MessageSectionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 055605072725318C0055EFDC /* MessageSectionController.swift */; };
+		0556050A272533030055EFDC /* MessageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05560509272533030055EFDC /* MessageModel.swift */; };
+		0556050C2725337A0055EFDC /* MessageCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0556050B2725337A0055EFDC /* MessageCollectionViewCell.swift */; };
 		05578C362429CE030016B1E5 /* PersistenceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05578C352429CE030016B1E5 /* PersistenceManager.swift */; };
 		0559B8B325D3682A0069C44A /* InstagramStories.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0559B8B225D3682A0069C44A /* InstagramStories.swift */; };
 		0559B8D325D39AC20069C44A /* KeyboardCardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0559B8D225D39AC20069C44A /* KeyboardCardViewModel.swift */; };
@@ -102,6 +105,7 @@
 		05903A3F25925C3400D70A13 /* WKView in Frameworks */ = {isa = PBXBuildFile; productRef = 05903A3E25925C3400D70A13 /* WKView */; };
 		05909319261FDB2400DA686D /* FlexibleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05909318261FDB2400DA686D /* FlexibleView.swift */; };
 		0590931F261FDB3300DA686D /* _FlexibleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0590931E261FDB3300DA686D /* _FlexibleView.swift */; };
+		059209F42725059B00A441A9 /* MessagesTimelineViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 059209F32725059B00A441A9 /* MessagesTimelineViewController.swift */; };
 		0593C0A223CB2AFE00460AAA /* VerifyCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0593C0A123CB2AFE00460AAA /* VerifyCodeView.swift */; };
 		0596844E25ABED4D0051B707 /* EditProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0596844D25ABED4D0051B707 /* EditProfileViewModel.swift */; };
 		0596845625AC16E80051B707 /* VisitContactViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0596845525AC16E80051B707 /* VisitContactViewModel.swift */; };
@@ -253,6 +257,9 @@
 		054DA6C1250FF9DF00F28F74 /* AboutChatrView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutChatrView.swift; sourceTree = "<group>"; };
 		054E9B7B25D242BB00365CE0 /* EarlyAdopterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EarlyAdopterView.swift; sourceTree = "<group>"; };
 		0554281625AFE7AD00B6D106 /* ChatrStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatrStats.swift; sourceTree = "<group>"; };
+		055605072725318C0055EFDC /* MessageSectionController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageSectionController.swift; sourceTree = "<group>"; };
+		05560509272533030055EFDC /* MessageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageModel.swift; sourceTree = "<group>"; };
+		0556050B2725337A0055EFDC /* MessageCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageCollectionViewCell.swift; sourceTree = "<group>"; };
 		05578C352429CE030016B1E5 /* PersistenceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceManager.swift; sourceTree = "<group>"; };
 		0559B8B225D3682A0069C44A /* InstagramStories.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramStories.swift; sourceTree = "<group>"; };
 		0559B8D225D39AC20069C44A /* KeyboardCardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardCardViewModel.swift; sourceTree = "<group>"; };
@@ -304,6 +311,7 @@
 		058E760B261C2518008578E3 /* NewPublicConversationSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPublicConversationSection.swift; sourceTree = "<group>"; };
 		05909318261FDB2400DA686D /* FlexibleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlexibleView.swift; sourceTree = "<group>"; };
 		0590931E261FDB3300DA686D /* _FlexibleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = _FlexibleView.swift; sourceTree = "<group>"; };
+		059209F32725059B00A441A9 /* MessagesTimelineViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesTimelineViewController.swift; sourceTree = "<group>"; };
 		0593C0A123CB2AFE00460AAA /* VerifyCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifyCodeView.swift; sourceTree = "<group>"; };
 		0596844D25ABED4D0051B707 /* EditProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileViewModel.swift; sourceTree = "<group>"; };
 		0596845525AC16E80051B707 /* VisitContactViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitContactViewModel.swift; sourceTree = "<group>"; };
@@ -816,6 +824,10 @@
 		05F8E11623F0DE150066954C /* Representable or Pure Swift */ = {
 			isa = PBXGroup;
 			children = (
+				059209F32725059B00A441A9 /* MessagesTimelineViewController.swift */,
+				055605072725318C0055EFDC /* MessageSectionController.swift */,
+				0556050B2725337A0055EFDC /* MessageCollectionViewCell.swift */,
+				05560509272533030055EFDC /* MessageModel.swift */,
 				05A7BD5324FAED250001BFC9 /* CameraViewController.swift */,
 				053AC4B125194C080036946E /* GIFController.swift */,
 				05ECD98F25E0FBE600B5783A /* PlayerView.swift */,
@@ -1090,6 +1102,7 @@
 				05DB89B4238B851400D4581F /* SceneDelegate.swift in Sources */,
 				05A7BD4F24F9E8D20001BFC9 /* ContactRealmCell.swift in Sources */,
 				056BCC622654B6FC006DD302 /* PublicActionSection.swift in Sources */,
+				059209F42725059B00A441A9 /* MessagesTimelineViewController.swift in Sources */,
 				0559B8D325D39AC20069C44A /* KeyboardCardViewModel.swift in Sources */,
 				05196DDB24EE3BD20026B9A7 /* ContactsRealmModel.swift in Sources */,
 				056B989524C8F76B003F7FBA /* HomeUserInfoHeader.swift in Sources */,
@@ -1129,6 +1142,7 @@
 				05D09F6D26F05A4100D0EA72 /* EmptyMessagesSection.swift in Sources */,
 				05D8A8DC2502CB3A00D53BE2 /* MailView.swift in Sources */,
 				055AEE382512EC9500F35B8F /* EditProfileView.swift in Sources */,
+				0556050A272533030055EFDC /* MessageModel.swift in Sources */,
 				050582FF24DA5F9600CBD4AC /* MessagesRealmModel.swift in Sources */,
 				052E6E2025CE513B00C3EAE4 /* ReactionsView.swift in Sources */,
 				0593C0A223CB2AFE00460AAA /* VerifyCodeView.swift in Sources */,
@@ -1184,6 +1198,7 @@
 				054E9B7C25D242BB00365CE0 /* EarlyAdopterView.swift in Sources */,
 				05BCE40F250C55E100E29F39 /* ShareProfileView.swift in Sources */,
 				056B989C24C8F9BD003F7FBA /* MenuButton.swift in Sources */,
+				055605082725318C0055EFDC /* MessageSectionController.swift in Sources */,
 				056B98A024C8FA41003F7FBA /* AppearanceView.swift in Sources */,
 				05A7BD5F24FEF3870001BFC9 /* QucickSnapsSection.swift in Sources */,
 				05F58CEB25BFCF5400839590 /* CameraViewModel.swift in Sources */,
@@ -1207,6 +1222,7 @@
 				0572BAB72398998800AE9061 /* PhoneNumberView.swift in Sources */,
 				058AC52F2599064F0027FD11 /* DiscoverView.swift in Sources */,
 				05B463BD2667257D007EDCEA /* DiscoverFeaturedCell.swift in Sources */,
+				0556050C2725337A0055EFDC /* MessageCollectionViewCell.swift in Sources */,
 				05C93BDD251578100059D1AA /* DialogContactCell.swift in Sources */,
 				05A1223124AEE6D300EEDD72 /* KeyboardCard.swift in Sources */,
 				05FD085B2394784600575727 /* ProgressBar.swift in Sources */,

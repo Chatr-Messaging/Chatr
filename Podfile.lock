@@ -383,6 +383,9 @@ PODS:
     - gRPC-Core/Interface (= 1.28.2)
   - gRPC-Core/Interface (1.28.2)
   - GTMSessionFetcher/Core (1.5.0)
+  - IGListDiffKit (4.0.0)
+  - IGListKit (4.0.0):
+    - IGListDiffKit (= 4.0.0)
   - leveldb-library (1.22.1)
   - libwebp (1.2.0):
     - libwebp/demux (= 1.2.0)
@@ -436,6 +439,7 @@ DEPENDENCIES:
   - FirebaseFirestore
   - FirebaseStorage
   - Giphy (from `https://s3.amazonaws.com/sdk.mobile.giphy.com/SDK/2.0.3/Giphy.podspec`)
+  - IGListKit
   - PhoneNumberKit
   - Purchases
   - SDWebImageSwiftUI
@@ -468,6 +472,8 @@ SPEC REPOS:
     - "gRPC-C++"
     - gRPC-Core
     - GTMSessionFetcher
+    - IGListDiffKit
+    - IGListKit
     - leveldb-library
     - libwebp
     - nanopb
@@ -512,6 +518,8 @@ SPEC CHECKSUMS:
   "gRPC-C++": 13d8ccef97d5c3c441b7e3c529ef28ebee86fad2
   gRPC-Core: 4afa11bfbedf7cdecd04de535a9e046893404ed5
   GTMSessionFetcher: b3503b20a988c4e20cc189aa798fd18220133f52
+  IGListDiffKit: 665d6cf43ce726e676013db9c7d6c4294259b6b2
+  IGListKit: fd5a5d21935298f5849fa49d426843cff97b77c7
   leveldb-library: 50c7b45cbd7bf543c81a468fe557a16ae3db8729
   libwebp: e90b9c01d99205d03b6bb8f2c8c415e5a4ef66f0
   nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96
@@ -526,6 +534,6 @@ SPEC CHECKSUMS:
   SnapSDK: 222857226700e1373a186da658c619a79dfa40c8
   SROTPView: 81b761c6e72f0a1a0b8c77b0046e13a54d4dcaa9
 
-PODFILE CHECKSUM: 0ec79093e732d15240d57ebd25a77d36b8b62431
+PODFILE CHECKSUM: d1c52247d1a0f3eddc96b7bbdd563b9aaeb32bdd
 
 COCOAPODS: 1.10.2

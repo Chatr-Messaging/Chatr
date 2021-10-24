@@ -506,25 +506,28 @@ struct ChatrBaseView: View {
                 }.overlay(
                     //MARK: Chat Messages View
                     GeometryReader { geo in
-                    ChatMessagesView(viewModel: self.messageViewModel, activeView: self.$activeView, keyboardChange: self.$keyboardHeight, dialogID: self.$selectedDialogID, textFieldHeight: self.$textFieldHeight, keyboardDragState: self.$keyboardDragState, hasAttachment: self.$hasAttachments, newDialogFromSharedContact: self.$newDialogFromSharedContact, isKeyboardActionOpen: self.$isKeyboardActionOpen, isHomeDialogOpen: self.$isLocalOpen, isDetailOpen: self.$isDetailOpen, emptyQuickSnaps: self.$emptyQuickSnaps, detailMessageModel: self.$detailMessageModel, namespace: self.namespace)
-                            .environmentObject(self.auth)
-                            //.position(x: UIScreen.main.bounds.size.width / 2, y: self.activeView.height)
-                            .frame(width: Constants.screenWidth, height: Constants.screenHeight - (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 127 : 91) : 201), alignment: .bottom)
-                            .fixedSize(horizontal: true, vertical: false)
-                            .zIndex(1)
-                            .contentShape(Rectangle())
-                            .offset(y: -geo.frame(in: .global).minY + (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 127 : 91) : 186))
-                            .padding(.bottom, self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 127 : 91) : 186)
-                            .offset(y: self.activeView.height) // + (self.emptyQuickSnaps ? 25 : 197))
-                            .simultaneousGesture(DragGesture(minimumDistance: UserDefaults.standard.bool(forKey: "localOpen") ? 800 : 0))
-                            .layoutPriority(1)
-                            .onDisappear {
-                                guard let dialog = self.auth.selectedConnectyDialog, dialog.isJoined(), dialog.type == .group || dialog.type == .public else {
-                                    return
+//                    ChatMessagesView(viewModel: self.messageViewModel, activeView: self.$activeView, keyboardChange: self.$keyboardHeight, dialogID: self.$selectedDialogID, textFieldHeight: self.$textFieldHeight, keyboardDragState: self.$keyboardDragState, hasAttachment: self.$hasAttachments, newDialogFromSharedContact: self.$newDialogFromSharedContact, isKeyboardActionOpen: self.$isKeyboardActionOpen, isHomeDialogOpen: self.$isLocalOpen, isDetailOpen: self.$isDetailOpen, emptyQuickSnaps: self.$emptyQuickSnaps, detailMessageModel: self.$detailMessageModel, namespace: self.namespace)
+                        if self.isLocalOpen {
+                            MessagesTimelineView()
+                                //.environmentObject(self.auth)
+                                //.position(x: UIScreen.main.bounds.size.width / 2, y: self.activeView.height)
+                                .frame(width: Constants.screenWidth, height: Constants.screenHeight - (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 127 : 91) : 201), alignment: .bottom)
+                                .fixedSize(horizontal: true, vertical: false)
+                                .zIndex(1)
+                                .contentShape(Rectangle())
+                                .offset(y: -geo.frame(in: .global).minY + (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 127 : 91) : 186))
+                                .padding(.bottom, self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 127 : 91) : 186)
+                                .offset(y: self.activeView.height) // + (self.emptyQuickSnaps ? 25 : 197))
+                                .simultaneousGesture(DragGesture(minimumDistance: UserDefaults.standard.bool(forKey: "localOpen") ? 800 : 0))
+                                .layoutPriority(1)
+                                .onDisappear {
+                                    guard let dialog = self.auth.selectedConnectyDialog, dialog.isJoined(), dialog.type == .group || dialog.type == .public else {
+                                        return
+                                    }
+                                    
+                                    self.auth.leaveDialog()
                                 }
-                                
-                                self.auth.leaveDialog()
-                            }
+                        }
                     }
                 )
                 .slideOverCard(isPresented: $showWelcomeNewUser, onDismiss: {

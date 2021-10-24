@@ -411,6 +411,7 @@ struct KeyboardCardView: View {
                                     .font(.system(size: 18))
                                     .padding(.vertical, 10)
                                     .padding(.leading, 45)
+                                    .offset(y: -2)
                                     .foregroundColor(self.mainText.count == 0 && self.isOpen ? Color.secondary : .clear)
                             }
                         )
@@ -862,7 +863,7 @@ struct ResizableTextField : UIViewRepresentable {
         view.isEditable = true
         view.isScrollEnabled = true
         view.text = self.text
-        view.keyboardDismissMode = .interactive
+        view.keyboardDismissMode = .none
         view.font = .systemFont(ofSize: 18)
         view.textColor = UIColor(named: "textColor")
         view.backgroundColor = .clear
