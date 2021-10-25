@@ -41,7 +41,7 @@ class MessagesViewController: UIViewController {
 
     var bottomPadding: CGFloat {
         get {
-            return self.view.safeAreaInsets.bottom
+            return 0 //self.view.safeAreaInsets.bottom
         }
     }
 
@@ -81,19 +81,19 @@ class MessagesViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         view.addSubview(collectionView)
         setObservers()
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        
+
         collectionView.frame = CGRect(x: 0, y: 0, width: view.bounds.width, height: view.bounds.height - bottomPadding)
-        collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 52, right: 0)
-        
+        collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 55, right: 0)
+
         guard let lastComment = messages.last else { return }
-        
+
         adapter.scroll(to: lastComment, supplementaryKinds: nil, scrollDirection: .vertical, scrollPosition: .centeredVertically, animated: false)
     }
 }
@@ -132,7 +132,7 @@ extension MessagesViewController {
     }
     
     @objc private func hideKeyboard(_ notification: Foundation.Notification) {
-        collectionView.contentInset = UIEdgeInsets(top: 16, left: 0, bottom: 52, right: 0)
+        collectionView.contentInset = UIEdgeInsets(top: 16, left: 0, bottom: 55, right: 0)
     }
     
     @objc private func showKeyboard(_ notification: Foundation.Notification) {
@@ -144,7 +144,7 @@ extension MessagesViewController {
 
         if endFrame.height > 80 {
             collectionView.setContentOffset(CGPoint(x: 0, y: self.collectionView.contentOffset.y + keyboardFrame.height - bottomPadding), animated: true)
-            collectionView.contentInset = UIEdgeInsets(top: 2.5, left: 0, bottom: 52 + keyboardFrame.height - bottomPadding, right: 0)
+            collectionView.contentInset = UIEdgeInsets(top: 2.5, left: 0, bottom: 55 + keyboardFrame.height - bottomPadding, right: 0)
 
             collectionView.layoutIfNeeded()
         }
