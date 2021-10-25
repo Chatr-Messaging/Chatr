@@ -17,7 +17,7 @@ import RealmSwift
 
 class MessageStruct : Object, Identifiable {
     @objc dynamic var id: String = ""
-    @objc dynamic var text: String = "No Name"
+    @objc dynamic var text: String = ""
     @objc dynamic var dialogID: String = ""
     @objc dynamic var date: Date = Date()
     @objc dynamic var destroyDate: Int = 0
