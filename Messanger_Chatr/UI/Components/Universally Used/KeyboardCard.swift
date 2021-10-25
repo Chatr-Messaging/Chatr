@@ -27,6 +27,7 @@ struct KeyboardCardView: View {
     @Binding var hasAttachments: Bool
     @Binding var showImagePicker: Bool
     @Binding var isKeyboardActionOpen: Bool
+    @Binding var keyboardHeight: CGFloat
     @State var selectedContacts: [Int] = []
     @State var newDialogID: String = ""
     @State var gifData: [GIFMediaAsset] = []
@@ -365,6 +366,7 @@ struct KeyboardCardView: View {
                                         .font(Font.title.weight(.regular))
                                         .foregroundColor(.secondary)
                                         .padding(self.isKeyboardActionOpen ? 12.5 : 8)
+                                        .offset(y: self.isKeyboardActionOpen ? 0.0 : -2)
                                 }
                                 .padding(.horizontal, 2)
                                 .buttonStyle(changeBGPaperclipButtonStyle())
@@ -374,7 +376,7 @@ struct KeyboardCardView: View {
                                     .environmentObject(self.auth)
                                     .frame(height: self.height < 175 ? self.height : 175)
                                     .padding(.trailing, 7.5)
-                                    .offset(x: -5, y: -1)
+                                    .offset(x: -5, y: -3)
 
                                 if self.mainText.count == 0 && !self.enableLocation && self.gifData.isEmpty && self.imagePicker.pastedImages.isEmpty && self.imagePicker.selectedVideos.isEmpty && self.imagePicker.selectedPhotos.isEmpty {
                                     Button(action: {
@@ -792,8 +794,12 @@ struct KeyboardCardView: View {
             UserDefaults.standard.set(false, forKey: "disabledMessaging")
             observePublicMembersType()
             keyboard.observe { (event) in
+                let keyboardFrameEnd = event.keyboardFrameEnd
+
                 switch event.type {
                 case .willShow:
+                    self.keyboardHeight = keyboardFrameEnd.height - 22
+
                     if self.hasAttachments && self.showImagePicker {
                         UIView.animate(withDuration: event.duration, delay: 0.0, options: [event.options], animations: {
                             self.showImagePicker = false
@@ -801,8 +807,19 @@ struct KeyboardCardView: View {
                     }
 
                 case .willHide:
+                    self.keyboardHeight = 0
+
                     guard presentGIF, showImagePicker else { return }
                     self.isKeyboardActionOpen = false
+
+                case .didChangeFrame:
+                    self.keyboardHeight = keyboardFrameEnd.height - 22
+
+                case .willChangeFrame:
+                    self.keyboardHeight = keyboardFrameEnd.height - 22
+
+                case .didHide:
+                    self.keyboardHeight = 0
 
                 default:
                     break

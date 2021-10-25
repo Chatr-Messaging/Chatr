@@ -10,6 +10,7 @@ import UIKit
 import IGListKit
 import SwiftUI
 import RealmSwift
+import Cache
 
 struct MessagesTimelineView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> MessagesViewController {
@@ -22,54 +23,28 @@ struct MessagesTimelineView: UIViewControllerRepresentable {
 }
 
 class MessagesViewController: UIViewController {
-    var messages: [Any] = []
-    var messagesRealm = MessagesRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(MessageStruct.self))
-    
+    var messages: [MessageModel] = []
+
     lazy var adapter: ListAdapter = {
         return ListAdapter(updater: ListAdapterUpdater(), viewController: self, workingRangeSize: 2)
     }()
-    
+
     lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
-        collectionView.backgroundColor = UIColor.clear
         collectionView.showsVerticalScrollIndicator = false
-        
+        collectionView.alwaysBounceVertical = true
+        collectionView.keyboardDismissMode = .interactive
+        collectionView.backgroundColor = .clear
+
         return collectionView
     }()
-    
+
     var bottomPadding: CGFloat {
         get {
             return self.view.safeAreaInsets.bottom
         }
     }
-    
-    let heightInputContainer: CGFloat = 52.0
-    
-    //    lazy var inputContainer: InputContainer = {
-    //        let inputView = InputContainer()
-    //        inputView.translatesAutoresizingMaskIntoConstraints = false
-    //        inputView.autoresizingMask = .flexibleHeight
-    //
-    //        inputView.onSendButtonPressed = { [weak self] message in
-    //            self?.onButtonSend(message: message)
-    //        }
-    //        inputView.onCameraButtonPressed = {
-    //            self.onCameraButton()
-    //        }
-    //
-    //        inputView.onGalleryButtonPressed = {
-    //            self.onGalleryButton()
-    //        }
-    //
-    //        return inputView
-    //    }()
-    
-    //    override var inputAccessoryView: UIView? {
-    //        get {
-    //            return inputContainer
-    //        }
-    //    }
-    
+
     override var canBecomeFirstResponder: Bool {
         return true
     }
@@ -91,13 +66,6 @@ class MessagesViewController: UIViewController {
     // MARK: Setup
     private func setup() {
         generateChat()
-        //        adapter.collectionView = collectionView
-        //        adapter.dataSource = self
-        //
-        //        view.addSubview(collectionView)
-        //
-        //        collectionView.alwaysBounceVertical = true
-        //        collectionView.keyboardDismissMode = .interactive
     }
     
     deinit {
@@ -115,18 +83,14 @@ class MessagesViewController: UIViewController {
         super.viewDidLoad()
         
         view.addSubview(collectionView)
-        collectionView.alwaysBounceVertical = true
-        collectionView.keyboardDismissMode = .interactive
-        collectionView.backgroundColor = .clear
-        
         setObservers()
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        collectionView.frame = CGRect(x: 0, y: 0, width: view.bounds.width, height: view.bounds.height - bottomPadding - heightInputContainer)
-        collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        collectionView.frame = CGRect(x: 0, y: 0, width: view.bounds.width, height: view.bounds.height - bottomPadding)
+        collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 52, right: 0)
         
         guard let lastComment = messages.last else { return }
         
@@ -136,22 +100,21 @@ class MessagesViewController: UIViewController {
 
 extension MessagesViewController : ListAdapterDataSource {
     func objects(for listAdapter: ListAdapter) -> [ListDiffable] {
-        return messages as! [ListDiffable]
+        return messages as [ListDiffable]
     }
-    
+
     func listAdapter(_ listAdapter: ListAdapter, sectionControllerFor object: Any) -> ListSectionController {
         switch object {
+        // Keeping like this just to show you have multiple model options
         case is MessageModel:
             let sectionController = MessageSectionController()
             sectionController.inset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+
             return sectionController
-            //    case is ImageModel:
-            //      let sectionController = ImagesSectionController()
-            //      sectionController.inset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-            //      return sectionController
         default:
             let sectionController = MessageSectionController()
             sectionController.inset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+
             return sectionController
         }
     }
@@ -169,20 +132,20 @@ extension MessagesViewController {
     }
     
     @objc private func hideKeyboard(_ notification: Foundation.Notification) {
-        collectionView.contentInset = UIEdgeInsets(top: 16, left: 0, bottom: 0, right: 0)
+        collectionView.contentInset = UIEdgeInsets(top: 16, left: 0, bottom: 52, right: 0)
     }
     
     @objc private func showKeyboard(_ notification: Foundation.Notification) {
         guard let info = (notification as NSNotification).userInfo,
-              let kbFrame = info[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else {
-                  return
-              }
+              let kbFrame = info[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
+
         let keyboardFrame = kbFrame.cgRectValue
         let endFrame = ((notification as NSNotification).userInfo![UIResponder.keyboardFrameEndUserInfoKey] as! NSValue).cgRectValue
-        
+
         if endFrame.height > 80 {
-            self.collectionView.setContentOffset(CGPoint(x: 0, y: self.collectionView.contentOffset.y + keyboardFrame.height - heightInputContainer - bottomPadding), animated: true)
-            collectionView.contentInset = UIEdgeInsets(top: 2.5, left: 0, bottom: 5 + keyboardFrame.height - heightInputContainer - bottomPadding, right: 0)
+            collectionView.setContentOffset(CGPoint(x: 0, y: self.collectionView.contentOffset.y + keyboardFrame.height - bottomPadding), animated: true)
+            collectionView.contentInset = UIEdgeInsets(top: 2.5, left: 0, bottom: 52 + keyboardFrame.height - bottomPadding, right: 0)
+
             collectionView.layoutIfNeeded()
         }
     }
@@ -190,8 +153,7 @@ extension MessagesViewController {
 
 extension MessagesViewController {
     func generateChat() {
-        print("generating chtatsjgfd")
-        messages = [
+        let messagesz = [
             MessageModel(id: -1, name: "Ignacia", text: "Have the courage to follow your heart and intuition.\n They somehow already know what you truly want to become.", isUser: false),
             MessageModel(id: 0, name: "Daniel", text: "Hola!", isUser: true),
             MessageModel(id: 1, name: "Daniel", text: "Todo bien?, todo correcto ?", isUser: true),
@@ -215,5 +177,21 @@ extension MessagesViewController {
             MessageModel(id: 19, name: "Ignacia", text: "Have the courage to follow your heart and intuition.\n They somehow already know what you truly want to become.", isUser: false),
             MessageModel(id: 20, name: "Ignacia", text: "If today were the last day of your life, would you want to do what you are about to do today?", isUser: false)
         ]
+
+        let diskConfig = DiskConfig(name: "test1")
+        let memoryConfig = MemoryConfig(expiry: .never, countLimit: 100, totalCostLimit: 50)
+        let storage = try? Storage<String, MessageModel>(diskConfig: diskConfig, memoryConfig: memoryConfig, transformer: TransformerFactory.forCodable(ofType: MessageModel.self))
+
+        for msgz in messagesz {
+            let foundMsg = try? storage?.object(forKey: msgz.id.description)
+
+            if let temp = foundMsg, let value = temp {
+                self.messages.append(value)
+            } else if foundMsg == nil {
+                try? storage?.setObject(msgz, forKey: msgz.id.description)
+
+                self.messages.append(msgz)
+            }
+        }
     }
 }
