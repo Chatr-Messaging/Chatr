@@ -40,7 +40,7 @@ enum messageKind: String {
 }
 
 enum messageStatus: String {
-    case delivered, sent, sending, read, isTyping, removedTyping, editied, deleted, error
+    case delivered, sent, sending, read, isTyping, removedTyping, edited, deleted, error
 }
 
 enum messagePosition {
@@ -808,7 +808,7 @@ extension AuthModel: ChatDelegate {
         if (message.removed) {
             self.messages.updateMessageState(messageID: message.id ?? "", messageState: .deleted)
         } else if (message.edited) {
-            self.messages.updateMessageState(messageID: message.id ?? "", messageState: .editied)
+            self.messages.updateMessageState(messageID: message.id ?? "", messageState: .edited)
         } else if (message.delayed) {
             self.messages.updateMessageDelayState(messageID: message.id ?? "", messageDelayed: true)
         }
@@ -830,7 +830,7 @@ extension AuthModel: ChatDelegate {
         if (message.removed) {
             self.messages.updateMessageState(messageID: message.id ?? "", messageState: .deleted)
         } else if (message.edited) {
-            self.messages.updateMessageState(messageID: message.id ?? "", messageState: .editied)
+            self.messages.updateMessageState(messageID: message.id ?? "", messageState: .edited)
         } else if (message.delayed) {
             self.messages.updateMessageDelayState(messageID: message.id ?? "", messageDelayed: true)
         }

@@ -45,8 +45,9 @@ extension MessageSectionController {
         }
 
         let estimatedFrame = self.calcEstimatedFrame(text: message.text, width: context.containerSize.width)
+        let rightPosition = Int(message.senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? true : false
 
-        if message.isUser {
+        if rightPosition {
             let width = context.containerSize.width
             cell.child.view.frame = CGRect(x: width - estimatedFrame.width - 20, y: 0, width: estimatedFrame.width + 8, height: estimatedFrame.height)
         } else {
@@ -54,7 +55,7 @@ extension MessageSectionController {
         }
 
         cell.child.rootView.text = message.text
-        cell.child.rootView.isMine = message.isUser
+        cell.child.rootView.isMine = rightPosition
 
         return cell
     }

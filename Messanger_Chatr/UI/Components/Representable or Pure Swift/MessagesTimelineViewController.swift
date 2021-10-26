@@ -11,6 +11,7 @@ import IGListKit
 import SwiftUI
 import RealmSwift
 import Cache
+import ConnectyCube
 
 struct MessagesTimelineView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> MessagesViewController {
@@ -65,7 +66,7 @@ class MessagesViewController: UIViewController {
     
     // MARK: Setup
     private func setup() {
-        generateChat()
+        generateChat(dialogId: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "")
     }
     
     deinit {
@@ -152,46 +153,114 @@ extension MessagesViewController {
 }
 
 extension MessagesViewController {
-    func generateChat() {
-        let messagesz = [
-            MessageModel(id: -1, name: "Ignacia", text: "Have the courage to follow your heart and intuition.\n They somehow already know what you truly want to become.", isUser: false),
-            MessageModel(id: 0, name: "Daniel", text: "Hola!", isUser: true),
-            MessageModel(id: 1, name: "Daniel", text: "Todo bien?, todo correcto ?", isUser: true),
-            MessageModel(id: 2, name: "Ignacia", text: "Sii 😀", isUser: false),
-            MessageModel(id: 3, name: "Daniel", text: "Y yo que me alegro", isUser: true),
-            MessageModel(id: 4, name: "Daniel", text: "Siempre hemos apostado por lo extraordinario. Es lo que nos ha dado la fuerza para trazar nuestro propio camino desde 1878.", isUser: true),
-            MessageModel(id: 5, name: "Ignacia", text: "Ir a la caza de sabores únicos requiere tiempo y paciencia, pero sobre todo necesita la habilidad y creatividad de reescribir las reglas. \n Por eso hemos revisado cuidadosamente nuestro proceso de producción para incorporar diferenciadores matices de roble en la personalidad de Manifest", isUser: false),
-            MessageModel(id: 6, name: "Daniel", text: "In general, that should be all you need in most cases.\n Even if you are changing the height of the text view on the fly, this usually does all you need.\n (A common example of changing the height on the fly, is changing it as the user types.) \n Here is the broken UITextView from Apple...", isUser: true),
-            MessageModel(id: 7, name: "Ignacia", text: "You can’t connect the dots looking forward; you can only connect them looking backward. So you have to trust that the dots will somehow connect in your future.", isUser: false),
-            MessageModel(id: 8, name: "Ignacia", text: "Your time is limited, so don’t waste it living someone else’s life.", isUser: false),
-            MessageModel(id: 9, name: "Ignacia", text: "Have the courage to follow your heart and intuition. They somehow already know what you truly want to become.", isUser: false),
-            MessageModel(id: 10, name: "Ignacia", text: "If today were the last day of your life, would you want to do what you are about to do today?", isUser: false),
-            MessageModel(id: 11, name: "Daniel", text: "Hola!", isUser: true),
-            MessageModel(id: 12, name: "Daniel", text: "Todo bien?, todo correcto ?", isUser: true),
-            MessageModel(id: 13, name: "Ignacia", text: "Sii 😀", isUser: false),
-            MessageModel(id: 14, name: "Daniel", text: "Y yo que me alegro", isUser: true),
-            MessageModel(id: 15, name: "Daniel", text: "Siempre hemos apostado por lo extraordinario. Es lo que nos ha dado la fuerza para trazar nuestro propio camino desde 1878.", isUser: true),
-            MessageModel(id: 16, name: "Ignacia", text: "Ir a la caza de sabores únicos requiere tiempo y paciencia, pero sobre todo necesita la habilidad y creatividad de reescribir las reglas.\n Por eso hemos revisado cuidadosamente nuestro proceso de producción para incorporar diferenciadores matices de roble en la personalidad de Manifest", isUser: false),
-            MessageModel(id: 17, name: "Daniel", text: "In general, that should be all you need in most cases.\n Even if you are changing the height of the text view on the fly, this usually does all you need.\n (A common example of changing the height on the fly, is changing it as the user types.) \n Here is the broken UITextView from Apple...", isUser: true),
-            MessageModel(id: 18, name: "Ignacia", text: "You can’t connect the dots looking forward; you can only connect them looking backward. So you have to trust that the dots will somehow connect in your future.", isUser: false),
-            MessageModel(id: 19, name: "Ignacia", text: "Have the courage to follow your heart and intuition.\n They somehow already know what you truly want to become.", isUser: false),
-            MessageModel(id: 20, name: "Ignacia", text: "If today were the last day of your life, would you want to do what you are about to do today?", isUser: false)
-        ]
+    func generateChat(dialogId: String) {
+        let extRequest : [String: String] = ["sort_desc" : "date_sent", "mark_as_read" : "0"]
 
-        let diskConfig = DiskConfig(name: "test1")
-        let memoryConfig = MemoryConfig(expiry: .never, countLimit: 100, totalCostLimit: 50)
-        let storage = try? Storage<String, MessageModel>(diskConfig: diskConfig, memoryConfig: memoryConfig, transformer: TransformerFactory.forCodable(ofType: MessageModel.self))
+        print("requesting messages: \(dialogId)")
+        Request.messages(withDialogID: dialogId, extendedRequest: extRequest, paginator: Paginator.limit(UInt(40), skip: UInt(0)), successBlock: { (messages, _) in
+            print("found the requested messages: \(messages.count)")
 
-        for msgz in messagesz {
-            let foundMsg = try? storage?.object(forKey: msgz.id.description)
+            let diskConfig = DiskConfig(name: "test1")
+            let memoryConfig = MemoryConfig(expiry: .never, countLimit: 100, totalCostLimit: 50)
+            let storage = try? Storage<String, MessageModel>(diskConfig: diskConfig, memoryConfig: memoryConfig, transformer: TransformerFactory.forCodable(ofType: MessageModel.self))
+            
+            for msgz in messages {
+                let foundMsg = try? storage?.object(forKey: msgz.id ?? "")
 
-            if let temp = foundMsg, let value = temp {
-                self.messages.append(value)
-            } else if foundMsg == nil {
-                try? storage?.setObject(msgz, forKey: msgz.id.description)
+                if let temp = foundMsg, let value = temp {
+                    print("found the message adding it now: \(String(describing: msgz.text))")
+                    self.messages.insert(value, at: 0)
+                } else if foundMsg == nil {
+                    print("creating new message model: \(String(describing: msgz.text))")
+                    let newMsg = MessageModel()
+                    newMsg.id = msgz.id ?? ""
+                    newMsg.text = msgz.text ?? ""
+                    newMsg.dialogID = msgz.dialogID ?? ""
+                    newMsg.date = msgz.dateSent ?? Date()
+                    newMsg.destroyDate = Int(msgz.destroyAfterInterval)
+                    newMsg.senderID = Int(msgz.senderID)
+                    newMsg.positionRight = Int(msgz.senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? true : false
 
-                self.messages.append(msgz)
+                    for read in msgz.readIDs ?? [] {
+                        if !newMsg.readIDs.contains(Int(truncating: read)) {
+                            newMsg.readIDs.append(Int(truncating: read))
+                        }
+                    }
+
+                    for deliv in msgz.deliveredIDs ?? [] {
+                        if !newMsg.deliveredIDs.contains(Int(truncating: deliv)) {
+                            newMsg.deliveredIDs.append(Int(truncating: deliv))
+                        }
+                    }
+
+                    if msgz.delayed {
+                        newMsg.hadDelay = true
+                    }
+
+                    if (msgz.destroyAfterInterval > 0) {
+                        newMsg.destroyDate = Int(msgz.destroyAfterInterval)
+                    }
+
+                    if let attachments = msgz.attachments {
+                        for attach in attachments {
+                            //image/video attachment
+                            if let imagePram = attach.customParameters as? [String: String] {
+                                if let typez = attach.type {
+                                    newMsg.imageType = typez
+                                }
+
+                                if let imagez = imagePram["imageURL"] {
+                                    newMsg.image = imagez
+                                }
+
+                                if let imageUploadPram = imagePram["uploadId"] {
+                                    newMsg.uploadMediaId = imageUploadPram
+                                }
+
+                                if let contactID = imagePram["contactID"] {
+                                    newMsg.contactID = Int(contactID) ?? 0
+                                }
+
+                                if let channelId = imagePram["channelID"] {
+                                    newMsg.channelID = channelId
+                                }
+
+                                if let longitude = imagePram["longitude"] {
+                                    newMsg.longitude = Double("\(longitude)") ?? 0
+                                }
+
+                                if let latitude = imagePram["latitude"] {
+                                    newMsg.latitude = Double("\(latitude)") ?? 0
+                                }
+
+                                if let videoUrl = imagePram["videoURL"] {
+                                    newMsg.image = "\(videoUrl)"
+                                }
+
+                                if let placeholderId = imagePram["placeholderURL"] {
+                                    newMsg.placeholderVideoImg = "\(placeholderId)"
+                                }
+
+                                if let ratio = imagePram["mediaRatio"] {
+                                    newMsg.mediaRatio = Double("\(ratio)") ?? 0.0
+                                }
+                            }
+                        }
+                    }
+
+                    self.messages.insert(newMsg, at: 0)
+
+                    try? storage?.setObject(newMsg, forKey: msgz.id ?? "")
+                }
             }
+            
+//            self.insertMessages(messages, completion: {
+//                self.checkSurroundingValues(dialogId: dialogID, completion: {
+//                    completion(true)
+//                })
+//            })
+        }) { errorz in
+            print("error fetching messages: \(errorz.localizedDescription)")
         }
     }
 }

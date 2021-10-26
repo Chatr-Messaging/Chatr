@@ -174,7 +174,7 @@ extension MessagesRealmModel {
                             }
                         }
                         
-                        //case delivered, sending, read, isTyping, editied, deleted, error
+                        //case delivered, sending, read, isTyping, edited, deleted, error
                         if let deliverCount = object.deliveredIDs?.count, deliverCount > 1 {
                             foundMessage.messageState = .delivered
                         } else {
@@ -184,7 +184,7 @@ extension MessagesRealmModel {
                             foundMessage.messageState = .read
                         }
                         if object.edited {
-                            foundMessage.messageState = .editied
+                            foundMessage.messageState = .edited
                         }
                         if object.removed {
                             foundMessage.messageState = .deleted
@@ -272,7 +272,7 @@ extension MessagesRealmModel {
                         }
                     }
                     
-                    //case delivered, sending, read, isTyping, editied, deleted, error
+                    //case delivered, sending, read, isTyping, edited, deleted, error
                     if object.deliveredIDs?.count ?? 0 > 1 {
                         newData.messageState = .delivered
                     } else {
@@ -282,7 +282,7 @@ extension MessagesRealmModel {
                         newData.messageState = .read
                     }
                     if object.edited {
-                        newData.messageState = .editied
+                        newData.messageState = .edited
                     }
                     if object.removed {
                         newData.messageState = .deleted
@@ -408,7 +408,7 @@ extension MessagesRealmModel {
                         }
                     }
                     
-                    //case delivered, sending, read, isTyping, editied, deleted, error
+                    //case delivered, sending, read, isTyping, edited, deleted, error
                     if let deliverCount = object.deliveredIDs?.count, deliverCount > 1 {
                         foundMessage.messageState = .delivered
                     } else {
@@ -418,7 +418,7 @@ extension MessagesRealmModel {
                         foundMessage.messageState = .read
                     }
                     if object.edited {
-                        foundMessage.messageState = .editied
+                        foundMessage.messageState = .edited
                     }
                     if object.removed {
                         foundMessage.messageState = .deleted
@@ -521,7 +521,7 @@ extension MessagesRealmModel {
                     newData.messageState = .read
                 }
                 if object.edited {
-                    newData.messageState = .editied
+                    newData.messageState = .edited
                 }
                 if object.removed {
                     newData.messageState = .deleted

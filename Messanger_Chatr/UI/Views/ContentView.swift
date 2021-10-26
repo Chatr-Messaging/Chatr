@@ -29,7 +29,7 @@ struct HomeView: View {
         ZStack {
             switch self.auth.isUserAuthenticated {
             case .undefined:
-                Text("user Sign In status is Unknown.")
+                Text("user's sign-in status is unknown.")
                     .foregroundColor(.primary)
                     .edgesIgnoringSafeArea(.all)
             case .signedIn:
@@ -347,7 +347,7 @@ struct ChatrBaseView: View {
                                     .edgesIgnoringSafeArea(.all)
                             }
                         }
-                        
+
 //                        //MARK: Pull to refresh - loading dialogs
 //                        PullToRefreshIndicator(isLoading: self.$isLoading, preLoading: self.$isPreLoading, localOpen: self.$isLocalOpen)
 //                            .environmentObject(self.auth)
@@ -356,7 +356,7 @@ struct ChatrBaseView: View {
 //                                self.isLoading = false
 //                                self.isPreLoading = false
 //                            }
-                        
+
                         //MARK: Search Bar
                         if self.dialogs.results.filter { $0.isDeleted != true }.count != 0 {
                             CustomSearchBar(searchText: self.$searchText, localOpen: self.$isLocalOpen)
@@ -507,7 +507,7 @@ struct ChatrBaseView: View {
                     //MARK: Chat Messages View
                     GeometryReader { geo in
 //                    ChatMessagesView(viewModel: self.messageViewModel, activeView: self.$activeView, keyboardChange: self.$keyboardHeight, dialogID: self.$selectedDialogID, textFieldHeight: self.$textFieldHeight, keyboardDragState: self.$keyboardDragState, hasAttachment: self.$hasAttachments, newDialogFromSharedContact: self.$newDialogFromSharedContact, isKeyboardActionOpen: self.$isKeyboardActionOpen, isHomeDialogOpen: self.$isLocalOpen, isDetailOpen: self.$isDetailOpen, emptyQuickSnaps: self.$emptyQuickSnaps, detailMessageModel: self.$detailMessageModel, namespace: self.namespace)
-                        if self.isLocalOpen {
+                        if self.isLocalOpen, UserDefaults.standard.string(forKey: "selectedDialogID") == self.selectedDialogID, UserDefaults.standard.string(forKey: "selectedDialogID") != "" {
                             MessagesTimelineView()
                                 //.environmentObject(self.auth)
                                 //.position(x: UIScreen.main.bounds.size.width / 2, y: self.activeView.height)

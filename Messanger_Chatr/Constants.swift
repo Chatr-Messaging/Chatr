@@ -222,7 +222,7 @@ extension String {
                         return message.readIDs.count.description + " read"
                     }
                 }
-            case .editied:
+            case .edited:
                 return "edited"
                 
             case .deleted:
@@ -258,12 +258,12 @@ extension String {
             
             return date + "   " + message.readIDs.count.description + " read"
             
-        case .editied:
+        case .edited:
             guard message.readIDs.count >= 2 else {
-                return date + "   editied"
+                return date + "   edited"
             }
             
-            return date + "   editied   " + message.readIDs.count.description + " read"
+            return date + "   edited   " + message.readIDs.count.description + " read"
             
         default:
             return date
