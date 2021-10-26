@@ -165,12 +165,13 @@ extension MessagesViewController {
             let storage = try? Storage<String, MessageModel>(diskConfig: diskConfig, memoryConfig: memoryConfig, transformer: TransformerFactory.forCodable(ofType: MessageModel.self))
             
             for msgz in messages {
-                let foundMsg = try? storage?.object(forKey: msgz.id ?? "")
-
-                if let temp = foundMsg, let value = temp {
-                    print("found the message adding it now: \(String(describing: msgz.text))")
-                    self.messages.insert(value, at: 0)
-                } else if foundMsg == nil {
+                do {
+                    let foundMsg = try storage?.object(forKey: msgz.id ?? "")
+                    if let safeMsg = foundMsg {
+                        print("found the message adding it now: \(String(describing: safeMsg.text))")
+                        self.messages.insert(safeMsg, at: 0)
+                    }
+                } catch {
                     print("creating new message model: \(String(describing: msgz.text))")
                     let newMsg = MessageModel()
                     newMsg.id = msgz.id ?? ""
