@@ -10,7 +10,13 @@ import Foundation
 import IGListKit
 
 final class MessageSectionController: ListSectionController {
-    private var message: MessageModel?
+    private var message: MessageModel? {
+        didSet {
+            collectionContext?.performBatch(animated: true, updates: { batchContext in
+                batchContext.reload(self)
+            })
+        }
+    }
 
     override init() {
         super.init()

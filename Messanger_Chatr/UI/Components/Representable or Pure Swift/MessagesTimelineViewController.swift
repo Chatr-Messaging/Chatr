@@ -42,9 +42,15 @@ class MessagesViewController: UIViewController {
 
     var bottomPadding: CGFloat {
         get {
-            return 0 //self.view.safeAreaInsets.bottom
+            return self.view.safeAreaInsets.bottom
         }
     }
+
+//    override var inputAccessoryView: UIView? {
+//      get {
+//        return inputContainer
+//      }
+//    }
 
     override var canBecomeFirstResponder: Bool {
         return true
@@ -91,11 +97,12 @@ class MessagesViewController: UIViewController {
         super.viewDidLayoutSubviews()
 
         collectionView.frame = CGRect(x: 0, y: 0, width: view.bounds.width, height: view.bounds.height - bottomPadding)
-        collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 55, right: 0)
+        collectionView.contentInset = UIEdgeInsets(top: 25, left: 0, bottom: 35 + bottomPadding, right: 0)
+        
+        guard !messages.isEmpty, let lastComment = messages.last else { return }
 
-        guard let lastComment = messages.last else { return }
-
-        adapter.scroll(to: lastComment, supplementaryKinds: nil, scrollDirection: .vertical, scrollPosition: .centeredVertically, animated: false)
+        self.adapter.scroll(to: lastComment, supplementaryKinds: nil, scrollDirection: .vertical, scrollPosition: .centeredVertically, animated: false)
+        print("just called scroll to...")
     }
 }
 
@@ -133,7 +140,7 @@ extension MessagesViewController {
     }
     
     @objc private func hideKeyboard(_ notification: Foundation.Notification) {
-        collectionView.contentInset = UIEdgeInsets(top: 16, left: 0, bottom: 55, right: 0)
+        collectionView.contentInset = UIEdgeInsets(top: 25, left: 0, bottom: 35 + bottomPadding, right: 0)
     }
     
     @objc private func showKeyboard(_ notification: Foundation.Notification) {
@@ -144,8 +151,8 @@ extension MessagesViewController {
         let endFrame = ((notification as NSNotification).userInfo![UIResponder.keyboardFrameEndUserInfoKey] as! NSValue).cgRectValue
 
         if endFrame.height > 80 {
-            collectionView.setContentOffset(CGPoint(x: 0, y: self.collectionView.contentOffset.y + keyboardFrame.height - bottomPadding), animated: true)
-            collectionView.contentInset = UIEdgeInsets(top: 2.5, left: 0, bottom: 55 + keyboardFrame.height - bottomPadding, right: 0)
+            collectionView.setContentOffset(CGPoint(x: 0, y: self.collectionView.contentOffset.y + keyboardFrame.height), animated: true)
+            collectionView.contentInset = UIEdgeInsets(top: 25, left: 0, bottom: keyboardFrame.height + bottomPadding + 5, right: 0)
 
             collectionView.layoutIfNeeded()
         }
@@ -163,103 +170,103 @@ extension MessagesViewController {
             let diskConfig = DiskConfig(name: "test1")
             let memoryConfig = MemoryConfig(expiry: .never, countLimit: 100, totalCostLimit: 50)
             let storage = try? Storage<String, MessageModel>(diskConfig: diskConfig, memoryConfig: memoryConfig, transformer: TransformerFactory.forCodable(ofType: MessageModel.self))
-            
-            for msgz in messages {
-                do {
-                    let foundMsg = try storage?.object(forKey: msgz.id ?? "")
-                    if let safeMsg = foundMsg {
-                        print("found the message adding it now: \(String(describing: safeMsg.text))")
-                        self.messages.insert(safeMsg, at: 0)
-                    }
-                } catch {
-                    print("creating new message model: \(String(describing: msgz.text))")
-                    let newMsg = MessageModel()
-                    newMsg.id = msgz.id ?? ""
-                    newMsg.text = msgz.text ?? ""
-                    newMsg.dialogID = msgz.dialogID ?? ""
-                    newMsg.date = msgz.dateSent ?? Date()
-                    newMsg.destroyDate = Int(msgz.destroyAfterInterval)
-                    newMsg.senderID = Int(msgz.senderID)
-                    newMsg.positionRight = Int(msgz.senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? true : false
 
-                    for read in msgz.readIDs ?? [] {
-                        if !newMsg.readIDs.contains(Int(truncating: read)) {
-                            newMsg.readIDs.append(Int(truncating: read))
+            DispatchQueue.main.async {
+                for msgz in messages {
+                    do {
+                        let foundMsg = try storage?.object(forKey: msgz.id ?? "")
+                        if let safeMsg = foundMsg {
+                            print("found the message adding it now: \(String(describing: safeMsg.text))")
+                            self.messages.insert(safeMsg, at: 0)
                         }
-                    }
-
-                    for deliv in msgz.deliveredIDs ?? [] {
-                        if !newMsg.deliveredIDs.contains(Int(truncating: deliv)) {
-                            newMsg.deliveredIDs.append(Int(truncating: deliv))
-                        }
-                    }
-
-                    if msgz.delayed {
-                        newMsg.hadDelay = true
-                    }
-
-                    if (msgz.destroyAfterInterval > 0) {
+                    } catch {
+                        print("creating new message model: \(String(describing: msgz.text))")
+                        let newMsg = MessageModel()
+                        newMsg.id = msgz.id ?? ""
+                        newMsg.text = msgz.text ?? ""
+                        newMsg.dialogID = msgz.dialogID ?? ""
+                        newMsg.date = msgz.dateSent ?? Date()
                         newMsg.destroyDate = Int(msgz.destroyAfterInterval)
-                    }
+                        newMsg.senderID = Int(msgz.senderID)
+                        newMsg.positionRight = Int(msgz.senderID) == UserDefaults.standard.integer(forKey: "currentUserID") ? true : false
 
-                    if let attachments = msgz.attachments {
-                        for attach in attachments {
-                            //image/video attachment
-                            if let imagePram = attach.customParameters as? [String: String] {
-                                if let typez = attach.type {
-                                    newMsg.imageType = typez
-                                }
+                        for read in msgz.readIDs ?? [] {
+                            if !newMsg.readIDs.contains(Int(truncating: read)) {
+                                newMsg.readIDs.append(Int(truncating: read))
+                            }
+                        }
 
-                                if let imagez = imagePram["imageURL"] {
-                                    newMsg.image = imagez
-                                }
+                        for deliv in msgz.deliveredIDs ?? [] {
+                            if !newMsg.deliveredIDs.contains(Int(truncating: deliv)) {
+                                newMsg.deliveredIDs.append(Int(truncating: deliv))
+                            }
+                        }
 
-                                if let imageUploadPram = imagePram["uploadId"] {
-                                    newMsg.uploadMediaId = imageUploadPram
-                                }
+                        if msgz.delayed {
+                            newMsg.hadDelay = true
+                        }
 
-                                if let contactID = imagePram["contactID"] {
-                                    newMsg.contactID = Int(contactID) ?? 0
-                                }
+                        if (msgz.destroyAfterInterval > 0) {
+                            newMsg.destroyDate = Int(msgz.destroyAfterInterval)
+                        }
 
-                                if let channelId = imagePram["channelID"] {
-                                    newMsg.channelID = channelId
-                                }
+                        if let attachments = msgz.attachments {
+                            for attach in attachments {
+                                //image/video attachment
+                                if let imagePram = attach.customParameters as? [String: String] {
+                                    if let typez = attach.type {
+                                        newMsg.imageType = typez
+                                    }
 
-                                if let longitude = imagePram["longitude"] {
-                                    newMsg.longitude = Double("\(longitude)") ?? 0
-                                }
+                                    if let imagez = imagePram["imageURL"] {
+                                        newMsg.image = imagez
+                                    }
 
-                                if let latitude = imagePram["latitude"] {
-                                    newMsg.latitude = Double("\(latitude)") ?? 0
-                                }
+                                    if let imageUploadPram = imagePram["uploadId"] {
+                                        newMsg.uploadMediaId = imageUploadPram
+                                    }
 
-                                if let videoUrl = imagePram["videoURL"] {
-                                    newMsg.image = "\(videoUrl)"
-                                }
+                                    if let contactID = imagePram["contactID"] {
+                                        newMsg.contactID = Int(contactID) ?? 0
+                                    }
 
-                                if let placeholderId = imagePram["placeholderURL"] {
-                                    newMsg.placeholderVideoImg = "\(placeholderId)"
-                                }
+                                    if let channelId = imagePram["channelID"] {
+                                        newMsg.channelID = channelId
+                                    }
 
-                                if let ratio = imagePram["mediaRatio"] {
-                                    newMsg.mediaRatio = Double("\(ratio)") ?? 0.0
+                                    if let longitude = imagePram["longitude"] {
+                                        newMsg.longitude = Double("\(longitude)") ?? 0
+                                    }
+
+                                    if let latitude = imagePram["latitude"] {
+                                        newMsg.latitude = Double("\(latitude)") ?? 0
+                                    }
+
+                                    if let videoUrl = imagePram["videoURL"] {
+                                        newMsg.image = "\(videoUrl)"
+                                    }
+
+                                    if let placeholderId = imagePram["placeholderURL"] {
+                                        newMsg.placeholderVideoImg = "\(placeholderId)"
+                                    }
+
+                                    if let ratio = imagePram["mediaRatio"] {
+                                        newMsg.mediaRatio = Double("\(ratio)") ?? 0.0
+                                    }
                                 }
                             }
                         }
+
+                        self.messages.insert(newMsg, at: 0)
+
+                        try? storage?.setObject(newMsg, forKey: msgz.id ?? "")
                     }
-
-                    self.messages.insert(newMsg, at: 0)
-
-                    try? storage?.setObject(newMsg, forKey: msgz.id ?? "")
                 }
+
+                self.adapter.reloadData(completion: { (completed) in
+                    print("the done total messages is: \(self.messages.count) && \(completed)")
+                })
             }
-            
-//            self.insertMessages(messages, completion: {
-//                self.checkSurroundingValues(dialogId: dialogID, completion: {
-//                    completion(true)
-//                })
-//            })
         }) { errorz in
             print("error fetching messages: \(errorz.localizedDescription)")
         }
