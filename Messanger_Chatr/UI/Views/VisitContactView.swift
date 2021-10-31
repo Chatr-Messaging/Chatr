@@ -11,7 +11,6 @@ import SDWebImageSwiftUI
 import MessageUI
 import ConnectyCube
 import RealmSwift
-import PopupView
 import Grid
 
 struct VisitContactView: View {
@@ -31,7 +30,6 @@ struct VisitContactView: View {
     @State var isUrlOpen: Bool = false
     @State private var showingMoreSheet = false
     @State var showForwardContact = false
-    @State var receivedNotification: Bool = false
     @State var newDialogID: String = ""
     @State var selectedContact: [Int] = []
     @State var profileViewSize = CGSize.zero
@@ -438,10 +436,6 @@ struct VisitContactView: View {
             }
             .coordinateSpace(name: "visitContact-scroll")
             .background(Color("bgColor"))
-            .popup(isPresented: self.$receivedNotification, type: .floater(), position: .bottom, animation: Animation.spring(), autohideIn: 4, closeOnTap: true) {
-                NotificationSection()
-                    .environmentObject(self.auth)
-            }
             .navigationBarHidden(self.quickSnapViewState == .camera || self.quickSnapViewState == .takenPic)
             .navigationTitle(self.scrollOffset > 152 ? self.contact.fullName : "")
             .navigationBarItems(leading:
@@ -540,10 +534,6 @@ struct VisitContactView: View {
                 .disabled(self.quickSnapViewState != .closed ? false : true)
         }.onAppear() {
             DispatchQueue.main.async {
-                NotificationCenter.default.addObserver(forName: NSNotification.Name("NotificationAlert"), object: nil, queue: .main) { (_) in
-                    self.receivedNotification.toggle()
-                }
-                
                 if self.viewState == .fromSearch {
                     let config = Realm.Configuration(schemaVersion: 1)
                     do {
@@ -696,8 +686,6 @@ struct VisitContactView: View {
                     }
                 }
             }
-        }.onDisappear() {
-            NotificationCenter.default.removeObserver(self, name: NSNotification.Name("NotificationAlert"), object: nil)
         }
     }
 
@@ -723,9 +711,9 @@ struct VisitContactView: View {
 
         //selectedContact
         if self.selectedContact.count == 0 {
-            self.auth.notificationtext = "Forwarded contact"
             UINotificationFeedbackGenerator().notificationOccurred(.success)
-            NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+            
+            showNotiHUD(image: "arrowshape.turn.up.right", color: .blue, title: "Forwarded contact", subtitle: nil)
         } else {
             // does not have a dialog for the selected user so we create one
             for contact in self.selectedContact {
@@ -754,10 +742,9 @@ struct VisitContactView: View {
 
                 self.auth.dialogs.fetchDialogs(completion: { _ in
                     self.selectedContact.removeAll()
-                    self.auth.notificationtext = "Forwarded contact"
                     UINotificationFeedbackGenerator().notificationOccurred(.success)
-                    NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
 
+                    showNotiHUD(image: "arrowshape.turn.up.right", color: .blue, title: "Forwarded contact", subtitle: nil)
                 })
             }
         }

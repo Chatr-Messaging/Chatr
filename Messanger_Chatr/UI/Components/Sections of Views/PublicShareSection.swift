@@ -152,10 +152,9 @@ struct PublicShareSection: View {
         //selectedContact
         if self.selectedContact.count == 0 {
             UINotificationFeedbackGenerator().notificationOccurred(.success)
-            self.notiType = "success"
-            self.notiText = "Successfully forwarded channel"
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                self.showAlert = true
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
+                showNotiHUD(image: "arrowshape.turn.up.right", color: .blue, title: "Forwarded channel", subtitle: nil)
             }
         } else {
             // does not have a dialog for the selected user so we create one

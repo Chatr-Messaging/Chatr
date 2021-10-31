@@ -35,6 +35,10 @@ enum connectionState {
     case connected, disconnected, loading, error
 }
 
+enum NetworkStatus: String {
+    case connected, disconnected
+}
+
 enum messageKind: String {
     case text, image, gif, contact, attachment, location, removed
 }
@@ -82,6 +86,7 @@ enum PremiumSubscriptionStatus {
 
 class AuthModel: NSObject, ObservableObject {
     @Published var currentTask: UploadTaskResumable?
+    @Published var networkStatus: NetworkStatus = .connected
 
     @Published var attempted: Bool = false
     @Published var preventDismissal: Bool = false
@@ -107,7 +112,6 @@ class AuthModel: NSObject, ObservableObject {
     @Published public var yearlySubscription: Purchases.Package?
     @Published public var inPaymentProgress = false
     @Published public var subscriptionStatus: PremiumSubscriptionStatus = UserDefaults.standard.bool(forKey: "premiumSubscriptionStatus") ? .subscribed : .notSubscribed
-    @Published public var notificationtext: String = ""
 
     @Published var avatarProgress: CGFloat = CGFloat(0.0)
     
@@ -120,9 +124,10 @@ class AuthModel: NSObject, ObservableObject {
     
     @Published var userHasiOS15: Bool = false
     var anyCancellable: AnyCancellable? = nil
-    var anyCancellable1: AnyCancellable? = nil
-    var authStateDidChangeListenerHandle: AuthStateDidChangeListenerHandle?
     
+//    private let monitor = NWPathMonitor()
+//    private let queue = DispatchQueue(label: "Monitor")
+
     override init() {
         super.init()
         anyCancellable = profile.objectWillChange.sink { [weak self] (_) in
@@ -131,9 +136,25 @@ class AuthModel: NSObject, ObservableObject {
         anyCancellable = messages.objectWillChange.sink { [weak self] (_) in
             self?.objectWillChange.send()
         }
-        anyCancellable1 = contacts.objectWillChange.sink { [weak self] (_) in
+        anyCancellable = contacts.objectWillChange.sink { [weak self] (_) in
             self?.objectWillChange.send()
         }
+
+//        monitor.pathUpdateHandler = { [weak self] path in
+//            guard let self = self else { return }
+//
+//            DispatchQueue.main.async {
+//                if path.status == .satisfied {
+//                    print("We're connected!")
+//                    self.networkStatus = .connected
+//                } else {
+//                    print("No connection....")
+//                    self.networkStatus = .disconnected
+//                }
+//            }
+//        }
+//
+//        monitor.start(queue: queue)
      }
     
     // MARK: - Auth

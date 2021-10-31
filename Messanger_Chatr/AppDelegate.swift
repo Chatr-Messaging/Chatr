@@ -69,15 +69,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) { }
 
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Swift.Void) {
-        if let info = userInfo["aps"] as? Dictionary<String, AnyObject> {
-            if let alertMsg = info["alert"] as? String {
-                if let sceneDelegate = application.connectedScenes.first?.delegate as? SceneDelegate {
-                    if alertMsg.last == "❤️" || alertMsg.byWords.first == "snap" || alertMsg.byWords.last == "🥳" || alertMsg.byWords.last == "request" {
-                        sceneDelegate.environment.notificationtext = alertMsg
-                        NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
-                    }
-                }
-            }
+        guard let info = userInfo["aps"] as? Dictionary<String, AnyObject>,
+              let alertMsg = info["alert"] as? String else { return }
+
+        if alertMsg.last == "❤️" || alertMsg.byWords.first == "snap" || alertMsg.byWords.last == "🥳" || alertMsg.byWords.last == "request" {
+            var info = [String : String]()
+            info["image"] = "bell.badge"
+            info["color"] = "blue"
+            info["title"] = alertMsg
+
+            NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil, userInfo: info)
         }
     }
     

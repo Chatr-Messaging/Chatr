@@ -155,12 +155,12 @@ struct PinnedSectionView: View {
         self.pinMessage(message: message, completion: { added in
             if !added {
                 self.auth.dialogs.removeDialogPin(messageId: message.id, dialogID: message.dialogID)
-                auth.notificationtext = "Removed pined message"
-                NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+
+                showNotiHUD(image: "pin.slash", color: .red, title: "Removed pined message", subtitle: nil)
             } else {
                 self.auth.dialogs.addDialogPin(messageId: message.id, dialogID: message.dialogID)
-                auth.notificationtext = "Pined message"
-                NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+
+                showNotiHUD(image: "pin", color: .blue, title: "Pined message", subtitle: nil)
             }
         })
     }

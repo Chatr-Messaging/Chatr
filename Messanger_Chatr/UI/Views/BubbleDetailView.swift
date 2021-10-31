@@ -384,8 +384,7 @@ struct BubbleDetailView: View {
                                                 UINotificationFeedbackGenerator().notificationOccurred(.success)
                                                 UIPasteboard.general.setValue(self.message.text, forPasteboardType: kUTTypePlainText as String)
 
-                                                self.auth.notificationtext = "Copied message"
-                                                NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+                                                showNotiHUD(image: "doc.on.doc", color: .blue, title: "Copied message", subtitle: nil)
                                             }) {
                                                 Label("Copy Text", systemImage: "doc.on.doc")
                                             }
@@ -398,8 +397,7 @@ struct BubbleDetailView: View {
                                                 UINotificationFeedbackGenerator().notificationOccurred(.success)
                                                 UIPasteboard.general.setValue(copyText, forPasteboardType: kUTTypePlainText as String)
 
-                                                self.auth.notificationtext = "Copied message"
-                                                NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+                                                showNotiHUD(image: "doc.on.doc", color: .blue, title: "Copied message", subtitle: nil)
                                             }) {
                                                 Label("Copy Location", systemImage: "doc.on.doc")
                                             }
@@ -736,12 +734,12 @@ struct BubbleDetailView: View {
         self.viewModel.pinMessage(message: self.message, completion: { added in
             if !added {
                 self.auth.dialogs.removeDialogPin(messageId: self.message.id, dialogID: self.message.dialogID)
-                auth.notificationtext = "Removed pined message"
-                NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+
+                showNotiHUD(image: "pin.slash", color: .red, title: "Removed pined message", subtitle: nil)
             } else {
                 self.auth.dialogs.addDialogPin(messageId: self.message.id, dialogID: self.message.dialogID)
-                auth.notificationtext = "Pined message"
-                NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+
+                showNotiHUD(image: "pin", color: .blue, title: "Pined message", subtitle: nil)
             }
         })
     }
@@ -754,11 +752,9 @@ struct BubbleDetailView: View {
                 request.addResource(with: .photo, data: imageData, options: nil)
             }) { (success, error) in
                 if error == nil {
-                    DispatchQueue.main.async {
-                        auth.notificationtext = "Saved image"
-                        NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
-                    }
                     UINotificationFeedbackGenerator().notificationOccurred(.success)
+
+                    showNotiHUD(image: "square.and.arrow.down", color: .blue, title: "Saved image", subtitle: nil)
                 }
             }
         }

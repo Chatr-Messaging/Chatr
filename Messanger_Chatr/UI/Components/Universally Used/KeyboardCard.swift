@@ -736,8 +736,8 @@ struct KeyboardCardView: View {
                                     self.isVisiting = ""
                                 }
                                 UserDefaults.standard.set("", forKey: "visitingDialogId")
-                                self.auth.notificationtext = "Joined channel"
-                                NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+
+                                showNotiHUD(image: "person.crop.circle.badge.plus", color: .blue, title: "Joined channel", subtitle: nil)
                             })
                         }, onError: { err in
                             UINotificationFeedbackGenerator().notificationOccurred(.error)

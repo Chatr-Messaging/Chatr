@@ -11,7 +11,6 @@ import UIKit
 import SwiftUI
 import CoreData
 import ConnectyCube
-import PopupView
 import RealmSwift
 import LocalAuthentication
 import UserNotifications
@@ -163,7 +162,6 @@ struct ChatrBaseView: View {
     @State var showSharedPublicDialog: Bool = false
     @State var isEditGroupOpen: Bool = false
     @State var canEditGroup: Bool = false
-    @State var receivedNotification: Bool = false
     @State var disableDialog: Bool = false
     @State var showWelcomeNewUser: Bool = false
     @State var showKeyboardMediaAssets: Bool = false
@@ -496,6 +494,10 @@ struct ChatrBaseView: View {
 //                            self.isLocalOpen = false
 //                        }
                         
+                        Button("tap me") {
+                            showNotiHUD(image: "wifi", color: .blue, title: "Connected", subtitle: "cool ass subtitle...")
+                        }
+
                         if self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.count >= 3 || self.dialogs.results.filter { $0.isDeleted != true }.count == 0 {
                             FooterInformation()
                                 .padding(.top, 140)
@@ -649,19 +651,20 @@ struct ChatrBaseView: View {
                 .environmentObject(self.auth)
                 .disabled(self.quickSnapViewState != .closed || self.auth.isLoacalAuth ? false : true)
                 .opacity(self.auth.isLoacalAuth ? 0 : 1)
-                .popup(isPresented: self.$receivedNotification, type: .floater(), position: .top, animation: Animation.spring(), autohideIn: 5, closeOnTap: true) {
-                    NotificationSection()
-                        .environmentObject(self.auth)
-                }
             
             ConfettiCannon(counter: $counter, repetitions: 3, repetitionInterval: 0.2)
         }.onAppear {
-            NotificationCenter.default.addObserver(forName: NSNotification.Name("NotificationAlert"), object: nil, queue: .main) { (_) in
-                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                self.receivedNotification.toggle()
+            NotificationCenter.default.addObserver(forName: NSNotification.Name("NotificationAlert"), object: nil, queue: .main) { (notii) in
+                if let dict = notii.userInfo as NSDictionary? {
+                    if let image = dict["image"] as? String, let color = dict["color"] as? String, let title = dict["title"] as? String {
+                        let subtitle = dict["image"] as? String
+
+                        showNotiHUD(image: image, color: color == "blue" ? .blue : color == "primary" ? .primary : color == "red" ? .red : color == "orange" ? .orange : .primary, title: title, subtitle: subtitle)
+                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                    }
+                }
             }
-            
-            
+
             if self.auth.isFirstTimeUser && UserDefaults.standard.bool(forKey: "isEarlyAdopter") {
                 self.isTopCardOpen = true
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {

@@ -11,7 +11,6 @@ import SDWebImageSwiftUI
 import ConnectyCube
 import RealmSwift
 import Firebase
-import PopupView
 
 struct messagePinStruct: Identifiable, RealmSwift.RealmCollectionValue {
     var id = UUID()
@@ -349,10 +348,11 @@ struct VisitGroupChannelView: View {
                             }
                         })))
                 }
-            }.popup(isPresented: self.$showAlert, type: .floater(), position: .bottom, animation: Animation.spring(), autohideIn: 4, closeOnTap: true) {
-                self.auth.createTopFloater(alertType: self.notiType, message: self.notiText)
-                    .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 8)
             }
+//            .popup(isPresented: self.$showAlert, type: .floater(), position: .bottom, animation: Animation.spring(), autohideIn: 4, closeOnTap: true) {
+//                self.auth.createTopFloater(alertType: self.notiType, message: self.notiText)
+//                    .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 8)
+//            }
         }.background(Color("bgColor"))
         .onAppear() {
             DispatchQueue.main.async {
@@ -486,15 +486,9 @@ struct VisitGroupChannelView: View {
                 if self.dialogRelationship == .subscribed {
                     self.loadNotifications()
                 }
-                
-                NotificationCenter.default.addObserver(forName: NSNotification.Name("NotificationAlert"), object: nil, queue: .main) { (_) in
-                    self.showAlert.toggle()
-                }
 
                 self.fromSharedPublicDialog = ""
             }
-        }.onDisappear() {
-            NotificationCenter.default.removeObserver(self, name: NSNotification.Name("NotificationAlert"), object: nil)
         }
     }
     

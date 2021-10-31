@@ -16,7 +16,6 @@ import SDWebImageSwiftUI
 import AVFoundation
 import SCSDKCreativeKit
 import SlideOverCard
-import PopupView
 import ConnectyCube
 
 struct ShareProfileView: View {
@@ -323,12 +322,11 @@ struct ShareProfileView: View {
                 FooterInformation()
                     .padding(.top, 80)
                     .padding(.bottom)
-                
             }.frame(width: Constants.screenWidth)
-            .popup(isPresented: self.$showAlert, type: .floater(), position: .bottom, animation: Animation.spring(), autohideIn: 4, closeOnTap: true) {
-                self.auth.createTopFloater(alertType: self.notiType, message: self.notiText)
-                    .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 8)
-            }
+//            .popup(isPresented: self.$showAlert, type: .floater(), position: .bottom, animation: Animation.spring(), autohideIn: 4, closeOnTap: true) {
+//                self.auth.createTopFloater(alertType: self.notiType, message: self.notiText)
+//                    .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 8)
+//            }
         }.navigationBarTitle(self.isPublicDialog ? "Share Channel" : "Share Profile", displayMode: .automatic)
         .animation(.spring(response: 0.35, dampingFraction: 0.60, blendDuration: 0))
         .navigationBarItems(trailing:
