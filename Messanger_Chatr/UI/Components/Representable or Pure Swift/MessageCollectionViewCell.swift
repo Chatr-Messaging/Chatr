@@ -56,10 +56,6 @@ final class MessageCollectionViewCell: UICollectionViewCell {
         child.view.backgroundColor = .clear
         contentView.addSubviews([child.view])
     }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-    }
 }
 
 extension UIView {

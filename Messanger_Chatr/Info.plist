@@ -52,6 +52,24 @@
 				<key>UIPrerenderedIcon</key>
 				<false/>
 			</dict>
+			<key>AppIcon-Colorful-Fill-Flat-Dark</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>AppIcon-Colorful-Fill-Flat-Dark</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
+			<key>AppIcon-Colorful-Fill-Flat</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>AppIcon-Colorful-Fill-Flat</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
 			<key>AppIcon-Original-Dark</key>
 			<dict>
 				<key>CFBundleIconFiles</key>
@@ -117,6 +135,24 @@
 				<key>CFBundleIconFiles</key>
 				<array>
 					<string>AppIcon-Flat-Dark</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
+			<key>AppIcon-Colorful-Fill-Flat-Dark</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>AppIcon-Colorful-Fill-Flat-Dark</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
+			<key>AppIcon-Colorful-Fill-Flat</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>AppIcon-Colorful-Fill-Flat</string>
 				</array>
 				<key>UIPrerenderedIcon</key>
 				<false/>

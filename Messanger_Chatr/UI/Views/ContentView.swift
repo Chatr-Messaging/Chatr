@@ -444,37 +444,40 @@ struct ChatrBaseView: View {
                         //MARK: Main Dialog Cells
                         ForEach(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }, id: \.id) { i in
                             GeometryReader { geo in
-                                DialogCell(dialogModel: i,
-                                           isOpen: $isLocalOpen,
-                                           activeView: $activeView,
-                                           selectedDialogID: $selectedDialogID,
-                                           showPinDetails: $showPinDetails)
-                                    .environmentObject(auth)
-                                    .contentShape(Rectangle())
-                                    .position(x: i.isOpen && isLocalOpen ? UIScreen.main.bounds.size.width / 2 : UIScreen.main.bounds.size.width / 2 - 20, y: i.isOpen && isLocalOpen ? activeView.height + 40 : 40)
-                                    .fixedSize(horizontal: false, vertical: true)
-                                    .zIndex(i.isOpen ? 2 : 0)
-                                    .opacity(isLocalOpen ? (i.isOpen ? 1 : 0) : 1)
-                                    .offset(y: i.isOpen && isLocalOpen ? -geo.frame(in: .global).minY + (emptyQuickSnaps ? (UIDevice.current.hasNotch ? 50 : 25) : 110) : emptyQuickSnaps ? -25 : 70)
-                                    .shadow(color: Color.black.opacity(isLocalOpen ? (colorScheme == .dark ? 0.25 : 0.15) : 0.15), radius: isLocalOpen ? 15 : 8, x: 0, y: self.isLocalOpen ? (colorScheme == .dark ? 15 : 5) : 5)
-                                    .animation(.spring(response: isLocalOpen ? 0.375 : 0.45, dampingFraction: isLocalOpen ? 0.68 : 0.8, blendDuration: 0))
-                                    .id(i.id)
-                                    .tag(i.id)
-                                    .onTapGesture {
-                                        onCellTapGesture(id: i.id, dialogType: i.dialogType)
-                                    }.simultaneousGesture(DragGesture(minimumDistance: i.isOpen ? 0 : 500).onChanged { value in
-                                        guard value.translation.height < 150 else { return }
-                                        guard value.translation.height > 0 else { return }
-
-                                        activeView = value.translation
-                                    }.onEnded { value in
-                                        if activeView.height > 50 {
-                                            onCellTapGesture(id: i.id, dialogType: i.dialogType)
-                                        }
-                                        activeView.height = .zero
-                                    })
+                                Button(action: {
+                                    onCellTapGesture(id: i.id, dialogType: i.dialogType)
+                                }) {
+                                    DialogCell(dialogModel: i,
+                                               isOpen: $isLocalOpen,
+                                               activeView: $activeView,
+                                               selectedDialogID: $selectedDialogID,
+                                               showPinDetails: $showPinDetails)
+                                        .environmentObject(auth)
+                                        .shadow(color: Color.black.opacity(isLocalOpen ? (colorScheme == .dark ? 0.25 : 0.15) : 0.15), radius: isLocalOpen ? 15 : 8, x: 0, y: self.isLocalOpen ? (colorScheme == .dark ? 15 : 5) : 5)
+                                }
+                                .contentShape(Rectangle())
+                                .position(x: i.isOpen && isLocalOpen ? UIScreen.main.bounds.size.width / 2 : UIScreen.main.bounds.size.width / 2 - 20, y: i.isOpen && isLocalOpen ? activeView.height + 40 : 40)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .zIndex(i.isOpen ? 2 : 0)
+                                .opacity(isLocalOpen ? (i.isOpen ? 1 : 0) : 1)
+                                .offset(y: i.isOpen && isLocalOpen ? -geo.frame(in: .global).minY + (emptyQuickSnaps ? (UIDevice.current.hasNotch ? 50 : 25) : 110) : emptyQuickSnaps ? -25 : 70)
+                                .animation(.spring(response: isLocalOpen ? 0.375 : 0.45, dampingFraction: isLocalOpen ? 0.68 : 0.8, blendDuration: 0))
+                                .buttonStyle(dialogButtonStyle())
+                                .id(i.id)
+                                .tag(i.id)
                             }.frame(height: 75, alignment: .center)
                             .padding(.horizontal, isLocalOpen && i.isOpen ? 0 : 20)
+                            .simultaneousGesture(DragGesture(minimumDistance: i.isOpen ? 0 : 500).onChanged { value in
+                                guard value.translation.height < 150 else { return }
+                                guard value.translation.height > 0 else { return }
+
+                                activeView = value.translation
+                            }.onEnded { value in
+                                if activeView.height > 50 {
+                                    onCellTapGesture(id: i.id, dialogType: i.dialogType)
+                                }
+                                activeView.height = .zero
+                            })
                         }
                         .disabled(self.disableDialog)
                         .onChange(of: UserDefaults.standard.bool(forKey: "localOpen")) { isOpen in
@@ -662,6 +665,22 @@ struct ChatrBaseView: View {
                         showNotiHUD(image: image, color: color == "blue" ? .blue : color == "primary" ? .primary : color == "red" ? .red : color == "orange" ? .orange : .primary, title: title, subtitle: subtitle)
                         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                     }
+                }
+            }
+
+            self.auth.delegateConnectionState = { connectState in
+                switch connectState {
+                case .connected:
+                    showNotiHUD(image: "wifi", color: .blue, title: "Connected", subtitle: nil)
+
+                case .disconnected:
+                    showNotiHUD(image: "wifi", color: .red, title: "Disonnected", subtitle: nil)
+
+                case .loading:
+                    showNotiHUD(image: "wifi", color: .secondary, title: "", subtitle: "connecting...")
+
+                default:
+                    return
                 }
             }
 

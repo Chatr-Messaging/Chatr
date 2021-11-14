@@ -36,16 +36,12 @@ class ChatMessageViewModel: ObservableObject {
         let extRequest : [String: String] = ["sort_desc" : "lastMessageDate"]
 
         Request.updateDialog(withID: dialogId, update: UpdateChatDialogParameters(), successBlock: { dialog in
-            self.syncLoadFoundDialog(dialog: dialog, auth: auth, dialogId: dialogId, completion: {
-                completion()
-            })
+            self.syncLoadFoundDialog(dialog: dialog, auth: auth, dialogId: dialogId, completion: completion)
         }) { _ in
             Request.dialogs(with: Paginator.limit(500, skip: 0), extendedRequest: extRequest, successBlock: { (dialogs, usersIDs, paginator) in
                 for dialog in dialogs {
                     if dialog.id == dialogId {
-                        self.syncLoadFoundDialog(dialog: dialog, auth: auth, dialogId: dialogId, completion: {
-                            completion()
-                        })
+                        self.syncLoadFoundDialog(dialog: dialog, auth: auth, dialogId: dialogId, completion: completion)
                         
                         break
                     }

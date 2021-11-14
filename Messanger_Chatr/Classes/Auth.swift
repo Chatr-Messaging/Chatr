@@ -114,6 +114,8 @@ class AuthModel: NSObject, ObservableObject {
     @Published public var subscriptionStatus: PremiumSubscriptionStatus = UserDefaults.standard.bool(forKey: "premiumSubscriptionStatus") ? .subscribed : .notSubscribed
 
     @Published var avatarProgress: CGFloat = CGFloat(0.0)
+
+    @Published var delegateConnectionState: ((_ connectState: connectionState) -> ())?
     
     @ObservedObject var profile = ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self))
     @ObservedObject var contacts = ContactsRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ContactStruct.self))
@@ -735,22 +737,27 @@ extension AuthModel: ChatDelegate {
     func chatDidConnect() {
         //print("Chat did Connect!!! \(String(describing: Session.current.sessionDetails?.userID))")
         //self.connectionState = .connected
+        delegateConnectionState?(.connected)
     }
 
     func chatDidReconnect() {
         //print("Chat did Reconnect")
         //self.connectionState = .connected
+        delegateConnectionState?(.connected)
     }
 
     func chatDidDisconnectWithError(_ error: Error) {
         //print("Chat did Disconnect: \(error.localizedDescription)")
         //self.connectionState = .disconnected
+        delegateConnectionState?(.disconnected)
     }
 
     func chatDidNotConnectWithError(_ error: Error) {
         //print("Chat did not connect: \(error.localizedDescription)")
         //self.connectionState = .disconnected
         self.configureFirebaseStateDidChange()
+
+        delegateConnectionState?(.disconnected)
     }
 
     func chatDidReceiveContactAddRequest(fromUser userID: UInt) {

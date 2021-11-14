@@ -37,15 +37,17 @@ struct appearanceView: View {
         AppIconData(title: "Original Dark", image: "AppIcon-Original-Dark", selected: false),
         AppIconData(title: "Flat", image: "AppIcon-Flat", selected: false),
         AppIconData(title: "Flat Dark", image: "AppIcon-Flat-Dark", selected: false),
-        AppIconData(title: "Paper Airplane", image: "AppIcon-PaperAirplane", selected: false),
-        AppIconData(title: "Paper Airplane Dark", image: "AppIcon-PaperAirplane-Dark", selected: false),
+        AppIconData(title: "Colorful Flat Dark", image: "AppIcon-Colorful-Fill-Flat", selected: false),
+        AppIconData(title: "Colorful Flat", image: "AppIcon-Colorful-Fill-Flat-Dark", selected: false),
+        AppIconData(title: "Airplane", image: "AppIcon-PaperAirplane", selected: false),
+        AppIconData(title: "Airplane Dark", image: "AppIcon-PaperAirplane-Dark", selected: false),
         AppIconData(title: "Colorful", image: "AppIcon-Colorful", selected: false),
         AppIconData(title: "Colorful Dark", image: "AppIcon-Colorful-Dark", selected: false)
     ]
     var WallpaperDataArray : [WallpaperData] = [
         WallpaperData(title: "Empty", image: "", selected: false, isPremium: false),
         WallpaperData(title: "Chat Bubbles", image: "SoftChatBubbles_DarkWallpaper", selected: false, isPremium: false),
-        WallpaperData(title: "Paper Airplanes", image: "SoftPaperAirplane-Wallpaper", selected: false, isPremium: true),
+        WallpaperData(title: "Airplanes", image: "SoftPaperAirplane-Wallpaper", selected: false, isPremium: true),
         WallpaperData(title: "Night Sky", image: "oldHouseWallpaper", selected: false, isPremium: true),
         WallpaperData(title: "New York City", image: "nycWallpaper", selected: false, isPremium: true),
         WallpaperData(title: "Michael Angelo", image: "michaelAngelWallpaper", selected: false, isPremium: true),
@@ -83,7 +85,7 @@ struct appearanceView: View {
                     VStack(alignment: .center) {
                         Grid(self.AppIconDataArray) { item in
                             Button(action: {
-                                if self.auth.subscriptionStatus == .subscribed || item.title == self.AppIconDataArray.first?.title || (item.title == "Original Dark" && UserDefaults.standard.bool(forKey: "isEarlyAdopter")) {
+                                if self.auth.subscriptionStatus != .subscribed || item.title == self.AppIconDataArray.first?.title || (item.title == "Original Dark" && UserDefaults.standard.bool(forKey: "isEarlyAdopter")) {
                                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                     self.selectedIcon = item
                                     UserDefaults.standard.set(item.title, forKey: "selectedAppIcon")
@@ -100,9 +102,9 @@ struct appearanceView: View {
                                         .frame(width: 55, height: 55, alignment: .center)
                                         .cornerRadius(15)
                                         .padding(.bottom, 5)
-                                        .shadow(color: Color("buttonShadow"), radius: 5, x: 0, y: 5)
+                                        .shadow(color: Color("buttonShadow"), radius: 8, x: 0, y: 6)
 
-                                    if self.auth.subscriptionStatus == .subscribed || item.title == "Original" || (item.title == "Original Dark" && UserDefaults.standard.bool(forKey: "isEarlyAdopter")) {
+                                    if self.auth.subscriptionStatus != .subscribed || item.title == "Original" || (item.title == "Original Dark" && UserDefaults.standard.bool(forKey: "isEarlyAdopter")) {
                                         if self.selectedIcon?.title == item.title {
                                             Image(systemName: "checkmark.circle.fill" )
                                                 .resizable()
@@ -136,7 +138,7 @@ struct appearanceView: View {
                             .background(RoundedRectangle(cornerRadius: 15).fill(self.selectedIcon?.title == item.title ? Color("bgColor_light") : Color.clear).animation(.none))
                             .buttonStyle(ClickMiniButtonStyleBG())
 
-                        }.frame(minHeight: 520, maxHeight: 620, alignment: .center)
+                        }.frame(minHeight: 520, maxHeight: 820, alignment: .center)
                         .padding(.vertical, 15)
                         .gridStyle(self.style)
                         .onAppear {

@@ -744,7 +744,7 @@ struct PhoneNumberView: View {
                 .padding(.horizontal, 30)
                 .padding(.bottom, 2.5)
             
-            Text("Yep, no need to remember a password.\nEnter your phone number below.")
+            Text("Yep, no need to remember a password.\nOnly a phone number is used for verification.")
                 .font(.system(size: 12))
                 .font(.footnote)
                 .foregroundColor(Color.secondary)
