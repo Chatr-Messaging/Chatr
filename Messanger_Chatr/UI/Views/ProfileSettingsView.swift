@@ -694,7 +694,6 @@ struct ProfileView: View {
         .edgesIgnoringSafeArea(.all)
         .navigationBarItems(leading:
             Button(action: {
-                print("Done btn tap")
                 withAnimation {
                     self.dimissView.toggle()
                 }

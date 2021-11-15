@@ -21,8 +21,8 @@ target 'Messanger_Chatr' do
   pod 'Purchases'
   pod 'Giphy', :podspec => 'https://s3.amazonaws.com/sdk.mobile.giphy.com/SDK/2.0.3/Giphy.podspec'
   pod 'SnapSDK', '1.4.0', :subspecs => ['SCSDKCreativeKit']
-  pod 'netfox'
   pod 'Cache'
+  pod 'IGListKit'
 
 end
 

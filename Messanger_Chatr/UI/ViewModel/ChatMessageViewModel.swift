@@ -36,23 +36,17 @@ class ChatMessageViewModel: ObservableObject {
         let extRequest : [String: String] = ["sort_desc" : "lastMessageDate"]
 
         Request.updateDialog(withID: dialogId, update: UpdateChatDialogParameters(), successBlock: { dialog in
-            self.syncLoadFoundDialog(dialog: dialog, auth: auth, dialogId: dialogId, completion: {
-                completion()
-            })
-        }) { (error) in
-            print("error fetching the dialog: \(error.localizedDescription)")
+            self.syncLoadFoundDialog(dialog: dialog, auth: auth, dialogId: dialogId, completion: completion)
+        }) { _ in
             Request.dialogs(with: Paginator.limit(500, skip: 0), extendedRequest: extRequest, successBlock: { (dialogs, usersIDs, paginator) in
                 for dialog in dialogs {
                     if dialog.id == dialogId {
-                        self.syncLoadFoundDialog(dialog: dialog, auth: auth, dialogId: dialogId, completion: {
-                            completion()
-                        })
+                        self.syncLoadFoundDialog(dialog: dialog, auth: auth, dialogId: dialogId, completion: completion)
                         
                         break
                     }
                 }
-            }) { (error) in
-                print("error fetching the dialog againnn: \(error.localizedDescription)")
+            }) { _ in
                 completion()
             }
         }
@@ -81,23 +75,19 @@ class ChatMessageViewModel: ObservableObject {
             }
             
             dialog.requestOnlineUsers(completionBlock: { (online, error) in
-                print("The online count is!!: \(String(describing: online?.count))")
                 //self.onlineCount = online?.count ?? 0
                 self.setOnlineCount(dialog: dialog)
             })
 
             dialog.onUpdateOccupant = { (userID: UInt) in
-                print("update occupant: \(userID)")
                 self.setOnlineCount(dialog: dialog)
             }
 
             dialog.onJoinOccupant = { (userID: UInt) in
-                print("on join occupant: \(userID)")
                 self.setOnlineCount(dialog: dialog)
             }
 
             dialog.onLeaveOccupant = { (userID: UInt) in
-                print("on leave occupant: \(userID)")
                 self.setOnlineCount(dialog: dialog)
             }
 
@@ -116,9 +106,7 @@ class ChatMessageViewModel: ObservableObject {
     func updateDialogMessageCount(dialogId: String, completion: @escaping () -> Void) {
         Request.countOfMessages(forDialogID: dialogId, extendedRequest: ["sort_desc" : "lastMessageDate"], successBlock: { count in
             self.totalMessageCount = Int(count)
-            print("the total message count is: \(Int(count))")
             Request.totalUnreadMessageCountForDialogs(withIDs: Set([dialogId]), successBlock: { (unread, directory) in
-                print("the unread count for this dialog: \(unread) && \(directory)")
                 self.unreadMessageCount = Int(unread)
                 
                 if self.unreadMessageCount == 0 {
@@ -202,10 +190,7 @@ class ChatMessageViewModel: ObservableObject {
     }
     
     func sendReply(text: String, name: String, messagez: MessageStruct, completion: @escaping () -> Void) {
-        guard messagez.senderID != 0, messagez.dialogID != "" else {
-            print("the sender id or dialog is is not there...")
-            return
-        }
+        guard messagez.senderID != 0, messagez.dialogID != "" else { return }
 
         let msg = Database.database().reference().child("Dialogs").child(messagez.dialogID).child(messagez.id).child("replies")
         let newPostId = msg.childByAutoId().key
@@ -323,13 +308,12 @@ class ChatMessageViewModel: ObservableObject {
     }
     
     func editMessage() {
-        print("edit message")
+        //print("edit message")
     }
 
     func trashMessage(connectyDialog: ChatDialog, messageId: String, completion: @escaping () -> Void) {
         connectyDialog.removeMessage(withID: messageId) { (error) in
             if error != nil {
-                print("the error deleting: \(String(describing: error?.localizedDescription))")
                 UINotificationFeedbackGenerator().notificationOccurred(.error)
             } else {
                 self.auth.messages.updateMessageState(messageID: messageId, messageState: .deleted)
@@ -377,7 +361,6 @@ class ChatMessageViewModel: ObservableObject {
                 return MessageStruct()
             }
         } catch {
-            print(error.localizedDescription)
             return MessageStruct()
         }
     }
@@ -439,7 +422,6 @@ class ChatMessageViewModel: ObservableObject {
         }
 
         dialog.requestOnlineUsers(completionBlock: { (online, error) in
-            print("the online count is: \(online?.count ?? 0)")
             let config = Realm.Configuration(schemaVersion: 1)
             do {
                 let realm = try Realm(configuration: config)
@@ -449,9 +431,7 @@ class ChatMessageViewModel: ObservableObject {
                         realm.add(foundContact, update: .all)
                     })
                 }
-            } catch {
-                print(error.localizedDescription)
-            }
+            } catch {  }
         })
     }
 
@@ -472,11 +452,7 @@ class ChatMessageViewModel: ObservableObject {
 
             event.message = jsonString
 
-            Request.createEvent(event, successBlock: {(events) in
-                print("sent push notification!! \(events)")
-            }, errorBlock: {(error) in
-                print("error sending noti: \(error.localizedDescription)")
-            })
+            Request.createEvent(event, successBlock: { _ in }, errorBlock: { _ in })
         }
     }
 

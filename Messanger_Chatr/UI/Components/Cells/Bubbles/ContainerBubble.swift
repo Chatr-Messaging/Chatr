@@ -357,8 +357,7 @@ struct ContainerBubble: View {
                             UINotificationFeedbackGenerator().notificationOccurred(.success)
                             self.deleteActionSheet.toggle()
 
-                            auth.notificationtext = "Deleted Message"
-                            NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+                            showNotiHUD(image: "trash.circle", color: .red, title: "Deleted message", subtitle: nil)
                         })
                     }), .cancel()
                 ])
@@ -388,7 +387,6 @@ struct ContainerBubble: View {
                 self.hasUserDisliked = self.message.dislikedId.contains(self.auth.profile.results.first?.id ?? 0)
 
                 self.viewModel.fetchReplyCount(message: self.message, completion: { count in
-                    print("the total reply count is: \(count)")
                     self.replyCount = count
                 })
             }
@@ -406,7 +404,6 @@ struct ContainerBubble: View {
                 let y = value.translation.width
                 let c = value.startLocation.x
 
-                print("the y value is: \(y) start location: \(c) &&7 noww")
                 if message.messageState != .error {
                     if messagePosition == .right && (Int(Constants.screenWidth) / 2 - 50 > self.message.bubbleWidth || c > Constants.screenWidth / 2 - 75) {
                         self.dragLeftInteraction(y: y)
@@ -512,12 +509,11 @@ struct ContainerBubble: View {
             UIPasteboard.general.setValue(self.message.text, forPasteboardType: kUTTypePlainText as String)
         }
 
-        auth.notificationtext = "Copied message"
-        NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+        showNotiHUD(image: "doc.on.doc", color: .blue, title: "Copied message", subtitle: nil)
     }
 
     func tryAgain() {
-        print("try again action")
+        //print("try again action")
     }
     
     func openReplyDetailView() {
@@ -546,18 +542,17 @@ struct ContainerBubble: View {
     }
 
     func pinMessage() {
-        print("the pinning message id is: \(self.message.id.description)")
         self.viewModel.pinMessage(message: self.message, completion: { added in
             if !added {
                 self.auth.dialogs.removeDialogPin(messageId: self.message.id, dialogID: self.message.dialogID)
                 self.reactions[1] = "pin"
-                auth.notificationtext = "Removed pined message"
-                NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+
+                showNotiHUD(image: "pin.slash", color: .red, title: "Removed pined message", subtitle: nil)
             } else {
                 self.auth.dialogs.addDialogPin(messageId: self.message.id, dialogID: self.message.dialogID)
                 self.reactions[1] = "unpin"
-                auth.notificationtext = "Pined message"
-                NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+
+                showNotiHUD(image: "pin", color: .blue, title: "Pined message", subtitle: nil)
             }
         })
     }
@@ -570,7 +565,6 @@ struct ContainerBubble: View {
 
                 if let videoData = result?.object {
                     let paths = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)[0]
-
                     let dataPath = paths.appending("/saveCameraRoll/saveChatrVideoToCameraRoll.mp4")
 
                     try videoData.write(to: URL(fileURLWithPath: dataPath))
@@ -579,17 +573,13 @@ struct ContainerBubble: View {
                         PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: URL(fileURLWithPath: dataPath))
                     }) { (success, error) in
                         if error != nil {
-                            DispatchQueue.main.async {
-                                auth.notificationtext = "Error saving video"
-                                NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
-                            }
                             UINotificationFeedbackGenerator().notificationOccurred(.error)
+
+                            showNotiHUD(image: "exclamationmark.octagon", color: .red, title: "Error saving video", subtitle: nil)
                         } else {
-                            DispatchQueue.main.async {
-                                auth.notificationtext = "Saved video"
-                                NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
-                            }
                             UINotificationFeedbackGenerator().notificationOccurred(.success)
+
+                            showNotiHUD(image: "square.and.arrow.down", color: .blue, title: "Saved video", subtitle: nil)
                         }
                     }
                 }
@@ -600,19 +590,14 @@ struct ContainerBubble: View {
                     let request = PHAssetCreationRequest.forAsset()
                     request.addResource(with: .photo, data: imageData, options: nil)
                 }) { (success, error) in
-                    if let error = error {
-                        print(error.localizedDescription)
-                        DispatchQueue.main.async {
-                            auth.notificationtext = "Error saving image"
-                            NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
-                        }
+                    if error != nil {
                         UINotificationFeedbackGenerator().notificationOccurred(.error)
+
+                        showNotiHUD(image: "exclamationmark.octagon", color: .red, title: "Error saving image", subtitle: nil)
                     } else {
-                        DispatchQueue.main.async {
-                            auth.notificationtext = "Saved image"
-                            NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
-                        }
                         UINotificationFeedbackGenerator().notificationOccurred(.success)
+
+                        showNotiHUD(image: "square.and.arrow.down", color: .blue, title: "Saved image", subtitle: nil)
                     }
                 }
             }
@@ -631,7 +616,6 @@ struct ContainerBubble: View {
                 if typeLike == "likes" {
                     self.auth.messages.updateMessageLikeAdded(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
                     self.hasUserLiked = self.message.likedId.contains(profileID)
-                    print("liked added: contain: \(self.message.likedId.contains(profileID)) && my id: \(profileID)")
                 } else if typeLike == "dislikes" {
                     self.auth.messages.updateMessageDislikeAdded(messageID: self.message.id, userID: Int(childSnap.key) ?? 0)
                     self.hasUserDisliked = self.message.dislikedId.contains(profileID)

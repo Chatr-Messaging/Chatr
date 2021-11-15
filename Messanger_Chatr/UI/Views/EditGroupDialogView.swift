@@ -254,7 +254,6 @@ struct EditGroupDialogView: View {
                                         let fullImgLink = Constants.uploadcareBaseUrl + avatarId + Constants.uploadcareStandardTransform
                                         
                                         self.setGroupAvatar(avatarLink: fullImgLink, completion: { didUpdate in
-                                            print("done updating channel avatar: \(didUpdate)")
                                             UINotificationFeedbackGenerator().notificationOccurred(.success)
                                         })
                                     }
@@ -457,7 +456,6 @@ struct EditGroupDialogView: View {
                     self.didSave = true
                 })
             }) { (error) in
-                print("the dialogzzzzz : \(error.localizedDescription)")
                 UINotificationFeedbackGenerator().notificationOccurred(.error)
                 self.loadingSave = false
                 self.didSave = false
@@ -485,7 +483,6 @@ struct EditGroupDialogView: View {
         let data = image.jpegData(compressionQuality: 0.5)
         
         Request.uploadFile(with: data!, fileName: "\(self.dialogModel.fullName)s_coverImg", contentType: "image/jpeg", isPublic: true, progressBlock: { (progress) in
-            print("the upload progress is: \(progress)")
             self.coverPhotoDownload = CGFloat(progress)
         }, successBlock: { (blob) in
             let parameters = UpdateChatDialogParameters()
@@ -496,7 +493,6 @@ struct EditGroupDialogView: View {
                 completion(true)
             })
         }) { (error) in
-            print("error somehow uploading...\(error.localizedDescription)")
             completion(false)
         }
     }

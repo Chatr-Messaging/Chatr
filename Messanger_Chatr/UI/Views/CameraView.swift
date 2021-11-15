@@ -241,7 +241,6 @@ struct CameraView: View {
                                     .padding(.horizontal, 45)
                                     .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 0)
                                     .onAppear() {
-                                        print("the selected users to send to are: \(self.selectedContacts)")
                                         self.loadAni.toggle()
                                     }
                                 
@@ -345,10 +344,8 @@ struct CameraView: View {
                   event.message = jsonString
 
                   Request.createEvent(event, successBlock: {(events) in
-                    print("sent push notification!! \(events)")
                     occs.removeAll()
                   }, errorBlock: {(error) in
-                    print("error sending noti: \(error.localizedDescription)")
                     occs.removeAll()
                   })
                 }

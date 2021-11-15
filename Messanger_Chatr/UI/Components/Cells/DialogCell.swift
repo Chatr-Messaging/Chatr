@@ -56,15 +56,15 @@ struct DialogCell: View {
                                 .offset(x: self.dialogModel.dialogType == "public" ? -7.5 : -5)
                                 .shadow(color: Color.black.opacity(0.23), radius: 7, x: 0, y: 5)
                                 .onTapGesture {
+                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+
                                     if isOpen {
-                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                         if self.dialogModel.dialogType == "private" {
                                             self.openContactProfile.toggle()
                                         } else if self.dialogModel.dialogType == "group" || self.dialogModel.dialogType == "public" {
                                             self.openGroupProfile.toggle()
                                         }
                                     } else {
-                                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                         self.isOpen = true
                                         self.selectedDialogID = self.dialogModel.id
                                         UserDefaults.standard.set(self.dialogModel.id, forKey: "selectedDialogID")
@@ -72,7 +72,7 @@ struct DialogCell: View {
                                         self.auth.dialogs.updateDialogOpen(isOpen: true, dialogID: self.dialogModel.id)
                                     }
                                 }
-                        
+
                         } else {
                             RoundedRectangle(cornerRadius: self.dialogModel.dialogType == "public" ? 12.5 : 27.5)
                                 .frame(width: 55, height: 55, alignment: .center)
@@ -226,7 +226,6 @@ struct DialogCell: View {
                             .onAppear() {
                                 self.isJoining = true
                                 dialog.join(completionBlock: { val in
-                                    print("done join dia logggg: \(val) && \(!dialog.isJoined())")
                                     self.isJoining = !dialog.isJoined()
                                 })
                             }
@@ -268,7 +267,6 @@ struct DialogCell: View {
                     self.auth.dialogs.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
 
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
-                        print("the current one is: \(self.dialogModel.id) and now the new one: \(diaOpen)")
                         UserDefaults.standard.set(diaOpen, forKey: "selectedDialogID")
                         self.selectedDialogID = diaOpen
                         self.isOpen = true
@@ -383,53 +381,51 @@ struct DialogCell: View {
             .padding(.trailing, self.dialogModel.isOpen ? 20 : 0)
             .opacity(self.isOpen ? 1 : 0)
         }.padding(.trailing, self.dialogModel.isOpen ? 20 : 5)
-        .padding(.leading)
-        .padding(.vertical, self.privateDialogContact.quickSnaps.count > 0 ? 4 : 8)
-        .background(Color("buttonColor"))
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
-        .onAppear() {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                if self.dialogModel.dialogType == "private" {
-                    for occ in self.dialogModel.occupentsID {
-                        if occ != UserDefaults.standard.integer(forKey: "currentUserID") {
-                            self.privateDialogContact.id = occ
-                            break
+            .padding(.leading)
+            .padding(.vertical, self.privateDialogContact.quickSnaps.count > 0 ? 4 : 8)
+            .onAppear() {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    if self.dialogModel.dialogType == "private" {
+                        for occ in self.dialogModel.occupentsID {
+                            if occ != UserDefaults.standard.integer(forKey: "currentUserID") {
+                                self.privateDialogContact.id = occ
+                                break
+                            }
                         }
-                    }
 
-                    do {
-                        let realm = try Realm(configuration: Realm.Configuration(schemaVersion: 1))
-                        if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: self.privateDialogContact.id) {
-                            self.privateDialogContact = foundContact
-                            self.connectyContact.id = UInt(foundContact.id)
-                            if self.privateDialogContact.avatar == "" || self.privateDialogContact.id == 0 && !Session.current.tokenHasExpired {
-                                self.pullPrivateAvatatr()
-                            } else if Session.current.tokenHasExpired {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                        do {
+                            let realm = try Realm(configuration: Realm.Configuration(schemaVersion: 1))
+                            if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: self.privateDialogContact.id) {
+                                self.privateDialogContact = foundContact
+                                self.connectyContact.id = UInt(foundContact.id)
+                                if self.privateDialogContact.avatar == "" || self.privateDialogContact.id == 0 && !Session.current.tokenHasExpired {
                                     self.pullPrivateAvatatr()
+                                } else if Session.current.tokenHasExpired {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                        self.pullPrivateAvatatr()
+                                    }
                                 }
-                            }
-                        } else {
-                            if !Session.current.tokenHasExpired {
-                                self.pullPrivateAvatatr()
                             } else {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                if !Session.current.tokenHasExpired {
                                     self.pullPrivateAvatatr()
+                                } else {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                        self.pullPrivateAvatatr()
+                                    }
                                 }
                             }
-                        }
-                    } catch { }
-                } else if self.dialogModel.dialogType == "group" && !Session.current.tokenHasExpired {
-                    self.pullGroupAvatar()
-                } else {
-                    if self.dialogModel.dialogType == "group" {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                            self.pullGroupAvatar()
+                        } catch { }
+                    } else if self.dialogModel.dialogType == "group" && !Session.current.tokenHasExpired {
+                        self.pullGroupAvatar()
+                    } else {
+                        if self.dialogModel.dialogType == "group" {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                self.pullGroupAvatar()
+                            }
                         }
                     }
                 }
             }
-        }
     }
     
     func pullGroupAvatar() {
@@ -512,7 +508,6 @@ struct DialogCell: View {
                         self.auth.dialogs.updateDialogOpen(isOpen: false, dialogID: self.dialogModel.id)
 
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
-                            print("the current one is: \(self.dialogModel.id) and now the new one: \(dia.id)")
                             self.selectedDialogID = dia.id
                             UserDefaults.standard.set(dia.id, forKey: "selectedDialogID")
                             self.openNewDialogID = 0
@@ -543,7 +538,6 @@ struct DialogCell: View {
 
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
                         let newId = self.auth.dialogs.filterDia(text: "").filter { $0.isDeleted != true }.last?.id ?? ""
-                        print("the current one is: \(self.dialogModel.id) and now the new one: \(newId)")
                         UserDefaults.standard.set(newId, forKey: "selectedDialogID")
                         self.selectedDialogID = newId
                         self.openNewDialogID = 0
@@ -559,7 +553,6 @@ struct DialogCell: View {
         }) { (error) in
             //occu.removeAll()
             UINotificationFeedbackGenerator().notificationOccurred(.error)
-            print("error making dialog: \(error.localizedDescription)")
         }
     }
 }

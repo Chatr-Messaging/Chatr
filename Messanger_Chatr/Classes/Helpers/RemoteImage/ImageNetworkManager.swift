@@ -25,14 +25,12 @@ class ImageNetworkManager: NSObject {
         }
         
         guard let url = URL(string: urlString) else {
-            print("wherereree")
             completed(nil)
             return
         }
         
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
             guard let data = data, let image = UIImage(data: data) else {
-                print("comeeiulsbflsd")
                 completed(nil)
                 return
             }

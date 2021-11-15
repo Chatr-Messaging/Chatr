@@ -63,12 +63,10 @@ class AdvancedViewModel: ObservableObject {
             if CLLocationManager.locationServicesEnabled() {
                 switch manager.authorizationStatus {
                     case .notDetermined, .restricted, .denied:
-                        print("No access to location")
                         DispatchQueue.main.async {
                             self.locationPermission = false
                         }
                     case .authorizedAlways, .authorizedWhenInUse:
-                        print("Access location true")
                         DispatchQueue.main.async {
                             self.locationPermission = true
                         }
@@ -87,13 +85,10 @@ class AdvancedViewModel: ObservableObject {
     func checkNotiPermission() {
         UNUserNotificationCenter.current().getNotificationSettings(completionHandler: { (settings) in
             if settings.authorizationStatus == .notDetermined {
-                print("Noti permission is .notDermined")
                 self.notificationPermission = false
             } else if settings.authorizationStatus == .denied {
-                print("Noti permission is .denied")
                 self.notificationPermission = false
             } else if settings.authorizationStatus == .authorized {
-                print("Noti permission is .auth")
                 self.notificationPermission = true
             }
         })
@@ -119,13 +114,10 @@ class AdvancedViewModel: ObservableObject {
     func checkMicPermission() {
         switch AVAudioSession.sharedInstance().recordPermission {
         case AVAudioSession.RecordPermission.granted:
-            print("Permission granted")
             self.micPermission = true
         case AVAudioSession.RecordPermission.denied:
-            print("Pemission denied")
             self.micPermission = false
         case AVAudioSession.RecordPermission.undetermined:
-            print("Request permission here")
             self.micPermission = false
         @unknown default:
             self.micPermission = false

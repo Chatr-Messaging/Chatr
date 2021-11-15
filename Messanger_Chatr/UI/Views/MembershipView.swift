@@ -171,7 +171,6 @@ struct MembershipView: View {
                     Spacer()
                     HStack(spacing: 10) {
                         Button(action: {
-                            print("monthly!")
                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             self.selectedOption = 1
                         }, label: {
@@ -225,7 +224,6 @@ struct MembershipView: View {
                         .buttonStyle(ClickButtonStyle())
                         
                         Button(action: {
-                            print("buy 3 months")
                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             self.selectedOption = 2
                         }, label: {
@@ -278,7 +276,6 @@ struct MembershipView: View {
                         .buttonStyle(ClickButtonStyle())
                         
                         Button(action: {
-                            print("buy yearly")
                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             self.selectedOption = 3
                         }, label: {
@@ -336,20 +333,14 @@ struct MembershipView: View {
                         if self.selectedOption == 1 {
                             if let mont = self.monthly {
                                 self.auth.purchase(source: "profile_settings", product: mont)
-                            } else {
-                                print("monthy no there")
                             }
                         } else if self.selectedOption == 2 {
                             if let threemont = self.threeMonthly {
                                 self.auth.purchase(source: "profile_settings", product: threemont)
-                            } else {
-                                print("3 monthy no there")
                             }
                         } else if self.selectedOption == 3 {
                             if let yearlyy = self.yearly {
                                 self.auth.purchase(source: "profile_settings", product: yearlyy)
-                            } else {
-                                print("yearly no there")
                             }
                         }
                         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
@@ -372,7 +363,6 @@ struct MembershipView: View {
                     .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
 
                     Button(action: {
-                        print("restore IAP")
                         self.auth.restorePurchase()
                     }) {
                         Text("restore subscription")
@@ -411,10 +401,7 @@ struct MembershipView: View {
         .padding(.horizontal)
         .onAppear() {
             Purchases.shared.offerings { (offerings, error) in
-                if error != nil {
-                    print("error getting IAP offerings: \(String(describing: error?.localizedDescription))")
-                } else {
-                    print("received the IAP offerings in membership view: \(String(describing: offerings?.current))")
+                if error == nil {
                     if let mont = offerings?.current?.monthly {
                         self.monthly = mont
                     }

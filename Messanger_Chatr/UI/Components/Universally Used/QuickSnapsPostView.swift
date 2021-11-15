@@ -53,11 +53,8 @@ struct QuickSnapsPostView: View {
                                     .onReceive(timer) { _ in
                                         if self.viewState == .viewing {
                                             if self.timeRemaining > 0 {
-                                                print("Quick Snap Timer: \(self.timeRemaining)")
                                                 self.timeRemaining -= 1
                                             } else {
-                                                //time remaining!
-                                                print("DONE WITH THIS POST!!")
                                                 self.timer.upstream.connect().cancel()
                                                 self.deletePost()
                                             }
@@ -99,7 +96,6 @@ struct QuickSnapsPostView: View {
                         
                         Spacer()
                         Button(action: {
-                            print("close Button")
                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             self.deletePost()
                             self.viewState = .closed
@@ -149,7 +145,6 @@ struct QuickSnapsPostView: View {
                                             .foregroundColor(.white)
                                             .onAppear() {
                                                 self.loadAni = true
-                                                print("well the url is: \(image)")
                                             }.onDisappear() {
                                                 self.loadAni = false
                                                 self.errorLoading = false
@@ -184,7 +179,6 @@ struct QuickSnapsPostView: View {
                             }
                             .onTapGesture {
                                 if !self.loadAni {
-                                    print("Tap a da tap - DONE WITH THIS POST!!")
                                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                     self.timer.upstream.connect().cancel()
                                     self.deletePost()
@@ -244,7 +238,6 @@ struct QuickSnapsPostView: View {
                             Spacer()
                             VStack {
                                 Button(action: {
-                                    print("Like Quick Snap")
                                     if self.likePost == true {
                                         UINotificationFeedbackGenerator().notificationOccurred(.error)
                                     } else {
@@ -267,11 +260,8 @@ struct QuickSnapsPostView: View {
 
                                             event.message = jsonString
 
-                                            Request.createEvent(event, successBlock: {(events) in
-                                                print("sent push notification!! \(events)")
-                                            }, errorBlock: {(error) in
-                                                print("error sending noti: \(error.localizedDescription)")
-                                            })
+                                            Request.createEvent(event, successBlock: { _ in
+                                            }, errorBlock: { _ in })
                                         }
                                     }
                                 }, label: {
@@ -302,7 +292,6 @@ struct QuickSnapsPostView: View {
                             
                             VStack {
                                 Button(action: {
-                                    print("Reply")
                                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                     self.selectedContacts.removeAll()
                                     self.selectedContacts.append(self.selectedQuickSnapContact.id)
@@ -337,7 +326,6 @@ struct QuickSnapsPostView: View {
                         Spacer()
                         
                         Button(action: {
-                            print("close Button")
                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             self.deletePost()
                             self.viewState = .closed
@@ -359,7 +347,6 @@ struct QuickSnapsPostView: View {
             .cornerRadius(20)
         }.onAppear() {
             NotificationCenter.default.addObserver(forName: UIApplication.userDidTakeScreenshotNotification, object: nil, queue: .main) { notification in
-                print("Screenshot taken!")
                 if self.viewState == .viewing {
                     UINotificationFeedbackGenerator().notificationOccurred(.error)
                     
@@ -379,11 +366,7 @@ struct QuickSnapsPostView: View {
 
                         event.message = jsonString
 
-                        Request.createEvent(event, successBlock: {(events) in
-                            print("sent push notification!! \(events)")
-                        }, errorBlock: {(error) in
-                            print("error sending noti: \(error.localizedDescription)")
-                        })
+                        Request.createEvent(event, successBlock: { _ in }, errorBlock: { _ in })
                     }
                 }
             }
@@ -416,8 +399,6 @@ struct QuickSnapsPostView: View {
                 }
                 self.timeRemaining = 10
             })
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
 }

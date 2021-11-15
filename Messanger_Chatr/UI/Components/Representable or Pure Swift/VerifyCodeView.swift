@@ -58,13 +58,7 @@ struct VerifyCodeTextFieldView: UIViewRepresentable {
         func textFieldDidChangeSelection(_ textField: UITextField) {
             if textField.text!.count >= 6 && self.parent.auth.verifyCodeStatus != .loading {
                 UIApplication.shared.endEditing(true)
-                self.parent.auth.checkSecurityCode(securityCode: textField.text ?? "") { value in
-                    if value == false {
-                        print("ERROR checking security code")
-                    } else {
-                        print("Success Checking code")
-                    }
-                }
+                self.parent.auth.checkSecurityCode(securityCode: textField.text ?? "") { _ in }
             }
         }
     }

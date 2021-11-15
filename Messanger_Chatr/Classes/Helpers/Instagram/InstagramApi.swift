@@ -54,12 +54,8 @@ class InstagramApi {
                 let contentType = param["content-type"]!
                 var fileContent: String = ""
                 do { fileContent = try String(contentsOfFile: filename, encoding: String.Encoding.utf8)}
-                catch {
-                    print(error)
-                }
-                if (error != nil) {
-                    print(error!)
-                }
+                catch {  }
+
                 body += "; filename=\"\(filename)\"\r\n"
                 body += "Content-Type: \(contentType)\r\n\r\n"
                 body += fileContent
@@ -74,7 +70,6 @@ class InstagramApi {
         let requestURLString = (request.url?.absoluteString)! as String
         if requestURLString.starts(with: "\(redirectURI)?code=") {
             
-            print("Response uri:",requestURLString)
             if let range = requestURLString.range(of: "\(redirectURI)?code=") {
                 return String(requestURLString[range.upperBound...].dropLast(2))
             }
@@ -89,16 +84,10 @@ class InstagramApi {
         
         let session = URLSession.shared
         let task = session.dataTask(with: request, completionHandler: { data, response, error in
-            if let response = response {
-                print(response)
-            }
+
             do { let jsonData = try JSONDecoder().decode(Feed.self, from: data!)
-                print(jsonData)
                 completion(jsonData)
-            }
-            catch let error as NSError {
-                print(error)
-            }
+            } catch {  }
         })
         task.resume()
     }
@@ -110,15 +99,12 @@ class InstagramApi {
         
         let session = URLSession.shared
         let task = session.dataTask(with: request, completionHandler: { data, response, error in
-            if let response = response {
-                print(response)
-            }
+            
             do { let jsonData = try JSONDecoder().decode(InstagramLongLiveUser.self, from: data!)
                 print(jsonData)
                 completion(jsonData.access_token)
             }
-            catch let error as NSError {
-                print(error)
+            catch {
                 Database.database().reference().child("Users").child("\(Session.current.currentUserID)").updateChildValues(["instagramAccessToken" : ""])
                 Database.database().reference().child("Users").child("\(Session.current.currentUserID)").updateChildValues(["instagramId" : ""])
             }
@@ -133,15 +119,11 @@ class InstagramApi {
         
         let session = URLSession.shared
         let task = session.dataTask(with: request, completionHandler: { data, response, error in
-            if let response = response {
-                print(response)
-            }
             do { let jsonData = try JSONDecoder().decode(InstagramLongLiveUser.self, from: data!)
                 UserDefaults.standard.set(jsonData.access_token, forKey: "instagramAuthKey")
                 Database.database().reference().child("Users").child("\(Session.current.currentUserID)").updateChildValues(["instagramAccessToken" : jsonData.access_token])
             }
-            catch let error as NSError {
-                print(error)
+            catch {
                 Database.database().reference().child("Users").child("\(Session.current.currentUserID)").updateChildValues(["instagramAccessToken" : ""])
                 Database.database().reference().child("Users").child("\(Session.current.currentUserID)").updateChildValues(["instagramId" : ""])
             }
@@ -158,7 +140,6 @@ class InstagramApi {
         let session = URLSession.shared
         let task = session.dataTask(with: request, completionHandler: { data, response, error in
             if let response = response {
-                print("the auth app responce is: \(response)")
                 completion(response.url)
             }
         })
@@ -205,17 +186,13 @@ class InstagramApi {
         
         let session = URLSession.shared
         let dataTask = session.dataTask(with: request, completionHandler: {(data, response, error) in
-            if (error != nil) {
-                print(error!)
-            } else {
+            if error == nil {
                 do { let jsonData = try JSONDecoder().decode(InstagramTestUser.self, from: data!)
-                    print(jsonData)
                     self.getLongLivedToken(shortLivedToken: jsonData.access_token, completion: { token in
                         completion(InstagramTestUser(access_token: token, user_id: jsonData.user_id))
                     })
                 }
-                catch let error as NSError {
-                    print(error)
+                catch {
                     Database.database().reference().child("Users").child("\(Session.current.currentUserID)").updateChildValues(["instagramAccessToken" : ""])
                     Database.database().reference().child("Users").child("\(Session.current.currentUserID)").updateChildValues(["instagramId" : ""])
                 }
@@ -230,18 +207,9 @@ class InstagramApi {
         let request = URLRequest(url: URL(string: urlString)!)
         let session = URLSession.shared
         let dataTask = session.dataTask(with: request, completionHandler: {(data, response, error) in
-            if (error != nil) {
-                print(error!)
-            } else {
-                let httpResponse = response as? HTTPURLResponse
-                print(httpResponse!)
-            }
             do { let jsonData = try JSONDecoder().decode(InstagramUser.self, from: data!)
                 completion(jsonData)
-            }
-            catch let error as NSError {
-                print(error)
-            }
+            } catch {  }
         })
         dataTask.resume()
     }
@@ -257,10 +225,7 @@ class InstagramApi {
                 let task = session.dataTask(with: request, completionHandler: { data, _, error in
                     do { let jsonData = try JSONDecoder().decode(InstagramMedia.self, from: data!)
                         igMedia.append(jsonData)
-                    }
-                    catch let error as NSError {
-                        print(error)
-                    }
+                    } catch {  }
                 })
                 task.resume()
             }
@@ -273,9 +238,6 @@ class InstagramApi {
         
         let session = URLSession.shared
         let task = session.dataTask(with: request, completionHandler: { data, response, error in
-            if let response = response {
-                print(response)
-            }
             completion(data)
         })
         task.resume()
@@ -301,10 +263,7 @@ class InstagramApi {
                             DispatchQueue.main.async {
                                 self.igMedia.append(jsonData)
                             }
-                        }
-                        catch let error as NSError {
-                            print(error)
-                        }
+                        } catch {  }
                     })
                     task.resume()
                 }

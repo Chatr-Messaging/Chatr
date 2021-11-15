@@ -12,7 +12,6 @@ import SDWebImageSwiftUI
 import ConnectyCube
 import FirebaseDatabase
 import Uploadcare
-import PopupView
 
 struct EditProfileView: View {
     @EnvironmentObject var auth: AuthModel
@@ -36,7 +35,6 @@ struct EditProfileView: View {
     @State var username: String = ""
     @State var presentAuth = false
     @State var instagramApi = InstagramApi.shared
-    @State var receivedNotification: Bool = false
 
     var body: some View {
         ZStack {
@@ -107,10 +105,9 @@ struct EditProfileView: View {
                                 DispatchQueue.main.async {
                                     self.showImagePicker = false
                                     self.auth.setUserAvatar(imageId: imageId, oldLink: self.auth.profile.results.first?.avatar ?? "", completion: { success in
-                                        print("DONEEE SETTING UP URL! \(success)")
                                         UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                        auth.notificationtext = "Updated profile image"
-                                        NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+
+                                        showNotiHUD(image: "person.crop.circle.badge.checkmark", color: .blue, title: "Updated profile image", subtitle: nil)
                                     })
                                 }
                             })
@@ -495,8 +492,8 @@ struct EditProfileView: View {
                                 self.didSave = true
                                 
                                 UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                auth.notificationtext = "Updated profile"
-                                NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+
+                                showNotiHUD(image: "person.crop.circle.badge.checkmark", color: .blue, title: "Updated profile", subtitle: nil)
                             })
                         }) { (error) in
                             UINotificationFeedbackGenerator().notificationOccurred(.error)
@@ -512,15 +509,7 @@ struct EditProfileView: View {
                 }.disabled(self.bioText.count > 220 || loadingSave ? true : self.didSave ? true : false)
             ).background(Color("bgColor"))
             .edgesIgnoringSafeArea(.all)
-            .popup(isPresented: self.$receivedNotification, type: .floater(), position: .bottom, animation: Animation.spring(), autohideIn: 4, closeOnTap: true) {
-                NotificationSection()
-                    .environmentObject(self.auth)
-            }
             .onAppear {
-                NotificationCenter.default.addObserver(forName: NSNotification.Name("NotificationAlert"), object: nil, queue: .main) { (_) in
-                    self.receivedNotification.toggle()
-                }
-
                 NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { (data) in
                     let height1 = data.userInfo![UIResponder.keyboardFrameEndUserInfoKey] as! NSValue
                     self.keyboardHeight = height1.cgRectValue.height + 10
@@ -530,7 +519,6 @@ struct EditProfileView: View {
                     self.keyboardHeight = 0
                 }
             }.onDisappear() {
-                NotificationCenter.default.removeObserver(self, name: NSNotification.Name("NotificationAlert"), object: nil)
                 NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
                 NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
             }

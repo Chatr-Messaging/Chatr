@@ -40,7 +40,6 @@ struct ContactsView: View {
             NavigationView {
                 ScrollView(.vertical, showsIndicators: true) {
                     VStack() {
-                        
                         //MARK: Self Profile Section
                         NavigationLink(destination: ProfileView(dimissView: $showUserProfile, selectedNewDialog: self.$newDialogID, fromContactsPage: true), tag: 1, selection: $navLinkAction) {
                             ZStack(alignment: .center) {
@@ -159,9 +158,6 @@ struct ContactsView: View {
                                     if self.contactBannerDataArray.count > 1 {
                                         ContactPageControl(page: self.$pageIndex, dataArrayCount: self.$bannerCount, color: colorScheme == .dark ? "white" : "black")
                                             .frame(minWidth: 35, idealWidth: 50, maxWidth: 75)
-                                            .onChange(of: self.pageIndex, perform: { index in
-                                                print("the change in contact banner index is: \(index)")
-                                            })
                                     }
                                 }
                             }.onAppear {

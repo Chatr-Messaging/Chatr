@@ -49,8 +49,6 @@ class InstagramStories: NSObject {
         do {
             try videoData = Data(contentsOf: bgVideoUrl)
         } catch {
-            print("Cannot open \(bgVideoUrl)")
-            
             return false
         }
         items[0].updateValue(videoData as Any, forKey: optionsKey.bgVideo.rawValue)
@@ -95,9 +93,7 @@ class InstagramStories: NSObject {
     
     //MARK: Post to Instagram Stories
     private func post(_ items:[[String : Any]]) -> Bool{
-        guard UIApplication.shared.canOpenURL(urlScheme) else {
-            print("Cannot open \(urlScheme)")
-            
+        guard UIApplication.shared.canOpenURL(urlScheme) else {            
             return false
         }
 

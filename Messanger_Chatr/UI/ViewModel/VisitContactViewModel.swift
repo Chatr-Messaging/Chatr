@@ -43,9 +43,7 @@ class VisitContactViewModel: ObservableObject {
     func addContact(contactRelationship: visitContactRelationship, contactId: Int, completion: @escaping (visitContactRelationship) -> Void) {
         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
         Chat.instance.addUser(toContactListRequest: UInt(contactId)) { (error) in
-            if error != nil {
-                print("error adding user: \(String(describing: error?.localizedDescription))")
-            } else {
+            if error == nil {
                 let event = Event()
                 event.notificationType = .push
                 event.usersIDs = [NSNumber(value: contactId)]
@@ -60,10 +58,7 @@ class VisitContactViewModel: ObservableObject {
 
                     event.message = jsonString
 
-                    Request.createEvent(event, successBlock: { _ in
-                    }, errorBlock: { (error) in
-                    print("error in sending push noti: \(error.localizedDescription)")
-                    })
+                    Request.createEvent(event, successBlock: { _ in }, errorBlock: { _ in })
                     completion(.pendingRequest)
                 }
             }
@@ -118,9 +113,7 @@ class VisitContactViewModel: ObservableObject {
                     realm.add(realmContact, update: .all)
                 })
             }
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
     
     func trashContactRequest(visitContactRelationship: visitContactRelationship, userId: Int, completion: @escaping (visitContactRelationship) -> Void) {
@@ -149,9 +142,7 @@ class VisitContactViewModel: ObservableObject {
                 })
                 completion()
             }
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
     
     func acceptContactRequest(contactRelationship: visitContactRelationship, contactId: Int, completion: @escaping (visitContactRelationship) -> Void) {
@@ -174,7 +165,6 @@ class VisitContactViewModel: ObservableObject {
                     Request.createEvent(event, successBlock: { _ in }, errorBlock: {(error) in
                         //UINotificationFeedbackGenerator().notificationOccurred(.error)
                         //completion(.pendingRequestForYou)
-                        print("error in sending push noti: \(error.localizedDescription)")
                     })
                     completion(.contact)
                 }
@@ -192,9 +182,7 @@ class VisitContactViewModel: ObservableObject {
             }
         } else if contactRelationship == .notContact {
             Chat.instance.addUser(toContactListRequest: UInt(contactId)) { (error) in
-                if error != nil {
-                    print("error adding user: \(String(describing: error?.localizedDescription))")
-                } else {
+                if error == nil {
                     let event = Event()
                     event.notificationType = .push
                     event.usersIDs = [NSNumber(value: contactId)]
@@ -209,12 +197,11 @@ class VisitContactViewModel: ObservableObject {
 
                         event.message = jsonString
 
-                        Request.createEvent(event, successBlock: {(events) in
-                        print("sent push notification to user \(contactId)")
-                        }, errorBlock: {(error) in
-                        UINotificationFeedbackGenerator().notificationOccurred(.error)
-                        print("error in sending push noti: \(error.localizedDescription)")
+                        Request.createEvent(event, successBlock: { _ in
+                        }, errorBlock: { _ in
+                            UINotificationFeedbackGenerator().notificationOccurred(.error)
                         })
+                        
                         completion(.pendingRequest)
                     }
                 }

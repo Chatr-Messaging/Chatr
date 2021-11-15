@@ -107,8 +107,7 @@ extension DialogRealmModel {
                 }
             }
 
-        }) { (error) in
-            print("Error in fetching dialogs... error: \(error.localizedDescription)")
+        }) { _ in
             DispatchQueue.main.async {
                 completion(false)
             }
@@ -210,7 +209,6 @@ extension DialogRealmModel {
                     })
                 }
             } catch {
-                print(error.localizedDescription)
                 DispatchQueue.main.async {
                     completion()
                 }
@@ -425,9 +423,7 @@ extension DialogRealmModel {
                     realm.add(dialogResult, update: .all)
                 }
             })
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
 
     func addDialogPin(messageId: String, dialogID: String) {
@@ -448,9 +444,7 @@ extension DialogRealmModel {
                     realm.add(messageResult, update: .all)
                 }
             })
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
 
     func removeDialogPin(messageId: String, dialogID: String) {
@@ -470,9 +464,7 @@ extension DialogRealmModel {
                     }
                 }
             })
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
     
     func updateDialogMembersType(canType: Bool, dialogID: String) {
@@ -484,12 +476,9 @@ extension DialogRealmModel {
                     dialogResult.canMembersType = canType
                     
                     realm.add(dialogResult, update: .all)
-                    print("Successfully updated or adjusted Dialog! \(String(describing: dialogResult.canMembersType))")
                 }
             })
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
 
     func updateDialogDelete(isDelete: Bool, dialogID: String) {
@@ -501,12 +490,9 @@ extension DialogRealmModel {
                     dialogResult.isDeleted = isDelete
                     
                     realm.add(dialogResult, update: .all)
-                    print("Successfully deleted or adjusted Dialog! \(String(describing: dialogResult.isDeleted))")
                 }
             })
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
     
     func updateDialogTypedText(text: String, dialogID: String) {
@@ -519,9 +505,7 @@ extension DialogRealmModel {
                     realm.add(dialogResult, update: .all)
                 })
             }
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
     
     func updateDialogNameDescription(name: String, description: String, membersType: Bool, dialogID: String) {
@@ -536,9 +520,7 @@ extension DialogRealmModel {
                 dialogResult?.canMembersType = membersType
                 realm.add(dialogResult!, update: .all)
             })
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
 
     func updateDialogAvatar(avatar: String, dialogID: String) {
@@ -551,9 +533,7 @@ extension DialogRealmModel {
                 dialogResult?.avatar = avatar
                 realm.add(dialogResult!, update: .all)
             })
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
 
     func updateDialogCoverPhoto(coverPhoto: String, dialogID: String) {
@@ -566,9 +546,7 @@ extension DialogRealmModel {
                 dialogResult?.coverPhoto = coverPhoto
                 realm.add(dialogResult!, update: .all)
             })
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
     
     func getRealmDialog(dialogId: String) -> DialogStruct {
@@ -578,9 +556,7 @@ extension DialogRealmModel {
             if let dialogResult = realm.object(ofType: DialogStruct.self, forPrimaryKey: dialogId) {
                 return dialogResult
             }
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
         return DialogStruct()
     }
     
@@ -590,11 +566,9 @@ extension DialogRealmModel {
                 self.updateDialogDelete(isDelete: true, dialogID: dialogID)
                 self.removeFirebaseAdmin(dialogId: dialogID, adminId: NSNumber(value: UserDefaults.standard.integer(forKey: "currentUserID")), onSuccess: { _ in }, onError: { _ in })
             }, onError: { err in
-                print("error deleting public: \(String(describing: err)) for dialog: \(dialogID)")
                 self.updateDialogDelete(isDelete: true, dialogID: dialogID)
             })
-        }) { (error) in
-            print("error deleting dialog: \(error.localizedDescription) for dialog: \(dialogID)")
+        }) { _ in
             self.updateDialogDelete(isDelete: true, dialogID: dialogID)
         }
     }
@@ -614,11 +588,7 @@ extension DialogRealmModel {
                 self.updateDialogDelete(isDelete: true, dialogID: dialogID)
                 self.removePublicMemberRealmDialog(memberId: UserDefaults.standard.integer(forKey: "currentUserID"), dialogId: dialogID)
                 self.removeFirebaseAdmin(dialogId: dialogID, adminId: NSNumber(value: UserDefaults.standard.integer(forKey: "currentUserID")), onSuccess: { _ in }, onError: { _ in })
-            }, onError: { err in
-                print("error deleting public: \(String(describing: err)) for dialog: \(dialogID)")
-            })
-        }, errorBlock: { error in
-            print("error deleting public: \(error.localizedDescription) for dialog: \(dialogID)")
+            }, onError: { _ in })
         })
     }
     
@@ -636,9 +606,7 @@ extension DialogRealmModel {
                     })
                 }
             }
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
     
     func addPublicMemberCountRealmDialog(count: Int, dialogId: String) {
@@ -653,9 +621,7 @@ extension DialogRealmModel {
                     realm.add(dialogResult, update: .all)
                 })
             }
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
     
     func removeAllDialogs() {

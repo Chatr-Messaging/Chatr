@@ -133,7 +133,7 @@ struct PublicShareSection: View {
             if dialog.dialogType == "private" {
                 for id in dialog.occupentsID {
                     if id != self.auth.profile.results.first?.id {
-                        print("the user ID is: \(id)")
+                        //print("the user ID is: \(id)")
                         //replace below with selected contact id:
                         if self.selectedContact.contains(id) {
                             if let selectedDialog = self.auth.dialogs.results.filter("id == %@", dialog.id).first {
@@ -152,10 +152,9 @@ struct PublicShareSection: View {
         //selectedContact
         if self.selectedContact.count == 0 {
             UINotificationFeedbackGenerator().notificationOccurred(.success)
-            self.notiType = "success"
-            self.notiText = "Successfully forwarded channel"
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                self.showAlert = true
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
+                showNotiHUD(image: "arrowshape.turn.up.right", color: .blue, title: "Forwarded channel", subtitle: nil)
             }
         } else {
             // does not have a dialog for the selected user so we create one
@@ -175,17 +174,13 @@ struct PublicShareSection: View {
                    dialog.send(message) { (error) in
                        self.auth.messages.insertMessage(message, completion: {
                            if error != nil {
-                               print("error sending message: \(String(describing: error?.localizedDescription))")
                                self.auth.messages.updateMessageState(messageID: message.id ?? "", messageState: .error)
                            } else {
-                               print("Success sending message to ConnectyCube server!")
                                self.auth.messages.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
                            }
                        })
                    }
-                }) { (error) in
-                    print("error making dialog: \(error.localizedDescription)")
-                }
+                }) { _ in }
 
                 self.auth.dialogs.fetchDialogs(completion: { _ in
                     self.selectedContact.removeAll()

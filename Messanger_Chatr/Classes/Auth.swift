@@ -35,12 +35,16 @@ enum connectionState {
     case connected, disconnected, loading, error
 }
 
+enum NetworkStatus: String {
+    case connected, disconnected
+}
+
 enum messageKind: String {
     case text, image, gif, contact, attachment, location, removed
 }
 
 enum messageStatus: String {
-    case delivered, sent, sending, read, isTyping, removedTyping, editied, deleted, error
+    case delivered, sent, sending, read, isTyping, removedTyping, edited, deleted, error
 }
 
 enum messagePosition {
@@ -82,6 +86,7 @@ enum PremiumSubscriptionStatus {
 
 class AuthModel: NSObject, ObservableObject {
     @Published var currentTask: UploadTaskResumable?
+    @Published var networkStatus: NetworkStatus = .connected
 
     @Published var attempted: Bool = false
     @Published var preventDismissal: Bool = false
@@ -107,9 +112,10 @@ class AuthModel: NSObject, ObservableObject {
     @Published public var yearlySubscription: Purchases.Package?
     @Published public var inPaymentProgress = false
     @Published public var subscriptionStatus: PremiumSubscriptionStatus = UserDefaults.standard.bool(forKey: "premiumSubscriptionStatus") ? .subscribed : .notSubscribed
-    @Published public var notificationtext: String = ""
 
     @Published var avatarProgress: CGFloat = CGFloat(0.0)
+
+    @Published var delegateConnectionState: ((_ connectState: connectionState) -> ())?
     
     @ObservedObject var profile = ProfileRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ProfileStruct.self))
     @ObservedObject var contacts = ContactsRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(ContactStruct.self))
@@ -120,9 +126,10 @@ class AuthModel: NSObject, ObservableObject {
     
     @Published var userHasiOS15: Bool = false
     var anyCancellable: AnyCancellable? = nil
-    var anyCancellable1: AnyCancellable? = nil
-    var authStateDidChangeListenerHandle: AuthStateDidChangeListenerHandle?
     
+//    private let monitor = NWPathMonitor()
+//    private let queue = DispatchQueue(label: "Monitor")
+
     override init() {
         super.init()
         anyCancellable = profile.objectWillChange.sink { [weak self] (_) in
@@ -131,9 +138,25 @@ class AuthModel: NSObject, ObservableObject {
         anyCancellable = messages.objectWillChange.sink { [weak self] (_) in
             self?.objectWillChange.send()
         }
-        anyCancellable1 = contacts.objectWillChange.sink { [weak self] (_) in
+        anyCancellable = contacts.objectWillChange.sink { [weak self] (_) in
             self?.objectWillChange.send()
         }
+
+//        monitor.pathUpdateHandler = { [weak self] path in
+//            guard let self = self else { return }
+//
+//            DispatchQueue.main.async {
+//                if path.status == .satisfied {
+//                    print("We're connected!")
+//                    self.networkStatus = .connected
+//                } else {
+//                    print("No connection....")
+//                    self.networkStatus = .disconnected
+//                }
+//            }
+//        }
+//
+//        monitor.start(queue: queue)
      }
     
     // MARK: - Auth
@@ -150,7 +173,6 @@ class AuthModel: NSObject, ObservableObject {
         self.verifyPhoneNumberStatus = .loading
         PhoneAuthProvider.provider().verifyPhoneNumber(numberText.trimmingCharacters(in: .whitespacesAndNewlines), uiDelegate: nil, completion: {(verificationID, error) in
             if error != nil {
-                print("error with sending verification: \(String(describing: error?.localizedDescription)))")
                 self.verifyPhoneNumberStatus = .error
             } else {
                 self.verifyPhoneNumberStatus = .success
@@ -171,7 +193,6 @@ class AuthModel: NSObject, ObservableObject {
         //login & check firebase pin code
         Auth.auth().signIn(with: credential) { (userz, error) in
            if error != nil {
-                print("error: \(String(describing: error?.localizedDescription))")
                 self.verifyCodeStatus = .error
                 completion(false)
             
@@ -182,7 +203,6 @@ class AuthModel: NSObject, ObservableObject {
                 let data: [String: Any] = ["providerID" : userz!.user.providerID, "phoneNumber" : userz!.user.phoneNumber ?? "", "localAuth" : false]
                 AuthModel.mergeProfile(data, uid: userz?.user.phoneNumber ?? "") { result in
                     if result != true {
-                        print("error when adding the user to firestore: \(result)")
                         self.verifyCodeStatus = .error
                         completion(false)
                         
@@ -227,10 +247,8 @@ class AuthModel: NSObject, ObservableObject {
                                     //Update Firebase Analytics log events by checking Firebase new user
                                     Chat.instance.connect(withUserID: UInt(user.id), password: Session.current.sessionDetails?.token ?? "") { (error) in
                                         if error != nil {
-                                            print("there is a error connecting to session! \(String(describing: error))")
                                             self.verifyCodeStatus = .error
                                         } else {
-                                            print("Success joining session from Login! the current user: \(String(describing: Session.current.currentUserID))")
                                             self.verifyPhoneStatusKeyboard = false
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                                                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
@@ -258,10 +276,7 @@ class AuthModel: NSObject, ObservableObject {
     //MARK: IN APP PURCHASE
     public func initIAPurchase() {
         Purchases.shared.offerings { (offerings, error) in
-            if error != nil {
-                print("error getting IAP offerings: \(String(describing: error?.localizedDescription))")
-            } else {
-                print("\(Thread.current.isMainThread) received the IAP offerings: \(String(describing: offerings?.current))")
+            if error == nil {
                 self.monthlySubscription = offerings?.current?.monthly
                 self.threeMonthSubscription = offerings?.current?.threeMonth
                 self.yearlySubscription = offerings?.current?.annual
@@ -275,36 +290,28 @@ class AuthModel: NSObject, ObservableObject {
         self.inPaymentProgress = true
         Purchases.shared.setAttributes(["source": source])
         Purchases.shared.purchasePackage(product) { (transaction, purchaserInfo, error, userCancelled) in
-            print("error purchasing? : \(String(describing: error?.localizedDescription))")
             self.processInfo(info: purchaserInfo)
         }
     }
     
     public func refreshSubscription() {
         Purchases.shared.purchaserInfo { (info, error) in
-            if let e = error {
-                print("error getting purcherser \(e.localizedDescription)")
-            }
             self.processInfo(info: info)
-            print("the purchaser info is: \(String(describing: info))")
         }
     }
     
     public func restorePurchase() {
         Purchases.shared.restoreTransactions { (info, _) in
             self.processInfo(info: info)
-            print("the user is subed? :\(self.subscriptionStatus)")
         }
     }
 
     private func processInfo(info: Purchases.PurchaserInfo?) {
         if info?.entitlements.all["Premium"]?.isActive == true {
-            print("has purchased")
             self.subscriptionStatus = .subscribed
             UserDefaults.standard.set(true, forKey: "premiumSubscriptionStatus")
             Database.database().reference().child("Users").child("\(Session.current.currentUserID)").updateChildValues(["isPremium" : true])
         } else {
-            print("has NOT purchased: \(String(describing: info?.entitlements.all)) && \(String(describing: info?.entitlements.all["Premium"]?.isSandbox))")
             self.subscriptionStatus = .notSubscribed
             UserDefaults.standard.set(false, forKey: "premiumSubscriptionStatus")
             Database.database().reference().child("Users").child("\(Session.current.currentUserID)").updateChildValues(["isPremium" : false])
@@ -313,36 +320,25 @@ class AuthModel: NSObject, ObservableObject {
     }
 
     func handleIncomingDynamicLink(_ dynamicLink: DynamicLink) {
-        guard let url = dynamicLink.url else {
-            print("weird, my link object has no url")
-            return
-        }
-        print("Your incoming link is: \(url.absoluteString)")
-        
-        guard (dynamicLink.matchType == .unique || dynamicLink.matchType == .default) else {
-            print("not a string enough match type to continue")
-            return
-        }
-        
-        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false), let queryItems = components.queryItems else { return }
-        
+        guard let url = dynamicLink.url, (dynamicLink.matchType == .unique || dynamicLink.matchType == .default), let components = URLComponents(url: url, resolvingAgainstBaseURL: false), let queryItems = components.queryItems else { return }
+
         if components.path == "/contact" {
             if let postIdQueryItem = queryItems.first(where: {$0.name == "contactID"}) {
                 guard let contactId = postIdQueryItem.value else { return }
-                print("WE MADE IT TO GOING INTO A CONTACT: \(Int(contactId) ?? 0)")
+
                 if self.isUserAuthenticated == .signedIn {
                     self.dynamicLinkContactID = Int(contactId) ?? 0
                     self.visitContactProfile = true
-                } else { print("user is logged out") }
+                }
             }
         } else if components.path == "/publicDialog" {
             if let postIdQueryItem = queryItems.first(where: {$0.name == "publicDialogID"}) {
                 guard let dialogId = postIdQueryItem.value else { return }
-                print("WE MADE IT TO GOING INTO A PUBLIC DIALOG: \(dialogId)")
+
                 if self.isUserAuthenticated == .signedIn {
                     self.dynamicLinkPublicDialogID = dialogId
                     self.visitPublicDialogProfile = true
-                } else { print("user is logged out") }
+                }
             }
         }
     }
@@ -414,20 +410,17 @@ class AuthModel: NSObject, ObservableObject {
         let semaphore = DispatchSemaphore(value: 0)
         let uploadcare = Uploadcare(withPublicKey: Constants.uploadcarePublicKey, secretKey: Constants.uploadcareSecretKey)
         let trimmedString = oldString.replacingOccurrences(of: Constants.uploadcareBaseUrl, with: "").replacingOccurrences(of: Constants.uploadcareStandardTransform, with: "").replacingOccurrences(of: "/", with: "")
-        print("the trimmed string is now: \(trimmedString)")
 
         uploadcare.deleteFile(withUUID: trimmedString, { (file, error) in
             defer {
                 semaphore.signal()
             }
             
-            if let error = error {
-                print("the error around here issss: \(error)")
+            if error != nil {
                 completion(false)
                 return
             }
-            print("below is the file print")
-            print(file ?? "")
+
             completion(true)
         })
         
@@ -446,9 +439,7 @@ class AuthModel: NSObject, ObservableObject {
                     realm.add(oldData, update: .all)    
                 })
             }
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
     
     func styleBuilder<Content: View>(@ViewBuilder content: () -> Content) -> some View {
@@ -468,8 +459,7 @@ class AuthModel: NSObject, ObservableObject {
         let data: Data
         do {
             data = try Data(contentsOf: url)
-        } catch let error {
-            print("the error getting contents of url data: " + error.localizedDescription)
+        } catch {
             completionHandler("")
             return
         }
@@ -490,7 +480,6 @@ class AuthModel: NSObject, ObservableObject {
         
         uploadcare.uploadAPI.upload(files: [filename: data], store: .store, { (progress) in
             DispatchQueue.main.async { [weak self] in
-                print("upload progress: \(progress * 100)%")
                 self?.avatarProgress = CGFloat(progress)
             }
         }) { (resultDictionary, error) in
@@ -498,9 +487,9 @@ class AuthModel: NSObject, ObservableObject {
                 semaphore.signal()
             }
             
-            if let error = error {
-                print("the error uploading direct files: " + error.debugDescription)
+            if error != nil {
                 completionHandler("")
+                return
             }
 
             guard let uploadData = resultDictionary, let fileId = uploadData.first?.value else {
@@ -508,7 +497,6 @@ class AuthModel: NSObject, ObservableObject {
                 return
             }
             
-            print("success uploading direct file. Here is the data: " + "\(fileId)")
             completionHandler(fileId)
         }
         
@@ -541,14 +529,13 @@ class AuthModel: NSObject, ObservableObject {
                 self.currentTask = nil
             }
             
-            if let error = error {
-                print(error)
+            if error != nil {
                 return
             }
             
             guard let file = file else { return }
+
             completionHandler(file.fileId)
-            print("success uploading multipart upload: " + "\(file)")
         })
     }
     
@@ -559,18 +546,16 @@ class AuthModel: NSObject, ObservableObject {
             switch storageType {
             case .fileSystem:
                 if imageComparison(image1: image, isEqualTo: self.retrieveImage(forKey: key, inStorageType: .fileSystem) ?? UIImage()) {
-                    print("you already have this image saved...")
+                    //print("you already have this image saved...")
                 } else {
-                    print("success saving image to file system")
+                    //print("success saving image to file system")
                     if let filePath = filePath(forKey: key) {
                         do  {
                             if key == "userImage" {
                                 //self.avitarImg = image
                             }
                             try pngRepresentation.write(to: filePath, options: .atomic)
-                        } catch let err {
-                            print("Saving file resulted in error: ", err)
-                        }
+                        } catch {  }
                     }
                 }
             case .userDefaults:
@@ -589,8 +574,6 @@ class AuthModel: NSObject, ObservableObject {
                     //self.avatarImg = image
                 }
                 return image
-            } else {
-                print("The image had an error loading the local image")
             }
             
         case .userDefaults:
@@ -637,7 +620,6 @@ class AuthModel: NSObject, ObservableObject {
     func logOutConnectyCube() {
 //        Request.unregisterSubscription(forUniqueDeviceIdentifier: UIDevice.current.identifierForVendor!.uuidString, successBlock: nil)
         Request.logOut(successBlock: {
-            print("success logging out of connecty cube")
             self.verifyPhoneNumberStatus = .undefined
             self.profile.removeAllProfile()
             self.messages.removeAllMessages(completion: { _ in
@@ -645,16 +627,9 @@ class AuthModel: NSObject, ObservableObject {
                 self.contacts.removeAllContacts()
                 self.quickSnaps.removeAllQuickSnaps()
             })
-        }) { (error) in
-            print("Error logging out of ConnectyCube: \(error.localizedDescription)")
-        }
+        })
 
-        Chat.instance.disconnect { (error) in
-            if error != nil {
-                print("error disconnecting from connecty cube: \(String(describing: error?.localizedDescription))")
-            }
-            print("disconnecteddddd")
-        }
+        Chat.instance.disconnect { _ in }
     }
     
     func logOutFirebase(completion: @escaping () -> Void) {
@@ -666,10 +641,9 @@ class AuthModel: NSObject, ObservableObject {
             self.isUserAuthenticated = .signedOut
             //self.configureFirebaseStateDidChange()
             UserDefaults.standard.set(0, forKey: "selectedWallpaper")
-            print("done logging out firebase!")
+            
             completion()
-        } catch let signOutError as NSError {
-            print ("Error signing out: %@", signOutError)
+        } catch {
             completion()
         }
     }
@@ -680,9 +654,7 @@ class AuthModel: NSObject, ObservableObject {
         }
 
         dialog.sendUserStoppedTyping()
-        dialog.leave { error in
-            print("just left dialog! error?: \(String(describing: error?.localizedDescription))")
-        }
+        dialog.leave { _ in }
     }
     
     func createTopFloater(alertType: String, message: String) -> some View {
@@ -718,14 +690,9 @@ class AuthModel: NSObject, ObservableObject {
 
         if let jsonData = try? JSONSerialization.data(withJSONObject: pushParameters, options: .prettyPrinted) {
             let jsonString = String(bytes: jsonData, encoding: String.Encoding.utf8)
-
             event.message = jsonString
 
-            Request.createEvent(event, successBlock: {(events) in
-                print("sent push notification!! \(events)")
-            }, errorBlock: {(error) in
-                print("error sending noti: \(error.localizedDescription)")
-            })
+            Request.createEvent(event, successBlock: { _ in })
         }
     }
     
@@ -760,13 +727,7 @@ class AuthModel: NSObject, ObservableObject {
     
     // MARK: - Icons
     func changeHomeIconTo(name: String?) {
-        UIApplication.shared.setAlternateIconName(name ?? nil) { error in
-            if let error = error {
-                print("the error changing the icon is:" + error.localizedDescription)
-            } else {
-                print("Success! Changed the home icon to: \(String(describing: name ?? "default app icon"))")
-            }
-        }
+        UIApplication.shared.setAlternateIconName(name ?? nil) { _ in }
     }
 }
 
@@ -774,57 +735,60 @@ class AuthModel: NSObject, ObservableObject {
 extension AuthModel: ChatDelegate {
     
     func chatDidConnect() {
-        print("Chat did Connect!!! \(String(describing: Session.current.sessionDetails?.userID))")
+        //print("Chat did Connect!!! \(String(describing: Session.current.sessionDetails?.userID))")
         //self.connectionState = .connected
+        delegateConnectionState?(.connected)
     }
 
     func chatDidReconnect() {
-        print("Chat did Reconnect")
+        //print("Chat did Reconnect")
         //self.connectionState = .connected
+        delegateConnectionState?(.connected)
     }
 
     func chatDidDisconnectWithError(_ error: Error) {
         //print("Chat did Disconnect: \(error.localizedDescription)")
         //self.connectionState = .disconnected
+        delegateConnectionState?(.disconnected)
     }
 
     func chatDidNotConnectWithError(_ error: Error) {
         //print("Chat did not connect: \(error.localizedDescription)")
         //self.connectionState = .disconnected
         self.configureFirebaseStateDidChange()
+
+        delegateConnectionState?(.disconnected)
     }
 
     func chatDidReceiveContactAddRequest(fromUser userID: UInt) {
         self.profile.addContactRequest(userID: userID)
         
-        print("chat did receive Contact Request userID: \(userID) & \(String(describing: self.profile.results.first?.contactRequests)) & \(String(describing: self.profile.results.first?.contactRequests.contains(Int(userID))))")
+        //print("chat did receive Contact Request userID: \(userID) & \(String(describing: self.profile.results.first?.contactRequests)) & \(String(describing: self.profile.results.first?.contactRequests.contains(Int(userID))))")
     }
     
     func chatDidReceiveAcceptContactRequest(fromUser userID: UInt) {
-        print("chat did receive ACCEPTED new Contact! userID: \(userID)")
         self.contacts.updateSingleRealmContact(userID: Int(userID), completion: { _ in })
         self.profile.removeContactRequest(userID: userID)
     }
     
     func chatDidReceiveRejectContactRequest(fromUser userID: UInt) {
-        print("chat did receive REJECTED Contact request! userID: \(userID)")
+        //print("chat did receive REJECTED Contact request! userID: \(userID)")
         self.profile.removeContactRequest(userID: userID)
     }
     
     func chatContactListDidChange(_ contactList: ContactList) {
-        print("contact list did change: \(contactList.contacts.count)")
+        //print("contact list did change: \(contactList.contacts.count)")
         if contactList.contacts.count > 0 {
             self.contacts.updateContacts(contactList: contactList.contacts, completion: { _ in })
         }
     }
     
     func chatDidReceiveContactItemActivity(_ userID: UInt, isOnline: Bool, status: String?) {
-        print("contact list did receive new activity from: \(userID). Is online: \(isOnline). Status: \(String(describing: status))")
         self.contacts.updateContactOnlineStatus(userID: userID, isOnline: isOnline)
     }
     
     func chatDidDeliverMessage(withID messageID: String, dialogID: String, toUserID userID: UInt) {
-        print("message delivered is: \(messageID) & to user: \(userID)")
+        //print("message delivered is: \(messageID) & to user: \(userID)")
         let config = Realm.Configuration(schemaVersion: 1)
         do {
             let realm = try Realm(configuration: config)
@@ -834,13 +798,11 @@ extension AuthModel: ChatDelegate {
                     realm.add(deliveredMessage, update: .all)
                 }
             }
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
     
     func chatDidReadMessage(withID messageID: String, dialogID: String, readerID: UInt) {
-        print("message read: \(messageID) & by user: \(readerID)")
+        //print("message read: \(messageID) & by user: \(readerID)")
         if readerID != UserDefaults.standard.integer(forKey: "currentUserID") {
             let config = Realm.Configuration(schemaVersion: 1)
             do {
@@ -852,25 +814,19 @@ extension AuthModel: ChatDelegate {
                         realm.add(readMessage, update: .all)
                     }
                 }
-            } catch {
-                print(error.localizedDescription)
-            }
-        } else {
-            print("the message was read by yourself!")
+            } catch {  }
         }
     }
     
     func chatDidReceive(_ message: ChatMessage) {
-        print("received new message: \(String(describing: message.text)) from: \(message.senderID)")
+        //print("received new message: \(String(describing: message.text)) from: \(message.senderID)")
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         if UserDefaults.standard.bool(forKey: "localOpen") {
             if (!message.removed) {
                 self.messages.insertMessage(message, completion: { })
                 
                 if message.senderID != UserDefaults.standard.integer(forKey: "currentUserID") {
-                    Chat.instance.read(message) { (error) in
-                        print("read chat message! error?? \(String(describing: error?.localizedDescription))")
-                    }
+                    Chat.instance.read(message) { _ in }
                 }
             }
         } else {
@@ -880,14 +836,14 @@ extension AuthModel: ChatDelegate {
         if (message.removed) {
             self.messages.updateMessageState(messageID: message.id ?? "", messageState: .deleted)
         } else if (message.edited) {
-            self.messages.updateMessageState(messageID: message.id ?? "", messageState: .editied)
+            self.messages.updateMessageState(messageID: message.id ?? "", messageState: .edited)
         } else if (message.delayed) {
             self.messages.updateMessageDelayState(messageID: message.id ?? "", messageDelayed: true)
         }
     }
 
     func chatRoomDidReceive(_ message: ChatMessage, fromDialogID dialogID: String) {
-        print("received new GROUP message: \(String(describing: message.text)) for dialogID: \(dialogID)")
+        //print("received new GROUP message: \(String(describing: message.text)) for dialogID: \(dialogID)")
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         self.messages.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
         if UserDefaults.standard.bool(forKey: "localOpen") {
@@ -902,54 +858,54 @@ extension AuthModel: ChatDelegate {
         if (message.removed) {
             self.messages.updateMessageState(messageID: message.id ?? "", messageState: .deleted)
         } else if (message.edited) {
-            self.messages.updateMessageState(messageID: message.id ?? "", messageState: .editied)
+            self.messages.updateMessageState(messageID: message.id ?? "", messageState: .edited)
         } else if (message.delayed) {
             self.messages.updateMessageDelayState(messageID: message.id ?? "", messageDelayed: true)
         }
     }
     
     func chatDidReceivePresence(withStatus status: String, fromUser userID: Int) {
-        print("chatDidReceivePresence: \(status)")
+        //print("chatDidReceivePresence: \(status)")
         //self.contacts.updateContactOnlineStatus(userID: userID, isOnline: isOnline)
     }
         
     //MARK: BLOCK LIST DELEGATE
     func chatDidSetPrivacyList(withName name: String) {
-        print("did set privacy list: \(name)")
+        //print("did set privacy list: \(name)")
     }
     
     func chatDidNotSetPrivacyList(withName name: String, error: Error) {
-        print("did set privacy list \(name) & error: \(error.localizedDescription)")
+        //print("did set privacy list \(name) & error: \(error.localizedDescription)")
     }
     
     func chatDidSetDefaultPrivacyList(withName name: String) {
-        print("did set DEFAULT privacy list: \(name) & the names are: \(Chat.instance.retrievePrivacyListNames())")
+        //print("did set DEFAULT privacy list: \(name) & the names are: \(Chat.instance.retrievePrivacyListNames())")
     }
     
     func chatDidNotSetDefaultPrivacyList(withName name: String, error: Error) {
-        print("did NOT set DEFAULT privacy list: \(name) & error: \(error.localizedDescription)")
+        //print("did NOT set DEFAULT privacy list: \(name) & error: \(error.localizedDescription)")
     }
     
     func chatDidReceivePrivacyListNames(_ listNames: [String]) {
-        print("did receive privacy list names:")
-        for i in listNames {
-            print("privacy name: \(i)")
-        }
+//        print("did receive privacy list names:")
+//        for i in listNames {
+//            print("privacy name: \(i)")
+//        }
     }
     
     func chatDidNotReceivePrivacyListNamesDue(toError error: Error) {
-        print("did NOT receive privacy list names because: \(error.localizedDescription)")
+        //print("did NOT receive privacy list names because: \(error.localizedDescription)")
     }
     
     func chatDidReceive(_ privacyList: PrivacyList) {
-        print("did receive privacy list: \(privacyList.name)")
+        //print("did receive privacy list: \(privacyList.name)")
     }
     
     func chatDidNotReceivePrivacyList(withName name: String, error: Error) {
-        print("did NOT receive privacy list: \(name) & error: \(error.localizedDescription)")
+        //print("did NOT receive privacy list: \(name) & error: \(error.localizedDescription)")
     }
     
     func chatDidRemovedPrivacyList(withName name: String) {
-        print("did REMOVE privacy list: \(name)")
+        //print("did REMOVE privacy list: \(name)")
     }
 }

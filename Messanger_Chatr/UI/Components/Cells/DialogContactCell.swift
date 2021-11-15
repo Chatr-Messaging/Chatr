@@ -148,7 +148,6 @@ struct DialogContactCell: View {
                                     self.auth.dialogs.insertDialogs([updatedDialog]) {
                                         self.isAdmin = true
                                         self.isOwner = false
-                                        print("Success adding contact as admin!")
                                         UINotificationFeedbackGenerator().notificationOccurred(.success)
                                         self.notiType = "success"
                                         self.notiText = "Successfully added \(self.contact.fullName) as admin"
@@ -157,7 +156,6 @@ struct DialogContactCell: View {
                                     }
                                 }, onError: { _ in })
                             }) { (error) in
-                                print("Error adding contact as admin: \(error.localizedDescription) && \(UserDefaults.standard.string(forKey: "selectedDialogID") ?? "")")
                                 UINotificationFeedbackGenerator().notificationOccurred(.error)
                                 self.notiType = "error"
                                 self.notiText = "Error adding \(self.contact.fullName) as admin"
@@ -169,7 +167,6 @@ struct DialogContactCell: View {
                                     self.auth.dialogs.insertDialogs([updatedDialog]) {
                                         self.isAdmin = false
                                         self.isOwner = false
-                                        print("Success removing contact as admin!")
                                         UINotificationFeedbackGenerator().notificationOccurred(.success)
                                         self.notiType = "success"
                                         self.notiText = "Successfully removed \(self.contact.fullName) as admin"
@@ -178,7 +175,6 @@ struct DialogContactCell: View {
                                     }
                                 }, onError: { _ in })
                             }) { (error) in
-                                print("Error removing contact as admin: \(error.localizedDescription)")
                                 UINotificationFeedbackGenerator().notificationOccurred(.error)
                                 self.notiType = "error"
                                 self.notiText = "Error removing \(self.contact.fullName) as admin"
@@ -196,7 +192,6 @@ struct DialogContactCell: View {
                             }
                             
                             self.auth.dialogs.insertDialogs([updatedDialog]) {
-                                print("Success removing contact from dialog")
                                 UINotificationFeedbackGenerator().notificationOccurred(.success)
                                 self.notiType = "success"
                                 self.notiText = ("Successfully removed \(self.contact.fullName) from the ") + (isPublic ? "channel" : "group chat")
@@ -204,7 +199,6 @@ struct DialogContactCell: View {
                                 self.auth.sendPushNoti(userIDs: [NSNumber(value: self.contact.id)], title: isPublic ? "Removed From Channel" : "Removed From Group", message: ("\(self.auth.profile.results.first?.fullName ?? "Chatr User") removed you from the ") + (isPublic ? "channel" : "group chat"))
                             }
                         }) { (error) in
-                            print("Error removing contact from dialog: \(error.localizedDescription)")
                             UINotificationFeedbackGenerator().notificationOccurred(.error)
                             self.notiType = "error"
                             self.notiText = ("Error removing \(self.contact.fullName) from the ") + (isPublic ? "channel" : "group chat")
@@ -226,12 +220,10 @@ struct DialogContactCell: View {
                 if let foundContact = realm.object(ofType: ContactStruct.self, forPrimaryKey: self.contactID) {
                     self.contact = foundContact
                     self.connectyContact.id = UInt(foundContact.id)
-                    print("DialogContact Cellid:\(self.contactID) - found contact: \(foundContact.fullName) & \(foundContact.avatar)")
                     if self.contact.id != 0 { return }
                 }
                 
                 if self.contact.id == 0 || self.contact.avatar == "" {
-                    print("not found in contact realm \(self.contactID)")
                     Request.users(withIDs: [NSNumber(value: self.contactID)], paginator: Paginator.limit(1, skip: 0), successBlock: { (paginator, users) in
                         self.auth.contacts.observeFirebaseContactReturn(contactID: Int(users.first?.id ?? 0), completion: { contact in
                             if let firstUser = users.first {

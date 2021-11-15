@@ -316,13 +316,9 @@ struct WalkthroughCell: View, Identifiable {
                     .offset(x: cardIndex == 3 ? 60 : 0)
                     .offset(y: cardIndex == 0 ? 20 : 0)
                     .offset(y: Constants.screenWidth == 375 ? (cardIndex == 1 ? 10 : cardIndex == 2 ? 20 : cardIndex == 3 ? 35 : 0) : 0)
-                
-                    .onAppear() {
-                        print("the width is: \(Constants.screenWidth)")
-                    }
-                //.offset(y: page == cardIndex && cardIndex != 0 && cardIndex != 2 ? 10 : 0)
-                //.animation(Animation.easeInOut(duration: 3.33).repeatForever(autoreverses: page == cardIndex ? true : false))
-                
+                    //.offset(y: page == cardIndex && cardIndex != 0 && cardIndex != 2 ? 10 : 0)
+                    //.animation(Animation.easeInOut(duration: 3.33).repeatForever(autoreverses: page == cardIndex ? true : false))
+
                 Image("walkthrough_" + "\(cardIndex + 1)" + "_bottom")
                     .resizable()
                     .scaledToFit()
@@ -490,17 +486,14 @@ struct PermissionsView: View {
                     .onAppear(perform: {
                         if CLLocationManager.locationServicesEnabled() {
                             switch locationManager.authorizationStatus {
-                            case .notDetermined, .restricted, .denied:
-                                print("No access to location")
-                                self.locationPermission = false
-                            case .authorizedAlways, .authorizedWhenInUse:
-                                print("Access location true")
-                                self.locationPermission = true
-                            @unknown default:
+                                case .notDetermined, .restricted, .denied:
+                                    self.locationPermission = false
+                                case .authorizedAlways, .authorizedWhenInUse:
+                                    self.locationPermission = true
+                                @unknown default:
                                 break
                             }
                         } else {
-                            print("Location services are not enabled")
                             self.locationPermission = false
                         }
                     })
@@ -527,11 +520,9 @@ struct PermissionsView: View {
                     
                     Button(action: {
                         if self.notificationPermission == false {
-                            print("allow access to noit")
                             if #available(iOS 10, *) {
                                 UNUserNotificationCenter.current().requestAuthorization(options: [.badge, .alert, .sound, .carPlay], completionHandler: { (granted, error) in
                                     if error == nil {
-                                        print("error with notification permissions")
                                         DispatchQueue.main.async(execute: {
                                             UIApplication.shared.registerForRemoteNotifications()
                                         })
@@ -722,13 +713,10 @@ struct PermissionsView: View {
     func checkNotiPermission() {
         UNUserNotificationCenter.current().getNotificationSettings(completionHandler: { (settings) in
             if settings.authorizationStatus == .notDetermined {
-                print("Noti permission is .notDermined")
                 self.notificationPermission = false
             } else if settings.authorizationStatus == .denied {
-                print("Noti permission is .denied")
                 self.notificationPermission = false
             } else if settings.authorizationStatus == .authorized {
-                print("Noti permission is .auth")
                 self.notificationPermission = true
             }
         })
@@ -756,7 +744,7 @@ struct PhoneNumberView: View {
                 .padding(.horizontal, 30)
                 .padding(.bottom, 2.5)
             
-            Text("Yep, no need to remember a password.\nEnter your phone number below.")
+            Text("Yep, no need to remember a password.\nOnly a phone number is used for verification.")
                 .font(.system(size: 12))
                 .font(.footnote)
                 .foregroundColor(Color.secondary)

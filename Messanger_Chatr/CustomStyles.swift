@@ -76,6 +76,16 @@ struct ClickMiniButtonStyleBG: ButtonStyle {
     }
 }
 
+struct dialogButtonStyle: ButtonStyle {
+    public func makeBody(configuration: ClickButtonStyle.Configuration) -> some View {
+        configuration.label
+            .background(configuration.isPressed ? Color("bgColor_light") : Color("buttonColor"))
+            .opacity(configuration.isPressed ? 0.95 : 1)
+            .clipShape(RoundedRectangle(cornerRadius: 20, style: .circular))
+            .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
+    }
+}
+
 struct keyboardButtonStyle: ButtonStyle {
     public func makeBody(configuration: keyboardButtonStyle.Configuration) -> some View {
         configuration.label
@@ -319,7 +329,7 @@ class ImageSaver: NSObject {
     }
 
     @objc func saveError(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
-        print("Save finished!")
+        //print("Save finished!")
     }
 }
 

@@ -91,10 +91,7 @@ struct QuickSnapsSection: View {
                     .onAppear() {
                         if self.auth.isUserAuthenticated != .signedOut {
                             self.emptyQuickSnaps = true
-                            self.auth.contacts.updateContacts(contactList: Chat.instance.contactList?.contacts ?? [], completion: { _ in
-                                print("done refreshing quick snap contacts!... just in case")
-                            })
-                            print("empty quick snaps so try to refresh to double check: \(self.emptyQuickSnaps)")
+                            self.auth.contacts.updateContacts(contactList: Chat.instance.contactList?.contacts ?? [], completion: { _ in })
                         }
                     }
 //                Button(action: {

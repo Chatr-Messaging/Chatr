@@ -38,8 +38,7 @@ struct MessageReplyCell: View {
                         self.viewModel.deleteReply(messageId: self.reply.id, completion: {
                             UINotificationFeedbackGenerator().notificationOccurred(.success)
 
-                            self.auth.notificationtext = "Deleted reply"
-                            NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+                            showNotiHUD(image: "trash.circle", color: .red, title: "Deleted reply", subtitle: nil)
                         })
                     }) {
                         Label("Delete Reply", systemImage: "trash")
@@ -51,8 +50,7 @@ struct MessageReplyCell: View {
                         self.viewModel.sendReplyReport(replyStruct: self.reply, name: self.auth.profile.results.last?.fullName ?? "A user", completion: {
                             UINotificationFeedbackGenerator().notificationOccurred(.success)
 
-                            self.auth.notificationtext = "Reported reply"
-                            NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+                            showNotiHUD(image: "exclamationmark.shield", color: .orange, title: "Reported reply", subtitle: nil)
                         })
                     }) {
                         Label("Report Reply", systemImage: "exclamationmark.icloud")

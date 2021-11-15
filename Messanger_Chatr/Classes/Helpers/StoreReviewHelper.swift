@@ -25,7 +25,6 @@ struct StoreReviewHelper {
             UserDefaults.standard.set(1, forKey: "APP_OPENED_COUNT")
             return
         }
-        print("App run count is: \(appOpenCount)")
 
         switch appOpenCount {
         case 5, 50:

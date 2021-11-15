@@ -31,7 +31,7 @@ class DiscoverViewModel: ObservableObject {
         query.observeSingleEvent(of: .value, with: {
             snapshot in
             var items = snapshot.children.allObjects
-            print(items)
+
             if loadMore {
                 if items.count <= postCount! {
                     isHiddenIndicator(true)
@@ -63,7 +63,7 @@ class DiscoverViewModel: ObservableObject {
         query.observeSingleEvent(of: .value, with: {
             snapshot in
             var items = snapshot.children.allObjects
-            print(items)
+
             if loadMore {
                 if items.count <= postCount! {
                     isHiddenIndicator(true)
@@ -103,7 +103,7 @@ class DiscoverViewModel: ObservableObject {
         query.observeSingleEvent(of: .value, with: {
             snapshot in
             var items = snapshot.children.allObjects
-            print(items)
+
             if loadMore {
                 if items.count <= postCount! {
                     isHiddenIndicator(true)

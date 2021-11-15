@@ -31,7 +31,6 @@ struct PublicDialogDiscoverCell: View {
             })
 
             Button(action: {
-                print("pushing to the next: \(String(describing: self.dialogData.name)) && \(String(describing: self.dialogData.id))")
                 self.actionState.toggle()
             }) {
                 VStack(alignment: .leading, spacing: 0) {

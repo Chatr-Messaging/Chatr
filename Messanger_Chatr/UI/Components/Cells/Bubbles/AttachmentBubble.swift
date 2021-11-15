@@ -198,7 +198,6 @@ struct AttachmentBubble: View {
     func loadVideo(fileId: String, completion: @escaping () -> Void) {
         DispatchQueue.main.async {
             do {
-                print("loading video id: \(fileId)")
                 let result = try storage?.entry(forKey: Constants.uploadcareBaseVideoUrl + fileId)
                 let playerItem = CachingPlayerItem(data: result?.object ?? Data(), mimeType: "video/mov", fileExtension: "mov")
 
@@ -206,22 +205,16 @@ struct AttachmentBubble: View {
 
                 completion()
             } catch {
-                print("failed so im about to download the file: \(fileId)")
-
                 Request.downloadFile(withUID: fileId, progressBlock: { (progress) in
-                    print("the progress of the download is: \(progress)")
                     self.videoDownloadProgress = CGFloat(progress)
                 }, successBlock: { data in
                     let playerItem = CachingPlayerItem(data: data as Data, mimeType: "video/mov", fileExtension: "mov")
                     self.player = AVPlayer(playerItem: playerItem)
 
-                    self.storage?.async.setObject(data, forKey: Constants.uploadcareBaseVideoUrl + fileId, completion: { test in
-                        print("the testtt data is: \(test)")
-                    })
+                    self.storage?.async.setObject(data, forKey: Constants.uploadcareBaseVideoUrl + fileId, completion: { _ in })
                     
                     completion()
-                }, errorBlock: { error in
-                    print("the error videoo is: \(String(describing: error.localizedDescription))")
+                }, errorBlock: { _ in
                     completion()
                 })
             }

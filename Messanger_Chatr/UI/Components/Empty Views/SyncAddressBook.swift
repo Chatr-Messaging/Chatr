@@ -38,7 +38,6 @@ struct SyncAddressBook: View {
                     .padding(.horizontal)
                 
                 Button(action: {
-                    print("add the fetch address book function here")
                     changeAddressBookRealmData.shared.uploadAddressBook(completion: { result in })
                 }) {
                     HStack {
@@ -69,7 +68,6 @@ struct SyncAddressBook: View {
                     self.confirmZeroAddress = true
                 }
             }) { (error) in
-                print("error in getting address book: \(error.localizedDescription)")
                 self.confirmZeroAddress = true
             }
         }

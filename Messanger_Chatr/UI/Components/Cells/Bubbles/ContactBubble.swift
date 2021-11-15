@@ -69,7 +69,6 @@ struct ContactBubble: View {
                                 Button(action: {
                                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                     Chat.instance.confirmAddContactRequest(UInt(self.contact.id)) { (error) in
-                                        print("accepted new contact:")
                                         self.contactRelationship = .contact
                                         self.auth.profile.removeContactRequest(userID: UInt(self.contact.id))
 
@@ -89,11 +88,8 @@ struct ContactBubble: View {
 
                                           event.message = jsonString
 
-                                          Request.createEvent(event, successBlock: {(events) in
-                                            print("sent push notification to user")
-                                          }, errorBlock: {(error) in
-                                            print("error in sending push noti: \(error.localizedDescription)")
-                                          })
+                                          Request.createEvent(event, successBlock: { _ in
+                                          }, errorBlock: { _ in })
                                         }
                                     }
                                 }) {
@@ -116,13 +112,9 @@ struct ContactBubble: View {
                                 }
                                 
                                 Button(action: {
-                                    print("reject")
                                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                     Chat.instance.rejectAddContactRequest(UInt(self.contact.id)) { (error) in
-                                        if error != nil {
-                                            print("error rejecting contact: \(String(describing: error?.localizedDescription))")
-                                        } else {
-                                            print("rejected contact")
+                                        if error == nil {
                                             self.contactRelationship = .unknown
                                             self.auth.profile.removeContactRequest(userID: UInt(self.contact.id))
                                         }
@@ -243,7 +235,6 @@ struct ContactBubble: View {
                         self.auth.dialogs.updateDialogOpen(isOpen: false, dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? self.auth.selectedConnectyDialog?.id ?? "")
 
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
-                            print("the current one is:  and now the new one: \(dia.id)")
                             self.openDialogId = dia.id
                             UserDefaults.standard.set(dia.id, forKey: "selectedDialogID")
                             self.chatContact = 0
@@ -272,7 +263,6 @@ struct ContactBubble: View {
                     self.auth.dialogs.updateDialogOpen(isOpen: false, dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? self.auth.selectedConnectyDialog?.id ?? "")
 
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
-                        print("the current one jklis: and now the new one:")
                         self.openDialogId = dialog.id ?? ""
                         UserDefaults.standard.set(dialog.id ?? "", forKey: "selectedDialogID")
                         self.chatContact = 0
@@ -283,10 +273,9 @@ struct ContactBubble: View {
                     }
                 }
             })
-        }) { (error) in
+        }) { _ in
             //occu.removeAll()
             UINotificationFeedbackGenerator().notificationOccurred(.error)
-            print("error making dialog: \(error.localizedDescription)")
         }
     }
 }

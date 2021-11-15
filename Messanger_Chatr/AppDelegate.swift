@@ -17,19 +17,12 @@ import RealmSwift
 import CoreData
 import PushKit
 import Purchases
-import netfox
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        
-        #if DEBUG
-        //Debugging tools
-        //NFX.sharedInstance().start()
-
-        #endif
 
         UNUserNotificationCenter.current().delegate = self
         UIApplication.shared.registerForRemoteNotifications()
@@ -52,54 +45,40 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
-        Chat.instance.disconnect { (error) in
-            print("chat instance did disconnect \(String(describing: error?.localizedDescription))")
-        }
+        Chat.instance.disconnect { _ in }
     }
 
     func applicationDidEnterBackground(_ application: UIApplication) {
-        Chat.instance.disconnect { (error) in
-            print("chat instance did disconnect \(String(describing: error?.localizedDescription))")
-        }
+        Chat.instance.disconnect { _ in }
     }
     
-    func sceneDidEnterBackground(_ scene: UIScene) {
-        print("scene did enter background from AppDelegate")
-        //PersistenceManager.shared.save()
-    }
+    func sceneDidEnterBackground(_ scene: UIScene) {  }
 
-    func applicationWillEnterForeground(_ application: UIApplication) {
-        print("app will enter foreground")
-    }
+    func applicationWillEnterForeground(_ application: UIApplication) {  }
     
     func application( _ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data ) {
         let subcription = Subscription()
         subcription.notificationChannel = .APNS
         subcription.deviceToken = deviceToken
         subcription.deviceUDID = UIDevice.current.identifierForVendor?.uuidString
-        Request.createSubscription(subcription, successBlock: { (subscriptions) in
-            print("created push subscription: \(subcription)")
-        }) { (error) in
-            print("Failed to create push subscription: \(error.localizedDescription)")
-        }
+        Request.createSubscription(subcription, successBlock: { _ in })
 
         Purchases.shared.setPushToken(deviceToken)
     }
     
-    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        print("Failed to register for notifications: \(error.localizedDescription)")
-    }
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) { }
 
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Swift.Void) {
-        if let info = userInfo["aps"] as? Dictionary<String, AnyObject> {
-            if let alertMsg = info["alert"] as? String {
-                if let sceneDelegate = application.connectedScenes.first?.delegate as? SceneDelegate {
-                    if alertMsg.last == "❤️" || alertMsg.byWords.first == "snap" || alertMsg.byWords.last == "🥳" || alertMsg.byWords.last == "request" {
-                        sceneDelegate.environment.notificationtext = alertMsg
-                        NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
-                    }
-                }
-            }
+        guard let info = userInfo["aps"] as? Dictionary<String, AnyObject>,
+              let alertMsg = info["alert"] as? String else { return }
+
+        if alertMsg.last == "❤️" || alertMsg.byWords.first == "snap" || alertMsg.byWords.last == "🥳" || alertMsg.byWords.last == "request" {
+            var info = [String : String]()
+            info["image"] = "bell.badge"
+            info["color"] = "blue"
+            info["title"] = alertMsg
+
+            NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil, userInfo: info)
         }
     }
     
@@ -176,16 +155,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
     
     func handleIncomingDynamicLink(_ dynamicLink: DynamicLink) {
-        guard let url = dynamicLink.url else {
-            print("weird, my link object has no url")
-            return
-        }
-        print("Your incoming link is: \(url.absoluteString)")
+        //guard let url = dynamicLink.url else { return }
         
-        guard (dynamicLink.matchType == .unique || dynamicLink.matchType == .default) else {
-            print("not a string enough match type to continue")
-            return
-        }
+        //guard (dynamicLink.matchType == .unique || dynamicLink.matchType == .default) else { return }
     }
 }
 

@@ -119,7 +119,6 @@ struct WebView: View {
         self.init(uRLRequest: URLRequest(url: url),
                   webViewStateModel: webViewStateModel,
                   onNavigationAction: onNavigationAction)
-        print("the init of the view is: \(self.webViewStateModel.websiteUrl)")
     }
 }
 

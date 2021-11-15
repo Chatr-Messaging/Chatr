@@ -67,12 +67,10 @@ struct DiscoverView: View {
                         .font(.system(size: 18))
                         .lineLimit(1)
                         .keyboardType(.webSearch)
-                        .onChange(of: self.searchText) { value in
-                            print("the value is: \(value)")
+                        .onChange(of: self.searchText) { _ in
                             if self.searchText.count >= 2 {
                                 //self.grandSeach(searchText: self.searchText)
                                 self.viewModel.searchPublicDialog(withText: self.searchText, completion: { dia in
-                                    print("found dialog isss: \(String(describing: dia.name))")
                                     if dia.banned == false, !self.grandSearchData.contains(where: { $0.id == dia.id }) {
                                         withAnimation {
                                             self.grandSearchData.append(dia)

@@ -352,13 +352,11 @@ struct BubbleDetailView: View {
                                                 if let dialog = self.auth.selectedConnectyDialog {
                                                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                                     self.viewModel.trashMessage(connectyDialog: dialog, messageId: self.message.id , completion: {
-                                                        print("delete button")
                                                         self.viewModel.isDetailOpen = false
                                                     })
                                                 }
                                             } else {
                                                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                                print("report button")
                                             }
                                         }) {
                                             Label(messagePosition == .right ? "Delete Message" : "Report Message", systemImage: messagePosition == .right ? "trash" : "exclamationmark.triangle")
@@ -386,8 +384,7 @@ struct BubbleDetailView: View {
                                                 UINotificationFeedbackGenerator().notificationOccurred(.success)
                                                 UIPasteboard.general.setValue(self.message.text, forPasteboardType: kUTTypePlainText as String)
 
-                                                self.auth.notificationtext = "Copied message"
-                                                NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+                                                showNotiHUD(image: "doc.on.doc", color: .blue, title: "Copied message", subtitle: nil)
                                             }) {
                                                 Label("Copy Text", systemImage: "doc.on.doc")
                                             }
@@ -400,8 +397,7 @@ struct BubbleDetailView: View {
                                                 UINotificationFeedbackGenerator().notificationOccurred(.success)
                                                 UIPasteboard.general.setValue(copyText, forPasteboardType: kUTTypePlainText as String)
 
-                                                self.auth.notificationtext = "Copied message"
-                                                NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+                                                showNotiHUD(image: "doc.on.doc", color: .blue, title: "Copied message", subtitle: nil)
                                             }) {
                                                 Label("Copy Location", systemImage: "doc.on.doc")
                                             }
@@ -418,7 +414,7 @@ struct BubbleDetailView: View {
                                 }.buttonStyle(ClickButtonStyle())
                             } else {
                                 Button(action: {
-                                    print("try again btn")
+                                    //print("try again btn")
                                 }, label: {
                                     HStack {
                                         Text("try again")
@@ -615,7 +611,7 @@ struct BubbleDetailView: View {
         .background(BlurView(style: .systemUltraThinMaterial).opacity(!self.repliesOpen ? Double((300 - self.cardDrag.height) / 300) : 1))
         .sheet(isPresented: self.$showContact, onDismiss: {
             //if self.chatContact != 0 && self.chatContact != self.message.senderID {
-               print("need to open Chat view!!111 \(newDialogFromSharedContact)")
+               //print("need to open Chat view!!111 \(newDialogFromSharedContact)")
             //}
         }) {
             NavigationView {
@@ -738,12 +734,12 @@ struct BubbleDetailView: View {
         self.viewModel.pinMessage(message: self.message, completion: { added in
             if !added {
                 self.auth.dialogs.removeDialogPin(messageId: self.message.id, dialogID: self.message.dialogID)
-                auth.notificationtext = "Removed pined message"
-                NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+
+                showNotiHUD(image: "pin.slash", color: .red, title: "Removed pined message", subtitle: nil)
             } else {
                 self.auth.dialogs.addDialogPin(messageId: self.message.id, dialogID: self.message.dialogID)
-                auth.notificationtext = "Pined message"
-                NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+
+                showNotiHUD(image: "pin", color: .blue, title: "Pined message", subtitle: nil)
             }
         })
     }
@@ -755,14 +751,10 @@ struct BubbleDetailView: View {
                 let request = PHAssetCreationRequest.forAsset()
                 request.addResource(with: .photo, data: imageData, options: nil)
             }) { (success, error) in
-                if let error = error {
-                    print(error.localizedDescription)
-                } else {
-                    DispatchQueue.main.async {
-                        auth.notificationtext = "Saved image"
-                        NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
-                    }
+                if error == nil {
                     UINotificationFeedbackGenerator().notificationOccurred(.success)
+
+                    showNotiHUD(image: "square.and.arrow.down", color: .blue, title: "Saved image", subtitle: nil)
                 }
             }
         }

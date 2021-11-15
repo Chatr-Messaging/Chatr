@@ -11,7 +11,6 @@ import SDWebImageSwiftUI
 import MessageUI
 import ConnectyCube
 import RealmSwift
-import PopupView
 import Grid
 
 struct VisitContactView: View {
@@ -31,7 +30,6 @@ struct VisitContactView: View {
     @State var isUrlOpen: Bool = false
     @State private var showingMoreSheet = false
     @State var showForwardContact = false
-    @State var receivedNotification: Bool = false
     @State var newDialogID: String = ""
     @State var selectedContact: [Int] = []
     @State var profileViewSize = CGSize.zero
@@ -216,7 +214,6 @@ struct VisitContactView: View {
                                 self.isUrlOpen.toggle()
                                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                             } else {
-                                print("website is empty")
                                 UINotificationFeedbackGenerator().notificationOccurred(.error)
                             }
                         }) {
@@ -439,10 +436,6 @@ struct VisitContactView: View {
             }
             .coordinateSpace(name: "visitContact-scroll")
             .background(Color("bgColor"))
-            .popup(isPresented: self.$receivedNotification, type: .floater(), position: .bottom, animation: Animation.spring(), autohideIn: 4, closeOnTap: true) {
-                NotificationSection()
-                    .environmentObject(self.auth)
-            }
             .navigationBarHidden(self.quickSnapViewState == .camera || self.quickSnapViewState == .takenPic)
             .navigationTitle(self.scrollOffset > 152 ? self.contact.fullName : "")
             .navigationBarItems(leading:
@@ -506,7 +499,7 @@ struct VisitContactView: View {
                             .gesture(DragGesture(minimumDistance: self.isProfileImgOpen ? 0 : Constants.screenHeight).onChanged { value in
                                 guard value.translation.height < 175 else { return }
                                 guard value.translation.height > -175 else { return }
-                                print("height: \(value.translation.height)")
+
                                 if self.isProfileImgOpen {
                                     self.profileViewSize = value.translation
                                 }
@@ -541,10 +534,6 @@ struct VisitContactView: View {
                 .disabled(self.quickSnapViewState != .closed ? false : true)
         }.onAppear() {
             DispatchQueue.main.async {
-                NotificationCenter.default.addObserver(forName: NSNotification.Name("NotificationAlert"), object: nil, queue: .main) { (_) in
-                    self.receivedNotification.toggle()
-                }
-                
                 if self.viewState == .fromSearch {
                     let config = Realm.Configuration(schemaVersion: 1)
                     do {
@@ -592,7 +581,6 @@ struct VisitContactView: View {
                     }
                     self.contactWebsiteUrl = self.contact.website
                 } else if self.viewState == .fromRequests {
-                    print("shuld have everything already...")
                     if self.contact.instagramAccessToken != "" && self.contact.instagramId != 0 {
                         self.viewModel.loadInstagramImages(testUser: InstagramTestUser(access_token: self.contact.instagramAccessToken, user_id: self.contact.instagramId))
                     }
@@ -613,9 +601,7 @@ struct VisitContactView: View {
                         if self.contactRelationship == .notContact || (self.contactRelationship == .unknown && self.auth.profile.results.first?.id != self.contact.id) {
                             self.pullNonContact()
                         }
-                    } catch {
-                        print("error catching realm error")
-                    }
+                    } catch {  }
                 }
                 else if self.viewState == .fromDynamicLink {
                     if self.auth.dynamicLinkContactID != 0 {
@@ -688,25 +674,18 @@ struct VisitContactView: View {
                                                     self.viewModel.loadInstagramImages(testUser: InstagramTestUser(access_token: newContact.instagramAccessToken, user_id: newContact.instagramId))
                                                 }
                                                 
-                                                print("the contact is now: \(self.contact)")
                                                 self.auth.dynamicLinkContactID = 0
                                             })
                                             
                                             break
                                         }
                                     }
-                                }) { (error) in
-                                    print("error pulling user from connectycube: \(error.localizedDescription)")
-                                }
+                                })
                             }
-                        } catch {
-                            print("error catching realm error")
-                        }
+                        } catch {  }
                     }
                 }
             }
-        }.onDisappear() {
-            NotificationCenter.default.removeObserver(self, name: NSNotification.Name("NotificationAlert"), object: nil)
         }
     }
 
@@ -715,7 +694,6 @@ struct VisitContactView: View {
             if dialog.dialogType == "private" {
                 for id in dialog.occupentsID {
                     if id != self.auth.profile.results.first?.id {
-                        print("the user ID is: \(id)")
                         //replace below with selected contact id:
                         if self.selectedContact.contains(id) {
                             if let selectedDialog = self.auth.dialogs.results.filter("id == %@", dialog.id).first {
@@ -733,9 +711,9 @@ struct VisitContactView: View {
 
         //selectedContact
         if self.selectedContact.count == 0 {
-            self.auth.notificationtext = "Forwarded contact"
             UINotificationFeedbackGenerator().notificationOccurred(.success)
-            NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
+            
+            showNotiHUD(image: "arrowshape.turn.up.right", color: .blue, title: "Forwarded contact", subtitle: nil)
         } else {
             // does not have a dialog for the selected user so we create one
             for contact in self.selectedContact {
@@ -754,24 +732,19 @@ struct VisitContactView: View {
                    dialog.send(message) { (error) in
                        self.auth.messages.insertMessage(message, completion: {
                            if error != nil {
-                               print("error sending message: \(String(describing: error?.localizedDescription))")
                                self.auth.messages.updateMessageState(messageID: message.id ?? "", messageState: .error)
                            } else {
-                               print("Success sending message to ConnectyCube server!")
                                self.auth.messages.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
                            }
                        })
                    }
-                }) { (error) in
-                    print("error making dialog: \(error.localizedDescription)")
-                }
+                })
 
                 self.auth.dialogs.fetchDialogs(completion: { _ in
                     self.selectedContact.removeAll()
-                    self.auth.notificationtext = "Forwarded contact"
                     UINotificationFeedbackGenerator().notificationOccurred(.success)
-                    NotificationCenter.default.post(name: NSNotification.Name("NotificationAlert"), object: nil)
 
+                    showNotiHUD(image: "arrowshape.turn.up.right", color: .blue, title: "Forwarded contact", subtitle: nil)
                 })
             }
         }
@@ -820,8 +793,6 @@ struct VisitContactView: View {
             if newContact.instagramAccessToken != "" && newContact.instagramId != 0 {
                 self.viewModel.loadInstagramImages(testUser: InstagramTestUser(access_token: newContact.instagramAccessToken, user_id: newContact.instagramId))
             }
-            
-            print("done loading contact: \(self.contact.id) name: \(self.contact.fullName) relationship: \(self.contactRelationship) vieState: \(self.viewState)")
         })
     }
 }

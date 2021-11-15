@@ -69,9 +69,7 @@ class ProfileRealmModel<Element>: ObservableObject where Element: RealmSwift.Rea
                     realm.add(oldData, update: .all)
                 })
             }
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
     
     func removeContactRequest(userID: UInt) {
@@ -82,14 +80,11 @@ class ProfileRealmModel<Element>: ObservableObject where Element: RealmSwift.Rea
                 try realm.safeWrite ({
                     if let index = oldData.contactRequests.firstIndex(of: Int(userID)) {
                         oldData.contactRequests.remove(at: index)
-                        print("removed contact!")
                     }
                     realm.add(oldData, update: .all)
                 })
             }
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
 }
 
@@ -105,7 +100,6 @@ extension ProfileRealmModel {
                     do {
                         let realm = try Realm(configuration: config)
                         if let foundContact = realm.object(ofType: ProfileStruct.self, forPrimaryKey: id) {
-                            //print("Contact FOUND in Realm: \(snapshot.key) anddd faceID? : \(String(describing: dict["faceID"] as? Bool))")
                             try realm.safeWrite({
                                 if let bio = dict["bio"] as? String, foundContact.bio != bio {
                                     foundContact.bio = bio
@@ -150,7 +144,6 @@ extension ProfileRealmModel {
                                 realm.add(foundContact, update: .all)
                             })
                         } else {
-                            print("Contact NOT in Realm: \(snapshot.key)")
                             let newData = ProfileStruct()
                             newData.id = Int(snapshot.key) ?? 0
                             newData.bio = dict["bio"] as? String ?? ""
@@ -168,9 +161,7 @@ extension ProfileRealmModel {
                                 realm.add(newData, update: .all)
                             })
                         }
-                    } catch {
-                        print(error.localizedDescription)
-                    }
+                    } catch {  }
                 }
             })
         //}
@@ -224,14 +215,12 @@ extension ProfileRealmModel {
 
                 try realm.safeWrite({
                     realm.add(newData, update: .all)
-                    print("Succsessfuly added new Profile to Realm!")
                     DispatchQueue.main.async {
                         completion()
                     }
                 })
             }
         } catch {
-            print(error.localizedDescription)
             DispatchQueue.main.async {
                 completion()
             }
@@ -246,11 +235,8 @@ extension ProfileRealmModel {
             try? realm.safeWrite({
                 profileResult?.isLocalAuthOn = bool
                 realm.add(profileResult!, update: .all)
-                print("Succsessfuly updated profile's isLocalAuth bool to: \(String(describing: profileResult?.isLocalAuthOn))")
             })
-        } catch {
-            print(error.localizedDescription)
-        }
+        } catch {  }
     }
     
     func getCubeProfileLocalAuthSetting(usersID: ConnectyCube.User) -> Bool? {
@@ -258,7 +244,6 @@ extension ProfileRealmModel {
             if let customData = try? JSONSerialization.jsonObject(with: data, options: []) as? [String : String] {
                 
                 if let authSetting = customData?["local_auth"] {
-                    //print("the users Auth Setting is: \(String(describing: authSetting))")
                     if authSetting == "true" {
                         return true
                     } else {

@@ -73,9 +73,7 @@ class changeAddressBookRealmData {
                 try store.enumerateContacts(with: request) { contact, stop in
                     contacts.append(contact)
                 }
-            } catch {
-                print(error)
-            }
+            } catch {  }
 
             if !contacts.isEmpty {
                 let addressBook = NSMutableOrderedSet()
@@ -108,9 +106,7 @@ class changeAddressBookRealmData {
                                     realm.add(newData, update: .all)
                                 })
                             }
-                        } catch {
-                            print(error.localizedDescription)
-                        }
+                        } catch {  }
                     }
                 }
 
@@ -120,8 +116,7 @@ class changeAddressBookRealmData {
                         
                         completion(true)
                     }
-                }) { (error) in
-                    print("Failed to uploaded all of your contacts to ConnectyCube backend: \(error.localizedDescription)")
+                }) { _ in
                     completion(false)
                 }
             }

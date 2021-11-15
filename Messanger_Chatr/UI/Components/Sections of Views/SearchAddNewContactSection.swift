@@ -43,8 +43,7 @@ struct SearchAddNewContactSection: View {
                             .font(.system(size: 18))
                             .lineLimit(1)
                             .keyboardType(.webSearch)
-                            .onChange(of: self.searchText) { value in
-                                print("the value is: \(value)")
+                            .onChange(of: self.searchText) { _ in
                                 if self.searchText.count >= 2 {
                                     self.grandSeach(searchText: self.searchText)
                                 } else {
@@ -214,12 +213,8 @@ struct SearchAddNewContactSection: View {
                     }
                 }
                 self.isLoading = false
-            }) { (error) in
-                print("error searching for phone number user \(error.localizedDescription)")
-            }
-        }) { (error) in
-            print("error searching for name user \(error.localizedDescription)")
-        }
+            }) { _ in }
+        }) { _ in }
     }
     
     func isUserNotContact(id: UInt) -> Bool {

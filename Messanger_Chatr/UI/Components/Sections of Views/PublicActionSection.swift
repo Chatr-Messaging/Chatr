@@ -40,7 +40,6 @@ struct PublicActionSection: View {
                                 self.dismissView.toggle()
                             })
                         }, onError: { err in
-                            print("there is an error visiting the member count: \(String(describing: err))")
                             UINotificationFeedbackGenerator().notificationOccurred(.error)
                             self.dialogRelationship = .error
                             self.notiType = "error"
@@ -96,7 +95,6 @@ struct PublicActionSection: View {
                                 self.showAlert.toggle()
                             })
                         }, onError: { err in
-                            print("there is an error updating the member count: \(String(describing: err))")
                             UINotificationFeedbackGenerator().notificationOccurred(.error)
                             self.dialogRelationship = .error
                             self.notiType = "error"
@@ -211,11 +209,8 @@ struct PublicActionSection: View {
         
         let recipeIDQueryItem = URLQueryItem(name: "publicDialogID", value: self.dialogModel.id)
         components.queryItems = [recipeIDQueryItem]
-        
-        print("I am sharing this new link: \(String(describing: components.url?.absoluteString))")
-        
+                
         guard let shareLink = DynamicLinkComponents.init(link: (components.url ?? URL(string: ""))!, domainURIPrefix: "https://chatrmessaging.page.link") else {
-            print("can't make FDL componcets")
             return
         }
         if let myBundleId = Bundle.main.bundleIdentifier {
@@ -226,20 +221,20 @@ struct PublicActionSection: View {
         shareLink.socialMetaTagParameters?.descriptionText = "\(self.dialogModel.bio)"
         shareLink.socialMetaTagParameters?.imageURL = URL(string: self.dialogModel.avatar)
         
-        let longurl = shareLink.url
-        print("the long dynamic link is: \(String(describing: longurl?.absoluteString))")
+        //let longurl = shareLink.url
+        //print("the long dynamic link is: \(String(describing: longurl?.absoluteString))")
         
-        shareLink.shorten(completion: { (url, warnings, error) in
-            if error != nil {
-                print("oh no we have an error: \(String(describing: error?.localizedDescription))")
-            }
-            if let warnings = warnings {
-                for warning in warnings {
-                    print("FDL warning: \(warning)")
-                }
-            }
+        shareLink.shorten(completion: { (url, _, _) in
+//            if error != nil {
+//                print("oh no we have an error: \(String(describing: error?.localizedDescription))")
+//            }
+//            if let warnings = warnings {
+//                for warning in warnings {
+//                    print("FDL warning: \(warning)")
+//                }
+//            }
             guard let url = url else { return }
-            print("I have a short URL to share: \(url.absoluteString)")
+            //print("I have a short URL to share: \(url.absoluteString)")
             
             UIPasteboard.general.setValue(url.absoluteString, forPasteboardType: kUTTypePlainText as String)
             self.notiType = "success"

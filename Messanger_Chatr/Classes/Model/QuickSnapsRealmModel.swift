@@ -69,7 +69,6 @@ extension QuickSnapsRealmModel {
                 newPostReference.setValue(dict, withCompletionBlock: {
                     (error, ref) in
                     if error != nil {
-                        print("Error setting realtime database: \(String(describing: error?.localizedDescription))")
                         
                         completion(false)
                         return
@@ -84,7 +83,6 @@ extension QuickSnapsRealmModel {
                     completion(true)
                 })
             } else {
-                print("error receiving image URL")
                 completion(false)
             }
         })
@@ -98,18 +96,11 @@ extension QuickSnapsRealmModel {
         
         storageRef.putData(data, metadata: metadata) { (metadata, error) in
             if error != nil {
-                print("Error uploading the quick Snap image: \(String(describing: error?.localizedDescription))")
                 onSuccess("error")
                 return
             }
-            storageRef.downloadURL { url, error in
-                if error != nil {
 
-                } else {
-                    print("the metatdata is: \(String(describing: metadata))")
-                    onSuccess((url?.absoluteString)!)
-                }
-            }
+            storageRef.downloadURL { _, _ in }
         }
     }
     

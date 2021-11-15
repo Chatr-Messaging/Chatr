@@ -57,7 +57,6 @@ struct HighlightedContactCell: View {
                     
                     if self.contact.isMyContact {
                         Button(action: {
-                            print("Favorite tap")
                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             if self.contact.isFavourite {
                                 self.auth.contacts.updateContactFavouriteStatus(userID: UInt(self.contact.id), favourite: false)
@@ -122,7 +121,6 @@ struct HighlightedContactCell: View {
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                         self.quickSnapViewState = .camera
                         self.selectedQuickSnapContact = self.contact
-                        print("camera...")
                     }) {
                         Image("SnapIcon")
                             .resizable()

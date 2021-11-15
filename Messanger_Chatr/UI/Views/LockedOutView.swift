@@ -66,15 +66,9 @@ struct LockedOutView: View {
                                 if success {
                                     self.auth.isLoacalAuth = false
                                     ChatrApp.connect()
-                                } else {
-                                    // error
-                                    print("error! logging in")
                                 }
                             }
                         }
-                    } else {
-                        // no biometry
-                        print("error with biometry!")
                     }
                 }) {
                     HStack {

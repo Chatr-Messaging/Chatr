@@ -201,7 +201,6 @@ class PersistenceManager: ObservableObject {
             
             return fetchedObjects ?? [T]()
         } catch {
-            print(error)
             return [T]()
         }
     }
@@ -215,7 +214,6 @@ class PersistenceManager: ObservableObject {
             
             return fetchedObjects?.first ?? T()
         } catch {
-            print(error)
             return T()
         }
     }

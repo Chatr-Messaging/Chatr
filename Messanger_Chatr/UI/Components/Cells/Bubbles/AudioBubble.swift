@@ -115,11 +115,9 @@ struct AudioBubble: View {
                         self.viewModel.audio.stopAudioRecording()
                         self.timer.upstream.connect().cancel()
                         self.isPlayingAudio = false
-                        print("stop playing")
                      } else {
                          self.timer = Timer.publish(every: 0.2, on: .main, in: .common).autoconnect()
                          self.loadAudio(fileId: self.message.image)
-                         print("stop??? lolll playing")
                      }
                 }) {
                     Image(systemName: self.isPlayingAudio ? "pause.circle.fill" : "play.circle.fill")
@@ -138,14 +136,12 @@ struct AudioBubble: View {
                     .padding(.trailing, 5)
                     .onReceive(self.timer) { time in
                         guard self.viewModel.audio.playingBubbleId == self.message.id.description else {
-                            print("not the correct cell to play from: \(self.message.id.description)")
                             self.isPlayingAudio = false
                             self.timer.upstream.connect().cancel()
 
                             return
                         }
 
-                        print("the time is: \(time) for: \(self.message.id.description)")
                         self.durationString = self.viewModel.audio.getTotalPlaybackDurationString()
                         self.audioProgress = CGFloat(self.viewModel.audio.audioPlayer.currentTime / self.viewModel.audio.audioPlayer.duration) * CGFloat(Constants.screenWidth * 0.4)
                     }
@@ -181,42 +177,29 @@ struct AudioBubble: View {
             self.viewModel.audio.playingBubbleId = self.message.id.description
 
             do {
-                print("the audio cashed id is: \(fileId)")
                 let result = try storage?.entry(forKey: fileId)
                 if let objectData = result?.object {
                     self.viewModel.audio.audioPlayer = try AVAudioPlayer(data: objectData)
-                    print("got it and now going to play it222")
                     self.viewModel.audio.audioPlayer.prepareToPlay()
                     self.viewModel.audio.audioPlayer.play()
                     self.isPlayingAudio = true
-                    print("successfully added cached audio data \(String(describing: result?.object))")
-                } else {
-                    print("error setting audio")
                 }
                 
                 //self.audioPlayer = try AVAudioPlayer(data: result?.object ?? Data())
             } catch {
-                print("could not find cached audio... downloading now..")
-                Request.downloadFile(withUID: fileId, progressBlock: { (progress) in
-                    print("the progress of the audio download is: \(progress)")
+                Request.downloadFile(withUID: fileId, progressBlock: { _ in
+                    //print("the progress of the audio download is: \(progress)")
                 }, successBlock: { data in
                     //self.storage?.async.setObject(data, forKey: fileId, completion: { _ in })
                     self.storage?.async.setObject(data, forKey: fileId, completion: { test in
-                        print("the testtt data is: \(data)")
                     })
                     
                     do {
                         self.viewModel.audio.audioPlayer = try AVAudioPlayer(data: data)
-                        print("got it and now going to play it")
                         self.isPlayingAudio = true
                         self.viewModel.audio.audioPlayer.play()
-                    } catch {
-                        print("failed to set new audio")
-                    }
-         
-                    print("successfully saved the audio file from download")
-                }, errorBlock: { error in
-                    print("the error audiooo is: \(String(describing: error.localizedDescription))")
+                    } catch { }
+                }, errorBlock: { _ in
                 })
             }
         }
