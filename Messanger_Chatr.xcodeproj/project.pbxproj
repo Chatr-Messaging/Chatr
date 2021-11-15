@@ -26,11 +26,11 @@
 		0525E4C125EC98A90086EB54 /* PinchZoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0525E4C025EC98A90086EB54 /* PinchZoomView.swift */; };
 		0525E4C525ECC4440086EB54 /* MessageReplyCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0525E4C425ECC4440086EB54 /* MessageReplyCell.swift */; };
 		052E6E2025CE513B00C3EAE4 /* ReactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052E6E1F25CE513B00C3EAE4 /* ReactionsView.swift */; };
+		05309F4C2741ED5B00E9B174 /* AppIcon-Original-Dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 05309F4B2741ED5B00E9B174 /* AppIcon-Original-Dark.png */; };
+		05309F4E2741ED9000E9B174 /* AppIcon-Original.png in Resources */ = {isa = PBXBuildFile; fileRef = 05309F4D2741ED9000E9B174 /* AppIcon-Original.png */; };
+		05309F502741EDCB00E9B174 /* AppIcon-Colorful-Dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 05309F4F2741EDCB00E9B174 /* AppIcon-Colorful-Dark.png */; };
+		05309F522741EDDD00E9B174 /* AppIcon-Colorful.png in Resources */ = {isa = PBXBuildFile; fileRef = 05309F512741EDDD00E9B174 /* AppIcon-Colorful.png */; };
 		0534107726BCDAA5001B4585 /* AudioVisualizeObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0534107626BCDAA5001B4585 /* AudioVisualizeObserver.swift */; };
-		0538929F270BE4A100BF9EB3 /* AppIcon-Original-Dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 0538929D270BE4A100BF9EB3 /* AppIcon-Original-Dark.png */; };
-		053892A0270BE4A100BF9EB3 /* AppIcon-Original.png in Resources */ = {isa = PBXBuildFile; fileRef = 0538929E270BE4A100BF9EB3 /* AppIcon-Original.png */; };
-		053892A3270BE4B000BF9EB3 /* AppIcon-Colorful.png in Resources */ = {isa = PBXBuildFile; fileRef = 053892A1270BE4B000BF9EB3 /* AppIcon-Colorful.png */; };
-		053892A4270BE4B000BF9EB3 /* AppIcon-Colorful-Dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 053892A2270BE4B000BF9EB3 /* AppIcon-Colorful-Dark.png */; };
 		053892A7270BEA1700BF9EB3 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 053892A6270BEA1700BF9EB3 /* MarkdownUI */; };
 		05390F62267C656C001C5720 /* PublicShareSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05390F61267C656C001C5720 /* PublicShareSection.swift */; };
 		05390F64267F107E001C5720 /* ChannelBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05390F63267F107E001C5720 /* ChannelBubble.swift */; };
@@ -232,11 +232,11 @@
 		0525E4C025EC98A90086EB54 /* PinchZoomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinchZoomView.swift; sourceTree = "<group>"; };
 		0525E4C425ECC4440086EB54 /* MessageReplyCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageReplyCell.swift; sourceTree = "<group>"; };
 		052E6E1F25CE513B00C3EAE4 /* ReactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReactionsView.swift; sourceTree = "<group>"; };
+		05309F4B2741ED5B00E9B174 /* AppIcon-Original-Dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-Original-Dark.png"; sourceTree = "<group>"; };
+		05309F4D2741ED9000E9B174 /* AppIcon-Original.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-Original.png"; sourceTree = "<group>"; };
+		05309F4F2741EDCB00E9B174 /* AppIcon-Colorful-Dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-Colorful-Dark.png"; sourceTree = "<group>"; };
+		05309F512741EDDD00E9B174 /* AppIcon-Colorful.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-Colorful.png"; sourceTree = "<group>"; };
 		0534107626BCDAA5001B4585 /* AudioVisualizeObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioVisualizeObserver.swift; sourceTree = "<group>"; };
-		0538929D270BE4A100BF9EB3 /* AppIcon-Original-Dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon-Original-Dark.png"; path = "../../../../Chatr Designs/Logos/Production Icons/AppIcon-Original-Dark.png"; sourceTree = "<group>"; };
-		0538929E270BE4A100BF9EB3 /* AppIcon-Original.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon-Original.png"; path = "../../../../Chatr Designs/Logos/Production Icons/AppIcon-Original.png"; sourceTree = "<group>"; };
-		053892A1270BE4B000BF9EB3 /* AppIcon-Colorful.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon-Colorful.png"; path = "../../../../Chatr Designs/Logos/Production Icons/AppIcon-Colorful.png"; sourceTree = "<group>"; };
-		053892A2270BE4B000BF9EB3 /* AppIcon-Colorful-Dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon-Colorful-Dark.png"; path = "../../../../Chatr Designs/Logos/Production Icons/AppIcon-Colorful-Dark.png"; sourceTree = "<group>"; };
 		05390F61267C656C001C5720 /* PublicShareSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicShareSection.swift; sourceTree = "<group>"; };
 		05390F63267F107E001C5720 /* ChannelBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelBubble.swift; sourceTree = "<group>"; };
 		053A63982509647700571226 /* StoreKitTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKitTest.framework; path = Developer/Library/Frameworks/StoreKitTest.framework; sourceTree = SDKROOT; };
@@ -655,14 +655,14 @@
 		0583A83123BD34B400F9220B /* AppIcons */ = {
 			isa = PBXGroup;
 			children = (
-				0538929D270BE4A100BF9EB3 /* AppIcon-Original-Dark.png */,
-				0538929E270BE4A100BF9EB3 /* AppIcon-Original.png */,
+				05309F4B2741ED5B00E9B174 /* AppIcon-Original-Dark.png */,
+				05309F4D2741ED9000E9B174 /* AppIcon-Original.png */,
 				056EAB5E2516D8E500DC72FA /* AppIcon-Flat.png */,
 				056EAB5F2516D8E600DC72FA /* AppIcon-Flat-Dark.png */,
 				056EAB652516D8F300DC72FA /* AppIcon-PaperAirplane.png */,
 				056EAB6A2516D8FD00DC72FA /* AppIcon-PaperAirplane-Dark.png */,
-				053892A2270BE4B000BF9EB3 /* AppIcon-Colorful-Dark.png */,
-				053892A1270BE4B000BF9EB3 /* AppIcon-Colorful.png */,
+				05309F4F2741EDCB00E9B174 /* AppIcon-Colorful-Dark.png */,
+				05309F512741EDDD00E9B174 /* AppIcon-Colorful.png */,
 			);
 			path = AppIcons;
 			sourceTree = "<group>";
@@ -985,15 +985,15 @@
 				05DB89BE238B851800D4581F /* LaunchScreen.storyboard in Resources */,
 				05DB89BB238B851800D4581F /* Preview Assets.xcassets in Resources */,
 				05DB89B8238B851800D4581F /* Assets.xcassets in Resources */,
-				053892A4270BE4B000BF9EB3 /* AppIcon-Colorful-Dark.png in Resources */,
-				053892A0270BE4A100BF9EB3 /* AppIcon-Original.png in Resources */,
 				05DB89E2238B854400D4581F /* GoogleService-Info.plist in Resources */,
+				05309F502741EDCB00E9B174 /* AppIcon-Colorful-Dark.png in Resources */,
 				056EAB6B2516D8FD00DC72FA /* AppIcon-PaperAirplane-Dark.png in Resources */,
-				0538929F270BE4A100BF9EB3 /* AppIcon-Original-Dark.png in Resources */,
-				053892A3270BE4B000BF9EB3 /* AppIcon-Colorful.png in Resources */,
+				05309F4C2741ED5B00E9B174 /* AppIcon-Original-Dark.png in Resources */,
 				056EAB602516D8E600DC72FA /* AppIcon-Flat.png in Resources */,
+				05309F522741EDDD00E9B174 /* AppIcon-Colorful.png in Resources */,
 				056EAB662516D8F300DC72FA /* AppIcon-PaperAirplane.png in Resources */,
 				056EAB612516D8E600DC72FA /* AppIcon-Flat-Dark.png in Resources */,
+				05309F4E2741ED9000E9B174 /* AppIcon-Original.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
