@@ -89,6 +89,7 @@
 		056EAB612516D8E600DC72FA /* AppIcon-Flat-Dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 056EAB5F2516D8E600DC72FA /* AppIcon-Flat-Dark.png */; };
 		056EAB662516D8F300DC72FA /* AppIcon-PaperAirplane.png in Resources */ = {isa = PBXBuildFile; fileRef = 056EAB652516D8F300DC72FA /* AppIcon-PaperAirplane.png */; };
 		056EAB6B2516D8FD00DC72FA /* AppIcon-PaperAirplane-Dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 056EAB6A2516D8FD00DC72FA /* AppIcon-PaperAirplane-Dark.png */; };
+		057188EE2742369200A41871 /* AppLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057188ED2742369200A41871 /* AppLog.swift */; };
 		0572046E25B3FDB700542CCF /* ImagePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0572046D25B3FDB700542CCF /* ImagePickerView.swift */; };
 		0572BAB72398998800AE9061 /* PhoneNumberView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0572BAB62398998700AE9061 /* PhoneNumberView.swift */; };
 		0572BAB923989A5100AE9061 /* VerifyNumberView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0572BAB823989A5100AE9061 /* VerifyNumberView.swift */; };
@@ -296,6 +297,7 @@
 		056EAB5F2516D8E600DC72FA /* AppIcon-Flat-Dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-Flat-Dark.png"; sourceTree = "<group>"; };
 		056EAB652516D8F300DC72FA /* AppIcon-PaperAirplane.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-PaperAirplane.png"; sourceTree = "<group>"; };
 		056EAB6A2516D8FD00DC72FA /* AppIcon-PaperAirplane-Dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-PaperAirplane-Dark.png"; sourceTree = "<group>"; };
+		057188ED2742369200A41871 /* AppLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLog.swift; sourceTree = "<group>"; };
 		0571F8EC254B7F3B00FA5695 /* libswiftSystem_Foundation.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libswiftSystem_Foundation.tbd; path = usr/lib/swift/libswiftSystem_Foundation.tbd; sourceTree = SDKROOT; };
 		0572046D25B3FDB700542CCF /* ImagePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerView.swift; sourceTree = "<group>"; };
 		0572BAB62398998700AE9061 /* PhoneNumberView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneNumberView.swift; sourceTree = "<group>"; };
@@ -742,6 +744,7 @@
 				055F37BB2606F45F003EDB1F /* CachingPlayerItem.swift */,
 				05ECD98B25E0FA6800B5783A /* CacheManager.swift */,
 				055F37C42607F15F003EDB1F /* Cryptography.swift */,
+				057188ED2742369200A41871 /* AppLog.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -1003,7 +1006,6 @@
 				05DB89B8238B851800D4581F /* Assets.xcassets in Resources */,
 				05309F582741F55400E9B174 /* AppIcon-Colorful-Dark.png in Resources */,
 				05DB89E2238B854400D4581F /* GoogleService-Info.plist in Resources */,
-				05309F502741EDCB00E9B174 /* AppIcon-Colorful-Dark.png in Resources */,
 				056EAB6B2516D8FD00DC72FA /* AppIcon-PaperAirplane-Dark.png in Resources */,
 				05309F542741F52D00E9B174 /* AppIcon-Original-Dark.png in Resources */,
 				05309F562741F53F00E9B174 /* AppIcon-Original.png in Resources */,
@@ -1011,7 +1013,6 @@
 				05309F492740A58A00E9B174 /* AppIcon-Colorful-Fill-Flat-Dark.png in Resources */,
 				056EAB662516D8F300DC72FA /* AppIcon-PaperAirplane.png in Resources */,
 				056EAB612516D8E600DC72FA /* AppIcon-Flat-Dark.png in Resources */,
-				05309F4E2741ED9000E9B174 /* AppIcon-Original.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1233,6 +1234,7 @@
 				05A1223124AEE6D300EEDD72 /* KeyboardCard.swift in Sources */,
 				05FD085B2394784600575727 /* ProgressBar.swift in Sources */,
 				059D1C4E25D6028800A7FB96 /* ContainerBubble.swift in Sources */,
+				057188EE2742369200A41871 /* AppLog.swift in Sources */,
 				05A7BD5D24FDDFD10001BFC9 /* QuickSnapCell.swift in Sources */,
 				05C6951424F1EC5400EEF819 /* StorageView.swift in Sources */,
 				05390F62267C656C001C5720 /* PublicShareSection.swift in Sources */,

@@ -735,25 +735,25 @@ class AuthModel: NSObject, ObservableObject {
 extension AuthModel: ChatDelegate {
     
     func chatDidConnect() {
-        //print("Chat did Connect!!! \(String(describing: Session.current.sessionDetails?.userID))")
+        print("Chat did Connect!!! \(String(describing: Session.current.sessionDetails?.userID))")
         //self.connectionState = .connected
         delegateConnectionState?(.connected)
     }
 
     func chatDidReconnect() {
-        //print("Chat did Reconnect")
+        print("Chat did Reconnect")
         //self.connectionState = .connected
         delegateConnectionState?(.connected)
     }
 
     func chatDidDisconnectWithError(_ error: Error) {
-        //print("Chat did Disconnect: \(error.localizedDescription)")
+        print("Chat did Disconnect: \(error.localizedDescription)")
         //self.connectionState = .disconnected
         delegateConnectionState?(.disconnected)
     }
 
     func chatDidNotConnectWithError(_ error: Error) {
-        //print("Chat did not connect: \(error.localizedDescription)")
+        print("Chat did not connect: \(error.localizedDescription)")
         //self.connectionState = .disconnected
         self.configureFirebaseStateDidChange()
 
@@ -763,7 +763,7 @@ extension AuthModel: ChatDelegate {
     func chatDidReceiveContactAddRequest(fromUser userID: UInt) {
         self.profile.addContactRequest(userID: userID)
         
-        //print("chat did receive Contact Request userID: \(userID) & \(String(describing: self.profile.results.first?.contactRequests)) & \(String(describing: self.profile.results.first?.contactRequests.contains(Int(userID))))")
+        print("chat did receive Contact Request userID: \(userID) & \(String(describing: self.profile.results.first?.contactRequests)) & \(String(describing: self.profile.results.first?.contactRequests.contains(Int(userID))))")
     }
     
     func chatDidReceiveAcceptContactRequest(fromUser userID: UInt) {
@@ -772,12 +772,14 @@ extension AuthModel: ChatDelegate {
     }
     
     func chatDidReceiveRejectContactRequest(fromUser userID: UInt) {
-        //print("chat did receive REJECTED Contact request! userID: \(userID)")
+        print("chat did receive REJECTED Contact request! userID: \(userID)")
+
         self.profile.removeContactRequest(userID: userID)
     }
     
     func chatContactListDidChange(_ contactList: ContactList) {
-        //print("contact list did change: \(contactList.contacts.count)")
+        print("contact list did change: \(contactList.contacts.count)")
+
         if contactList.contacts.count > 0 {
             self.contacts.updateContacts(contactList: contactList.contacts, completion: { _ in })
         }
@@ -788,7 +790,8 @@ extension AuthModel: ChatDelegate {
     }
     
     func chatDidDeliverMessage(withID messageID: String, dialogID: String, toUserID userID: UInt) {
-        //print("message delivered is: \(messageID) & to user: \(userID)")
+        print("message delivered is: \(messageID) & to user: \(userID)")
+
         let config = Realm.Configuration(schemaVersion: 1)
         do {
             let realm = try Realm(configuration: config)
@@ -802,7 +805,8 @@ extension AuthModel: ChatDelegate {
     }
     
     func chatDidReadMessage(withID messageID: String, dialogID: String, readerID: UInt) {
-        //print("message read: \(messageID) & by user: \(readerID)")
+        print("message read: \(messageID) & by user: \(readerID)")
+
         if readerID != UserDefaults.standard.integer(forKey: "currentUserID") {
             let config = Realm.Configuration(schemaVersion: 1)
             do {
@@ -819,7 +823,8 @@ extension AuthModel: ChatDelegate {
     }
     
     func chatDidReceive(_ message: ChatMessage) {
-        //print("received new message: \(String(describing: message.text)) from: \(message.senderID)")
+        print("received new message: \(String(describing: message.text)) from: \(message.senderID)")
+
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         if UserDefaults.standard.bool(forKey: "localOpen") {
             if (!message.removed) {
@@ -843,9 +848,11 @@ extension AuthModel: ChatDelegate {
     }
 
     func chatRoomDidReceive(_ message: ChatMessage, fromDialogID dialogID: String) {
-        //print("received new GROUP message: \(String(describing: message.text)) for dialogID: \(dialogID)")
+        print("received new GROUP message: \(String(describing: message.text)) for dialogID: \(dialogID)")
+
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         self.messages.updateMessageState(messageID: message.id ?? "", messageState: .delivered)
+
         if UserDefaults.standard.bool(forKey: "localOpen") {
             if (!message.removed) {
                 Chat.instance.read(message) { (error) in
@@ -855,6 +862,7 @@ extension AuthModel: ChatDelegate {
         } else {
             self.dialogs.fetchDialogs(completion: { _ in })
         }
+
         if (message.removed) {
             self.messages.updateMessageState(messageID: message.id ?? "", messageState: .deleted)
         } else if (message.edited) {
@@ -865,47 +873,46 @@ extension AuthModel: ChatDelegate {
     }
     
     func chatDidReceivePresence(withStatus status: String, fromUser userID: Int) {
-        //print("chatDidReceivePresence: \(status)")
-        //self.contacts.updateContactOnlineStatus(userID: userID, isOnline: isOnline)
+        print("chatDidReceivePresence: \(status)")
     }
         
     //MARK: BLOCK LIST DELEGATE
     func chatDidSetPrivacyList(withName name: String) {
-        //print("did set privacy list: \(name)")
+        print("did set privacy list: \(name)")
     }
     
     func chatDidNotSetPrivacyList(withName name: String, error: Error) {
-        //print("did set privacy list \(name) & error: \(error.localizedDescription)")
+        print("did set privacy list \(name) & error: \(error.localizedDescription)")
     }
     
     func chatDidSetDefaultPrivacyList(withName name: String) {
-        //print("did set DEFAULT privacy list: \(name) & the names are: \(Chat.instance.retrievePrivacyListNames())")
+        print("did set DEFAULT privacy list: \(name) & the names are: \(Chat.instance.retrievePrivacyListNames())")
     }
     
     func chatDidNotSetDefaultPrivacyList(withName name: String, error: Error) {
-        //print("did NOT set DEFAULT privacy list: \(name) & error: \(error.localizedDescription)")
+        print("did NOT set DEFAULT privacy list: \(name) & error: \(error.localizedDescription)")
     }
     
     func chatDidReceivePrivacyListNames(_ listNames: [String]) {
-//        print("did receive privacy list names:")
-//        for i in listNames {
-//            print("privacy name: \(i)")
-//        }
+        print("did receive privacy list names:")
+        for i in listNames {
+            print("privacy name: \(i)")
+        }
     }
     
     func chatDidNotReceivePrivacyListNamesDue(toError error: Error) {
-        //print("did NOT receive privacy list names because: \(error.localizedDescription)")
+        print("did NOT receive privacy list names because: \(error.localizedDescription)")
     }
     
     func chatDidReceive(_ privacyList: PrivacyList) {
-        //print("did receive privacy list: \(privacyList.name)")
+        print("did receive privacy list: \(privacyList.name)")
     }
     
     func chatDidNotReceivePrivacyList(withName name: String, error: Error) {
-        //print("did NOT receive privacy list: \(name) & error: \(error.localizedDescription)")
+        print("did NOT receive privacy list: \(name) & error: \(error.localizedDescription)")
     }
     
     func chatDidRemovedPrivacyList(withName name: String) {
-        //print("did REMOVE privacy list: \(name)")
+        print("did REMOVE privacy list: \(name)")
     }
 }
