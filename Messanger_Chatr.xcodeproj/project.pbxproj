@@ -31,8 +31,8 @@
 		05309F542741F52D00E9B174 /* AppIcon-Original-Dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 05309F532741F52C00E9B174 /* AppIcon-Original-Dark.png */; };
 		05309F562741F53F00E9B174 /* AppIcon-Original.png in Resources */ = {isa = PBXBuildFile; fileRef = 05309F552741F53F00E9B174 /* AppIcon-Original.png */; };
 		05309F582741F55400E9B174 /* AppIcon-Colorful-Dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 05309F572741F55400E9B174 /* AppIcon-Colorful-Dark.png */; };
+		05309F5A2741F5CE00E9B174 /* AppIcon-Colorful.png in Resources */ = {isa = PBXBuildFile; fileRef = 05309F592741F5CE00E9B174 /* AppIcon-Colorful.png */; };
 		0534107726BCDAA5001B4585 /* AudioVisualizeObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0534107626BCDAA5001B4585 /* AudioVisualizeObserver.swift */; };
-		053892A3270BE4B000BF9EB3 /* AppIcon-Colorful.png in Resources */ = {isa = PBXBuildFile; fileRef = 053892A1270BE4B000BF9EB3 /* AppIcon-Colorful.png */; };
 		053892A7270BEA1700BF9EB3 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 053892A6270BEA1700BF9EB3 /* MarkdownUI */; };
 		05390F62267C656C001C5720 /* PublicShareSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05390F61267C656C001C5720 /* PublicShareSection.swift */; };
 		05390F64267F107E001C5720 /* ChannelBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05390F63267F107E001C5720 /* ChannelBubble.swift */; };
@@ -242,8 +242,8 @@
 		05309F532741F52C00E9B174 /* AppIcon-Original-Dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-Original-Dark.png"; sourceTree = "<group>"; };
 		05309F552741F53F00E9B174 /* AppIcon-Original.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-Original.png"; sourceTree = "<group>"; };
 		05309F572741F55400E9B174 /* AppIcon-Colorful-Dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-Colorful-Dark.png"; sourceTree = "<group>"; };
+		05309F592741F5CE00E9B174 /* AppIcon-Colorful.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-Colorful.png"; sourceTree = "<group>"; };
 		0534107626BCDAA5001B4585 /* AudioVisualizeObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioVisualizeObserver.swift; sourceTree = "<group>"; };
-		053892A1270BE4B000BF9EB3 /* AppIcon-Colorful.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon-Colorful.png"; path = "../../../../Chatr Designs/Logos/Production Icons/AppIcon-Colorful.png"; sourceTree = "<group>"; };
 		05390F61267C656C001C5720 /* PublicShareSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicShareSection.swift; sourceTree = "<group>"; };
 		05390F63267F107E001C5720 /* ChannelBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelBubble.swift; sourceTree = "<group>"; };
 		053A63982509647700571226 /* StoreKitTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKitTest.framework; path = Developer/Library/Frameworks/StoreKitTest.framework; sourceTree = SDKROOT; };
@@ -674,7 +674,7 @@
 				056EAB652516D8F300DC72FA /* AppIcon-PaperAirplane.png */,
 				056EAB6A2516D8FD00DC72FA /* AppIcon-PaperAirplane-Dark.png */,
 				05309F572741F55400E9B174 /* AppIcon-Colorful-Dark.png */,
-				053892A1270BE4B000BF9EB3 /* AppIcon-Colorful.png */,
+				05309F592741F5CE00E9B174 /* AppIcon-Colorful.png */,
 			);
 			path = AppIcons;
 			sourceTree = "<group>";
@@ -996,6 +996,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				05309F5A2741F5CE00E9B174 /* AppIcon-Colorful.png in Resources */,
 				05DB89BE238B851800D4581F /* LaunchScreen.storyboard in Resources */,
 				05DB89BB238B851800D4581F /* Preview Assets.xcassets in Resources */,
 				05309F4A2740A58A00E9B174 /* AppIcon-Colorful-Fill-Flat.png in Resources */,
@@ -1003,7 +1004,6 @@
 				05309F582741F55400E9B174 /* AppIcon-Colorful-Dark.png in Resources */,
 				05DB89E2238B854400D4581F /* GoogleService-Info.plist in Resources */,
 				056EAB6B2516D8FD00DC72FA /* AppIcon-PaperAirplane-Dark.png in Resources */,
-				053892A3270BE4B000BF9EB3 /* AppIcon-Colorful.png in Resources */,
 				05309F542741F52D00E9B174 /* AppIcon-Original-Dark.png in Resources */,
 				05309F562741F53F00E9B174 /* AppIcon-Original.png in Resources */,
 				056EAB602516D8E600DC72FA /* AppIcon-Flat.png in Resources */,
