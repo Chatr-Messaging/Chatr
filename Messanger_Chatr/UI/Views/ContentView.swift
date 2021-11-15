@@ -181,6 +181,7 @@ struct ChatrBaseView: View {
     @State var selectedQuickSnapContact: ContactStruct = ContactStruct()
     @Namespace var namespace
     @ObservedObject var dialogs = DialogRealmModel(results: try! Realm(configuration: Realm.Configuration(schemaVersion: 1)).objects(DialogStruct.self))
+    @State var shouldExecuteTap: Bool = true
     let wallpaperNames = ["", "SoftChatBubbles_DarkWallpaper", "SoftPaperAirplane-Wallpaper", "oldHouseWallpaper", "nycWallpaper", "michaelAngelWallpaper", "moonWallpaper", "patagoniaWallpaper", "oceanRocksWallpaper", "southAfricaWallpaper", "flowerWallpaper", "paintWallpaper"]
     
     var body: some View {
@@ -445,6 +446,12 @@ struct ChatrBaseView: View {
                         ForEach(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }, id: \.id) { i in
                             GeometryReader { geo in
                                 Button(action: {
+                                    guard activeView.height == .zero || activeView.height > 50 else {
+                                        activeView.height = .zero
+                                        return
+                                    }
+
+                                    activeView.height = .zero
                                     onCellTapGesture(id: i.id, dialogType: i.dialogType)
                                 }) {
                                     DialogCell(dialogModel: i,
@@ -453,7 +460,8 @@ struct ChatrBaseView: View {
                                                selectedDialogID: $selectedDialogID,
                                                showPinDetails: $showPinDetails)
                                         .environmentObject(auth)
-                                        .shadow(color: Color.black.opacity(isLocalOpen ? (colorScheme == .dark ? 0.25 : 0.15) : 0.15), radius: isLocalOpen ? 15 : 8, x: 0, y: self.isLocalOpen ? (colorScheme == .dark ? 15 : 5) : 5)
+                                        .id(i.id)
+                                        .tag(i.id)
                                 }
                                 .contentShape(Rectangle())
                                 .position(x: i.isOpen && isLocalOpen ? UIScreen.main.bounds.size.width / 2 : UIScreen.main.bounds.size.width / 2 - 20, y: i.isOpen && isLocalOpen ? activeView.height + 40 : 40)
@@ -463,8 +471,7 @@ struct ChatrBaseView: View {
                                 .offset(y: i.isOpen && isLocalOpen ? -geo.frame(in: .global).minY + (emptyQuickSnaps ? (UIDevice.current.hasNotch ? 50 : 25) : 110) : emptyQuickSnaps ? -25 : 70)
                                 .animation(.spring(response: isLocalOpen ? 0.375 : 0.45, dampingFraction: isLocalOpen ? 0.68 : 0.8, blendDuration: 0))
                                 .buttonStyle(dialogButtonStyle())
-                                .id(i.id)
-                                .tag(i.id)
+                                .shadow(color: Color.black.opacity(isLocalOpen ? (colorScheme == .dark ? 0.25 : 0.15) : 0.15), radius: isLocalOpen ? 15 : 8, x: 0, y: self.isLocalOpen ? (colorScheme == .dark ? 15 : 5) : 5)
                             }.frame(height: 75, alignment: .center)
                             .padding(.horizontal, isLocalOpen && i.isOpen ? 0 : 20)
                             .simultaneousGesture(DragGesture(minimumDistance: i.isOpen ? 0 : 500).onChanged { value in
@@ -473,10 +480,12 @@ struct ChatrBaseView: View {
 
                                 activeView = value.translation
                             }.onEnded { value in
-                                if activeView.height > 50 {
-                                    onCellTapGesture(id: i.id, dialogType: i.dialogType)
-                                }
-                                activeView.height = .zero
+                                //if activeView.height > 50 {
+                                    //onCellTapGesture(id: i.id, dialogType: i.dialogType)
+                                //}
+
+                                //shouldExecuteTap = false
+                                //activeView.height = .zero
                             })
                         }
                         .disabled(self.disableDialog)
@@ -492,10 +501,10 @@ struct ChatrBaseView: View {
                                 self.disableDialog = false
                             }
                         }
-//                        .onAppear {
-//                            UserDefaults.standard.set(false, forKey: "localOpen")
-//                            self.isLocalOpen = false
-//                        }
+                        .onAppear {
+                            UserDefaults.standard.set(false, forKey: "localOpen")
+                            self.isLocalOpen = false
+                        }
                         
                         Button("tap me") {
                             showNotiHUD(image: "wifi", color: .blue, title: "Connected", subtitle: "cool ass subtitle...")
@@ -762,6 +771,12 @@ struct ChatrBaseView: View {
     }
     
     func onCellTapGesture(id: String, dialogType: String) {
+        guard self.shouldExecuteTap else {
+            self.shouldExecuteTap = true
+
+            return
+        }
+
         UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
         UserDefaults.standard.set(id, forKey: "selectedDialogID")
