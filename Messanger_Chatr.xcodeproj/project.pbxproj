@@ -1003,6 +1003,7 @@
 				05DB89B8238B851800D4581F /* Assets.xcassets in Resources */,
 				05309F582741F55400E9B174 /* AppIcon-Colorful-Dark.png in Resources */,
 				05DB89E2238B854400D4581F /* GoogleService-Info.plist in Resources */,
+				05309F502741EDCB00E9B174 /* AppIcon-Colorful-Dark.png in Resources */,
 				056EAB6B2516D8FD00DC72FA /* AppIcon-PaperAirplane-Dark.png in Resources */,
 				05309F542741F52D00E9B174 /* AppIcon-Original-Dark.png in Resources */,
 				05309F562741F53F00E9B174 /* AppIcon-Original.png in Resources */,
@@ -1010,6 +1011,7 @@
 				05309F492740A58A00E9B174 /* AppIcon-Colorful-Fill-Flat-Dark.png in Resources */,
 				056EAB662516D8F300DC72FA /* AppIcon-PaperAirplane.png in Resources */,
 				056EAB612516D8E600DC72FA /* AppIcon-Flat-Dark.png in Resources */,
+				05309F4E2741ED9000E9B174 /* AppIcon-Original.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
