@@ -39,7 +39,11 @@ struct ContactsView: View {
         ZStack {
             NavigationView {
                 ScrollView(.vertical, showsIndicators: true) {
-                    VStack() {
+                    VStack() {                        
+                        Button("tap me 222222") {
+                            showNotiHUD(image: "wifi", color: .blue, title: "Connected", subtitle: "cool ass subtitle...")
+                        }.padding(.bottom, 40)
+
                         //MARK: Self Profile Section
                         NavigationLink(destination: ProfileView(dimissView: $showUserProfile, selectedNewDialog: self.$newDialogID, fromContactsPage: true), tag: 1, selection: $navLinkAction) {
                             ZStack(alignment: .center) {

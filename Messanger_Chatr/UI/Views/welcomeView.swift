@@ -378,6 +378,7 @@ struct PermissionsView: View {
                 .multilineTextAlignment(.center)
                 .foregroundColor(Color.primary)
                 .padding(.top, 25)
+                .padding(.bottom, 10)
             
             Text("To provide the best experience, please allow Chatr to access your contacts, location, notifications, photos, & camera.")
                 .font(.system(size: 12))
@@ -385,8 +386,8 @@ struct PermissionsView: View {
                 .lineLimit(4)
                 .foregroundColor(Color.secondary)
                 .multilineTextAlignment(.center)
-                .padding(.vertical, 5)
-                .padding(.horizontal, 40)
+                .padding(.bottom, 10)
+                .padding(.horizontal)
             
             Group {
                 // MARK: Contacts
@@ -779,6 +780,44 @@ struct PhoneNumberView: View {
                     .overlay(RoundedRectangle(cornerRadius: 15).stroke(Color.red.opacity(auth.verifyPhoneNumberStatus == .error ? 0.6 : 0.0), lineWidth: 2.5))
                     .shadow(color: Color("buttonShadow").opacity(0.65), radius: 8, x: 0, y: 5)
             }.padding(.horizontal)
+
+            Button(action: {
+                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                self.openTerms.toggle()
+            }) {
+                VStack(alignment: .center, spacing: 2) {
+                    Text("By submitting your number, you agree to Chatr's")
+                        .font(.system(size: 12))
+                        .font(.footnote)
+                        .foregroundColor(Color.secondary)
+                        .lineLimit(1)
+                        .multilineTextAlignment(.center)
+                    
+                    Text("Terms of Service & Privacy Policy.")
+                        .font(.system(size: 12))
+                        .font(.footnote)
+                        .foregroundColor(Color.blue)
+                        .lineLimit(1)
+                        .multilineTextAlignment(.center)
+                }.padding(.horizontal)
+            }
+            .buttonStyle(ClickButtonStyle())
+            .padding(.vertical, 5)
+            .sheet(isPresented: $openTerms) {
+                NavigationView {
+                    TermsView(markdown: Constants.termsOfServiceMarkdown, navTitle: "Terms of Service")
+                        .navigationBarItems(leading:
+                                                Button(action: {
+                            withAnimation {
+                                self.openTerms.toggle()
+                            }
+                        }) {
+                            Text("Done")
+                                .foregroundColor(.primary)
+                                .fontWeight(.medium)
+                        })
+                }
+            }
             
             if auth.verifyPhoneNumberStatus == .success {
                 Text("Success")
@@ -791,6 +830,7 @@ struct PhoneNumberView: View {
                     .frame(width: 25, height: 25)
                     .rotationEffect(.init(degrees: self.loadAni ? 360 : 0))
                     .padding(.vertical, 15)
+                    .padding(.bottom, 15)
                     .animation(Animation.linear(duration: 0.55).repeatForever(autoreverses: false))
                     .onAppear(perform: ({
                         self.loadAni.toggle()
@@ -828,8 +868,9 @@ struct PhoneNumberView: View {
                                 .frame(width: 20, height: 18, alignment: .center)
                         }.padding(.horizontal)
                     }.buttonStyle(MainButtonStyle())
-                    .padding(.horizontal)
-                    .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
+                    .padding(.horizontal, 40)
+                    .padding(.bottom, 15)
+                    .shadow(color: Color("buttonShadow"), radius: 8, x: 0, y: 8)
                 }
             } else if auth.verifyPhoneNumberStatus == .undefined || auth.verifyPhoneNumberStatus == .error {
                 if self.text.count >= 5 {
@@ -850,9 +891,9 @@ struct PhoneNumberView: View {
                                 .frame(width: 20, height: 18, alignment: .center)
                         }.padding(.horizontal)
                     }.buttonStyle(MainButtonStyle())
-                    .padding(.horizontal, 60)
-                    .padding(.vertical, 5)
-                    .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 10)
+                    .padding(.horizontal, 40)
+                    .padding(.bottom, 15)
+                    .shadow(color: Color("buttonShadow"), radius: 8, x: 0, y: 8)
                 } else {
                     Button(action: {
                         UINotificationFeedbackGenerator().notificationOccurred(.error)
@@ -870,52 +911,14 @@ struct PhoneNumberView: View {
                                 .frame(width: 20, height: 18, alignment: .center)
                         }.padding(.horizontal)
                     }.buttonStyle(MainButtonStyleDeselected())
-                    .padding(.horizontal)
-                    .padding(.vertical, 5)
+                    .padding(.horizontal, 40)
+                    .padding(.bottom, 15)
                 }
             } else {
                 Text("Verify")
                     .fontWeight(.medium)
                     .padding(.horizontal , 20)
                     .foregroundColor(Color.white)
-            }
-            
-            Button(action: {
-                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                self.openTerms.toggle()
-            }) {
-                VStack(alignment: .center, spacing: 2) {
-                    Text("By submitting your number, you agree to Chatr's")
-                        .font(.system(size: 12))
-                        .font(.footnote)
-                        .foregroundColor(Color.secondary)
-                        .lineLimit(1)
-                        .multilineTextAlignment(.center)
-                    
-                    Text("Terms of Service & Privacy Policy.")
-                        .font(.system(size: 12))
-                        .font(.footnote)
-                        .foregroundColor(Color.blue)
-                        .lineLimit(1)
-                        .multilineTextAlignment(.center)
-                }.padding(.horizontal)
-            }
-            .buttonStyle(ClickButtonStyle())
-            .padding(.bottom, 15)
-            .sheet(isPresented: $openTerms) {
-                NavigationView {
-                    TermsView(markdown: Constants.termsOfServiceMarkdown, navTitle: "Terms of Service")
-                        .navigationBarItems(leading:
-                                                Button(action: {
-                            withAnimation {
-                                self.openTerms.toggle()
-                            }
-                        }) {
-                            Text("Done")
-                                .foregroundColor(.primary)
-                                .fontWeight(.medium)
-                        })
-                }
             }
         }
     }

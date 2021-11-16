@@ -15,6 +15,7 @@ struct ContactsBtn: View {
     
     var body: some View {
         Button(action: {
+            bringNotiViewToFront()
             self.showContacts.toggle()
             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
         }) {

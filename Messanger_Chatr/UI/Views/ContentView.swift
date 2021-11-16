@@ -370,76 +370,13 @@ struct ChatrBaseView: View {
                                                 
                         //MARK: Dialogs Section
                         if self.dialogs.results.filter { $0.isDeleted != true }.count == 0 {
-                            VStack {
-                                Image("EmptyDialog")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(minWidth: Constants.screenWidth - 20, maxWidth: Constants.screenWidth)
-                                    .frame(height: Constants.screenWidth < 375 ? 200 : 150)
-                                    .padding(.horizontal, 10)
-                                    .onAppear() {
-                                        self.auth.dialogs.fetchDialogs(completion: { _ in })
-                                    }
-                                
-                                Text(self.auth.isFirstTimeUser ? "Lets Get Started!" : "No Messages Found")
-                                    .foregroundColor(.primary)
-                                    .font(.title)
-                                    .fontWeight(.semibold)
-                                    .frame(alignment: .center)
-                                    .padding(.top, 15)
-                                    .padding(.bottom, 2.5)
-                                
-                                Text("Start a new conversation \nor discover an existing channel!")
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
-                                    .lineLimit(3)
-                                    .multilineTextAlignment(.center)
-                                    .padding(.bottom, 30)
-                                
-                                Button(action: {
-                                    self.showNewChat.toggle()
-                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                }) {
-                                    HStack(alignment: .center, spacing: 15) {
-                                        Text("Start Conversation")
-                                            .font(.headline)
-                                            .foregroundColor(.white)
-                                        
-                                        Image("ComposeIcon_white")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 22, height: 22, alignment: .center)
-                                            .offset(x: -2, y: -2)
-                                    }.padding(.horizontal, 15)
-                                }.buttonStyle(MainButtonStyle())
-                                .frame(maxWidth: 230)
-                                .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 8)
-                                .padding(.bottom, 5)
-                                
-                                Button(action: {
-                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                    self.isDiscoverOpen.toggle()
-                                }) {
-                                    HStack(alignment: .center, spacing: 15) {
-                                        Text("Discover Channels")
-                                            .font(.headline)
-                                            .foregroundColor(.primary)
-                                        
-                                        Image(systemName: "safari")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 22, height: 22, alignment: .center)
-                                            .offset(x: -2, y: -2)
-                                    }.padding(.horizontal, 15)
-                                    .frame(minWidth: 40, maxWidth: Constants.screenWidth, minHeight: 55, maxHeight: 55)
-                                    .background(Color("buttonColor"))
-                                    .cornerRadius(15)
-                                    .frame(maxWidth: 230)
-                                    .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 8)
+                            EmptyDialogView(showNewChat: self.$showNewChat, isDiscoverOpen: self.$isDiscoverOpen)
+                                .environmentObject(auth)
+                                .offset(y: Constants.screenWidth < 375 ? 60 : 20)
+                                .offset(y: self.emptyQuickSnaps ? 0 : 100)
+                                .onAppear() {
+                                    self.auth.dialogs.fetchDialogs(completion: { _ in })
                                 }
-                                .buttonStyle(ClickButtonStyle())
-                            }.offset(y: Constants.screenWidth < 375 ? 60 : 10)
-                            .offset(y: self.emptyQuickSnaps ? 0 : 100)
                         }
                         
                         //MARK: Main Dialog Cells
@@ -506,9 +443,9 @@ struct ChatrBaseView: View {
                             self.isLocalOpen = false
                         }
                         
-                        Button("tap me") {
+                        Button("tap me 22222222") {
                             showNotiHUD(image: "wifi", color: .blue, title: "Connected", subtitle: "cool ass subtitle...")
-                        }
+                        }.padding(.top, 145)
 
                         if self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.count >= 3 || self.dialogs.results.filter { $0.isDeleted != true }.count == 0 {
                             FooterInformation()
@@ -665,7 +602,8 @@ struct ChatrBaseView: View {
                 .opacity(self.auth.isLoacalAuth ? 0 : 1)
             
             ConfettiCannon(counter: $counter, repetitions: 3, repetitionInterval: 0.2)
-        }.onAppear {
+        }
+        .onAppear {
             NotificationCenter.default.addObserver(forName: NSNotification.Name("NotificationAlert"), object: nil, queue: .main) { (notii) in
                 if let dict = notii.userInfo as NSDictionary? {
                     if let image = dict["image"] as? String, let color = dict["color"] as? String, let title = dict["title"] as? String {

@@ -129,4 +129,11 @@ extension View {
 
         getRootController().view.addSubview(hudViewController.view)
     }
+
+    func bringNotiViewToFront() {
+        guard let notiView = getRootController().view.subviews.first(where: { $0.tag == 1009 }) else { return }
+
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1) { UIApplication.shared.windows.first?.bringSubviewToFront(notiView)
+        }
+    }
 }
