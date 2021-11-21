@@ -100,7 +100,7 @@ class AuthModel: NSObject, ObservableObject {
     @Published var verifyCodeStatusKeyboard = false
     @Published var verifyPhoneStatusKeyboard = false
     
-    @Published var isLoacalAuth = false
+    @Published var isLocalAuth = false
     @Published var visitContactProfile: Bool = false
     @Published var visitPublicDialogProfile: Bool = false
     @Published var dynamicLinkContactID: Int = 0

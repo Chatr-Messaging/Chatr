@@ -48,7 +48,7 @@ struct ContactsView: View {
                         NavigationLink(destination: ProfileView(dimissView: $showUserProfile, selectedNewDialog: self.$newDialogID, fromContactsPage: true), tag: 1, selection: $navLinkAction) {
                             ZStack(alignment: .center) {
                                 RoundedRectangle(cornerRadius: 20, style: .circular)
-                                    .foregroundColor(Color("buttonColor"))
+                                    .foregroundColor(Color.clear)
                                     .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 8)
                                 
                                 HStack {
@@ -679,8 +679,8 @@ struct ContactsView: View {
             //MARK: Quick Snap View
             QuickSnapStartView(viewState: self.$quickSnapViewState, selectedQuickSnapContact: self.$selectedQuickSnapContact)
                 .environmentObject(self.auth)
-                .disabled(self.quickSnapViewState != .closed || self.auth.isLoacalAuth ? false : true)
-                .opacity(self.auth.isLoacalAuth ? 0 : 1)
+                .disabled(self.quickSnapViewState != .closed || self.auth.isLocalAuth ? false : true)
+                .opacity(self.auth.isLocalAuth ? 0 : 1)
         }
     }
 }

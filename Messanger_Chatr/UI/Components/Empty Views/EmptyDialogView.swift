@@ -21,6 +21,7 @@ struct EmptyDialogView: View {
                 .frame(minWidth: Constants.screenWidth - 20, maxWidth: Constants.screenWidth)
                 .frame(height: Constants.screenWidth < 375 ? 100 : 80)
                 .padding(.top)
+                .padding(.bottom, 10)
 
             Text(self.auth.isFirstTimeUser ? "Lets Get Started!" : "No Messages Found")
                 .foregroundColor(.primary)
@@ -78,9 +79,9 @@ struct EmptyDialogView: View {
             .padding(.horizontal, 15)
             .padding(.bottom)
         }
+        .frame(maxWidth: Constants.screenWidth - 50)
         .background(RoundedRectangle(cornerRadius: 25).frame(maxWidth: Constants.screenWidth - 30).foregroundColor(Color("bgColor_secondary")))
         .shadow(color: Color("buttonShadow"), radius: 10, x: 0, y: 8)
-        .frame(maxWidth: Constants.screenWidth - 30)
     }
 }
 

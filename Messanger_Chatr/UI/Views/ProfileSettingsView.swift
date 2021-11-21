@@ -41,7 +41,7 @@ struct ProfileView: View {
                 NavigationLink(destination: EditProfileView().environmentObject(self.auth), tag: 1, selection: $editProfileAction) {
                     ZStack(alignment: .center) {
                         RoundedRectangle(cornerRadius: 20, style: .circular)
-                            .foregroundColor(Color("buttonColor"))
+                            .foregroundColor(Color.clear)
                             .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 8)
                         
                         HStack {
@@ -108,7 +108,7 @@ struct ProfileView: View {
                                 .foregroundColor(.secondary)
                         }.padding(.horizontal)
                     }
-                }.buttonStyle(ClickMiniButtonStyle())
+                }.buttonStyle(ClickMiniButtonStyleBGColored())
                 .simultaneousGesture(TapGesture()
                     .onEnded { _ in
                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()

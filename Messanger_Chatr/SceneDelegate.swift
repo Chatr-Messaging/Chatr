@@ -93,7 +93,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         //print("scene will resign active")
         if self.environment.isUserAuthenticated == .signedIn {
             if self.environment.profile.results.first?.isLocalAuthOn ?? false {
-                self.environment.isLoacalAuth = true
+                self.environment.isLocalAuth = true
             }
             if let dialog = self.environment.selectedConnectyDialog {
                 dialog.sendUserStoppedTyping()
@@ -147,7 +147,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     private func sendLocalAuth() {
         guard self.environment.profile.results.first?.isLocalAuthOn == true else { return }
 
-        self.environment.isLoacalAuth = true
+        self.environment.isLocalAuth = true
         let context = LAContext()
         var error: NSError?
 
@@ -157,7 +157,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 
                 DispatchQueue.main.async {
                     if success {
-                        self.environment.isLoacalAuth = false
+                        self.environment.isLocalAuth = false
                     }
                 }
             }

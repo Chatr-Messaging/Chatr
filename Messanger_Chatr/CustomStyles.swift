@@ -76,6 +76,15 @@ struct ClickMiniButtonStyleBG: ButtonStyle {
     }
 }
 
+struct ClickMiniButtonStyleBGColored: ButtonStyle {
+    public func makeBody(configuration: ClickMiniButtonStyleBGColored.Configuration) -> some View {
+        configuration.label
+            .background(configuration.isPressed ? Color("bgColor_light") : Color("buttonColor"))
+            .cornerRadius(20)
+            .scaleEffect(configuration.isPressed ? 0.975 : 1.0)
+    }
+}
+
 struct dialogButtonStyle: ButtonStyle {
     public func makeBody(configuration: ClickButtonStyle.Configuration) -> some View {
         configuration.label
@@ -183,6 +192,8 @@ struct navigationScaleHelpticButtonStyle: PrimitiveButtonStyle {
                 }
             
             return configuration.label
+                .background(self.pressed ? Color("bgColor_light") : Color("buttonColor"))
+                .cornerRadius(20)
                 .scaleEffect(self.pressed ? 0.975 : 1.0)
                 .highPriorityGesture(gesture)
         }
@@ -270,7 +281,7 @@ struct personalProfileView: View {
     }
 }
 
-extension TimeInterval{
+extension TimeInterval {
     func stringFromTimeInterval() -> String {
         let time = NSInteger(self)
 
@@ -294,6 +305,20 @@ extension UIApplication {
     var currentScene: UIWindowScene? {
         connectedScenes
             .first { $0.activationState == .foregroundActive } as? UIWindowScene
+    }
+}
+
+extension Array where Element: Hashable {
+    func removingDuplicates() -> [Element] {
+        var addedDict = [Element: Bool]()
+
+        return filter {
+            addedDict.updateValue(true, forKey: $0) == nil
+        }
+    }
+
+    mutating func removeDuplicates() {
+        self = self.removingDuplicates()
     }
 }
 

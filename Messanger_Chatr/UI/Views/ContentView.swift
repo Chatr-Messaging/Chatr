@@ -39,7 +39,7 @@ struct HomeView: View {
                             self.auth.initIAPurchase()
 
                             if self.auth.profile.results.first?.isLocalAuthOn ?? false {
-                                self.auth.isLoacalAuth = true
+                                self.auth.isLocalAuth = true
                                 let context = LAContext()
                                 var error: NSError?
 
@@ -48,11 +48,11 @@ struct HomeView: View {
 
                                     context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, authenticationError in
                                         if success {
-                                            self.auth.isLoacalAuth = false
+                                            self.auth.isLocalAuth = false
                                         }
                                     }
                                 }
-                            } else { self.auth.isLoacalAuth = false }
+                            } else { self.auth.isLocalAuth = false }
                         })
                         .onDisappear(perform: {
                             self.auth.haveUserFullName = false
@@ -185,70 +185,19 @@ struct ChatrBaseView: View {
     let wallpaperNames = ["", "SoftChatBubbles_DarkWallpaper", "SoftPaperAirplane-Wallpaper", "oldHouseWallpaper", "nycWallpaper", "michaelAngelWallpaper", "moonWallpaper", "patagoniaWallpaper", "oceanRocksWallpaper", "southAfricaWallpaper", "flowerWallpaper", "paintWallpaper"]
     
     var body: some View {
-        ZStack {
-            if !self.auth.isLoacalAuth && self.auth.isUserAuthenticated != .signedOut {
-                ScrollView(.vertical, showsIndicators: false) {
-                    VStack {
-                        //MARK: Header Section
-                        GeometryReader { geo in
-                            HomeHeaderSection(showUserProfile: self.$showUserProfile)
-                                .environmentObject(self.auth)
-                                .offset(y: geo.frame(in: .global).minY > 0 ? -geo.frame(in: .global).minY + 40 : (geo.frame(in: .global).minY < 40 ? 40 : -geo.frame(in: .global).minY + 40))
-                                .padding(.horizontal, 10)
-                                .padding(.top)
-                                .sheet(isPresented: self.$showUserProfile, onDismiss: {
-                                    if self.auth.isUserAuthenticated != .signedOut {
-                                        self.loadSelectedDialog()
-                                    } else {
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
-                                            self.auth.logOutFirebase(completion: {
-                                                self.auth.logOutConnectyCube()
-                                            })
-                                        }
-                                    }
-                                }) {
-                                    if self.auth.isUserAuthenticated == .signedIn {
-                                        NavigationView {
-                                            ProfileView(dimissView: self.$showUserProfile, selectedNewDialog: self.$newDialogFromContact)
-                                                .environmentObject(self.auth)
-                                                .background(Color("bgColor"))
-                                        }
-                                    }
-                                }
-                        }.frame(height: Constants.btnSize + 100)
-                        .onChange(of: self.showPinDetails) { msgId in
-                            if self.showPinDetails != "" {
-                                self.showPinDetails = ""
-                                if let msg = self.auth.messages.selectedDialog(dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").filter({ $0.id == msgId }).first {
-                                    self.messageViewModel.message = msg
-                                    self.isDetailOpen = true
-//                                    if msg.imageType == "video/mov" {
-//                                        self.messageViewModel.loadVideo(fileId: msg.image, completion: { })
-//                                    }
-                                }
-                            }
-                        }
-                        
-                        if self.isTopCardOpen {
-                            HomeBannerCard(isTopCardOpen: self.$isTopCardOpen, counter: self.$counter)
-                                .environmentObject(self.auth)
-                                .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.05)), removal: AnyTransition.identity))
-                        }
-
-                        // MARK: "Message" Title
-                        HomeMessagesTitle(isLocalOpen: self.$isLocalOpen, contacts: self.$showContacts, newChat: self.$showNewChat)
-                            .frame(height: 50)
+        ZStack(alignment: .center) {
+            ScrollView(.vertical, showsIndicators: false) {
+                VStack {
+                    //MARK: Header Section
+                    GeometryReader { geo in
+                        HomeHeaderSection(showUserProfile: self.$showUserProfile)
                             .environmentObject(self.auth)
-                            .padding(.bottom)
-                            .sheet(isPresented: self.$showContacts, onDismiss: {
+                            .offset(y: geo.frame(in: .global).minY > 0 ? -geo.frame(in: .global).minY + 40 : (geo.frame(in: .global).minY < 40 ? 40 : -geo.frame(in: .global).minY + 40))
+                            .padding(.horizontal, 10)
+                            .padding(.top)
+                            .sheet(isPresented: self.$showUserProfile, onDismiss: {
                                 if self.auth.isUserAuthenticated != .signedOut {
-                                    if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), !diaId.isEmpty {
-                                        self.loadPublicDialog(diaId: diaId)
-                                    } else if let diaId = UserDefaults.standard.string(forKey: "openingDialogId"), !diaId.isEmpty {
-                                        self.loadPublicDialog(diaId: diaId)
-                                    } else {
-                                        self.loadSelectedDialog()
-                                    }
+                                    self.loadSelectedDialog()
                                 } else {
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
                                         self.auth.logOutFirebase(completion: {
@@ -257,95 +206,145 @@ struct ChatrBaseView: View {
                                     }
                                 }
                             }) {
-                                ContactsView(newDialogID: self.$newDialogFromContact, dismissView: self.$showContacts, showPinDetails: self.$showPinDetails)
-                                    .environmentObject(self.auth)
-                                    .background(Color("bgColor"))
-                                    .edgesIgnoringSafeArea(.all)
-                            }
-                            .onChange(of: self.newDialogFromSharedContact) { _ in
-                                if self.newDialogFromSharedContact != 0 {
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
-                                        self.loadSelectedDialog()
+                                if self.auth.isUserAuthenticated == .signedIn {
+                                    NavigationView {
+                                        ProfileView(dimissView: self.$showUserProfile, selectedNewDialog: self.$newDialogFromContact)
+                                            .environmentObject(self.auth)
+                                            .background(Color("bgColor"))
                                     }
                                 }
                             }
-                        
-                        //MARK: Quick Snaps Section
-                        GeometryReader { geometry in
-                            ZStack(alignment: .top) {
-                                BlurView(style: .systemUltraThinMaterial)
-                                    .allowsHitTesting(!UserDefaults.standard.bool(forKey: "localOpen") ? false : true)
-                                    .simultaneousGesture(DragGesture(minimumDistance: self.isLocalOpen ? 0 : 500))
-                                    .frame(width: Constants.screenWidth, height: Constants.screenHeight, alignment: .center)
-                                    .offset(y: self.isLocalOpen ? -geometry.frame(in: .global).minY : -35)
-                                    .opacity(self.isLocalOpen ? Double((275 - self.activeView.height) / 150) : 0)
-                                
-                                //Wallpaper View
-                                Image(self.wallpaperNames[UserDefaults.standard.integer(forKey: "selectedWallpaper")])
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: Constants.screenWidth, height: Constants.screenHeight - 150)
-                                    .offset(y: self.isLocalOpen ? -geometry.frame(in: .global).minY + 150 : 0)
-                                    .offset(y: self.isLocalOpen ? self.activeView.height : 0)
-                                    .opacity(self.isLocalOpen ? Double((275 - self.activeView.height) / 150) : 0)
-                                    .animation(.spring(response: 0.45, dampingFraction: self.isLocalOpen ? 0.65 : 0.75, blendDuration: 0))
-                                    .allowsHitTesting(!UserDefaults.standard.bool(forKey: "localOpen") ? false : true)
-                                    .simultaneousGesture(DragGesture(minimumDistance: self.isLocalOpen ? 0 : 500))
-
-                                QuickSnapsSection(viewState: self.$quickSnapViewState, selectedQuickSnapContact: self.$selectedQuickSnapContact, emptyQuickSnaps: self.$emptyQuickSnaps, isLocalOpen: self.$isLocalOpen)
-                                    .environmentObject(self.auth)
-                                    .frame(width: Constants.screenWidth)
-                                    .offset(y: self.isLocalOpen ? -geometry.frame(in: .global).minY - (UIDevice.current.hasNotch ? -15 : 30) : 0)
-                                    .offset(y: self.isLocalOpen ? self.activeView.height / 1.5 : 0)
-                                    .animation(.spring(response: 0.45, dampingFraction: self.isLocalOpen ? 0.65 : 0.75, blendDuration: 0))
-                                    .padding(.vertical, self.emptyQuickSnaps ? 0 : 20)
+                    }.frame(height: Constants.btnSize + 100)
+                    .onChange(of: self.showPinDetails) { msgId in
+                        if self.showPinDetails != "" {
+                            self.showPinDetails = ""
+                            if let msg = self.auth.messages.selectedDialog(dialogID: UserDefaults.standard.string(forKey: "selectedDialogID") ?? "").filter({ $0.id == msgId }).first {
+                                self.messageViewModel.message = msg
+                                self.isDetailOpen = true
+//                                    if msg.imageType == "video/mov" {
+//                                        self.messageViewModel.loadVideo(fileId: msg.image, completion: { })
+//                                    }
                             }
-                        }.sheet(isPresented: self.$showNewChat, onDismiss: {
-                            if self.newDialogID.count > 0 {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
-                                    self.selectedDialogID = self.newDialogID
-                                    self.isLocalOpen = true
-                                    UserDefaults.standard.set(self.isLocalOpen, forKey: "localOpen")
-                                    self.auth.dialogs.updateDialogOpen(isOpen: self.isLocalOpen, dialogID: self.selectedDialogID)
-                                    UserDefaults.standard.set(self.selectedDialogID, forKey: "selectedDialogID")
-                                    self.newDialogID = ""
+                        }
+                    }
+                    
+                    if self.isTopCardOpen {
+                        HomeBannerCard(isTopCardOpen: self.$isTopCardOpen, counter: self.$counter)
+                            .environmentObject(self.auth)
+                            .transition(.asymmetric(insertion: AnyTransition.opacity.animation(.easeInOut(duration: 0.05)), removal: AnyTransition.identity))
+                    }
+
+                    // MARK: "Message" Title
+                    HomeMessagesTitle(isLocalOpen: self.$isLocalOpen, contacts: self.$showContacts, newChat: self.$showNewChat)
+                        .frame(height: 50)
+                        .environmentObject(self.auth)
+                        .padding(.bottom)
+                        .sheet(isPresented: self.$showContacts, onDismiss: {
+                            if self.auth.isUserAuthenticated != .signedOut {
+                                if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), !diaId.isEmpty {
+                                    self.loadPublicDialog(diaId: diaId)
+                                } else if let diaId = UserDefaults.standard.string(forKey: "openingDialogId"), !diaId.isEmpty {
+                                    self.loadPublicDialog(diaId: diaId)
+                                } else {
+                                    self.loadSelectedDialog()
+                                }
+                            } else {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
+                                    self.auth.logOutFirebase(completion: {
+                                        self.auth.logOutConnectyCube()
+                                    })
                                 }
                             }
                         }) {
-                            NewConversationView(usedAsNew: true, selectedContact: self.$selectedContacts, newDialogID: self.$newDialogID)
+                            ContactsView(newDialogID: self.$newDialogFromContact, dismissView: self.$showContacts, showPinDetails: self.$showPinDetails)
                                 .environmentObject(self.auth)
+                                .background(Color("bgColor"))
+                                .edgesIgnoringSafeArea(.all)
                         }
-                        .sheet(isPresented: self.$isDiscoverOpen, onDismiss: {
-                            if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), !diaId.isEmpty {
-                                self.loadPublicDialog(diaId: diaId)
-                            } else if let diaId = UserDefaults.standard.string(forKey: "openingDialogId"), !diaId.isEmpty {
-                                self.loadPublicDialog(diaId: diaId)
-                            } else {
-                                self.loadSelectedDialog()
-                            }
-                        }) {
-                            NavigationView {
-                                DiscoverView(removeDoneBtn: false, dismissView: self.$isDiscoverOpen, showPinDetails: self.$showPinDetails, openNewDialogID: self.$newDialogFromContact)
-                                    .environmentObject(self.auth)
-                                    .navigationBarTitle("Discover", displayMode: .automatic)
-                                    .background(Color("bgColor")
-                                    .edgesIgnoringSafeArea(.all))
+                        .onChange(of: self.newDialogFromSharedContact) { _ in
+                            if self.newDialogFromSharedContact != 0 {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
+                                    self.loadSelectedDialog()
+                                }
                             }
                         }
-                        .sheet(isPresented: self.$showSharedContact, onDismiss: {
-                            if self.newDialogFromContact != 0 {
-                                self.isLocalOpen = false
-                                UserDefaults.standard.set(false, forKey: "localOpen")
-                                self.auth.dialogs.updateDialogOpen(isOpen: false, dialogID: "\(self.newDialogFromContact)")
+                    
+                    //MARK: Quick Snaps Section
+                    GeometryReader { geometry in
+                        ZStack(alignment: .top) {
+                            BlurView(style: .systemUltraThinMaterial)
+                                .allowsHitTesting(!UserDefaults.standard.bool(forKey: "localOpen") ? false : true)
+                                .simultaneousGesture(DragGesture(minimumDistance: self.isLocalOpen ? 0 : 500))
+                                .frame(width: Constants.screenWidth, height: Constants.screenHeight, alignment: .center)
+                                .offset(y: self.isLocalOpen ? -geometry.frame(in: .global).minY : -35)
+                                .opacity(self.isLocalOpen ? Double((275 - self.activeView.height) / 150) : 0)
+                            
+                            //Wallpaper View
+                            Image(self.wallpaperNames[UserDefaults.standard.integer(forKey: "selectedWallpaper")])
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: Constants.screenWidth, height: Constants.screenHeight - 150)
+                                .offset(y: self.isLocalOpen ? -geometry.frame(in: .global).minY + 150 : 0)
+                                .offset(y: self.isLocalOpen ? self.activeView.height : 0)
+                                .opacity(self.isLocalOpen ? Double((275 - self.activeView.height) / 150) : 0)
+                                .animation(.spring(response: 0.45, dampingFraction: self.isLocalOpen ? 0.65 : 0.75, blendDuration: 0))
+                                .allowsHitTesting(!UserDefaults.standard.bool(forKey: "localOpen") ? false : true)
+                                .simultaneousGesture(DragGesture(minimumDistance: self.isLocalOpen ? 0 : 500))
+
+                            QuickSnapsSection(viewState: self.$quickSnapViewState, selectedQuickSnapContact: self.$selectedQuickSnapContact, emptyQuickSnaps: self.$emptyQuickSnaps, isLocalOpen: self.$isLocalOpen)
+                                .environmentObject(self.auth)
+                                .frame(width: Constants.screenWidth)
+                                .offset(y: self.isLocalOpen ? -geometry.frame(in: .global).minY - (UIDevice.current.hasNotch ? -15 : 30) : 0)
+                                .offset(y: self.isLocalOpen ? self.activeView.height / 1.5 : 0)
+                                .animation(.spring(response: 0.45, dampingFraction: self.isLocalOpen ? 0.65 : 0.75, blendDuration: 0))
+                                .padding(.vertical, self.emptyQuickSnaps ? 0 : 20)
+                        }
+                    }.sheet(isPresented: self.$showNewChat, onDismiss: {
+                        if self.newDialogID.count > 0 {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
+                                self.selectedDialogID = self.newDialogID
+                                self.isLocalOpen = true
+                                UserDefaults.standard.set(self.isLocalOpen, forKey: "localOpen")
+                                self.auth.dialogs.updateDialogOpen(isOpen: self.isLocalOpen, dialogID: self.selectedDialogID)
+                                UserDefaults.standard.set(self.selectedDialogID, forKey: "selectedDialogID")
+                                self.newDialogID = ""
                             }
+                        }
+                    }) {
+                        NewConversationView(usedAsNew: true, selectedContact: self.$selectedContacts, newDialogID: self.$newDialogID)
+                            .environmentObject(self.auth)
+                    }
+                    .sheet(isPresented: self.$isDiscoverOpen, onDismiss: {
+                        if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), !diaId.isEmpty {
+                            self.loadPublicDialog(diaId: diaId)
+                        } else if let diaId = UserDefaults.standard.string(forKey: "openingDialogId"), !diaId.isEmpty {
+                            self.loadPublicDialog(diaId: diaId)
+                        } else {
                             self.loadSelectedDialog()
-                        }) {
-                            NavigationView {
-                                VisitContactView(fromDialogCell: true, newMessage: self.$newDialogFromContact, dismissView: self.$showSharedContact, viewState: .fromDynamicLink)
-                                    .environmentObject(self.auth)
-                                    .edgesIgnoringSafeArea(.all)
-                            }
                         }
+                    }) {
+                        NavigationView {
+                            DiscoverView(removeDoneBtn: false, dismissView: self.$isDiscoverOpen, showPinDetails: self.$showPinDetails, openNewDialogID: self.$newDialogFromContact)
+                                .environmentObject(self.auth)
+                                .navigationBarTitle("Discover", displayMode: .automatic)
+                                .background(Color("bgColor")
+                                .edgesIgnoringSafeArea(.all))
+                        }
+                    }
+                    .sheet(isPresented: self.$showSharedContact, onDismiss: {
+                        if self.newDialogFromContact != 0 {
+                            self.isLocalOpen = false
+                            UserDefaults.standard.set(false, forKey: "localOpen")
+                            self.auth.dialogs.updateDialogOpen(isOpen: false, dialogID: "\(self.newDialogFromContact)")
+                        }
+                        self.loadSelectedDialog()
+                    }) {
+                        NavigationView {
+                            VisitContactView(fromDialogCell: true, newMessage: self.$newDialogFromContact, dismissView: self.$showSharedContact, viewState: .fromDynamicLink)
+                                .environmentObject(self.auth)
+                                .edgesIgnoringSafeArea(.all)
+                        }
+                    }
 
 //                        //MARK: Pull to refresh - loading dialogs
 //                        PullToRefreshIndicator(isLoading: self.$isLoading, preLoading: self.$isPreLoading, localOpen: self.$isLocalOpen)
@@ -356,250 +355,252 @@ struct ChatrBaseView: View {
 //                                self.isPreLoading = false
 //                            }
 
-                        //MARK: Search Bar
-                        if self.dialogs.results.filter { $0.isDeleted != true }.count != 0 {
-                            CustomSearchBar(searchText: self.$searchText, localOpen: self.$isLocalOpen)
-                                .opacity(self.isLocalOpen ? Double(self.activeView.height / 150) : 1)
-                                .opacity(self.dialogs.results.count != 0 ? 1 : 0)
-                                .offset(y: self.isLocalOpen ? -75 + (self.activeView.height / 3) : 0)
-                                .offset(y: self.emptyQuickSnaps ? -30 : 65)
-                                .blur(radius: self.isLocalOpen ? ((950 - (self.activeView.height * 3)) / 600) * 2 : 0)
-                                .animation(.spring(response: 0.4, dampingFraction: 0.8, blendDuration: 0))
-                                .resignKeyboardOnDragGesture()
-                        }
-                                                
-                        //MARK: Dialogs Section
-                        if self.dialogs.results.filter { $0.isDeleted != true }.count == 0 {
-                            EmptyDialogView(showNewChat: self.$showNewChat, isDiscoverOpen: self.$isDiscoverOpen)
-                                .environmentObject(auth)
-                                .offset(y: Constants.screenWidth < 375 ? 60 : 20)
-                                .offset(y: self.emptyQuickSnaps ? 0 : 100)
-                                .onAppear() {
-                                    self.auth.dialogs.fetchDialogs(completion: { _ in })
-                                }
-                        }
-                        
-                        //MARK: Main Dialog Cells
-                        ForEach(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }, id: \.id) { i in
-                            GeometryReader { geo in
-                                Button(action: {
-                                    guard activeView.height == .zero || activeView.height > 50 else {
-                                        activeView.height = .zero
-                                        return
-                                    }
-
+                    //MARK: Search Bar
+                    if self.dialogs.results.filter { $0.isDeleted != true }.count != 0 {
+                        CustomSearchBar(searchText: self.$searchText, localOpen: self.$isLocalOpen)
+                            .opacity(self.isLocalOpen ? Double(self.activeView.height / 150) : 1)
+                            .opacity(self.dialogs.results.count != 0 ? 1 : 0)
+                            .offset(y: self.isLocalOpen ? -75 + (self.activeView.height / 3) : 0)
+                            .offset(y: self.emptyQuickSnaps ? -30 : 65)
+                            .blur(radius: self.isLocalOpen ? ((950 - (self.activeView.height * 3)) / 600) * 2 : 0)
+                            .animation(.spring(response: 0.4, dampingFraction: 0.8, blendDuration: 0))
+                            .resignKeyboardOnDragGesture()
+                    }
+                                            
+                    //MARK: Dialogs Section
+                    if self.dialogs.results.filter { $0.isDeleted != true }.count == 0 {
+                        EmptyDialogView(showNewChat: self.$showNewChat, isDiscoverOpen: self.$isDiscoverOpen)
+                            .environmentObject(auth)
+                            .offset(y: Constants.screenWidth < 375 ? 60 : 20)
+                            .offset(y: self.emptyQuickSnaps ? 0 : 100)
+                            .onAppear() {
+                                self.auth.dialogs.fetchDialogs(completion: { _ in })
+                            }
+                    }
+                    
+                    //MARK: Main Dialog Cells
+                    ForEach(self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }, id: \.id) { i in
+                        GeometryReader { geo in
+                            Button(action: {
+                                guard activeView.height == .zero || activeView.height > 50 else {
                                     activeView.height = .zero
-                                    onCellTapGesture(id: i.id, dialogType: i.dialogType)
-                                }) {
-                                    DialogCell(dialogModel: i,
-                                               isOpen: $isLocalOpen,
-                                               activeView: $activeView,
-                                               selectedDialogID: $selectedDialogID,
-                                               showPinDetails: $showPinDetails)
-                                        .environmentObject(auth)
-                                        .id(i.id)
-                                        .tag(i.id)
+                                    return
                                 }
-                                .contentShape(Rectangle())
-                                .position(x: i.isOpen && isLocalOpen ? UIScreen.main.bounds.size.width / 2 : UIScreen.main.bounds.size.width / 2 - 20, y: i.isOpen && isLocalOpen ? activeView.height + 40 : 40)
-                                .fixedSize(horizontal: false, vertical: true)
-                                .zIndex(i.isOpen ? 2 : 0)
-                                .opacity(isLocalOpen ? (i.isOpen ? 1 : 0) : 1)
-                                .offset(y: i.isOpen && isLocalOpen ? -geo.frame(in: .global).minY + (emptyQuickSnaps ? (UIDevice.current.hasNotch ? 50 : 25) : 110) : emptyQuickSnaps ? -25 : 70)
-                                .animation(.spring(response: isLocalOpen ? 0.375 : 0.45, dampingFraction: isLocalOpen ? 0.68 : 0.8, blendDuration: 0))
-                                .buttonStyle(dialogButtonStyle())
-                                .shadow(color: Color.black.opacity(isLocalOpen ? (colorScheme == .dark ? 0.25 : 0.15) : 0.15), radius: isLocalOpen ? 15 : 8, x: 0, y: self.isLocalOpen ? (colorScheme == .dark ? 15 : 5) : 5)
-                            }.frame(height: 75, alignment: .center)
-                            .padding(.horizontal, isLocalOpen && i.isOpen ? 0 : 20)
-                            .simultaneousGesture(DragGesture(minimumDistance: i.isOpen ? 0 : 500).onChanged { value in
-                                guard value.translation.height < 150 else { return }
-                                guard value.translation.height > 0 else { return }
 
-                                activeView = value.translation
-                            }.onEnded { value in
-                                //if activeView.height > 50 {
-                                    //onCellTapGesture(id: i.id, dialogType: i.dialogType)
-                                //}
-
-                                //shouldExecuteTap = false
-                                //activeView.height = .zero
-                            })
-                        }
-                        .disabled(self.disableDialog)
-                        .onChange(of: UserDefaults.standard.bool(forKey: "localOpen")) { isOpen in
-                            //self.isLocalOpen = isOpen
-                            if !isOpen {
-                                self.isLocalOpen = false
-                                self.isKeyboardActionOpen = false
+                                activeView.height = .zero
+                                onCellTapGesture(id: i.id, dialogType: i.dialogType)
+                            }) {
+                                DialogCell(dialogModel: i,
+                                           isOpen: $isLocalOpen,
+                                           activeView: $activeView,
+                                           selectedDialogID: $selectedDialogID,
+                                           showPinDetails: $showPinDetails)
+                                    .environmentObject(auth)
+                                    .id(i.id)
+                                    .tag(i.id)
                             }
+                            .contentShape(Rectangle())
+                            .position(x: i.isOpen && isLocalOpen ? UIScreen.main.bounds.size.width / 2 : UIScreen.main.bounds.size.width / 2 - 20, y: i.isOpen && isLocalOpen ? activeView.height + 40 : 40)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .zIndex(i.isOpen ? 2 : 0)
+                            .opacity(isLocalOpen ? (i.isOpen ? 1 : 0) : 1)
+                            .offset(y: i.isOpen && isLocalOpen ? -geo.frame(in: .global).minY + (emptyQuickSnaps ? (UIDevice.current.hasNotch ? 50 : 25) : 110) : emptyQuickSnaps ? -25 : 70)
+                            .animation(.spring(response: isLocalOpen ? 0.375 : 0.45, dampingFraction: isLocalOpen ? 0.68 : 0.8, blendDuration: 0))
+                            .buttonStyle(dialogButtonStyle())
+                            .shadow(color: Color.black.opacity(isLocalOpen ? (colorScheme == .dark ? 0.25 : 0.15) : 0.15), radius: isLocalOpen ? 15 : 8, x: 0, y: self.isLocalOpen ? (colorScheme == .dark ? 15 : 5) : 5)
+                        }.frame(height: 75, alignment: .center)
+                        .padding(.horizontal, isLocalOpen && i.isOpen ? 0 : 20)
+                        .simultaneousGesture(DragGesture(minimumDistance: i.isOpen ? 0 : 500).onChanged { value in
+                            guard value.translation.height < 150 else { return }
+                            guard value.translation.height > 0 else { return }
 
-                            self.disableDialog = true
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                                self.disableDialog = false
-                            }
-                        }
-                        .onAppear {
-                            UserDefaults.standard.set(false, forKey: "localOpen")
+                            activeView = value.translation
+                        }.onEnded { value in
+                            //if activeView.height > 50 {
+                                //onCellTapGesture(id: i.id, dialogType: i.dialogType)
+                            //}
+
+                            //shouldExecuteTap = false
+                            //activeView.height = .zero
+                        })
+                    }
+                    .disabled(self.disableDialog)
+                    .onChange(of: UserDefaults.standard.bool(forKey: "localOpen")) { isOpen in
+                        //self.isLocalOpen = isOpen
+                        if !isOpen {
                             self.isLocalOpen = false
+                            self.isKeyboardActionOpen = false
                         }
-                        
-                        Button("tap me 22222222") {
-                            showNotiHUD(image: "wifi", color: .blue, title: "Connected", subtitle: "cool ass subtitle...")
-                        }.padding(.top, 145)
 
-                        if self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.count >= 3 || self.dialogs.results.filter { $0.isDeleted != true }.count == 0 {
-                            FooterInformation()
-                                .padding(.top, 140)
-                                .padding(.bottom, 25)
-                                .opacity(self.isLocalOpen ? 0 : 1)
+                        self.disableDialog = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                            self.disableDialog = false
                         }
                     }
-                }.overlay(
-                    //MARK: Chat Messages View
-                    GeometryReader { geo in
-//                    ChatMessagesView(viewModel: self.messageViewModel, activeView: self.$activeView, keyboardChange: self.$keyboardHeight, dialogID: self.$selectedDialogID, textFieldHeight: self.$textFieldHeight, keyboardDragState: self.$keyboardDragState, hasAttachment: self.$hasAttachments, newDialogFromSharedContact: self.$newDialogFromSharedContact, isKeyboardActionOpen: self.$isKeyboardActionOpen, isHomeDialogOpen: self.$isLocalOpen, isDetailOpen: self.$isDetailOpen, emptyQuickSnaps: self.$emptyQuickSnaps, detailMessageModel: self.$detailMessageModel, namespace: self.namespace)
-                        if self.isLocalOpen, UserDefaults.standard.string(forKey: "selectedDialogID") == self.selectedDialogID, UserDefaults.standard.string(forKey: "selectedDialogID") != "" {
-                            MessagesTimelineView()
-                                //.environmentObject(self.auth)
-                                //.position(x: UIScreen.main.bounds.size.width / 2, y: self.activeView.height)
-                                .frame(width: Constants.screenWidth, height: Constants.screenHeight - (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 127 : 91) : 201), alignment: .bottom)
-                                .fixedSize(horizontal: true, vertical: false)
-                                .zIndex(1)
-                                .contentShape(Rectangle())
-                                .offset(y: -geo.frame(in: .global).minY + (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 127 : 91) : 186))
-                                .padding(.bottom, self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 127 : 91) : 186)
-                                .offset(y: self.activeView.height) // + (self.emptyQuickSnaps ? 25 : 197))
-                                .simultaneousGesture(DragGesture(minimumDistance: UserDefaults.standard.bool(forKey: "localOpen") ? 800 : 0))
-                                .layoutPriority(1)
-                                .onDisappear {
-                                    guard let dialog = self.auth.selectedConnectyDialog, dialog.isJoined(), dialog.type == .group || dialog.type == .public else {
-                                        return
-                                    }
-                                    
-                                    self.auth.leaveDialog()
-                                }
-                        }
+                    .onAppear {
+                        UserDefaults.standard.set(false, forKey: "localOpen")
+                        self.isLocalOpen = false
                     }
-                )
-                .slideOverCard(isPresented: $showWelcomeNewUser, onDismiss: {
-                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                }) {
-                    EarlyAdopterView(counter: self.$counter)
+                    
+                    Button("tap me 22222222") {
+                        showNotiHUD(image: "wifi", color: .blue, title: "Connected", subtitle: "cool ass subtitle...")
+                    }.padding(.top, 145)
+
+                    if self.dialogs.filterDia(text: self.searchText).filter { $0.isDeleted != true }.count >= 3 || self.dialogs.results.filter { $0.isDeleted != true }.count == 0 {
+                        FooterInformation()
+                            .padding(.top, 140)
+                            .padding(.bottom, 25)
+                            .opacity(self.isLocalOpen ? 0 : 1)
+                    }
                 }
-
-                //MARK: Keyboard View
+            }
+            .overlay(
+                //MARK: Chat Messages View
                 GeometryReader { geo in
-                    KeyboardCardView(imagePicker: self.imagePicker, height: self.$textFieldHeight, isOpen: self.$isLocalOpen, mainText: self.$keyboardText, hasAttachments: self.$hasAttachments, showImagePicker: self.$showKeyboardMediaAssets, isKeyboardActionOpen: self.$isKeyboardActionOpen, keyboardHeight: self.$keyboardHeight)
-                        .environmentObject(self.auth)
-                        .frame(width: Constants.screenWidth, alignment: .center)
-                        .shadow(color: Color.black.opacity(0.15), radius: 14, x: 0, y: -5)
-                        .offset(y: self.isLocalOpen ? geo.frame(in: .global).maxY - 50 - (UIDevice.current.hasNotch ? 0 : -20) - (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) - (self.hasAttachments ? 110 : 0) - self.keyboardHeight - (self.isKeyboardActionOpen ? 80 : 0) : geo.frame(in: .global).maxY)
-                        .animation(.spring(response: 0.45, dampingFraction: 0.85, blendDuration: 0))
-                        .zIndex(2)
-                        .onChange(of: self.auth.visitContactProfile) { newValue in
-                            if newValue {
-                                self.showSharedContact.toggle()
-                                self.auth.visitContactProfile = false
+//                    ChatMessagesView(viewModel: self.messageViewModel, activeView: self.$activeView, keyboardChange: self.$keyboardHeight, dialogID: self.$selectedDialogID, textFieldHeight: self.$textFieldHeight, keyboardDragState: self.$keyboardDragState, hasAttachment: self.$hasAttachments, newDialogFromSharedContact: self.$newDialogFromSharedContact, isKeyboardActionOpen: self.$isKeyboardActionOpen, isHomeDialogOpen: self.$isLocalOpen, isDetailOpen: self.$isDetailOpen, emptyQuickSnaps: self.$emptyQuickSnaps, detailMessageModel: self.$detailMessageModel, namespace: self.namespace)
+                    if self.isLocalOpen, UserDefaults.standard.string(forKey: "selectedDialogID") == self.selectedDialogID, UserDefaults.standard.string(forKey: "selectedDialogID") != "" {
+                        MessagesTimelineView()
+                            //.environmentObject(self.auth)
+                            //.position(x: UIScreen.main.bounds.size.width / 2, y: self.activeView.height)
+                            .frame(width: Constants.screenWidth, height: Constants.screenHeight - (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 127 : 91) : 201), alignment: .bottom)
+                            .fixedSize(horizontal: true, vertical: false)
+                            .zIndex(1)
+                            .contentShape(Rectangle())
+                            .offset(y: -geo.frame(in: .global).minY + (self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 127 : 91) : 186))
+                            .padding(.bottom, self.emptyQuickSnaps ? (UIDevice.current.hasNotch ? 127 : 91) : 186)
+                            .offset(y: self.activeView.height) // + (self.emptyQuickSnaps ? 25 : 197))
+                            .simultaneousGesture(DragGesture(minimumDistance: UserDefaults.standard.bool(forKey: "localOpen") ? 800 : 0))
+                            .layoutPriority(1)
+                            .onDisappear {
+                                guard let dialog = self.auth.selectedConnectyDialog, dialog.isJoined(), dialog.type == .group || dialog.type == .public else {
+                                    return
+                                }
+                                
+                                self.auth.leaveDialog()
                             }
-                        }.onChange(of: self.auth.visitPublicDialogProfile) { newValue in
-                            if newValue {
+                    }
+                }
+            )
+            .slideOverCard(isPresented: $showWelcomeNewUser, onDismiss: {
+                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+            }) {
+                EarlyAdopterView(counter: self.$counter)
+            }
+
+            //MARK: Keyboard View
+            GeometryReader { geo in
+                KeyboardCardView(imagePicker: self.imagePicker, height: self.$textFieldHeight, isOpen: self.$isLocalOpen, mainText: self.$keyboardText, hasAttachments: self.$hasAttachments, showImagePicker: self.$showKeyboardMediaAssets, isKeyboardActionOpen: self.$isKeyboardActionOpen, keyboardHeight: self.$keyboardHeight)
+                    .environmentObject(self.auth)
+                    .frame(width: Constants.screenWidth, alignment: .center)
+                    .shadow(color: Color.black.opacity(0.15), radius: 14, x: 0, y: -5)
+                    .offset(y: self.isLocalOpen ? geo.frame(in: .global).maxY - 50 - (UIDevice.current.hasNotch ? 0 : -20) - (self.textFieldHeight <= 180 ? self.textFieldHeight : 180) - (self.hasAttachments ? 110 : 0) - self.keyboardHeight - (self.isKeyboardActionOpen ? 80 : 0) : geo.frame(in: .global).maxY)
+                    .animation(.spring(response: 0.45, dampingFraction: 0.85, blendDuration: 0))
+                    .zIndex(2)
+                    .onChange(of: self.auth.visitContactProfile) { newValue in
+                        if newValue {
+                            self.showSharedContact.toggle()
+                            self.auth.visitContactProfile = false
+                        }
+                    }.onChange(of: self.auth.visitPublicDialogProfile) { newValue in
+                        if newValue {
 //                                if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), !diaId.isEmpty {
 //                                    print("helooo we here: \(diaId) && \(self.auth.dynamicLinkPublicDialogID)")
 //                                }
 
-                                self.showSharedPublicDialog.toggle()
-                                self.auth.visitPublicDialogProfile = false
-                            }
+                            self.showSharedPublicDialog.toggle()
+                            self.auth.visitPublicDialogProfile = false
                         }
-                        .sheet(isPresented: self.$showSharedPublicDialog, onDismiss: {
-                            guard self.auth.dynamicLinkPublicDialogID == "" else {
-                                self.auth.dynamicLinkPublicDialogID = ""
+                    }
+                    .sheet(isPresented: self.$showSharedPublicDialog, onDismiss: {
+                        guard self.auth.dynamicLinkPublicDialogID == "" else {
+                            self.auth.dynamicLinkPublicDialogID = ""
 
-                                return
-                            }
+                            return
+                        }
 
-                            if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), !diaId.isEmpty {
-                                self.loadPublicDialog(diaId: diaId)
-                            } else if let diaId = UserDefaults.standard.string(forKey: "openingDialogId"), !diaId.isEmpty {
-                                self.loadPublicDialog(diaId: diaId)
-                            }
-                        }) {
-                            NavigationView {
-                                VisitGroupChannelView(dismissView: self.$showSharedPublicDialog, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$newDialogFromContact, showPinDetails: self.$showPinDetails, fromSharedPublicDialog: self.auth.dynamicLinkPublicDialogID, viewState: .fromDiscover, dialogRelationship: .unknown)
-                                    .environmentObject(self.auth)
-                                    .edgesIgnoringSafeArea(.all)
-                                    .navigationBarItems(leading:
+                        if let diaId = UserDefaults.standard.string(forKey: "visitingDialogId"), !diaId.isEmpty {
+                            self.loadPublicDialog(diaId: diaId)
+                        } else if let diaId = UserDefaults.standard.string(forKey: "openingDialogId"), !diaId.isEmpty {
+                            self.loadPublicDialog(diaId: diaId)
+                        }
+                    }) {
+                        NavigationView {
+                            VisitGroupChannelView(dismissView: self.$showSharedPublicDialog, isEditGroupOpen: self.$isEditGroupOpen, canEditGroup: self.$canEditGroup, openNewDialogID: self.$newDialogFromContact, showPinDetails: self.$showPinDetails, fromSharedPublicDialog: self.auth.dynamicLinkPublicDialogID, viewState: .fromDiscover, dialogRelationship: .unknown)
+                                .environmentObject(self.auth)
+                                .edgesIgnoringSafeArea(.all)
+                                .navigationBarItems(leading:
+                                            Button(action: {
+                                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                                UserDefaults.standard.set("", forKey: "visitingDialogId")
+                                                UserDefaults.standard.set("", forKey: "openingDialogId")
+                                                withAnimation {
+                                                    self.showSharedPublicDialog.toggle()
+                                                }
+                                            }) {
+                                                Text("Done")
+                                                    .foregroundColor(.primary)
+                                                    .fontWeight(.medium)
+                                            }, trailing:
                                                 Button(action: {
-                                                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                                                    UserDefaults.standard.set("", forKey: "visitingDialogId")
-                                                    UserDefaults.standard.set("", forKey: "openingDialogId")
-                                                    withAnimation {
-                                                        self.showSharedPublicDialog.toggle()
-                                                    }
+                                                    self.isEditGroupOpen.toggle()
                                                 }) {
-                                                    Text("Done")
-                                                        .foregroundColor(.primary)
-                                                        .fontWeight(.medium)
-                                                }, trailing:
-                                                    Button(action: {
-                                                        self.isEditGroupOpen.toggle()
-                                                    }) {
-                                                        Text("Edit")
-                                                            .foregroundColor(.blue)
-                                                            .opacity(self.canEditGroup ? 1 : 0)
-                                                    }.disabled(self.canEditGroup ? false : true))
-                            }
+                                                    Text("Edit")
+                                                        .foregroundColor(.blue)
+                                                        .opacity(self.canEditGroup ? 1 : 0)
+                                                }.disabled(self.canEditGroup ? false : true))
                         }
-                        /*
-                        .simultaneousGesture(DragGesture().onChanged { value in
-                            self.keyboardDragState = value.translation
-                            if self.showFullKeyboard {
-                                self.keyboardDragState.height += -100
-                            }
-                            if self.keyboardDragState.height < -70 {
-                                self.keyboardDragState.height = -70
-                            }
-                            if self.keyboardDragState.height > 140 {
-                                self.keyboardDragState.height = 110
-                            }
-                        }.onEnded { valueEnd in
-                            if self.keyboardDragState.height > 50 {
-                                self.showFullKeyboard = false
-                                self.keyboardDragState = .zero
-                                self.keyboardHeight = 0
-                                UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
-                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                            }
-                            if self.keyboardDragState.height < -50 {
-                                self.keyboardDragState.height = -75
-                                self.showFullKeyboard = true
-                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                            } else {
-                                self.keyboardDragState = .zero
-                                self.showFullKeyboard = false
-                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                            }
-                        })
-                        */
-                }
+                    }
+                    /*
+                    .simultaneousGesture(DragGesture().onChanged { value in
+                        self.keyboardDragState = value.translation
+                        if self.showFullKeyboard {
+                            self.keyboardDragState.height += -100
+                        }
+                        if self.keyboardDragState.height < -70 {
+                            self.keyboardDragState.height = -70
+                        }
+                        if self.keyboardDragState.height > 140 {
+                            self.keyboardDragState.height = 110
+                        }
+                    }.onEnded { valueEnd in
+                        if self.keyboardDragState.height > 50 {
+                            self.showFullKeyboard = false
+                            self.keyboardDragState = .zero
+                            self.keyboardHeight = 0
+                            UIApplication.shared.windows.first?.rootViewController?.view.endEditing(true)
+                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                        }
+                        if self.keyboardDragState.height < -50 {
+                            self.keyboardDragState.height = -75
+                            self.showFullKeyboard = true
+                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                        } else {
+                            self.keyboardDragState = .zero
+                            self.showFullKeyboard = false
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        }
+                    })
+                    */
+            }
 
-                //MARK: Bubble Detail View
-                if self.isDetailOpen {
-                    BubbleDetailView(viewModel: self.messageViewModel, namespace: self.namespace, newDialogFromSharedContact: self.$newDialogFromSharedContact, isDetailOpen: self.$isDetailOpen, message: self.$detailMessageModel)
-                        .environmentObject(self.auth)
-                        .frame(width: Constants.screenWidth, height: Constants.screenHeight, alignment: .center)
-                        .zIndex(2)
-                }
-            } else {
-                //MARK: LOCKED OUT VIEW
+            //MARK: Bubble Detail View
+            if self.isDetailOpen {
+                BubbleDetailView(viewModel: self.messageViewModel, namespace: self.namespace, newDialogFromSharedContact: self.$newDialogFromSharedContact, isDetailOpen: self.$isDetailOpen, message: self.$detailMessageModel)
+                    .environmentObject(self.auth)
+                    .frame(width: Constants.screenWidth, height: Constants.screenHeight, alignment: .center)
+                    .zIndex(2)
+            }
+            
+            //MARK: LOCKED OUT VIEW
+            if self.auth.isLocalAuth && self.auth.isUserAuthenticated != .signedOut {
                 LockedOutView()
             }
 
             //MARK: Quick Snap View
             QuickSnapStartView(viewState: self.$quickSnapViewState, selectedQuickSnapContact: self.$selectedQuickSnapContact)
                 .environmentObject(self.auth)
-                .disabled(self.quickSnapViewState != .closed || self.auth.isLoacalAuth ? false : true)
-                .opacity(self.auth.isLoacalAuth ? 0 : 1)
+                .disabled(self.quickSnapViewState != .closed || self.auth.isLocalAuth ? false : true)
+                .opacity(self.auth.isLocalAuth ? 0 : 1)
             
             ConfettiCannon(counter: $counter, repetitions: 3, repetitionInterval: 0.2)
         }
@@ -782,19 +783,5 @@ struct ChatrBaseView: View {
             }
         }
         self.activeView.height = .zero
-    }
-}
-
-extension Array where Element: Hashable {
-    func removingDuplicates() -> [Element] {
-        var addedDict = [Element: Bool]()
-
-        return filter {
-            addedDict.updateValue(true, forKey: $0) == nil
-        }
-    }
-
-    mutating func removeDuplicates() {
-        self = self.removingDuplicates()
     }
 }
