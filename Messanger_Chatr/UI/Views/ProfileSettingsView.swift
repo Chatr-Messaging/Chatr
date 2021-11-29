@@ -116,6 +116,7 @@ struct ProfileView: View {
                     })
                 .frame(height: 60, alignment: .center)
                 .background(Color.clear)
+                .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 8)
                 .padding(.top)
                 .padding(.horizontal)
                 
