@@ -75,7 +75,7 @@ struct ImagePicker: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: UIImagePickerController,
                                 context: UIViewControllerRepresentableContext<ImagePicker>) {  }
 }
-
+// ["bitter", "girl", "main", "opera", "kite", "auction", "assume", "all", "exit", "vehicle", "horror", "silent"]
 struct ImagePicker22: UIViewControllerRepresentable {
     @Environment(\.presentationMode)
     private var presentationMode
